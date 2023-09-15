@@ -3,9 +3,10 @@
 package mocks
 
 import (
-	time "time"
-
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
+
+	time "time"
 
 	v1 "k8s.io/api/core/v1"
 
@@ -379,6 +380,40 @@ func (_m *ExecutableNode) GetOutputAlias() []v1alpha1.Alias {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]v1alpha1.Alias)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNode_GetResourceMetadata struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetResourceMetadata) Return(_a0 *core.ResourceMetadata) *ExecutableNode_GetResourceMetadata {
+	return &ExecutableNode_GetResourceMetadata{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetResourceMetadata() *ExecutableNode_GetResourceMetadata {
+	c_call := _m.On("GetResourceMetadata")
+	return &ExecutableNode_GetResourceMetadata{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetResourceMetadataMatch(matchers ...interface{}) *ExecutableNode_GetResourceMetadata {
+	c_call := _m.On("GetResourceMetadata", matchers...)
+	return &ExecutableNode_GetResourceMetadata{Call: c_call}
+}
+
+// GetResourceMetadata provides a mock function with given fields:
+func (_m *ExecutableNode) GetResourceMetadata() *core.ResourceMetadata {
+	ret := _m.Called()
+
+	var r0 *core.ResourceMetadata
+	if rf, ok := ret.Get(0).(func() *core.ResourceMetadata); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.ResourceMetadata)
 		}
 	}
 
