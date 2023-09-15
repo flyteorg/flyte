@@ -119,6 +119,30 @@ func TestBuildNodeSpec(t *testing.T) {
 		assert.Equal(t, expectedCPU.Value(), spec.Resources.Requests.Cpu().Value())
 	})
 
+	t.Run("node with resource metadata overrides", func(t *testing.T) {
+		expectedResourceMetadata := &core.ResourceMetadata{
+			AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+		}
+		n.Node.Target = &core.Node_TaskNode{
+			TaskNode: &core.TaskNode{
+				Reference: &core.TaskNode_ReferenceId{
+					ReferenceId: &core.Identifier{Name: "ref_2"},
+				},
+				Overrides: &core.TaskNodeOverrides{
+					ResourceMetadata: expectedResourceMetadata,
+				},
+			},
+		}
+
+		spec := mustBuild(t, n, 1, errs.NewScope())
+		assert.NotNil(t, spec.GetResourceMetadata())
+		assert.Equal(t, expectedResourceMetadata, spec.GetResourceMetadata())
+	})
+
 	t.Run("LaunchPlanRef", func(t *testing.T) {
 		n.Node.Target = &core.Node_WorkflowNode{
 			WorkflowNode: &core.WorkflowNode{
