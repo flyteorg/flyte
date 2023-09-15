@@ -35,3 +35,4 @@ A Helm chart for Flyte agent
 | serviceAccount.create | bool | `true` | Should a service account be created for flyteagent |
 | serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
 | tolerations | list | `[]` | tolerations for flyteagent deployment |
+
