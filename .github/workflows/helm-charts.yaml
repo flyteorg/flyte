@@ -41,6 +41,7 @@ jobs:
               exit 1
           fi
       - name: Publish Helm chart to GHCR
+        working-directory: charts
         if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
         run:
           helm push ${{ matrix.chart }}-*.tgz oci://ghcr.io/flyteorg/helm-charts
