@@ -155,3 +155,4 @@ Chart for basic single Flyte executable deployment
 | serviceAccount.imagePullSecrets | list | `[]` |  |
 | serviceAccount.labels | object | `{}` |  |
 | serviceAccount.name | string | `""` |  |
+
