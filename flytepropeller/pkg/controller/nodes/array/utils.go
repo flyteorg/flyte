@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/codex"
@@ -45,7 +46,16 @@ func buildTaskExecutionEvent(_ context.Context, nCtx interfaces.NodeExecutionCon
 	}
 
 	nodeExecutionID := nCtx.NodeExecutionMetadata().GetNodeExecutionID()
+	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
+		if err != nil {
+			return nil, err
+		}
+		nodeExecutionID.NodeId = currentNodeUniqueID
+	}
+
 	workflowExecutionID := nodeExecutionID.ExecutionId
+
 	return &event.TaskExecutionEvent{
 		TaskId: &idlcore.Identifier{
 			ResourceType: idlcore.ResourceType_TASK,
@@ -54,7 +64,7 @@ func buildTaskExecutionEvent(_ context.Context, nCtx interfaces.NodeExecutionCon
 			Name:         nCtx.NodeID(),
 			Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
 		},
-		ParentNodeExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID(),
+		ParentNodeExecutionId: nodeExecutionID,
 		RetryAttempt:          0, // ArrayNode will never retry
 		Phase:                 taskPhase,
 		PhaseVersion:          taskPhaseVersion,

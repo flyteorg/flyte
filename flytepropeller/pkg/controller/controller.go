@@ -598,9 +598,7 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	}
 
 	go flyteworkflowInformerFactory.Start(ctx.Done())
-	if flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateName != "" {
-		go informerFactory.Start(ctx.Done())
-	}
+	go informerFactory.Start(ctx.Done())
 
 	if err = c.Run(ctx); err != nil {
 		return errors.Wrapf(err, "Error running FlytePropeller.")
