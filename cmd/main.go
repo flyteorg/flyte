@@ -11,5 +11,7 @@ func main() {
 	err := single.Execute()
 	if err != nil {
 		panic(err)
+	} else {
+		glog.V(2).Info("Shutting down Flyte")
 	}
 }
