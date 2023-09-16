@@ -10,9 +10,10 @@ import (
 
 // ClientsetBuilder is used to build the clientset. This allows custom token cache implementations to be plugged in.
 type ClientsetBuilder struct {
-	config     *Config
-	tokenCache cache.TokenCache
-	opts       []grpc.DialOption
+	config          *Config
+	tokenCache      cache.TokenCache
+	proxyTokenCache cache.TokenCache
+	opts            []grpc.DialOption
 }
 
 // ClientSetBuilder is constructor function to be used by the clients in interacting with the builder
@@ -32,6 +33,13 @@ func (cb *ClientsetBuilder) WithTokenCache(tokenCache cache.TokenCache) *Clients
 	return cb
 }
 
+// TokenCache is designed to cache a single token. When clients choose to send `"proxy-authorization`"
+// headers, we, thus, employ a separate token cache.
+func (cb *ClientsetBuilder) WithProxyTokenCache(tokenCache cache.TokenCache) *ClientsetBuilder {
+	cb.proxyTokenCache = tokenCache
+	return cb
+}
+
 func (cb *ClientsetBuilder) WithDialOptions(opts ...grpc.DialOption) *ClientsetBuilder {
 	cb.opts = opts
 	return cb
@@ -42,12 +50,15 @@ func (cb *ClientsetBuilder) Build(ctx context.Context) (*Clientset, error) {
 	if cb.tokenCache == nil {
 		cb.tokenCache = &cache.TokenCacheInMemoryProvider{}
 	}
+	if cb.proxyTokenCache == nil {
+		cb.proxyTokenCache = &cache.TokenCacheInMemoryProvider{}
+	}
 
 	if cb.config == nil {
 		cb.config = GetConfig(ctx)
 	}
 
-	return initializeClients(ctx, cb.config, cb.tokenCache, cb.opts...)
+	return initializeClients(ctx, cb.config, cb.tokenCache, cb.proxyTokenCache, cb.opts...)
 }
 
 func NewClientsetBuilder() *ClientsetBuilder {

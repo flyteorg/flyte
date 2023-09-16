@@ -21,8 +21,8 @@ const ProxyAuthorizationHeader = "proxy-authorization"
 
 // MaterializeCredentials will attempt to build a TokenSource given the anonymously available information exposed by the server.
 // Once established, it'll invoke PerRPCCredentialsFuture.Store() on perRPCCredentials to populate it with the appropriate values.
-func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, perRPCCredentials *PerRPCCredentialsFuture) error {
-	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg)
+func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.TokenCache, proxyTokenCache cache.TokenCache, perRPCCredentials *PerRPCCredentialsFuture) error {
+	authMetadataClient, err := InitializeAuthMetadataClient(ctx, cfg, proxyTokenCache)
 	if err != nil {
 		return fmt.Errorf("failed to initialized Auth Metadata Client. Error: %w", err)
 	}
@@ -51,8 +51,8 @@ func MaterializeCredentials(ctx context.Context, cfg *Config, tokenCache cache.T
 	return nil
 }
 
-func GetProxyTokenSource(ctx context.Context, cfg *Config) (oauth2.TokenSource, error) {
-	tokenSourceProvider, err := NewExternalTokenSourceProvider(cfg.ProxyCommand)
+func GetProxyTokenSource(ctx context.Context, cfg *Config, proxyTokenCache cache.TokenCache) (oauth2.TokenSource, error) {
+	tokenSourceProvider, err := NewExternalTokenSourceProvider(cfg.ProxyCommand, proxyTokenCache)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialized proxy authorization token source provider. Err: %w", err)
 	}
@@ -63,8 +63,8 @@ func GetProxyTokenSource(ctx context.Context, cfg *Config) (oauth2.TokenSource, 
 	return proxyTokenSource, nil
 }
 
-func MaterializeProxyAuthCredentials(ctx context.Context, cfg *Config) (context.Context, error) {
-	proxyTokenSource, err := GetProxyTokenSource(ctx, cfg)
+func MaterializeProxyAuthCredentials(ctx context.Context, cfg *Config, proxyTokenCache cache.TokenCache) (context.Context, error) {
+	proxyTokenSource, err := GetProxyTokenSource(ctx, cfg, proxyTokenCache)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func (c *proxyAuthTransport) RoundTrip(req *http.Request) (*http.Response, error
 }
 
 // Set up http client used in oauth2
-func setHTTPClientContext(ctx context.Context, cfg *Config) context.Context {
+func setHTTPClientContext(ctx context.Context, cfg *Config, proxyTokenCache cache.TokenCache) (context.Context, error) {
 	httpClient := &http.Client{}
 	transport := &http.Transport{}
 
@@ -108,7 +108,10 @@ func setHTTPClientContext(ctx context.Context, cfg *Config) context.Context {
 	}
 
 	if cfg.ProxyCommand != nil {
-		proxyTokenSource, _ := GetProxyTokenSource(ctx, cfg)
+		proxyTokenSource, err := GetProxyTokenSource(ctx, cfg, proxyTokenCache)
+		if err != nil {
+			return nil, err
+		}
 
 		httpClient.Transport = &proxyAuthTransport{
 			transport:   transport,
@@ -118,7 +121,7 @@ func setHTTPClientContext(ctx context.Context, cfg *Config) context.Context {
 		httpClient.Transport = transport
 	}
 
-	return context.WithValue(ctx, oauth2.HTTPClient, httpClient)
+	return context.WithValue(ctx, oauth2.HTTPClient, httpClient), nil
 }
 
 // NewAuthInterceptor creates a new grpc.UnaryClientInterceptor that forwards the grpc call and inspects the error.
@@ -131,11 +134,14 @@ func setHTTPClientContext(ctx context.Context, cfg *Config) context.Context {
 // more. It'll fail hard if it couldn't do so (i.e. it will no longer attempt to send an unauthenticated request). Once
 // a token source has been created, it'll invoke the grpc pipeline again, this time the grpc.PerRPCCredentials should
 // be able to find and acquire a valid AccessToken to annotate the request with.
-func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
+func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, proxyTokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-		ctx = setHTTPClientContext(ctx, cfg)
+		ctx, err := setHTTPClientContext(ctx, cfg, proxyTokenCache)
+		if err != nil {
+			return err
+		}
 
-		err := invoker(ctx, method, req, reply, cc, opts...)
+		err = invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
 
@@ -143,7 +149,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 				// If the error we receive from executing the request expects
 				if shouldAttemptToAuthenticate(st.Code()) {
 					logger.Debugf(ctx, "Request failed due to [%v]. Attempting to establish an authenticated connection and trying again.", st.Code())
-					newErr := MaterializeCredentials(ctx, cfg, tokenCache, credentialsFuture)
+					newErr := MaterializeCredentials(ctx, cfg, tokenCache, proxyTokenCache, credentialsFuture)
 					if newErr != nil {
 						return fmt.Errorf("authentication error! Original Error: %v, Auth Error: %w", err, newErr)
 					}
@@ -157,9 +163,9 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 	}
 }
 
-func NewProxyAuthInterceptor(cfg *Config) grpc.UnaryClientInterceptor {
+func NewProxyAuthInterceptor(cfg *Config, proxyTokenCache cache.TokenCache) grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-		ctx, err := MaterializeProxyAuthCredentials(ctx, cfg)
+		ctx, err := MaterializeProxyAuthCredentials(ctx, cfg, proxyTokenCache)
 		if err != nil {
 			return fmt.Errorf("proxy authorization error! Original Error: %v", err)
 		}

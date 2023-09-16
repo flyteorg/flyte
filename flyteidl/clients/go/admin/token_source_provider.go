@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/clientcredentials"
@@ -86,7 +87,7 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 			return nil, err
 		}
 	case AuthTypeExternalCommand:
-		tokenProvider, err = NewExternalTokenSourceProvider(cfg.Command)
+		tokenProvider, err = NewExternalTokenSourceProvider(cfg.Command, tokenCache)
 		if err != nil {
 			return nil, err
 		}
@@ -107,24 +108,51 @@ func NewTokenSourceProvider(ctx context.Context, cfg *Config, tokenCache cache.T
 	return tokenProvider, nil
 }
 
-type ExternalTokenSourceProvider struct {
+type ExternalTokenSource struct {
 	command []string
 }
 
-func NewExternalTokenSourceProvider(command []string) (TokenSourceProvider, error) {
-	return &ExternalTokenSourceProvider{command: command}, nil
+func NewExternalTokenSource(command []string) oauth2.TokenSource {
+	return &ExternalTokenSource{command: command}
 }
 
-func (e ExternalTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
+func (e *ExternalTokenSource) Token() (*oauth2.Token, error) {
 	output, err := externalprocess.Execute(e.command)
 	if err != nil {
 		return nil, err
 	}
-
-	return oauth2.StaticTokenSource(&oauth2.Token{
-		AccessToken: strings.Trim(string(output), "\t \n"),
+	token := strings.Trim(string(output), "\t \n")
+	exp, err := externalprocess.GetUnvalidatedTokenExpiration(token)
+	if err != nil {
+		// If we cannot extract an expiration, as a precaution, we do not
+		// want to cache the token as otherwise the external command would
+		// never be called again. Note that `exp = time.Time{}` would cause
+		// the token to be considered valid forever.
+		exp = time.Unix(0, 0)
+	}
+	return &oauth2.Token{
+		AccessToken: token,
 		TokenType:   "bearer",
-	}), nil
+		Expiry:      exp,
+	}, nil
+}
+
+type ExternalTokenSourceProvider struct {
+	command    []string
+	tokenCache cache.TokenCache
+}
+
+func NewExternalTokenSourceProvider(command []string, tokenCache cache.TokenCache) (TokenSourceProvider, error) {
+	return &ExternalTokenSourceProvider{command: command, tokenCache: tokenCache}, nil
+}
+
+func (e *ExternalTokenSourceProvider) GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
+	return &customTokenSource{
+		ctx:        ctx,
+		new:        NewExternalTokenSource(e.command),
+		mu:         sync.Mutex{},
+		tokenCache: e.tokenCache,
+	}, nil
 }
 
 type PKCETokenSourceProvider struct {
@@ -150,8 +178,6 @@ func GetPKCEAuthTokenSource(ctx context.Context, pkceTokenOrchestrator pkce.Toke
 	if err != nil {
 		logger.Warnf(ctx, "Failed fetching from cache. Will restart the flow. Error: %v", err)
 	}
-
-	authToken = nil
 
 	if authToken == nil {
 		// Fetch using auth flow
