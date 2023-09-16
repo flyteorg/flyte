@@ -130,6 +130,7 @@ jobs:
     timeout-minutes: 20
     needs: [build-and-push-single-binary-image]
     steps:
+      - uses: jlumbroso/free-disk-space@main
       - name: Set latest Flytesnacks release
         if: ${{ env.FLYTESNACKS_VERSION == '' }}
         run: |
