@@ -131,6 +131,8 @@ jobs:
     needs: [build-and-push-single-binary-image]
     steps:
       - uses: jlumbroso/free-disk-space@main
+        with:
+          haskell: false
       - name: Set latest Flytesnacks release
         if: ${{ env.FLYTESNACKS_VERSION == '' }}
         run: |
