@@ -1,6 +1,8 @@
 package artifacts
 
 import (
+	"fmt"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/logger"
@@ -48,6 +50,22 @@ func (a *ArtifactRegistry) RegisterArtifactConsumer(ctx context.Context, id *cor
 		logger.Errorf(ctx, "Failed to register artifact consumer for entity [%+v] with err: %v", id, err)
 	}
 	logger.Debugf(ctx, "Registered artifact consumer [%+v]", id)
+}
+
+func (a *ArtifactRegistry) RegisterTrigger(ctx context.Context, plan *admin.LaunchPlan) error {
+	if a.client == nil {
+		logger.Debugf(ctx, "Artifact client not configured, skipping trigger [%+v]", plan)
+		return fmt.Errorf("artifact client not configured")
+	}
+	_, err := a.client.CreateTrigger(ctx, &artifact.CreateTriggerRequest{
+		TriggerLaunchPlan: plan,
+	})
+	if err != nil {
+		logger.Errorf(ctx, "Failed to register trigger for [%+v] with err: %v", plan.Id, err)
+		return err
+	}
+	logger.Debugf(ctx, "Registered trigger for [%+v]", plan.Id)
+	return nil
 }
 
 func (a *ArtifactRegistry) GetClient() artifact.ArtifactRegistryClient {

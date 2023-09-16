@@ -845,17 +845,17 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 			domain = ak.GetDomain()
 		}
 
-		var partitions map[string]string
+		var partitions map[string]*core.PartitionValue
 
-		if artifactID.GetPartitions() != nil {
-			partitions = make(map[string]string, len(artifactID.GetPartitions().Value))
-			for k, v := range artifactID.GetPartitions().Value {
-				newValue, err := m.templateInputString(ctx, v, inputs, metadata)
+		if artifactID.GetPartitions() != nil && artifactID.GetPartitions().GetValue() != nil {
+			partitions = make(map[string]*core.PartitionValue, len(artifactID.GetPartitions().Value))
+			for k, v := range artifactID.GetPartitions().GetValue() {
+				newValue, err := m.templateInputString(ctx, v.StaticValue, inputs, metadata)
 				if err != nil {
 					logger.Errorf(ctx, "Failed to template input string [%s] [%v]", v, err)
 					return query, err
 				}
-				partitions[k] = newValue
+				partitions[k] = &core.PartitionValue{StaticValue: newValue}
 			}
 		}
 		return core.ArtifactQuery{

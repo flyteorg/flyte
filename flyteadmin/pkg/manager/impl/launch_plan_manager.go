@@ -90,6 +90,16 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 		return nil, err
 	}
 
+	// The presence of this field indicates that this is a trigger launch plan
+	// Return true and send this request over to the artifact registry instead
+	if launchPlan.Spec.GetEntityMetadata() != nil && launchPlan.Spec.GetEntityMetadata().GetLaunchConditions() != nil {
+		err := m.artifactRegistry.RegisterTrigger(ctx, &launchPlan)
+		if err != nil {
+			return nil, err
+		}
+		return &admin.LaunchPlanCreateResponse{}, nil
+	}
+
 	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Id)
 	if err == nil {
 		if bytes.Equal(existingLaunchPlanModel.Digest, launchPlanDigest) {
