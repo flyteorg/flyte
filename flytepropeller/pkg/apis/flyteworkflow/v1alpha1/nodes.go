@@ -96,25 +96,40 @@ type ResourceMetadata struct {
 	*core.ResourceMetadata
 }
 
+func (in *ResourceMetadata) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := marshaler.Marshal(&buf, in.ResourceMetadata); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+func (in *ResourceMetadata) UnmarshalJSON(b []byte) error {
+	in.ResourceMetadata = &core.ResourceMetadata{}
+	return jsonpb.Unmarshal(bytes.NewReader(b), in.ResourceMetadata)
+}
+
 func (in *ResourceMetadata) DeepCopyInto(out *ResourceMetadata) {
 	*out = *in
+	// We do not manipulate the object, so its ok
+	// Once we figure out the autogenerate story we can replace this
 }
 
 type NodeSpec struct {
-	ID               NodeID                        `json:"id"`
-	Name             string                        `json:"name,omitempty"`
-	Resources        *typesv1.ResourceRequirements `json:"resources,omitempty"`
-	ResourceMetadata *ResourceMetadata             `json:"resourceMetadata,omitempty"`
-	Kind             NodeKind                      `json:"kind"`
-	BranchNode       *BranchNodeSpec               `json:"branch,omitempty"`
-	TaskRef          *TaskID                       `json:"task,omitempty"`
-	WorkflowNode     *WorkflowNodeSpec             `json:"workflow,omitempty"`
-	GateNode         *GateNodeSpec                 `json:"gate,omitempty"`
-	ArrayNode        *ArrayNodeSpec                `json:"array,omitempty"`
-	InputBindings    []*Binding                    `json:"inputBindings,omitempty"`
-	Config           *typesv1.ConfigMap            `json:"config,omitempty"`
-	RetryStrategy    *RetryStrategy                `json:"retry,omitempty"`
-	OutputAliases    []Alias                       `json:"outputAlias,omitempty"`
+	ID            NodeID                        `json:"id"`
+	Name          string                        `json:"name,omitempty"`
+	Resources     *typesv1.ResourceRequirements `json:"resources,omitempty"`
+	Kind          NodeKind                      `json:"kind"`
+	BranchNode    *BranchNodeSpec               `json:"branch,omitempty"`
+	TaskRef       *TaskID                       `json:"task,omitempty"`
+	WorkflowNode  *WorkflowNodeSpec             `json:"workflow,omitempty"`
+	GateNode      *GateNodeSpec                 `json:"gate,omitempty"`
+	ArrayNode     *ArrayNodeSpec                `json:"array,omitempty"`
+	InputBindings []*Binding                    `json:"inputBindings,omitempty"`
+	Config        *typesv1.ConfigMap            `json:"config,omitempty"`
+	RetryStrategy *RetryStrategy                `json:"retry,omitempty"`
+	OutputAliases []Alias                       `json:"outputAlias,omitempty"`
 
 	// SecurityContext holds pod-level security attributes and common container settings.
 	// Optional: Defaults to empty.  See type description for default values of each field.
@@ -143,6 +158,10 @@ type NodeSpec struct {
 	// If not specified, the pod will be dispatched by default scheduler.
 	// +optional
 	SchedulerName string `json:"schedulerName,omitempty" protobuf:"bytes,19,opt,name=schedulerName"`
+	// If specified, includes overrides for metadata about resources to allocate to the
+	// node.
+	// +optional
+	ResourceMetadata *ResourceMetadata `json:"resourceMetadata,omitempty" protobuf:"bytes,20,opt,name=resourceMetadata"`
 	// If specified, the pod's tolerations.
 	// +optional
 	Tolerations []typesv1.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
