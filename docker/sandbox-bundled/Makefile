@@ -27,6 +27,10 @@ manifests:
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
+	kustomize build \
+		--enable-helm \
+		--load-restrictor=LoadRestrictionsNone \
+		kustomize/complete-agent > manifests/complete-agent.yaml
 
 .PHONY: build
 build: flyte manifests
