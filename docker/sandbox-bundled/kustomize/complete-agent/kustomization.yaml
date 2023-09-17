@@ -1,7 +1,7 @@
 helmGlobals:
   chartHome: ../../../../charts
 helmCharts:
-- name: flyte-sandbo  x
+- name: flyte-sandbox
   releaseName: flyte-sandbox
   namespace: flyte
 - name: flyteagent

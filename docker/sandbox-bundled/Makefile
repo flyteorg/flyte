@@ -19,6 +19,7 @@ flyte:
 manifests:
 	mkdir -p manifests
 	helm dependency update ../../charts/flyte-sandbox
+	helm dependency update ../../charts/flyteagent
 	kustomize build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
