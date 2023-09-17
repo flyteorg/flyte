@@ -10,3 +10,10 @@ helmCharts:
 namespace: flyte
 resources:
 - ../namespace.yaml
+
+patches:
+  - path: ./flyteagent_patch.yaml
+    target:
+      kind: ConfigMap
+      name: flyte-sandbox-config
+
