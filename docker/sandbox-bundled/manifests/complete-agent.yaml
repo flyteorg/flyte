@@ -456,6 +456,7 @@ data:
           container_array: k8s-array
           sidecar: sidecar
         enabled-plugins:
+        - agent-service
         - container
         - sidecar
         - k8s-array
