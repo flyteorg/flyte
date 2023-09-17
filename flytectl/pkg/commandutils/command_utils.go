@@ -14,7 +14,7 @@ func AskForConfirmation(s string, reader io.Reader) bool {
 		response := strings.ToLower(strings.TrimSpace(r.Text()))
 		if response == "y" || response == "yes" {
 			return true
-		} else if response == "n" || response == "No" {
+		} else if response == "n" || response == "no" {
 			return false
 		}
 	}
