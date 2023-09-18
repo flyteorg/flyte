@@ -10,7 +10,7 @@ import (
 
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
-func resolveAttrPathInPromise(ctx context.Context, nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAtrribute) (*core.Literal, error) {
+func resolveAttrPathInPromise(ctx context.Context, nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 	var currVal *core.Literal = literal
 	var tmpVal *core.Literal
 	var err error
@@ -51,7 +51,8 @@ func resolveAttrPathInPromise(ctx context.Context, nodeID string, literal *core.
 	return currVal, nil
 }
 
-func resolveAttrPathInPbStruct(ctx context.Context, nodeID string, st *structpb.Struct, bindAttrPath []*core.PromiseAtrribute) (*core.Literal, error) {
+// resolveAttrPathInPbStruct resolves the protobuf struct (e.g. dataclass) with attribute path
+func resolveAttrPathInPbStruct(ctx context.Context, nodeID string, st *structpb.Struct, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 
 	var currVal interface{}
 	var tmpVal interface{}
@@ -78,13 +79,20 @@ func resolveAttrPathInPbStruct(ctx context.Context, nodeID string, st *structpb.
 		}
 	}
 
+	// After resolve, convert the interface to literal
+	literal, err := convertInterfaceToLiteral(ctx, nodeID, currVal)
+
+	return literal, err
+}
+
+// convertInterfaceToLiteral converts the protobuf struct (e.g. dataclass) to literal
+func convertInterfaceToLiteral(ctx context.Context, nodeID string, obj interface{}) (*core.Literal, error) {
+
 	literal := &core.Literal{}
 
-	// Different types of current value will be wrapped in different ways
-	switch currVal.(type) {
-	// We don't need to wrap map[string]interface{} to LiteralMap, because DictTransformer in flytekit can also handle pb struct
+	switch obj.(type) {
 	case map[string]interface{}:
-		new_st, err := structpb.NewStruct(currVal.(map[string]interface{}))
+		new_st, err := structpb.NewStruct(obj.(map[string]interface{}))
 		if err != nil {
 			return nil, err
 		}
@@ -97,23 +105,21 @@ func resolveAttrPathInPbStruct(ctx context.Context, nodeID string, st *structpb.
 		}
 	case []interface{}:
 		literals := []*core.Literal{}
-		for _, v := range currVal.([]interface{}) {
-			literalItem := &core.Literal{}
-			scalar, err := resolveInterfaceToLiteralScalar(ctx, nodeID, v)
+		for _, v := range obj.([]interface{}) {
+			// recursively convert the interface to literal
+			literal, err := convertInterfaceToLiteral(ctx, nodeID, v)
 			if err != nil {
 				return nil, err
 			}
-			literalItem.Value = scalar
-			literals = append(literals, literalItem)
+			literals = append(literals, literal)
 		}
-
 		literal.Value = &core.Literal_Collection{
 			Collection: &core.LiteralCollection{
 				Literals: literals,
 			},
 		}
 	case interface{}:
-		scalar, err := resolveInterfaceToLiteralScalar(ctx, nodeID, currVal)
+		scalar, err := convertInterfaceToLiteralScalar(ctx, nodeID, obj)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +129,8 @@ func resolveAttrPathInPbStruct(ctx context.Context, nodeID string, st *structpb.
 	return literal, nil
 }
 
-func resolveInterfaceToLiteralScalar(ctx context.Context, nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
+// convertInterfaceToLiteralScalar converts the a single value to a literal scalar
+func convertInterfaceToLiteralScalar(ctx context.Context, nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
 	value := &core.Primitive{}
 
 	switch obj.(type) {

@@ -32,20 +32,21 @@ func NewStructFromMap(m map[string]interface{}) *structpb.Struct {
 }
 
 func TestResolveAttrPathIn(t *testing.T) {
-	// 1. map {"foo": "bar"}
-	// 2. collection ["foo", "bar"]
-	// 3. struct1 {"foo": "bar"}
-	// 4. struct2 {"foo": ["bar1", "bar2"]}
-	// 5. map+collection+struct {"foo": [{"bar": "car"}]}
-	// 6. exception key error with map
-	// 7. exception out of range with collection
-	// 8. exception key error with struct
-	// 9. exception out of range with struct
+	// - map {"foo": "bar"}
+	// - collection ["foo", "bar"]
+	// - struct1 {"foo": "bar"}
+	// - struct2 {"foo": ["bar1", "bar2"]}
+	// - nested list struct {"foo": [["bar1", "bar2"]]}
+	// - map+collection+struct {"foo": [{"bar": "car"}]}
+	// - exception key error with map
+	// - exception out of range with collection
+	// - exception key error with struct
+	// - exception out of range with struct
 
 	args := []struct {
 		literal  *core.Literal
-		path     []*core.PromiseAtrribute
-		expected string
+		path     []*core.PromiseAttribute
+		expected *core.Literal
 		hasError bool
 	}{
 		{
@@ -58,14 +59,14 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
 			},
-			expected: "bar",
+			expected: NewScalarLiteral("bar"),
 			hasError: false,
 		},
 		{
@@ -79,14 +80,14 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_IntValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 1,
 					},
 				},
 			},
-			expected: "bar",
+			expected: NewScalarLiteral("bar"),
 			hasError: false,
 		},
 		{
@@ -99,14 +100,14 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
 			},
-			expected: "bar",
+			expected: NewScalarLiteral("bar"),
 			hasError: false,
 		},
 		{
@@ -123,19 +124,60 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_IntValue{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 1,
 					},
 				},
 			},
-			expected: "bar2",
+			expected: NewScalarLiteral("bar2"),
+			hasError: false,
+		},
+		{
+			literal: &core.Literal{
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Generic{
+							Generic: NewStructFromMap(
+								map[string]interface{}{
+									"foo": []interface{}{[]interface{}{"bar1", "bar2"}},
+								},
+							),
+						},
+					},
+				},
+			},
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
+						StringValue: "foo",
+					},
+				},
+			},
+			expected: &core.Literal{
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							&core.Literal{
+								Value: &core.Literal_Collection{
+									Collection: &core.LiteralCollection{
+										Literals: []*core.Literal{
+											NewScalarLiteral("bar1"),
+											NewScalarLiteral("bar2"),
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 			hasError: false,
 		},
 		{
@@ -164,24 +206,24 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_IntValue{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 0,
 					},
 				},
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "bar",
 					},
 				},
 			},
-			expected: "car",
+			expected: NewScalarLiteral("car"),
 			hasError: false,
 		},
 		{
@@ -194,14 +236,14 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "random",
 					},
 				},
 			},
-			expected: "",
+			expected: &core.Literal{},
 			hasError: true,
 		},
 		{
@@ -215,14 +257,14 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_IntValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 2,
 					},
 				},
 			},
-			expected: "",
+			expected: &core.Literal{},
 			hasError: true,
 		},
 		{
@@ -235,14 +277,14 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "random",
 					},
 				},
 			},
-			expected: "",
+			expected: &core.Literal{},
 			hasError: true,
 		},
 		{
@@ -259,32 +301,31 @@ func TestResolveAttrPathIn(t *testing.T) {
 					},
 				},
 			},
-			path: []*core.PromiseAtrribute{
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_StringValue{
+			path: []*core.PromiseAttribute{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_StringValue{
 						StringValue: "foo",
 					},
 				},
-				&core.PromiseAtrribute{
-					Value: &core.PromiseAtrribute_IntValue{
+				&core.PromiseAttribute{
+					Value: &core.PromiseAttribute_IntValue{
 						IntValue: 100,
 					},
 				},
 			},
-			expected: "",
+			expected: &core.Literal{},
 			hasError: true,
 		},
 	}
 
-	for _, arg := range args {
+	for i, arg := range args {
 		resolved, err := resolveAttrPathInPromise(nil, "", arg.literal, arg.path)
 		if arg.hasError {
-			assert.Error(t, err)
-			assert.ErrorContains(t, err, errors.PromiseAttributeResolveError)
+			assert.Error(t, err, i)
+			assert.ErrorContains(t, err, errors.PromiseAttributeResolveError, i)
 			fmt.Println(err)
 		} else {
-			assert.NoError(t, err)
-			assert.Equal(t, arg.expected, resolved.GetScalar().GetPrimitive().GetStringValue())
+			assert.Equal(t, arg.expected, resolved, i)
 		}
 	}
 }
