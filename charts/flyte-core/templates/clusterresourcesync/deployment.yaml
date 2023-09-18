@@ -57,7 +57,7 @@ spec:
         {{- if gt (len .Values.configmap.clusters.labelClusterMap) 0 }}
         - name: cluster-secrets
           secret:
-            secretName: cluster-secrets
+            secretName: cluster-credentials
         {{- end }}
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
         - name: auth
