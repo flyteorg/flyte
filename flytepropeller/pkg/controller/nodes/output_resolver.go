@@ -62,6 +62,10 @@ func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executor
 		output, err = resolveSubtaskOutput(ctx, r.store, n.GetID(), outputsFileRef, *index, actualVar)
 	}
 
+	if err != nil {
+		return nil, err
+	}
+
 	return resolveAttrPathInPromise(ctx, n.GetID(), output, bindAttrPath)
 }
 

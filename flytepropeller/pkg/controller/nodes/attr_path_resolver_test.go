@@ -1,7 +1,6 @@
 package nodes
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -323,7 +322,6 @@ func TestResolveAttrPathIn(t *testing.T) {
 		if arg.hasError {
 			assert.Error(t, err, i)
 			assert.ErrorContains(t, err, errors.PromiseAttributeResolveError, i)
-			fmt.Println(err)
 		} else {
 			assert.Equal(t, arg.expected, resolved, i)
 		}
