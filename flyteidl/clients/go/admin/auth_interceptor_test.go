@@ -114,7 +114,7 @@ func newAuthMetadataServer(t testing.TB, port int, impl service.AuthMetadataServ
 func Test_newAuthInterceptor(t *testing.T) {
 	t.Run("Other Error", func(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
-		interceptor := NewAuthInterceptor(&Config{}, &mocks.TokenCache{}, f)
+		interceptor := NewAuthInterceptor(&Config{}, &mocks.TokenCache{}, &mocks.TokenCache{}, f)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -150,7 +150,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, &mocks.TokenCache{}, f)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Unauthenticated, "").Err()
 		}
@@ -181,7 +181,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, &mocks.TokenCache{}, f)
 		authenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return nil
 		}
@@ -220,7 +220,7 @@ func Test_newAuthInterceptor(t *testing.T) {
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, &mocks.TokenCache{}, f)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Aborted, "").Err()
 		}
@@ -254,7 +254,7 @@ func TestMaterializeCredentials(t *testing.T) {
 			Scopes:                []string{"all"},
 			Audience:              "http://localhost:30081",
 			AuthorizationHeader:   "authorization",
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, &mocks.TokenCache{}, f)
 		assert.NoError(t, err)
 	})
 	t.Run("Failed to fetch client metadata", func(t *testing.T) {
@@ -277,7 +277,7 @@ func TestMaterializeCredentials(t *testing.T) {
 			AuthType:              AuthTypeClientSecret,
 			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
 			Scopes:                []string{"all"},
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, &mocks.TokenCache{}, f)
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")
 	})
 }

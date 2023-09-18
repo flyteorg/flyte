@@ -77,7 +77,7 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 	})
 
 	t.Run("legal-from-config", func(t *testing.T) {
-		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true}, nil)
+		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true}, nil, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AuthMetadataClient())
@@ -85,7 +85,7 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		assert.NotNil(t, clientSet.HealthServiceClient())
 	})
 	t.Run("legal-from-config-with-cacerts", func(t *testing.T) {
-		clientSet, err := initializeClients(ctx, &Config{CACertFilePath: "testdata/root.pem"}, nil)
+		clientSet, err := initializeClients(ctx, &Config{CACertFilePath: "testdata/root.pem"}, nil, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AuthMetadataClient())
@@ -105,7 +105,7 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		}
 
 		assert.NoError(t, SetConfig(newAdminServiceConfig))
-		clientSet, err := initializeClients(ctx, newAdminServiceConfig, nil)
+		clientSet, err := initializeClients(ctx, newAdminServiceConfig, nil, nil)
 		assert.NotNil(t, err)
 		assert.Nil(t, clientSet)
 	})
