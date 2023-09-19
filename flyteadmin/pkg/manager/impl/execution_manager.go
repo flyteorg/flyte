@@ -771,7 +771,7 @@ func (m *ExecutionManager) templateInputString(ctx context.Context, input string
 			var customFormattedTime string
 			if metadata != nil && metadata.ScheduledAt != nil {
 				t := time.Unix(metadata.ScheduledAt.GetSeconds(), 0)
-				customFormattedTime = fmt.Sprintf("%d-%02d-%02d", t.Year(), int(t.Month()), t.Second())
+				customFormattedTime = fmt.Sprintf("%d-%02d-%02d", t.Year(), int(t.Month()), t.Day())
 			} else {
 				customFormattedTime = "2023-09-58"
 			}
