@@ -23,17 +23,42 @@ guide already contains the ingress rules, but they are not enabled by default.
 
 To turn on ingress, update your ``values.yaml`` file to include the following block.
 
-.. tabbed:: AWS - ``flyte-binary``
-
-   .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
-      :caption: charts/flyte-binary/eks-production.yaml
-      :language: yaml
-      :lines: 127-135
-
-.. note::
+.. tabs:: 
    
-   This section assumes that you're using the NGINX Ingress controller. Instructions and annotations for the ALB controller
-   are covered in the `Flyte The Hard Way <https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/06-intro-to-ingress.md#setting-up-amazons-load-balancer-alb-ingress-controller>`__ tutorial.
+   .. group-tab:: ``flyte-binary`` on EKS using NGINX
+
+      .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
+         :caption: charts/flyte-binary/eks-production.yaml
+         :language: yaml
+         :lines: 127-135
+
+   .. group-tab:: ``flyte-binary`` on EKS using ALB 
+
+      .. code-block:: yaml
+
+         ingress:
+           create: true
+           commonAnnotations:
+             alb.ingress.kubernetes.io/certificate-arn: '<your-SSL-certificate-ARN>'
+             alb.ingress.kubernetes.io/group.name: flyte
+             alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+             alb.ingress.kubernetes.io/scheme: internet-facing
+             alb.ingress.kubernetes.io/ssl-redirect: '443'
+             alb.ingress.kubernetes.io/target-type: ip
+             kubernetes.io/ingress.class: alb
+           httpAnnotations:
+             alb.ingress.kubernetes.io/actions.app-root: '{"Type": "redirect", "RedirectConfig": {"Path": "/console", "StatusCode": "HTTP_302"}}'
+           grpcAnnotations:
+             alb.ingress.kubernetes.io/backend-protocol-version: GRPC 
+           host: <your-URL> #use a DNS CNAME pointing to your ALB
+
+   .. group-tab:: ``flyte-core`` on GCP using NGINX  
+
+      .. literalinclude:: ../../../charts/flyte-core/values-gcp.yaml
+      :caption: charts/flyte-core/values-gcp.yaml
+      :language: yaml
+      :lines: 156-164
+
 
 ***************
 Authentication
