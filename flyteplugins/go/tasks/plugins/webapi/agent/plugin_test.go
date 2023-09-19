@@ -42,7 +42,7 @@ func TestPlugin(t *testing.T) {
 		assert.Equal(t, plugin.cfg.ResourceConstraints, constraints)
 	})
 
-	t.Run("tet newAgentPlugin", func(t *testing.T) {
+	t.Run("test newAgentPlugin", func(t *testing.T) {
 		p := newAgentPlugin()
 		assert.NotNil(t, p)
 		assert.Equal(t, "agent-service", p.ID)
