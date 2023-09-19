@@ -49,6 +49,10 @@ type Job struct {
 	SubJobs        []*Job               `json:"array,omitempty"`
 }
 
+func (j Job) IsTerminal() bool {
+	return j.Status.Phase.IsTerminal()
+}
+
 type Attempt struct {
 	LogStream string    `json:"logStream,omitempty"`
 	StartedAt time.Time `json:"startedAt,omitempty"`

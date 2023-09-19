@@ -50,6 +50,10 @@ type CacheItem struct {
 	Resource webapi.Resource
 }
 
+func (c CacheItem) IsTerminal() bool {
+	return c.State.Phase.IsTerminal()
+}
+
 // This basically grab an updated status from Client and store it in the cache
 // All other handling should be in the synchronous loop.
 func (q *ResourceCache) SyncResource(ctx context.Context, batch cache.Batch) (
