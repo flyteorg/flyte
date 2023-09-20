@@ -385,7 +385,7 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 	}, nil
 }
 
-// PopulateDefaultStateChangeDetails used to populate execution state change details for older executions which donot
+// PopulateDefaultStateChangeDetails used to populate execution state change details for older executions which do not
 // have these details captured. Hence we construct a default state change details from existing data model.
 func PopulateDefaultStateChangeDetails(executionModel models.Execution) (*admin.ExecutionStateChangeDetails, error) {
 	var err error

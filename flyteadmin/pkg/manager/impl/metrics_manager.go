@@ -209,7 +209,7 @@ func (m *MetricsManager) parseBranchNodeExecution(ctx context.Context,
 
 		*spans = append(*spans, nodeExecutionSpan)
 
-		// backened overhead
+		// backend overhead
 		if !nodeExecution.Closure.UpdatedAt.AsTime().Before(branchNodeExecution.Closure.UpdatedAt.AsTime()) {
 			*spans = append(*spans, createOperationSpan(branchNodeExecution.Closure.UpdatedAt,
 				nodeExecution.Closure.UpdatedAt, nodeTeardown))
@@ -271,7 +271,7 @@ func (m *MetricsManager) parseDynamicNodeExecution(ctx context.Context, nodeExec
 				return err
 			}
 
-			// backened overhead
+			// backend overhead
 			latestUpstreamNode := m.getLatestUpstreamNodeExecution(v1alpha1.EndNodeID,
 				nodeExecutionData.DynamicWorkflow.CompiledWorkflow.Primary.Connections.Upstream, nodeExecutions)
 			if latestUpstreamNode != nil && !nodeExecution.Closure.UpdatedAt.AsTime().Before(latestUpstreamNode.Closure.UpdatedAt.AsTime()) {
@@ -540,7 +540,7 @@ func (m *MetricsManager) parseSubworkflowNodeExecution(ctx context.Context,
 			return err
 		}
 
-		// backened overhead
+		// backend overhead
 		latestUpstreamNode := m.getLatestUpstreamNodeExecution(v1alpha1.EndNodeID,
 			workflow.Closure.CompiledWorkflow.Primary.Connections.Upstream, nodeExecutions)
 		if latestUpstreamNode != nil && !nodeExecution.Closure.UpdatedAt.AsTime().Before(latestUpstreamNode.Closure.UpdatedAt.AsTime()) {

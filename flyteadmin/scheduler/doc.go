@@ -4,7 +4,7 @@
 // 1] Schedule management
 //    This component is part of the pkg/async/schedule/flytescheduler package
 //    Role of this component is to create / activate / deactivate schedules
-//    The above actions are exposed through launchplan activation/deactivation api's and donot have separate controls.
+//    The above actions are exposed through launchplan activation/deactivation api's and do not have separate controls.
 //    Whenever a launchplan with a schedule is activated, a new schedule entry is created in the datastore
 //    On deactivation the created scheduled and launchplan is deactivated through a flag
 //    Atmost one launchplan is active at any moment across its various versions and same semantics apply for the

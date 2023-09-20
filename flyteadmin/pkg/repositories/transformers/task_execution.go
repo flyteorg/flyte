@@ -280,7 +280,7 @@ func mergeCustom(existing, latest *_struct.Struct) (*_struct.Struct, error) {
 	return &response, nil
 }
 
-// mergeExternalResource combines the lastest ExternalResourceInfo proto with an existing instance
+// mergeExternalResource combines the latest ExternalResourceInfo proto with an existing instance
 // by updating fields and merging logs.
 func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.ExternalResourceInfo {
 	if existing == nil {

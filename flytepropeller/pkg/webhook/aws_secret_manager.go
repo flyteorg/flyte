@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	// AWSSecretMountPathPrefix defins the default mount path for secrets
+	// AWSSecretMountPathPrefix defines the default mount path for secrets
 	AWSSecretMountPathPrefix = []string{string(os.PathSeparator), "etc", "flyte", "secrets"}
 )
 
