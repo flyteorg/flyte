@@ -235,7 +235,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 
 	for _, batch := range batches {
 		b := batch
-		w.workqueue.Add(b)
+		w.workqueue.Add(b[0])
 	}
 
 	return nil
@@ -279,7 +279,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			}
 
 			t := w.metrics.SyncLatency.Start()
-			updatedBatch, err := w.syncCb(ctx, *item.(*Batch))
+			updatedBatch, err := w.syncCb(ctx, Batch{item.(ItemWrapper)})
 
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
