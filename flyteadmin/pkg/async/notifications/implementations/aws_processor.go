@@ -38,9 +38,12 @@ func (p *Processor) run() error {
 	var emailMessage admin.EmailMessage
 	var err error
 	for msg := range p.sub.Start() {
+		ctx := context.Background()
+
 		p.systemMetrics.MessageTotal.Inc()
 		// Currently this is safe because Gizmo takes a string and casts it to a byte array.
 		stringMsg := string(msg.Message())
+		logger.Infof(ctx, "debugb64 Original stringMsg [%v]", stringMsg)
 
 		var snsJSONFormat map[string]interface{}
 
@@ -53,6 +56,7 @@ func (p *Processor) run() error {
 			p.markMessageDone(msg)
 			continue
 		}
+		logger.Infof(ctx, "debugb64 snsJSONFormat [%v]", snsJSONFormat)
 
 		var value interface{}
 		var ok bool
@@ -81,6 +85,7 @@ func (p *Processor) run() error {
 			p.markMessageDone(msg)
 			continue
 		}
+		logger.Infof(ctx, "debugb64 Decoded valueString [%v] to [%v]", valueString, notificationBytes)
 
 		if err = proto.Unmarshal(notificationBytes, &emailMessage); err != nil {
 			logger.Debugf(context.Background(), "failed to unmarshal to notification object from decoded string[%s] from message [%s] with err: %v", valueString, stringMsg, err)
