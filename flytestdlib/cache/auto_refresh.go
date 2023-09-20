@@ -235,7 +235,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 
 	for _, batch := range batches {
 		b := batch
-		w.workqueue.Add(b[0])
+		w.workqueue.Add(b[0].GetID())
 	}
 
 	return nil
@@ -273,12 +273,16 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 		case <-ctx.Done():
 			return nil
 		default:
-			item, shutdown := w.workqueue.Get()
+			itemId, shutdown := w.workqueue.Get()
 			if shutdown {
 				return nil
 			}
 
 			t := w.metrics.SyncLatency.Start()
+			item, ok := w.lruMap.Get(itemId)
+			if !ok {
+				return nil
+			}
 			updatedBatch, err := w.syncCb(ctx, Batch{item.(ItemWrapper)})
 
 			// Since we create batches every time we sync, we will just remove the item from the queue here
