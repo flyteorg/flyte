@@ -56,6 +56,7 @@ func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executor
 
 	var output *core.Literal
 
+	// retrieving task output
 	if index == nil {
 		output, err = resolveSingleOutput(ctx, r.store, n.GetID(), outputsFileRef, actualVar)
 	} else {
@@ -66,7 +67,12 @@ func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executor
 		return nil, err
 	}
 
-	return resolveAttrPathInPromise(ctx, n.GetID(), output, bindAttrPath)
+	// resolving binding attribute path if exist
+	if len(bindAttrPath) > 0 {
+		output, err = resolveAttrPathInPromise(ctx, n.GetID(), output, bindAttrPath)
+	}
+
+	return output, err
 }
 
 func resolveSubtaskOutput(ctx context.Context, store storage.ProtobufStore, nodeID string, outputsFileRef storage.DataReference,
