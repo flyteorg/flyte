@@ -9,7 +9,7 @@ import random
 import re
 import sys
 
-header = """Timestamp   Line    Duration    Heirarchical Log Layout
+header = """Timestamp   Line    Duration    Hierarchical Log Layout
 ----------------------------------------------------------------------------------------------------"""
 printfmt = "%-11s %-7d %-11s %s"
 

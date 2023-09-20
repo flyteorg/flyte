@@ -133,7 +133,7 @@ func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.No
 }
 
 // GetOrExtendCatalogReservation attempts to acquire an artifact reservation if the task is
-// cachable and cache serializable. If the reservation already exists for this owner, the
+// cacheable and cache serializable. If the reservation already exists for this owner, the
 // reservation is extended.
 func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	cacheHandler interfaces.CacheableNodeHandler, heartbeatInterval time.Duration) (catalog.ReservationEntry, error) {
@@ -169,7 +169,7 @@ func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx i
 		reservation.HeartbeatInterval.AsDuration(), reservation.OwnerId, status), nil
 }
 
-// ReleaseCatalogReservation attempts to release an artifact reservation if the task is cachable
+// ReleaseCatalogReservation attempts to release an artifact reservation if the task is cacheable
 // and cache serializable. If the reservation does not exist for this owner (e.x. it never existed
 // or has been acquired by another owner) this call is still successful.
 func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx interfaces.NodeExecutionContext,

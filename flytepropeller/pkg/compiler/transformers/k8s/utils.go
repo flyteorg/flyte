@@ -89,7 +89,7 @@ func StripTypeMetadata(t *core.LiteralType) *core.LiteralType {
 	c.Annotation = nil
 	// Note that we cannot strip `Structure` from the type because the dynamic node output type is used to validate the
 	// interface of the dynamically compiled workflow. `Structure` is used to extend type checking information on
-	// differnent Flyte types and is therefore required to ensure correct type validation.
+	// different Flyte types and is therefore required to ensure correct type validation.
 
 	switch underlyingType := c.Type.(type) {
 	case *core.LiteralType_UnionType:

@@ -20,7 +20,7 @@ const taskNamespace = "flyte_task"
 const maxParamHashLength = 8
 
 // Declare the definition of empty literal and variable maps. This is important because we hash against
-// the literal and variable maps. So Nil and empty literals and variable maps should translate to these defintions
+// the literal and variable maps. So Nil and empty literals and variable maps should translate to these definitions
 // in order to have a consistent hash.
 var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
 var emptyVariableMap = core.VariableMap{Variables: map[string]*core.Variable{}}

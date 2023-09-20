@@ -56,7 +56,7 @@ func (p *taskPluginRegistry) RegisterK8sPlugin(info k8s.PluginEntry) {
 	}
 
 	if len(info.RegisteredTaskTypes) == 0 {
-		logger.Panicf(context.TODO(), "K8s AsyncPlugin should be registered to handle atleast one task type")
+		logger.Panicf(context.TODO(), "K8s AsyncPlugin should be registered to handle at least one task type")
 	}
 
 	if info.Plugin == nil {
@@ -78,7 +78,7 @@ func (p *taskPluginRegistry) RegisterCorePlugin(info core.PluginEntry) {
 		logger.Panicf(context.TODO(), "ID is required attribute for k8s plugin")
 	}
 	if len(info.RegisteredTaskTypes) == 0 {
-		logger.Panicf(context.TODO(), "AsyncPlugin should be registered to handle atleast one task type")
+		logger.Panicf(context.TODO(), "AsyncPlugin should be registered to handle at least one task type")
 	}
 	if info.LoadPlugin == nil {
 		logger.Panicf(context.TODO(), "PluginLoader cannot be nil")

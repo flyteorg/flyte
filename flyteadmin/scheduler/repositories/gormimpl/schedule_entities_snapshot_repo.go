@@ -18,7 +18,7 @@ type ScheduleEntitiesSnapshotRepo struct {
 	metrics          gormMetrics
 }
 
-// TODO : always overwrite the exisiting snapshot instead of creating new rows
+// TODO : always overwrite the existing snapshot instead of creating new rows
 func (r *ScheduleEntitiesSnapshotRepo) Write(ctx context.Context, input models.ScheduleEntitiesSnapshot) error {
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Omit("id").Create(&input)

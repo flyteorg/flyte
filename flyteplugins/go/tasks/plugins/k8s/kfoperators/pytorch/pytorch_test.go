@@ -92,7 +92,7 @@ func dummyPytorchTaskTemplate(id string, args ...interface{}) *core.TaskTemplate
 			var pytorchCustomObj = t
 			ptObjJSON, err = utils.MarshalToString(pytorchCustomObj)
 		default:
-			err = fmt.Errorf("Unkonw input type %T", t)
+			err = fmt.Errorf("Unknown input type %T", t)
 		}
 	}
 

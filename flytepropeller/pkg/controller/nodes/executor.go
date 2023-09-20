@@ -7,7 +7,7 @@
 //
 // Available node handlers are
 //   - Task: Arguably the most important handler as it handles all tasks. These include all plugins. The goal of the workflow is
-//     is to run tasks, thus every workflow will contain atleast one TaskNode (except for the case, where the workflow
+//     is to run tasks, thus every workflow will contain at least one TaskNode (except for the case, where the workflow
 //     is purely a meta-workflow and can run other workflows
 //   - SubWorkflow: This is one of the most important handlers. It can execute Workflows that are nested inside a workflow
 //   - DynamicTask Handler: This is just a decorator on the Task Handler. It handles cases, in which the Task returns a futures
@@ -1414,7 +1414,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task cached skipped in Discovery", scope),
 		catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", scope),
 		catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
-		catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),
+		catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get failure count", scope),
 		reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", scope),
 		reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", scope),
 		reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", scope),

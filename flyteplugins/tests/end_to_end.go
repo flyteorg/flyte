@@ -209,7 +209,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			or := args.Get(2).(io.OutputReader)
 			o, ee, err := or.Read(ctx)
 			assert.NoError(t, err)
-			// TODO: Outputing error is not yet supported.
+			// TODO: Outputting error is not yet supported.
 			assert.Nil(t, ee)
 			catData.Store(key, o)
 		})

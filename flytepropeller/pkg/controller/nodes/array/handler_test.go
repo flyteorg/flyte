@@ -205,7 +205,7 @@ func TestAbort(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			// initailize universal variables
+			// initialize universal variables
 			literalMap := convertMapToArrayLiterals(test.inputMap)
 
 			size := -1
@@ -301,7 +301,7 @@ func TestFinalize(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			// initailize universal variables
+			// initialize universal variables
 			literalMap := convertMapToArrayLiterals(test.inputMap)
 
 			size := -1
@@ -440,7 +440,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 	ctx := context.Background()
 	minSuccessRatio := float32(0.5)
 
-	// initailize universal variables
+	// initialize universal variables
 	inputMap := map[string][]int64{
 		"foo": []int64{0, 1},
 		"bar": []int64{2, 3},

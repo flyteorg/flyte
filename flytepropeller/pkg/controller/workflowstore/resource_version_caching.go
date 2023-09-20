@@ -18,7 +18,7 @@ type resourceVersionMetrics struct {
 	workflowRedundantUpdatesCount labeled.Counter
 }
 
-// Simple function that covnerts the namespace and name to a string
+// Simple function that converts the namespace and name to a string
 func resourceVersionKey(namespace, name string) string {
 	return fmt.Sprintf("%s/%s", namespace, name)
 }

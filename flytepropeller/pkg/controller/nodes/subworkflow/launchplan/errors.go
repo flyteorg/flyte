@@ -10,7 +10,7 @@ const (
 	RemoteErrorAlreadyExists ErrorCode = "AlreadyExists"
 	RemoteErrorNotFound      ErrorCode = "NotFound"
 	RemoteErrorSystem        ErrorCode = "SystemError" // timeouts, network error etc
-	RemoteErrorUser          ErrorCode = "UserError"   // Incase of bad specification, invalid arguments, etc
+	RemoteErrorUser          ErrorCode = "UserError"   // In case of bad specification, invalid arguments, etc
 )
 
 // Checks if the error is of type RemoteError and the ErrorCode is of type RemoteErrorAlreadyExists

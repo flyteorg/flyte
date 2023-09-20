@@ -62,7 +62,7 @@ The protobuf definitions in `flyteidl` need to include a new (optional) paramete
 
 #### `flyteadmin`
 
-`flyteadmin` needs to accept an updated config for execution requests to support the eviction override as well as pass it along to `flytepropeller`. The new flag should be available via API to either be invoked programatically (e.g. via a user script) or via `flyteconsole`.
+`flyteadmin` needs to accept an updated config for execution requests to support the eviction override as well as pass it along to `flytepropeller`. The new flag should be available via API to either be invoked programmatically (e.g. via a user script) or via `flyteconsole`.
 
 #### `flyteconsole`
 
@@ -136,7 +136,7 @@ The proposed cache eviction changes introduces a slight overhead in execution pr
 Depending on the size of the cached outputs and the blob storage speed, this might induce increased scheduling times for tasks, although no performance impact should occur if no cache eviction is performed.  
 In order to minimize the execution startup delay, cache eviction could be postponed until the task executed successfully, only requiring a quick check beforehand and ensuring the actual computation can start as soon as possible.
 
-We do not anticipate any noticable impact by the API extension for `flyteadmin` during regular executions, however evicting all cached outputs of a large workflow could introduce some strain on `flyteadmin`/`datacatalog` during processing.
+We do not anticipate any noticeable impact by the API extension for `flyteadmin` during regular executions, however evicting all cached outputs of a large workflow could introduce some strain on `flyteadmin`/`datacatalog` during processing.
 
 ## 6 Alternatives
 
@@ -146,13 +146,13 @@ At the moment, no direct alternative exists to allow for partial re-processing o
 
 As this change spans across most of Flyte's components and repositories, a coordinated effort to introduce and test this proposal will be required. Since we rely on an API change, a `flyteidl` release will be required before additional components can be adapted.
 
-The potential for malicious exploitation is deemed non-existant as no access to any data is provided and most additional communication will be performed intra-cluster. An attacker could potentially cause additional computational costs by removing cached outputs.
+The potential for malicious exploitation is deemed non-existent as no access to any data is provided and most additional communication will be performed intra-cluster. An attacker could potentially cause additional computational costs by removing cached outputs.
 
 ## 8 Unresolved questions
 
 1. When should cache eviction happen during a repeated execution?
    Should we evict the cache entry immediately before starting task execution, potentially leaving no cached output available if the execution fails, or postpone the removal until the task has finished (successfully) and new data can be stored right away?
-    - **RESOLVED**: eviction will happen after the successfull execution of a task, overwriting the existing data.
+    - **RESOLVED**: eviction will happen after the successful execution of a task, overwriting the existing data.
 2. Should the `cache_override` flag also be added to `flytekit`'s task decorator?
    This would allow users to define tasks/workflows which will automatically evict their cached results, however does not strictly fit with the actual task "definition".
 3. Which Flyte tools (`flyteconsole`/`flytectl`) should support the proposed `AdminService` API extension for `flyteadmin`, if any?

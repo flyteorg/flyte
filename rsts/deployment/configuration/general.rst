@@ -245,7 +245,7 @@ Hierarchy
 *********
 
 Increasing specificity defines how matchable resource attributes get applied.
-The available configurations, in order of decreasing specifity are:
+The available configurations, in order of decreasing specificity are:
 
 #. Domain, Project, Workflow name, and LaunchPlan
 

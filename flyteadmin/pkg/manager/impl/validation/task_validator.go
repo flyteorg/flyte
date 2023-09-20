@@ -293,7 +293,7 @@ func validateTaskType(taskID core.Identifier, taskType string, whitelistConfig r
 		} else if scope.Project != taskID.Project {
 			continue
 		}
-		// We have a potential match! Verify that this task type is approved given the specifity of the whitelist.
+		// We have a potential match! Verify that this task type is approved given the specificity of the whitelist.
 		if scope.Domain == "" {
 			// All domains for this project are whitelisted
 			return nil

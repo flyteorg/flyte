@@ -122,7 +122,7 @@ func (g *GoCronScheduler) ScheduleJob(ctx context.Context, schedule models.Sched
 
 	// Update the catchupFrom time as the lastExecTime.
 	// Here lastExecTime is passed to this function only from BootStrapSchedulesFromSnapShot which is during bootup
-	// Once initialized we wont be changing the catchupTime until the next boot
+	// Once initialized we won't be changing the catchupTime until the next boot
 	job := &GoCronJob{nameOfSchedule: nameOfSchedule, schedule: schedule, funcWithSchedule: funcWithSchedule,
 		catchupFromTime: lastExecTime, lastExecTime: lastExecTime, ctx: ctx}
 
@@ -276,7 +276,7 @@ func (g *GoCronScheduler) AddFixedIntervalJob(ctx context.Context, job *GoCronJo
 		lastTime = *job.lastExecTime
 	}
 	entryID := g.cron.ScheduleTimedJob(cron.ConstantDelaySchedule{Delay: d}, jobFunc, lastTime)
-	// Update the enttry id in the job which is handle to be used for removal
+	// Update the entry id in the job which is handle to be used for removal
 	job.entryID = entryID
 	logger.Infof(ctx, "successfully added the fixed rate schedule %s to the scheduler for schedule %+v",
 		job.nameOfSchedule, job.schedule)
@@ -298,7 +298,7 @@ func (g *GoCronScheduler) AddCronJob(ctx context.Context, job *GoCronJob) error 
 	jobFunc = job.Run
 
 	entryID, err := g.cron.AddTimedJob(job.schedule.CronExpression, jobFunc)
-	// Update the enttry id in the job which is handle to be used for removal
+	// Update the entry id in the job which is handle to be used for removal
 	job.entryID = entryID
 	if err == nil {
 		logger.Infof(ctx, "successfully added the schedule %s to the scheduler for schedule %+v",

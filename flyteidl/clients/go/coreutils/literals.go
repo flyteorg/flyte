@@ -588,7 +588,7 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		var newV string
 		if v == nil {
 			if len(t.GetEnumType().Values) == 0 {
-				return nil, fmt.Errorf("enum types need atleast one value")
+				return nil, fmt.Errorf("enum types need at least one value")
 			}
 			newV = t.GetEnumType().Values[0]
 		} else {

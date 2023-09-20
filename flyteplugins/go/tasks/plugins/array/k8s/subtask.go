@@ -80,7 +80,7 @@ func addMetadata(stCtx SubTaskExecutionContext, cfg *Config, k8sPluginCfg *confi
 	}
 
 	// The legacy map task implemented these as overrides so they were left as such. May want to
-	// revist whether they would serve better as appends.
+	// revisit whether they would serve better as appends.
 	if len(cfg.NodeSelector) != 0 {
 		pod.Spec.NodeSelector = cfg.NodeSelector
 	}

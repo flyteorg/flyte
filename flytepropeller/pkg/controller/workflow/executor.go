@@ -337,7 +337,7 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 				return nil
 			}
 			if eventsErr.IsEventAlreadyInTerminalStateError(recordingErr) {
-				// Move to WorkflowPhaseFailed for state mis-match
+				// Move to WorkflowPhaseFailed for state mismatch
 				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.Phase.String(), wfEvent.ExecutionId)
 				logger.Warningf(ctx, msg)
 				wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg, nil)
