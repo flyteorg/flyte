@@ -125,10 +125,24 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 					}
 				}
 
-				// Skip the validation if the promise has attribute paths
-				// because we don't know the type of the resolved attribute
-				if len(val.Promise.AttrPath) > 0 {
+				// If the type is a struct (e.g. dataclass) and the attribute path is longer than 0,
+				// We skip the type check and let it fail at runtime because we don't know the type of struct field
+				if sourceType.GetSimple() == flyte.SimpleType_STRUCT && len(val.Promise.AttrPath) > 0 {
 					return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
+				}
+
+				// If the variable has an attribute path. Extract the type of the last attribute.
+				for range val.Promise.AttrPath {
+					if sourceType.GetCollectionType() != nil {
+						sourceType = sourceType.GetCollectionType()
+					}
+					if sourceType.GetMapValueType() != nil {
+						sourceType = sourceType.GetMapValueType()
+					}
+					// If the current type is struct, skip the type check because we don't know the type of struct field
+					if sourceType.GetSimple() == flyte.SimpleType_STRUCT {
+						return param.GetType(), []c.NodeID{val.Promise.NodeId}, true
+					}
 				}
 
 				if !validateParamTypes || AreTypesCastable(sourceType, expectedType) {
