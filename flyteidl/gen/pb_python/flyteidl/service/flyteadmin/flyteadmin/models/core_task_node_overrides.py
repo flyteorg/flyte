@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_resource_metadata import CoreResourceMetadata  # noqa: F401,E501
 from flyteadmin.models.core_resources import CoreResources  # noqa: F401,E501
 
 
@@ -33,21 +34,26 @@ class CoreTaskNodeOverrides(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'resources': 'CoreResources'
+        'resources': 'CoreResources',
+        'resource_metadata': 'CoreResourceMetadata'
     }
 
     attribute_map = {
-        'resources': 'resources'
+        'resources': 'resources',
+        'resource_metadata': 'resource_metadata'
     }
 
-    def __init__(self, resources=None):  # noqa: E501
+    def __init__(self, resources=None, resource_metadata=None):  # noqa: E501
         """CoreTaskNodeOverrides - a model defined in Swagger"""  # noqa: E501
 
         self._resources = None
+        self._resource_metadata = None
         self.discriminator = None
 
         if resources is not None:
             self.resources = resources
+        if resource_metadata is not None:
+            self.resource_metadata = resource_metadata
 
     @property
     def resources(self):
@@ -71,6 +77,27 @@ class CoreTaskNodeOverrides(object):
         """
 
         self._resources = resources
+
+    @property
+    def resource_metadata(self):
+        """Gets the resource_metadata of this CoreTaskNodeOverrides.  # noqa: E501
+
+
+        :return: The resource_metadata of this CoreTaskNodeOverrides.  # noqa: E501
+        :rtype: CoreResourceMetadata
+        """
+        return self._resource_metadata
+
+    @resource_metadata.setter
+    def resource_metadata(self, resource_metadata):
+        """Sets the resource_metadata of this CoreTaskNodeOverrides.
+
+
+        :param resource_metadata: The resource_metadata of this CoreTaskNodeOverrides.  # noqa: E501
+        :type: CoreResourceMetadata
+        """
+
+        self._resource_metadata = resource_metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""

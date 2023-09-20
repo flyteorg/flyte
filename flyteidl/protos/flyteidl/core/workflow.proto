@@ -279,4 +279,7 @@ message WorkflowTemplate {
 message TaskNodeOverrides {
     // A customizable interface to convey resources requested for a task container. 
     Resources resources = 1;
+
+    // Additional metadata associated with resources to allocate to this task
+    core.ResourceMetadata resource_metadata = 2;
 }

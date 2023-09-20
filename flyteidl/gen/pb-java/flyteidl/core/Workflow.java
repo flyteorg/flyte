@@ -20389,6 +20389,31 @@ public final class Workflow {
      * <code>.flyteidl.core.Resources resources = 1;</code>
      */
     flyteidl.core.Tasks.ResourcesOrBuilder getResourcesOrBuilder();
+
+    /**
+     * <pre>
+     * Additional metadata associated with resources to allocate to this task
+     * </pre>
+     *
+     * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+     */
+    boolean hasResourceMetadata();
+    /**
+     * <pre>
+     * Additional metadata associated with resources to allocate to this task
+     * </pre>
+     *
+     * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+     */
+    flyteidl.core.Tasks.ResourceMetadata getResourceMetadata();
+    /**
+     * <pre>
+     * Additional metadata associated with resources to allocate to this task
+     * </pre>
+     *
+     * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+     */
+    flyteidl.core.Tasks.ResourceMetadataOrBuilder getResourceMetadataOrBuilder();
   }
   /**
    * <pre>
@@ -20442,6 +20467,19 @@ public final class Workflow {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(resources_);
                 resources_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
+              flyteidl.core.Tasks.ResourceMetadata.Builder subBuilder = null;
+              if (resourceMetadata_ != null) {
+                subBuilder = resourceMetadata_.toBuilder();
+              }
+              resourceMetadata_ = input.readMessage(flyteidl.core.Tasks.ResourceMetadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(resourceMetadata_);
+                resourceMetadata_ = subBuilder.buildPartial();
               }
 
               break;
@@ -20511,6 +20549,39 @@ public final class Workflow {
       return getResources();
     }
 
+    public static final int RESOURCE_METADATA_FIELD_NUMBER = 2;
+    private flyteidl.core.Tasks.ResourceMetadata resourceMetadata_;
+    /**
+     * <pre>
+     * Additional metadata associated with resources to allocate to this task
+     * </pre>
+     *
+     * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+     */
+    public boolean hasResourceMetadata() {
+      return resourceMetadata_ != null;
+    }
+    /**
+     * <pre>
+     * Additional metadata associated with resources to allocate to this task
+     * </pre>
+     *
+     * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+     */
+    public flyteidl.core.Tasks.ResourceMetadata getResourceMetadata() {
+      return resourceMetadata_ == null ? flyteidl.core.Tasks.ResourceMetadata.getDefaultInstance() : resourceMetadata_;
+    }
+    /**
+     * <pre>
+     * Additional metadata associated with resources to allocate to this task
+     * </pre>
+     *
+     * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+     */
+    public flyteidl.core.Tasks.ResourceMetadataOrBuilder getResourceMetadataOrBuilder() {
+      return getResourceMetadata();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -20528,6 +20599,9 @@ public final class Workflow {
       if (resources_ != null) {
         output.writeMessage(1, getResources());
       }
+      if (resourceMetadata_ != null) {
+        output.writeMessage(2, getResourceMetadata());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -20540,6 +20614,10 @@ public final class Workflow {
       if (resources_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getResources());
+      }
+      if (resourceMetadata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getResourceMetadata());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -20561,6 +20639,11 @@ public final class Workflow {
         if (!getResources()
             .equals(other.getResources())) return false;
       }
+      if (hasResourceMetadata() != other.hasResourceMetadata()) return false;
+      if (hasResourceMetadata()) {
+        if (!getResourceMetadata()
+            .equals(other.getResourceMetadata())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -20575,6 +20658,10 @@ public final class Workflow {
       if (hasResources()) {
         hash = (37 * hash) + RESOURCES_FIELD_NUMBER;
         hash = (53 * hash) + getResources().hashCode();
+      }
+      if (hasResourceMetadata()) {
+        hash = (37 * hash) + RESOURCE_METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getResourceMetadata().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -20719,6 +20806,12 @@ public final class Workflow {
           resources_ = null;
           resourcesBuilder_ = null;
         }
+        if (resourceMetadataBuilder_ == null) {
+          resourceMetadata_ = null;
+        } else {
+          resourceMetadata_ = null;
+          resourceMetadataBuilder_ = null;
+        }
         return this;
       }
 
@@ -20749,6 +20842,11 @@ public final class Workflow {
           result.resources_ = resources_;
         } else {
           result.resources_ = resourcesBuilder_.build();
+        }
+        if (resourceMetadataBuilder_ == null) {
+          result.resourceMetadata_ = resourceMetadata_;
+        } else {
+          result.resourceMetadata_ = resourceMetadataBuilder_.build();
         }
         onBuilt();
         return result;
@@ -20800,6 +20898,9 @@ public final class Workflow {
         if (other == flyteidl.core.Workflow.TaskNodeOverrides.getDefaultInstance()) return this;
         if (other.hasResources()) {
           mergeResources(other.getResources());
+        }
+        if (other.hasResourceMetadata()) {
+          mergeResourceMetadata(other.getResourceMetadata());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -20981,6 +21082,159 @@ public final class Workflow {
           resources_ = null;
         }
         return resourcesBuilder_;
+      }
+
+      private flyteidl.core.Tasks.ResourceMetadata resourceMetadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.ResourceMetadata, flyteidl.core.Tasks.ResourceMetadata.Builder, flyteidl.core.Tasks.ResourceMetadataOrBuilder> resourceMetadataBuilder_;
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public boolean hasResourceMetadata() {
+        return resourceMetadataBuilder_ != null || resourceMetadata_ != null;
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public flyteidl.core.Tasks.ResourceMetadata getResourceMetadata() {
+        if (resourceMetadataBuilder_ == null) {
+          return resourceMetadata_ == null ? flyteidl.core.Tasks.ResourceMetadata.getDefaultInstance() : resourceMetadata_;
+        } else {
+          return resourceMetadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public Builder setResourceMetadata(flyteidl.core.Tasks.ResourceMetadata value) {
+        if (resourceMetadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          resourceMetadata_ = value;
+          onChanged();
+        } else {
+          resourceMetadataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public Builder setResourceMetadata(
+          flyteidl.core.Tasks.ResourceMetadata.Builder builderForValue) {
+        if (resourceMetadataBuilder_ == null) {
+          resourceMetadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          resourceMetadataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public Builder mergeResourceMetadata(flyteidl.core.Tasks.ResourceMetadata value) {
+        if (resourceMetadataBuilder_ == null) {
+          if (resourceMetadata_ != null) {
+            resourceMetadata_ =
+              flyteidl.core.Tasks.ResourceMetadata.newBuilder(resourceMetadata_).mergeFrom(value).buildPartial();
+          } else {
+            resourceMetadata_ = value;
+          }
+          onChanged();
+        } else {
+          resourceMetadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public Builder clearResourceMetadata() {
+        if (resourceMetadataBuilder_ == null) {
+          resourceMetadata_ = null;
+          onChanged();
+        } else {
+          resourceMetadata_ = null;
+          resourceMetadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public flyteidl.core.Tasks.ResourceMetadata.Builder getResourceMetadataBuilder() {
+        
+        onChanged();
+        return getResourceMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      public flyteidl.core.Tasks.ResourceMetadataOrBuilder getResourceMetadataOrBuilder() {
+        if (resourceMetadataBuilder_ != null) {
+          return resourceMetadataBuilder_.getMessageOrBuilder();
+        } else {
+          return resourceMetadata_ == null ?
+              flyteidl.core.Tasks.ResourceMetadata.getDefaultInstance() : resourceMetadata_;
+        }
+      }
+      /**
+       * <pre>
+       * Additional metadata associated with resources to allocate to this task
+       * </pre>
+       *
+       * <code>.flyteidl.core.ResourceMetadata resource_metadata = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.ResourceMetadata, flyteidl.core.Tasks.ResourceMetadata.Builder, flyteidl.core.Tasks.ResourceMetadataOrBuilder> 
+          getResourceMetadataFieldBuilder() {
+        if (resourceMetadataBuilder_ == null) {
+          resourceMetadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.ResourceMetadata, flyteidl.core.Tasks.ResourceMetadata.Builder, flyteidl.core.Tasks.ResourceMetadataOrBuilder>(
+                  getResourceMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          resourceMetadata_ = null;
+        }
+        return resourceMetadataBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -21205,10 +21459,11 @@ public final class Workflow {
       "re.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyte" +
       "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013" +
       "2\'.flyteidl.core.WorkflowMetadataDefault" +
-      "s\"@\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001(" +
-      "\0132\030.flyteidl.core.ResourcesB6Z4github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
-      "oreb\006proto3"
+      "s\"|\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001(" +
+      "\0132\030.flyteidl.core.Resources\022:\n\021resource_" +
+      "metadata\030\002 \001(\0132\037.flyteidl.core.ResourceM" +
+      "etadataB6Z4github.com/flyteorg/flyteidl/" +
+      "gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21338,7 +21593,7 @@ public final class Workflow {
     internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskNodeOverrides_descriptor,
-        new java.lang.String[] { "Resources", });
+        new java.lang.String[] { "Resources", "ResourceMetadata", });
     flyteidl.core.Condition.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();

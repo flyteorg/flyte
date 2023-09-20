@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_resource_metadata import CoreResourceMetadata  # noqa: F401,E501
 from flyteadmin.models.core_retry_strategy import CoreRetryStrategy  # noqa: F401,E501
 from flyteadmin.models.core_runtime_metadata import CoreRuntimeMetadata  # noqa: F401,E501
 
@@ -44,7 +45,8 @@ class CoreTaskMetadata(object):
         'cache_serializable': 'bool',
         'generates_deck': 'bool',
         'tags': 'dict(str, str)',
-        'pod_template_name': 'str'
+        'pod_template_name': 'str',
+        'resource_metadata': 'CoreResourceMetadata'
     }
 
     attribute_map = {
@@ -58,10 +60,11 @@ class CoreTaskMetadata(object):
         'cache_serializable': 'cache_serializable',
         'generates_deck': 'generates_deck',
         'tags': 'tags',
-        'pod_template_name': 'pod_template_name'
+        'pod_template_name': 'pod_template_name',
+        'resource_metadata': 'resource_metadata'
     }
 
-    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None, pod_template_name=None):  # noqa: E501
+    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None, pod_template_name=None, resource_metadata=None):  # noqa: E501
         """CoreTaskMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._discoverable = None
@@ -75,6 +78,7 @@ class CoreTaskMetadata(object):
         self._generates_deck = None
         self._tags = None
         self._pod_template_name = None
+        self._resource_metadata = None
         self.discriminator = None
 
         if discoverable is not None:
@@ -99,6 +103,8 @@ class CoreTaskMetadata(object):
             self.tags = tags
         if pod_template_name is not None:
             self.pod_template_name = pod_template_name
+        if resource_metadata is not None:
+            self.resource_metadata = resource_metadata
 
     @property
     def discoverable(self):
@@ -346,6 +352,27 @@ class CoreTaskMetadata(object):
         """
 
         self._pod_template_name = pod_template_name
+
+    @property
+    def resource_metadata(self):
+        """Gets the resource_metadata of this CoreTaskMetadata.  # noqa: E501
+
+
+        :return: The resource_metadata of this CoreTaskMetadata.  # noqa: E501
+        :rtype: CoreResourceMetadata
+        """
+        return self._resource_metadata
+
+    @resource_metadata.setter
+    def resource_metadata(self, resource_metadata):
+        """Sets the resource_metadata of this CoreTaskMetadata.
+
+
+        :param resource_metadata: The resource_metadata of this CoreTaskMetadata.  # noqa: E501
+        :type: CoreResourceMetadata
+        """
+
+        self._resource_metadata = resource_metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""
