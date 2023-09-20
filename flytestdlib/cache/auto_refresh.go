@@ -285,7 +285,10 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				logger.Infof(ctx, "item with id [%v] not found in cache", itemId)
 				return nil
 			}
-			updatedBatch, err := w.syncCb(ctx, Batch{item.(ItemWrapper)})
+			updatedBatch, err := w.syncCb(ctx, Batch{itemWrapper{
+				id:   itemId.(ItemID),
+				item: item.(Item),
+			}})
 
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
