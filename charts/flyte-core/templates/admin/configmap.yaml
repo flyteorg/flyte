@@ -45,7 +45,16 @@ data:
   notifications.yaml: |
     notifications:
       type: {{ .Values.workflow_notifications.config.notifications.type }}
-      region: {{ tpl .Values.workflow_notifications.config.notifications.region $ }}
+      {{- if eq .Values.workflow_notifications.config.notifications.type "aws" }}
+      {{- with .Values.workflow_notifications.config.notifications.aws }}
+      aws: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- if eq .Values.workflow_notifications.config.notifications.type "gcp" }}
+      {{- with .Values.workflow_notifications.config.notifications.gcp }}
+      gcp: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
+      {{- end }}
       {{- with .Values.workflow_notifications.config.notifications.publisher }}
       publisher: {{- tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
