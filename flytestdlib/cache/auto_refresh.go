@@ -235,7 +235,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 
 	for _, batch := range batches {
 		b := batch
-		w.workqueue.Add(&b)
+		w.workqueue.Add(b)
 	}
 
 	return nil
