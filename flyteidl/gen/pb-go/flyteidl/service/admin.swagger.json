@@ -6489,6 +6489,12 @@
         "var": {
           "type": "string",
           "description": "Variable name must refer to an output variable for the node."
+        },
+        "attr_path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/corePromiseAttribute"
+          }
         }
       },
       "description": "A reference to an output produced by a node. The type can be retrieved -and validated- from\nthe underlying interface of the node."
@@ -6552,6 +6558,18 @@
         }
       },
       "title": "Primitive Types"
+    },
+    "corePromiseAttribute": {
+      "type": "object",
+      "properties": {
+        "string_value": {
+          "type": "string"
+        },
+        "int_value": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
     },
     "coreQualityOfService": {
       "type": "object",

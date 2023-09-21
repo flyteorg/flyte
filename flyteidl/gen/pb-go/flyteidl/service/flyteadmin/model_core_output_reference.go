@@ -15,4 +15,5 @@ type CoreOutputReference struct {
 	NodeId string `json:"node_id,omitempty"`
 	// Variable name must refer to an output variable for the node.
 	Var_ string `json:"var,omitempty"`
+	AttrPath []CorePromiseAttribute `json:"attr_path,omitempty"`
 }

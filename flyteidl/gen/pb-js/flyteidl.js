@@ -9864,6 +9864,7 @@
                  * @interface IOutputReference
                  * @property {string|null} [nodeId] OutputReference nodeId
                  * @property {string|null} ["var"] OutputReference var
+                 * @property {Array.<flyteidl.core.IPromiseAttribute>|null} [attrPath] OutputReference attrPath
                  */
     
                 /**
@@ -9875,6 +9876,7 @@
                  * @param {flyteidl.core.IOutputReference=} [properties] Properties to set
                  */
                 function OutputReference(properties) {
+                    this.attrPath = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -9896,6 +9898,14 @@
                  * @instance
                  */
                 OutputReference.prototype["var"] = "";
+    
+                /**
+                 * OutputReference attrPath.
+                 * @member {Array.<flyteidl.core.IPromiseAttribute>} attrPath
+                 * @memberof flyteidl.core.OutputReference
+                 * @instance
+                 */
+                OutputReference.prototype.attrPath = $util.emptyArray;
     
                 /**
                  * Creates a new OutputReference instance using the specified properties.
@@ -9925,6 +9935,9 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.nodeId);
                     if (message["var"] != null && message.hasOwnProperty("var"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message["var"]);
+                    if (message.attrPath != null && message.attrPath.length)
+                        for (var i = 0; i < message.attrPath.length; ++i)
+                            $root.flyteidl.core.PromiseAttribute.encode(message.attrPath[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -9952,6 +9965,11 @@
                         case 2:
                             message["var"] = reader.string();
                             break;
+                        case 3:
+                            if (!(message.attrPath && message.attrPath.length))
+                                message.attrPath = [];
+                            message.attrPath.push($root.flyteidl.core.PromiseAttribute.decode(reader, reader.uint32()));
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -9977,10 +9995,167 @@
                     if (message["var"] != null && message.hasOwnProperty("var"))
                         if (!$util.isString(message["var"]))
                             return "var: string expected";
+                    if (message.attrPath != null && message.hasOwnProperty("attrPath")) {
+                        if (!Array.isArray(message.attrPath))
+                            return "attrPath: array expected";
+                        for (var i = 0; i < message.attrPath.length; ++i) {
+                            var error = $root.flyteidl.core.PromiseAttribute.verify(message.attrPath[i]);
+                            if (error)
+                                return "attrPath." + error;
+                        }
+                    }
                     return null;
                 };
     
                 return OutputReference;
+            })();
+    
+            core.PromiseAttribute = (function() {
+    
+                /**
+                 * Properties of a PromiseAttribute.
+                 * @memberof flyteidl.core
+                 * @interface IPromiseAttribute
+                 * @property {string|null} [stringValue] PromiseAttribute stringValue
+                 * @property {number|null} [intValue] PromiseAttribute intValue
+                 */
+    
+                /**
+                 * Constructs a new PromiseAttribute.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a PromiseAttribute.
+                 * @implements IPromiseAttribute
+                 * @constructor
+                 * @param {flyteidl.core.IPromiseAttribute=} [properties] Properties to set
+                 */
+                function PromiseAttribute(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PromiseAttribute stringValue.
+                 * @member {string} stringValue
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @instance
+                 */
+                PromiseAttribute.prototype.stringValue = "";
+    
+                /**
+                 * PromiseAttribute intValue.
+                 * @member {number} intValue
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @instance
+                 */
+                PromiseAttribute.prototype.intValue = 0;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * PromiseAttribute value.
+                 * @member {"stringValue"|"intValue"|undefined} value
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @instance
+                 */
+                Object.defineProperty(PromiseAttribute.prototype, "value", {
+                    get: $util.oneOfGetter($oneOfFields = ["stringValue", "intValue"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new PromiseAttribute instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {flyteidl.core.IPromiseAttribute=} [properties] Properties to set
+                 * @returns {flyteidl.core.PromiseAttribute} PromiseAttribute instance
+                 */
+                PromiseAttribute.create = function create(properties) {
+                    return new PromiseAttribute(properties);
+                };
+    
+                /**
+                 * Encodes the specified PromiseAttribute message. Does not implicitly {@link flyteidl.core.PromiseAttribute.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {flyteidl.core.IPromiseAttribute} message PromiseAttribute message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PromiseAttribute.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.stringValue != null && message.hasOwnProperty("stringValue"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.stringValue);
+                    if (message.intValue != null && message.hasOwnProperty("intValue"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.intValue);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PromiseAttribute message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.PromiseAttribute} PromiseAttribute
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PromiseAttribute.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.PromiseAttribute();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.stringValue = reader.string();
+                            break;
+                        case 2:
+                            message.intValue = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PromiseAttribute message.
+                 * @function verify
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PromiseAttribute.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.stringValue != null && message.hasOwnProperty("stringValue")) {
+                        properties.value = 1;
+                        if (!$util.isString(message.stringValue))
+                            return "stringValue: string expected";
+                    }
+                    if (message.intValue != null && message.hasOwnProperty("intValue")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        if (!$util.isInteger(message.intValue))
+                            return "intValue: integer expected";
+                    }
+                    return null;
+                };
+    
+                return PromiseAttribute;
             })();
     
             core.Error = (function() {
