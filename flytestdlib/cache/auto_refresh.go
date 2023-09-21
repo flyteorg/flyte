@@ -235,7 +235,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 
 	for _, batch := range batches {
 		b := batch
-		logger.Infof(ctx, "Enqueuing batch with id: %v", b[0].GetID())
+		logger.Debugf(ctx, "Enqueuing batch with id: %v", b[0].GetID())
 		w.workqueue.Add(b[0].GetID())
 	}
 
@@ -282,7 +282,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			t := w.metrics.SyncLatency.Start()
 			item, ok := w.lruMap.Get(itemId)
 			if !ok {
-				logger.Infof(ctx, "item with id [%v] not found in cache", itemId)
+				logger.Debugf(ctx, "item with id [%v] not found in cache", itemId)
 				return nil
 			}
 			updatedBatch, err := w.syncCb(ctx, Batch{itemWrapper{
