@@ -465,6 +465,10 @@ data:
             kubernetes-template-uri: http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
             cloudwatch-enabled: false
             stackdriver-enabled: false
+      agent-service:
+        defaultAgent:
+          endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
+          insecure: true
   002-database.yaml: |
     database:
       postgres:
@@ -796,7 +800,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: eUp3NTVTZ3RpRUp0NEhBNQ==
+  haSharedSecret: d1B5UTNPWVBoRjA4UGFhYw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1194,7 +1198,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 7f44628a274eee8a93d71643705b34f0d5ae672b350c64fa9ea5b20a03de604d
+        checksum/configuration: 454886716e03425f5b6980d658280a5c9d2dd9b73767ab8e080ba381b97efc95
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1357,7 +1361,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 4870c07b2cab42edd7ea782204e2ad225d2c82d5c4f3f74aebd59a6f76293591
+        checksum/secret: 750125a1cf681cdd45d59c2ff0f2cfb69349e246452fff3387bb1d65f5706794
       labels:
         app: docker-registry
         release: flyte-sandbox
