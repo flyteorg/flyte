@@ -155,6 +155,9 @@ configuration:
     defaultAgent:
       endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
       insecure: true
+      timeouts:
+        GetTask: 10s
+      defaultTimeout: 10s
   #   Uncomment and modify to include configuration for Flyte Agent
   #   defaultGrpcEndpoint: agent-service.agent-namespace:8000
   # externalConfigMap Specify an existing, external ConfigMap to use as configuration for Flyte
