@@ -315,6 +315,7 @@ Class | Method | HTTP request | Description
  - [CoreParameter](docs/CoreParameter.md)
  - [CoreParameterMap](docs/CoreParameterMap.md)
  - [CorePrimitive](docs/CorePrimitive.md)
+ - [CorePromiseAttribute](docs/CorePromiseAttribute.md)
  - [CoreQualityOfService](docs/CoreQualityOfService.md)
  - [CoreQualityOfServiceSpec](docs/CoreQualityOfServiceSpec.md)
  - [CoreResourceMetadata](docs/CoreResourceMetadata.md)
