@@ -164,9 +164,9 @@ func NewProxyAuthInterceptor(cfg *Config, proxyCredentialsFuture *PerRPCCredenti
 
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
-			err := MaterializeProxyAuthCredentials(ctx, cfg, proxyCredentialsFuture)
-			if err != nil {
-				return fmt.Errorf("proxy authorization error! Original Error: %v", err)
+			newErr := MaterializeProxyAuthCredentials(ctx, cfg, proxyCredentialsFuture)
+			if newErr != nil {
+				return fmt.Errorf("proxy authorization error! Original Error: %v, Proxy Auth Error: %w", err, newErr)
 			}
 			return invoker(ctx, method, req, reply, cc, opts...)
 		}
