@@ -100,7 +100,7 @@ func (c *proxyAuthTransport) RoundTrip(req *http.Request) (*http.Response, error
 }
 
 // Set up http client used in oauth2
-func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture) (context.Context, error) {
+func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture) context.Context {
 	httpClient := &http.Client{}
 	transport := &http.Transport{}
 
@@ -118,7 +118,7 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 		httpClient.Transport = transport
 	}
 
-	return context.WithValue(ctx, oauth2.HTTPClient, httpClient), nil
+	return context.WithValue(ctx, oauth2.HTTPClient, httpClient)
 }
 
 // NewAuthInterceptor creates a new grpc.UnaryClientInterceptor that forwards the grpc call and inspects the error.
@@ -133,11 +133,9 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 // be able to find and acquire a valid AccessToken to annotate the request with.
 func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFuture *PerRPCCredentialsFuture, proxyCredentialsFuture *PerRPCCredentialsFuture) grpc.UnaryClientInterceptor {
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
-		ctx, err := setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
-		if err != nil {
-			return fmt.Errorf("Could not create http client for oauth! Original Error: %v", err)
-		}
-		err = invoker(ctx, method, req, reply, cc, opts...)
+		ctx = setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
+
+		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
 			logger.Debugf(ctx, "Request failed due to [%v]. If it's an unauthenticated error, we will attempt to establish an authenticated context.", err)
 
