@@ -553,6 +553,10 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if err != nil {
 		return nil, nil, err
 	}
+	labels, err = m.addBaseExecutionLabel(ctx, workflowExecutionID.Name, labels)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	var annotations map[string]string
 	if executionConfig.Annotations != nil {
@@ -807,6 +811,10 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 	labels, err = m.addProjectLabels(ctx, request.Project, labels)
+	if err != nil {
+		return nil, nil, err
+	}
+	labels, err = m.addBaseExecutionLabel(ctx, workflowExecutionID.Name, labels)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1683,6 +1691,19 @@ func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName str
 		if _, ok := initialLabels[k]; !ok {
 			initialLabels[k] = v
 		}
+	}
+	return initialLabels, nil
+}
+
+// Adds base execution label to execution labels. Base execution label is ignored if a corresponding label is set on the execution already.
+// An execution label will exist if Flytepropeller launches a child workflow execution, as it will copy the parent execution's labels.
+// This label can later be used to retrieve all executions that were launched from a given execution, no matter how deep in the recursion tree.
+func (m *ExecutionManager) addBaseExecutionLabel(_ context.Context, execID string, initialLabels map[string]string) (map[string]string, error) {
+	if initialLabels == nil {
+		initialLabels = make(map[string]string)
+	}
+	if _, ok := initialLabels[shared.BaseExecutionIDLabelKey]; !ok {
+		initialLabels[shared.BaseExecutionIDLabelKey] = execID
 	}
 	return initialLabels, nil
 }

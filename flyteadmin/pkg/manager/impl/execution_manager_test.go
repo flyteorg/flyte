@@ -886,8 +886,9 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(executionData workflowengineInterfaces.ExecutionData) bool {
 		assert.EqualValues(t, map[string]string{
-			"dynamiclabel1": "dynamic1",
-			"dynamiclabel2": "dynamic2",
+			"dynamiclabel1":                "dynamic1",
+			"dynamiclabel2":                "dynamic2",
+			shared.BaseExecutionIDLabelKey: "name",
 		}, executionData.ExecutionParameters.Labels)
 		assert.EqualValues(t, map[string]string{
 			"dynamicannotation3": "dynamic3",
@@ -3834,8 +3835,9 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(execData workflowengineInterfaces.ExecutionData) bool {
 		assert.EqualValues(t, map[string]string{
-			"label1": "1",
-			"label2": "2",
+			"label1":                       "1",
+			"label2":                       "2",
+			shared.BaseExecutionIDLabelKey: "name",
 		}, execData.ExecutionParameters.Labels)
 		assert.EqualValues(t, map[string]string{
 			"annotation3": "3",
