@@ -15,6 +15,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -292,75 +293,108 @@ func TestMaterializeCredentials(t *testing.T) {
 	})
 }
 
-// type testRoundTripper struct {
-// 	RoundTripFunc func(req *http.Request) (*http.Response, error)
-// }
+func TestNewProxyAuthInterceptor(t *testing.T) {
+	cfg := &Config{
+		ProxyCommand: []string{"echo", "test-token"},
+	}
 
-// func (t *testRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
-// 	return t.RoundTripFunc(req)
-// }
+	p := NewPerRPCCredentialsFuture()
 
-// func TestSetHTTPClientContext(t *testing.T) {
-// 	ctx := context.Background()
-// 	tokenCache := &cache.TokenCacheInMemoryProvider{}
+	interceptor := NewProxyAuthInterceptor(cfg, p)
 
-// 	t.Run("no proxy command and no proxy url", func(t *testing.T) {
-// 		cfg := &Config{}
+	ctx := context.Background()
+	method := "/test.method"
+	req := "request"
+	reply := "reply"
+	cc := new(grpc.ClientConn)
 
-// 		newCtx, err := setHTTPClientContext(ctx, cfg, tokenCache)
-// 		assert.NoError(t, err)
+	errorInvoker := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+		return errors.New("test error")
+	}
 
-// 		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
-// 		assert.True(t, ok)
+	// Call should return an error and trigger the interceptor to materialize proxy auth credentials
+	err := interceptor(ctx, method, req, reply, cc, errorInvoker)
+	assert.Error(t, err)
 
-// 		transport, ok := httpClient.Transport.(*http.Transport)
-// 		assert.True(t, ok)
-// 		assert.Nil(t, transport.Proxy)
-// 	})
+	// Check if proxyCredentialsFuture contains a proxy auth header token
+	creds, err := p.Get().GetRequestMetadata(ctx, "")
+	assert.True(t, p.IsInitialized())
+	assert.NoError(t, err)
+	assert.Equal(t, "Bearer test-token", creds[ProxyAuthorizationHeader])
+}
 
-// 	t.Run("proxy url", func(t *testing.T) {
-// 		cfg := &Config{
-// 			HTTPProxyURL: config.
-// 				URL{URL: url.URL{
-// 				Scheme: "http",
-// 				Host:   "localhost:8080",
-// 			}},
-// 		}
-// 		newCtx, err := setHTTPClientContext(ctx, cfg, tokenCache)
-// 		assert.NoError(t, err)
+type testRoundTripper struct {
+	RoundTripFunc func(req *http.Request) (*http.Response, error)
+}
 
-// 		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
-// 		assert.True(t, ok)
+func (t *testRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	return t.RoundTripFunc(req)
+}
 
-// 		transport, ok := httpClient.Transport.(*http.Transport)
-// 		assert.True(t, ok)
-// 		assert.NotNil(t, transport.Proxy)
-// 	})
+func TestSetHTTPClientContext(t *testing.T) {
+	ctx := context.Background()
 
-// 	t.Run("proxy command adds proxy-authorization header", func(t *testing.T) {
-// 		cfg := &Config{
-// 			ProxyCommand: []string{"echo", "test-token-http-client"},
-// 		}
-// 		newCtx, err := setHTTPClientContext(ctx, cfg, tokenCache)
-// 		assert.NoError(t, err)
+	t.Run("no proxy command and no proxy url", func(t *testing.T) {
+		cfg := &Config{}
 
-// 		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
-// 		assert.True(t, ok)
+		newCtx, err := setHTTPClientContext(ctx, cfg, nil)
+		assert.NoError(t, err)
 
-// 		pat, ok := httpClient.Transport.(*proxyAuthTransport)
-// 		assert.True(t, ok)
+		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
+		assert.True(t, ok)
 
-// 		testRoundTripper := &testRoundTripper{
-// 			RoundTripFunc: func(req *http.Request) (*http.Response, error) {
-// 				// Check if the ProxyAuthorizationHeader is correctly set
-// 				assert.Equal(t, "Bearer test-token-http-client", req.Header.Get(ProxyAuthorizationHeader))
-// 				return &http.Response{StatusCode: http.StatusOK}, nil
-// 			},
-// 		}
-// 		pat.transport = testRoundTripper
+		transport, ok := httpClient.Transport.(*http.Transport)
+		assert.True(t, ok)
+		assert.Nil(t, transport.Proxy)
+	})
 
-// 		req, _ := http.NewRequest("GET", "http://example.com", nil)
-// 		_, err = httpClient.Do(req)
-// 		assert.NoError(t, err)
-// 	})
-// }
+	t.Run("proxy url", func(t *testing.T) {
+		cfg := &Config{
+			HTTPProxyURL: config.
+				URL{URL: url.URL{
+				Scheme: "http",
+				Host:   "localhost:8080",
+			}},
+		}
+		newCtx, err := setHTTPClientContext(ctx, cfg, nil)
+		assert.NoError(t, err)
+
+		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
+		assert.True(t, ok)
+
+		transport, ok := httpClient.Transport.(*http.Transport)
+		assert.True(t, ok)
+		assert.NotNil(t, transport.Proxy)
+	})
+
+	t.Run("proxy command adds proxy-authorization header", func(t *testing.T) {
+		cfg := &Config{
+			ProxyCommand: []string{"echo", "test-token-http-client"},
+		}
+
+		p := NewPerRPCCredentialsFuture()
+		MaterializeProxyAuthCredentials(ctx, cfg, p)
+
+		newCtx, err := setHTTPClientContext(ctx, cfg, p)
+		assert.NoError(t, err)
+
+		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
+		assert.True(t, ok)
+
+		pat, ok := httpClient.Transport.(*proxyAuthTransport)
+		assert.True(t, ok)
+
+		testRoundTripper := &testRoundTripper{
+			RoundTripFunc: func(req *http.Request) (*http.Response, error) {
+				// Check if the ProxyAuthorizationHeader is correctly set
+				assert.Equal(t, "Bearer test-token-http-client", req.Header.Get(ProxyAuthorizationHeader))
+				return &http.Response{StatusCode: http.StatusOK}, nil
+			},
+		}
+		pat.transport = testRoundTripper
+
+		req, _ := http.NewRequest("GET", "http://example.com", nil)
+		_, err = httpClient.Do(req)
+		assert.NoError(t, err)
+	})
+}
