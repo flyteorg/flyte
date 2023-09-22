@@ -337,8 +337,7 @@ func TestSetHTTPClientContext(t *testing.T) {
 	t.Run("no proxy command and no proxy url", func(t *testing.T) {
 		cfg := &Config{}
 
-		newCtx, err := setHTTPClientContext(ctx, cfg, nil)
-		assert.NoError(t, err)
+		newCtx := setHTTPClientContext(ctx, cfg, nil)
 
 		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
 		assert.True(t, ok)
@@ -356,8 +355,7 @@ func TestSetHTTPClientContext(t *testing.T) {
 				Host:   "localhost:8080",
 			}},
 		}
-		newCtx, err := setHTTPClientContext(ctx, cfg, nil)
-		assert.NoError(t, err)
+		newCtx := setHTTPClientContext(ctx, cfg, nil)
 
 		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
 		assert.True(t, ok)
@@ -375,8 +373,7 @@ func TestSetHTTPClientContext(t *testing.T) {
 		p := NewPerRPCCredentialsFuture()
 		MaterializeProxyAuthCredentials(ctx, cfg, p)
 
-		newCtx, err := setHTTPClientContext(ctx, cfg, p)
-		assert.NoError(t, err)
+		newCtx := setHTTPClientContext(ctx, cfg, p)
 
 		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
 		assert.True(t, ok)
@@ -394,7 +391,7 @@ func TestSetHTTPClientContext(t *testing.T) {
 		pat.transport = testRoundTripper
 
 		req, _ := http.NewRequest("GET", "http://example.com", nil)
-		_, err = httpClient.Do(req)
+		_, err := httpClient.Do(req)
 		assert.NoError(t, err)
 	})
 }
