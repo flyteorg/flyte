@@ -124,7 +124,7 @@ func NewAdminConnection(ctx context.Context, cfg *Config, proxyCredentialsFuture
 	if opts == nil {
 		// Initialize opts list to the potential number of options we will add. Initialization optimizes memory
 		// allocation.
-		opts = make([]grpc.DialOption, 0, 6)
+		opts = make([]grpc.DialOption, 0, 7)
 	}
 
 	if cfg.UseInsecureConnection {
