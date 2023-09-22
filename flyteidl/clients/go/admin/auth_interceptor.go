@@ -63,16 +63,16 @@ func GetProxyTokenSource(ctx context.Context, cfg *Config) (oauth2.TokenSource, 
 	return proxyTokenSource, nil
 }
 
-func MaterializeProxyAuthCredentials(ctx context.Context, cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture) (context.Context, error) {
+func MaterializeProxyAuthCredentials(ctx context.Context, cfg *Config, proxyCredentialsFuture *PerRPCCredentialsFuture) error {
 	proxyTokenSource, err := GetProxyTokenSource(ctx, cfg)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	wrappedTokenSource := NewCustomHeaderTokenSource(proxyTokenSource, cfg.UseInsecureConnection, ProxyAuthorizationHeader)
 	proxyCredentialsFuture.Store(wrappedTokenSource)
 
-	return ctx, nil
+	return nil
 }
 
 func shouldAttemptToAuthenticate(errorCode codes.Code) bool {
@@ -164,7 +164,7 @@ func NewProxyAuthInterceptor(cfg *Config, proxyCredentialsFuture *PerRPCCredenti
 
 		err := invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
-			ctx, err := MaterializeProxyAuthCredentials(ctx, cfg, proxyCredentialsFuture)
+			err := MaterializeProxyAuthCredentials(ctx, cfg, proxyCredentialsFuture)
 			if err != nil {
 				return fmt.Errorf("proxy authorization error! Original Error: %v", err)
 			}
