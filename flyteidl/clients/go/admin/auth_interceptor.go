@@ -135,7 +135,7 @@ func NewAuthInterceptor(cfg *Config, tokenCache cache.TokenCache, credentialsFut
 	return func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, invoker grpc.UnaryInvoker, opts ...grpc.CallOption) error {
 		ctx, err := setHTTPClientContext(ctx, cfg, proxyCredentialsFuture)
 		if err != nil {
-			return err
+			return fmt.Errorf("Could not create http client for oauth! Original Error: %v", err)
 		}
 		err = invoker(ctx, method, req, reply, cc, opts...)
 		if err != nil {
