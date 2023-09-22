@@ -47,10 +47,10 @@ spec:
         {{- end }}
         {{- end }}
         {{- if .Values.commonAnnotations }}
-        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.commonAnnotations | toYaml ) . | nindent 8 }}
         {{- end }}
         {{- if .Values.deployment.podAnnotations }}
-        {{- tpl ( .Values.deployment.podAnnotations | toYaml ) . | nindent 4 }}
+        {{- tpl ( .Values.deployment.podAnnotations | toYaml ) . | nindent 8 }}
         {{- end }}
     spec:
       {{- if .Values.deployment.extraPodSpec }}
