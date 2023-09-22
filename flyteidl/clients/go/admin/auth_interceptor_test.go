@@ -371,7 +371,8 @@ func TestSetHTTPClientContext(t *testing.T) {
 		}
 
 		p := NewPerRPCCredentialsFuture()
-		MaterializeProxyAuthCredentials(ctx, cfg, p)
+		err := MaterializeProxyAuthCredentials(ctx, cfg, p)
+		assert.NoError(t, err)
 
 		newCtx := setHTTPClientContext(ctx, cfg, p)
 
@@ -391,7 +392,7 @@ func TestSetHTTPClientContext(t *testing.T) {
 		pat.transport = testRoundTripper
 
 		req, _ := http.NewRequest("GET", "http://example.com", nil)
-		_, err := httpClient.Do(req)
+		_, err = httpClient.Do(req)
 		assert.NoError(t, err)
 	})
 }
