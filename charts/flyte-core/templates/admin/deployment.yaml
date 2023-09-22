@@ -73,8 +73,9 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
           {{- if gt (len .Values.configmap.clusters.labelClusterMap) 0 }}
-          - mountPath: /var/run/credentials
-            name: cluster-credentials
+          {{- with .Values.flyteadmin.additionalVolumeMounts -}}
+          {{ tpl (toYaml .) $ | nindent 10 }}
+          {{- end }}
           {{- end }}
         {{- end }}
         - name: generate-secrets
