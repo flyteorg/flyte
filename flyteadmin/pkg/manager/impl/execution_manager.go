@@ -553,10 +553,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if err != nil {
 		return nil, nil, err
 	}
-	labels, err = m.addBaseExecutionLabel(ctx, workflowExecutionID.Name, labels)
-	if err != nil {
-		return nil, nil, err
-	}
+	labels = m.addBaseExecutionLabel(ctx, workflowExecutionID.Name, labels)
 
 	var annotations map[string]string
 	if executionConfig.Annotations != nil {
@@ -814,10 +811,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		return nil, nil, err
 	}
-	labels, err = m.addBaseExecutionLabel(ctx, workflowExecutionID.Name, labels)
-	if err != nil {
-		return nil, nil, err
-	}
+	labels = m.addBaseExecutionLabel(ctx, workflowExecutionID.Name, labels)
+
 	annotations, err := resolveStringMap(executionConfig.GetAnnotations(), launchPlan.Spec.Annotations, "annotations", m.config.RegistrationValidationConfiguration().GetMaxAnnotationEntries())
 	if err != nil {
 		return nil, nil, err
@@ -1698,14 +1693,14 @@ func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName str
 // Adds base execution label to execution labels. Base execution label is ignored if a corresponding label is set on the execution already.
 // An execution label will exist if Flytepropeller launches a child workflow execution, as it will copy the parent execution's labels.
 // This label can later be used to retrieve all executions that were launched from a given execution, no matter how deep in the recursion tree.
-func (m *ExecutionManager) addBaseExecutionLabel(_ context.Context, execID string, initialLabels map[string]string) (map[string]string, error) {
+func (m *ExecutionManager) addBaseExecutionLabel(_ context.Context, execID string, initialLabels map[string]string) map[string]string {
 	if initialLabels == nil {
 		initialLabels = make(map[string]string)
 	}
 	if _, ok := initialLabels[shared.BaseExecutionIDLabelKey]; !ok {
 		initialLabels[shared.BaseExecutionIDLabelKey] = execID
 	}
-	return initialLabels, nil
+	return initialLabels
 }
 
 func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error) {
