@@ -103,7 +103,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	for i, tag := range input.RequestSpec.Tags {
 		tags[i] = models.AdminTag{Name: tag}
 	}
-
+	
 	executionModel := &models.Execution{
 		ExecutionKey: models.ExecutionKey{
 			Project: input.WorkflowExecutionID.Project,
@@ -294,7 +294,6 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 
 // Update tag information of existing execution model.
 func UpdateExecutionModelTag(executionModel *models.Execution, tagsUpdatedTo []string) error {
-	//tagUpdatedAt time.Time, tagUpdatedBy string) error {
 
 	var spec admin.ExecutionSpec
 	var err error
@@ -302,54 +301,25 @@ func UpdateExecutionModelTag(executionModel *models.Execution, tagsUpdatedTo []s
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
 	}
 
-	// Update the closure with the same
-	//var tagUpdatedAtProto *timestamppb.Timestamp
-	// Default use the createdAt timestamp as the state change occurredAt time
-	//if stateUpdatedAtProto, err = ptypes.TimestampProto(stateUpdatedAt); err != nil {
-	//	return err
-	//}
-
-	// combine tags and tagsUpdatedTo to one []models.AdminTag and then write back to executionModel.Tags
-	// logger out the tags name of executionModel.Tags
-	//logger.Infof(context.Background(), "Before UpdateTag is executed")
-	//for _, tag := range spec.Tags {
-	//	logger.Infof(context.Background(), "tag name: %v", tag)
-	//}
-	//Append tagsUpdatedTo to spec.Tags, but use set to avoid duplicate tags
 	tagSet := sets.NewString()
 	for _, tag := range spec.Tags {
 		tagSet.Insert(tag)
 	}
 	for _, tag := range tagsUpdatedTo {
+		// if tag not in tagSet, append into executionModel.Tags
+		if !tagSet.Has(tag) {
+			executionModel.Tags = append(executionModel.Tags, models.AdminTag{Name: tag})
+		}
 		tagSet.Insert(tag)
 	}
 	spec.Tags = tagSet.List()
-	//logger.Infof(context.Background(), "After tag name: %v", spec.Tags)
-	//spec.Tags = append(spec.Tags, tagsUpdatedTo...)
-	//Write into DB
+	
 	marshaledSpec, err := proto.Marshal(&spec)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution spec: %v", err)
 	}
 	executionModel.Spec = marshaledSpec
 
-	// logger out the tags name of executionModel.Tags
-
-	//logger.Infof(context.Background(), "After UpdateTag is executed")
-	//for _, tag := range executionModel.Tags {
-	//	logger.Infof(context.Background(), "tag name: %v", tag.Name)
-	//}
-	//I need to figure out where is tag is wrote?
-	//closure.StateChangeDetails = &admin.ExecutionStateChangeDetails{
-	//	Tags:      tagsUpdatedTo,
-	//	Principal:  stateUpdatedBy,
-	//	OccurredAt: stateUpdatedAtProto,
-	//}
-	//marshaledClosure, err := proto.Marshal(&closure)
-	//if err != nil {
-	//	return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
-	//}
-	//executionModel.Closure = marshaledClosure
 	return nil
 }
 
