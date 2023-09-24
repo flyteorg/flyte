@@ -81,7 +81,7 @@ func NewDataCatalogService() *DataCatalogService {
 	defer func() {
 		if err := recover(); err != nil {
 			catalogScope.MustNewCounter("initialization_panic",
-				"panics encountered initializating the datacatalog service").Inc()
+				"panics encountered initializing the datacatalog service").Inc()
 			logger.Fatalf(context.Background(), fmt.Sprintf("caught panic: %v [%+v]", err, string(debug.Stack())))
 		}
 	}()

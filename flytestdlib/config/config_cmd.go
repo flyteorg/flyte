@@ -57,7 +57,7 @@ func NewConfigCommand(accessorProvider AccessorProvider) *cobra.Command {
 
 	docsCmd := &cobra.Command{
 		Use:   "docs",
-		Short: "Generate configuration documetation in rst format",
+		Short: "Generate configuration documentation in rst format",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			sections := GetRootSection().GetSections()
 			orderedSectionKeys := sets.NewString()

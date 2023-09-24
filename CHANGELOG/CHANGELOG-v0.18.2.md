@@ -29,7 +29,7 @@ See the flytekit [0.25.0 release notes](https://github.com/flyteorg/flytekit/rel
   In addition to component-specific versions released from each of the flyte repositories (e.g. flytepropeller:v0.16.5), new images will be re-tagged and pushed that match the flyte release version (e.g. the upcoming flytepropeller-release:v0.18.2). This makes it easier to make sure all your deployments are on the same version to ensure best compatibility.
 * Helm changes
     * [flyte-core](https://artifacthub.io/packages/helm/flyte/flyte-core) helm chart has reached release preview and can be leveraged to install your cloud(AWS/GCP) deployments of flyte.
-    * Going forward flyte-core will install flyte native scheduler, For AWS backword compatibility you need to define `workflow_schedule.type` to `aws`. (https://github.com/flyteorg/flyte/pull/1896)
+    * Going forward flyte-core will install flyte native scheduler, For AWS backward compatibility you need to define `workflow_schedule.type` to `aws`. (https://github.com/flyteorg/flyte/pull/1896)
     * [flyte](https://artifacthub.io/packages/helm/flyte/flyte) helm chart has been refactored to depend on flyte-core helm chart and install additional dependencies to continue to provide a sandboxed installation of flyte.
 
     **Migration Notes**
@@ -43,7 +43,7 @@ See the flytekit [0.25.0 release notes](https://github.com/flyteorg/flytekit/rel
         ...
       minio:
         ...
-      countour:
+      contour:
         ...
       ```
     
@@ -56,7 +56,7 @@ See the flytekit [0.25.0 release notes](https://github.com/flyteorg/flytekit/rel
           ...
       minio:
         ...
-      countour:
+      contour:
         ...    
       ```
-    * Alternatively, if you do not have any dependency on external flyte depdencies, you can keep your ``myvalues.yaml`` and switch to using ``flyte-core`` helm chart directly with no changes.
+    * Alternatively, if you do not have any dependency on external flyte dependencies, you can keep your ``myvalues.yaml`` and switch to using ``flyte-core`` helm chart directly with no changes.

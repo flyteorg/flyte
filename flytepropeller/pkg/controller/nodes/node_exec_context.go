@@ -84,7 +84,7 @@ func (e eventRecorder) RecordNodeEvent(ctx context.Context, nodeEvent *event.Nod
 				return nil
 			}
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
-			return nodeerrors.Wrapf(nodeerrors.IllegalStateError, nodeEvent.Id.NodeId, err, "phase mis-match mismatch between propeller and control plane; Trying to record Node p: %s", nodeEvent.Phase)
+			return nodeerrors.Wrapf(nodeerrors.IllegalStateError, nodeEvent.Id.NodeId, err, "phase mismatch mismatch between propeller and control plane; Trying to record Node p: %s", nodeEvent.Phase)
 		}
 	}
 	return err

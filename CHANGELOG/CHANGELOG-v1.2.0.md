@@ -4,7 +4,7 @@
 - Support for Ray (https://github.com/flyteorg/flyte/issues/2641) - Also see the [blog post](https://blog.flyte.org/ray-and-flyte). 
 - Execution names can be longer now, up to 63 characters (https://github.com/flyteorg/flyteadmin/pull/466)
 - Offloading FlyteWorkflow CRD static workflow spec (https://github.com/flyteorg/flyte/issues/2705)
-- Enabled FlytePropeller subqueue - this means that everytime a pod is updated in the workflow it reevals for faster downstream scheduling
+- Enabled FlytePropeller subqueue - this means that every time a pod is updated in the workflow it reevals for faster downstream scheduling
 - Add container configuration to default pod template (https://github.com/flyteorg/flyte/issues/2703)
 - Fixed issues with blobstore writes - GCS had duplicate writes and subworkflow inputs were rewritten on every evaluation, this meant slower evaluations
 - Support external deletion of non-terminal map task subtasks (as a result of https://github.com/flyteorg/flyte/issues/2701)

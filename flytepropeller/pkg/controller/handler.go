@@ -267,7 +267,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 		}
 
 		if err != nil {
-			// NOTE We are overriding the deepcopy here, as we are essentially ingnoring all mutations
+			// NOTE We are overriding the deepcopy here, as we are essentially ignoring all mutations
 			// We only want to increase failed attempts and discard any other partial changes to the CRD.
 			mutatedWf = RecordSystemError(w, err)
 			p.metrics.SystemError.Inc(ctx)

@@ -85,11 +85,11 @@ message LaunchPlanSpec {
     LaunchPlanMetadata entity_metadata = 2;
 
     // Input values to be passed for the execution.
-    // These can be overriden when an execution is created with this launch plan.
+    // These can be overridden when an execution is created with this launch plan.
     core.ParameterMap default_inputs = 3;
 
     // Fixed, non-overridable inputs for the Launch Plan.
-    // These can not be overriden when an execution is created with this launch plan.
+    // These can not be overridden when an execution is created with this launch plan.
     core.LiteralMap fixed_inputs = 4;
 
     // String to indicate the role to use to execute the workflow underneath

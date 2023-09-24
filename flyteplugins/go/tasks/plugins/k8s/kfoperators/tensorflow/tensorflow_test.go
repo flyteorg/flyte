@@ -85,7 +85,7 @@ func dummyTensorFlowTaskTemplate(id string, args ...interface{}) *core.TaskTempl
 			var tensorflowCustomObj = t
 			tfObjJSON, err = utils.MarshalToString(tensorflowCustomObj)
 		default:
-			err = fmt.Errorf("Unkonw input type %T", t)
+			err = fmt.Errorf("Unknown input type %T", t)
 		}
 	}
 

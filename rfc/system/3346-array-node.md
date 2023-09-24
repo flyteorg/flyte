@@ -82,7 +82,7 @@ If this is implemented correctly, the performance should be very similar to exis
 
 ## 5 Drawbacks
 
-The only currently known drawback of this proposal is adding cache lookups for subtasks as a synchronous call. The existing implementation, implementing as a backend plugin, uses a separate service to batch cache lookups that are performed asynchronously. This is marginally more efficient but does introduce it's own problems in complexity. Additionally, while the performance of cache lookups may be slightly degraded, the introduction of ArrayNodes means that cacheing will be functionality complete, specifically cache serialization and cache overwriting will be supported over `map_task` subtasks.
+The only currently known drawback of this proposal is adding cache lookups for subtasks as a synchronous call. The existing implementation, implementing as a backend plugin, uses a separate service to batch cache lookups that are performed asynchronously. This is marginally more efficient but does introduce it's own problems in complexity. Additionally, while the performance of cache lookups may be slightly degraded, the introduction of ArrayNodes means that caching will be functionality complete, specifically cache serialization and cache overwriting will be supported over `map_task` subtasks.
 
 ## 6 Alternatives
 

@@ -73,7 +73,7 @@ Sample configuration, illustrating 3 separate sharding techniques, is provided b
               - flyteexamples
               - flytelab
 
-		  # process the 'production' domain on a single instace and all other domains on another
+		  # process the 'production' domain on a single instance and all other domains on another
           type: domain
 		  enableUncoveredReplica: true
           replicas:

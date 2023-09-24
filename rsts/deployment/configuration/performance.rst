@@ -69,7 +69,7 @@ Let us first look at various config properties that can be set and would impact 
      - Description
    * - ``workers``
      - propeller
-     - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context swtiching. A number usually < 500 - 800 with 4-8 cpu cores works fine.
+     - Larger the number, implies more workflows can be evaluated in parallel. But it should depend on number of CPU cores assigned to FlytePropeller and evaluated against the cost of context switching. A number usually < 500 - 800 with 4-8 cpu cores works fine.
      - Number of `logical threads` workers, that can work concurrently. Also implies number of workflows that can be executed in parallel. Since FlytePropeller uses go-routines, it can run way  more than number of physical cores.
    * - ``workflow-reeval-duration``
      - propeller
@@ -101,7 +101,7 @@ Let us first look at various config properties that can be set and would impact 
      - It is essential to limit the number of writes from FlytePropeller to flyteadmin to prevent brown-outs or request throttling at the server. Also the cache reduces number of calls to the server.
    * - ``tasks.backoff.max-duration``
      - propeller
-     - This config is used to configure the maximum back-off interval incase of resource-quota errors
+     - This config is used to configure the maximum back-off interval in case of resource-quota errors
      - FlytePropeller will automatically back-off when k8s or other services request it to slowdown or when desired quotas are met.
    * - ``max-parallelism``
      - admin, per workflow, per execution
@@ -147,9 +147,9 @@ The worst case for FlytePropeller is workflows that have an extremely large fan-
 A solution for this is to limit the maximum number of nodes that can be evaluated. This can be done by setting max-parallelism for an execution.
 This can done in multiple ways
 
-#. Platform default: This allows to set platform-wide defaults for maximum concurrency within a Workflow execution. This can be overriden per Launch plan or per execution.
+#. Platform default: This allows to set platform-wide defaults for maximum concurrency within a Workflow execution. This can be overridden per Launch plan or per execution.
    The default `maxParallelism is configured to be 25 <https://github.com/flyteorg/flyteadmin/blob/master/pkg/runtime/application_config_provider.go#L40>`_.
-   It can be overriden with this config block in flyteadmin
+   It can be overridden with this config block in flyteadmin
 
    .. code-block:: yaml
 
@@ -167,19 +167,19 @@ This can done in multiple ways
          max_parallelism=30,
        )
 
-#. Specify for an execution. For any specific execution the max-parallelism can be overriden. This can be done using flytectl (and soon flyteconsole). Refer to :std:ref:`flyteCtl docs <flytectl:flytectl_create_execution>`
+#. Specify for an execution. For any specific execution the max-parallelism can be overridden. This can be done using flytectl (and soon flyteconsole). Refer to :std:ref:`flyteCtl docs <flytectl:flytectl_create_execution>`
 
 
 
 
 Scaling out FlyteAdmin
 =======================
-FlyteAdmin is a stateless service. Often time before needing to scale FlyteAdmin, you need to scale the backing database. Check out the FlyteAdmin Dashboard to see signs of latency degredation and increase the size of backing postgres instance.
+FlyteAdmin is a stateless service. Often time before needing to scale FlyteAdmin, you need to scale the backing database. Check out the FlyteAdmin Dashboard to see signs of latency degradation and increase the size of backing postgres instance.
 FlyteAdmin is a stateless service and its replicas (in the kubernetes deployment) can be simply increased to allow higher throughput.
 
 Scaling out Datacatalog
 ========================
-Datacatalog is a stateless service. Often time before needing to scale Datacatalog, you need to scale the backing database. Check out the Datacatalog Dashboard to see signs of latency degredation and increase the size of backing postgres instance.
+Datacatalog is a stateless service. Often time before needing to scale Datacatalog, you need to scale the backing database. Check out the Datacatalog Dashboard to see signs of latency degradation and increase the size of backing postgres instance.
 Datacatalog is a stateless service and its replicas (in the kubernetes deployment) can be simply increased to allow higher throughput.
 
 Scaling out FlytePropeller
@@ -191,11 +191,11 @@ FlytePropeller can be run manually per namespace. This is not a recommended solu
 
 Automatic scale-out
 -------------------
-FlytePropeller Manager is a new component introduced as part of `this RFC <https://github.com/flyteorg/flyte/blob/master/rfc/system/1483-flytepropeller-horizontal-scaling.md>`_ to facilitate horizontal scaling of FlytePropeller through sharding. Effectively, the Manager is responsible for maintaining liveness and proper configuration over a collection of FlytePropeller instances. This scheme uses k8s label selectors to deterministically assign FlyteWorkflow CRD responsibilites to FlytePropeller instances, effectively distributing processing load over the shards.
+FlytePropeller Manager is a new component introduced as part of `this RFC <https://github.com/flyteorg/flyte/blob/master/rfc/system/1483-flytepropeller-horizontal-scaling.md>`_ to facilitate horizontal scaling of FlytePropeller through sharding. Effectively, the Manager is responsible for maintaining liveness and proper configuration over a collection of FlytePropeller instances. This scheme uses k8s label selectors to deterministically assign FlyteWorkflow CRD responsibilities to FlytePropeller instances, effectively distributing processing load over the shards.
 
 Deployment of FlytePropeller Manager requires k8s configuration updates including a modified FlytePropeller Deployment and a new PodTemplate defining managed FlytePropeller instances. The easiest way to apply these updates is by setting the "flytepropeller.manager" value to "true" in the `helm deployment <https://docs.flyte.org/en/latest/deployment/overview.html#usage-of-helm>`_ and setting the manager config at "configmap.core.manager".
 
-Flyte provides a variety of Shard Strategies to configure how FlyteWorkflows are sharded among managed FlytePropeller instances. These include hash, which uses consitent hashing to load-balance evaluation over shards, and project / domain, which map the respective IDs to specific managed FlytePropeller instances. Below we include examples of helm configurations for each of the existing Shard Strategies.
+Flyte provides a variety of Shard Strategies to configure how FlyteWorkflows are sharded among managed FlytePropeller instances. These include hash, which uses consistent hashing to load-balance evaluation over shards, and project / domain, which map the respective IDs to specific managed FlytePropeller instances. Below we include examples of helm configurations for each of the existing Shard Strategies.
 
 The Hash Shard Strategy, denoted by "type: hash" in the configuration below, uses consistent hashing to evenly distribute FlyteWorkflows over managed FlytePropeller instances. This configuration requires a "shard-count" variable which defines the number of managed FlytePropeller instances.
 
@@ -259,6 +259,6 @@ Offloading Static Workflow Information from CRD
 
 Flyte uses a k8s CRD (Custom Resource Definition) to store and track workflow executions. This resource includes the workflow definition, for example tasks and subworkflows that are involved and the dependencies between nodes, but also includes the execution status of the workflow. The latter information (ie. runtime status) is dynamic, meaning changes during the workflow's execution as nodes transition phases and the workflow execution progresses. However, the former information (ie. workflow definition) remains static, meaning it will never change and is only consulted to retrieve node definitions and workflow dependencies.
 
-CRDs are stored within etcd, a key-value datastore heavily used in kubernetes. Etcd requires a complete rewrite of the value data everytime a single field changes. Consequently, the read / write performance of etcd, as with all key-value stores, is strongly correlated with the size of the data. In Flyte's case, to guarantee only-once execution of nodes we need to persist workflow state by updating the CRD at every node phase change. As the size of a workflow increases this means we are frequently rewritting a large CRD. In addition to poor read / write performance in etcd this update may be restricted by a hard limit on the overall CRD size.
+CRDs are stored within etcd, a key-value datastore heavily used in kubernetes. Etcd requires a complete rewrite of the value data every time a single field changes. Consequently, the read / write performance of etcd, as with all key-value stores, is strongly correlated with the size of the data. In Flyte's case, to guarantee only-once execution of nodes we need to persist workflow state by updating the CRD at every node phase change. As the size of a workflow increases this means we are frequently rewriting a large CRD. In addition to poor read / write performance in etcd this update may be restricted by a hard limit on the overall CRD size.
 
 To counter the challenges of large FlyteWorkflow CRDs Flyte includes a configuration option to offload the static portions of the CRD (ie. workflow / task / subworkflow definitions and node dependencies) to the blobstore. This functionality can be enabled by setting the ``useOffloadedWorkflowClosure`` option to ``true`` in the `FlyteAdmin configuration <https://docs.flyte.org/en/latest/deployment/cluster_config/flyteadmin_config.html#useoffloadedworkflowclosure-bool>`_. When set, the FlyteWorkflow CRD will populate a ``WorkflowClosureReference`` field on the CRD with the location of the static data and FlytePropeller will read this information (through a cache) during each workflow evaluation. One important note is that currently this requires FlyteAdmin and FlytePropeller to have access to the same blobstore since FlyteAdmin only specifies a blobstore location in the CRD.

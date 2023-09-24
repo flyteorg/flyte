@@ -78,7 +78,7 @@ func (w *ScheduledExecutor) Run(ctx context.Context) error {
 	gcronUpdater := core.NewUpdater(w.db, gcronScheduler)
 	go wait.UntilWithContext(updaterCtx, gcronUpdater.UpdateGoCronSchedules, scheduleUpdaterDuration)
 
-	// Catch up simulataneously on all the schedules in the scheduler
+	// Catch up simultaneously on all the schedules in the scheduler
 	currTime := time.Now()
 	af := futures.NewAsyncFuture(ctx, func(ctx context.Context) (interface{}, error) {
 		return gcronScheduler.CatchupAll(ctx, currTime), nil

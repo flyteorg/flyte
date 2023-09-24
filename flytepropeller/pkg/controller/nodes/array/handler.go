@@ -369,7 +369,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		if len(arrayNodeState.SubNodePhases.GetItems())-failedCount < minSuccesses {
-			// no chance to reach the mininum number of successes
+			// no chance to reach the minimum number of successes
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseFailing
 		} else if successCount >= minSuccesses && runningCount == 0 {
 			// wait until all tasks have completed before declaring success
@@ -480,7 +480,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		// need to increment taskPhaseVersion if arrayNodeState.Phase does not change, otherwise
 		// reset to 0. by incrementing this always we report an event and ensure processing
-		// everytime the ArrayNode is evaluated. if this overhead becomes too large, we will need
+		// every time the ArrayNode is evaluated. if this overhead becomes too large, we will need
 		// to revisit and only increment when any subNode state changes.
 		if currentArrayNodePhase != arrayNodeState.Phase {
 			arrayNodeState.TaskPhaseVersion = 0
@@ -547,7 +547,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	nodePhase := v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(subNodeIndex))
 	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))
 
-	// need to initialize the inputReader everytime to ensure TaskHandler can access for cache lookups / population
+	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
 	inputLiteralMap, err := constructLiteralMap(ctx, nCtx.InputReader(), subNodeIndex)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, nil, err

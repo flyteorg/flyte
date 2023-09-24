@@ -83,7 +83,7 @@ func dummyMPITaskTemplate(id string, args ...interface{}) *core.TaskTemplate {
 			var mpiCustomObj = t
 			mpiObjJSON, err = utils.MarshalToString(mpiCustomObj)
 		default:
-			err = fmt.Errorf("Unkonw input type %T", t)
+			err = fmt.Errorf("Unknown input type %T", t)
 		}
 	}
 

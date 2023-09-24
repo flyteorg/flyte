@@ -252,7 +252,7 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "DB Secret backend enginge is supported",
+			name: "DB Secret backend engine is supported",
 			args: args{
 				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion1},
 				secret: &coreIdl.Secret{

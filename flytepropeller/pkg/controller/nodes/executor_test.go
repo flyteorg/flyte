@@ -440,7 +440,7 @@ func TestNodeExecutor_RecursiveNodeHandler_RecurseEndNode(t *testing.T) {
 			}, false},
 
 			{"queued->failed", v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseFailed, interfaces.NodePhaseFailed, func() (handler.Transition, error) {
-				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, "code", "mesage", nil)), nil
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_USER, "code", "message", nil)), nil
 			}, false},
 
 			{"queued->running", v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseRunning, interfaces.NodePhasePending, func() (handler.Transition, error) {

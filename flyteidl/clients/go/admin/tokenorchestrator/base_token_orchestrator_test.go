@@ -45,7 +45,7 @@ func TestRefreshTheToken(t *testing.T) {
 
 func TestFetchFromCache(t *testing.T) {
 	ctx := context.Background()
-	metatdata := &service.OAuth2MetadataResponse{
+	metadata := &service.OAuth2MetadataResponse{
 		TokenEndpoint:   "/token",
 		ScopesSupported: []string{"code", "all"},
 	}
@@ -54,7 +54,7 @@ func TestFetchFromCache(t *testing.T) {
 		RedirectUri:              "http://localhost:8089/redirect",
 	}
 	mockAuthClient := new(mocks.AuthMetadataServiceClient)
-	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
+	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
 	mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 
 	t.Run("no token in cache", func(t *testing.T) {
