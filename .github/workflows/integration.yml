@@ -16,7 +16,7 @@ on:
 jobs:
   integration:
     name: Integration tests
-    runs-on: ubuntu-latest
+    runs-on: union-k8s-runner
     defaults:
       run:
         working-directory: ${{ inputs.component }}

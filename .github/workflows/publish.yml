@@ -31,7 +31,7 @@ on:
 jobs:
   push-github:
     name: Push to Github Registry
-    runs-on: ubuntu-latest
+    runs-on: union-k8s-runner
     steps:
       - uses: actions/checkout@v3
         with:
