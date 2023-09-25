@@ -33,7 +33,7 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
 
     .. link-button:: deployment-agent-setup
        :type: ref
-       :text: 🔥 Agent Setup
+       :text: 🤖 Agent Setup
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
     Enable Flyte agents to extend Flyte's capabilities, including features like File sesnor, Databricks job, and Snowflake query services.
