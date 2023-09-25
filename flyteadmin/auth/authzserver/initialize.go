@@ -7,7 +7,7 @@ import (
 
 	"github.com/ory/fosite"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 
 	"github.com/ory/fosite/compose"
 	"github.com/ory/fosite/token/jwt"

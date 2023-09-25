@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/flyteorg/flyteadmin/cmd/entrypoints"
-	"github.com/flyteorg/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteadmin/cmd/entrypoints"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/golang/glog"
 )
 

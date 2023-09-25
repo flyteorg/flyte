@@ -6,8 +6,8 @@ package repositories
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/stretchr/testify/assert"
 )
 

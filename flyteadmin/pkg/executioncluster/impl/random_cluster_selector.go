@@ -6,23 +6,23 @@ import (
 	"hash/fnv"
 	"math/rand"
 
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/resources"
-	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
+	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
 
-	"github.com/flyteorg/flytestdlib/random"
+	"github.com/flyteorg/flyte/flytestdlib/random"
 
-	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	runtime "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 )
 
 // Implementation of Random cluster selector

@@ -14,13 +14,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	stdLibErrs "github.com/flyteorg/flytestdlib/errors"
+	stdLibErrs "github.com/flyteorg/flyte/flytestdlib/errors"
 
 	"github.com/spf13/cobra"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/config/files"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config/files"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/mitchellh/mapstructure"

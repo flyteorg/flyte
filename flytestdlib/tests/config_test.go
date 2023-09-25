@@ -9,12 +9,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/internal/utils"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
 )

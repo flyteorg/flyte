@@ -12,7 +12,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/json"
 
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"

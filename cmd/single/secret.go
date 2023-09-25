@@ -1,7 +1,7 @@
 package single
 
 import (
-	"github.com/flyteorg/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/spf13/cobra"
 )
 

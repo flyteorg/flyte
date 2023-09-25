@@ -6,8 +6,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	authConfig "github.com/flyteorg/flyteadmin/auth/config"
-	"github.com/flyteorg/flytestdlib/config"
+	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 const SectionKey = "server"

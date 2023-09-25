@@ -1,6 +1,6 @@
 package deviceflow
 
-import "github.com/flyteorg/flytestdlib/config"
+import "github.com/flyteorg/flyte/flytestdlib/config"
 
 // Config defines settings used for Device orchestration flow.
 type Config struct {

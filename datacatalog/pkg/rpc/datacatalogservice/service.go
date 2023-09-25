@@ -13,16 +13,16 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/flyteorg/datacatalog/pkg/config"
-	"github.com/flyteorg/datacatalog/pkg/manager/impl"
-	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
-	"github.com/flyteorg/datacatalog/pkg/repositories"
-	"github.com/flyteorg/datacatalog/pkg/runtime"
+	"github.com/flyteorg/flyte/datacatalog/pkg/config"
+	"github.com/flyteorg/flyte/datacatalog/pkg/manager/impl"
+	"github.com/flyteorg/flyte/datacatalog/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
+	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	catalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
 )
 
 type DataCatalogService struct {

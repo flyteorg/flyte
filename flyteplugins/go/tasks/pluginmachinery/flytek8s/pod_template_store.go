@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"

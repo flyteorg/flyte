@@ -3,9 +3,9 @@ package core
 import (
 	"context"
 
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Updater this updates the scheduler with the latest state of schedules from the DB.

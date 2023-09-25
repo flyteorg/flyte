@@ -3,7 +3,7 @@ package validation
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"

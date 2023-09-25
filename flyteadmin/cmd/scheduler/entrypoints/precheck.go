@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flytestdlib/logger"
 
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc/health/grpc_health_v1"

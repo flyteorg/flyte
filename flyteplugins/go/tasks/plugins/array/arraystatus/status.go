@@ -8,8 +8,8 @@ import (
 	"encoding/binary"
 	"hash/fnv"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
 type JobID = string

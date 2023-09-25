@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	coreIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
 	"github.com/go-test/deep"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

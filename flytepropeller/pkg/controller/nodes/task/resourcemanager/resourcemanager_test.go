@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
+	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	core2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	rmConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"

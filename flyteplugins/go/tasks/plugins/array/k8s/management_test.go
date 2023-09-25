@@ -6,18 +6,18 @@ import (
 
 	core2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
-	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
+	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/flyteorg/flytestdlib/bitarray"
-	"github.com/flyteorg/flytestdlib/storage"
-	stdmocks "github.com/flyteorg/flytestdlib/storage/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+	stdmocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -34,6 +34,7 @@ import (
 type metadata struct {
 	exists bool
 	size   int64
+	etag   string
 }
 
 func (m metadata) Exists() bool {
@@ -42,6 +43,10 @@ func (m metadata) Exists() bool {
 
 func (m metadata) Size() int64 {
 	return m.size
+}
+
+func (m metadata) Etag() string {
+	return m.etag
 }
 
 func createSampleContainerTask() *core2.Container {
@@ -124,7 +129,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	matchedBy := mock.MatchedBy(func(s storage.DataReference) bool {
 		return true
 	})
-	composedProtobufStore.On("Head", mock.Anything, matchedBy).Return(metadata{true, 0}, nil)
+	composedProtobufStore.On("Head", mock.Anything, matchedBy).Return(metadata{true, 0, ""}, nil)
 	dataStore := &storage.DataStore{
 		ComposedProtobufStore: composedProtobufStore,
 		ReferenceConstructor:  &storage.URLPathConstructor{},

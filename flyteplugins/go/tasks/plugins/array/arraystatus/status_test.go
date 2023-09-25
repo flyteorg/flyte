@@ -7,9 +7,9 @@ package arraystatus
 import (
 	"testing"
 
-	types "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	types "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 
 	"github.com/stretchr/testify/assert"
 )

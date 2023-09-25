@@ -3,7 +3,7 @@ package core
 import (
 	"context"
 
-	sImpl "github.com/flyteorg/flyteadmin/scheduler/snapshoter"
+	sImpl "github.com/flyteorg/flyte/flyteadmin/scheduler/snapshoter"
 )
 
 const snapShotVersion = 1

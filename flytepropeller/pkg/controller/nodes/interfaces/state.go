@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 )
 
 type NodeStateWriter interface {

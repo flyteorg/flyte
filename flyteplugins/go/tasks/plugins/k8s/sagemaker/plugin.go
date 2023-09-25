@@ -5,17 +5,17 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	pluginErrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 
 	"k8s.io/client-go/kubernetes/scheme"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 	hpojobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/hyperparametertuningjob"
 	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 // Sanity test that the plugin implements method of k8s.Plugin

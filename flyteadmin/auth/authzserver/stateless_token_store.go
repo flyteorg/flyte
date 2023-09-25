@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/ory/fosite/handler/oauth2"

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flytepropeller/cmd/kubectl-flyte/cmd"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytepropeller/cmd/kubectl-flyte/cmd"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 

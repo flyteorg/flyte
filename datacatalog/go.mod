@@ -1,11 +1,11 @@
-module github.com/flyteorg/datacatalog
+module github.com/flyteorg/flyte/datacatalog
 
 go 1.19
 
 require (
 	github.com/Selvatico/go-mocket v1.0.7
-	github.com/flyteorg/flyteidl v1.3.6
-	github.com/flyteorg/flytestdlib v1.0.22
+	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/gofrs/uuid v4.2.0+incompatible
 	github.com/golang/glog v1.1.0
 	github.com/golang/protobuf v1.5.3
@@ -104,4 +104,13 @@ require (
 	k8s.io/apimachinery v0.20.2 // indirect
 	k8s.io/client-go v0.0.0-20210217172142-7279fc64d847 // indirect
 	k8s.io/klog/v2 v2.5.0 // indirect
+)
+
+replace (
+	github.com/flyteorg/flyte/datacatalog => ../datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyteidl => ../flyteidl
 )

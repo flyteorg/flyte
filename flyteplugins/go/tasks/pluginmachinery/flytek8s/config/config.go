@@ -10,10 +10,10 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	config2 "github.com/flyteorg/flytestdlib/config"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 )
 
 //go:generate pflags K8sPluginConfig --default-var=defaultK8sConfig

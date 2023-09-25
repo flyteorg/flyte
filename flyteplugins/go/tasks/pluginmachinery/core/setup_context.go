@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"k8s.io/apimachinery/pkg/types"
 )
 

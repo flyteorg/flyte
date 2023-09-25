@@ -9,15 +9,15 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/flyteorg/datacatalog/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
 
-	apiErrors "github.com/flyteorg/datacatalog/pkg/errors"
+	apiErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"google.golang.org/grpc/codes"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

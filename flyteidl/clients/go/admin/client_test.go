@@ -18,6 +18,8 @@ import (
 	"golang.org/x/oauth2"
 	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
 
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
 	cachemocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
@@ -25,8 +27,6 @@ import (
 	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyteidl/clients/go/admin/tokenorchestrator"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 func TestInitializeAndGetAdminClient(t *testing.T) {

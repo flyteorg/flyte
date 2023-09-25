@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
-	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
-	stdConfig "github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/gorilla/securecookie"
 	"github.com/stretchr/testify/assert"
 )

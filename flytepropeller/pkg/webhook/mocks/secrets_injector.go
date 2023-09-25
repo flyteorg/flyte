@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	config "github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	config "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 
 	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 

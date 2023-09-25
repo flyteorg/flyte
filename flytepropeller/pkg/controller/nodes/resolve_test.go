@@ -4,20 +4,20 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
-	flyteassert "github.com/flyteorg/flytepropeller/pkg/utils/assert"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
+	flyteassert "github.com/flyteorg/flyte/flytepropeller/pkg/utils/assert"
 )
 
 var testScope = promutils.NewScope("test")

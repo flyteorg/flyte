@@ -1,4 +1,6 @@
+//go:build integration
 // +build integration
+
 // Add this tag to your project settings if you want to pick it up.
 
 package events
@@ -15,7 +17,7 @@ import (
 	"github.com/flyteorg/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/golang/protobuf/ptypes"
 )
 
@@ -30,11 +32,17 @@ var (
 )
 
 // To run this test, and see if the deadline working, pick an existing successful execution from your admin database
-// 		select * from executions;
+//
+//	select * from executions;
+//
 // Then delete all the events from it.
-// 		delete from execution_events where execution_name = 'ikuy55mn0y';
+//
+//	delete from execution_events where execution_name = 'ikuy55mn0y';
+//
 // Then run this
-// 		begin work; lock table executions in ACCESS EXCLUSIVE mode; SELECT pg_sleep(20); commit work;
+//
+//	begin work; lock table executions in ACCESS EXCLUSIVE mode; SELECT pg_sleep(20); commit work;
+//
 // This will lock your table so that admin can't read it, causing the grpc call to timeout.
 // On timeout, you should get a deadline exceeded error.  Otherwise, you should get an error to the effect of
 // "Invalid phase change from SUCCEEDED to RUNNING" or something like that.

@@ -1,7 +1,7 @@
 package interfaces
 
 import (
-	schedulerInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
+	schedulerInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	"gorm.io/gorm"
 )
 

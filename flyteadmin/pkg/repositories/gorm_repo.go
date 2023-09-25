@@ -1,12 +1,12 @@
 package repositories
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/gormimpl"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	schedulerGormImpl "github.com/flyteorg/flyteadmin/scheduler/repositories/gormimpl"
-	schedulerInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gormimpl"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	schedulerGormImpl "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/gormimpl"
+	schedulerInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 )
 

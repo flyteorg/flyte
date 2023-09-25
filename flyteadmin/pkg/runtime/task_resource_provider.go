@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 

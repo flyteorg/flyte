@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 const configSectionKey = "plugins"

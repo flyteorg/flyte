@@ -12,10 +12,10 @@ import (
 	a "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/batch"
-	"github.com/flyteorg/flyteplugins/go/tasks/aws"
-	definition2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/aws"
+	definition2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 //go:generate mockery -all -case=underscore

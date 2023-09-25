@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // RetryDelay indicates how long to wait between restarting a subscriber connection in the case of network failures.
