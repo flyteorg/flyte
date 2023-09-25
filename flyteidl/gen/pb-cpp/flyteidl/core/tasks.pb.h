@@ -51,7 +51,7 @@ struct TableStruct_flyteidl_2fcore_2ftasks_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[18]
+  static const ::google::protobuf::internal::ParseTable schema[16]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -69,9 +69,6 @@ extern ContainerPortDefaultTypeInternal _ContainerPort_default_instance_;
 class DataLoadingConfig;
 class DataLoadingConfigDefaultTypeInternal;
 extern DataLoadingConfigDefaultTypeInternal _DataLoadingConfig_default_instance_;
-class GPUAccelerator;
-class GPUAcceleratorDefaultTypeInternal;
-extern GPUAcceleratorDefaultTypeInternal _GPUAccelerator_default_instance_;
 class IOStrategy;
 class IOStrategyDefaultTypeInternal;
 extern IOStrategyDefaultTypeInternal _IOStrategy_default_instance_;
@@ -87,9 +84,6 @@ extern K8sObjectMetadata_LabelsEntry_DoNotUseDefaultTypeInternal _K8sObjectMetad
 class K8sPod;
 class K8sPodDefaultTypeInternal;
 extern K8sPodDefaultTypeInternal _K8sPod_default_instance_;
-class ResourceMetadata;
-class ResourceMetadataDefaultTypeInternal;
-extern ResourceMetadataDefaultTypeInternal _ResourceMetadata_default_instance_;
 class Resources;
 class ResourcesDefaultTypeInternal;
 extern ResourcesDefaultTypeInternal _Resources_default_instance_;
@@ -121,13 +115,11 @@ namespace protobuf {
 template<> ::flyteidl::core::Container* Arena::CreateMaybeMessage<::flyteidl::core::Container>(Arena*);
 template<> ::flyteidl::core::ContainerPort* Arena::CreateMaybeMessage<::flyteidl::core::ContainerPort>(Arena*);
 template<> ::flyteidl::core::DataLoadingConfig* Arena::CreateMaybeMessage<::flyteidl::core::DataLoadingConfig>(Arena*);
-template<> ::flyteidl::core::GPUAccelerator* Arena::CreateMaybeMessage<::flyteidl::core::GPUAccelerator>(Arena*);
 template<> ::flyteidl::core::IOStrategy* Arena::CreateMaybeMessage<::flyteidl::core::IOStrategy>(Arena*);
 template<> ::flyteidl::core::K8sObjectMetadata* Arena::CreateMaybeMessage<::flyteidl::core::K8sObjectMetadata>(Arena*);
 template<> ::flyteidl::core::K8sObjectMetadata_AnnotationsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::K8sObjectMetadata_AnnotationsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::K8sObjectMetadata_LabelsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::K8sObjectMetadata_LabelsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::K8sPod* Arena::CreateMaybeMessage<::flyteidl::core::K8sPod>(Arena*);
-template<> ::flyteidl::core::ResourceMetadata* Arena::CreateMaybeMessage<::flyteidl::core::ResourceMetadata>(Arena*);
 template<> ::flyteidl::core::Resources* Arena::CreateMaybeMessage<::flyteidl::core::Resources>(Arena*);
 template<> ::flyteidl::core::Resources_ResourceEntry* Arena::CreateMaybeMessage<::flyteidl::core::Resources_ResourceEntry>(Arena*);
 template<> ::flyteidl::core::RuntimeMetadata* Arena::CreateMaybeMessage<::flyteidl::core::RuntimeMetadata>(Arena*);
@@ -764,303 +756,6 @@ class RuntimeMetadata final :
 };
 // -------------------------------------------------------------------
 
-class GPUAccelerator final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.GPUAccelerator) */ {
- public:
-  GPUAccelerator();
-  virtual ~GPUAccelerator();
-
-  GPUAccelerator(const GPUAccelerator& from);
-
-  inline GPUAccelerator& operator=(const GPUAccelerator& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  GPUAccelerator(GPUAccelerator&& from) noexcept
-    : GPUAccelerator() {
-    *this = ::std::move(from);
-  }
-
-  inline GPUAccelerator& operator=(GPUAccelerator&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const GPUAccelerator& default_instance();
-
-  enum PartitionSizeValueCase {
-    kUnpartitioned = 2,
-    kPartitionSize = 3,
-    PARTITION_SIZE_VALUE_NOT_SET = 0,
-  };
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const GPUAccelerator* internal_default_instance() {
-    return reinterpret_cast<const GPUAccelerator*>(
-               &_GPUAccelerator_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    3;
-
-  void Swap(GPUAccelerator* other);
-  friend void swap(GPUAccelerator& a, GPUAccelerator& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline GPUAccelerator* New() const final {
-    return CreateMaybeMessage<GPUAccelerator>(nullptr);
-  }
-
-  GPUAccelerator* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<GPUAccelerator>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const GPUAccelerator& from);
-  void MergeFrom(const GPUAccelerator& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(GPUAccelerator* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string device = 1;
-  void clear_device();
-  static const int kDeviceFieldNumber = 1;
-  const ::std::string& device() const;
-  void set_device(const ::std::string& value);
-  #if LANG_CXX11
-  void set_device(::std::string&& value);
-  #endif
-  void set_device(const char* value);
-  void set_device(const char* value, size_t size);
-  ::std::string* mutable_device();
-  ::std::string* release_device();
-  void set_allocated_device(::std::string* device);
-
-  // bool unpartitioned = 2;
-  private:
-  bool has_unpartitioned() const;
-  public:
-  void clear_unpartitioned();
-  static const int kUnpartitionedFieldNumber = 2;
-  bool unpartitioned() const;
-  void set_unpartitioned(bool value);
-
-  // string partition_size = 3;
-  private:
-  bool has_partition_size() const;
-  public:
-  void clear_partition_size();
-  static const int kPartitionSizeFieldNumber = 3;
-  const ::std::string& partition_size() const;
-  void set_partition_size(const ::std::string& value);
-  #if LANG_CXX11
-  void set_partition_size(::std::string&& value);
-  #endif
-  void set_partition_size(const char* value);
-  void set_partition_size(const char* value, size_t size);
-  ::std::string* mutable_partition_size();
-  ::std::string* release_partition_size();
-  void set_allocated_partition_size(::std::string* partition_size);
-
-  void clear_partition_size_value();
-  PartitionSizeValueCase partition_size_value_case() const;
-  // @@protoc_insertion_point(class_scope:flyteidl.core.GPUAccelerator)
- private:
-  class HasBitSetters;
-  void set_has_unpartitioned();
-  void set_has_partition_size();
-
-  inline bool has_partition_size_value() const;
-  inline void clear_has_partition_size_value();
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr device_;
-  union PartitionSizeValueUnion {
-    PartitionSizeValueUnion() {}
-    bool unpartitioned_;
-    ::google::protobuf::internal::ArenaStringPtr partition_size_;
-  } partition_size_value_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
-
-  friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
-};
-// -------------------------------------------------------------------
-
-class ResourceMetadata final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.ResourceMetadata) */ {
- public:
-  ResourceMetadata();
-  virtual ~ResourceMetadata();
-
-  ResourceMetadata(const ResourceMetadata& from);
-
-  inline ResourceMetadata& operator=(const ResourceMetadata& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  ResourceMetadata(ResourceMetadata&& from) noexcept
-    : ResourceMetadata() {
-    *this = ::std::move(from);
-  }
-
-  inline ResourceMetadata& operator=(ResourceMetadata&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const ResourceMetadata& default_instance();
-
-  enum AcceleratorValueCase {
-    kGpuAccelerator = 1,
-    ACCELERATOR_VALUE_NOT_SET = 0,
-  };
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ResourceMetadata* internal_default_instance() {
-    return reinterpret_cast<const ResourceMetadata*>(
-               &_ResourceMetadata_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    4;
-
-  void Swap(ResourceMetadata* other);
-  friend void swap(ResourceMetadata& a, ResourceMetadata& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline ResourceMetadata* New() const final {
-    return CreateMaybeMessage<ResourceMetadata>(nullptr);
-  }
-
-  ResourceMetadata* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ResourceMetadata>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ResourceMetadata& from);
-  void MergeFrom(const ResourceMetadata& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(ResourceMetadata* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
-  bool has_gpu_accelerator() const;
-  void clear_gpu_accelerator();
-  static const int kGpuAcceleratorFieldNumber = 1;
-  const ::flyteidl::core::GPUAccelerator& gpu_accelerator() const;
-  ::flyteidl::core::GPUAccelerator* release_gpu_accelerator();
-  ::flyteidl::core::GPUAccelerator* mutable_gpu_accelerator();
-  void set_allocated_gpu_accelerator(::flyteidl::core::GPUAccelerator* gpu_accelerator);
-
-  void clear_accelerator_value();
-  AcceleratorValueCase accelerator_value_case() const;
-  // @@protoc_insertion_point(class_scope:flyteidl.core.ResourceMetadata)
- private:
-  class HasBitSetters;
-  void set_has_gpu_accelerator();
-
-  inline bool has_accelerator_value() const;
-  inline void clear_has_accelerator_value();
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  union AcceleratorValueUnion {
-    AcceleratorValueUnion() {}
-    ::flyteidl::core::GPUAccelerator* gpu_accelerator_;
-  } accelerator_value_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
-
-  friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
-};
-// -------------------------------------------------------------------
-
 class TaskMetadata_TagsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<TaskMetadata_TagsEntry_DoNotUse, 
     ::std::string, ::std::string,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
@@ -1128,7 +823,7 @@ class TaskMetadata final :
                &_TaskMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    4;
 
   void Swap(TaskMetadata* other);
   friend void swap(TaskMetadata& a, TaskMetadata& b) {
@@ -1264,15 +959,6 @@ class TaskMetadata final :
   ::flyteidl::core::RetryStrategy* mutable_retries();
   void set_allocated_retries(::flyteidl::core::RetryStrategy* retries);
 
-  // .flyteidl.core.ResourceMetadata resource_metadata = 13;
-  bool has_resource_metadata() const;
-  void clear_resource_metadata();
-  static const int kResourceMetadataFieldNumber = 13;
-  const ::flyteidl::core::ResourceMetadata& resource_metadata() const;
-  ::flyteidl::core::ResourceMetadata* release_resource_metadata();
-  ::flyteidl::core::ResourceMetadata* mutable_resource_metadata();
-  void set_allocated_resource_metadata(::flyteidl::core::ResourceMetadata* resource_metadata);
-
   // bool discoverable = 1;
   void clear_discoverable();
   static const int kDiscoverableFieldNumber = 1;
@@ -1323,7 +1009,6 @@ class TaskMetadata final :
   ::flyteidl::core::RuntimeMetadata* runtime_;
   ::google::protobuf::Duration* timeout_;
   ::flyteidl::core::RetryStrategy* retries_;
-  ::flyteidl::core::ResourceMetadata* resource_metadata_;
   bool discoverable_;
   bool cache_serializable_;
   bool generates_deck_;
@@ -1407,7 +1092,7 @@ class TaskTemplate final :
                &_TaskTemplate_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    6;
 
   void Swap(TaskTemplate* other);
   friend void swap(TaskTemplate& a, TaskTemplate& b) {
@@ -1643,7 +1328,7 @@ class ContainerPort final :
                &_ContainerPort_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    7;
 
   void Swap(ContainerPort* other);
   friend void swap(ContainerPort& a, ContainerPort& b) {
@@ -1755,7 +1440,7 @@ class Container final :
                &_Container_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    8;
 
   void Swap(Container* other);
   friend void swap(Container& a, Container& b) {
@@ -2019,7 +1704,7 @@ class IOStrategy final :
                &_IOStrategy_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    9;
 
   void Swap(IOStrategy* other);
   friend void swap(IOStrategy& a, IOStrategy& b) {
@@ -2194,7 +1879,7 @@ class DataLoadingConfig final :
                &_DataLoadingConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    10;
 
   void Swap(DataLoadingConfig* other);
   friend void swap(DataLoadingConfig& a, DataLoadingConfig& b) {
@@ -2381,7 +2066,7 @@ class K8sPod final :
                &_K8sPod_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    11;
 
   void Swap(K8sPod* other);
   friend void swap(K8sPod& a, K8sPod& b) {
@@ -2564,7 +2249,7 @@ class K8sObjectMetadata final :
                &_K8sObjectMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    14;
 
   void Swap(K8sObjectMetadata* other);
   friend void swap(K8sObjectMetadata& a, K8sObjectMetadata& b) {
@@ -2700,7 +2385,7 @@ class Sql final :
                &_Sql_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    15;
 
   void Swap(Sql* other);
   friend void swap(Sql& a, Sql& b) {
@@ -3083,247 +2768,6 @@ inline void RuntimeMetadata::set_allocated_flavor(::std::string* flavor) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.RuntimeMetadata.flavor)
 }
 
-// -------------------------------------------------------------------
-
-// GPUAccelerator
-
-// string device = 1;
-inline void GPUAccelerator::clear_device() {
-  device_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& GPUAccelerator::device() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.GPUAccelerator.device)
-  return device_.GetNoArena();
-}
-inline void GPUAccelerator::set_device(const ::std::string& value) {
-  
-  device_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.core.GPUAccelerator.device)
-}
-#if LANG_CXX11
-inline void GPUAccelerator::set_device(::std::string&& value) {
-  
-  device_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.GPUAccelerator.device)
-}
-#endif
-inline void GPUAccelerator::set_device(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  device_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.core.GPUAccelerator.device)
-}
-inline void GPUAccelerator::set_device(const char* value, size_t size) {
-  
-  device_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.GPUAccelerator.device)
-}
-inline ::std::string* GPUAccelerator::mutable_device() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.GPUAccelerator.device)
-  return device_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* GPUAccelerator::release_device() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.GPUAccelerator.device)
-  
-  return device_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void GPUAccelerator::set_allocated_device(::std::string* device) {
-  if (device != nullptr) {
-    
-  } else {
-    
-  }
-  device_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), device);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.GPUAccelerator.device)
-}
-
-// bool unpartitioned = 2;
-inline bool GPUAccelerator::has_unpartitioned() const {
-  return partition_size_value_case() == kUnpartitioned;
-}
-inline void GPUAccelerator::set_has_unpartitioned() {
-  _oneof_case_[0] = kUnpartitioned;
-}
-inline void GPUAccelerator::clear_unpartitioned() {
-  if (has_unpartitioned()) {
-    partition_size_value_.unpartitioned_ = false;
-    clear_has_partition_size_value();
-  }
-}
-inline bool GPUAccelerator::unpartitioned() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.GPUAccelerator.unpartitioned)
-  if (has_unpartitioned()) {
-    return partition_size_value_.unpartitioned_;
-  }
-  return false;
-}
-inline void GPUAccelerator::set_unpartitioned(bool value) {
-  if (!has_unpartitioned()) {
-    clear_partition_size_value();
-    set_has_unpartitioned();
-  }
-  partition_size_value_.unpartitioned_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.core.GPUAccelerator.unpartitioned)
-}
-
-// string partition_size = 3;
-inline bool GPUAccelerator::has_partition_size() const {
-  return partition_size_value_case() == kPartitionSize;
-}
-inline void GPUAccelerator::set_has_partition_size() {
-  _oneof_case_[0] = kPartitionSize;
-}
-inline void GPUAccelerator::clear_partition_size() {
-  if (has_partition_size()) {
-    partition_size_value_.partition_size_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    clear_has_partition_size_value();
-  }
-}
-inline const ::std::string& GPUAccelerator::partition_size() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.GPUAccelerator.partition_size)
-  if (has_partition_size()) {
-    return partition_size_value_.partition_size_.GetNoArena();
-  }
-  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
-}
-inline void GPUAccelerator::set_partition_size(const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.core.GPUAccelerator.partition_size)
-  if (!has_partition_size()) {
-    clear_partition_size_value();
-    set_has_partition_size();
-    partition_size_value_.partition_size_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  partition_size_value_.partition_size_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.core.GPUAccelerator.partition_size)
-}
-#if LANG_CXX11
-inline void GPUAccelerator::set_partition_size(::std::string&& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.core.GPUAccelerator.partition_size)
-  if (!has_partition_size()) {
-    clear_partition_size_value();
-    set_has_partition_size();
-    partition_size_value_.partition_size_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  partition_size_value_.partition_size_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.GPUAccelerator.partition_size)
-}
-#endif
-inline void GPUAccelerator::set_partition_size(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  if (!has_partition_size()) {
-    clear_partition_size_value();
-    set_has_partition_size();
-    partition_size_value_.partition_size_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  partition_size_value_.partition_size_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.core.GPUAccelerator.partition_size)
-}
-inline void GPUAccelerator::set_partition_size(const char* value, size_t size) {
-  if (!has_partition_size()) {
-    clear_partition_size_value();
-    set_has_partition_size();
-    partition_size_value_.partition_size_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  partition_size_value_.partition_size_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
-      reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.GPUAccelerator.partition_size)
-}
-inline ::std::string* GPUAccelerator::mutable_partition_size() {
-  if (!has_partition_size()) {
-    clear_partition_size_value();
-    set_has_partition_size();
-    partition_size_value_.partition_size_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.GPUAccelerator.partition_size)
-  return partition_size_value_.partition_size_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* GPUAccelerator::release_partition_size() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.GPUAccelerator.partition_size)
-  if (has_partition_size()) {
-    clear_has_partition_size_value();
-    return partition_size_value_.partition_size_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  } else {
-    return nullptr;
-  }
-}
-inline void GPUAccelerator::set_allocated_partition_size(::std::string* partition_size) {
-  if (has_partition_size_value()) {
-    clear_partition_size_value();
-  }
-  if (partition_size != nullptr) {
-    set_has_partition_size();
-    partition_size_value_.partition_size_.UnsafeSetDefault(partition_size);
-  }
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.GPUAccelerator.partition_size)
-}
-
-inline bool GPUAccelerator::has_partition_size_value() const {
-  return partition_size_value_case() != PARTITION_SIZE_VALUE_NOT_SET;
-}
-inline void GPUAccelerator::clear_has_partition_size_value() {
-  _oneof_case_[0] = PARTITION_SIZE_VALUE_NOT_SET;
-}
-inline GPUAccelerator::PartitionSizeValueCase GPUAccelerator::partition_size_value_case() const {
-  return GPUAccelerator::PartitionSizeValueCase(_oneof_case_[0]);
-}
-// -------------------------------------------------------------------
-
-// ResourceMetadata
-
-// .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
-inline bool ResourceMetadata::has_gpu_accelerator() const {
-  return accelerator_value_case() == kGpuAccelerator;
-}
-inline void ResourceMetadata::set_has_gpu_accelerator() {
-  _oneof_case_[0] = kGpuAccelerator;
-}
-inline void ResourceMetadata::clear_gpu_accelerator() {
-  if (has_gpu_accelerator()) {
-    delete accelerator_value_.gpu_accelerator_;
-    clear_has_accelerator_value();
-  }
-}
-inline ::flyteidl::core::GPUAccelerator* ResourceMetadata::release_gpu_accelerator() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.ResourceMetadata.gpu_accelerator)
-  if (has_gpu_accelerator()) {
-    clear_has_accelerator_value();
-      ::flyteidl::core::GPUAccelerator* temp = accelerator_value_.gpu_accelerator_;
-    accelerator_value_.gpu_accelerator_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::flyteidl::core::GPUAccelerator& ResourceMetadata::gpu_accelerator() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.ResourceMetadata.gpu_accelerator)
-  return has_gpu_accelerator()
-      ? *accelerator_value_.gpu_accelerator_
-      : *reinterpret_cast< ::flyteidl::core::GPUAccelerator*>(&::flyteidl::core::_GPUAccelerator_default_instance_);
-}
-inline ::flyteidl::core::GPUAccelerator* ResourceMetadata::mutable_gpu_accelerator() {
-  if (!has_gpu_accelerator()) {
-    clear_accelerator_value();
-    set_has_gpu_accelerator();
-    accelerator_value_.gpu_accelerator_ = CreateMaybeMessage< ::flyteidl::core::GPUAccelerator >(
-        GetArenaNoVirtual());
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.ResourceMetadata.gpu_accelerator)
-  return accelerator_value_.gpu_accelerator_;
-}
-
-inline bool ResourceMetadata::has_accelerator_value() const {
-  return accelerator_value_case() != ACCELERATOR_VALUE_NOT_SET;
-}
-inline void ResourceMetadata::clear_has_accelerator_value() {
-  _oneof_case_[0] = ACCELERATOR_VALUE_NOT_SET;
-}
-inline ResourceMetadata::AcceleratorValueCase ResourceMetadata::accelerator_value_case() const {
-  return ResourceMetadata::AcceleratorValueCase(_oneof_case_[0]);
-}
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -3718,57 +3162,6 @@ inline void TaskMetadata::set_allocated_pod_template_name(::std::string* pod_tem
   }
   pod_template_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), pod_template_name);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskMetadata.pod_template_name)
-}
-
-// .flyteidl.core.ResourceMetadata resource_metadata = 13;
-inline bool TaskMetadata::has_resource_metadata() const {
-  return this != internal_default_instance() && resource_metadata_ != nullptr;
-}
-inline void TaskMetadata::clear_resource_metadata() {
-  if (GetArenaNoVirtual() == nullptr && resource_metadata_ != nullptr) {
-    delete resource_metadata_;
-  }
-  resource_metadata_ = nullptr;
-}
-inline const ::flyteidl::core::ResourceMetadata& TaskMetadata::resource_metadata() const {
-  const ::flyteidl::core::ResourceMetadata* p = resource_metadata_;
-  // @@protoc_insertion_point(field_get:flyteidl.core.TaskMetadata.resource_metadata)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::ResourceMetadata*>(
-      &::flyteidl::core::_ResourceMetadata_default_instance_);
-}
-inline ::flyteidl::core::ResourceMetadata* TaskMetadata::release_resource_metadata() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.TaskMetadata.resource_metadata)
-  
-  ::flyteidl::core::ResourceMetadata* temp = resource_metadata_;
-  resource_metadata_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::ResourceMetadata* TaskMetadata::mutable_resource_metadata() {
-  
-  if (resource_metadata_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::ResourceMetadata>(GetArenaNoVirtual());
-    resource_metadata_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.TaskMetadata.resource_metadata)
-  return resource_metadata_;
-}
-inline void TaskMetadata::set_allocated_resource_metadata(::flyteidl::core::ResourceMetadata* resource_metadata) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete resource_metadata_;
-  }
-  if (resource_metadata) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      resource_metadata = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, resource_metadata, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  resource_metadata_ = resource_metadata;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskMetadata.resource_metadata)
 }
 
 inline bool TaskMetadata::has_interruptible_value() const {
@@ -5139,10 +4532,6 @@ inline void Sql::set_dialect(::flyteidl::core::Sql_Dialect value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

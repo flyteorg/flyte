@@ -1052,42 +1052,6 @@ pub mod runtime_metadata {
         }
     }
 }
-/// Metadata associated with the GPU accelerator to allocate to a task
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GpuAccelerator {
-    #[prost(string, tag="1")]
-    pub device: ::prost::alloc::string::String,
-    #[prost(oneof="gpu_accelerator::PartitionSizeValue", tags="2, 3")]
-    pub partition_size_value: ::core::option::Option<gpu_accelerator::PartitionSizeValue>,
-}
-/// Nested message and enum types in `GPUAccelerator`.
-pub mod gpu_accelerator {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum PartitionSizeValue {
-        #[prost(bool, tag="2")]
-        Unpartitioned(bool),
-        #[prost(string, tag="3")]
-        PartitionSize(::prost::alloc::string::String),
-    }
-}
-/// Additional metadata associated with resources to allocate to a task
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ResourceMetadata {
-    #[prost(oneof="resource_metadata::AcceleratorValue", tags="1")]
-    pub accelerator_value: ::core::option::Option<resource_metadata::AcceleratorValue>,
-}
-/// Nested message and enum types in `ResourceMetadata`.
-pub mod resource_metadata {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum AcceleratorValue {
-        #[prost(message, tag="1")]
-        GpuAccelerator(super::GpuAccelerator),
-    }
-}
 /// Task Metadata
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1125,9 +1089,6 @@ pub struct TaskMetadata {
     /// identically as, the default PodTemplate configured in FlytePropeller.
     #[prost(string, tag="12")]
     pub pod_template_name: ::prost::alloc::string::String,
-    /// Additional metadata associated with resources to allocate to this task
-    #[prost(message, optional, tag="13")]
-    pub resource_metadata: ::core::option::Option<ResourceMetadata>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
@@ -2384,9 +2345,6 @@ pub struct TaskNodeOverrides {
     /// A customizable interface to convey resources requested for a task container. 
     #[prost(message, optional, tag="1")]
     pub resources: ::core::option::Option<Resources>,
-    /// Additional metadata associated with resources to allocate to this task
-    #[prost(message, optional, tag="2")]
-    pub resource_metadata: ::core::option::Option<ResourceMetadata>,
 }
 /// Adjacency list for the workflow. This is created as part of the compilation process. Every process after the compilation
 /// step uses this created ConnectionSet

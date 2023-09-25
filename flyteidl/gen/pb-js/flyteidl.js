@@ -4570,7 +4570,6 @@
                  * @memberof flyteidl.core
                  * @interface ITaskNodeOverrides
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
-                 * @property {flyteidl.core.IResourceMetadata|null} [resourceMetadata] TaskNodeOverrides resourceMetadata
                  */
     
                 /**
@@ -4595,14 +4594,6 @@
                  * @instance
                  */
                 TaskNodeOverrides.prototype.resources = null;
-    
-                /**
-                 * TaskNodeOverrides resourceMetadata.
-                 * @member {flyteidl.core.IResourceMetadata|null|undefined} resourceMetadata
-                 * @memberof flyteidl.core.TaskNodeOverrides
-                 * @instance
-                 */
-                TaskNodeOverrides.prototype.resourceMetadata = null;
     
                 /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -4630,8 +4621,6 @@
                         writer = $Writer.create();
                     if (message.resources != null && message.hasOwnProperty("resources"))
                         $root.flyteidl.core.Resources.encode(message.resources, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.resourceMetadata != null && message.hasOwnProperty("resourceMetadata"))
-                        $root.flyteidl.core.ResourceMetadata.encode(message.resourceMetadata, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -4656,9 +4645,6 @@
                         case 1:
                             message.resources = $root.flyteidl.core.Resources.decode(reader, reader.uint32());
                             break;
-                        case 2:
-                            message.resourceMetadata = $root.flyteidl.core.ResourceMetadata.decode(reader, reader.uint32());
-                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -4682,11 +4668,6 @@
                         var error = $root.flyteidl.core.Resources.verify(message.resources);
                         if (error)
                             return "resources." + error;
-                    }
-                    if (message.resourceMetadata != null && message.hasOwnProperty("resourceMetadata")) {
-                        var error = $root.flyteidl.core.ResourceMetadata.verify(message.resourceMetadata);
-                        if (error)
-                            return "resourceMetadata." + error;
                     }
                     return null;
                 };
@@ -12458,301 +12439,6 @@
                 return RuntimeMetadata;
             })();
     
-            core.GPUAccelerator = (function() {
-    
-                /**
-                 * Properties of a GPUAccelerator.
-                 * @memberof flyteidl.core
-                 * @interface IGPUAccelerator
-                 * @property {string|null} [device] GPUAccelerator device
-                 * @property {boolean|null} [unpartitioned] GPUAccelerator unpartitioned
-                 * @property {string|null} [partitionSize] GPUAccelerator partitionSize
-                 */
-    
-                /**
-                 * Constructs a new GPUAccelerator.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents a GPUAccelerator.
-                 * @implements IGPUAccelerator
-                 * @constructor
-                 * @param {flyteidl.core.IGPUAccelerator=} [properties] Properties to set
-                 */
-                function GPUAccelerator(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * GPUAccelerator device.
-                 * @member {string} device
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @instance
-                 */
-                GPUAccelerator.prototype.device = "";
-    
-                /**
-                 * GPUAccelerator unpartitioned.
-                 * @member {boolean} unpartitioned
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @instance
-                 */
-                GPUAccelerator.prototype.unpartitioned = false;
-    
-                /**
-                 * GPUAccelerator partitionSize.
-                 * @member {string} partitionSize
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @instance
-                 */
-                GPUAccelerator.prototype.partitionSize = "";
-    
-                // OneOf field names bound to virtual getters and setters
-                var $oneOfFields;
-    
-                /**
-                 * GPUAccelerator partitionSizeValue.
-                 * @member {"unpartitioned"|"partitionSize"|undefined} partitionSizeValue
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @instance
-                 */
-                Object.defineProperty(GPUAccelerator.prototype, "partitionSizeValue", {
-                    get: $util.oneOfGetter($oneOfFields = ["unpartitioned", "partitionSize"]),
-                    set: $util.oneOfSetter($oneOfFields)
-                });
-    
-                /**
-                 * Creates a new GPUAccelerator instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @static
-                 * @param {flyteidl.core.IGPUAccelerator=} [properties] Properties to set
-                 * @returns {flyteidl.core.GPUAccelerator} GPUAccelerator instance
-                 */
-                GPUAccelerator.create = function create(properties) {
-                    return new GPUAccelerator(properties);
-                };
-    
-                /**
-                 * Encodes the specified GPUAccelerator message. Does not implicitly {@link flyteidl.core.GPUAccelerator.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @static
-                 * @param {flyteidl.core.IGPUAccelerator} message GPUAccelerator message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                GPUAccelerator.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.device != null && message.hasOwnProperty("device"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.device);
-                    if (message.unpartitioned != null && message.hasOwnProperty("unpartitioned"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).bool(message.unpartitioned);
-                    if (message.partitionSize != null && message.hasOwnProperty("partitionSize"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.partitionSize);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a GPUAccelerator message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.GPUAccelerator} GPUAccelerator
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                GPUAccelerator.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.GPUAccelerator();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.device = reader.string();
-                            break;
-                        case 2:
-                            message.unpartitioned = reader.bool();
-                            break;
-                        case 3:
-                            message.partitionSize = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a GPUAccelerator message.
-                 * @function verify
-                 * @memberof flyteidl.core.GPUAccelerator
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                GPUAccelerator.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    var properties = {};
-                    if (message.device != null && message.hasOwnProperty("device"))
-                        if (!$util.isString(message.device))
-                            return "device: string expected";
-                    if (message.unpartitioned != null && message.hasOwnProperty("unpartitioned")) {
-                        properties.partitionSizeValue = 1;
-                        if (typeof message.unpartitioned !== "boolean")
-                            return "unpartitioned: boolean expected";
-                    }
-                    if (message.partitionSize != null && message.hasOwnProperty("partitionSize")) {
-                        if (properties.partitionSizeValue === 1)
-                            return "partitionSizeValue: multiple values";
-                        properties.partitionSizeValue = 1;
-                        if (!$util.isString(message.partitionSize))
-                            return "partitionSize: string expected";
-                    }
-                    return null;
-                };
-    
-                return GPUAccelerator;
-            })();
-    
-            core.ResourceMetadata = (function() {
-    
-                /**
-                 * Properties of a ResourceMetadata.
-                 * @memberof flyteidl.core
-                 * @interface IResourceMetadata
-                 * @property {flyteidl.core.IGPUAccelerator|null} [gpuAccelerator] ResourceMetadata gpuAccelerator
-                 */
-    
-                /**
-                 * Constructs a new ResourceMetadata.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents a ResourceMetadata.
-                 * @implements IResourceMetadata
-                 * @constructor
-                 * @param {flyteidl.core.IResourceMetadata=} [properties] Properties to set
-                 */
-                function ResourceMetadata(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ResourceMetadata gpuAccelerator.
-                 * @member {flyteidl.core.IGPUAccelerator|null|undefined} gpuAccelerator
-                 * @memberof flyteidl.core.ResourceMetadata
-                 * @instance
-                 */
-                ResourceMetadata.prototype.gpuAccelerator = null;
-    
-                // OneOf field names bound to virtual getters and setters
-                var $oneOfFields;
-    
-                /**
-                 * ResourceMetadata acceleratorValue.
-                 * @member {"gpuAccelerator"|undefined} acceleratorValue
-                 * @memberof flyteidl.core.ResourceMetadata
-                 * @instance
-                 */
-                Object.defineProperty(ResourceMetadata.prototype, "acceleratorValue", {
-                    get: $util.oneOfGetter($oneOfFields = ["gpuAccelerator"]),
-                    set: $util.oneOfSetter($oneOfFields)
-                });
-    
-                /**
-                 * Creates a new ResourceMetadata instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.ResourceMetadata
-                 * @static
-                 * @param {flyteidl.core.IResourceMetadata=} [properties] Properties to set
-                 * @returns {flyteidl.core.ResourceMetadata} ResourceMetadata instance
-                 */
-                ResourceMetadata.create = function create(properties) {
-                    return new ResourceMetadata(properties);
-                };
-    
-                /**
-                 * Encodes the specified ResourceMetadata message. Does not implicitly {@link flyteidl.core.ResourceMetadata.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.ResourceMetadata
-                 * @static
-                 * @param {flyteidl.core.IResourceMetadata} message ResourceMetadata message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ResourceMetadata.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.gpuAccelerator != null && message.hasOwnProperty("gpuAccelerator"))
-                        $root.flyteidl.core.GPUAccelerator.encode(message.gpuAccelerator, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a ResourceMetadata message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.ResourceMetadata
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.ResourceMetadata} ResourceMetadata
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ResourceMetadata.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ResourceMetadata();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.gpuAccelerator = $root.flyteidl.core.GPUAccelerator.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a ResourceMetadata message.
-                 * @function verify
-                 * @memberof flyteidl.core.ResourceMetadata
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ResourceMetadata.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    var properties = {};
-                    if (message.gpuAccelerator != null && message.hasOwnProperty("gpuAccelerator")) {
-                        properties.acceleratorValue = 1;
-                        {
-                            var error = $root.flyteidl.core.GPUAccelerator.verify(message.gpuAccelerator);
-                            if (error)
-                                return "gpuAccelerator." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return ResourceMetadata;
-            })();
-    
             core.TaskMetadata = (function() {
     
                 /**
@@ -12770,7 +12456,6 @@
                  * @property {boolean|null} [generatesDeck] TaskMetadata generatesDeck
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
-                 * @property {flyteidl.core.IResourceMetadata|null} [resourceMetadata] TaskMetadata resourceMetadata
                  */
     
                 /**
@@ -12877,14 +12562,6 @@
                  */
                 TaskMetadata.prototype.podTemplateName = "";
     
-                /**
-                 * TaskMetadata resourceMetadata.
-                 * @member {flyteidl.core.IResourceMetadata|null|undefined} resourceMetadata
-                 * @memberof flyteidl.core.TaskMetadata
-                 * @instance
-                 */
-                TaskMetadata.prototype.resourceMetadata = null;
-    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -12946,8 +12623,6 @@
                             writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
                     if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
                         writer.uint32(/* id 12, wireType 2 =*/98).string(message.podTemplateName);
-                    if (message.resourceMetadata != null && message.hasOwnProperty("resourceMetadata"))
-                        $root.flyteidl.core.ResourceMetadata.encode(message.resourceMetadata, writer.uint32(/* id 13, wireType 2 =*/106).fork()).ldelim();
                     return writer;
                 };
     
@@ -13006,9 +12681,6 @@
                             break;
                         case 12:
                             message.podTemplateName = reader.string();
-                            break;
-                        case 13:
-                            message.resourceMetadata = $root.flyteidl.core.ResourceMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13076,11 +12748,6 @@
                     if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
                         if (!$util.isString(message.podTemplateName))
                             return "podTemplateName: string expected";
-                    if (message.resourceMetadata != null && message.hasOwnProperty("resourceMetadata")) {
-                        var error = $root.flyteidl.core.ResourceMetadata.verify(message.resourceMetadata);
-                        if (error)
-                            return "resourceMetadata." + error;
-                    }
                     return null;
                 };
     
