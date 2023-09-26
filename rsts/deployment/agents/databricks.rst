@@ -1,9 +1,9 @@
-.. _deployment-plugin-setup-webapi-databricks:
+.. _deployment-agent-setup-databricks:
 
-Databricks Plugin
+Databricks Agent
 =================
 
-This guide provides an overview of how to set up Databricks in your Flyte deployment.
+This guide provides an overview of how to set up Databricks agent in your Flyte deployment.
 
 Spin up a cluster
 -----------------
@@ -381,3 +381,43 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
   Make sure you enable `custom containers 
   <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__
   on your Databricks cluster before you trigger the workflow.
+
+Databricks Agent Service configuration
+--------------------------------------
+
+You can use Spark via the Databricks Agent Service.
+
+To do so, follow these steps:
+
+1. Configure the Databricks Agent Service.
+2. Create a secret with the group "databricks" and the key "access_token".
+
+.. code-block::
+
+  kubectl create secret generic databricks --namespace=flyte --from-literal=access_token=your_databricks_access_token
+
+3. Mount the secret to the Flyte agent deployment
+    
+   For more details, you can refer to
+   `here <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/use_secrets.html#secrets>`__.
+
+
+.. code-block:: yaml
+
+  tasks:
+    task-plugins:
+      enabled-plugins:
+        - agent-service
+      default-for-task-types:
+        - spark: agent-service
+  plugins:
+    agent-service:
+      supportedTaskTypes:
+        - spark
+      # By default, all the request will be sent to the default agent.
+      defaultAgent:
+        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+        insecure: true
+        timeouts:
+          GetTask: 100s
+        defaultTimeout: 100s
