@@ -28,7 +28,7 @@ const (
 )
 
 // Wraps a regular TaskExecutionMetadata and overrides the IsInterruptible method to always return false
-// This is useful as the runner and the scheduler pods should never be interruptable
+// This is useful as the runner and the scheduler pods should never be interruptible
 type nonInterruptibleTaskExecutionMetadata struct {
 	pluginsCore.TaskExecutionMetadata
 }
