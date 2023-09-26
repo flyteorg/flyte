@@ -14,7 +14,7 @@ import (
 
 	"github.com/flyteorg/flyteadmin/auth/interfaces"
 
-	"github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/flyteorg/flytestdlib/errors"
 	"github.com/flyteorg/flytestdlib/logger"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"

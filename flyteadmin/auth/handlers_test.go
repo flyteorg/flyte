@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	stdConfig "github.com/flyteorg/flytestdlib/config"
 	"github.com/stretchr/testify/assert"
