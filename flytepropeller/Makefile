@@ -21,7 +21,7 @@ compile:
 	mkdir -p ./bin
 	go build -o bin/flytepropeller ./cmd/controller/main.go
 	go build -o bin/flytepropeller-manager ./cmd/manager/main.go
-	go build -o bin/kubectl-flyte ./cmd/kubectl-flyte/main.go && cp bin/kubectl-flyte ${GOPATH}/bin
+	go build -o bin/kubectl-flyte ./cmd/kubectl-flyte/main.go
 
 cross_compile:
 	@glide install
