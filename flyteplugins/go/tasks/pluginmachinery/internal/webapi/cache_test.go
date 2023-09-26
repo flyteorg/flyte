@@ -67,6 +67,36 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		assert.Equal(t, cacheItem, newCacheItem[0].Item)
 	})
 
+	t.Run("Retry limit exceeded", func(t *testing.T) {
+		mockCache := &cacheMocks.AutoRefresh{}
+		mockClient := &mocks.Client{}
+
+		q := ResourceCache{
+			AutoRefresh: mockCache,
+			client:      mockClient,
+			cfg: webapi.CachingConfig{
+				MaxSystemFailures: 2,
+			},
+		}
+
+		cacheItem := CacheItem{
+			State: State{
+				SyncFailureCount: 5,
+				ErrorMessage:     "some error",
+			},
+		}
+
+		iw := &cacheMocks.ItemWrapper{}
+		iw.OnGetItem().Return(cacheItem)
+		iw.OnGetID().Return("some-id")
+
+		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
+		assert.NoError(t, err)
+		assert.Equal(t, cache.Update, newCacheItem[0].Action)
+		cacheItem.State.Phase = PhaseSystemFailure
+		assert.Equal(t, cacheItem, newCacheItem[0].Item)
+	})
+
 	t.Run("move to success", func(t *testing.T) {
 		mockCache := &cacheMocks.AutoRefresh{}
 		mockClient := &mocks.Client{}

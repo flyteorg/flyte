@@ -81,7 +81,17 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	}
 
 	envVars := getEnvVarsForTask(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(), taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
-	res := tCtx.TaskExecutionMetadata().GetOverrides().GetResources()
+
+	// compile resources
+	res, err := flytek8s.ToK8sResourceRequirements(taskTemplate.GetContainer().GetResources())
+	if err != nil {
+		return nil, err
+	}
+
+	if overrideResources := tCtx.TaskExecutionMetadata().GetOverrides().GetResources(); overrideResources != nil {
+		flytek8s.MergeResources(*overrideResources, res)
+	}
+
 	platformResources := tCtx.TaskExecutionMetadata().GetPlatformResources()
 	if platformResources == nil {
 		platformResources = &v1.ResourceRequirements{}

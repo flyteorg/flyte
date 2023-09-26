@@ -19,6 +19,10 @@ type MemoryMetadata struct {
 	etag   string
 }
 
+func (m MemoryMetadata) Etag() string {
+	return ""
+}
+
 func (m MemoryMetadata) Size() int64 {
 	return m.size
 }
