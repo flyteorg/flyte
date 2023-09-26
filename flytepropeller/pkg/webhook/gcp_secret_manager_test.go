@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 
 	"github.com/go-test/deep"
 

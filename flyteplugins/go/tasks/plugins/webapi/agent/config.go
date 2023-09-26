@@ -3,10 +3,10 @@ package agent
 import (
 	"time"
 
-	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flytestdlib/config"
+	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 var (

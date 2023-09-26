@@ -36,8 +36,8 @@ package config
 import (
 	"time"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"k8s.io/apimachinery/pkg/types"
 )
 

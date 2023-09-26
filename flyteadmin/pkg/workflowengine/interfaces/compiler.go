@@ -1,9 +1,9 @@
 package interfaces
 
 import (
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/compiler"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 )
 
 // Workflow compiler interface.

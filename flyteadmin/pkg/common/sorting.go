@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 )
 
 const gormDescending = "%s desc"

@@ -10,13 +10,13 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	pluginIOMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 
 	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
@@ -83,7 +83,7 @@ func dummyMPITaskTemplate(id string, args ...interface{}) *core.TaskTemplate {
 			var mpiCustomObj = t
 			mpiObjJSON, err = utils.MarshalToString(mpiCustomObj)
 		default:
-			err = fmt.Errorf("Unkonw input type %T", t)
+			err = fmt.Errorf("Unknown input type %T", t)
 		}
 	}
 

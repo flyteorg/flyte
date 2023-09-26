@@ -5,13 +5,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/scheduler/identifier"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"

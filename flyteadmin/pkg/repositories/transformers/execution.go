@@ -6,14 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 
@@ -385,7 +385,7 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 	}, nil
 }
 
-// PopulateDefaultStateChangeDetails used to populate execution state change details for older executions which donot
+// PopulateDefaultStateChangeDetails used to populate execution state change details for older executions which do not
 // have these details captured. Hence we construct a default state change details from existing data model.
 func PopulateDefaultStateChangeDetails(executionModel models.Execution) (*admin.ExecutionStateChangeDetails, error) {
 	var err error

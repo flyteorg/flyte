@@ -166,7 +166,7 @@ func addStringFieldWithDefaults(ctx context.Context, m map[string]string, fieldK
 	m[fieldKey.String()] = val.(string)
 }
 
-// GetLogFields gets a map of all known logKeys set on the context. logKeys are special and should be used incase,
+// GetLogFields gets a map of all known logKeys set on the context. logKeys are special and should be used in case,
 // context fields are to be added to the log lines.
 func GetLogFields(ctx context.Context) map[string]interface{} {
 	res := map[string]interface{}{}

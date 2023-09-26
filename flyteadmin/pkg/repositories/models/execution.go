@@ -7,7 +7,7 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 // IMPORTANT: If you update the model below, be sure to double check model definitions in

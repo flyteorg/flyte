@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/datacatalog/pkg/common"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/stretchr/testify/assert"
 )

@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	workflowengineInterfaces "github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/logger"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 

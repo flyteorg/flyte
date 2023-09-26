@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
-	adminModels "github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
-	schedMocks "github.com/flyteorg/flyteadmin/scheduler/repositories/mocks"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	adminModels "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
+	schedMocks "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/assert"
 )

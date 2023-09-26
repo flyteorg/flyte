@@ -1,10 +1,10 @@
 package impl
 
 import (
-	executioncluster_interface "github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
+	executioncluster_interface "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func GetExecutionCluster(scope promutils.Scope, kubeConfig, master string, config interfaces.Configuration, db repositoryInterfaces.Repository) executioncluster_interface.ClusterInterface {

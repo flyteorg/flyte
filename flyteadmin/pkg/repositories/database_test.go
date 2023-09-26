@@ -11,11 +11,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/jackc/pgconn"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"

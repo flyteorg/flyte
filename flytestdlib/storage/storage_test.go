@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/assert"
 )

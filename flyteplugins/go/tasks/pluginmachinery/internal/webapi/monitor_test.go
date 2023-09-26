@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/cache"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/util/workqueue"
 
-	core2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/stretchr/testify/mock"
 
@@ -19,8 +19,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	internalMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	internalMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
 )
 
 func Test_monitor(t *testing.T) {

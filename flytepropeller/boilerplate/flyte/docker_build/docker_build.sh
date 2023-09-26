@@ -43,7 +43,7 @@ fi
 docker build -t "$IMAGE_TAG_WITH_SHA" --target=${BUILD_PHASE} .
 echo "${IMAGE_TAG_WITH_SHA} built locally."
 
-# if REGISTRY specified, push the images to the remote registy
+# if REGISTRY specified, push the images to the remote registry
 if [ -n "$REGISTRY" ]; then
 
   if [ -n "${DOCKER_REGISTRY_PASSWORD}" ]; then

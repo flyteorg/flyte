@@ -6,15 +6,15 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 func TestGetExecutionEnvVars(t *testing.T) {

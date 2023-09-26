@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 //go:generate mockery -all -case=underscore

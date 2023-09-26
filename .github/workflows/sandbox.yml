@@ -114,4 +114,4 @@ jobs:
           target: dind
           tags: ${{ steps.dind-names.outputs.tags }}
           build-args: "FLYTE_VERSION=${{ steps.set_version.outputs.flyte_version }}"
-          file: docker/sandbox-lite/Dockerfile
+          file: Dockerfile.sandbox-lite

@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

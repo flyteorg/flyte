@@ -1,6 +1,6 @@
 package config
 
-import pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
+import pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 
 //go:generate pflags Config --default-var=defaultConfig
 

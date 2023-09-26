@@ -83,7 +83,7 @@ message WorkflowErrorExistsIdenticalStructure {
     core.Identifier id = 1;
 }
 
-// When a CreateWorkflowRequest failes due to matching id
+// When a CreateWorkflowRequest fails due to matching id
 message CreateWorkflowFailureReason {
     oneof reason {
         WorkflowErrorExistsDifferentStructure exists_different_structure = 1;

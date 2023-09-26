@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 const SectionKey = "application"

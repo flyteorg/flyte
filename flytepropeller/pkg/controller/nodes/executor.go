@@ -7,7 +7,7 @@
 //
 // Available node handlers are
 //   - Task: Arguably the most important handler as it handles all tasks. These include all plugins. The goal of the workflow is
-//     is to run tasks, thus every workflow will contain atleast one TaskNode (except for the case, where the workflow
+//     is to run tasks, thus every workflow will contain at least one TaskNode (except for the case, where the workflow
 //     is purely a meta-workflow and can run other workflows
 //   - SubWorkflow: This is one of the most important handlers. It can execute Workflows that are nested inside a workflow
 //   - DynamicTask Handler: This is just a decorator on the Task Handler. It handles cases, in which the Task returns a futures
@@ -26,28 +26,28 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
-	"github.com/flyteorg/flytepropeller/events"
-	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flyte/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	errors2 "github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	errors2 "github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/golang/protobuf/ptypes"
 
@@ -1414,7 +1414,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task cached skipped in Discovery", scope),
 		catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", scope),
 		catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", scope),
-		catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", scope),
+		catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get failure count", scope),
 		reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", scope),
 		reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", scope),
 		reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", scope),

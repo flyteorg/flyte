@@ -4,7 +4,7 @@ Flyte comes with a rich set of overridable defaults ([matchable resources](https
 
 These can be configured to have default levels across a Flyte installation, on a per-domain basis, on a per-project basis and even at a per-workflow basis.
 
-Managing these requires setting the defaults at a level of specifity using a variety of [message types](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L14,L38). Furthermore it's difficult to holistically reason about what overrides exist at say, the project level. Updating these overrides is error-prone because there is no existing merge logic and requires understanding the data model to even know what specific matchable resource to specifically update.
+Managing these requires setting the defaults at a level of specificity using a variety of [message types](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/admin/matchable_resource.proto#L14,L38). Furthermore it's difficult to holistically reason about what overrides exist at say, the project level. Updating these overrides is error-prone because there is no existing merge logic and requires understanding the data model to even know what specific matchable resource to specifically update.
 
 Importantly, the current mechanism for applying application overrides is driven imperatively using flytectl and hard to reason about across revisions or manage using [Infrastructure as Code](https://learn.microsoft.com/en-us/devops/deliver/what-is-infrastructure-as-code).
 
@@ -130,7 +130,7 @@ In FlyteAdmin config
 
 ```
 flyteadmin:
-  overrrides:
+  overrides:
     sourceType: configmap
     sourcePath: /etc/flyte/overrides/
 
@@ -174,7 +174,7 @@ metadata:
 ```
 This can work the same way cluster resource templates are mounted as ConfigMaps in the FlyteAdmin deployment but are [fully customizable](https://github.com/flyteorg/flyte/blob/5ab8cb887a5a7051070cb93fca603ed1f22f2f74/charts/flyte-core/values.yaml#L752-L810).
 
-This does require restarting the FlyteAdmin deployment for invididual overrides changes but allows for declaratively defining the complete set of overrides in a reproducible manner. See more discusison on the trade-offs [here](https://github.com/flyteorg/flyte/discussions/3731#discussioncomment-6053743).
+This does require restarting the FlyteAdmin deployment for individual overrides changes but allows for declaratively defining the complete set of overrides in a reproducible manner. See more discusison on the trade-offs [here](https://github.com/flyteorg/flyte/discussions/3731#discussioncomment-6053743).
 
 #### FlyteAdmin changes
 

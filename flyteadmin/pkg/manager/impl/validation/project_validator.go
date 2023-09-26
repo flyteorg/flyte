@@ -3,12 +3,12 @@ package validation
 import (
 	"context"
 
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/shared"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/validation"

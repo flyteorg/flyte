@@ -7,12 +7,12 @@ import (
 
 	"fmt"
 
-	"github.com/flyteorg/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 
-	"github.com/flyteorg/datacatalog/pkg/repositories/config"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/config"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 )
 

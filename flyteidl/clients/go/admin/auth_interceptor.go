@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/logger"
 	"golang.org/x/oauth2"
 
 	"google.golang.org/grpc/codes"

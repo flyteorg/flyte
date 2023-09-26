@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -360,7 +360,7 @@ func (m *CatalogClient) Update(ctx context.Context, key catalog.Key, reader io.O
 	return catalogStatus, nil
 }
 
-// GetOrExtendReservation attempts to get a reservation for the cachable task. If you have
+// GetOrExtendReservation attempts to get a reservation for the cacheable task. If you have
 // previously acquired a reservation it will be extended. If another entity holds the reservation
 // that is returned.
 func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error) {
@@ -400,7 +400,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 	return response.Reservation, nil
 }
 
-// ReleaseReservation attempts to release a reservation for a cachable task. If the reservation
+// ReleaseReservation attempts to release a reservation for a cacheable task. If the reservation
 // does not exist (e.x. it never existed or has been acquired by another owner) then this call
 // still succeeds.
 func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key, ownerID string) error {

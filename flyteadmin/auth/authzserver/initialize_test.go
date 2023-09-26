@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteadmin/auth"
-	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 )
 
 func TestRegisterHandlers(t *testing.T) {

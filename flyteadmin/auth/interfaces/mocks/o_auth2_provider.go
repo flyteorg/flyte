@@ -9,7 +9,7 @@ import (
 
 	http "net/http"
 
-	interfaces "github.com/flyteorg/flyteadmin/auth/interfaces"
+	interfaces "github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 
 	jwk "github.com/lestrrat-go/jwx/jwk"
 

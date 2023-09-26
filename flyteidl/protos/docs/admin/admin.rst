@@ -1812,8 +1812,8 @@ User-provided launch plan definition and configuration values.
 
    "workflow_id", ":ref:`ref_flyteidl.core.Identifier`", "", "Reference to the Workflow template that the launch plan references"
    "entity_metadata", ":ref:`ref_flyteidl.admin.LaunchPlanMetadata`", "", "Metadata for the Launch Plan"
-   "default_inputs", ":ref:`ref_flyteidl.core.ParameterMap`", "", "Input values to be passed for the execution. These can be overriden when an execution is created with this launch plan."
-   "fixed_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Fixed, non-overridable inputs for the Launch Plan. These can not be overriden when an execution is created with this launch plan."
+   "default_inputs", ":ref:`ref_flyteidl.core.ParameterMap`", "", "Input values to be passed for the execution. These can be overridden when an execution is created with this launch plan."
+   "fixed_inputs", ":ref:`ref_flyteidl.core.LiteralMap`", "", "Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan."
    "role", ":ref:`ref_string`", "", "**Deprecated.** String to indicate the role to use to execute the workflow underneath"
    "labels", ":ref:`ref_flyteidl.admin.Labels`", "", "Custom labels to be applied to the execution resource."
    "annotations", ":ref:`ref_flyteidl.admin.Annotations`", "", "Custom annotations to be applied to the execution resource."
@@ -3324,7 +3324,7 @@ populated value (indicating the signal has been given).
 SignalGetOrCreateRequest
 ------------------------------------------------------------------
 
-SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
 See :ref:`ref_flyteidl.admin.Signal` for more details
 
 
@@ -3907,7 +3907,7 @@ flyteidl/admin/workflow.proto
 CreateWorkflowFailureReason
 ------------------------------------------------------------------
 
-When a CreateWorkflowRequest failes due to matching id
+When a CreateWorkflowRequest fails due to matching id
 
 
 

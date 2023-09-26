@@ -3,12 +3,12 @@ package transformers
 import (
 	"context"
 
-	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flytestdlib/logger"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
 )

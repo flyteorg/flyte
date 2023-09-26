@@ -3,12 +3,12 @@ package shardstrategy
 import (
 	"fmt"
 
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 
 	v1 "k8s.io/api/core/v1"
 )
 
-// EnvironmentShardStrategy assigns either project or domain identifers to individual
+// EnvironmentShardStrategy assigns either project or domain identifiers to individual
 // FlytePropeller instances to determine FlyteWorkflow processing responsibility.
 type EnvironmentShardStrategy struct {
 	EnvType     environmentType

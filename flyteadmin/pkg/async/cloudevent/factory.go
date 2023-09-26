@@ -10,14 +10,14 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-	"github.com/flyteorg/flyteadmin/pkg/async"
-	cloudEventImplementations "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/implementations"
-	"github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/implementations"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	cloudEventImplementations "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func NewCloudEventsPublisher(ctx context.Context, config runtimeInterfaces.CloudEventsConfig, scope promutils.Scope) interfaces.Publisher {

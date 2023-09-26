@@ -5,32 +5,32 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	flyteIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/batch"
 
-	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	batchMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	"github.com/flyteorg/flytestdlib/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	batchMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/net/context"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
 func init() {

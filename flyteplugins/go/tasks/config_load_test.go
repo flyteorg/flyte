@@ -8,12 +8,12 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	sagemakerConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/spark"
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	sagemakerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/spark"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 )
 
 func TestLoadConfig(t *testing.T) {

@@ -10,7 +10,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 
 	"github.com/sirupsen/logrus"
 )

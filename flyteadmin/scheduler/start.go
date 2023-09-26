@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
 )
 
 // StartScheduler creates and starts a new scheduler instance. This is a blocking call and will block the calling go-routine

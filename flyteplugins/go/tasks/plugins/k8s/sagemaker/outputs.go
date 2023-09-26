@@ -6,13 +6,13 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/logger"
 
 	hpojobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/hyperparametertuningjob"
 	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 func createOutputLiteralMap(tk *core.TaskTemplate, outputPath string) *core.LiteralMap {

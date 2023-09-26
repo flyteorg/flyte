@@ -9,7 +9,7 @@ go generate ./...
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
   if [ -n "$DIRTY" ]; then
-    echo "FAILED: Go code updated without commiting generated code."
+    echo "FAILED: Go code updated without committing generated code."
     echo "Ensure make generate has run and all changes are committed."
     DIFF=$(git diff)
     echo "diff detected: $DIFF"

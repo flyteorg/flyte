@@ -3,10 +3,10 @@ package adminservice
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
-	"github.com/flyteorg/flyteadmin/pkg/rpc/adminservice/util"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/grpc/codes"

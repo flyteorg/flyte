@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

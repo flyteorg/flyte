@@ -5,11 +5,11 @@ package mocks
 import (
 	context "context"
 
-	catalog "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 
-	handler "github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	handler "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 
-	interfaces "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
 )

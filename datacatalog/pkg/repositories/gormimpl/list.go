@@ -3,11 +3,11 @@ package gormimpl
 import (
 	"fmt"
 
-	errors2 "github.com/flyteorg/datacatalog/pkg/errors"
+	errors2 "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 
-	"github.com/flyteorg/datacatalog/pkg/common"
-	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 )

@@ -3,8 +3,8 @@ package common
 import (
 	"time"
 
-	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flytestdlib/config"
+	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

@@ -3,11 +3,11 @@ package catalog
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 )
 
 type ResponseStatus uint8

@@ -10,7 +10,7 @@ Using `with_overrides` can provide node-level override for workflow, but this is
 
 ## Design
 
-By default, all task nodes are not overridable at runtime. However, users can call `.with_runtime_override(name: str)` on task nodes to register a "hook" on tasks, which allows the task to be indentified by `name` and overridden with new config at runtime.
+By default, all task nodes are not overridable at runtime. However, users can call `.with_runtime_override(name: str)` on task nodes to register a "hook" on tasks, which allows the task to be identified by `name` and overridden with new config at runtime.
 
 One main motivation for introducing such a "hook mechanism" based on identifiers/names is that we couldn't come up with a good answer how a good UX can be achieved when having to specify overrides in a nested workflow graph in the UI, in code, or via the CLI since all approaches would require replicating the workflow graph structure in the overrides config. This way, the overrides can be specified in a simple map and the structure of the workflow graph does not matter/does not have to be shown.
 
@@ -26,8 +26,8 @@ def t2():
 @workflow
 def wf():
   t1() # this task node cannot be overridden
-  t1().with_runtime_override("task-yee") # can be overriden under the name "task-yee"
-  t2().with_runtime_override("task-ketan") # can be overriden under the name "task-ketan"
+  t1().with_runtime_override("task-yee") # can be overridden under the name "task-yee"
+  t2().with_runtime_override("task-ketan") # can be overridden under the name "task-ketan"
   t3() # this task node cannot be overridden
 ```
 

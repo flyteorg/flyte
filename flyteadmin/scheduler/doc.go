@@ -4,7 +4,7 @@
 // 1] Schedule management
 //    This component is part of the pkg/async/schedule/flytescheduler package
 //    Role of this component is to create / activate / deactivate schedules
-//    The above actions are exposed through launchplan activation/deactivation api's and donot have separate controls.
+//    The above actions are exposed through launchplan activation/deactivation api's and do not have separate controls.
 //    Whenever a launchplan with a schedule is activated, a new schedule entry is created in the datastore
 //    On deactivation the created scheduled and launchplan is deactivated through a flag
 //    Atmost one launchplan is active at any moment across its various versions and same semantics apply for the
@@ -25,7 +25,7 @@
 // 			This component is responsible for writing the snapshot state of all the schedules at a regular cadence to a
 //			persistent store. The current implementation uses DB to store the GOB format of the snapshot which is versioned.
 //			The snapshot is map[string]time.Time which stores a map of schedules names to there last execution times
-// 			During bootup the snapshot is bootstraped from the data store and loaded in memory
+// 			During bootup the snapshot is bootstrapped from the data store and loaded in memory
 //			The Scheduler use this snapshot to schedule any missed schedules.
 //
 //			We cannot use global snapshot time since each time snapshot doesn't contain information on how many schedules
@@ -74,7 +74,7 @@
 //		    During the discrepancy the executions won't be scheduled on admin once the bug(1354) is fixed.
 //
 //      b) Case when scheduled time T1 execution fails. The goroutine executing for T1 will go through 30 repetitions before
-//		   aborting the run. In such a scenario its possible that furture scheduled time T2 succeeds and gets executed successfully
+//		   aborting the run. In such a scenario its possible that future scheduled time T2 succeeds and gets executed successfully
 //		   by the admin. i.e admin could execute the schedules in this order T2, T1. This is rare case though
 //
 // 		c) Case when the scheduler goes down then once it comes back up it will run catch up on all the schedules using

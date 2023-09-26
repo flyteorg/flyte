@@ -3,10 +3,10 @@ package interfaces
 import (
 	"context"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 //go:generate mockery -all -case=underscore

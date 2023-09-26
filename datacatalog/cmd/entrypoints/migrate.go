@@ -1,7 +1,7 @@
 package entrypoints
 
 import (
-	"github.com/flyteorg/datacatalog/pkg/repositories"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 
 	"context"
 

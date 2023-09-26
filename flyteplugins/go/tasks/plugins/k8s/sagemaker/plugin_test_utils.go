@@ -1,20 +1,20 @@
 package sagemaker
 
 import (
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/pkg/errors"
 
 	"github.com/golang/protobuf/proto"
 
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	sagemakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	pluginIOMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/mock"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 
 	"github.com/stretchr/testify/assert"
 )

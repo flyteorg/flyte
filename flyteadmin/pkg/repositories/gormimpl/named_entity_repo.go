@@ -4,16 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
 const innerJoinTableAlias = "entities"

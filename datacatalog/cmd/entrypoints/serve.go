@@ -3,13 +3,13 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/flyteorg/datacatalog/pkg/config"
-	"github.com/flyteorg/datacatalog/pkg/rpc/datacatalogservice"
-	"github.com/flyteorg/datacatalog/pkg/runtime"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/profutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/datacatalog/pkg/config"
+	"github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
+	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/profutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 
 	"github.com/spf13/cobra"
 )

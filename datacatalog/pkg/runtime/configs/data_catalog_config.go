@@ -3,7 +3,7 @@ package configs
 import (
 	"time"
 
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 //go:generate pflags DataCatalogConfig --default-var=defaultConfig

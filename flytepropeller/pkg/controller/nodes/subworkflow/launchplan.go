@@ -6,17 +6,17 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

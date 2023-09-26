@@ -3,24 +3,24 @@ package resources
 import (
 	"context"
 
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	// pkg/runtime/interfaces/application_configuration.go
 	"testing"
 
-	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
+	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
-	commonTestUtils "github.com/flyteorg/flyteadmin/pkg/common/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"

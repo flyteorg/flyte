@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	"github.com/flyteorg/flytepropeller/manager/shardstrategy"
-	"github.com/flyteorg/flytepropeller/manager/shardstrategy/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy"
+	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

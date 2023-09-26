@@ -7,14 +7,14 @@ package awsbatch
 import (
 	"context"
 
-	stdConfig "github.com/flyteorg/flytestdlib/config"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	"github.com/flyteorg/flytestdlib/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"testing"
 

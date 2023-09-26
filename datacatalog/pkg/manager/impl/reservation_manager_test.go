@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"testing"
 	"time"
 
-	errors2 "github.com/flyteorg/datacatalog/pkg/errors"
-	errors3 "github.com/flyteorg/datacatalog/pkg/repositories/errors"
-	"github.com/flyteorg/datacatalog/pkg/repositories/mocks"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	errors2 "github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	errors3 "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"

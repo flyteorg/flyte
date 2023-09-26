@@ -1,8 +1,8 @@
 package mocks
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	ifaceMocks "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	ifaceMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 

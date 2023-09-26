@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type dataStoreCreateFn func(ctx context.Context, cfg *Config, metrics *dataStoreMetrics) (RawStore, error)

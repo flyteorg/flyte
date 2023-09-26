@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"github.com/flyteorg/datacatalog/pkg/common"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/datacatalog/pkg/repositories/utils"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/utils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/stretchr/testify/assert"
 )
