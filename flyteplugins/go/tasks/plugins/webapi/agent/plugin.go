@@ -144,7 +144,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 
-	return &ResourceWrapper{
+	return ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
 	}, nil
