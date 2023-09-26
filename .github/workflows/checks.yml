@@ -87,6 +87,7 @@ jobs:
   integration:
     name: Integration Test
     needs:
+      - docker-build
       - unpack-envvars
     strategy:
       fail-fast: false
