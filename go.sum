@@ -1519,10 +1519,6 @@ github.com/ugorji/go v1.1.4/go.mod h1:uQMGLiO92mf5W77hV/PUCpI3pbzQx3CRekS0kk+RGr
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
 github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a h1:pTbOzzOh94yt3WHt7uqZ1m6PUZth++GspSJGK9dEBC4=
 github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a/go.mod h1:eQICP3HwyT7UooqI/z+Ov+PtYAWygg1TEWWzGIFLtro=
-github.com/unionai/flyteadmin v1.1.115-0.20230922220028-90b279296f02 h1:UT7+HmFEo5trdkI3R9TWGHhfeCJTICAXiOvcc4ZhYpA=
-github.com/unionai/flyteadmin v1.1.115-0.20230922220028-90b279296f02/go.mod h1:DoYsyQ2kEoOEt+xnRC96foR1eTVfKgOy1DRPLkgPh/Y=
-github.com/unionai/flyteidl v1.5.14-0.20230916200054-78caf2c2eeb3 h1:GznIW2znW7PeixgNbSJxNIajqB5LlL98uEBOPA99HGI=
-github.com/unionai/flyteidl v1.5.14-0.20230916200054-78caf2c2eeb3/go.mod h1:EtE/muM2lHHgBabjYcxqe9TWeJSL0kXwbI0RgVwI4Og=
 github.com/unrolled/secure v0.0.0-20180918153822-f340ee86eb8b/go.mod h1:mnPT77IAdsi/kV7+Es7y+pXALeV3h7G6dQF6mNYjcLA=
 github.com/unrolled/secure v0.0.0-20181005190816-ff9db2ff917f/go.mod h1:mnPT77IAdsi/kV7+Es7y+pXALeV3h7G6dQF6mNYjcLA=
 github.com/urfave/cli v1.20.0/go.mod h1:70zkFmudgCuE/ngEzBv17Jvp/497gISqfk5gWijbERA=

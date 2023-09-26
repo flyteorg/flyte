@@ -34,7 +34,7 @@ manifests:
 		kustomize/complete-agent > manifests/complete-agent.yaml
 
 .PHONY: build
-build: manifests
+build: flyte manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
