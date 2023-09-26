@@ -1,7 +1,7 @@
 define FLYTE_BINARY_BUILD
 mkdir -p images/tar/$(1)
 
-docker buildx build \
+docker buildx build --ssh default \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--platform linux/$(1) \
 	--tag flyte-binary:sandbox \
@@ -29,13 +29,13 @@ manifests:
 		kustomize/dev > manifests/dev.yaml
 
 .PHONY: build
-build: flyte manifests
+build: manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
 		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
 		--platform linux/arm64,linux/amd64
-	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
+	docker buildx build --ssh default --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox:latest .
 
 # Port map
