@@ -1,0 +1,54 @@
+name: Bump git tags
+
+on:
+  workflow_call:
+    outputs:
+      version:
+        description: "Tag name"
+        value: ${{ jobs.bump_version.outputs.version }}
+jobs:
+  bump_version:
+    name: Bump Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.bump_version.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      # Bump patch version
+      - uses: rickstaa/action-get-semver@v1
+        id: get_semver
+        with:
+          bump_level: "patch"
+      - name: Print current and next version
+        run: |
+          echo "Current version: ${{ steps.get_semver.outputs.current_version  }}"
+          echo "Next version: ${{ steps.get_semver.outputs.next_version }}"
+      # Generate all tags for all components
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ steps.get_semver.outputs.next_version }}`,
+              sha: context.sha
+            })
+            const components = [
+              "datacatalog",
+              "flyteadmin",
+              "flytecopilot",
+              "flyteplugins",
+              "flytepropeller",
+              "flytestdlib",
+            ];
+            for (const c of components) {
+              github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/${c}/${{ steps.get_semver.outputs.next_version }}`,
+                sha: context.sha
+              })
+            }

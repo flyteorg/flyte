@@ -117,15 +117,16 @@ jobs:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
 
-  # TODO(monorepo): enable bump_version
-  # bump_version:
-  #   name: Bump Version
-  #   if: ${{ github.event_name != 'pull_request' }}
-  #   needs: [ endtoend,  integration, lint, tests, generate ] # Only to ensure it can successfully build
-  #   uses: flyteorg/flytetools/.github/workflows/bump_version.yml@master
-  #   secrets:
-  #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+  bump-tags:
+    name: Bump git tags
+    # TODO(monorepo): skip this if author is flyte-bot?
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: [ integration, lint, tests, generate ] # Only to ensure it can successfully build
+    uses: ./.github/workflows/bump-tags.yml
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
+  # TODO(monorepo): we are not going to release any binary
   # goreleaser:
   #   name: Goreleaser
   #   needs: [ bump_version ] # Only to ensure it can successfully build
@@ -135,27 +136,24 @@ jobs:
   #   secrets:
   #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
-  # push_docker_image:
-  #   name: Build & Push Image
-  #   # TODO(monorepo): depend on bump_version
-  #   # needs: [ bump_version ]
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       component:
-  #         - datacatalog
-  #         - flyteadmin
-  #         - flytecopilot
-  #         - flytepropeller
-  #         - flytescheduler
-  #   uses: ./.github/workflows/publish.yml
-  #   with:
-  #     version: "test-version-monorepo"
-  #     component: ${{ matrix.component }}
-  #     dockerfile: Dockerfile.${{ matrix.component }}
-  #     # TODO(monorepo): set push to true once we depend on bump_version
-  #     # push: true
-  #     push: false
-  #   secrets:
-  #     FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-  #     FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+  push_docker_image:
+    name: Build & Push Image
+    needs: [ bump-tags ]
+    strategy:
+      fail-fast: false
+      matrix:
+        component:
+          - datacatalog
+          - flyteadmin
+          - flytecopilot
+          - flytepropeller
+          - flytescheduler
+    uses: ./.github/workflows/publish.yml
+    with:
+      version: ${{ needs.bump-tags.outputs.version }}
+      component: ${{ matrix.component }}
+      dockerfile: Dockerfile.${{ matrix.component }}
+      push: true
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
