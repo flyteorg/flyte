@@ -92,6 +92,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
 	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil)
 
 	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		or := args.Get(1).(io.OutputReader)

@@ -64,6 +64,10 @@ func (e ExecutionStateCacheItem) ID() string {
 	return e.Identifier
 }
 
+func (e ExecutionStateCacheItem) IsTerminal() bool {
+	return e.ExecutionState.Phase.IsTerminal()
+}
+
 // This basically grab an updated status from the Qubole API and store it in the cache
 // All other handling should be in the synchronous loop.
 func (q *QuboleHiveExecutionsCache) SyncQuboleQuery(ctx context.Context, batch cache.Batch) (

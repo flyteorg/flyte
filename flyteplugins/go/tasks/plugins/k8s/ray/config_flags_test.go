@@ -169,20 +169,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_nodeIPAddress", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("nodeIPAddress", testValue)
-			if vString, err := cmdFlags.GetString("nodeIPAddress"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.NodeIPAddress)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_remoteClusterConfig.name", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -219,6 +205,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("remoteClusterConfig.enabled", testValue)
 			if vBool, err := cmdFlags.GetBool("remoteClusterConfig.enabled"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.RemoteClusterConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_enableUsageStats", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("enableUsageStats", testValue)
+			if vBool, err := cmdFlags.GetBool("enableUsageStats"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EnableUsageStats)
 
 			} else {
 				assert.FailNow(t, err.Error())

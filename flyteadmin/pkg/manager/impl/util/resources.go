@@ -100,7 +100,7 @@ func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager 
 
 	resource, err := resourceManager.GetResource(ctx, request)
 	if err != nil {
-		logger.Warningf(ctx, "Failed to fetch override values when assigning task resource default values for [%+v]: %v",
+		logger.Infof(ctx, "Failed to fetch override values when assigning task resource default values for [%+v]: %v",
 			id, err)
 	}
 

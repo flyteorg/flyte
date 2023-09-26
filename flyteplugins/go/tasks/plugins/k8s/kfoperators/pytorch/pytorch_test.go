@@ -48,6 +48,13 @@ var (
 		"test-args",
 	}
 
+	dummyAnnotations = map[string]string{
+		"annotation-key": "annotation-value",
+	}
+	dummyLabels = map[string]string{
+		"label-key": "label-value",
+	}
+
 	resourceRequirements = &corev1.ResourceRequirements{
 		Limits: corev1.ResourceList{
 			corev1.ResourceCPU:         resource.MustParse("1000m"),
@@ -170,8 +177,8 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
 	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
@@ -339,6 +346,18 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 	}
 
 	assert.True(t, hasContainerWithDefaultPytorchName)
+
+	// verify TaskExecutionMetadata labels and annotations are copied to the PyTorchJob
+	for k, v := range dummyAnnotations {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+		}
+	}
+	for k, v := range dummyLabels {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+		}
+	}
 }
 
 func TestBuildResourcePytorch(t *testing.T) {
@@ -355,6 +374,18 @@ func TestBuildResourcePytorch(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas)
 	assert.Nil(t, pytorchJob.Spec.ElasticPolicy)
+
+	// verify TaskExecutionMetadata labels and annotations are copied to the TensorFlowJob
+	for k, v := range dummyAnnotations {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+		}
+	}
+	for k, v := range dummyLabels {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+		}
+	}
 
 	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
 		var hasContainerWithDefaultPytorchName = false

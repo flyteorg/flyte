@@ -1230,10 +1230,13 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 
 		err = nCtx.EventsRecorder().RecordNodeEvent(ctx, nev, c.eventConfig)
 		if err != nil {
-			if eventsErr.IsTooLarge(err) {
-				// With large enough dynamic task fanouts the reported node event, which contains the compiled
-				// workflow closure, can exceed the gRPC message size limit. In this case we immediately
-				// transition the node to failing to abort the workflow.
+			if eventsErr.IsTooLarge(err) || eventsErr.IsInvalidArguments(err) {
+				// we immediately transition to failing if one of two scenarios occur during node event recording:
+				// (1) the event is too large to be sent over gRPC. this can occur if, for example, a dynamic task
+				// has a very large fanout and the compiled workflow closure causes the event to exceed the gRPC
+				// message size limit.
+				// (2) the event is invalid. this can occur if, for example, a dynamic task compiles a workflow
+				// which is invalid per admin limits (ex. maximum resources exceeded).
 				np = v1alpha1.NodePhaseFailing
 				p = handler.PhaseInfoFailure(core.ExecutionError_USER, "NodeFailed", err.Error(), p.GetInfo())
 
