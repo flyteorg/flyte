@@ -294,6 +294,8 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				item: item.(Item),
 			}})
 
+			// Since we create batches every time we sync, we will just remove the item from the queue here
+			// regardless of whether it succeeded the sync or not.
 			w.workqueue.Forget(itemID)
 			w.workqueue.Done(itemID)
 
