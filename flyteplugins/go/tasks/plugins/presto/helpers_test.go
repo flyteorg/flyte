@@ -1,13 +1,13 @@
 package presto
 
 import (
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	coreMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flytestdlib/storage"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"

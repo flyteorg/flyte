@@ -3,14 +3,14 @@ package config
 import (
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
 /*
 	IMPORTANT: You'll observe several models are redefined below with named index tags *omitted*. This is because
 	postgres requires that index names be unique across *all* tables. If you modify Task, Execution, NodeExecution or
 	TaskExecution models in code be sure to update the appropriate duplicate definitions here.
-	That is, in the actual code, it makes more sense to re-use structs, like how NodeExecutionKey is in both NodeExecution
+	That is, in the actual code, it makes more sense to reuse structs, like how NodeExecutionKey is in both NodeExecution
 	and in TaskExecution. But simply re-using in migrations would result in indices with the same name.
 	In the new model where all models are replicated in each function, this is not an issue.
 */

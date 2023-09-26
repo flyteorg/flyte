@@ -3,7 +3,7 @@ package ioutils
 import (
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 )
 

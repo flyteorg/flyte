@@ -6,13 +6,13 @@ import (
 	"strings"
 	"testing"
 
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 )
 
 var testRequestMetrics = NewRequestMetrics(mockScope.NewTestScope(), "foo")

@@ -4,7 +4,7 @@ package shared
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 
 	"google.golang.org/grpc/codes"
 )

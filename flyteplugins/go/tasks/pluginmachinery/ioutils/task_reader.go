@@ -5,9 +5,9 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/atomic"
-	"github.com/flyteorg/flytestdlib/storage"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/pkg/errors"
 )
 

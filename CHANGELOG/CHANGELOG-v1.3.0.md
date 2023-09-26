@@ -95,7 +95,7 @@ r.set_signal("signal-name", "execidabc123", True)
 ```
 
 ### Overwritten Cached Values on Execution
-Users can now configure workflow execution to overwrite the cache. Each task in the workflow execution, regardless of previous cache status, will execute and write cached values - overwritting previous values if necessary. This allows previously corrupted cache values to be corrected without the tedious process of incrementing the `cache_version` and re-registering Flyte workflows / tasks.
+Users can now configure workflow execution to overwrite the cache. Each task in the workflow execution, regardless of previous cache status, will execute and write cached values - overwriting previous values if necessary. This allows previously corrupted cache values to be corrected without the tedious process of incrementing the `cache_version` and re-registering Flyte workflows / tasks.
 
 
 ### Support for Dask

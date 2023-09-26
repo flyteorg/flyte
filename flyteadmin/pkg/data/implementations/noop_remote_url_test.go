@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/stretchr/testify/assert"
 
-	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
+	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 )
 
 const noopFileSize = int64(1256)

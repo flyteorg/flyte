@@ -14,7 +14,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 		assert.Equal(t, core.SimpleType_NONE.String(), lt.GetSimple().String())
 	})
 
-	t.Run("homogenous", func(t *testing.T) {
+	t.Run("homogeneous", func(t *testing.T) {
 		lt := literalTypeForLiterals([]*core.Literal{
 			coreutils.MustMakeLiteral(5),
 			coreutils.MustMakeLiteral(0),

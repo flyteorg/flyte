@@ -21,21 +21,21 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	catalogMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/stretchr/testify/mock"
 
-	coreMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
@@ -92,6 +92,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
 	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
+	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil)
 
 	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		or := args.Get(1).(io.OutputReader)
@@ -209,7 +210,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 			or := args.Get(2).(io.OutputReader)
 			o, ee, err := or.Read(ctx)
 			assert.NoError(t, err)
-			// TODO: Outputing error is not yet supported.
+			// TODO: Outputting error is not yet supported.
 			assert.Nil(t, ee)
 			catData.Store(key, o)
 		})

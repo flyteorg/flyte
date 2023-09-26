@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 

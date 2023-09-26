@@ -1,6 +1,6 @@
 package pkce
 
-import "github.com/flyteorg/flytestdlib/config"
+import "github.com/flyteorg/flyte/flytestdlib/config"
 
 // Config defines settings used for PKCE flow.
 type Config struct {

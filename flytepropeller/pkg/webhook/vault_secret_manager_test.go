@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	coreIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
 	"github.com/go-test/deep"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -252,7 +252,7 @@ func TestVaultSecretManagerInjector_Inject(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "DB Secret backend enginge is supported",
+			name: "DB Secret backend engine is supported",
 			args: args{
 				cfg: config.VaultSecretManagerConfig{Role: "flyte", KVVersion: config.KVVersion1},
 				secret: &coreIdl.Secret{

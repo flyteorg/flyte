@@ -14,7 +14,7 @@ import (
 
 type ArtifactType int
 
-// The suffixes in these constants are used to match against the tail end of the flyte url, to keep tne flyte url simpler
+// The suffixes in these constants are used to match against the tail end of the flyte url, to keep the flyte url simpler
 const (
 	ArtifactTypeUndefined ArtifactType = iota
 	ArtifactTypeI                      // inputs

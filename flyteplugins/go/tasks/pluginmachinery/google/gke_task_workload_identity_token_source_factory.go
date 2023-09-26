@@ -3,7 +3,7 @@ package google
 import (
 	"context"
 
-	pluginmachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/impersonate"

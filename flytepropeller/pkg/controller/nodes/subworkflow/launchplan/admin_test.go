@@ -7,10 +7,10 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flytestdlib/cache"
-	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"

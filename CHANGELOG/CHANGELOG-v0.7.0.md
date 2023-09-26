@@ -9,7 +9,7 @@
 - Large steps towards intracloud workflow portability
 
 ## Console
- - Ability to track lineage and caching information directly in the UI. On a cache hit - possible to jump to the orginating execution.
+ - Ability to track lineage and caching information directly in the UI. On a cache hit - possible to jump to the originating execution.
  - Ability to clone an execution
  - bug fixes
 

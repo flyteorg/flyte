@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/flyteorg/datacatalog/pkg/common"
-	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 )
 
 const (

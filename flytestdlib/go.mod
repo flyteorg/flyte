@@ -1,4 +1,4 @@
-module github.com/flyteorg/flytestdlib
+module github.com/flyteorg/flyte/flytestdlib
 
 go 1.19
 
@@ -103,4 +103,13 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/klog/v2 v2.5.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.0.3 // indirect
+)
+
+replace (
+	github.com/flyteorg/flyte/datacatalog => ../datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/flyteorg/flyteidl => ../flyteidl
 )

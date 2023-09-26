@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 
 	"github.com/golang/protobuf/proto"
 

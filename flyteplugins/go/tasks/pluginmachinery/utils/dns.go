@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"k8s.io/apimachinery/pkg/util/validation"
 )
 

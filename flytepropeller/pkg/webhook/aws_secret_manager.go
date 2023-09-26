@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flytestdlib/logger"
 	corev1 "k8s.io/api/core/v1"
 )
 
@@ -31,7 +31,7 @@ const (
 )
 
 var (
-	// AWSSecretMountPathPrefix defins the default mount path for secrets
+	// AWSSecretMountPathPrefix defines the default mount path for secrets
 	AWSSecretMountPathPrefix = []string{string(os.PathSeparator), "etc", "flyte", "secrets"}
 )
 

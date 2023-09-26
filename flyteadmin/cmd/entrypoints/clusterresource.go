@@ -5,11 +5,11 @@ import (
 
 	errors2 "github.com/pkg/errors"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	"github.com/flyteorg/flyteadmin/pkg/clusterresource"
-	"github.com/flyteorg/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.

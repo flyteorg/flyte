@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/stretchr/testify/mock"
 )
 

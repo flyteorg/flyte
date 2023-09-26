@@ -16,7 +16,7 @@
 // TODO: Currently retries are not automatically handled.
 package data
 
-import "github.com/flyteorg/flytestdlib/futures"
+import "github.com/flyteorg/flyte/flytestdlib/futures"
 
 type VarMap map[string]interface{}
 type FutureMap map[string]futures.Future

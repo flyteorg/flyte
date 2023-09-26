@@ -4,15 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/cache"
-	cacheMocks "github.com/flyteorg/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
-	quboleMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
+	quboleMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

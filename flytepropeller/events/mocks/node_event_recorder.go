@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	config "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	config "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 
 	event "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 

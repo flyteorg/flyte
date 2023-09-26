@@ -3,11 +3,11 @@ package cmd
 import (
 	"context"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 
-	webhookConfig "github.com/flyteorg/flytepropeller/pkg/webhook/config"
+	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 
-	"github.com/flyteorg/flytepropeller/pkg/webhook"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
 
 	"github.com/spf13/cobra"
 )

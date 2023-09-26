@@ -14,16 +14,16 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	flyteK8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
-	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"

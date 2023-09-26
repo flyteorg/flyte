@@ -9,15 +9,15 @@ import (
 
 	"database/sql/driver"
 
-	"github.com/flyteorg/datacatalog/pkg/common"
-	apiErrors "github.com/flyteorg/datacatalog/pkg/errors"
-	"github.com/flyteorg/datacatalog/pkg/repositories/errors"
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/datacatalog/pkg/repositories/utils"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	apiErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/utils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"google.golang.org/grpc/codes"
 )
 

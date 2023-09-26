@@ -6,7 +6,7 @@ import (
 
 	"github.com/ory/fosite"
 
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=DefaultConfig

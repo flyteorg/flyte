@@ -8,8 +8,8 @@ import (
 	"encoding/binary"
 	"hash/fnv"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
 type JobID = string
@@ -23,7 +23,7 @@ type ArrayStatus struct {
 	Detailed bitarray.CompactArray `json:"details"`
 }
 
-// HashCode computes a hash of the phase indicies stored in the Detailed array to uniquely represent
+// HashCode computes a hash of the phase indices stored in the Detailed array to uniquely represent
 // a collection of subtask phases.
 func (a ArrayStatus) HashCode() (uint64, error) {
 	hash := fnv.New64()

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flytecopilot/cmd"
+	"github.com/flyteorg/flyte/flytecopilot/cmd"
 )
 
 func main() {

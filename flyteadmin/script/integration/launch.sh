@@ -34,7 +34,7 @@ docker run \
   --env "DOCKERNETES_DEBUG=${DOCKERNETES_DEBUG}" \
   lyft/dockernetes:1.10.1-v0.1 /sbin/init
 
-# wait for the system to initalize, then run execute.sh
+# wait for the system to initialize, then run execute.sh
 docker exec \
   -it \
   dockernetes /flyteadmin/script/integration/k8s/main.sh

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
 // TODO - optimization maybe? we can move this to predicate check, before we add it to the queue?
@@ -18,7 +18,7 @@ type resourceVersionMetrics struct {
 	workflowRedundantUpdatesCount labeled.Counter
 }
 
-// Simple function that covnerts the namespace and name to a string
+// Simple function that converts the namespace and name to a string
 func resourceVersionKey(namespace, name string) string {
 	return fmt.Sprintf("%s/%s", namespace, name)
 }

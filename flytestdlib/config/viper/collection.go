@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	viperLib "github.com/spf13/viper"
 

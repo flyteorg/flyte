@@ -12,19 +12,19 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/aws/aws-sdk-go/service/batch"
-	"github.com/flyteorg/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type JobName = string
@@ -47,6 +47,10 @@ type Job struct {
 	Attempts       []Attempt            `json:"attempts,omitempty"`
 	Status         JobStatus            `json:"status,omitempty"`
 	SubJobs        []*Job               `json:"array,omitempty"`
+}
+
+func (j Job) IsTerminal() bool {
+	return j.Status.Phase.IsTerminal()
 }
 
 type Attempt struct {

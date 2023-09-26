@@ -5,18 +5,18 @@ import (
 	"sort"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array"
 
 	"github.com/aws/aws-sdk-go/service/batch"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	config2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	config2 "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 	"github.com/golang/protobuf/ptypes/duration"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -81,7 +81,17 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	}
 
 	envVars := getEnvVarsForTask(ctx, tCtx.TaskExecutionMetadata().GetTaskExecutionID(), taskTemplate.GetContainer().GetEnv(), cfg.DefaultEnvVars)
-	res := tCtx.TaskExecutionMetadata().GetOverrides().GetResources()
+
+	// compile resources
+	res, err := flytek8s.ToK8sResourceRequirements(taskTemplate.GetContainer().GetResources())
+	if err != nil {
+		return nil, err
+	}
+
+	if overrideResources := tCtx.TaskExecutionMetadata().GetOverrides().GetResources(); overrideResources != nil {
+		flytek8s.MergeResources(*overrideResources, res)
+	}
+
 	platformResources := tCtx.TaskExecutionMetadata().GetPlatformResources()
 	if platformResources == nil {
 		platformResources = &v1.ResourceRequirements{}

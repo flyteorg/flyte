@@ -1,7 +1,7 @@
 .. _deployment-agent-setup:
 
-Memverge Agent Setup
-=======================
+Agent Setup
+==============
 
 .. tags:: Agent, Integration, Data, Advanced
 
@@ -11,6 +11,15 @@ Discover the process of setting up Agents for Flyte.
     :header: text-center
     :column: col-lg-12 p-2
 
+    .. link-button:: deployment-agent-setup-bigquery
+       :type: ref
+       :text: Bigquery Agent
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Bigquery agent.
+    
+    ---
+    
     .. link-button:: deployment-agent-setup-memverge
        :type: ref
        :text: Memverge Agent
@@ -18,9 +27,12 @@ Discover the process of setting up Agents for Flyte.
     ^^^^^^^^^^^^
     Guide to setting up the Memverge agent.
 
+
 .. toctree::
     :maxdepth: 1
     :name: Agent setup
     :hidden:
-
+    
+    bigquery
     memverge/index
+

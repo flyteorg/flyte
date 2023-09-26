@@ -4,19 +4,19 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

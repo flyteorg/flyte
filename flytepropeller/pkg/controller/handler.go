@@ -10,18 +10,18 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/workflowstore"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/prometheus/client_golang/prometheus"
 )
@@ -267,7 +267,7 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 		}
 
 		if err != nil {
-			// NOTE We are overriding the deepcopy here, as we are essentially ingnoring all mutations
+			// NOTE We are overriding the deepcopy here, as we are essentially ignoring all mutations
 			// We only want to increase failed attempts and discard any other partial changes to the CRD.
 			mutatedWf = RecordSystemError(w, err)
 			p.metrics.SystemError.Inc(ctx)

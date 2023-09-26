@@ -5,16 +5,16 @@ import (
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	stdErrors "github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (
@@ -55,6 +55,10 @@ type ExecutionStateCacheItem struct {
 	// unique across all of Flyte) and needs to be deterministic.
 	// This will also be used as the allocation token for now.
 	Identifier string `json:"id"`
+}
+
+func (e ExecutionStateCacheItem) IsTerminal() bool {
+	return e.ExecutionState.CurrentPhase.IsTerminal()
 }
 
 func (e ExecutionStateCacheItem) ID() string {

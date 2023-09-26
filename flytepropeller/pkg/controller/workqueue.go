@@ -3,13 +3,13 @@ package controller
 import (
 	"context"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 
 	"golang.org/x/time/rate"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	// Setup workqueue metrics
-	_ "github.com/flyteorg/flytestdlib/promutils"
+	_ "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"k8s.io/client-go/util/workqueue"
 )
 

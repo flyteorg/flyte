@@ -10,6 +10,6 @@ sphinx_fontawesome
 sphinx-panels
 sphinxcontrib-mermaid
 sphinxcontrib-video
-sphinxcontrib-youtube
+sphinxcontrib-youtube==1.2.0
 sphinx-tabs
 sphinx-tags

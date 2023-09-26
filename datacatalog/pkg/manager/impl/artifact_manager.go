@@ -5,21 +5,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/datacatalog/pkg/errors"
-	"github.com/flyteorg/datacatalog/pkg/manager/impl/validators"
-	"github.com/flyteorg/datacatalog/pkg/manager/interfaces"
-	"github.com/flyteorg/datacatalog/pkg/repositories"
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/manager/impl/validators"
+	"github.com/flyteorg/flyte/datacatalog/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
-	"github.com/flyteorg/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/datacatalog/pkg/repositories/transformers"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
 
-	"github.com/flyteorg/datacatalog/pkg/common"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"google.golang.org/grpc/codes"
 )
 

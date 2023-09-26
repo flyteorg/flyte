@@ -127,7 +127,7 @@ def schedule_workflow_groups(
     terminate_workflow_on_failure: bool,
 ) -> Dict[str, bool]:
     """
-    Schedule workflows executions for all workflow gropus and return True if all executions succeed, otherwise
+    Schedule workflows executions for all workflow groups and return True if all executions succeed, otherwise
     return False.
     """
     executions_by_wfgroup = {}

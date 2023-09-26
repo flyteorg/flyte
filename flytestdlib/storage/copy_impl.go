@@ -9,10 +9,10 @@ import (
 	errs "github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flyteorg/flytestdlib/ioutils"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/ioutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
 type copyImpl struct {

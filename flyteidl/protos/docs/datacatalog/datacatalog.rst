@@ -378,7 +378,7 @@ Dataset.
 GetOrExtendReservationRequest
 ------------------------------------------------------------------
 
-Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+Try to acquire or extend an artifact reservation. If an active reservation exists, retrieve that instance.
 
 
 

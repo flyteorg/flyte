@@ -14,9 +14,9 @@ import (
 	"fmt"
 	"reflect"
 
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/jackc/pgconn"

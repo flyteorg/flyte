@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/config"
-	"github.com/flyteorg/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
 )

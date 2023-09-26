@@ -3,8 +3,8 @@ package events
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 //go:generate pflags Config

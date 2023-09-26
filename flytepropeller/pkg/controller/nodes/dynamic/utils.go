@@ -7,9 +7,9 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
-	"github.com/flyteorg/flytepropeller/pkg/compiler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 )
 
 // Constructs the expected interface of a given node.

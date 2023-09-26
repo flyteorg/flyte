@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	config2 "github.com/flyteorg/flytepropeller/pkg/controller/config"
+	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 
-	"github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

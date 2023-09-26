@@ -9,14 +9,14 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/golang/protobuf/ptypes"
 
@@ -104,7 +104,7 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 
 	var nev *event.NodeExecutionEvent
 	// Start node is special case where the Inputs and Outputs are the same and hence here we copy the Output file
-	// into the OutputResult and in admin we copy it over into input aswell.
+	// into the OutputResult and in admin we copy it over into input as well.
 	if nodeExecID.NodeId == v1alpha1.StartNodeID {
 		outputsFile := v1alpha1.GetOutputsFile(status.GetOutputDir())
 		nev = &event.NodeExecutionEvent{

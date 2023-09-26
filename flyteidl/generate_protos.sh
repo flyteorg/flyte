@@ -102,7 +102,7 @@ rm -f gen/pb-go/flyteidl/service/admin.pb.gw.go-e
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
   if [ -n "$DIRTY" ]; then
-    echo "FAILED: Protos updated without commiting generated code."
+    echo "FAILED: Protos updated without committing generated code."
     echo "Ensure make generate has run and all changes are committed."
     DIFF=$(git diff)
     echo "diff detected: $DIFF"

@@ -5,8 +5,8 @@ import (
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 // InitializeExternalResources constructs an ExternalResource array where each element describes the

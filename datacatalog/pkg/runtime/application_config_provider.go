@@ -6,11 +6,11 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/datacatalog/pkg/runtime/configs"
-	"github.com/flyteorg/flytestdlib/database"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/datacatalog/pkg/runtime/configs"
+	"github.com/flyteorg/flyte/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const datacatalog = "datacatalog"

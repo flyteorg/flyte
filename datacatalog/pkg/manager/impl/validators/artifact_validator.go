@@ -3,7 +3,7 @@ package validators
 import (
 	"fmt"
 
-	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 

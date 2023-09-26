@@ -7,9 +7,9 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	stdAtomic "github.com/flyteorg/flytestdlib/atomic"
+	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"k8s.io/apimachinery/pkg/util/clock"
 )

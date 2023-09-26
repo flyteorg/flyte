@@ -3,16 +3,16 @@ package pod
 import (
 	"context"
 
-	pluginserrors "github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"hash/fnv"
 
-	"github.com/flyteorg/flytepropeller/manager/config"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/manager/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
 	v1 "k8s.io/api/core/v1"
 )

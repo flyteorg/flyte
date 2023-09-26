@@ -1,9 +1,9 @@
 package main
 
 import (
-	_ "github.com/flyteorg/flytepropeller/plugins"
+	_ "github.com/flyteorg/flyte/flytepropeller/plugins"
 
-	"github.com/flyteorg/flytepropeller/cmd/controller/cmd"
+	"github.com/flyteorg/flyte/flytepropeller/cmd/controller/cmd"
 )
 
 func main() {

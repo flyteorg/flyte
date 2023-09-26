@@ -8,8 +8,8 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/golang/protobuf/ptypes/timestamp"

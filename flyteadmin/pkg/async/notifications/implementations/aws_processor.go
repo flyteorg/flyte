@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
-	"github.com/flyteorg/flyteadmin/pkg/async"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
 )
 

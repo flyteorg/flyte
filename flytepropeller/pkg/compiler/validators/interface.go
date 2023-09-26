@@ -3,9 +3,9 @@ package validators
 import (
 	"fmt"
 
+	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 )
 
 // ValidateInterface validates interface has its required attributes set

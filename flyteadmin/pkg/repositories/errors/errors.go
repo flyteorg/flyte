@@ -2,7 +2,7 @@
 package errors
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 )

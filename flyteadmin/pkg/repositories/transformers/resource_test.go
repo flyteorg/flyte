@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/common/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
 

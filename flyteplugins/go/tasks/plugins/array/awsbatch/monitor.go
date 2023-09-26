@@ -5,22 +5,22 @@ import (
 
 	core2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
 
-	"github.com/flyteorg/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 func createSubJobList(count int) []*Job {

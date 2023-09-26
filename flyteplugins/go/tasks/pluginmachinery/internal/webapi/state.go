@@ -3,7 +3,7 @@ package webapi
 import (
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 )
 
 //go:generate enumer -type=Phase -trimprefix=Phase
@@ -56,4 +56,7 @@ type State struct {
 
 	// The time the execution first requests for an allocation token
 	AllocationTokenRequestStartTime time.Time `json:"allocationTokenRequestStartTime,omitempty"`
+
+	// ErrorMessage generated during cache synchronization.
+	ErrorMessage string `json:"error_message,omitempty"`
 }
