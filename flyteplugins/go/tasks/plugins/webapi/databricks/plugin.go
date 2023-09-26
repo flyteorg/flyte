@@ -179,7 +179,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	jobID := fmt.Sprintf("%.0f", data["job_id"])
 	lifeCycleState := fmt.Sprintf("%s", jobState["life_cycle_state"])
 	resultState := fmt.Sprintf("%s", jobState["result_state"])
-	return &ResourceWrapper{
+	return ResourceWrapper{
 		StatusCode:     resp.StatusCode,
 		JobID:          jobID,
 		LifeCycleState: lifeCycleState,

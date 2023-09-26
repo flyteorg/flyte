@@ -121,7 +121,6 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
-	logger.Infof(ctx, "Getting task metadata [%v]", taskCtx.ResourceMeta())
 	if taskCtx.ResourceMeta() == nil {
 		return nil, fmt.Errorf("resource metadata is nil")
 	}

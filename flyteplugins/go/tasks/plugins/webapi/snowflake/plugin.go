@@ -160,7 +160,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 	message := fmt.Sprintf("%v", data["message"])
-	return &ResourceWrapper{
+	return ResourceWrapper{
 		StatusCode: resp.StatusCode,
 		Message:    message,
 	}, nil
