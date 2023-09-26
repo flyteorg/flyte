@@ -739,7 +739,7 @@ func (m *ExecutionManager) ExtractArtifactKeys(input *core.Literal) []string {
 	return artifactKeys
 }
 
-var re = regexp.MustCompile(`.*({{\s*\.inputs\.([a-zA-Z0-9_]+)\s*}}).*`)
+var re = regexp.MustCompile(`.*({{\s*\.?inputs\.([a-zA-Z0-9_]+)\s*}}).*`)
 var reExecutionMetadata = regexp.MustCompile(`.*({{\s*\.execution\.([a-zA-Z0-9_]+)\s*}}).*`)
 
 // templateInputString uses regex to take a string that looks like "{{ .inputs.var1 }}" and replace it with the
@@ -755,7 +755,26 @@ func (m *ExecutionManager) templateInputString(ctx context.Context, input string
 		if val.GetScalar() == nil || val.GetScalar().GetPrimitive() == nil {
 			return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input value [%+v]", val)
 		}
-		x := strings.Replace(input, matches[1], val.GetScalar().GetPrimitive().GetStringValue(), -1)
+		var strVal = ""
+		p := val.GetScalar().GetPrimitive()
+		switch p.GetValue().(type) {
+		case *core.Primitive_Integer:
+			strVal = fmt.Sprintf("%s", p.GetStringValue())
+		case *core.Primitive_Datetime:
+			t := time.Unix(p.GetDatetime().Seconds, int64(p.GetDatetime().Nanos))
+			strVal = t.Format("2006-01-02")
+		case *core.Primitive_StringValue:
+			strVal = fmt.Sprintf("%s", p.GetStringValue())
+		case *core.Primitive_FloatValue:
+			strVal = fmt.Sprintf("%s", p.GetFloatValue())
+		case *core.Primitive_Boolean:
+			strVal = fmt.Sprintf("%s", p.GetBoolean())
+		default:
+			strVal = fmt.Sprintf("%s", p.GetValue())
+		}
+
+		logger.Debugf(ctx, "String templating returning [%s] for [%s]", strVal, input)
+		x := strings.Replace(input, matches[1], strVal, -1)
 		return x, nil
 	} else {
 		logger.Debugf(ctx, "No input matches found for input string [%s]", input)
@@ -1005,6 +1024,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	for k, v := range launchPlan.Spec.FixedInputs.Literals {
 		inputsForQueryTemplating[k] = v
 	}
+	logger.Debugf(ctx, "Inputs for query templating: [%+v]", inputsForQueryTemplating)
 
 	// Resolve artifact queries
 	//   Within the launch plan, the artifact will be in the Parameter map, and can come in form of an ArtifactID,

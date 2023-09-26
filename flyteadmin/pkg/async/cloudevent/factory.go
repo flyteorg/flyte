@@ -27,6 +27,7 @@ import (
 
 func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Repository, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, cloudEventsConfig runtimeInterfaces.CloudEventsConfig, remoteDataConfig runtimeInterfaces.RemoteDataConfig, scope promutils.Scope) interfaces.Publisher {
 	if !cloudEventsConfig.Enable {
+		logger.Infof(ctx, "CloudEvents are disabled, config is [+%v]", cloudEventsConfig)
 		return implementations.NewNoopPublish()
 	}
 	reconnectAttempts := cloudEventsConfig.ReconnectAttempts
@@ -96,7 +97,7 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 			publisher, err = redisPublisher.NewPublisher(cloudEventsConfig.RedisConfig)
 			return err
 		})
-		logger.Infof(ctx, "Using Redis cloud events publisher [%v]", publisher)
+		logger.Infof(ctx, "Using Redis cloud events publisher [%v] [%+v]", publisher, cloudEventsConfig.RedisConfig)
 
 		// Persistent errors should hard fail
 		if err != nil {
