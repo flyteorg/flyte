@@ -40,6 +40,10 @@ const (
 	PhaseQueryFailed
 )
 
+func (p ExecutionPhase) IsTerminal() bool {
+	return p == PhaseQuerySucceeded || p == PhaseQueryFailed
+}
+
 func (p ExecutionPhase) String() string {
 	switch p {
 	case PhaseNotStarted:

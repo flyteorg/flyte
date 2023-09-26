@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/config"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -20,14 +19,19 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/flyteorg/flytestdlib/promutils"
 	"google.golang.org/grpc"
 )
 
 type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
 
+type TaskType = string
+type SupportedTaskTypes []TaskType
 type Plugin struct {
 	metricScope     promutils.Scope
 	cfg             *Config
@@ -70,6 +74,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, err
 	}
 
+	var argTemplate []string
 	if taskTemplate.GetContainer() != nil {
 		templateParameters := template.Parameters{
 			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
@@ -77,6 +82,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 			OutputPath:       taskCtx.OutputWriter(),
 			Task:             taskCtx.TaskReader(),
 		}
+		argTemplate = taskTemplate.GetContainer().Args
 		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
 		if err != nil {
 			return nil, nil, err
@@ -101,6 +107,11 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
 	if err != nil {
 		return nil, nil, err
+	}
+
+	// Restore unrendered template for subsequent renders.
+	if taskTemplate.GetContainer() != nil {
+		taskTemplate.GetContainer().Args = argTemplate
 	}
 
 	return &ResourceMetaWrapper{
@@ -176,23 +187,36 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_RETRYABLE_FAILURE:
 		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	case admin.State_SUCCEEDED:
-		if resource.Outputs != nil {
-			err := taskCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil))
-			if err != nil {
-				return core.PhaseInfoUndefined, err
-			}
+		err = writeOutput(ctx, taskCtx, resource)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+			return core.PhaseInfoUndefined, err
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	}
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.State)
 }
 
-func createTaskLog(message string) []*flyteIdlCore.TaskLog {
-	return []*flyteIdlCore.TaskLog{
-		{
-			Name: message,
-		},
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource *ResourceWrapper) error {
+	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return err
 	}
+
+	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+		logger.Debugf(ctx, "The task declares no outputs. Skipping writing the outputs.")
+		return nil
+	}
+
+	var opReader io.OutputReader
+	if resource.Outputs != nil {
+		logger.Debugf(ctx, "Agent returned an output")
+		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
+	} else {
+		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
+		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+	}
+	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
 func getFinalAgent(taskType string, cfg *Config) (*Agent, error) {
@@ -281,8 +305,10 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func newAgentPlugin() webapi.PluginEntry {
-	supportedTaskTypes := GetConfig().SupportedTaskTypes
+func newAgentPlugin(supportedTaskTypes SupportedTaskTypes) webapi.PluginEntry {
+	if len(supportedTaskTypes) == 0 {
+		supportedTaskTypes = SupportedTaskTypes{"default_supported_task_type"}
+	}
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
@@ -298,9 +324,9 @@ func newAgentPlugin() webapi.PluginEntry {
 	}
 }
 
-func RegisterAgentPlugin() {
+func RegisterAgentPlugin(supportedTaskTypes SupportedTaskTypes) {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin())
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(supportedTaskTypes))
 }

@@ -36,6 +36,10 @@ type metadata struct {
 	size   int64
 }
 
+func (m metadata) Etag() string {
+	return ""
+}
+
 func (m metadata) Exists() bool {
 	return m.exists
 }

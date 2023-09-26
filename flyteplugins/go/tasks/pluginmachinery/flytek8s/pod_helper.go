@@ -61,7 +61,7 @@ func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.
 			nst.MatchExpressions = append(nst.MatchExpressions, nodeSelectorRequirement)
 		}
 	} else {
-		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
+		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
 	}
 
 }

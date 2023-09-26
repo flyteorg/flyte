@@ -1,8 +1,12 @@
 package ray
 
 import (
+	"context"
+
 	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	pluginmachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -14,10 +18,39 @@ var (
 		ServiceType:              "NodePort",
 		IncludeDashboard:         true,
 		DashboardHost:            "0.0.0.0",
-		NodeIPAddress:            "$MY_POD_IP",
+		EnableUsageStats:         false,
+		Defaults: DefaultConfig{
+			HeadNode: NodeConfig{
+				StartParameters: map[string]string{
+					// Disable usage reporting by default: https://docs.ray.io/en/latest/cluster/usage-stats.html
+					DisableUsageStatsStartParameter: "true",
+				},
+				IPAddress: "$MY_POD_IP",
+			},
+			WorkerNode: NodeConfig{
+				StartParameters: map[string]string{
+					// Disable usage reporting by default: https://docs.ray.io/en/latest/cluster/usage-stats.html
+					DisableUsageStatsStartParameter: "true",
+				},
+				IPAddress: "$MY_POD_IP",
+			},
+		},
 	}
 
-	configSection = pluginsConfig.MustRegisterSubSection("ray", &defaultConfig)
+	configSection = pluginsConfig.MustRegisterSubSectionWithUpdates("ray", &defaultConfig,
+		func(ctx context.Context, newValue config.Config) {
+			if newValue == nil {
+				return
+			}
+
+			if len(newValue.(*Config).Defaults.HeadNode.IPAddress) == 0 {
+				newValue.(*Config).Defaults.HeadNode.IPAddress = newValue.(*Config).DeprecatedNodeIPAddress
+			}
+
+			if len(newValue.(*Config).Defaults.WorkerNode.IPAddress) == 0 {
+				newValue.(*Config).Defaults.WorkerNode.IPAddress = newValue.(*Config).DeprecatedNodeIPAddress
+			}
+		})
 )
 
 // Config is config for 'ray' plugin
@@ -39,11 +72,24 @@ type Config struct {
 	// or 0.0.0.0 (available from all interfaces). By default, this is localhost.
 	DashboardHost string `json:"dashboardHost,omitempty"`
 
-	// NodeIPAddress the IP address of the head node. By default, this is pod ip address.
-	NodeIPAddress string `json:"nodeIPAddress,omitempty"`
+	// DeprecatedNodeIPAddress the IP address of the head node. By default, this is pod ip address.
+	DeprecatedNodeIPAddress string `json:"nodeIPAddress,omitempty" pflag:"-,DEPRECATED. Please use DefaultConfig.[HeadNode|WorkerNode].IPAddress"`
 
 	// Remote Ray Cluster Config
 	RemoteClusterConfig pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
+	Logs                logs.LogConfig                `json:"logs" pflag:"-,Log configuration for ray jobs"`
+	Defaults            DefaultConfig                 `json:"defaults" pflag:"-,Default configuration for ray jobs"`
+	EnableUsageStats    bool                          `json:"enableUsageStats" pflag:",Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html"`
+}
+
+type DefaultConfig struct {
+	HeadNode   NodeConfig `json:"headNode,omitempty" pflag:"-,Default configuration for head node of ray jobs"`
+	WorkerNode NodeConfig `json:"workerNode,omitempty" pflag:"-,Default configuration for worker node of ray jobs"`
+}
+
+type NodeConfig struct {
+	StartParameters map[string]string `json:"startParameters,omitempty" pflag:"-,Start parameters for the node"`
+	IPAddress       string            `json:"ipAddress,omitempty" pflag:"-,IP address of the node"`
 }
 
 func GetConfig() *Config {

@@ -307,7 +307,7 @@ func TestKickOffQuery(t *testing.T) {
 	}).Return(prestoExecuteResponse, nil)
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
-	mockCache.OnGetOrCreate(mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+	mockCache.OnGetOrCreateMatch(mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
 		getOrCreateCalled = true
 	}).Return(ExecutionStateCacheItem{}, nil)
 

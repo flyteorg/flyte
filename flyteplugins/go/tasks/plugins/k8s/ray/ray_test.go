@@ -3,6 +3,12 @@ package ray
 import (
 	"context"
 	"testing"
+	"time"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
@@ -169,7 +175,9 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, &headReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
-		map[string]string{"dashboard-host": "0.0.0.0", "include-dashboard": "true", "node-ip-address": "$MY_POD_IP", "num-cpus": "1"})
+		map[string]string{
+			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
+			"node-ip-address": "$MY_POD_IP", "num-cpus": "1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
@@ -180,10 +188,119 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, &workerReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"node-ip-address": "$MY_POD_IP"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+}
+
+func TestDefaultStartParameters(t *testing.T) {
+	rayJobResourceHandler := rayJobResourceHandler{}
+	rayJob := &plugins.RayJob{
+		RayCluster: &plugins.RayCluster{
+			HeadGroupSpec:   &plugins.HeadGroupSpec{},
+			WorkerGroupSpec: []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3}},
+		},
+	}
+
+	taskTemplate := dummyRayTaskTemplate("ray-id", rayJob)
+	toleration := []corev1.Toleration{{
+		Key:      "storage",
+		Value:    "dedicated",
+		Operator: corev1.TolerationOpExists,
+		Effect:   corev1.TaintEffectNoSchedule,
+	}}
+	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultTolerations: toleration})
+	assert.Nil(t, err)
+
+	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate))
+	assert.Nil(t, err)
+
+	assert.NotNil(t, RayResource)
+	ray, ok := RayResource.(*rayv1alpha1.RayJob)
+	assert.True(t, ok)
+
+	headReplica := int32(1)
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, &headReplica)
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
+		map[string]string{
+			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
+			"node-ip-address": "$MY_POD_IP"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
+
+	workerReplica := int32(3)
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, &workerReplica)
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, &workerReplica)
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, &workerReplica)
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+}
+
+func newPluginContext() k8s.PluginContext {
+	plg := &mocks2.PluginContext{}
+
+	taskExecID := &mocks.TaskExecutionID{}
+	taskExecID.OnGetID().Return(core.TaskExecutionIdentifier{
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my_name",
+				Project: "my_project",
+				Domain:  "my_domain",
+			},
+		},
+	})
+
+	tskCtx := &mocks.TaskExecutionMetadata{}
+	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
+	plg.OnTaskExecutionMetadata().Return(tskCtx)
+	return plg
+}
+
+func init() {
+	f := defaultConfig
+	f.Logs = logs.LogConfig{
+		IsKubernetesEnabled: true,
+	}
+
+	if err := SetConfig(&f); err != nil {
+		panic(err)
+	}
+}
+
+func TestGetTaskPhase(t *testing.T) {
+	ctx := context.Background()
+	rayJobResourceHandler := rayJobResourceHandler{}
+	pluginCtx := newPluginContext()
+
+	testCases := []struct {
+		rayJobPhase       rayv1alpha1.JobStatus
+		expectedCorePhase pluginsCore.Phase
+	}{
+		{"", pluginsCore.PhaseQueued},
+		{rayv1alpha1.JobStatusPending, pluginsCore.PhaseInitializing},
+		{rayv1alpha1.JobStatusRunning, pluginsCore.PhaseRunning},
+		{rayv1alpha1.JobStatusSucceeded, pluginsCore.PhaseSuccess},
+		{rayv1alpha1.JobStatusFailed, pluginsCore.PhasePermanentFailure},
+	}
+
+	for _, tc := range testCases {
+		t.Run("TestGetTaskPhase_"+string(tc.rayJobPhase), func(t *testing.T) {
+			rayObject := &rayv1alpha1.RayJob{}
+			rayObject.Status.JobStatus = tc.rayJobPhase
+			startTime := metav1.NewTime(time.Now())
+			rayObject.Status.StartTime = &startTime
+			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
+			assert.Nil(t, err)
+			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
+		})
+	}
 }
 
 func TestGetPropertiesRay(t *testing.T) {

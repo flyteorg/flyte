@@ -184,7 +184,7 @@ func phaseInfo(p Phase, v uint32, err *core.ExecutionError, info *TaskInfo, clea
 	}
 }
 
-// Return in the case the plugin is not ready to start
+// PhaseInfoNotReady represents the case the plugin is not ready to start
 func PhaseInfoNotReady(t time.Time, version uint32, reason string) PhaseInfo {
 	pi := phaseInfo(PhaseNotReady, version, nil, &TaskInfo{OccurredAt: &t}, false)
 	pi.reason = reason
@@ -198,7 +198,7 @@ func PhaseInfoWaitingForResources(t time.Time, version uint32, reason string) Ph
 	return pi
 }
 
-// Return in the case the plugin is not ready to start
+// PhaseInfoWaitingForResourcesInfo represents the case the plugin is not ready to start
 func PhaseInfoWaitingForResourcesInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseWaitingForResources, version, nil, info, false)
 	pi.reason = reason
