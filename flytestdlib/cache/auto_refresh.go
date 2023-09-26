@@ -313,12 +313,6 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				}
 			}
 
-			w.toDelete.Range(func(key interface{}) bool {
-				w.lruMap.Remove(key)
-				w.toDelete.Remove(key)
-				return true
-			})
-
 			t.Stop()
 		}
 	}
