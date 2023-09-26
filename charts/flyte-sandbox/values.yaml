@@ -29,7 +29,7 @@ flyte-binary:
           accessKey: minio
           secretKey: miniostorage
     logging:
-      level: 6
+      level: 5
       plugins:
         kubernetes:
           enabled: true
@@ -47,6 +47,16 @@ flyte-binary:
           ephemeralStorage: 0
           gpu: 0
           memory: 0
+      cloudEvents:
+        enable: true
+        transformToCloudEvents: true
+        type: redis
+        redis:
+          addr: "flyte-sandbox-redis-headless.flyte.svc.cluster.local:6379"
+      artifacts:
+        host: artifact-service.flyte.svc.cluster.local
+        port: 50051
+        insecure: true
       storage:
         signedURL:
           stowConfigOverride:
@@ -148,6 +158,21 @@ postgresql:
     image:
       tag: sandbox
       pullPolicy: Never
+
+redis:
+  enabled: true
+  image:
+    tag: sandbox
+    pullPolicy: Never
+  auth:
+    enabled: false
+  master:
+    service:
+      type: NodePort
+      nodePorts:
+        redis: 30004
+  replica:
+    replicaCount: 0
 
 sandbox:
   # dev Routes requests to an instance of Flyte running locally on a developer's
