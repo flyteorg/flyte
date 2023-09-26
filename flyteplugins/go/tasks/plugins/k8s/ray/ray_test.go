@@ -7,8 +7,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 
