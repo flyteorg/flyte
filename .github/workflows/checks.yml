@@ -2,9 +2,25 @@ name: Components Checks
 
 on:
   pull_request:
+    paths:
+      - 'datacatalog/**'
+      - 'flyteadmin/**'
+      - 'flytecopilot/**'
+      - 'flyteidl/**'
+      - 'flyteplugins/**'
+      - 'flytepropeller/**'
+      - 'flytestdlib/**'
   push:
     branches:
       - master
+    paths:
+      - 'datacatalog/**'
+      - 'flyteadmin/**'
+      - 'flytecopilot/**'
+      - 'flyteidl/**'
+      - 'flyteplugins/**'
+      - 'flytepropeller/**'
+      - 'flytestdlib/**'
 env:
   GO_VERSION: "1.19"
   PRIORITIES: "P0"
