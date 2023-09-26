@@ -80,7 +80,7 @@ Here is an example using ``:std:doc``:
 
   Output:
 
-  Task: :std:doc:`generated/flytekit.task`
+..   Task: :std:doc:`generated/flytekit.task`
 
 * Custom name
 
@@ -90,7 +90,7 @@ Here is an example using ``:std:doc``:
 
   Output:
 
-  :std:doc:`Using custom words <generated/flytekit.task>`
+..   :std:doc:`Using custom words <generated/flytekit.task>`
 
 |
 

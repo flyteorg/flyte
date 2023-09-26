@@ -48,14 +48,6 @@ to use these plugins in your workflows written in ``flytekit``.
     ^^^^^^^^^^^^
     Guide to setting up GCP-specific Plugins.
 
-    ---
-
-    .. link-button:: deployment-plugin-setup-memverge
-       :type: ref
-       :text: MemVerge Plugin
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Guide to setting up MemVerge Plugin.
 
 .. toctree::
     :maxdepth: 1
@@ -66,4 +58,3 @@ to use these plugins in your workflows written in ``flytekit``.
     aws/index
     gcp/index
     webapi/index
-    memverge/index

@@ -1,6 +1,6 @@
-.. _deployment-plugin-setup-memverge-mmcloud:
+.. _deployment-agent-setup-memverge-mmcloud:
 
-MMCloud Plugin
+MMCloud Agent
 =================
 
 MemVerge Memory Machine Cloud (MMCloud) empowers users to continuously optimize cloud resources during runtime,
@@ -49,23 +49,23 @@ Spin up a cluster
 
     helm repo add flyteorg https://flyteorg.github.io/flyte
 
-Specify plugin configuration
+Specify agent configuration
 ----------------------------
 
-Enable the MMCloud plugin by adding the following config to the relevant YAML file(s):
+Enable the MMCloud agent by adding the following config to the relevant YAML file(s):
 
 .. code-block:: yaml
 
   tasks:
-    task-plugins:
-      enabled-plugins:
+    task-agents:
+      enabled-agents:
         - agent-service
       default-for-task-types:
         - mmcloud_task: agent-service
 
 .. code-block:: yaml
 
-  plugins:
+  agents:
     agent-service:
       agents:
         mmcloud-agent:
