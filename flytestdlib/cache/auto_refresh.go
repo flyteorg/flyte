@@ -293,8 +293,8 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				item: item.(Item),
 			}})
 
-			w.workqueue.Forget(itemID)
-			w.workqueue.Done(itemID)
+			w.workqueue.Forget(item)
+			w.workqueue.Done(item)
 
 			if err != nil {
 				w.metrics.SyncErrors.Inc()
