@@ -7,11 +7,6 @@ FROM --platform=${BUILDPLATFORM} golang:1.19.1-bullseye AS flytebuilder
 ARG TARGETARCH
 ENV GOARCH "${TARGETARCH}"
 ENV GOOS linux
-ENV GOPRIVATE github.com/unionai/*
-RUN mkdir -m 0700 ~/.ssh
-RUN ssh-keyscan github.com >> ~/.ssh/known_hosts
-
-
 WORKDIR /flyteorg/build
 
 COPY datacatalog datacatalog
@@ -24,13 +19,6 @@ COPY flytestdlib flytestdlib
 
 COPY go.mod go.sum ./
 RUN go mod download
-RUN echo '\
-[url "ssh://git@github.com/"]\n\
-  insteadOf = https://github.com/'\
->> /root/.gitconfig
-
-COPY go.mod go.sum ./
-RUN --mount=type=ssh go mod download
 COPY cmd cmd
 COPY --from=flyteconsole /app/ cmd/single/dist
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \

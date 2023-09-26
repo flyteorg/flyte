@@ -55,6 +55,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.8.0 // indirect
 	github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2 v2.8.0 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.8.0 // indirect
 	github.com/coocood/freecache v1.1.1 // indirect
