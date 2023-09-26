@@ -9,13 +9,13 @@ OUTPUT_DIR="${ROOT_DIR}"/rsts/deployment/configuration/generated
 GOBIN=${GOPATH:-~/go}/bin
 
 make -C datacatalog compile
-cp datacatalog/bin/datacatalog ${GOBIN}/datacatalog
+mv datacatalog/bin/datacatalog ${GOBIN}/datacatalog
 make -C flyteadmin compile
-cp flyteadmin/bin/flyteadmin ${GOBIN}/flyteadmin
+mv flyteadmin/bin/flyteadmin ${GOBIN}/flyteadmin
 make -C flyteadmin compile_scheduler
-cp flyteadmin/bin/flytescheduler ${GOBIN}/scheduler
+mv flyteadmin/bin/flytescheduler ${GOBIN}/scheduler
 make -C flytepropeller compile_flytepropeller
-cp flytepropeller/bin/flytepropeller ${GOBIN}/flytepropeller
+mv flytepropeller/bin/flytepropeller ${GOBIN}/flytepropeller
 
 output_config () {
 CONFIG_NAME=$1
