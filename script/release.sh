@@ -11,10 +11,10 @@ LATEST_TAG=$(git tag | sed 's#[^/]*/##' | sort | tail -n 1)
 FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
 
 # bump latest release of flyte component in kustomize
-grep -rlZ "newTag:[^P]*# FLYTEADMIN_TAG" ./kustomize/overlays | xargs -0 sed -i "s/newTag:[^P]*# FLYTEADMIN_TAG/newTag: ${LATEST_TAG} # FLYTEADMIN_TAG/g"
-grep -rlZ "newTag:[^P]*# DATACATALOG_TAG" ./kustomize/overlays | xargs -0 sed -i "s/newTag:[^P]*# DATACATALOG_TAG/newTag: ${LATEST_TAG} # DATACATALOG_TAG/g"
-grep -rlZ "newTag:[^P]*# FLYTECONSOLE_TAG" ./kustomize/overlays | xargs -0 sed -i "s/newTag:[^P]*# FLYTECONSOLE_TAG/newTag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG/g"
-grep -rlZ "newTag:[^P]*# FLYTEPROPELLER_TAG" ./kustomize/overlays | xargs -0 sed -i "s/newTag:[^P]*# FLYTEPROPELLER_TAG/newTag: ${LATEST_TAG} # FLYTEPROPELLER_TAG/g"
+grep -rlZ "newTag:[^P]*# FLYTEADMIN_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTEADMIN_TAG/newTag: ${LATEST_TAG} # FLYTEADMIN_TAG/g" {}
+grep -rlZ "newTag:[^P]*# DATACATALOG_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# DATACATALOG_TAG/newTag: ${LATEST_TAG} # DATACATALOG_TAG/g" {}
+grep -rlZ "newTag:[^P]*# FLYTECONSOLE_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTECONSOLE_TAG/newTag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG/g" {}
+grep -rlZ "newTag:[^P]*# FLYTEPROPELLER_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTEPROPELLER_TAG/newTag: ${LATEST_TAG} # FLYTEPROPELLER_TAG/g" {}
 
 # bump latest release of flyte component in helm
 sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${LATEST_TAG} # FLYTEADMIN_TAG," ./charts/flyte/values.yaml
