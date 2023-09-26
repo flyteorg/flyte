@@ -34,5 +34,5 @@ Discover the process of setting up Agents for Flyte.
     :hidden:
     
     bigquery
-    memverge/index
+    memverge
 
