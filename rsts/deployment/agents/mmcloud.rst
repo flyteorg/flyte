@@ -1,7 +1,7 @@
-.. _deployment-agent-setup-memverge-mmcloud:
+.. _deployment-agent-setup-memverge:
 
 MMCloud Agent
-===========
+=============
 
 MemVerge Memory Machine Cloud (MMCloud) empowers users to continuously optimize cloud resources during runtime,
 safely execute stateful tasks on spot instances,

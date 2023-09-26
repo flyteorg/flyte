@@ -22,10 +22,10 @@ Discover the process of setting up Agents for Flyte.
     
     .. link-button:: deployment-agent-setup-memverge
        :type: ref
-       :text: Memverge Agent
+       :text: MMCloud Agent
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the Memverge agent.
+    Guide to setting up the MMCloud agent.
 
 
 .. toctree::
@@ -34,5 +34,5 @@ Discover the process of setting up Agents for Flyte.
     :hidden:
     
     bigquery
-    memverge
+    mmcloud
 
