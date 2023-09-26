@@ -12,8 +12,8 @@ import (
 	"testing"
 
 	"github.com/coreos/go-oidc"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	stdConfig "github.com/flyteorg/flytestdlib/config"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -25,8 +25,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 const (
