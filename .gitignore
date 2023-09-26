@@ -33,3 +33,5 @@ dist
 vendor/
 /docker/sandbox-bundled/images/tar
 rsts/_tags/
+rsts/conf.py
+rsts/community/contribute.rst
