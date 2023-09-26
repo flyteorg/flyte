@@ -14,7 +14,7 @@ make -C flyteadmin compile
 cp flyteadmin/bin/flyteadmin ${GOBIN}/flyteadmin
 make -C flyteadmin compile_scheduler
 cp flyteadmin/bin/flytescheduler ${GOBIN}/scheduler
-make -C flytepropeller compile
+make -C flytepropeller compile_flytepropeller
 cp flytepropeller/bin/flytepropeller ${GOBIN}/flytepropeller
 
 output_config () {

@@ -23,6 +23,11 @@ compile:
 	go build -o bin/flytepropeller-manager ./cmd/manager/main.go
 	go build -o bin/kubectl-flyte ./cmd/kubectl-flyte/main.go
 
+.PHONY: compile_flytepropeller
+compile_flytepropeller:
+	mkdir -p ./bin
+	go build -o bin/flytepropeller ./cmd/controller/main.go
+
 cross_compile:
 	@glide install
 	@mkdir -p ./bin/cross
