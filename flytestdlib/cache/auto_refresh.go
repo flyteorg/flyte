@@ -214,8 +214,6 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 		if w.toDelete.Contains(k) {
 			w.lruMap.Remove(k)
 			w.toDelete.Remove(k)
-			w.workqueue.Forget(k)
-			w.workqueue.Done(k)
 			continue
 		}
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
@@ -295,6 +293,9 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 				item: item.(Item),
 			}})
 
+			w.workqueue.Forget(itemID)
+			w.workqueue.Done(itemID)
+
 			if err != nil {
 				w.metrics.SyncErrors.Inc()
 				logger.Errorf(ctx, "failed to get latest copy of a batch. Error: %v", err)
@@ -312,8 +313,6 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			w.toDelete.Range(func(key interface{}) bool {
 				w.lruMap.Remove(key)
 				w.toDelete.Remove(key)
-				w.workqueue.Forget(itemID)
-				w.workqueue.Done(itemID)
 				return true
 			})
 
