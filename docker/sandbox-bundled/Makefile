@@ -29,7 +29,7 @@ manifests:
 		kustomize/dev > manifests/dev.yaml
 
 .PHONY: build
-build: manifests
+build: flyte manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
@@ -37,6 +37,17 @@ build: manifests
 		--platform linux/arm64,linux/amd64
 	docker buildx build --ssh default --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox:latest .
+
+# This is here because we want to be able to push locally, not depend on GH actions
+.PHONY: build_push
+build_push: flyte manifests
+	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
+		docker buildx create --name flyte-sandbox \
+		--driver docker-container --driver-opt image=moby/buildkit:master \
+		--buildkitd-flags '--allow-insecure-entitlement security.insecure' \
+		--platform linux/arm64,linux/amd64
+	docker buildx build --ssh default --builder flyte-sandbox --allow security.insecure --push \
+		--tag ghcr.io/flyteorg/flyte-sandbox:a_v0.1.1 .
 
 # Port map
 # 6443 - k8s API server
