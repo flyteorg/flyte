@@ -112,12 +112,12 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		taskTemplate.GetContainer().Args = argTemplate
 	}
 
-	return &ResourceMetaWrapper{
+	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		Token:             "",
 		TaskType:          taskTemplate.Type,
-	}, &ResourceWrapper{State: admin.State_RUNNING}, nil
+	}, ResourceWrapper{State: admin.State_RUNNING}, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
