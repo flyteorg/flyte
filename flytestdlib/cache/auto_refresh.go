@@ -286,6 +286,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			item, ok := w.lruMap.Get(itemID)
 			if !ok {
 				logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
+				t.Stop()
 				continue
 			}
 			updatedBatch, err := w.syncCb(ctx, Batch{itemWrapper{
