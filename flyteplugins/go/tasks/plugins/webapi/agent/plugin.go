@@ -173,7 +173,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 }
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
-	resource := taskCtx.Resource().(*ResourceWrapper)
+	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{}
 
 	switch resource.State {
@@ -194,7 +194,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.State)
 }
 
-func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource *ResourceWrapper) error {
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return err

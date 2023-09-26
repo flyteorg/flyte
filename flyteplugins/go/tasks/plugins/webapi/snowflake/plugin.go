@@ -139,12 +139,12 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	queryID := fmt.Sprintf("%v", data["statementHandle"])
 	message := fmt.Sprintf("%v", data["message"])
 
-	return &ResourceMetaWrapper{queryID, queryInfo.Account, token},
-		&ResourceWrapper{StatusCode: resp.StatusCode, Message: message}, nil
+	return ResourceMetaWrapper{queryID, queryInfo.Account, token},
+		ResourceWrapper{StatusCode: resp.StatusCode, Message: message}, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	req, err := buildRequest(get, QueryInfo{}, p.cfg.snowflakeEndpoint,
 		exec.Account, exec.Token, exec.QueryID, false)
 	if err != nil {
@@ -170,7 +170,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	if taskCtx.ResourceMeta() == nil {
 		return nil
 	}
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	req, err := buildRequest(post, QueryInfo{}, p.cfg.snowflakeEndpoint,
 		exec.Account, exec.Token, exec.QueryID, true)
 	if err != nil {
@@ -187,8 +187,8 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 }
 
 func (p Plugin) Status(_ context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
-	statusCode := taskCtx.Resource().(*ResourceWrapper).StatusCode
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
+	statusCode := taskCtx.Resource().(ResourceWrapper).StatusCode
 	if statusCode == 0 {
 		return core.PhaseInfoUndefined, errors.Errorf(ErrSystem, "No Status field set.")
 	}

@@ -146,12 +146,15 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 	runID := fmt.Sprintf("%v", data["run_id"])
 
-	return &ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
-		&ResourceWrapper{StatusCode: resp.StatusCode}, nil
+	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
+		ResourceWrapper{StatusCode: resp.StatusCode}, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
+	if taskCtx.ResourceMeta() == nil {
+		return nil, fmt.Errorf("resource meta is nil")
+	}
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	req, err := buildRequest(get, nil, p.cfg.databricksEndpoint,
 		p.cfg.DatabricksInstance, exec.Token, exec.RunID, false)
 	if err != nil {
@@ -206,8 +209,8 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 }
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
-	resource := taskCtx.Resource().(*ResourceWrapper)
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
+	resource := taskCtx.Resource().(ResourceWrapper)
 	message := resource.Message
 	statusCode := resource.StatusCode
 	jobID := resource.JobID
