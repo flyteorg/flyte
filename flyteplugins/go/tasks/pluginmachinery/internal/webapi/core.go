@@ -36,6 +36,7 @@ const (
 type CorePlugin struct {
 	id             string
 	p              webapi.AsyncPlugin
+	sp             webapi.SyncPlugin
 	cache          cache.AutoRefresh
 	tokenAllocator tokenAllocator
 	metrics        Metrics
@@ -68,10 +69,26 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
+// syncHandle
+// TODO: ADD Sync Handle
 func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
 	if err != nil {
 		return core.UnknownTransition, err
+	}
+
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+
+	if taskTemplate.Type == "requester" {
+		res, err := c.sp.Do(ctx, tCtx)
+		if err != nil {
+			return core.UnknownTransition, err
+		}
+		logger.Infof(ctx, "@@@ SyncPlugin [%v] returned result: %v", c.GetID(), res)
+		// if err := tCtx.PluginStateWriter().Put(pluginStateVersion, nextState); err != nil {
+		// 	return core.UnknownTransition, err
+		// }
+		return core.DoTransition(core.PhaseInfoSuccess(nil)), nil
 	}
 
 	var nextState *State
@@ -165,7 +182,7 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 		RegisteredTaskTypes: pluginEntry.SupportedTaskTypes,
 		LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (
 			core.Plugin, error) {
-			p, err := pluginEntry.PluginLoader(ctx, iCtx)
+			p, sp, err := pluginEntry.PluginLoader(ctx, iCtx)
 			if err != nil {
 				return nil, err
 			}
@@ -205,6 +222,7 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 			return CorePlugin{
 				id:             pluginEntry.ID,
 				p:              p,
+				sp:             sp,
 				cache:          resourceCache,
 				metrics:        newMetrics(iCtx.MetricsScope()),
 				tokenAllocator: newTokenAllocator(c),

@@ -61,6 +61,73 @@ func (p Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionCo
 	return "default", p.cfg.ResourceConstraints, nil
 }
 
+func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (latest webapi.Resource, err error) {
+	// write the resource here
+	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	inputs, err := taskCtx.InputReader().Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if taskTemplate.GetContainer() != nil {
+		templateParameters := template.Parameters{
+			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
+			Inputs:           taskCtx.InputReader(),
+			OutputPath:       taskCtx.OutputWriter(),
+			Task:             taskCtx.TaskReader(),
+		}
+		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
+		if err != nil {
+			return nil, err
+		}
+		taskTemplate.GetContainer().Args = modifiedArgs
+	}
+
+	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find agent agent with error: %v", err)
+	}
+
+	client, err := p.getClient(ctx, agent, p.connectionCache)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
+	}
+
+	finalCtx, cancel := getFinalContext(ctx, "DoTask", agent)
+
+	defer cancel()
+
+	// taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	// write it in agent?
+
+	logger.Infof(ctx, "@@@ inputs: [%v]", inputs)
+	logger.Infof(ctx, "@@@ taskTemplate: [%v]", taskTemplate)
+
+	res, err := client.DoTask(finalCtx, &admin.DoTaskRequest{Inputs: inputs, Template: taskTemplate})
+	if err != nil {
+		return nil, err
+	}
+
+	logger.Infof(ctx, "@@@ res.Resource.State: [%v]", res.Resource.State)
+	logger.Infof(ctx, "@@@ res.Resource.Outputs: [%v]", res.Resource.Outputs)
+
+	return &ResourceWrapper{
+		State:   res.Resource.State,
+		Outputs: res.Resource.Outputs,
+	}, nil
+}
+
+// todo: write the output
+
+// we can get the task type in core.go
+/*
+taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+taskTemplate.type = spark, requester ...
+*/
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
@@ -298,6 +365,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
+// TODO: Add sync agent plugin
 func newAgentPlugin(supportedTaskTypes SupportedTaskTypes) webapi.PluginEntry {
 	if len(supportedTaskTypes) == 0 {
 		supportedTaskTypes = SupportedTaskTypes{"default_supported_task_type"}
@@ -306,13 +374,18 @@ func newAgentPlugin(supportedTaskTypes SupportedTaskTypes) webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
 			return &Plugin{
-				metricScope:     iCtx.MetricsScope(),
-				cfg:             GetConfig(),
-				getClient:       getClientFunc,
-				connectionCache: make(map[*Agent]*grpc.ClientConn),
-			}, nil
+					metricScope:     iCtx.MetricsScope(),
+					cfg:             GetConfig(),
+					getClient:       getClientFunc,
+					connectionCache: make(map[*Agent]*grpc.ClientConn),
+				}, &Plugin{
+					metricScope:     iCtx.MetricsScope(),
+					cfg:             GetConfig(),
+					getClient:       getClientFunc,
+					connectionCache: make(map[*Agent]*grpc.ClientConn),
+				}, nil
 		},
 	}
 }
