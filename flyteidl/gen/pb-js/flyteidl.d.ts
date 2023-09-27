@@ -7254,6 +7254,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an EventReason. */
+        interface IEventReason {
+
+            /** EventReason reason */
+            reason?: (string|null);
+
+            /** EventReason occurredAt */
+            occurredAt?: (google.protobuf.ITimestamp|null);
+        }
+
+        /** Represents an EventReason. */
+        class EventReason implements IEventReason {
+
+            /**
+             * Constructs a new EventReason.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.event.IEventReason);
+
+            /** EventReason reason. */
+            public reason: string;
+
+            /** EventReason occurredAt. */
+            public occurredAt?: (google.protobuf.ITimestamp|null);
+
+            /**
+             * Creates a new EventReason instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EventReason instance
+             */
+            public static create(properties?: flyteidl.event.IEventReason): flyteidl.event.EventReason;
+
+            /**
+             * Encodes the specified EventReason message. Does not implicitly {@link flyteidl.event.EventReason.verify|verify} messages.
+             * @param message EventReason message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.event.IEventReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EventReason message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EventReason
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.event.EventReason;
+
+            /**
+             * Verifies an EventReason message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TaskExecutionEvent. */
         interface ITaskExecutionEvent {
 
@@ -7301,6 +7359,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent reason */
             reason?: (string|null);
+
+            /** TaskExecutionEvent reasons */
+            reasons?: (flyteidl.event.IEventReason[]|null);
 
             /** TaskExecutionEvent taskType */
             taskType?: (string|null);
@@ -7368,6 +7429,9 @@ export namespace flyteidl {
 
             /** TaskExecutionEvent reason. */
             public reason: string;
+
+            /** TaskExecutionEvent reasons. */
+            public reasons: flyteidl.event.IEventReason[];
 
             /** TaskExecutionEvent taskType. */
             public taskType: string;
