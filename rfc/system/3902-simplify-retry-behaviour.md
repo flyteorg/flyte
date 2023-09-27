@@ -98,13 +98,6 @@ This approach would allow plugins to demistify failures of tasks by looking at t
 
 By having to activate the new retry behavior in the platform configuration, we will not break existing workflows.
 
-## 8 Unresolved questions
-
-An open question is how we deal with the `interruptibleFailureThreshold`. Currently, this value is a positive integer that is the number of retries that are interruptible. For example, 4 (system failure) retries are allowed where 3 of them are interruptible. Defining it this way does not make as much sense when we allow for task-level configuration of the retries.
-
-We could define the number of retries that ARE NOT interruptible. For example a value of `nonInterruptibleRetries` that is set to 1 means that the last retry is not interruptible regardless of how many retries there are. We also have to discuss whether this value would be configured on the platform side (only for the new retry behavior) or whether we would add this value to to task-level metadata and expose it to users. Adding this flag while ensuring backwards compatibility will require further discussion.
-
-Note: while unifying the retry budgets, the new retry behaviour still distinguishes between retriable and non-retriable exceptions and should do so consistently across plugins.
 
 ## 9 Conclusion
 
