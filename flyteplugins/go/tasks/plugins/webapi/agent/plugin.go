@@ -126,7 +126,7 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContextReade
 // we can get the task type in core.go
 /*
 taskTemplate, err := taskCtx.TaskReader().Read(ctx)
-taskTemplate.type = spark, requester ...
+taskTemplate.type = spark, dispatcher ...
 */
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {

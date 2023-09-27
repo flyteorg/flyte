@@ -79,7 +79,7 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 
-	if taskTemplate.Type == "requester" {
+	if taskTemplate.Type == "dispatcher" {
 		res, err := c.sp.Do(ctx, tCtx)
 		if err != nil {
 			return core.UnknownTransition, err
