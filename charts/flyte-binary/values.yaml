@@ -149,7 +149,7 @@ configuration:
       # repository CoPilot sidecar image repository
       repository: cr.flyte.org/flyteorg/flytecopilot # FLYTECOPILOT_IMAGE
       # tag CoPilot sidecar image tag
-      tag: v0.0.33 # FLYTECOPILOT_TAG
+      tag: v1.9.4 # FLYTECOPILOT_TAG
   # agentService Flyte Agent configuration
   agentService: {}
   #   Uncomment and modify to include configuration for Flyte Agent
