@@ -55,7 +55,8 @@ This will require a surprisingly small amount of changes to Flyte:
 We propose to:
 
 * Add a configuration flag in FlytePropeller for counting system and user retries the same.
-* Apply the new behavior in the [`isEligibleForRetry`](https://github.com/flyteorg/flytepropeller/blob/294f47a18c9b11892f2d1a3573019e85257c3b19/pkg/controller/nodes/executor.go#L440) function where, in contrast to the current logic, if the flag is set, we check if the number of attempts + the number of system failures is larger than the max number of retries set in the task decorator. For the last retries (details see section 8), non-spot instances are used.
+* Apply the new behavior in the [`isEligibleForRetry`](https://github.com/flyteorg/flytepropeller/blob/294f47a18c9b11892f2d1a3573019e85257c3b19/pkg/controller/nodes/executor.go#L440) function where, in contrast to the current logic, if the flag is set, we check if the number of attempts + the number of system failures is larger than the max number of retries set in the task decorator. For the last retries, non-spot instances are used.
+    * To not introduce an additional platform config flag, the existing flag `interruptibleFailureThreshold` is reused to decide when to switch to a regular instance. With the existing retry behaviour, this number is a positive integer that is the number of retries that are interruptible. For example, 4 (system failure) retries are allowed where 3 of them are interruptible. With the new retry behaviour, a negative number such as e.g. `-2` means that the last to retries are non-interruptible.
 * Add configuration for default number of retries in FlytePropeller. Currently the default maximum number of attempts is hardcoded. This should be exposed in the configuration.
 
 
