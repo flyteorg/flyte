@@ -285,7 +285,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 		UpdatedAt: taskEventOccurredAtProto,
 		Reason:    "Task was scheduled",
 		Reasons: []*admin.Reason{
-			&admin.Reason{
+			{
 				OccurredAt: taskEventOccurredAtProto,
 				Message:    "Task was scheduled",
 			},
@@ -406,6 +406,93 @@ func TestCreateTaskExecutionModelRunning(t *testing.T) {
 	}, taskExecutionModel)
 }
 
+func TestCreateTaskExecutionModelSingleEvents(t *testing.T) {
+	taskExecutionModel, err := CreateTaskExecutionModel(context.TODO(), CreateTaskExecutionModelInput{
+		Request: &admin.TaskExecutionEventRequest{
+			Event: &event.TaskExecutionEvent{
+				TaskId:                sampleTaskID,
+				ParentNodeExecutionId: sampleNodeExecID,
+				Phase:                 core.TaskExecution_RUNNING,
+				PhaseVersion:          uint32(2),
+				RetryAttempt:          1,
+				InputValue: &event.TaskExecutionEvent_InputUri{
+					InputUri: testInputURI,
+				},
+				OutputResult: &event.TaskExecutionEvent_OutputUri{
+					OutputUri: "output uri",
+				},
+				OccurredAt: taskEventOccurredAtProto,
+				Reason:     "Task event 1",
+			},
+		},
+	})
+	assert.Nil(t, err)
+
+	expectedClosure := &admin.TaskExecutionClosure{
+		Phase:     core.TaskExecution_RUNNING,
+		StartedAt: taskEventOccurredAtProto,
+		CreatedAt: taskEventOccurredAtProto,
+		UpdatedAt: taskEventOccurredAtProto,
+		Reason:    "Task event 1",
+		Reasons: []*admin.Reason{
+			{OccurredAt: taskEventOccurredAtProto, Message: "Task event 1"},
+		},
+	}
+	expectedClosureBytes, err := proto.Marshal(expectedClosure)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedClosureBytes, taskExecutionModel.Closure)
+}
+
+func TestCreateTaskExecutionModelBatchedEvents(t *testing.T) {
+	secondTaskEventOccurredAt := taskEventOccurredAt.Add(time.Second)
+	secondTaskEventOccurredAtProto, _ := ptypes.TimestampProto(secondTaskEventOccurredAt)
+	taskExecutionModel, err := CreateTaskExecutionModel(context.TODO(), CreateTaskExecutionModelInput{
+		Request: &admin.TaskExecutionEventRequest{
+			Event: &event.TaskExecutionEvent{
+				TaskId:                sampleTaskID,
+				ParentNodeExecutionId: sampleNodeExecID,
+				Phase:                 core.TaskExecution_RUNNING,
+				PhaseVersion:          uint32(2),
+				RetryAttempt:          1,
+				InputValue: &event.TaskExecutionEvent_InputUri{
+					InputUri: testInputURI,
+				},
+				OutputResult: &event.TaskExecutionEvent_OutputUri{
+					OutputUri: "output uri",
+				},
+				OccurredAt: taskEventOccurredAtProto,
+				Reason:     "Task event 1", // Here for backwards compatibility
+				Reasons: []*event.EventReason{
+					{
+						OccurredAt: taskEventOccurredAtProto,
+						Reason:     "Task event 1",
+					},
+					{
+						OccurredAt: secondTaskEventOccurredAtProto,
+						Reason:     "Task event 2",
+					},
+				},
+			},
+		},
+	})
+	assert.Nil(t, err)
+
+	expectedClosure := &admin.TaskExecutionClosure{
+		Phase:     core.TaskExecution_RUNNING,
+		StartedAt: taskEventOccurredAtProto,
+		CreatedAt: taskEventOccurredAtProto,
+		UpdatedAt: taskEventOccurredAtProto,
+		Reason:    "Task event 2",
+		Reasons: []*admin.Reason{
+			{OccurredAt: taskEventOccurredAtProto, Message: "Task event 1"},
+			{OccurredAt: secondTaskEventOccurredAtProto, Message: "Task event 2"},
+		},
+	}
+	expectedClosureBytes, err := proto.Marshal(expectedClosure)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedClosureBytes, taskExecutionModel.Closure)
+}
+
 func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 	existingClosure := &admin.TaskExecutionClosure{
 		Phase:     core.TaskExecution_RUNNING,
@@ -425,7 +512,7 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		}),
 		Reason: "Task was scheduled",
 		Reasons: []*admin.Reason{
-			&admin.Reason{
+			{
 				OccurredAt: taskEventOccurredAtProto,
 				Message:    "Task was scheduled",
 			},
@@ -526,11 +613,11 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		}),
 		Reason: "task failed",
 		Reasons: []*admin.Reason{
-			&admin.Reason{
+			{
 				OccurredAt: taskEventOccurredAtProto,
 				Message:    "Task was scheduled",
 			},
-			&admin.Reason{
+			{
 				OccurredAt: occuredAtProto,
 				Message:    "task failed",
 			},
@@ -567,6 +654,207 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 		Duration:               time.Minute,
 	}, existingTaskExecution)
 
+}
+
+func TestUpdateTaskExecutionModelSingleEvents(t *testing.T) {
+	existingClosure := &admin.TaskExecutionClosure{
+		Phase:     core.TaskExecution_RUNNING,
+		StartedAt: taskEventOccurredAtProto,
+		CreatedAt: taskEventOccurredAtProto,
+		UpdatedAt: taskEventOccurredAtProto,
+		Reason:    "Task was scheduled",
+		Reasons: []*admin.Reason{
+			{
+				OccurredAt: taskEventOccurredAtProto,
+				Message:    "Task was scheduled",
+			},
+		},
+	}
+
+	closureBytes, err := proto.Marshal(existingClosure)
+	assert.Nil(t, err)
+
+	existingTaskExecution := models.TaskExecution{
+		TaskExecutionKey: models.TaskExecutionKey{
+			TaskKey: models.TaskKey{
+				Project: sampleTaskID.Project,
+				Domain:  sampleTaskID.Domain,
+				Name:    sampleTaskID.Name,
+				Version: sampleTaskID.Version,
+			},
+			NodeExecutionKey: models.NodeExecutionKey{
+				NodeID: sampleNodeExecID.NodeId,
+				ExecutionKey: models.ExecutionKey{
+					Project: sampleNodeExecID.ExecutionId.Project,
+					Domain:  sampleNodeExecID.ExecutionId.Domain,
+					Name:    sampleNodeExecID.ExecutionId.Name,
+				},
+			},
+			RetryAttempt: &retryAttemptValue,
+		},
+		Phase:                  "TaskExecutionPhase_TASK_PHASE_RUNNING",
+		InputURI:               "input uri",
+		Closure:                closureBytes,
+		StartedAt:              &taskEventOccurredAt,
+		TaskExecutionCreatedAt: &taskEventOccurredAt,
+		TaskExecutionUpdatedAt: &taskEventOccurredAt,
+	}
+
+	occuredAt := taskEventOccurredAt.Add(time.Minute)
+	occuredAtProto, err := ptypes.TimestampProto(occuredAt)
+	assert.Nil(t, err)
+
+	taskEventRequest := &admin.TaskExecutionEventRequest{
+		Event: &event.TaskExecutionEvent{
+			TaskId:                sampleTaskID,
+			ParentNodeExecutionId: sampleNodeExecID,
+			Phase:                 core.TaskExecution_RUNNING,
+			RetryAttempt:          1,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: testInputURI,
+			},
+			OutputResult: &event.TaskExecutionEvent_OutputUri{
+				OutputUri: "output uri",
+			},
+			OccurredAt: occuredAtProto,
+			Reason:     "update 1",
+		},
+	}
+
+	err = UpdateTaskExecutionModel(context.TODO(), taskEventRequest, &existingTaskExecution,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+	assert.Nil(t, err)
+
+	expectedClosure := &admin.TaskExecutionClosure{
+		Phase:     core.TaskExecution_RUNNING,
+		StartedAt: taskEventOccurredAtProto,
+		UpdatedAt: occuredAtProto,
+		CreatedAt: taskEventOccurredAtProto,
+		Reason:    "update 1",
+		Reasons: []*admin.Reason{
+			{
+				OccurredAt: taskEventOccurredAtProto,
+				Message:    "Task was scheduled",
+			},
+			{
+				OccurredAt: occuredAtProto,
+				Message:    "update 1",
+			},
+		},
+	}
+
+	expectedClosureBytes, err := proto.Marshal(expectedClosure)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedClosureBytes, existingTaskExecution.Closure)
+}
+
+func TestUpdateTaskExecutionModelBatchedEvents(t *testing.T) {
+	existingClosure := &admin.TaskExecutionClosure{
+		Phase:     core.TaskExecution_RUNNING,
+		StartedAt: taskEventOccurredAtProto,
+		CreatedAt: taskEventOccurredAtProto,
+		UpdatedAt: taskEventOccurredAtProto,
+		Reason:    "Task was scheduled",
+		Reasons: []*admin.Reason{
+			{
+				OccurredAt: taskEventOccurredAtProto,
+				Message:    "Task was scheduled",
+			},
+		},
+	}
+
+	closureBytes, err := proto.Marshal(existingClosure)
+	assert.Nil(t, err)
+
+	existingTaskExecution := models.TaskExecution{
+		TaskExecutionKey: models.TaskExecutionKey{
+			TaskKey: models.TaskKey{
+				Project: sampleTaskID.Project,
+				Domain:  sampleTaskID.Domain,
+				Name:    sampleTaskID.Name,
+				Version: sampleTaskID.Version,
+			},
+			NodeExecutionKey: models.NodeExecutionKey{
+				NodeID: sampleNodeExecID.NodeId,
+				ExecutionKey: models.ExecutionKey{
+					Project: sampleNodeExecID.ExecutionId.Project,
+					Domain:  sampleNodeExecID.ExecutionId.Domain,
+					Name:    sampleNodeExecID.ExecutionId.Name,
+				},
+			},
+			RetryAttempt: &retryAttemptValue,
+		},
+		Phase:                  "TaskExecutionPhase_TASK_PHASE_RUNNING",
+		InputURI:               "input uri",
+		Closure:                closureBytes,
+		StartedAt:              &taskEventOccurredAt,
+		TaskExecutionCreatedAt: &taskEventOccurredAt,
+		TaskExecutionUpdatedAt: &taskEventOccurredAt,
+	}
+
+	occuredAt := taskEventOccurredAt.Add(time.Minute)
+	occuredAtProto, err := ptypes.TimestampProto(occuredAt)
+	assert.Nil(t, err)
+	secondOccuredAt := taskEventOccurredAt.Add(time.Minute * 2)
+	secondOccuredAtProto, err := ptypes.TimestampProto(secondOccuredAt)
+	assert.Nil(t, err)
+
+	taskEventRequest := &admin.TaskExecutionEventRequest{
+		Event: &event.TaskExecutionEvent{
+			TaskId:                sampleTaskID,
+			ParentNodeExecutionId: sampleNodeExecID,
+			Phase:                 core.TaskExecution_RUNNING,
+			RetryAttempt:          1,
+			InputValue: &event.TaskExecutionEvent_InputUri{
+				InputUri: testInputURI,
+			},
+			OutputResult: &event.TaskExecutionEvent_OutputUri{
+				OutputUri: "output uri",
+			},
+			OccurredAt: occuredAtProto,
+			Reason:     "update 1", // Here for backwards compatibility
+			Reasons: []*event.EventReason{
+				{
+					OccurredAt: occuredAtProto,
+					Reason:     "update 1",
+				},
+				{
+					OccurredAt: secondOccuredAtProto,
+					Reason:     "update 2",
+				},
+			},
+		},
+	}
+
+	err = UpdateTaskExecutionModel(context.TODO(), taskEventRequest, &existingTaskExecution,
+		interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
+	assert.Nil(t, err)
+
+	expectedClosure := &admin.TaskExecutionClosure{
+		Phase:     core.TaskExecution_RUNNING,
+		StartedAt: taskEventOccurredAtProto,
+		UpdatedAt: occuredAtProto,
+		CreatedAt: taskEventOccurredAtProto,
+		Reason:    "update 2",
+		Reasons: []*admin.Reason{
+			{
+				OccurredAt: taskEventOccurredAtProto,
+				Message:    "Task was scheduled",
+			},
+			{
+				OccurredAt: occuredAtProto,
+				Message:    "update 1",
+			},
+			{
+				OccurredAt: secondOccuredAtProto,
+				Message:    "update 2",
+			},
+		},
+	}
+
+	expectedClosureBytes, err := proto.Marshal(expectedClosure)
+	assert.Nil(t, err)
+	assert.Equal(t, expectedClosureBytes, existingTaskExecution.Closure)
 }
 
 func TestFromTaskExecutionModel(t *testing.T) {

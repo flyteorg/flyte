@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flytestdlib/contextutils"
@@ -12,9 +16,6 @@ import (
 	"github.com/flyteorg/flytestdlib/promutils"
 	"github.com/flyteorg/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flytestdlib/storage"
-	"github.com/golang/protobuf/proto"
-	"github.com/prometheus/client_golang/prometheus"
-	"google.golang.org/grpc/codes"
 
 	cloudeventInterfaces "github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
 	notificationInterfaces "github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
@@ -189,7 +190,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		return nil, err
 	}
 
-	if request.Event.Phase == core.TaskExecution_RUNNING && request.Event.PhaseVersion == 0 {
+	if request.Event.Phase == core.TaskExecution_RUNNING && request.Event.PhaseVersion == 0 { // TODO: need to be careful about missing inc/decs
 		m.metrics.ActiveTaskExecutions.Inc()
 	} else if common.IsTaskExecutionTerminal(request.Event.Phase) && request.Event.PhaseVersion == 0 {
 		m.metrics.ActiveTaskExecutions.Dec()
