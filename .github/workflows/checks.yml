@@ -2,14 +2,6 @@ name: Components Checks
 
 on:
   pull_request:
-    paths:
-      - 'datacatalog/**'
-      - 'flyteadmin/**'
-      - 'flytecopilot/**'
-      - 'flyteidl/**'
-      - 'flyteplugins/**'
-      - 'flytepropeller/**'
-      - 'flytestdlib/**'
   push:
     branches:
       - master
