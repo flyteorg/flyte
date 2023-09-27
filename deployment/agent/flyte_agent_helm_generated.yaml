@@ -75,7 +75,7 @@ spec:
       - command:
         - pyflyte
         - serve
-        image: "ghcr.io/flyteorg/flyteagent:1.8.3"
+        image: "ghcr.io/flyteorg/flyteagent:1.9.1"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
