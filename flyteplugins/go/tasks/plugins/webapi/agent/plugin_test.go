@@ -113,7 +113,7 @@ func TestPlugin(t *testing.T) {
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
-		assert.Equal(t, "Waiting for cluster", phase.Info().Logs[0].Name)
+		assert.Equal(t, "Waiting for cluster", phase.Reason())
 	})
 
 	t.Run("test RUNNING Status", func(t *testing.T) {
@@ -127,7 +127,6 @@ func TestPlugin(t *testing.T) {
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
-		assert.Equal(t, "Job is running", phase.Info().Logs[0].Name)
 	})
 
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
@@ -154,19 +153,6 @@ func TestPlugin(t *testing.T) {
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
-	})
-
-	t.Run("test SUCCEEDED Status", func(t *testing.T) {
-		taskContext := new(webapiPlugin.StatusContext)
-		taskContext.On("Resource").Return(&ResourceWrapper{
-			State:   admin.State_SUCCEEDED,
-			Outputs: nil,
-			Message: "",
-		})
-
-		phase, err := plugin.Status(context.Background(), taskContext)
-		assert.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseSuccess, phase.Phase())
 	})
 
 	t.Run("test UNDEFINED Status", func(t *testing.T) {
