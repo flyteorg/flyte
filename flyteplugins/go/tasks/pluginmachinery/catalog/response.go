@@ -1,8 +1,8 @@
 package catalog
 
 import (
-	"github.com/flyteorg/flytestdlib/bitarray"
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 )
 
 type future struct {

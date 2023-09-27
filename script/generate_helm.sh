@@ -54,7 +54,7 @@ ${GOPATH:-~/go}/bin/helm-docs -c ${DIR}/../charts/
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
   if [ -n "$DIRTY" ]; then
-    echo "FAILED: helm code updated without commiting generated code."
+    echo "FAILED: helm code updated without committing generated code."
     echo "Ensure make helm has run and all changes are committed."
     DIFF=$(git diff)
     echo "diff detected: $DIFF"

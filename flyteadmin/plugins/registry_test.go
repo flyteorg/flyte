@@ -41,6 +41,26 @@ func TestRedirectHook(t *testing.T) {
 	assert.Equal(t, fmt.Errorf("redirect hook error"), err)
 }
 
+type LogoutHook func(context.Context) error
+
+func TestLogoutHook(t *testing.T) {
+	ar := NewAtomicRegistry(nil)
+	r := NewRegistry()
+
+	hook := LogoutHook(func(ctx context.Context) error {
+		return fmt.Errorf("redirect hook error")
+	})
+	err := r.Register(PluginIDLogoutHook, hook)
+	assert.NoError(t, err)
+
+	ar.Store(r)
+	r = ar.Load()
+	fn := Get[LogoutHook](r, PluginIDLogoutHook)
+	err = fn(context.Background())
+
+	assert.Equal(t, fmt.Errorf("redirect hook error"), err)
+}
+
 func TestRegistry_RegisterDefault(t *testing.T) {
 	r := NewRegistry()
 	r.RegisterDefault("hello", 5)

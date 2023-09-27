@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 
 	"github.com/golang/protobuf/proto"
 

@@ -73,7 +73,7 @@ const (
 	// An unknown error occurred while building the workflow.
 	WorkflowBuildError ErrorCode = "WorkflowBuildError"
 
-	// A value is expected to be unique but wasnt.
+	// A value is expected to be unique but wasn't.
 	ValueCollision ErrorCode = "ValueCollision"
 
 	// A value isn't on the right syntax.

@@ -3,12 +3,12 @@ package impl
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/clusterresource/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 

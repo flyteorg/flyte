@@ -8,19 +8,19 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/encoding"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/common"
-	nodeserrors "github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
+	nodeserrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/pkg/errors"
 
@@ -133,7 +133,7 @@ func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.No
 }
 
 // GetOrExtendCatalogReservation attempts to acquire an artifact reservation if the task is
-// cachable and cache serializable. If the reservation already exists for this owner, the
+// cacheable and cache serializable. If the reservation already exists for this owner, the
 // reservation is extended.
 func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	cacheHandler interfaces.CacheableNodeHandler, heartbeatInterval time.Duration) (catalog.ReservationEntry, error) {
@@ -169,7 +169,7 @@ func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx i
 		reservation.HeartbeatInterval.AsDuration(), reservation.OwnerId, status), nil
 }
 
-// ReleaseCatalogReservation attempts to release an artifact reservation if the task is cachable
+// ReleaseCatalogReservation attempts to release an artifact reservation if the task is cacheable
 // and cache serializable. If the reservation does not exist for this owner (e.x. it never existed
 // or has been acquired by another owner) this call is still successful.
 func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx interfaces.NodeExecutionContext,

@@ -9,26 +9,26 @@ import (
 
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/mocks"
 
-	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
+	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/golang/protobuf/ptypes"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	"github.com/golang/protobuf/proto"
 
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	runtimeMocks "github.com/flyteorg/flyteadmin/pkg/runtime/mocks"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 )

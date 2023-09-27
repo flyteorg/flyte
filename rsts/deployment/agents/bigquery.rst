@@ -87,4 +87,5 @@ Upgrade the Flyte Helm release
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).

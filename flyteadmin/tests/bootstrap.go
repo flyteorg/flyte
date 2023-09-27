@@ -7,13 +7,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"gorm.io/gorm"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const insertExecutionQueryStr = `INSERT INTO "executions" ` +

@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
-	config2 "github.com/flyteorg/flytestdlib/config"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/magiconair/properties/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
 )
 
 func TestWranglePluginsAndGenerateFinalList(t *testing.T) {

@@ -1,6 +1,6 @@
 package common
 
-import "github.com/flyteorg/flytestdlib/contextutils"
+import "github.com/flyteorg/flyte/flytestdlib/contextutils"
 
 var RuntimeTypeKey = contextutils.Key("runtime_type")
 var RuntimeVersionKey = contextutils.Key("runtime_version")

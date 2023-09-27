@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
-	"github.com/flyteorg/flytestdlib/cache"
-	cacheMocks "github.com/flyteorg/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -64,6 +64,36 @@ func TestResourceCache_SyncResource(t *testing.T) {
 		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
 		assert.NoError(t, err)
 		assert.Equal(t, cache.Unchanged, newCacheItem[0].Action)
+		assert.Equal(t, cacheItem, newCacheItem[0].Item)
+	})
+
+	t.Run("Retry limit exceeded", func(t *testing.T) {
+		mockCache := &cacheMocks.AutoRefresh{}
+		mockClient := &mocks.Client{}
+
+		q := ResourceCache{
+			AutoRefresh: mockCache,
+			client:      mockClient,
+			cfg: webapi.CachingConfig{
+				MaxSystemFailures: 2,
+			},
+		}
+
+		cacheItem := CacheItem{
+			State: State{
+				SyncFailureCount: 5,
+				ErrorMessage:     "some error",
+			},
+		}
+
+		iw := &cacheMocks.ItemWrapper{}
+		iw.OnGetItem().Return(cacheItem)
+		iw.OnGetID().Return("some-id")
+
+		newCacheItem, err := q.SyncResource(ctx, []cache.ItemWrapper{iw})
+		assert.NoError(t, err)
+		assert.Equal(t, cache.Update, newCacheItem[0].Action)
+		cacheItem.State.Phase = PhaseSystemFailure
 		assert.Equal(t, cacheItem, newCacheItem[0].Item)
 	})
 

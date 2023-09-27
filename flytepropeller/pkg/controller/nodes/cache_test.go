@@ -10,20 +10,20 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
-	executorsmocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	interfacesmocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	executorsmocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	interfacesmocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	catalogmocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalogmocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"k8s.io/apimachinery/pkg/types"
 
@@ -203,7 +203,7 @@ func TestCheckCatalogCache(t *testing.T) {
 				catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task cached skipped in Discovery", testScope),
 				catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", testScope),
 				catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", testScope),
-				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", testScope),
+				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get failure count", testScope),
 				reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", testScope),
 				reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", testScope),
 				reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", testScope),
@@ -275,7 +275,7 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 				catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task cached skipped in Discovery", testScope),
 				catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", testScope),
 				catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", testScope),
-				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", testScope),
+				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get failure count", testScope),
 				reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", testScope),
 				reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", testScope),
 				reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", testScope),
@@ -336,7 +336,7 @@ func TestReleaseCatalogReservation(t *testing.T) {
 				catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task cached skipped in Discovery", testScope),
 				catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", testScope),
 				catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", testScope),
-				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", testScope),
+				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get failure count", testScope),
 				reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", testScope),
 				reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", testScope),
 				reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", testScope),
@@ -410,7 +410,7 @@ func TestWriteCatalogCache(t *testing.T) {
 				catalogSkipCount:               labeled.NewCounter("discovery_skip_count", "Task cached skipped in Discovery", testScope),
 				catalogPutSuccessCount:         labeled.NewCounter("discovery_put_success_count", "Discovery Put success count", testScope),
 				catalogPutFailureCount:         labeled.NewCounter("discovery_put_failure_count", "Discovery Put failure count", testScope),
-				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get faillure count", testScope),
+				catalogGetFailureCount:         labeled.NewCounter("discovery_get_failure_count", "Discovery Get failure count", testScope),
 				reservationGetFailureCount:     labeled.NewCounter("reservation_get_failure_count", "Reservation GetOrExtend failure count", testScope),
 				reservationGetSuccessCount:     labeled.NewCounter("reservation_get_success_count", "Reservation GetOrExtend success count", testScope),
 				reservationReleaseFailureCount: labeled.NewCounter("reservation_release_failure_count", "Reservation Release failure count", testScope),

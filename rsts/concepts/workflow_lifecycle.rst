@@ -51,7 +51,7 @@ In the background Flyte will provide all the needed infrastructure such that by 
 As mentioned earlier some part of plugin logic lives on the SDK. In this
 case think of ``Spark`` data class here as a placeholder for all the
 Spark settings that we need our plugin to know. We need to pass this
-data accross multiple places. This is the config that Flyte operator (Flytepropeller)
+data across multiple places. This is the config that Flyte operator (Flytepropeller)
 will need in order to build the needed spark cluster. ``Spark`` class also tells
 Flytekit’s SDK that this task will run as a ``PysparkFunctionTask``
 because ``task_config`` points to a ``Spark`` object instance, this is
@@ -61,7 +61,7 @@ background <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-sp
 2. Once the user has finished writing needed Workflows. A packaging step
    is needed before user can run the workflows. This packaging step
    transforms workflows and tasks we described in python into a Protobuf
-   representation. This protobuf representation is used by Flyte accross its multiple codebases. For
+   representation. This protobuf representation is used by Flyte across its multiple codebases. For
    further details on the protobuf representation check `FlyteIdl
    repository <https://github.com/flyteorg/flyteidl>`__ . Package step is carried out by the sdk tooling you are using.
 
@@ -126,7 +126,7 @@ as defined in ``FlyteIDL``.
           "hello_spark"
         ]
 
-This representation is generated within Flytekit. Esentially the SDK is
+This representation is generated within Flytekit. Essentially the SDK is
 generating the instructions that Flyte’s kubernetes operator needs to
 know in order to run this task at a later stage.
 
@@ -143,7 +143,7 @@ Spark plugin expects all its particular settings in this field i.e:
 Spark workers, driver memory etc.
 
 `Container <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L152>`__
-is part of Flyte’s IDL primitives. Esentially any Flyte task is ran as
+is part of Flyte’s IDL primitives. Essentially any Flyte task is ran as
 either three primitives a ``Container`` a ``K8sPod`` or ``Sql``. Every
 task contains a ``Target`` which has to be either of these. In this
 particular case, our Spark cluster is a ``Container`` target. A
@@ -173,12 +173,12 @@ For more information on why this task contains these fields check
 ``TaskTemplate`` in `FlyteIDL
 repository <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/core/tasks.proto#L102>`__.
 I strongly advice you to take a look at the data structures in this file
-as they provide good insight in the interfaces used all accross Flyte’s
+as they provide good insight in the interfaces used all across Flyte’s
 codebases.
 
 3. Once user has packaged workflows and tasks then a registration step
    is needed. During registration Flyte adds these protocolbuffer files to its
-   database, esentially making these tasks and workflows runnable for
+   database, essentially making these tasks and workflows runnable for
    the user. Registration is done via `Flytectl <https://github.com/flyteorg/flytectl>` __
 
 4. At somepoint a Flyte user will trigger a Workflow run. The workflow
@@ -224,7 +224,7 @@ method is where magic happens. At task runtime:
    
    -  Calls `dispatch_execute <https://github.com/flyteorg/flytekit/blob/771aa8a72fbc3ded437b6ff8498404767fc438db/flytekit/core/base_task.py#L449>`__ . This trigger the execution of our spark task.
    
-   -  `PysparkFunctionTask <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-spark/flytekitplugins/spark/task.py#L78>`__. defines what gets run just before the user's task code gets executed. It esentially creatse a spark session and then run the user function (The actual code we want to run!).
+   -  `PysparkFunctionTask <https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-spark/flytekitplugins/spark/task.py#L78>`__. defines what gets run just before the user's task code gets executed. It essentially creatse a spark session and then run the user function (The actual code we want to run!).
 
 ------------
 

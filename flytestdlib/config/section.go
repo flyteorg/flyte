@@ -8,7 +8,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/flyteorg/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/flytestdlib/atomic"
 
 	"github.com/spf13/pflag"
 )

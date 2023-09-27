@@ -7,7 +7,7 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	models "github.com/flyteorg/datacatalog/pkg/repositories/models"
+	models "github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 
 	time "time"
 )

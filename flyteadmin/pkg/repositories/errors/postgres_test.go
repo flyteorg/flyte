@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	mockScope "github.com/flyteorg/flytestdlib/promutils"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/jackc/pgconn"
 	"github.com/magiconair/properties/assert"

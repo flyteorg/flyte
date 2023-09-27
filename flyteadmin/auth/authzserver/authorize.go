@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/ory/fosite"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (

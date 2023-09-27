@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	managerConfig "github.com/flyteorg/flytepropeller/manager/config"
-	"github.com/flyteorg/flytepropeller/manager/shardstrategy"
-	propellerConfig "github.com/flyteorg/flytepropeller/pkg/controller/config"
-	leader "github.com/flyteorg/flytepropeller/pkg/leaderelection"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	managerConfig "github.com/flyteorg/flyte/flytepropeller/manager/config"
+	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy"
+	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	leader "github.com/flyteorg/flyte/flytepropeller/pkg/leaderelection"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 
-	stderrors "github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	stderrors "github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/imdario/mergo"
 

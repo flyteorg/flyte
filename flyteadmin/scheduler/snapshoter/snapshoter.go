@@ -5,12 +5,12 @@ import (
 	"context"
 	"time"
 
-	repositoryInterfaces "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"

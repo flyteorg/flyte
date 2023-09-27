@@ -2,7 +2,7 @@
 Pflags Generator
 ================
 
-This tool enables you to generate code to add pflags for all fields in a struct (recursively). In conjunction with the config package, this can be useful to generate cli flags that overrides configs while maintaing type safety and not having to deal with string typos.
+This tool enables you to generate code to add pflags for all fields in a struct (recursively). In conjunction with the config package, this can be useful to generate cli flags that overrides configs while maintaining type safety and not having to deal with string typos.
 
 Getting Started
 ^^^^^^^^^^^^^^^

@@ -10,18 +10,18 @@ import (
 
 	"k8s.io/client-go/rest"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	kubeErrors "k8s.io/apimachinery/pkg/api/errors"
 
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
-	executioncluster "github.com/flyteorg/flyteadmin/pkg/executioncluster/impl"
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
+	executioncluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"

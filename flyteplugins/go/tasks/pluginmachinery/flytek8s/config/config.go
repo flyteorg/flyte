@@ -10,10 +10,10 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	config2 "github.com/flyteorg/flytestdlib/config"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 )
 
 //go:generate pflags K8sPluginConfig --default-var=defaultK8sConfig
@@ -89,7 +89,7 @@ type K8sPluginConfig struct {
 	// default memory requests for a container
 	DefaultMemoryRequest resource.Quantity `json:"default-memory" pflag:",Defines a default value for memory for containers if not specified."`
 
-	// Default Tolerations that will be added to every Pod that is created by Flyte. These can be used in heterogenous clusters, where one wishes to keep all pods created by Flyte on a separate
+	// Default Tolerations that will be added to every Pod that is created by Flyte. These can be used in heterogeneous clusters, where one wishes to keep all pods created by Flyte on a separate
 	// set of nodes.
 	DefaultTolerations []v1.Toleration `json:"default-tolerations"  pflag:"-,Tolerations to be applied for every node that is launched by Flyte. Useful in non dedicated flyte clusters"`
 	// Default Node Selector Labels for pods. These NodeSelector labels are added to all pods, created by Flyte, unless they are marked as interruptible (default of interruptible are different).
@@ -101,7 +101,7 @@ type K8sPluginConfig struct {
 	SchedulerName string `json:"scheduler-name" pflag:",Defines scheduler name."`
 
 	// -----------------------------------------------------------------
-	// Special tolerations and node selector for Interruptible tasks. This allows scheduling interruptible tasks onto specific hardward
+	// Special tolerations and node selector for Interruptible tasks. This allows scheduling interruptible tasks onto specific hardware
 
 	// Tolerations for interruptible k8s pods: These tolerations are added to the pods that can tolerate getting evicted from a node. We
 	// can leverage this for better bin-packing and using low-reliability cheaper machines.

@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	podPlugin "github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/pod"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	podPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
 
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/stretchr/testify/assert"
 )

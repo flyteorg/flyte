@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	config2 "github.com/flyteorg/flytestdlib/config"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
-	authConfig "github.com/flyteorg/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 )

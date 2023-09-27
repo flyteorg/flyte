@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"hash/fnv"
 
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 func hashIdentifier(identifier core.Identifier) uint64 {

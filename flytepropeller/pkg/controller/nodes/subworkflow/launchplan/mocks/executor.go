@@ -9,7 +9,7 @@ import (
 
 	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	launchplan "github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	launchplan "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 
 	mock "github.com/stretchr/testify/mock"
 )

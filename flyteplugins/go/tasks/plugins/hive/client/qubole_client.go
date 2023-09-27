@@ -12,11 +12,11 @@ import (
 	"strconv"
 	"time"
 
-	errors2 "github.com/flyteorg/flytestdlib/errors"
+	errors2 "github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
 )
 
 const (

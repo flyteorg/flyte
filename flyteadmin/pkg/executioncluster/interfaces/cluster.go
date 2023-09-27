@@ -3,7 +3,7 @@ package interfaces
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 )
 
 type GetTargetInterface interface {

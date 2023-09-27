@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
@@ -20,9 +20,9 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/runtime/protoiface"
 
-	"github.com/flyteorg/flyteadmin/auth/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 )
 
 const (
@@ -48,6 +48,7 @@ func (e *PreRedirectHookError) Error() string {
 // PreRedirectHookError is the error interface which allows the user to set correct http status code and Message to be set in case the function returns an error
 // without which the current usage in GetCallbackHandler will set this to InternalServerError
 type PreRedirectHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) *PreRedirectHookError
+type LogoutHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) error
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
 type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error
 
@@ -68,7 +69,7 @@ func RegisterHandlers(ctx context.Context, handler interfaces.HandlerRegisterer,
 	handler.HandleFunc(fmt.Sprintf("/%s", OIdCMetadataEndpoint), GetOIdCMetadataEndpointRedirectHandler(ctx, authCtx))
 
 	// These endpoints require authentication
-	handler.HandleFunc("/logout", GetLogoutEndpointHandler(ctx, authCtx))
+	handler.HandleFunc("/logout", GetLogoutEndpointHandler(ctx, authCtx, pluginRegistry))
 }
 
 // Look for access token and refresh token, if both are present and the access token is expired, then attempt to
@@ -123,7 +124,7 @@ func RefreshTokensIfExists(ctx context.Context, authCtx interfaces.Authenticatio
 			return
 		}
 
-		redirectURL := getAuthFlowEndRedirect(ctx, authCtx, request)
+		redirectURL := GetAuthFlowEndRedirect(ctx, authCtx, request)
 		http.Redirect(writer, request, redirectURL, http.StatusTemporaryRedirect)
 	}
 }
@@ -210,7 +211,7 @@ func GetCallbackHandler(ctx context.Context, authCtx interfaces.AuthenticationCo
 			}
 			logger.Info(ctx, "Successfully called the preRedirect hook")
 		}
-		redirectURL := getAuthFlowEndRedirect(ctx, authCtx, request)
+		redirectURL := GetAuthFlowEndRedirect(ctx, authCtx, request)
 		http.Redirect(writer, request, redirectURL, http.StatusTemporaryRedirect)
 	}
 }
@@ -466,9 +467,19 @@ func GetOIdCMetadataEndpointRedirectHandler(ctx context.Context, authCtx interfa
 	}
 }
 
-func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.AuthenticationContext) http.HandlerFunc {
+func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.AuthenticationContext, pluginRegistry *plugins.Registry) http.HandlerFunc {
 	return func(writer http.ResponseWriter, request *http.Request) {
-		logger.Debugf(ctx, "Deleting auth cookies")
+		hook := plugins.Get[LogoutHookFunc](pluginRegistry, plugins.PluginIDLogoutHook)
+		if hook != nil {
+			if err := hook(ctx, authCtx, request, writer); err != nil {
+				logger.Errorf(ctx, "logout hook failed: %v", err)
+				writer.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			logger.Debugf(ctx, "logout hook called")
+		}
+
+		logger.Debugf(ctx, "deleting auth cookies")
 		authCtx.CookieManager().DeleteCookies(ctx, writer)
 
 		// Redirect if one was given

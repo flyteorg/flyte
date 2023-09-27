@@ -170,6 +170,26 @@ message OutputReference {
 
     // Variable name must refer to an output variable for the node.
     string var = 2;
+
+    repeated PromiseAttribute attr_path = 3;
+}  
+
+// PromiseAttribute stores the attribute path of a promise, which will be resolved at runtime.
+// The attribute path is a list of strings and integers.
+// In the following example,
+// ```
+// @workflow
+// def wf():
+//     o = t1()
+//     t2(o.a["b"][0])
+// ```
+// the output reference t2 binds to has a list of PromiseAttribute ["a", "b", 0]
+
+message PromiseAttribute {
+    oneof value {
+        string string_value = 1;
+        int32 int_value = 2;
+    }
 }
 
 // Represents an error thrown from a node.

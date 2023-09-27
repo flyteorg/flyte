@@ -4,7 +4,7 @@ package gormimpl
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	mocket "github.com/Selvatico/go-mocket"

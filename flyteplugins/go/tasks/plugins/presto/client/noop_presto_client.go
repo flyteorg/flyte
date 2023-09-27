@@ -7,7 +7,7 @@ import (
 
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
 )
 
 const (

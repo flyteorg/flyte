@@ -3,8 +3,8 @@ package shardstrategy
 import (
 	"fmt"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 
 	v1 "k8s.io/api/core/v1"
 )

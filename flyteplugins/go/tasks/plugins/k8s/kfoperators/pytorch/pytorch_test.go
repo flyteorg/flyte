@@ -6,23 +6,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/stretchr/testify/mock"
 
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 
-	pluginIOMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
@@ -46,6 +46,13 @@ var (
 
 	testArgs = []string{
 		"test-args",
+	}
+
+	dummyAnnotations = map[string]string{
+		"annotation-key": "annotation-value",
+	}
+	dummyLabels = map[string]string{
+		"label-key": "label-value",
 	}
 
 	resourceRequirements = &corev1.ResourceRequirements{
@@ -92,7 +99,7 @@ func dummyPytorchTaskTemplate(id string, args ...interface{}) *core.TaskTemplate
 			var pytorchCustomObj = t
 			ptObjJSON, err = utils.MarshalToString(pytorchCustomObj)
 		default:
-			err = fmt.Errorf("Unkonw input type %T", t)
+			err = fmt.Errorf("Unknown input type %T", t)
 		}
 	}
 
@@ -170,8 +177,8 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
 	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
@@ -339,6 +346,18 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 	}
 
 	assert.True(t, hasContainerWithDefaultPytorchName)
+
+	// verify TaskExecutionMetadata labels and annotations are copied to the PyTorchJob
+	for k, v := range dummyAnnotations {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+		}
+	}
+	for k, v := range dummyLabels {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+		}
+	}
 }
 
 func TestBuildResourcePytorch(t *testing.T) {
@@ -355,6 +374,18 @@ func TestBuildResourcePytorch(t *testing.T) {
 	assert.True(t, ok)
 	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas)
 	assert.Nil(t, pytorchJob.Spec.ElasticPolicy)
+
+	// verify TaskExecutionMetadata labels and annotations are copied to the TensorFlowJob
+	for k, v := range dummyAnnotations {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+		}
+	}
+	for k, v := range dummyLabels {
+		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+		}
+	}
 
 	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
 		var hasContainerWithDefaultPytorchName = false

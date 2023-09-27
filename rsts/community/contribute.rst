@@ -293,6 +293,10 @@ This guide provides a step-by-step approach to setting up a local development en
 `flytekit <https://github.com/flyteorg/flytekit>`_ , `flyteconsole <https://github.com/flyteorg/flyteconsole>`_,
 `datacatalog <https://github.com/flyteorg/datacatalog>`_, and `flytestdlib <https://github.com/flyteorg/flytestdlib>`_.
 
+The video below is a tutorial on how to set up a local development environment for Flyte.
+
+..  youtube:: V-KlVQmQAjE 
+
 Requirements
 ************
 

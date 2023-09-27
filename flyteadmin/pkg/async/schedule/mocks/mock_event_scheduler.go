@@ -3,9 +3,9 @@ package mocks
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/aws"
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )

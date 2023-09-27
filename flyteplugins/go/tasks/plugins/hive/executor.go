@@ -3,15 +3,15 @@ package hive
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	pluginMachinery "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	pluginMachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // This is the name of this plugin effectively. In Flyte plugin configuration, use this string to enable this plugin.

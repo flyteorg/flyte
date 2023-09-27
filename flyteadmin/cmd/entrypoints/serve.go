@@ -3,18 +3,18 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 
-	"github.com/flyteorg/flytestdlib/profutils"
+	"github.com/flyteorg/flyte/flytestdlib/profutils"
 
 	_ "net/http/pprof" // Required to serve application.
 
-	"github.com/flyteorg/flyteadmin/pkg/server"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/spf13/cobra"
 
-	runtimeConfig "github.com/flyteorg/flyteadmin/pkg/runtime"
+	runtimeConfig "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 )
 
 var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())

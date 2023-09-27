@@ -7,28 +7,28 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	ioMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
-	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	pluginsCoreMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
-	quboleMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginsCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
+	quboleMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
 )
 
 func init() {
@@ -52,6 +52,7 @@ func TestInTerminalState(t *testing.T) {
 			e := ExecutionState{Phase: tt.phase}
 			res := InTerminalState(e)
 			assert.Equal(t, tt.isTerminal, res)
+			assert.Equal(t, tt.phase.IsTerminal(), res)
 		})
 	}
 }
@@ -338,7 +339,10 @@ func TestKickOffQuery(t *testing.T) {
 
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
-	mockCache.OnGetOrCreate(mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+	mockCache.OnGetOrCreate(mock.Anything,
+		ExecutionStateCacheItem{
+			ExecutionState: ExecutionState{Phase: PhaseSubmitted, CommandID: "453298043"},
+			Identifier:     "my_wf_exec_project:my_wf_exec_domain:my_wf_exec_name"}).Run(func(_ mock.Arguments) {
 		getOrCreateCalled = true
 	}).Return(ExecutionStateCacheItem{}, nil)
 

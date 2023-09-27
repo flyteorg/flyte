@@ -10,7 +10,7 @@ update_boilerplate:
 .PHONY: compile
 compile:
 	mkdir -p ./bin
-	go build -o datacatalog ./cmd/main.go && mv ./datacatalog ./bin
+	go build -o bin/datacatalog ./cmd/main.go
 
 .PHONY: linux_compile
 linux_compile: export CGO_ENABLED ?= 0

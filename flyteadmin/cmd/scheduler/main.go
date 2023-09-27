@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/flyteorg/flyteadmin/cmd/scheduler/entrypoints"
+	"github.com/flyteorg/flyte/flyteadmin/cmd/scheduler/entrypoints"
 	"github.com/golang/glog"
 )
 

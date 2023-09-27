@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
-	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

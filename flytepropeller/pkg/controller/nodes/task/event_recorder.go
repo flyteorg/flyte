@@ -3,7 +3,7 @@ package task
 import (
 	"context"
 
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 type bufferedEventRecorder struct {

@@ -5,9 +5,9 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
-	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
+	runtime "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 )
 
 type listTargets struct {

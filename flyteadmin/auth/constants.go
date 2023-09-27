@@ -1,6 +1,6 @@
 package auth
 
-import "github.com/flyteorg/flytestdlib/contextutils"
+import "github.com/flyteorg/flyte/flytestdlib/contextutils"
 
 const (
 	// OAuth2 Parameters

@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flytestdlib/pbhash"
 )
 
 const cachedTaskTag = "flyte_cached"
@@ -20,7 +20,7 @@ const taskNamespace = "flyte_task"
 const maxParamHashLength = 8
 
 // Declare the definition of empty literal and variable maps. This is important because we hash against
-// the literal and variable maps. So Nil and empty literals and variable maps should translate to these defintions
+// the literal and variable maps. So Nil and empty literals and variable maps should translate to these definitions
 // in order to have a consistent hash.
 var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
 var emptyVariableMap = core.VariableMap{Variables: map[string]*core.Variable{}}

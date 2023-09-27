@@ -3,11 +3,11 @@ package validators
 import (
 	"reflect"
 
-	"github.com/flyteorg/flytepropeller/pkg/compiler/typing"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
 
+	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	c "github.com/flyteorg/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
 )
 

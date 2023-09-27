@@ -7,6 +7,7 @@ include boilerplate/flyte/end2end/Makefile
 GIT_VERSION := $(shell git describe --always --tags)
 GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
+# TODO(monorepo): Do we need to change this? This is used in the service that provides a version.
 PACKAGE ?=github.com/flyteorg/flytestdlib
 
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
@@ -36,7 +37,8 @@ k8s_integration_execute:
 
 .PHONY: compile
 compile:
-	go build -o flyteadmin -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyteadmin ${GOPATH}/bin
+	mkdir -p ./bin
+	go build -o bin/flyteadmin -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: compile_debug
 compile_debug:
@@ -45,7 +47,8 @@ compile_debug:
 
 .PHONY: compile_scheduler
 compile_scheduler:
-	go build -o flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/ && mv ./flytescheduler ${GOPATH}/bin
+	mkdir -p ./bin
+	go build -o bin/flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/
 
 .PHONY: compile_scheduler_debug
 compile_scheduler_debug:

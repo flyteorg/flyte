@@ -25,7 +25,7 @@ This proposal includes 2 distinct and independent sets of changes. They are boun
 
 The first change is to move the application header that contains the branding and user identity elements from the top of the application window to the left rail. Doing this brings the appearance of the Flyte console more inline with the _de facto_ standard for developer console applications and also frees up ~75px of vertical real estate. The following illustrates this change.
 
-![comparison of new proposed changes with exisiting](../img/ui-upgrade-verticalRealEstate.png)
+![comparison of new proposed changes with existing](../img/ui-upgrade-verticalRealEstate.png)
 
 The second change is to introduce breadcrumb and page title elements consistently on all pages. This change is expected to have a positive usability and a11y impact.
 

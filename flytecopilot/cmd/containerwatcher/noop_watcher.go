@@ -3,7 +3,7 @@ package containerwatcher
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type NoopWatcher struct {

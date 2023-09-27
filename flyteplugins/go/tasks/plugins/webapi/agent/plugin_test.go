@@ -5,13 +5,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 
 	"google.golang.org/grpc"
 
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginCoreMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flytestdlib/promutils"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -42,8 +42,8 @@ func TestPlugin(t *testing.T) {
 		assert.Equal(t, plugin.cfg.ResourceConstraints, constraints)
 	})
 
-	t.Run("tet newAgentPlugin", func(t *testing.T) {
-		p := newAgentPlugin()
+	t.Run("test newAgentPlugin", func(t *testing.T) {
+		p := newAgentPlugin(SupportedTaskTypes{})
 		assert.NotNil(t, p)
 		assert.Equal(t, "agent-service", p.ID)
 		assert.NotNil(t, p.PluginLoader)

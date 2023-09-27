@@ -13,10 +13,10 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health/grpc_health_v1"
 
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 // IDE "Go Generate File". This will create a mocks/AdminServiceClient.go file
@@ -142,7 +142,7 @@ func NewAdminConnection(ctx context.Context, cfg *Config, opts ...grpc.DialOptio
 			}
 		}
 		if cfg.InsecureSkipVerify {
-			logger.Warnf(ctx, "using insecureSkipVerify. Server's certificate chain and host name wont be verified. Caution : shouldn't be used for production usecases")
+			logger.Warnf(ctx, "using insecureSkipVerify. Server's certificate chain and host name won't be verified. Caution : shouldn't be used for production usecases")
 			tlsConfig.InsecureSkipVerify = true
 			creds = credentials.NewTLS(tlsConfig)
 		} else {

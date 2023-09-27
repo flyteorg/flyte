@@ -5,14 +5,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flytepropeller/pkg/compiler/common/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
 
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
+	v "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/errors"
-	v "github.com/flyteorg/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flytepropeller/pkg/visualize"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 )

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"github.com/jackc/pgconn"
 
-	catalogErrors "github.com/flyteorg/datacatalog/pkg/errors"
+	catalogErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 )

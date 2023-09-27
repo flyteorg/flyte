@@ -6,23 +6,23 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	"github.com/flyteorg/flytestdlib/cache"
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type ExecutionPhase int
@@ -35,6 +35,10 @@ const (
 	PhaseQuerySucceeded
 	PhaseQueryFailed
 )
+
+func (p ExecutionPhase) IsTerminal() bool {
+	return p == PhaseQuerySucceeded || p == PhaseQueryFailed
+}
 
 func (p ExecutionPhase) String() string {
 	switch p {
@@ -485,7 +489,7 @@ func Finalize(ctx context.Context, tCtx core.TaskExecutionContext, _ ExecutionSt
 }
 
 func InTerminalState(e ExecutionState) bool {
-	return e.Phase == PhaseQuerySucceeded || e.Phase == PhaseQueryFailed
+	return e.Phase.IsTerminal()
 }
 
 func IsNotYetSubmitted(e ExecutionState) bool {
