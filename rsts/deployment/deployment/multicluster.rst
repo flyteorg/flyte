@@ -31,24 +31,170 @@ The case for multiple Kubernetes clusters may arise due to security constraints,
 cost effectiveness or a need to scale out computing resources.
 
 To address this, you can deploy Flyte's data plane to multiple Kubernetes clusters.
-The control plane (FlyteAdmin) can be configured to load-balance workflows across
-these individual data planes, protecting you from failure in a single Kubernetes
-cluster, thus increasing scalability.
+The control plane (FlyteAdmin) can be configured to submit workflows to
+these individual data planes. Additionally, Flyte provides the mechanisms for 
+administrators to retain control on the workflow placement logic while enabling
+users to reap the benefits using simple abstractions like ``projects`` and ``domains``.
+
+Prerequisites
+*************
+
+To make sure that your multicluster deployment is able to scale and process 
+requests successfully, the following environment-specific requirements should be met:
+
+.. tabbed:: AWS
+   
+   1. An IAM Policy that defines the permissions needed for Flyte. A minimum set of permissions include:
+   
+   .. code-block:: json
+      
+      "Action": [
+          "s3:DeleteObject*",
+          "s3:GetObject*",
+          "s3:ListBucket",
+          "s3:PutObject*"
+      ], 
+       "Resource": [
+                "arn:aws:s3:::<your-S3-bucket>*",
+                "arn:aws:s3:::<your-S3-bucket>*/*"
+            ],   
+
+   2. At least three IAM Roles configured: one for the controlplane components, another for the dataplane
+   and one more for the worker Pods that are bootstraped by Flyte to execute workflow tasks. 
+
+   3. An OIDC Provider associated with each of your EKS clusters. You can use the following command to create and connect the Provider:
+
+   .. prompt:: bash
+
+      eksctl utils associate-iam-oidc-provider --cluster <Name-EKS-Cluster> --approve  
+
+   4. An IAM Trust Relationship that associates each EKS cluster type (controlplane or dataplane) with the Service Account(s) and namespaces 
+      where the different elements of the system will run.
+  
+   Use the steps in this section to complete the requirements indicated above:
+
+   **Control plane role**
+
+   1. Use the following command to simplify the process of both creating a role and configuring an initial Trust Relationship:
+
+   .. prompt:: bash
+      
+      eksctl create iamserviceaccount --cluster=<controlplane-cluster-name> --name=flyteadmin --role-only --role-name=flyte-controlplane-role --attach-policy-arn <ARN-of-your-IAM-policy> --approve --region <AWS-REGION-CODE> --namespace flyte
+      
+   2. Go to the **IAM** section in your **AWS Management Console** and select the role that was just created
+   3. Go to the **Trust Relationships** tab and **Edit the Trust Policy**
+   4. Add the ``datacatalog`` Service Account to the ``sub`` section 
+   
+   The end result should look similar to the following example:
+
+   .. code-block:: json
+
+                 {
+          "Version": "2012-10-17",
+          "Statement": [
+              {
+                  "Effect": "Allow",
+                  "Principal": {
+                      "Federated": "arn:aws:iam::<ACCOUNT-ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<CONTROLPLANE-OIDC-PROVIDER>"
+                  },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "oidc.eks.<REGION>.amazonaws.com/id/<CONTROLPLANE-OIDC-PROVIDER>:aud": "sts.amazonaws.com",
+                    "oidc.eks.<REGION>.amazonaws.com/id/<CONTROLPLANE-OIDC-PROVIDER>:sub": [
+                        "system:serviceaccount:flyte:flyteadmin",
+                        "system:serviceaccount:flyte:datacatalog"
+                          ]
+                      }
+                  }
+              }
+          ]
+      }
+
+   **Data plane role**
+
+   1. Create the role and Trust Relationship:
+
+   .. prompt:: bash
+      
+      eksctl create iamserviceaccount --cluster=<dataplane1-cluster-name> --name=flytepropeller --role-only --role-name=flyte-dataplane-role --attach-policy-arn <ARN-of-your-IAM-policy> --approve --region <AWS-REGION-CODE> --namespace flyte
+      
+   2. Verify the Trust Relationship configuration:
+
+   .. prompt:: bash
+
+      aws iam get-role --role-name flyte-dataplane-role --query Role.AssumeRolePolicyDocument
+   
+   Example output:
+
+   .. code-block:: json
+
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::<ACCOUNT-ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringEquals": {
+                    "oidc.eks.us-east-1.amazonaws.com/id/66CBAF563FD1438BC98F1EF39FF8DACD:aud": "sts.amazonaws.com",
+                    "oidc.eks.us-east-1.amazonaws.com/id/66CBAF563FD1438BC98F1EF39FF8DACD:sub": "system:serviceaccount:flyte:flytepropeller"
+                    }
+                }
+            }
+         ]
+      }
+
+   **Workers role**
+
+   1. Create role and initial Trust Relationship:
+
+      .. prompt:: bash
+      
+      eksctl create iamserviceaccount --cluster=<dataplane1-cluster-name> --name=default --role-only --role-name=flyte-workers-role --attach-policy-arn <ARN-of-your-IAM-policy> --approve --region <AWS-REGION-CODE> --namespace flyte
+      
+   2. Go to the **IAM** section in your **AWS Management Console** and select the role that was just created
+   3. Go to the **Trust Relationships** tab and **Edit the Trust Policy**
+   4. By default, every Pod created for Task execution, uses the ``default`` Service Account on their respective namespace. In your cluster, you'll have as many
+      namespaces as ``project`` and ``domain`` combinations you may have. Hence, it might be useful to use a ``StringLike`` condition and to set a wildcard for the namespace in the Trust Policy:
+
+      .. code-block:: json
+
+         {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Federated": "arn:aws:iam::<ACCOUNT-ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
+            },
+            "Action": "sts:AssumeRoleWithWebIdentity",
+            "Condition": {
+                "StringLike": {
+                    "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:*:default",
+                    "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com"
+                  }
+               }
+            }
+          ]
+       }
 
 
-To deploy *only* the data planes to these clusters, use the `values-dataplane.yaml <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/values-dataplane.yaml>`__ provided with the Helm chart.
 
 Data Plane Deployment
 *********************
 
-This gude assumes that you have three Kubernetes clusters and that you can access
+This guide assumes that you have two Kubernetes clusters and that you can access
 them all with ``kubectl``.
 
-Let's call these clusters ``dataplane1``, ``dataplane2``, and ``dataplane3``.
+Let's call these clusters ``dataplane1`` and ``dataplane2``.
 
 1. Add the ``flyteorg`` Helm repo:
 
-.. code-block::
+.. prompt:: bash
 
     helm repo add flyteorg https://flyteorg.github.io/flyte
     helm repo update
@@ -56,7 +202,22 @@ Let's call these clusters ``dataplane1``, ``dataplane2``, and ``dataplane3``.
     helm fetch --untar --untardir . flyteorg/flyte-core
     cd flyte-core
 
-2. Install Flyte data plane Helm chart:
+2. Open the ``values-dataplane.yaml`` file and add the following contents:
+
+   .. code-block:: yaml
+
+      configmap:
+        admin:
+          admin:
+            endpoint: <your-Ingress-FQDN>:443 #use here the URL you're using to connect to Flyte
+            insecure: false #enables secure communication over SSL. Requires a signed certificate
+
+.. note:: 
+
+   This step is needed so the ``flytepropeller`` instance in the data plane cluster is able to send notifications
+   back to the ``flyteadmin`` service in the control plane.
+
+3. Install Flyte data plane Helm chart:
 
 .. note:: 
 
@@ -74,13 +235,14 @@ Let's call these clusters ``dataplane1``, ``dataplane2``, and ``dataplane3``.
 
     .. code-block::
 
-        helm upgrade flyte -n flyte flyteorg/flyte-core -f values.yaml \
-            -f values-gcp.yaml \
-            -f values-dataplane.yaml \
-            --create-namespace flyte --install
+        helm install flyte-core-data -n flyte flyteorg/flyte-core  \
+            --values values-gcp.yaml \
+            --values values-dataplane.yaml \
+            --create-namespace flyte 
 
+4. Repeat step 2 and 3 for each dataplane cluster in your environment.
 
-User and Control Plane Deployment
+Control Plane Deployment
 *********************************
 
 For ``flyteadmin`` to access and create Kubernetes resources in one or more
@@ -89,11 +251,11 @@ Flyte makes use of Kubernetess Service Accounts to enable every data plane clust
 authenticated requests to the Kubernetes API Server.
 The default behaviour is that ``flyteadmin`` creates a `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_
 in each data plane cluster. 
-In order to verify requests, the API Server expects a `signed bearer token <https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens>`__
-attached to the Service Account. As of Kubernetes 1.24 an above, the bearer token has to be generated manually.
+In order to verify requests, the Kubernetes API Server expects a `signed bearer token <https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens>`__
+attached to the Service Account. As of Kubernetes 1.24 and above, the bearer token has to be generated manually.
 
 
-1. Use the following manifest to create a long-lived secret for the ``flyteadmin`` Service Account in your dataplane cluster:
+1. Use the following manifest to create a long-lived bearer token for the ``flyteadmin`` Service Account in your dataplane cluster:
 
    .. prompt:: bash $
    
@@ -129,7 +291,7 @@ attached to the Service Account. As of Kubernetes 1.24 an above, the bearer toke
 
 .. prompt:: bash $
 
-  kubectl get secret -n flyte cluster-credentials \
+  kubectl get secret -n flyte dataplane1-token \
       -o jsonpath='{.data.token}' | base64 -D | pbcopy
 
 4. Go to ``secrets.yaml`` and add a new entry under ``stringData`` with the dataplane cluster token:
@@ -150,7 +312,7 @@ attached to the Service Account. As of Kubernetes 1.24 an above, the bearer toke
 
 .. prompt:: bash $
 
-  kubectl get secret -n flyte cluster-credentials \
+  kubectl get secret -n flyte dataplane1-token \
       -o jsonpath='{.data.ca\.crt}' | base64 -D | pbcopy
 
 6. Add another entry on your ``secrets.yaml`` file for the cert, making sure that indentation resembles the following example:
@@ -207,51 +369,45 @@ attached to the Service Account. As of Kubernetes 1.24 an above, the bearer toke
      additionalVolumeMounts:
      - name: cluster-credentials
        mountPath: /var/run/credentials
+     initContainerClusterSyncAdditionalVolumeMounts:
+     - name: cluster-credentials
+       mountPath: /etc/credentials
    configmap:
      clusters:
       labelClusterMap:
-        project1: 
+        label1:
         - id: dataplane_1
           weight: 1
-        project2:
+        label2:
         - id: dataplane_2
-          weight: 0.5
-        - id: dataplane_3
-          weight: 0.5
+          weight: 1
       clusterConfigs:
       - name: "dataplane_1"
-        endpoint: https://dataplane-1-kubeapi-endpoint.com:443
+        endpoint: https://<your-dataplane1-kubeapi-endpoint>:443
         enabled: true
         auth:
            type: "file_path"
            tokenPath: "/var/run/credentials/dataplane_1_token"
            certPath: "/var/run/credentials/dataplane_1_cacert"
       - name: "dataplane_2"
-        endpoint: https://dataplane-2-kubeapi-endpoint.com:443
+        endpoint: https://<your-dataplane2-kubeapi-endpoint>:443
         enabled: true
         auth:
-            type: "file_path"
-            tokenPath: "/var/run/credentials/dataplane_2_token"
-            certPath: "/var/run/credentials/dataplane_2_cacert"
-      - name: "dataplane_3"
-        endpoint: https://dataplane-3-kubeapi-endpoint.com:443
-        enabled: true
-        auth:
-            type: "file_path"
-            tokenPath: "/var/run/credentials/dataplane_3_token"
-            certPath: "/var/run/credentials/dataplane_3_cacert"
+          type: "file_path"
+          tokenPath: "/var/run/credentials/dataplane_2_token"
+          certPath: "/var/run/credentials/dataplane_2_cacert"
 
 .. note:: 
    
-   Typically, you can obtain your Kubernetes endpoint URL using the following command:
+   Typically, you can obtain your Kubernetes API endpoint URL using the following command:
 
    .. prompt:: bash $
       
       kubectl cluster-info
 
-In this configuration, ``team1`` and ``team2`` are just labels that we will use later in the process
+In this configuration, ``label1`` and ``label2`` are just labels that we will use later in the process
 to configure the necessary mappings so workflow executions matching those labels, are scheduled
-on one or multiple clusters depending on the weight (e.g. ``team1`` on ``dataplane_1``)
+on one or multiple clusters depending on the weight (e.g. ``label1`` on ``dataplane_1``)
 
 10. Update the control plane Helm release:
 
@@ -271,10 +427,9 @@ on one or multiple clusters depending on the weight (e.g. ``team1`` on ``datapla
     .. code-block::
 
         helm upgrade flyte -n flyte flyteorg/flyte-core values.yaml \
-            -f values-gcp.yaml \
-            -f values-controlplane.yaml \
-            -f values-override.yaml \
-            --create-namespace flyte --install
+            --values values-gcp.yaml \
+            --values values-controlplane.yaml \
+            --values values-override.yaml
 
 11. Verify that all Pods in the ``flyte`` namespace are ``Running``: 
 
@@ -286,35 +441,12 @@ Example output:
    NAME                             READY   STATUS    RESTARTS   AGE
    datacatalog-86f6b9bf64-bp2cj     1/1     Running   0          23h
    datacatalog-86f6b9bf64-fjzcp     1/1     Running   0          23h
-   flyteadmin-5bb4c4976d-rdk5l      0/1     Pending   0          23h
    flyteadmin-84f666b6f5-7g65j      1/1     Running   0          23h
    flyteadmin-84f666b6f5-sqfwv      1/1     Running   0          23h
    flyteconsole-cdcb48b56-5qzlb     1/1     Running   0          23h
    flyteconsole-cdcb48b56-zj75l     1/1     Running   0          23h
    flytescheduler-947ccbd6-r8kg5    1/1     Running   0          23h
    syncresources-6d8794bbcb-754wn   1/1     Running   0          23h
-
-12. Verify that your cluster configs landed on the ``flyte-clusterresourcesync-config`` ConfigMap:
-   
-   .. code-block:: yaml
-
-      clusters.yaml:
-      ----
-      clusters:
-        clusterConfigs:
-        - auth:
-            certPath: /var/run/credentials/dataplane_1_cacert
-            tokenPath: /var/run/credentials/dataplane_1_token
-            type: file_path
-            enabled: true
-            endpoint: https://dataplane-1-kubeapi-endpoint.com:443
-            name: dataplane_1
-  
-        labelClusterMap:
-          project1:
-          - id: dataplane_1
-            weight: 1
-    ...
 
 
 Configure Execution Cluster Labels
@@ -331,23 +463,14 @@ Kubernetes cluster.
 
       domain: development
       project: project1
-      value: project1
+      value: label1
 
    .. note:: 
 
       Change ``domain`` and ``project`` according to your environment.  The ``value`` file has 
       to match with the entry on ``clusterLabelMap`` that's in your ``flyte-clusterresourcesync-config`` ConfigMap.
-      Also, in order to automate the creation of the corresponding ``project-domain`` namespaces in the dataplane, add the following to your ``values-dataplane`` file:
-   
-      Example:
-
-      .. code-block:: yaml
-
-         initialProjects:
-         - project1
     
-    
-   2. Repeat step 1 for each project-domain mapping you need to configure, creating a YAML file for each one.
+   2. Repeat step 1 for every project-domain mapping you need to configure, creating a YAML file for each one.
 
    3. Update the  execution cluster label of the project and domain:
 
@@ -362,8 +485,14 @@ Kubernetes cluster.
          Updated attributes from team1 project and domain development
 
 
+   4. Execute a workflow indicating project and domain:
 
-.. tabbed:: Configure Specific Workflow
+      .. prompt:: bash $
+
+         pyflyte run --remote --project team1 --domain development example.py  training_workflow \                                                          ✔ ╱ docs-development-env 
+         --hyperparameters '{"C": 0.1}'
+
+.. tabbed:: Configure a Specific Workflow mapping
 
     1. Create a ``workflow-ecl.yaml`` file with the following example contents:
     
@@ -371,19 +500,25 @@ Kubernetes cluster.
 
         domain: development
         project: project1
-        workflow: core.control_flow.run_merge_sort.merge_sort
+        workflow: example.training_workflow
         value: project1
 
-    3. Update execution cluster label of the project and domain
+    2. Update execution cluster label of the project and domain
 
     .. prompt:: bash $
 
         flytectl update execution-cluster-label \
             -p project1 -d development \
-            core.control_flow.run_merge_sort.merge_sort \
+            example.training_workflow \
             --attrFile workflow-ecl.yaml
 
+    3. Execute a workflow indicationg project and domain:
+
+      .. prompt:: bash $
+
+         pyflyte run --remote --project team1 --domain development example.py  training_workflow \                                                          ✔ ╱ docs-development-env 
+         --hyperparameters '{"C": 0.1}'
 
 Congratulations 🎉! With this, the execution of workflows belonging to a specific
-project-domain or a single workflow will be scheduled on the target label
+project-domain or a single specific workflow will be scheduled on the target label
 cluster.
