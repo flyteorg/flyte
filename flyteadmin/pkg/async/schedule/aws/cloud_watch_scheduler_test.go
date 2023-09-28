@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/aws/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/aws/mocks"
-	scheduleInterfaces "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-	flyteAdminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws/mocks"
+	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
+	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/promutils"
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/cloudwatchevents"

@@ -9,11 +9,11 @@ This Document - https://hackmd.io/uVT5Q9zNS8SNMkEhs5pfqQ
 
 ## 1 Executive Summary
 
-We propose an approach to facilitate automatic, horizontal scaling of FlytePropeller. This is important to combat increases in indivdual workflow execution latency as the number of concurrent workflow executions increases. The solution includes a new FlytePropeller Manager component which handles automatic scaling of additional FlytePropeller instances. Additionally, we rely on a configurable sharding mechanism to ensure deterministic, decentralized coordination of Flyte workflows.
+We propose an approach to facilitate automatic, horizontal scaling of FlytePropeller. This is important to combat increases in individual workflow execution latency as the number of concurrent workflow executions increases. The solution includes a new FlytePropeller Manager component which handles automatic scaling of additional FlytePropeller instances. Additionally, we rely on a configurable sharding mechanism to ensure deterministic, decentralized coordination of Flyte workflows.
 
 ## 2 Motivation
 
-FlytePropeller is the engine that drives Flyte workflows. It is highly optimized and a single instance can run thousands of concurrent workflows. Internally, workflows are processed in a control loop which operates over a work queue. Consequently, as the number of concurrent workflows increases beyond a resonable threshold, the latency of workflow completion will experience marginal increases as well.
+FlytePropeller is the engine that drives Flyte workflows. It is highly optimized and a single instance can run thousands of concurrent workflows. Internally, workflows are processed in a control loop which operates over a work queue. Consequently, as the number of concurrent workflows increases beyond a reasonable threshold, the latency of workflow completion will experience marginal increases as well.
 
 The default FlytePropeller deployment strategy is a single instance and while it is possible to launch multiple FlytePropeller instances (ie. one per namespace) this has to be done manually. This approach has obvious limits to scalability. Therefore, to reduce workflow processing latency as the number of workflows increase, we need a new solution to increase the refresh rate per workflow.
 
@@ -41,7 +41,7 @@ ShardingStrategy:
      Strategy: <strategy specific configuration>
 ```
 
-Depending on the Sharding strategy the propeller-manager, launches one or more FlytePropeller instances. Ideally the FlytePropeller instances are identical to the propeller-manager (ie. k8s pod configuration) with minor changes that affect how the sharding works. The configuration will inlcude FlytePropeller image definition, serviceAccounts, etc.
+Depending on the Sharding strategy the propeller-manager, launches one or more FlytePropeller instances. Ideally the FlytePropeller instances are identical to the propeller-manager (ie. k8s pod configuration) with minor changes that affect how the sharding works. The configuration will include FlytePropeller image definition, serviceAccounts, etc.
 
 ```yaml=
 ConstantShardingStrategy:

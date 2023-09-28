@@ -5,9 +5,9 @@ package mocks
 import (
 	http "net/http"
 
-	config "github.com/flyteorg/flyteadmin/auth/config"
+	config "github.com/flyteorg/flyte/flyteadmin/auth/config"
 
-	interfaces "github.com/flyteorg/flyteadmin/auth/interfaces"
+	interfaces "github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
 

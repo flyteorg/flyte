@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type FailingRawStore struct {

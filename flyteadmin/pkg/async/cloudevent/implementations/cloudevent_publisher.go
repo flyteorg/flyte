@@ -11,16 +11,16 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/implementations"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/cloudevent/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
 )
 

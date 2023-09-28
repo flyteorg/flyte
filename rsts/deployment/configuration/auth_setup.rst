@@ -199,7 +199,7 @@ Apply OIDC Configuration
       * ``<release-name>`` is the name of your Helm release, typically ``flyte-backend``. You can find it using ``helm ls -n <your-namespace>``
         
 
-      6. Verify that your Flyte deployment now requires succesful login to your IdP to access the UI (``https://<your domain>/console``)
+      6. Verify that your Flyte deployment now requires successful login to your IdP to access the UI (``https://<your domain>/console``)
 
       7. For ``flytectl`` / ``pyflyte``, make sure that your local config file (``$HOME/.flyte/config.yaml``) includes the following option:
 
@@ -658,7 +658,7 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
 
    **Congratulations**
 
-   At this point, every interaction with Flyte components -be it in the UI or CLI- should require a succesful login to your IdP, where your security policies are maintained and enforced.
+   At this point, every interaction with Flyte components -be it in the UI or CLI- should require a successful login to your IdP, where your security policies are maintained and enforced.
 
 
 Disable Helm secret management

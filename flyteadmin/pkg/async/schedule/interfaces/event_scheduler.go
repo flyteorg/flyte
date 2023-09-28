@@ -4,7 +4,7 @@ package interfaces
 import (
 	"context"
 
-	appInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	appInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )

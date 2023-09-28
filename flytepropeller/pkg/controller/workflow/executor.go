@@ -8,19 +8,19 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
-	"github.com/flyteorg/flytepropeller/events"
-	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
-	"github.com/flyteorg/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/record"
@@ -337,7 +337,7 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 				return nil
 			}
 			if eventsErr.IsEventAlreadyInTerminalStateError(recordingErr) {
-				// Move to WorkflowPhaseFailed for state mis-match
+				// Move to WorkflowPhaseFailed for state mismatch
 				msg := fmt.Sprintf("workflow state mismatch between propeller and control plane; Propeller State: %s, ExecutionId %s", wfEvent.Phase.String(), wfEvent.ExecutionId)
 				logger.Warningf(ctx, msg)
 				wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg, nil)

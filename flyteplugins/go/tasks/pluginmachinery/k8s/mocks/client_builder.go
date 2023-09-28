@@ -6,7 +6,7 @@ import (
 	cache "sigs.k8s.io/controller-runtime/pkg/cache"
 	client "sigs.k8s.io/controller-runtime/pkg/client"
 
-	k8s "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	k8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 
 	mock "github.com/stretchr/testify/mock"
 

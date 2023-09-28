@@ -10,13 +10,13 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	pluginIOMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 
 	mpiOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
@@ -44,6 +44,13 @@ var (
 
 	testArgs = []string{
 		"test-args",
+	}
+
+	dummyAnnotations = map[string]string{
+		"annotation-key": "annotation-value",
+	}
+	dummyLabels = map[string]string{
+		"label-key": "label-value",
 	}
 
 	resourceRequirements = &corev1.ResourceRequirements{
@@ -83,7 +90,7 @@ func dummyMPITaskTemplate(id string, args ...interface{}) *core.TaskTemplate {
 			var mpiCustomObj = t
 			mpiObjJSON, err = utils.MarshalToString(mpiCustomObj)
 		default:
-			err = fmt.Errorf("Unkonw input type %T", t)
+			err = fmt.Errorf("Unknown input type %T", t)
 		}
 	}
 
@@ -150,8 +157,8 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
 	taskExecutionMetadata.OnGetNamespace().Return("test-namespace")
-	taskExecutionMetadata.OnGetAnnotations().Return(map[string]string{"annotation-1": "val1"})
-	taskExecutionMetadata.OnGetLabels().Return(map[string]string{"label-1": "val1"})
+	taskExecutionMetadata.OnGetAnnotations().Return(dummyAnnotations)
+	taskExecutionMetadata.OnGetLabels().Return(dummyLabels)
 	taskExecutionMetadata.OnGetOwnerReference().Return(v1.OwnerReference{
 		Kind: "node",
 		Name: "blah",
@@ -303,6 +310,18 @@ func TestBuildResourceMPI(t *testing.T) {
 	assert.Equal(t, int32(50), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas)
 	assert.Equal(t, int32(100), *mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas)
 	assert.Equal(t, int32(1), *mpiJob.Spec.SlotsPerWorker)
+
+	// verify TaskExecutionMetadata labels and annotations are copied to the MPIJob
+	for k, v := range dummyAnnotations {
+		for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Annotations[k])
+		}
+	}
+	for k, v := range dummyLabels {
+		for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
+			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
+		}
+	}
 
 	for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
 		for _, container := range replicaSpec.Template.Spec.Containers {

@@ -1,9 +1,9 @@
 package mocks
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	sIface "github.com/flyteorg/flyteadmin/scheduler/repositories/interfaces"
-	sMocks "github.com/flyteorg/flyteadmin/scheduler/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	sIface "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
+	sMocks "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/mocks"
 	"gorm.io/gorm"
 )
 

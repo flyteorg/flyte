@@ -8,7 +8,7 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/types.proto";
 
-// SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+// SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
 // See :ref:`ref_flyteidl.admin.Signal` for more details
 message SignalGetOrCreateRequest {
     // A unique identifier for the requested signal.

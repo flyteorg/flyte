@@ -3,8 +3,8 @@
 package mocks
 
 import (
+	common "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	common "github.com/flyteorg/flytepropeller/pkg/compiler/common"
 
 	mock "github.com/stretchr/testify/mock"
 )

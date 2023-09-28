@@ -7,24 +7,24 @@ import (
 	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flytestdlib/storage"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 
-	pluginMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	nodemocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	pluginMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	nodemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 )
 
 const containerTaskType = "container"

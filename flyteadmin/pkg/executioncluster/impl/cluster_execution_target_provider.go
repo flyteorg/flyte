@@ -1,11 +1,11 @@
 package impl
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/flytek8s"
-	runtime "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	flyteclient "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/flytek8s"
+	runtime "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	flyteclient "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"

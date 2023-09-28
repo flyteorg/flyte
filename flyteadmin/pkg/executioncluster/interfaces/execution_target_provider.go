@@ -1,8 +1,8 @@
 package interfaces
 
 import (
-	"github.com/flyteorg/flyteadmin/pkg/executioncluster"
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/prometheus/client_golang/prometheus"
 )
 

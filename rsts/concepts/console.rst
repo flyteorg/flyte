@@ -98,7 +98,7 @@ Debug Output
 ============
 
 This application makes use of the `debug <https://github.com/visionmedia/debug>`_
-libary to provide namespaced debug output in the browser console. In
+library to provide namespaced debug output in the browser console. In
 development, all debug output is enabled. For other environments, the debug
 output must be enabled manually. You can do this by setting a flag in
 localStorage using the console: ``localStorage.debug = 'flyte:*'``. Each module in

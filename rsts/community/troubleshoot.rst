@@ -55,7 +55,7 @@ This issue is more common on MacOS devices. Make sure that your Docker daemon ha
       limits:
         memory: 1Gi
 
-- Also, the default container resource limits are can be overriden from the task itself:
+- Also, the default container resource limits are can be overridden from the task itself:
 
 .. code-block:: python
 

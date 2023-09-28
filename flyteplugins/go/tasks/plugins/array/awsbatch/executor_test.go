@@ -5,34 +5,34 @@ import (
 	"reflect"
 	"testing"
 
-	mocks2 "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	v1 "k8s.io/api/core/v1"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"k8s.io/apimachinery/pkg/types"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/aws"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/aws"
 
-	arrayCore "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/core"
+	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
 
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	pluginMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	queueMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
+	pluginMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	queueMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array"
-	batchConfig "github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	cacheMocks "github.com/flyteorg/flytestdlib/cache/mocks"
-	"github.com/flyteorg/flytestdlib/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array"
+	batchConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestExecutor_Handle(t *testing.T) {

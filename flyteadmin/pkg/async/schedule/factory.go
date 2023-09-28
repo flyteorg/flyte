@@ -4,21 +4,21 @@ import (
 	"context"
 	"time"
 
-	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
 	gizmoConfig "github.com/NYTimes/gizmo/pubsub/aws"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/flyteorg/flyteadmin/pkg/async"
-	awsSchedule "github.com/flyteorg/flyteadmin/pkg/async/schedule/aws"
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/async/schedule/noop"
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	managerInterfaces "github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	flytescheduler "github.com/flyteorg/flyteadmin/scheduler/dbapi"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	awsSchedule "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/noop"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	flytescheduler "github.com/flyteorg/flyte/flyteadmin/scheduler/dbapi"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type WorkflowSchedulerConfig struct {

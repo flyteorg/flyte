@@ -3,25 +3,25 @@ package resources
 import (
 	"context"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/gogo/protobuf/proto"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/validation"
-	repo_interface "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
+	repo_interface "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 )
 
 type ResourceManager struct {

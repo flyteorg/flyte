@@ -3,7 +3,7 @@ package gormimpl
 import (
 	"testing"
 
-	"github.com/flyteorg/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/stretchr/testify/assert"
 )
 

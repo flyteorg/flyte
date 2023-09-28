@@ -7,14 +7,14 @@ import (
 	"sort"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -209,7 +209,7 @@ func (m *MetricsManager) parseBranchNodeExecution(ctx context.Context,
 
 		*spans = append(*spans, nodeExecutionSpan)
 
-		// backened overhead
+		// backend overhead
 		if !nodeExecution.Closure.UpdatedAt.AsTime().Before(branchNodeExecution.Closure.UpdatedAt.AsTime()) {
 			*spans = append(*spans, createOperationSpan(branchNodeExecution.Closure.UpdatedAt,
 				nodeExecution.Closure.UpdatedAt, nodeTeardown))
@@ -271,7 +271,7 @@ func (m *MetricsManager) parseDynamicNodeExecution(ctx context.Context, nodeExec
 				return err
 			}
 
-			// backened overhead
+			// backend overhead
 			latestUpstreamNode := m.getLatestUpstreamNodeExecution(v1alpha1.EndNodeID,
 				nodeExecutionData.DynamicWorkflow.CompiledWorkflow.Primary.Connections.Upstream, nodeExecutions)
 			if latestUpstreamNode != nil && !nodeExecution.Closure.UpdatedAt.AsTime().Before(latestUpstreamNode.Closure.UpdatedAt.AsTime()) {
@@ -540,7 +540,7 @@ func (m *MetricsManager) parseSubworkflowNodeExecution(ctx context.Context,
 			return err
 		}
 
-		// backened overhead
+		// backend overhead
 		latestUpstreamNode := m.getLatestUpstreamNodeExecution(v1alpha1.EndNodeID,
 			workflow.Closure.CompiledWorkflow.Primary.Connections.Upstream, nodeExecutions)
 		if latestUpstreamNode != nil && !nodeExecution.Closure.UpdatedAt.AsTime().Before(latestUpstreamNode.Closure.UpdatedAt.AsTime()) {

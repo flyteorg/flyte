@@ -5,8 +5,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"io/ioutil"
 )

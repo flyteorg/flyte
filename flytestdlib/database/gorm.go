@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	gormLogger "gorm.io/gorm/logger"
 )

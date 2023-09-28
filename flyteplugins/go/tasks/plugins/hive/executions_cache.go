@@ -6,17 +6,17 @@ import (
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	stdErrors "github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	stdErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/client"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/hive/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/client"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/hive/config"
 
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const ResyncDuration = 30 * time.Second
@@ -62,6 +62,10 @@ type ExecutionStateCacheItem struct {
 
 func (e ExecutionStateCacheItem) ID() string {
 	return e.Identifier
+}
+
+func (e ExecutionStateCacheItem) IsTerminal() bool {
+	return e.ExecutionState.Phase.IsTerminal()
 }
 
 // This basically grab an updated status from the Qubole API and store it in the cache

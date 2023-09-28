@@ -8,14 +8,14 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
 
-	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/storage"
+	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/ptypes"
@@ -25,8 +25,8 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
 func getRunningExecutionModel(specBytes []byte, existingClosureBytes []byte, startedAt time.Time) models.Execution {

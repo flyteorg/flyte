@@ -3,7 +3,7 @@ package implementations
 import (
 	"context"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 )
 

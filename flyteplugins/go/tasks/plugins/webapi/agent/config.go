@@ -3,10 +3,10 @@ package agent
 import (
 	"time"
 
-	pluginsConfig "github.com/flyteorg/flyteplugins/go/tasks/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flytestdlib/config"
+	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 var (
@@ -44,7 +44,6 @@ var (
 			Insecure:       true,
 			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
 		},
-		SupportedTaskTypes: []string{"task_type_1", "task_type_2"},
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("agent-service", &defaultConfig)
@@ -66,9 +65,6 @@ type Config struct {
 
 	// Maps task types to their agents. {TaskType: AgentId}
 	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
-
-	// SupportedTaskTypes is a list of task types that are supported by this plugin.
-	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
 }
 
 type Agent struct {

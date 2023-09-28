@@ -9,9 +9,9 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/flyteorg/flyteadmin/auth/config"
-	"github.com/flyteorg/flyteadmin/auth/interfaces/mocks"
-	stdConfig "github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/gorilla/securecookie"
 	"github.com/stretchr/testify/assert"
 )
@@ -131,7 +131,7 @@ func TestGetAuthFlowEndRedirect(t *testing.T) {
 		assert.NotNil(t, cookie)
 		request.AddCookie(cookie)
 		mockAuthCtx := &mocks.AuthenticationContext{}
-		redirect := getAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
 		assert.Equal(t, "/console", redirect)
 	})
 
@@ -145,7 +145,7 @@ func TestGetAuthFlowEndRedirect(t *testing.T) {
 				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
 			},
 		})
-		redirect := getAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
 		assert.Equal(t, "/api/v1/projects", redirect)
 	})
 }

@@ -5,15 +5,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -56,7 +56,9 @@ type metrics struct {
 	scope       promutils.Scope
 }
 
-type Item interface{}
+type Item interface {
+	IsTerminal() bool
+}
 
 // Items are wrapped inside an ItemWrapper to be stored in the cache.
 type ItemWrapper interface {
@@ -164,7 +166,7 @@ func (w *autoRefresh) Start(ctx context.Context) error {
 	go wait.Until(func() {
 		err := w.enqueueBatches(enqueueCtx)
 		if err != nil {
-			logger.Errorf(enqueueCtx, "Failed to sync. Error: %v", err)
+			logger.Errorf(enqueueCtx, "Failed to enqueue. Error: %v", err)
 		}
 	}, w.syncPeriod, enqueueCtx.Done())
 
@@ -209,13 +211,20 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 
 	snapshot := make([]ItemWrapper, 0, len(keys))
 	for _, k := range keys {
+		if w.toDelete.Contains(k) {
+			w.lruMap.Remove(k)
+			w.toDelete.Remove(k)
+			continue
+		}
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
 		// which is fine, we can just ignore.
-		if value, ok := w.lruMap.Peek(k); ok && !w.toDelete.Contains(k) {
-			snapshot = append(snapshot, itemWrapper{
-				id:   k.(ItemID),
-				item: value.(Item),
-			})
+		if value, ok := w.lruMap.Peek(k); ok {
+			if item, ok := value.(Item); !ok || (ok && !item.IsTerminal()) {
+				snapshot = append(snapshot, itemWrapper{
+					id:   k.(ItemID),
+					item: value.(Item),
+				})
+			}
 		}
 	}
 

@@ -8,13 +8,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/flytestdlib/atomic"
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -23,6 +23,18 @@ const fakeCacheItemValueLimit = 10
 
 type fakeCacheItem struct {
 	val int
+}
+
+func (f fakeCacheItem) IsTerminal() bool {
+	return false
+}
+
+type terminalCacheItem struct {
+	val int
+}
+
+func (t terminalCacheItem) IsTerminal() bool {
+	return true
 }
 
 func syncFakeItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error) {
@@ -46,7 +58,11 @@ func syncFakeItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error) {
 	return items, nil
 }
 
-func TestCacheTwo(t *testing.T) {
+func syncTerminalItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error) {
+	panic("This should never be called")
+}
+
+func TestCacheThree(t *testing.T) {
 	testResyncPeriod := time.Millisecond
 	rateLimiter := workqueue.DefaultControllerRateLimiter()
 
@@ -104,6 +120,28 @@ func TestCacheTwo(t *testing.T) {
 
 		cancel()
 	})
+
+	t.Run("Enqueue nothing", func(t *testing.T) {
+		cache, err := NewAutoRefreshCache("fake3", syncTerminalItem, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		assert.NoError(t, cache.Start(ctx))
+
+		// Create ten items in the cache
+		for i := 1; i <= 10; i++ {
+			_, err := cache.GetOrCreate(fmt.Sprintf("%d", i), terminalCacheItem{
+				val: 0,
+			})
+			assert.NoError(t, err)
+		}
+
+		// Wait half a second for all resync periods to complete
+		// If the cache tries to enqueue the item, a panic will be thrown.
+		time.Sleep(500 * time.Millisecond)
+
+		cancel()
+	})
 }
 
 func TestQueueBuildUp(t *testing.T) {
@@ -134,7 +172,7 @@ func TestQueueBuildUp(t *testing.T) {
 	defer cancelNow()
 
 	for i := 0; i < size; i++ {
-		_, err := cache.GetOrCreate(strconv.Itoa(i), "test")
+		_, err := cache.GetOrCreate(strconv.Itoa(i), fakeCacheItem{val: 3})
 		assert.NoError(t, err)
 	}
 

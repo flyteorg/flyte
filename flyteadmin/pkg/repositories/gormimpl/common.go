@@ -6,10 +6,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	adminErrors "github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 )
 
 const Project = "project"

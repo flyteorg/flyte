@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 
 	"github.com/stretchr/testify/assert"
 )

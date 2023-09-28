@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flytestdlib/fastcheck"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"k8s.io/client-go/rest"
 

@@ -3,9 +3,9 @@
 package mocks
 
 import (
-	executioncluster "github.com/flyteorg/flyteadmin/pkg/executioncluster"
+	executioncluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 
-	interfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	interfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
 

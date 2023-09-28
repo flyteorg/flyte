@@ -116,7 +116,7 @@ configuration:
       clientSecret: ""
     # internal Configuration for internal authentication
     # The settings for internal still need to be defined if you wish to use an external auth server
-    # These credentials are used during communication beteween the FlyteAdmin and Propeller microservices
+    # These credentials are used during communication between the FlyteAdmin and Propeller microservices
     internal:
       # clientId Client ID for internal authentication - set to flytepropeller or external auth server
       clientId: flytepropeller

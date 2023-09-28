@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
 	"github.com/prometheus/client_golang/prometheus/testutil"
 

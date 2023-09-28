@@ -1,6 +1,6 @@
 package noop
 
-import "github.com/flyteorg/flyteadmin/pkg/async/schedule/interfaces"
+import "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 
 type workflowExecutor struct{}
 

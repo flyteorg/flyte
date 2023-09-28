@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/scheduler/repositories/models"
-	"github.com/flyteorg/flyteadmin/scheduler/snapshoter"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/snapshoter"
 )
 
 type TimedFuncWithSchedule func(ctx context.Context, s models.SchedulableEntity, t time.Time) error

@@ -141,12 +141,22 @@ class LiteralType(_message.Message):
     def __init__(self, simple: _Optional[_Union[SimpleType, str]] = ..., schema: _Optional[_Union[SchemaType, _Mapping]] = ..., collection_type: _Optional[_Union[LiteralType, _Mapping]] = ..., map_value_type: _Optional[_Union[LiteralType, _Mapping]] = ..., blob: _Optional[_Union[BlobType, _Mapping]] = ..., enum_type: _Optional[_Union[EnumType, _Mapping]] = ..., structured_dataset_type: _Optional[_Union[StructuredDatasetType, _Mapping]] = ..., union_type: _Optional[_Union[UnionType, _Mapping]] = ..., metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., annotation: _Optional[_Union[TypeAnnotation, _Mapping]] = ..., structure: _Optional[_Union[TypeStructure, _Mapping]] = ...) -> None: ...
 
 class OutputReference(_message.Message):
-    __slots__ = ["node_id", "var"]
+    __slots__ = ["node_id", "var", "attr_path"]
     NODE_ID_FIELD_NUMBER: _ClassVar[int]
     VAR_FIELD_NUMBER: _ClassVar[int]
+    ATTR_PATH_FIELD_NUMBER: _ClassVar[int]
     node_id: str
     var: str
-    def __init__(self, node_id: _Optional[str] = ..., var: _Optional[str] = ...) -> None: ...
+    attr_path: _containers.RepeatedCompositeFieldContainer[PromiseAttribute]
+    def __init__(self, node_id: _Optional[str] = ..., var: _Optional[str] = ..., attr_path: _Optional[_Iterable[_Union[PromiseAttribute, _Mapping]]] = ...) -> None: ...
+
+class PromiseAttribute(_message.Message):
+    __slots__ = ["string_value", "int_value"]
+    STRING_VALUE_FIELD_NUMBER: _ClassVar[int]
+    INT_VALUE_FIELD_NUMBER: _ClassVar[int]
+    string_value: str
+    int_value: int
+    def __init__(self, string_value: _Optional[str] = ..., int_value: _Optional[int] = ...) -> None: ...
 
 class Error(_message.Message):
     __slots__ = ["failed_node_id", "message"]

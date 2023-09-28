@@ -25,10 +25,10 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flytestdlib/logger"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 )

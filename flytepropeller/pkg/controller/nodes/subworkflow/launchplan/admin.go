@@ -9,12 +9,12 @@ import (
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
-	"github.com/flyteorg/flytestdlib/cache"
-	stdErr "github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	evtErr "github.com/flyteorg/flytepropeller/events/errors"
+	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 
@@ -45,6 +45,13 @@ type executionCacheItem struct {
 	ExecutionClosure *admin.ExecutionClosure
 	SyncError        error
 	ExecutionOutputs *core.LiteralMap
+}
+
+func (e executionCacheItem) IsTerminal() bool {
+	if e.ExecutionClosure == nil {
+		return false
+	}
+	return e.ExecutionClosure.Phase == core.WorkflowExecution_ABORTED || e.ExecutionClosure.Phase == core.WorkflowExecution_FAILED || e.ExecutionClosure.Phase == core.WorkflowExecution_SUCCEEDED
 }
 
 func (e executionCacheItem) ID() string {

@@ -6,22 +6,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client"
-	prestoMocks "github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/client/mocks"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/presto/config"
-	mocks2 "github.com/flyteorg/flytestdlib/cache/mocks"
-	stdConfig "github.com/flyteorg/flytestdlib/config"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
+	prestoMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
+	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func init() {
@@ -307,7 +307,7 @@ func TestKickOffQuery(t *testing.T) {
 	}).Return(prestoExecuteResponse, nil)
 	var getOrCreateCalled = false
 	mockCache := &mocks2.AutoRefresh{}
-	mockCache.OnGetOrCreate(mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
+	mockCache.OnGetOrCreateMatch(mock.Anything, mock.Anything).Run(func(_ mock.Arguments) {
 		getOrCreateCalled = true
 	}).Return(ExecutionStateCacheItem{}, nil)
 

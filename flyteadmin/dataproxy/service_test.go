@@ -13,21 +13,21 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flyteadmin/pkg/manager/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 
-	commonMocks "github.com/flyteorg/flyteadmin/pkg/common/mocks"
-	stdlibConfig "github.com/flyteorg/flytestdlib/config"
+	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	stdlibConfig "github.com/flyteorg/flyte/flytestdlib/config"
 
-	"github.com/flyteorg/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
-	"github.com/flyteorg/flyteadmin/pkg/config"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 )
 

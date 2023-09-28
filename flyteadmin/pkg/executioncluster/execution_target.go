@@ -1,8 +1,8 @@
 package executioncluster
 
 import (
-	flyteclient "github.com/flyteorg/flytepropeller/pkg/client/clientset/versioned"
-	"github.com/flyteorg/flytestdlib/random"
+	flyteclient "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
+	"github.com/flyteorg/flyte/flytestdlib/random"
 	"k8s.io/client-go/dynamic"
 	restclient "k8s.io/client-go/rest"
 

@@ -5,23 +5,23 @@ import (
 	"fmt"
 	"time"
 
-	errors2 "github.com/flyteorg/flyteplugins/go/tasks/errors"
+	errors2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 
 	awsSdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/athena"
 	athenaTypes "github.com/aws/aws-sdk-go-v2/service/athena/types"
-	"github.com/flyteorg/flyteplugins/go/tasks/aws"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/aws"
 
 	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
-	"github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 )
 
 const (

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
 	"github.com/stretchr/testify/assert"
 )

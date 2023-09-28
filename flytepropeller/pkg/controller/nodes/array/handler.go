@@ -9,25 +9,25 @@ import (
 	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyteplugins/go/tasks/plugins/array/errorcollector"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
 
-	"github.com/flyteorg/flytepropeller/events"
-	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/errors"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
+	"github.com/flyteorg/flyte/flytepropeller/events"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 
-	"github.com/flyteorg/flytestdlib/bitarray"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var (
@@ -369,7 +369,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		if len(arrayNodeState.SubNodePhases.GetItems())-failedCount < minSuccesses {
-			// no chance to reach the mininum number of successes
+			// no chance to reach the minimum number of successes
 			arrayNodeState.Phase = v1alpha1.ArrayNodePhaseFailing
 		} else if successCount >= minSuccesses && runningCount == 0 {
 			// wait until all tasks have completed before declaring success
@@ -480,7 +480,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		// need to increment taskPhaseVersion if arrayNodeState.Phase does not change, otherwise
 		// reset to 0. by incrementing this always we report an event and ensure processing
-		// everytime the ArrayNode is evaluated. if this overhead becomes too large, we will need
+		// every time the ArrayNode is evaluated. if this overhead becomes too large, we will need
 		// to revisit and only increment when any subNode state changes.
 		if currentArrayNodePhase != arrayNodeState.Phase {
 			arrayNodeState.TaskPhaseVersion = 0
@@ -547,7 +547,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	nodePhase := v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(subNodeIndex))
 	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))
 
-	// need to initialize the inputReader everytime to ensure TaskHandler can access for cache lookups / population
+	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
 	inputLiteralMap, err := constructLiteralMap(ctx, nCtx.InputReader(), subNodeIndex)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, nil, err

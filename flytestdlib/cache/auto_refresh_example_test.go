@@ -8,9 +8,9 @@ import (
 
 	"k8s.io/client-go/util/workqueue"
 
-	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type ExampleItemStatus string
@@ -24,6 +24,10 @@ const (
 type ExampleCacheItem struct {
 	status ExampleItemStatus
 	id     string
+}
+
+func (e *ExampleCacheItem) IsTerminal() bool {
+	return e.status == ExampleStatusSucceeded
 }
 
 func (e *ExampleCacheItem) ID() string {
