@@ -300,3 +300,7 @@ func GetWorkflowRequestInterfaceBytes() []byte {
 	bytes, _ := proto.Marshal(GetWorkflowRequest().Spec.Template.Interface)
 	return bytes
 }
+
+func GetWorkflowRequestInterface() *core.TypedInterface {
+	return GetWorkflowRequest().Spec.Template.Interface
+}
