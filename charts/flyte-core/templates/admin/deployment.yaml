@@ -72,6 +72,11 @@ spec:
             name: clusters-config-volume
           - mountPath: /etc/secrets/
             name: admin-secrets
+          {{- if gt (len .Values.configmap.clusters.labelClusterMap) 0 }}
+          {{- with .Values.flyteadmin.additionalVolumeMounts -}}
+          {{ tpl (toYaml .) $ | nindent 10 }}
+          {{- end }}
+          {{- end }}
         {{- end }}
         - name: generate-secrets
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"

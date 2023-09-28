@@ -12,6 +12,8 @@ Flyte Scheduler Configuration
 
 - `cluster_resources <#section-cluster_resources>`_
 
+- `clusterpools <#section-clusterpools>`_
+
 - `clusters <#section-clusters>`_
 
 - `database <#section-database>`_
@@ -1493,6 +1495,19 @@ Whether the cluster resource sync is running in a standalone deployment and shou
   "false"
   
 
+Section: clusterpools
+========================================================================================================================
+
+clusterPoolAssignments (map[string]interfaces.ClusterPoolAssignment)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  {}
+  
+
 Section: clusters
 ========================================================================================================================
 
@@ -2446,6 +2461,7 @@ k8s (`config.K8sPluginConfig`_)
   delete-resource-on-finalize: false
   enable-host-networking-pod: null
   gpu-resource-name: nvidia.com/gpu
+  image-pull-backoff-grace-period: 3m0s
   inject-finalizer: false
   interruptible-node-selector: null
   interruptible-node-selector-requirement: null
@@ -2730,6 +2746,16 @@ Instructs the system to delete the resource upon successful execution of a k8s p
   
 
 create-container-error-grace-period (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  3m0s
+  
+
+image-pull-backoff-grace-period (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
