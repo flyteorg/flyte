@@ -3,11 +3,12 @@ module github.com/flyteorg/flyte
 go 1.19
 
 require (
-	github.com/flyteorg/datacatalog v1.0.48
-	github.com/flyteorg/flyteadmin v1.1.110
-	github.com/flyteorg/flytepropeller v1.1.106
-	github.com/flyteorg/flytestdlib v1.0.20
+	github.com/flyteorg/flyte/datacatalog v1.9.4
+	github.com/flyteorg/flyte/flyteadmin v1.9.4
+	github.com/flyteorg/flyte/flytepropeller v1.9.4
+	github.com/flyteorg/flyte/flytestdlib v1.9.4
 	github.com/golang/glog v1.1.0
+	github.com/prometheus/client_golang v1.12.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sync v0.1.0
@@ -54,6 +55,7 @@ require (
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.8.0 // indirect
 	github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2 v2.8.0 // indirect
 	github.com/cloudevents/sdk-go/v2 v2.8.0 // indirect
 	github.com/coocood/freecache v1.1.1 // indirect
@@ -62,7 +64,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v3 v3.0.0 // indirect
 	github.com/dgraph-io/ristretto v0.0.3 // indirect
-	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
@@ -70,9 +71,9 @@ require (
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/httpsnoop v1.0.1 // indirect
-	github.com/flyteorg/flyteidl v1.5.11 // indirect
-	github.com/flyteorg/flyteplugins v1.1.8 // indirect
-	github.com/flyteorg/stow v0.3.6 // indirect
+	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
+	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000 // indirect
+	github.com/flyteorg/stow v0.3.7 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0 // indirect
@@ -156,13 +157,11 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
-	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
 	github.com/ray-project/kuberay/ray-operator v0.0.0-20220728052838-eaa75fa6707c // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
-	github.com/redis/go-redis/v9 v9.0.5 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/sendgrid/rest v2.6.8+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
@@ -217,8 +216,13 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
-
-replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.14-0.20230916200054-78caf2c2eeb3
-
-replace github.com/flyteorg/flyteadmin => github.com/flyteorg/flyteadmin v1.1.115-0.20230926015535-b485d57f552d
+replace (
+	github.com/flyteorg/flyte/datacatalog => ./datacatalog
+	github.com/flyteorg/flyte/flyteadmin => ./flyteadmin
+	github.com/flyteorg/flyte/flytecopilot => ./flytecopilot
+	github.com/flyteorg/flyte/flyteplugins => ./flyteplugins
+	github.com/flyteorg/flyte/flytepropeller => ./flytepropeller
+	github.com/flyteorg/flyte/flytestdlib => ./flytestdlib
+	github.com/flyteorg/flyteidl => ./flyteidl
+	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
+)

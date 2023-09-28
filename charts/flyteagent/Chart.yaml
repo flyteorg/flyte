@@ -1,0 +1,5 @@
+apiVersion: v2
+name: flyteagent
+description: A Helm chart for Flyte agent
+type: application
+version: v0.1.10 # VERSION

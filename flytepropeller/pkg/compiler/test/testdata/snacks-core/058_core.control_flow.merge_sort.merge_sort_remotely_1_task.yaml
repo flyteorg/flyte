@@ -1,0 +1,62 @@
+template:
+  Target:
+    Container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.control_flow.merge_sort
+      - task-name
+      - merge_sort_remotely
+      env:
+      - key: _F_SS_C
+        value: H4sIAAAAAAAC/8VRXW7DIAy+ysTzWtKtUuiuMk2RAZN6pZCBE6mrevcBXdXuBHsIsr8f85mcBR1hxMHE4GgUb09nYdHB7HloREMCHGtxY8Tzk3BfoSLj3qQ1Ren8iTGm8VqYGA+6fFXIUKcKExOulFa4AbXdmR1YZ0CpbruDrt/qTWfBvvTK9V3X9+JSjO36XLzv/xHgo0aYUvxEw8UeZu8LYOMRKNz7BVOm+ABgWO7NdOJ9DAMFxjQlLGcNIuPEcilCqSnIq+a1bVSTH4iHhRLP4ItkSDHyX5MnfTOtlczEuJrAHOpbyduENg0yDxkTgadv4JKydMwUxtz+KQbQHm2pHfiMdTnMhb5KLaWHrSlzIj03xkfTJL/05fIDQ+X0kUICAAA=
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+  id:
+    name: core.control_flow.merge_sort.merge_sort_remotely
+    resource_type: 1
+  interface:
+    inputs:
+      variables:
+        numbers:
+          description: numbers
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 1
+        run_local_at_count:
+          description: run_local_at_count
+          type:
+            Type:
+              Simple: 1
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              CollectionType:
+                Type:
+                  Simple: 1
+  metadata:
+    InterruptibleValue: null
+    retries: {}
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+  type: python-task

@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/workflow.proto";
+import "flyteidl/core/tasks.proto";
+
+// Adjacency list for the workflow. This is created as part of the compilation process. Every process after the compilation
+// step uses this created ConnectionSet
+message ConnectionSet {
+    message IdList {
+        repeated string ids = 1;
+    }
+
+    // A list of all the node ids that are downstream from a given node id
+    map<string, IdList> downstream = 7;
+
+    // A list of all the node ids, that are upstream of this node id
+    map<string, IdList> upstream = 8;
+}
+
+// Output of the compilation Step. This object represents one workflow. We store more metadata at this layer
+message CompiledWorkflow {
+    // Completely contained Workflow Template
+    WorkflowTemplate template = 1;
+    // For internal use only! This field is used by the system and must not be filled in. Any values set will be ignored.
+    ConnectionSet connections = 2;
+}
+
+// Output of the Compilation step. This object represent one Task. We store more metadata at this layer
+message CompiledTask {
+    // Completely contained TaskTemplate
+    TaskTemplate template = 1;
+}
+
+// A Compiled Workflow Closure contains all the information required to start a new execution, or to visualize a workflow
+// and its details. The CompiledWorkflowClosure should always contain a primary workflow, that is the main workflow that
+// will being the execution. All subworkflows are denormalized. WorkflowNodes refer to the workflow identifiers of
+// compiled subworkflows.
+message CompiledWorkflowClosure {
+    //+required
+    CompiledWorkflow primary = 1;
+    // Guaranteed that there will only exist one and only one workflow with a given id, i.e., every sub workflow has a
+    // unique identifier. Also every enclosed subworkflow is used either by a primary workflow or by a subworkflow
+    // as an inlined workflow
+    //+optional
+    repeated CompiledWorkflow sub_workflows = 2;
+    // Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id
+    //+required (at least 1)
+    repeated CompiledTask tasks = 3;
+}

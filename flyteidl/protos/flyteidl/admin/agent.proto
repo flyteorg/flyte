@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/core/literals.proto";
+import "flyteidl/core/tasks.proto";
+import "flyteidl/core/interface.proto";
+import "flyteidl/core/identifier.proto";
+
+// The state of the execution is used to control its visibility in the UI/CLI.
+enum State {
+  RETRYABLE_FAILURE = 0;
+  PERMANENT_FAILURE = 1;
+  PENDING = 2;
+  RUNNING = 3;
+  SUCCEEDED = 4;
+}
+
+// Represents a subset of runtime task execution metadata that are relevant to external plugins.
+message TaskExecutionMetadata {
+  // ID of the task execution
+  core.TaskExecutionIdentifier task_execution_id = 1;
+  // k8s namespace where the task is executed in
+  string namespace = 2;
+  // Labels attached to the task execution
+  map<string, string> labels = 3;
+  // Annotations attached to the task execution
+  map<string, string> annotations = 4;
+  // k8s service account associated with the task execution
+  string k8s_service_account = 5;
+  // Environment variables attached to the task execution
+  map<string, string> environment_variables = 6;
+}
+
+// Represents a request structure to create task.
+message CreateTaskRequest {
+  // The inputs required to start the execution. All required inputs must be
+  // included in this map. If not required and not provided, defaults apply.
+  // +optional
+  core.LiteralMap inputs = 1;
+  // Template of the task that encapsulates all the metadata of the task.
+  core.TaskTemplate template = 2;
+  // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+  string output_prefix = 3;
+  // subset of runtime task execution metadata.
+  TaskExecutionMetadata task_execution_metadata = 4;
+}
+
+// Represents a create response structure.
+message CreateTaskResponse {
+  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  bytes resource_meta = 1;
+}
+
+// A message used to fetch a job resource from flyte agent server.
+message GetTaskRequest {
+  // A predefined yet extensible Task type identifier.
+  string task_type = 1;
+  // Metadata about the resource to be pass to the agent.
+  bytes resource_meta = 2;
+}
+
+// Response to get an individual task resource.
+message GetTaskResponse {
+  Resource resource = 1;
+}
+
+message Resource {
+  // The state of the execution is used to control its visibility in the UI/CLI.
+  State state = 1;
+  // The outputs of the execution. It's typically used by sql task. Agent service will create a
+  // Structured dataset pointing to the query result table.
+  // +optional
+  core.LiteralMap outputs = 2;
+}
+
+// A message used to delete a task.
+message DeleteTaskRequest {
+  // A predefined yet extensible Task type identifier.
+  string task_type = 1;
+  // Metadata about the resource to be pass to the agent.
+  bytes resource_meta = 2;
+}
+
+// Response to delete a task.
+message DeleteTaskResponse {
+}

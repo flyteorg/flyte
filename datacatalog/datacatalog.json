@@ -1,0 +1,22 @@
+{
+    "version": "1.0.38",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/flyteorg/datacatalog/releases/download/v1.0.38/datacatalog_v1.0.38_windows_i386.zip",
+            "bin": [
+                "datacatalog.exe"
+            ],
+            "hash": "3aae4c7b2907e9c2d564363951f98ba7e22de20de5e5d9e10652303ef5c0f858"
+        },
+        "64bit": {
+            "url": "https://github.com/flyteorg/datacatalog/releases/download/v1.0.38/datacatalog_v1.0.38_windows_x86_64.zip",
+            "bin": [
+                "datacatalog.exe"
+            ],
+            "hash": "f355deb945e0cc19e5a5ebfc589ab8d7f48363514490ec19f6ec7bbc9ba3a293"
+        }
+    },
+    "homepage": "https://godoc.org/github.com/lyft/datacatalog",
+    "license": "Apache-2.0",
+    "description": "datacatalog is the a memoization \u0026 lineage tracking service."
+}

@@ -1,0 +1,767 @@
+{
+  "nodes": [
+    {
+      "id": "dynamic-merge-sort-remotely-n0",
+      "metadata": {
+        "name": "flytekit.annotated.python_function_task.recipes.03_advanced.advanced_lang_features_copy.split",
+        "retries": {},
+        "interruptible": false
+      },
+      "inputs": [
+        {
+          "var": "input",
+          "binding": {
+            "collection": {
+              "bindings": [
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "934"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "3465"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "4552"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "8436"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "6044"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "466"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "9706"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "8815"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "327"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "7458"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "5040"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "9129"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "4348"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "459"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "1752"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "4103"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "2634"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "222"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "4416"
+                    }
+                  }
+                },
+                {
+                  "scalar": {
+                    "primitive": {
+                      "integer": "5188"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "taskNode": {
+        "referenceId": {
+          "resourceType": "TASK",
+          "project": "flytetester",
+          "domain": "development",
+          "name": "recipes.03_advanced.advanced_lang_features_copy.split",
+          "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+        }
+      }
+    },
+    {
+      "id": "dynamic-merge-sort-remotely-n1",
+      "metadata": {
+        "name": "flytekit.annotated.workflow.recipes.03_advanced.advanced_lang_features_copy.merge_sort",
+        "retries": {},
+        "interruptible": false
+      },
+      "inputs": [
+        {
+          "var": "count",
+          "binding": {
+            "promise": {
+              "nodeId": "dynamic-merge-sort-remotely-n0",
+              "var": "o2"
+            }
+          }
+        },
+        {
+          "var": "input",
+          "binding": {
+            "promise": {
+              "nodeId": "dynamic-merge-sort-remotely-n0",
+              "var": "o0"
+            }
+          }
+        }
+      ],
+      "upstreamNodeIds": [
+        "dynamic-merge-sort-remotely-n0"
+      ],
+      "workflowNode": {
+        "subWorkflowRef": {
+          "resourceType": "WORKFLOW",
+          "project": "flytetester",
+          "domain": "development",
+          "name": "recipes.03_advanced.advanced_lang_features_copy.merge_sort",
+          "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+        }
+      }
+    },
+    {
+      "id": "dynamic-merge-sort-remotely-n2",
+      "metadata": {
+        "name": "flytekit.annotated.workflow.recipes.03_advanced.advanced_lang_features_copy.merge_sort",
+        "retries": {},
+        "interruptible": false
+      },
+      "inputs": [
+        {
+          "var": "count",
+          "binding": {
+            "promise": {
+              "nodeId": "dynamic-merge-sort-remotely-n0",
+              "var": "o2"
+            }
+          }
+        },
+        {
+          "var": "input",
+          "binding": {
+            "promise": {
+              "nodeId": "dynamic-merge-sort-remotely-n0",
+              "var": "o1"
+            }
+          }
+        }
+      ],
+      "upstreamNodeIds": [
+        "dynamic-merge-sort-remotely-n0"
+      ],
+      "workflowNode": {
+        "subWorkflowRef": {
+          "resourceType": "WORKFLOW",
+          "project": "flytetester",
+          "domain": "development",
+          "name": "recipes.03_advanced.advanced_lang_features_copy.merge_sort",
+          "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+        }
+      }
+    },
+    {
+      "id": "dynamic-merge-sort-remotely-n3",
+      "metadata": {
+        "name": "flytekit.annotated.python_function_task.recipes.03_advanced.advanced_lang_features_copy.merge",
+        "retries": {},
+        "interruptible": false
+      },
+      "inputs": [
+        {
+          "var": "x",
+          "binding": {
+            "promise": {
+              "nodeId": "dynamic-merge-sort-remotely-n1",
+              "var": "o0"
+            }
+          }
+        },
+        {
+          "var": "y",
+          "binding": {
+            "promise": {
+              "nodeId": "dynamic-merge-sort-remotely-n2",
+              "var": "o0"
+            }
+          }
+        }
+      ],
+      "upstreamNodeIds": [
+        "dynamic-merge-sort-remotely-n1",
+        "dynamic-merge-sort-remotely-n2"
+      ],
+      "taskNode": {
+        "referenceId": {
+          "resourceType": "TASK",
+          "project": "flytetester",
+          "domain": "development",
+          "name": "recipes.03_advanced.advanced_lang_features_copy.merge",
+          "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+        }
+      }
+    }
+  ],
+  "minSuccesses": "4",
+  "outputs": [
+    {
+      "var": "o0",
+      "binding": {
+        "promise": {
+          "nodeId": "dynamic-merge-sort-remotely-n3",
+          "var": "o0"
+        }
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "id": {
+        "resourceType": "TASK",
+        "project": "flytetester",
+        "domain": "development",
+        "name": "recipes.03_advanced.advanced_lang_features_copy.split",
+        "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+      },
+      "type": "python-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o1": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o1"
+            },
+            "o2": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "o2"
+            },
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "recipes.03_advanced.advanced_lang_features_copy",
+          "--task-name",
+          "split",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {},
+        "env": [
+          {
+            "key": "FLYTE_INTERNAL_CONFIGURATION_PATH",
+            "value": "/root/sandbox.config"
+          },
+          {
+            "key": "FLYTE_INTERNAL_IMAGE",
+            "value": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65"
+          }
+        ]
+      }
+    },
+    {
+      "id": {
+        "resourceType": "TASK",
+        "project": "flytetester",
+        "domain": "development",
+        "name": "recipes.03_advanced.advanced_lang_features_copy.merge",
+        "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+      },
+      "type": "python-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "x": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "x"
+            },
+            "y": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "y"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "recipes.03_advanced.advanced_lang_features_copy",
+          "--task-name",
+          "merge",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {},
+        "env": [
+          {
+            "key": "FLYTE_INTERNAL_CONFIGURATION_PATH",
+            "value": "/root/sandbox.config"
+          },
+          {
+            "key": "FLYTE_INTERNAL_IMAGE",
+            "value": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65"
+          }
+        ]
+      }
+    },
+    {
+      "id": {
+        "resourceType": "TASK",
+        "project": "flytetester",
+        "domain": "development",
+        "name": "recipes.03_advanced.advanced_lang_features_copy.merge_sort_remotely",
+        "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+      },
+      "type": "dynamic-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "recipes.03_advanced.advanced_lang_features_copy",
+          "--task-name",
+          "merge_sort_remotely",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {},
+        "env": [
+          {
+            "key": "FLYTE_INTERNAL_CONFIGURATION_PATH",
+            "value": "/root/sandbox.config"
+          },
+          {
+            "key": "FLYTE_INTERNAL_IMAGE",
+            "value": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65"
+          }
+        ]
+      }
+    },
+    {
+      "id": {
+        "resourceType": "TASK",
+        "project": "flytetester",
+        "domain": "development",
+        "name": "recipes.03_advanced.advanced_lang_features_copy.merge_sort_locally",
+        "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+      },
+      "type": "python-task",
+      "metadata": {
+        "runtime": {
+          "type": "FLYTE_SDK",
+          "version": "0.16.0",
+          "flavor": "python"
+        },
+        "retries": {},
+        "interruptible": false
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "container": {
+        "image": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65",
+        "args": [
+          "pyflyte-execute",
+          "--task-module",
+          "recipes.03_advanced.advanced_lang_features_copy",
+          "--task-name",
+          "merge_sort_locally",
+          "--inputs",
+          "{{.input}}",
+          "--output-prefix",
+          "{{.outputPrefix}}",
+          "--raw-output-data-prefix",
+          "{{.rawOutputDataPrefix}}"
+        ],
+        "resources": {},
+        "env": [
+          {
+            "key": "FLYTE_INTERNAL_CONFIGURATION_PATH",
+            "value": "/root/sandbox.config"
+          },
+          {
+            "key": "FLYTE_INTERNAL_IMAGE",
+            "value": "flytecookbook:f6e892be276205a3cb11c058f389f69e02008b65"
+          }
+        ]
+      }
+    }
+  ],
+  "subworkflows": [
+    {
+      "id": {
+        "resourceType": "WORKFLOW",
+        "project": "flytetester",
+        "domain": "development",
+        "name": "recipes.03_advanced.advanced_lang_features_copy.merge_sort",
+        "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+      },
+      "metadata": {},
+      "interface": {
+        "inputs": {
+          "variables": {
+            "count": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "count"
+            },
+            "input": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "input"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "o0": {
+              "type": {
+                "collectionType": {
+                  "simple": "INTEGER"
+                }
+              },
+              "description": "o0"
+            }
+          }
+        }
+      },
+      "nodes": [
+        {
+          "id": "node-0",
+          "metadata": {
+            "name": "terminal_case",
+            "retries": {},
+            "interruptible": false
+          },
+          "inputs": [
+            {
+              "var": ".count",
+              "binding": {
+                "promise": {
+                  "var": "count"
+                }
+              }
+            }
+          ],
+          "branchNode": {
+            "ifElse": {
+              "case": {
+                "condition": {
+                  "comparison": {
+                    "operator": "LT",
+                    "leftValue": {
+                      "var": ".count"
+                    },
+                    "rightValue": {
+                      "primitive": {
+                        "integer": "10"
+                      }
+                    }
+                  }
+                },
+                "thenNode": {
+                  "id": "branchn0",
+                  "metadata": {
+                    "name": "flytekit.annotated.python_function_task.recipes.03_advanced.advanced_lang_features_copy.merge_sort_locally",
+                    "retries": {},
+                    "interruptible": false
+                  },
+                  "inputs": [
+                    {
+                      "var": "input",
+                      "binding": {
+                        "promise": {
+                          "var": "input"
+                        }
+                      }
+                    }
+                  ],
+                  "taskNode": {
+                    "referenceId": {
+                      "resourceType": "TASK",
+                      "project": "flytetester",
+                      "domain": "development",
+                      "name": "recipes.03_advanced.advanced_lang_features_copy.merge_sort_locally",
+                      "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+                    }
+                  }
+                }
+              },
+              "elseNode": {
+                "id": "branchn1",
+                "metadata": {
+                  "name": "flytekit.annotated.dynamic_workflow_task.recipes.03_advanced.advanced_lang_features_copy.merge_sort_remotely",
+                  "retries": {},
+                  "interruptible": false
+                },
+                "inputs": [
+                  {
+                    "var": "input",
+                    "binding": {
+                      "promise": {
+                        "var": "input"
+                      }
+                    }
+                  }
+                ],
+                "taskNode": {
+                  "referenceId": {
+                    "resourceType": "TASK",
+                    "project": "flytetester",
+                    "domain": "development",
+                    "name": "recipes.03_advanced.advanced_lang_features_copy.merge_sort_remotely",
+                    "version": "f6e892be276205a3cb11c058f389f69e02008b65"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "var": "o0",
+          "binding": {
+            "promise": {
+              "nodeId": "node-0",
+              "var": "o0"
+            }
+          }
+        }
+      ],
+      "metadataDefaults": {}
+    }
+  ]
+}
+

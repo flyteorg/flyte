@@ -16,6 +16,8 @@ jobs:
           go-version: "1.19"
       - name: Compile
         run: make compile
+      - name: Run tests
+        run: make test_unit
 
   docs:
     runs-on: ubuntu-latest

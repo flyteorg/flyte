@@ -1,0 +1,69 @@
+workflow:
+  id:
+    name: core.type_system.schema.df_wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        a:
+          description: a
+          type:
+            Type:
+              Simple: 1
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.type_system.schema.get_df
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: a
+      var: a
+    metadata:
+      InterruptibleValue: null
+      name: get_df
+      retries: {}
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.type_system.schema.add_df
+            resource_type: 1
+        overrides: {}
+    id: n1
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: df
+    metadata:
+      InterruptibleValue: null
+      name: add_df
+      retries: {}
+    upstream_node_ids:
+    - n0
+  outputs:
+  - binding:
+      Value:
+        Promise:
+          node_id: n1
+          var: o0
+    var: o0

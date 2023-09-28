@@ -31,6 +31,7 @@
    deployment/index
    deployment/deployment/index
    deployment/plugins/index
+   deployment/agents/index
    deployment/configuration/index
    deployment/configuration/generated/index
    deployment/security/index
@@ -118,7 +119,7 @@ and ML Engineers in the industry use Flyte to create:
 
 - ETL pipelines for petabyte-scale data processing.
 - Analytics workflows for business and finance use cases.
-- Machine learning pipelines for logistics, image processsing, and cancer diagnostics.
+- Machine learning pipelines for logistics, image processing, and cancer diagnostics.
 
 Explore Flyte
 =============

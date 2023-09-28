@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+
+import "flyteidl/core/identifier.proto";
+import "flyteidl/admin/common.proto";
+
+// DescriptionEntity contains detailed description for the task/workflow.
+// Documentation could provide insight into the algorithms, business use case, etc.
+message DescriptionEntity {
+  // id represents the unique identifier of the description entity.
+  core.Identifier id = 1;
+  // One-liner overview of the entity.
+  string short_description = 2;
+  // Full user description with formatting preserved.
+  Description long_description = 3;
+  // Optional link to source code used to define this entity.
+  SourceCode source_code = 4;
+  // User-specified tags. These are arbitrary and can be used for searching
+  // filtering and discovering tasks.
+  repeated string tags = 5;
+}
+
+// The format of the long description
+enum DescriptionFormat {
+  DESCRIPTION_FORMAT_UNKNOWN = 0;
+  DESCRIPTION_FORMAT_MARKDOWN = 1;
+  DESCRIPTION_FORMAT_HTML = 2;
+  // python default documentation - comments is rst
+  DESCRIPTION_FORMAT_RST = 3;
+}
+
+// Full user description with formatting preserved. This can be rendered
+// by clients, such as the console or command line tools with in-tact
+// formatting.
+message Description {
+  oneof content {
+    // long description - no more than 4KB
+    string value = 1;
+    // if the description sizes exceed some threshold we can offload the entire
+    // description proto altogether to an external data store, like S3 rather than store inline in the db
+    string uri = 2;
+  }
+
+  // Format of the long description
+  DescriptionFormat format = 3;
+  // Optional link to an icon for the entity
+  string icon_link = 4;
+}
+
+// Link to source code used to define this entity
+message SourceCode {
+  string link = 1;
+}
+
+// Represents a list of DescriptionEntities returned from the admin.
+// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
+message DescriptionEntityList {
+  // A list of DescriptionEntities returned based on the request.
+  repeated DescriptionEntity descriptionEntities = 1;
+
+  // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  // in a query. If there are no more results, this value will be empty.
+  string token                = 2;
+}
+
+// Represents a request structure to retrieve a list of DescriptionEntities.
+// See :ref:`ref_flyteidl.admin.DescriptionEntity` for more details
+message DescriptionEntityListRequest {
+  // Identifies the specific type of resource that this identifier corresponds to.
+  flyteidl.core.ResourceType resource_type  = 1;
+
+  // The identifier for the description entity.
+  // +required
+  NamedEntityIdentifier id = 2;
+
+  // Indicates the number of resources to be returned.
+  // +required
+  uint32 limit    = 3;
+
+  // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  // in a query.
+  // +optional
+  string token    = 4;
+
+  // Indicates a list of filters passed as string.
+  // More info on constructing filters : <Link>
+  // +optional
+  string filters  = 5;
+
+  // Sort ordering for returned list.
+  // +optional
+  Sort sort_by    = 6;
+}

@@ -1,0 +1,22 @@
+{
+    "version": "0.5.12",
+    "architecture": {
+        "32bit": {
+            "url": "https://github.com/lyft/flytepropeller/releases/download/v0.5.12/kubectl-flyte_v0.5.12_windows_i386.zip",
+            "bin": [
+                "kubectl-flyte.exe"
+            ],
+            "hash": "9410f248019c8b0a299a145b32f3625fc70b26c352c9bfe5b4b251917958785c"
+        },
+        "64bit": {
+            "url": "https://github.com/lyft/flytepropeller/releases/download/v0.5.12/kubectl-flyte_v0.5.12_windows_x86_64.zip",
+            "bin": [
+                "kubectl-flyte.exe"
+            ],
+            "hash": "03794575d93751d13be159dcfe43de123655868a1fda57ce8be783397af3a9d6"
+        }
+    },
+    "homepage": "https://godoc.org/github.com/lyft/flytepropeller",
+    "license": "Apache-2.0",
+    "description": "kubectl-flyte is an command line tool that can be used as an extension to kubectl"
+}

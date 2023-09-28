@@ -1,0 +1,116 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "google/protobuf/duration.proto";
+
+// Indicates various phases of Workflow Execution
+message WorkflowExecution {
+    enum Phase {
+        UNDEFINED = 0;
+        QUEUED = 1;
+        RUNNING = 2;
+        SUCCEEDING = 3;
+        SUCCEEDED = 4;
+        FAILING = 5;
+        FAILED = 6;
+        ABORTED = 7;
+        TIMED_OUT = 8;
+        ABORTING = 9;
+    }
+}
+
+// Indicates various phases of Node Execution that only include the time spent to run the nodes/workflows
+message NodeExecution {
+    enum Phase {
+        UNDEFINED = 0;
+        QUEUED = 1;
+        RUNNING = 2;
+        SUCCEEDED = 3;
+        FAILING = 4;
+        FAILED = 5;
+        ABORTED = 6;
+        SKIPPED = 7;
+        TIMED_OUT = 8;
+        DYNAMIC_RUNNING = 9;
+        RECOVERED = 10;
+    }
+}
+
+// Phases that task plugins can go through. Not all phases may be applicable to a specific plugin task,
+// but this is the cumulative list that customers may want to know about for their task.
+message TaskExecution{
+    enum Phase {
+        UNDEFINED = 0;
+        QUEUED = 1;
+        RUNNING = 2;
+        SUCCEEDED = 3;
+        ABORTED = 4;
+        FAILED = 5;
+        // To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing
+        INITIALIZING = 6;
+        // To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded
+        WAITING_FOR_RESOURCES = 7;
+    }
+}
+
+
+// Represents the error message from the execution.
+message ExecutionError {
+    // Error code indicates a grouping of a type of error.
+    // More Info: <Link>
+    string code = 1;
+    // Detailed description of the error - including stack trace.
+    string message = 2;
+    // Full error contents accessible via a URI
+    string error_uri = 3;
+    // Error type: System or User
+    enum ErrorKind {
+        UNKNOWN = 0;
+        USER = 1;
+        SYSTEM = 2;
+    }
+    ErrorKind kind = 4;
+}
+
+// Log information for the task that is specific to a log sink
+// When our log story is flushed out, we may have more metadata here like log link expiry
+message TaskLog {
+
+    enum MessageFormat {
+        UNKNOWN = 0;
+        CSV = 1;
+        JSON = 2;
+    }
+
+    string uri = 1;
+    string name = 2;
+    MessageFormat message_format = 3;
+    google.protobuf.Duration ttl = 4;
+}
+
+// Represents customized execution run-time attributes.
+message QualityOfServiceSpec {
+    // Indicates how much queueing delay an execution can tolerate.
+    google.protobuf.Duration queueing_budget = 1;
+
+    // Add future, user-configurable options here
+}
+
+// Indicates the priority of an execution.
+message QualityOfService {
+    enum Tier {
+        // Default: no quality of service specified.
+        UNDEFINED = 0;
+        HIGH = 1;
+        MEDIUM = 2;
+        LOW = 3;
+    }
+
+    oneof designation {
+        Tier tier = 1;
+        QualityOfServiceSpec spec = 2;
+    }
+}

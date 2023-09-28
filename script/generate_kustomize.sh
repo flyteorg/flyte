@@ -29,7 +29,7 @@ done
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
   if [ -n "$DIRTY" ]; then
-    echo "FAILED: kustomize code updated without commiting generated code."
+    echo "FAILED: kustomize code updated without committing generated code."
     echo "Ensure make kustomize has run and all changes are committed."
     DIFF=$(git diff)
     echo "diff detected: $DIFF"

@@ -733,16 +733,19 @@ agent-service (`agent.Config`_)
 
 .. code-block:: yaml
 
-  defaultGrpcEndpoint: dns:///flyte-agent.flyte.svc.cluster.local:80
-  endpointForTaskTypes: null
+  agentForTaskTypes: null
+  agents: null
+  defaultAgent:
+    defaultServiceConfig: ""
+    defaultTimeout: 10s
+    endpoint: dns:///flyteagent.flyte.svc.cluster.local:80
+    insecure: true
+    timeouts: null
   resourceConstraints:
     NamespaceScopeResourceConstraint:
       Value: 50
     ProjectScopeResourceConstraint:
       Value: 100
-  supportedTaskTypes:
-  - task_type_1
-  - task_type_2
   webApi:
     caching:
       maxSystemFailures: 5
@@ -988,6 +991,16 @@ k8s-array (`k8s.Config`_)
   tolerations: null
   
 
+kf-operator (`common.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  timeout: 1m0s
+  
+
 logs (`logs.LogConfig`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1042,8 +1055,30 @@ ray (`ray.Config`_)
 .. code-block:: yaml
 
   dashboardHost: 0.0.0.0
+  defaults:
+    headNode:
+      ipAddress: $MY_POD_IP
+      startParameters:
+        disable-usage-stats: "true"
+    workerNode:
+      ipAddress: $MY_POD_IP
+      startParameters:
+        disable-usage-stats: "true"
+  enableUsageStats: false
   includeDashboard: true
-  nodeIPAddress: $MY_POD_IP
+  logs:
+    cloudwatch-enabled: false
+    cloudwatch-log-group: ""
+    cloudwatch-region: ""
+    cloudwatch-template-uri: ""
+    gcp-project: ""
+    kubernetes-enabled: false
+    kubernetes-template-uri: ""
+    kubernetes-url: ""
+    stackdriver-enabled: false
+    stackdriver-logresourcename: ""
+    stackdriver-template-uri: ""
+    templates: null
   remoteClusterConfig:
     auth:
       caCertPath: ""
@@ -1213,19 +1248,35 @@ resourceConstraints (`core.ResourceConstraintsSpec`_)
     Value: 100
   
 
-defaultGrpcEndpoint (string)
+defaultAgent (`agent.Agent`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The default grpc endpoint of agent service.
+The default agent.
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  dns:///flyte-agent.flyte.svc.cluster.local:80
+  defaultServiceConfig: ""
+  defaultTimeout: 10s
+  endpoint: dns:///flyteagent.flyte.svc.cluster.local:80
+  insecure: true
+  timeouts: null
   
 
-endpointForTaskTypes (map[string]string)
+agents (map[string]*agent.Agent)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The agents.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+agentForTaskTypes (map[string]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -1235,15 +1286,57 @@ endpointForTaskTypes (map[string]string)
   null
   
 
-supportedTaskTypes ([]string)
+agent.Agent
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  - task_type_1
-  - task_type_2
+  dns:///flyteagent.flyte.svc.cluster.local:80
+  
+
+insecure (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+defaultServiceConfig (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+timeouts (map[string]config.Duration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+defaultTimeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
   
 
 core.ResourceConstraintsSpec
@@ -1807,6 +1900,19 @@ Maximum number of entries to keep in the index.
 .. code-block:: yaml
 
   "10000"
+  
+
+common.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1m0s
   
 
 config.Config
@@ -3213,7 +3319,7 @@ nodeIPAddress (string)
 
 .. code-block:: yaml
 
-  $MY_POD_IP
+  ""
   
 
 remoteClusterConfig (`k8s.ClusterConfig`_)
@@ -3231,6 +3337,106 @@ Configuration of remote K8s cluster for ray jobs
   enabled: false
   endpoint: ""
   name: ""
+  
+
+logs (`logs.LogConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cloudwatch-enabled: false
+  cloudwatch-log-group: ""
+  cloudwatch-region: ""
+  cloudwatch-template-uri: ""
+  gcp-project: ""
+  kubernetes-enabled: false
+  kubernetes-template-uri: ""
+  kubernetes-url: ""
+  stackdriver-enabled: false
+  stackdriver-logresourcename: ""
+  stackdriver-template-uri: ""
+  templates: null
+  
+
+defaults (`ray.DefaultConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  headNode:
+    ipAddress: $MY_POD_IP
+    startParameters:
+      disable-usage-stats: "true"
+  workerNode:
+    ipAddress: $MY_POD_IP
+    startParameters:
+      disable-usage-stats: "true"
+  
+
+enableUsageStats (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+ray.DefaultConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+headNode (`ray.NodeConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ipAddress: $MY_POD_IP
+  startParameters:
+    disable-usage-stats: "true"
+  
+
+workerNode (`ray.NodeConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ipAddress: $MY_POD_IP
+  startParameters:
+    disable-usage-stats: "true"
+  
+
+ray.NodeConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+startParameters (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  disable-usage-stats: "true"
+  
+
+ipAddress (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  $MY_POD_IP
   
 
 snowflake.Config

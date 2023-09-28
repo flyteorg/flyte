@@ -1,0 +1,14 @@
+plugins:
+  sagemaker:
+    roleArn: "config_role"
+    region: "us-west-2"
+    roleAnnotationKey: "iam.amazonaws.com/role"
+    prebuiltAlgorithms:
+      - name: "XGBOOST"
+        regionalConfigs:
+          - region: "us-west-2"
+            versionConfigs:
+              - version: "0.90"
+                image: "XGBOOST_us-west-2_image-0.90"
+              - version: "1.0"
+                image: "XGBOOST_us-west-2_image-1.0"

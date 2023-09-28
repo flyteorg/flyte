@@ -1,12 +1,11 @@
 .. _deployment-plugin-setup-aws:
 
-#################
-AWS Plugins Setup
-#################
+Configure AWS Plugins
+=====================
 
 .. tags:: AWS, Integration, MachineLearning, Data, Advanced
 
-Learn how to set up AWS plugins for Flyte.
+Discover the process of setting up AWS plugins for Flyte.
 
 .. panels::
     :header: text-center
@@ -18,7 +17,7 @@ Learn how to set up AWS plugins for Flyte.
        :text: AWS Batch
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the AWS Batch Plugin.
+    Guide to setting up the AWS Batch plugin.
 
     ---
 
@@ -27,7 +26,7 @@ Learn how to set up AWS plugins for Flyte.
        :text: AWS Athena
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the AWS Athena Plugin.
+    Guide to setting up the AWS Athena plugin.
 
     ---
 
@@ -36,11 +35,11 @@ Learn how to set up AWS plugins for Flyte.
        :text: AWS Sagemaker
        :classes: btn-block stretched-link
     ^^^^^^^^^^^^
-    Guide to setting up the AWS Sagemaker Plugin.
+    Guide to setting up the AWS Sagemaker plugin.
 
 .. toctree::
     :maxdepth: 1
-    :name: AWS plugin Setup
+    :name: AWS plugin setup
     :hidden:
 
     batch

@@ -143,4 +143,4 @@ Without a notification system excessive signalling requirements may result in fr
 
 ## 9 Conclusion
 
-In this docuemnt we have proposed a solution to provide dynamic, runtime control of workflows using signals and gate nodes. The variety of use-cases extend the application of Flyte to better satisfy the needs of our community.  The front-end approaches outline potential APIs to clearly promote this functionality and the backend architecture can scale to cope with integration into large deployments.
+In this document we have proposed a solution to provide dynamic, runtime control of workflows using signals and gate nodes. The variety of use-cases extend the application of Flyte to better satisfy the needs of our community.  The front-end approaches outline potential APIs to clearly promote this functionality and the backend architecture can scale to cope with integration into large deployments.

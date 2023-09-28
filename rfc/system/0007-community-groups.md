@@ -100,7 +100,7 @@ Working Groups will be disbanded if either of the following is true:
 
 ## 4. Drawbacks
 
-At the beginning, it could cause some confusion especially around SIG/WG ownership on repositories, but once those commmunity groups are formed, eventually most (ideally all) subcomponents of the project will be owned by a group.
+At the beginning, it could cause some confusion especially around SIG/WG ownership on repositories, but once those community groups are formed, eventually most (ideally all) subcomponents of the project will be owned by a group.
 
 ## 5. Alternatives
 

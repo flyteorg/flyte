@@ -1,0 +1,286 @@
+primary:
+  connections:
+    downstream:
+      n0:
+        ids:
+        - end-node
+      start-node:
+        ids:
+        - n0
+    upstream:
+      end-node:
+        ids:
+        - n0
+      n0:
+        ids:
+        - start-node
+      n0-n0:
+        ids:
+        - start-node
+      n0-n1:
+        ids:
+        - start-node
+  template:
+    id:
+      name: core.control_flow.merge_sort.merge_sort
+      resource_type: 2
+    interface:
+      inputs:
+        variables:
+          numbers:
+            description: numbers
+            type:
+              Type:
+                CollectionType:
+                  Type:
+                    Simple: 1
+          numbers_count:
+            description: numbers_count
+            type:
+              Type:
+                Simple: 1
+          run_local_at_count:
+            description: run_local_at_count
+            type:
+              Type:
+                Simple: 1
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                CollectionType:
+                  Type:
+                    Simple: 1
+    metadata: {}
+    metadata_defaults: {}
+    nodes:
+    - Target: null
+      id: start-node
+    - Target: null
+      id: end-node
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: n0
+              var: o0
+        var: o0
+    - Target:
+        BranchNode:
+          if_else:
+            Default:
+              ElseNode:
+                Target:
+                  TaskNode:
+                    Reference:
+                      ReferenceId:
+                        name: core.control_flow.merge_sort.merge_sort_remotely
+                        resource_type: 1
+                    overrides: {}
+                id: n0-n1
+                inputs:
+                - binding:
+                    Value:
+                      Promise:
+                        node_id: start-node
+                        var: numbers
+                  var: numbers
+                - binding:
+                    Value:
+                      Promise:
+                        node_id: start-node
+                        var: run_local_at_count
+                  var: run_local_at_count
+                metadata:
+                  InterruptibleValue: null
+                  name: merge_sort_remotely
+                  retries: {}
+            case:
+              condition:
+                Expr:
+                  Comparison:
+                    left_value:
+                      Val:
+                        Var: .numbers_count
+                    operator: 5
+                    right_value:
+                      Val:
+                        Var: .run_local_at_count
+              then_node:
+                Target:
+                  TaskNode:
+                    Reference:
+                      ReferenceId:
+                        name: core.control_flow.merge_sort.sort_locally
+                        resource_type: 1
+                    overrides: {}
+                id: n0-n0
+                inputs:
+                - binding:
+                    Value:
+                      Promise:
+                        node_id: start-node
+                        var: numbers
+                  var: numbers
+                metadata:
+                  InterruptibleValue: null
+                  name: sort_locally
+                  retries: {}
+      id: n0
+      inputs:
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: numbers_count
+        var: .numbers_count
+      - binding:
+          Value:
+            Promise:
+              node_id: start-node
+              var: run_local_at_count
+        var: .run_local_at_count
+      metadata:
+        InterruptibleValue: null
+        name: terminal_case
+        retries: {}
+    outputs:
+    - binding:
+        Value:
+          Promise:
+            node_id: n0
+            var: o0
+      var: o0
+tasks:
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.control_flow.merge_sort
+        - task-name
+        - merge_sort_remotely
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        env:
+        - key: _F_SS_C
+          value: H4sIAAAAAAAC/8VRXW7DIAy+ysTzWtKtUuiuMk2RAZN6pZCBE6mrevcBXdXuBHsIsr8f85mcBR1hxMHE4GgUb09nYdHB7HloREMCHGtxY8Tzk3BfoSLj3qQ1Ren8iTGm8VqYGA+6fFXIUKcKExOulFa4AbXdmR1YZ0CpbruDrt/qTWfBvvTK9V3X9+JSjO36XLzv/xHgo0aYUvxEw8UeZu8LYOMRKNz7BVOm+ABgWO7NdOJ9DAMFxjQlLGcNIuPEcilCqSnIq+a1bVSTH4iHhRLP4ItkSDHyX5MnfTOtlczEuJrAHOpbyduENg0yDxkTgadv4JKydMwUxtz+KQbQHm2pHfiMdTnMhb5KLaWHrSlzIj03xkfTJL/05fIDQ+X0kUICAAA=
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.control_flow.merge_sort.merge_sort_remotely
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          numbers:
+            description: numbers
+            type:
+              Type:
+                CollectionType:
+                  Type:
+                    Simple: 1
+          run_local_at_count:
+            description: run_local_at_count
+            type:
+              Type:
+                Simple: 1
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                CollectionType:
+                  Type:
+                    Simple: 1
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task
+- template:
+    Target:
+      Container:
+        args:
+        - pyflyte-execute
+        - --inputs
+        - '{{.input}}'
+        - --output-prefix
+        - '{{.outputPrefix}}'
+        - --raw-output-data-prefix
+        - '{{.rawOutputDataPrefix}}'
+        - --checkpoint-path
+        - '{{.checkpointOutputPrefix}}'
+        - --prev-checkpoint
+        - '{{.prevCheckpointPrefix}}'
+        - --resolver
+        - flytekit.core.python_auto_container.default_task_resolver
+        - --
+        - task-module
+        - core.control_flow.merge_sort
+        - task-name
+        - sort_locally
+        config:
+        - key: testKey1
+          value: testValue1
+        - key: testKey2
+          value: testValue2
+        - key: testKey3
+          value: testValue3
+        image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+        resources: {}
+    id:
+      name: core.control_flow.merge_sort.sort_locally
+      resource_type: 1
+    interface:
+      inputs:
+        variables:
+          numbers:
+            description: numbers
+            type:
+              Type:
+                CollectionType:
+                  Type:
+                    Simple: 1
+      outputs:
+        variables:
+          o0:
+            description: o0
+            type:
+              Type:
+                CollectionType:
+                  Type:
+                    Simple: 1
+    metadata:
+      InterruptibleValue: null
+      retries: {}
+      runtime:
+        flavor: python
+        type: 1
+        version: 0.32.6
+    type: python-task

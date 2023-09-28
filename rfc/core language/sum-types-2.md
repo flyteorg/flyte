@@ -4,7 +4,7 @@
 
 # Executive Summary
 
-Some questions on the previously proposed implementations made it clear that a deeper investigation into possible alternatives was required. I consider 3 programming languages with fundamentally different union type implementations in the core language or the standard library. I develop a new version of the sum type IDL representation that accomodates all three languages.
+Some questions on the previously proposed implementations made it clear that a deeper investigation into possible alternatives was required. I consider 3 programming languages with fundamentally different union type implementations in the core language or the standard library. I develop a new version of the sum type IDL representation that accommodates all three languages.
 
 # Examples in Programming Languages
 
