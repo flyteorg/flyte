@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
 	cacheMocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytestdlib/config"
 )
 
 func TestRefreshTheToken(t *testing.T) {
@@ -45,7 +45,7 @@ func TestRefreshTheToken(t *testing.T) {
 
 func TestFetchFromCache(t *testing.T) {
 	ctx := context.Background()
-	metadata := &service.OAuth2MetadataResponse{
+	metatdata := &service.OAuth2MetadataResponse{
 		TokenEndpoint:   "/token",
 		ScopesSupported: []string{"code", "all"},
 	}
@@ -54,7 +54,7 @@ func TestFetchFromCache(t *testing.T) {
 		RedirectUri:              "http://localhost:8089/redirect",
 	}
 	mockAuthClient := new(mocks.AuthMetadataServiceClient)
-	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
+	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
 	mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 
 	t.Run("no token in cache", func(t *testing.T) {

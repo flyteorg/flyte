@@ -18,8 +18,6 @@ import (
 	"golang.org/x/oauth2"
 	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
 	cachemocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
 	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
@@ -27,6 +25,8 @@ import (
 	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyteidl/clients/go/admin/tokenorchestrator"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 func TestInitializeAndGetAdminClient(t *testing.T) {
@@ -123,7 +123,7 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 		PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
 	}
 	t.Run("legal", func(t *testing.T) {
-		metadata := &service.OAuth2MetadataResponse{
+		metatdata := &service.OAuth2MetadataResponse{
 			TokenEndpoint:   "http://localhost:8089/token",
 			ScopesSupported: []string{"code", "all"},
 		}
@@ -131,7 +131,7 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 			AuthorizationMetadataKey: "flyte_authorization",
 		}
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
-		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
+		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 		dialOption, err := getAuthenticationDialOption(ctx, adminServiceConfig, nil, mockAuthClient)
 		assert.Nil(t, dialOption)
@@ -174,12 +174,12 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: expected err")
 	})
 	t.Run("error during flyte client", func(t *testing.T) {
-		metadata := &service.OAuth2MetadataResponse{
+		metatdata := &service.OAuth2MetadataResponse{
 			TokenEndpoint:   "/token",
 			ScopesSupported: []string{"code", "all"},
 		}
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
-		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
+		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(nil, fmt.Errorf("failed"))
 		dialOption, err := getAuthenticationDialOption(ctx, adminServiceConfig, nil, mockAuthClient)
 		assert.Nil(t, dialOption)
@@ -193,7 +193,7 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 		PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
 	}
 	t.Run("incorrect client secret loc", func(t *testing.T) {
-		metadata := &service.OAuth2MetadataResponse{
+		metatdata := &service.OAuth2MetadataResponse{
 			TokenEndpoint:   "http://localhost:8089/token",
 			ScopesSupported: []string{"code", "all"},
 		}
@@ -201,7 +201,7 @@ func TestGetAuthenticationDialOptionClientSecret(t *testing.T) {
 			AuthorizationMetadataKey: "flyte_authorization",
 		}
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
-		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
+		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 		dialOption, err := getAuthenticationDialOption(ctx, incorrectSecretLocConfig, nil, mockAuthClient)
 		assert.Nil(t, dialOption)
@@ -219,7 +219,7 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		AuthType:              AuthTypePkce,
 		PerRetryTimeout:       config.Duration{Duration: 1 * time.Second},
 	}
-	metadata := &service.OAuth2MetadataResponse{
+	metatdata := &service.OAuth2MetadataResponse{
 		TokenEndpoint:   "http://localhost:8089/token",
 		ScopesSupported: []string{"code", "all"},
 	}
@@ -238,7 +238,7 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
 		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
-		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
+		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 		tokenSourceProvider, err := NewTokenSourceProvider(ctx, adminServiceConfig, mockTokenCache, mockAuthClient)
 		assert.Nil(t, err)
@@ -252,7 +252,7 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 		mockAuthClient := new(mocks.AuthMetadataServiceClient)
 		mockTokenCache.OnGetTokenMatch().Return(&tokenData, nil)
 		mockTokenCache.OnSaveTokenMatch(mock.Anything).Return(nil)
-		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
+		mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
 		mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 		tokenSourceProvider, err := NewTokenSourceProvider(ctx, adminServiceConfig, mockTokenCache, mockAuthClient)
 		assert.Nil(t, err)
@@ -265,7 +265,7 @@ func TestGetAuthenticationDialOptionPkce(t *testing.T) {
 func Test_getPkceAuthTokenSource(t *testing.T) {
 	ctx := context.Background()
 	mockAuthClient := new(mocks.AuthMetadataServiceClient)
-	metadata := &service.OAuth2MetadataResponse{
+	metatdata := &service.OAuth2MetadataResponse{
 		TokenEndpoint:   "http://localhost:8089/token",
 		ScopesSupported: []string{"code", "all"},
 	}
@@ -275,7 +275,7 @@ func Test_getPkceAuthTokenSource(t *testing.T) {
 		RedirectUri:              "http://localhost:54546/callback",
 	}
 
-	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metadata, nil)
+	mockAuthClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(metatdata, nil)
 	mockAuthClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(clientMetatadata, nil)
 
 	t.Run("cached token expired", func(t *testing.T) {
