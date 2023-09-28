@@ -16,6 +16,8 @@ import (
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
 )
 
+const AgentServiceKey = "agent-service"
+
 var once sync.Once
 
 func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {
@@ -24,8 +26,9 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 	}
 
 	// Register the GRPC plugin after the config is loaded
-	once.Do(func() { agent.RegisterAgentPlugin() })
 	pluginsConfigMeta, err := cfg.GetEnabledPlugins()
+	once.Do(func() { agent.RegisterAgentPlugin(pluginsConfigMeta.AllDefaultForTaskTypes[AgentServiceKey]) })
+
 	if err != nil {
 		return nil, nil, err
 	}
