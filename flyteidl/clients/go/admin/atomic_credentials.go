@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/grpc/credentials"
 
-	stdlibAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
+	stdlibAtomic "github.com/flyteorg/flytestdlib/atomic"
 )
 
 // atomicPerRPCCredentials provides a convenience on top of atomic.Value and credentials.PerRPCCredentials to be thread-safe.

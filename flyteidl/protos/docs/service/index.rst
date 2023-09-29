@@ -1,7 +1,7 @@
 REST and gRPC interface for the Flyte Admin Service
 ===================================================
 
-This section provides all endpoint definitions that are implemented by the Admin service.
+This section provides all endpoint defintions that are implemented by the Admin service.
 
 `Admin service raw protos <https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/service>`__
 

@@ -26,7 +26,7 @@ func (cb *ClientsetBuilder) WithConfig(config *Config) *ClientsetBuilder {
 	return cb
 }
 
-// WithTokenCache allows pluggable token cache implementations. eg; flytectl uses keyring as tokenCache
+// WithTokenCache allows pluggable token cache implemetations. eg; flytectl uses keyring as tokenCache
 func (cb *ClientsetBuilder) WithTokenCache(tokenCache cache.TokenCache) *ClientsetBuilder {
 	cb.tokenCache = tokenCache
 	return cb

@@ -16,6 +16,8 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_artifact_id import CoreArtifactID  # noqa: F401,E501
+from flyteadmin.models.core_artifact_query import CoreArtifactQuery  # noqa: F401,E501
 from flyteadmin.models.core_literal import CoreLiteral  # noqa: F401,E501
 from flyteadmin.models.core_variable import CoreVariable  # noqa: F401,E501
 
@@ -36,21 +38,27 @@ class CoreParameter(object):
     swagger_types = {
         'var': 'CoreVariable',
         'default': 'CoreLiteral',
-        'required': 'bool'
+        'required': 'bool',
+        'artifact_query': 'CoreArtifactQuery',
+        'artifact_id': 'CoreArtifactID'
     }
 
     attribute_map = {
         'var': 'var',
         'default': 'default',
-        'required': 'required'
+        'required': 'required',
+        'artifact_query': 'artifact_query',
+        'artifact_id': 'artifact_id'
     }
 
-    def __init__(self, var=None, default=None, required=None):  # noqa: E501
+    def __init__(self, var=None, default=None, required=None, artifact_query=None, artifact_id=None):  # noqa: E501
         """CoreParameter - a model defined in Swagger"""  # noqa: E501
 
         self._var = None
         self._default = None
         self._required = None
+        self._artifact_query = None
+        self._artifact_id = None
         self.discriminator = None
 
         if var is not None:
@@ -59,6 +67,10 @@ class CoreParameter(object):
             self.default = default
         if required is not None:
             self.required = required
+        if artifact_query is not None:
+            self.artifact_query = artifact_query
+        if artifact_id is not None:
+            self.artifact_id = artifact_id
 
     @property
     def var(self):
@@ -128,6 +140,50 @@ class CoreParameter(object):
         """
 
         self._required = required
+
+    @property
+    def artifact_query(self):
+        """Gets the artifact_query of this CoreParameter.  # noqa: E501
+
+        This is an execution time search basically that should result in exactly one Artifact with a Type that matches the type of the variable.  # noqa: E501
+
+        :return: The artifact_query of this CoreParameter.  # noqa: E501
+        :rtype: CoreArtifactQuery
+        """
+        return self._artifact_query
+
+    @artifact_query.setter
+    def artifact_query(self, artifact_query):
+        """Sets the artifact_query of this CoreParameter.
+
+        This is an execution time search basically that should result in exactly one Artifact with a Type that matches the type of the variable.  # noqa: E501
+
+        :param artifact_query: The artifact_query of this CoreParameter.  # noqa: E501
+        :type: CoreArtifactQuery
+        """
+
+        self._artifact_query = artifact_query
+
+    @property
+    def artifact_id(self):
+        """Gets the artifact_id of this CoreParameter.  # noqa: E501
+
+
+        :return: The artifact_id of this CoreParameter.  # noqa: E501
+        :rtype: CoreArtifactID
+        """
+        return self._artifact_id
+
+    @artifact_id.setter
+    def artifact_id(self, artifact_id):
+        """Sets the artifact_id of this CoreParameter.
+
+
+        :param artifact_id: The artifact_id of this CoreParameter.  # noqa: E501
+        :type: CoreArtifactID
+        """
+
+        self._artifact_id = artifact_id
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -19,8 +19,8 @@
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_BooleanExpression_flyteidl_2fcore_2fcondition_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ComparisonExpression_flyteidl_2fcore_2fcondition_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcondition_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Operand_flyteidl_2fcore_2fcondition_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Primitive_flyteidl_2fcore_2fliterals_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
 namespace flyteidl {
 namespace core {
 class ComparisonExpressionDefaultTypeInternal {

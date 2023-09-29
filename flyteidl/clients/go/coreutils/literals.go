@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flytestdlib/storage"
 
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/ptypes"
@@ -588,7 +588,7 @@ func MakeLiteralForType(t *core.LiteralType, v interface{}) (*core.Literal, erro
 		var newV string
 		if v == nil {
 			if len(t.GetEnumType().Values) == 0 {
-				return nil, fmt.Errorf("enum types need at least one value")
+				return nil, fmt.Errorf("enum types need atleast one value")
 			}
 			newV = t.GetEnumType().Values[0]
 		} else {
