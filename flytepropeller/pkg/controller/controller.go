@@ -323,7 +323,7 @@ func getAdminClient(ctx context.Context) (client service.AdminServiceClient, sig
 }
 
 // New returns a new FlyteWorkflow controller
-func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
+func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Interface, flytepropellerClientset clientset.Interface,
 	flyteworkflowInformerFactory informers.SharedInformerFactory, informerFactory k8sInformers.SharedInformerFactory,
 	kubeClient executors.Client, scope promutils.Scope) (*Controller, error) {
 
@@ -354,13 +354,13 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create EventSink [%v], error %v", events.GetConfig(ctx).Type, err)
 	}
-	gc, err := NewGarbageCollector(cfg, scope, clock.RealClock{}, kubeclientset.CoreV1().Namespaces(), flytepropellerClientset.FlyteworkflowV1alpha1())
+	gc, err := NewGarbageCollector(cfg, scope, clock.RealClock{}, kubeClientset.CoreV1().Namespaces(), flytepropellerClientset.FlyteworkflowV1alpha1())
 	if err != nil {
 		logger.Errorf(ctx, "failed to initialize GC for workflows")
 		return nil, errors.Wrapf(err, "failed to initialize WF GC")
 	}
 
-	eventRecorder, err := utils.NewK8sEventRecorder(ctx, kubeclientset, controllerAgentName, cfg.PublishK8sEvents)
+	eventRecorder, err := utils.NewK8sEventRecorder(ctx, kubeClientset, controllerAgentName, cfg.PublishK8sEvents)
 	if err != nil {
 		logger.Errorf(ctx, "failed to event recorder %v", err)
 		return nil, errors.Wrapf(err, "failed to initialize resource lock.")
@@ -372,7 +372,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 		numWorkers: cfg.Workers,
 	}
 
-	lock, err := leader.NewResourceLock(kubeclientset.CoreV1(), kubeclientset.CoordinationV1(), eventRecorder, cfg.LeaderElection)
+	lock, err := leader.NewResourceLock(kubeClientset.CoreV1(), kubeClientset.CoordinationV1(), eventRecorder, cfg.LeaderElection)
 	if err != nil {
 		logger.Errorf(ctx, "failed to initialize resource lock.")
 		return nil, errors.Wrapf(err, "failed to initialize resource lock.")
@@ -440,7 +440,7 @@ func New(ctx context.Context, cfg *config.Config, kubeclientset kubernetes.Inter
 
 	recoveryClient := recovery.NewClient(adminClient)
 	nodeHandlerFactory, err := factory.NewHandlerFactory(ctx, launchPlanActor, launchPlanActor,
-		kubeClient, catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
+		kubeClient, kubeClientset, catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}

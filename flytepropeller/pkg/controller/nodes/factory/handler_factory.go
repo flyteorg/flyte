@@ -3,6 +3,8 @@ package factory
 import (
 	"context"
 
+	"k8s.io/client-go/kubernetes"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
@@ -33,6 +35,7 @@ type handlerFactory struct {
 	workflowLauncher launchplan.Executor
 	launchPlanReader launchplan.Reader
 	kubeClient       executors.Client
+	kubeClientset    kubernetes.Interface
 	catalogClient    catalog.Client
 	recoveryClient   recovery.Client
 	eventConfig      *config.EventConfig
@@ -50,7 +53,7 @@ func (f *handlerFactory) GetHandler(kind v1alpha1.NodeKind) (interfaces.NodeHand
 }
 
 func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, setup interfaces.SetupContext) error {
-	t, err := task.New(ctx, f.kubeClient, f.catalogClient, f.eventConfig, f.clusterID, f.scope)
+	t, err := task.New(ctx, f.kubeClient, f.kubeClientset, f.catalogClient, f.eventConfig, f.clusterID, f.scope)
 	if err != nil {
 		return err
 	}
@@ -79,13 +82,14 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 }
 
 func NewHandlerFactory(ctx context.Context, workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader,
-	kubeClient executors.Client, catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig,
+	kubeClient executors.Client, kubeClientset kubernetes.Interface, catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig,
 	clusterID string, signalClient service.SignalServiceClient, scope promutils.Scope) (interfaces.HandlerFactory, error) {
 
 	return &handlerFactory{
 		workflowLauncher: workflowLauncher,
 		launchPlanReader: launchPlanReader,
 		kubeClient:       kubeClient,
+		kubeClientset:    kubeClientset,
 		catalogClient:    catalogClient,
 		recoveryClient:   recoveryClient,
 		eventConfig:      eventConfig,

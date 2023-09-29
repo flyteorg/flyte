@@ -6,26 +6,7 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-
-	compiler "github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
-	nodeTaskConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
-
-	"github.com/flyteorg/flytestdlib/contextutils"
-	stdErrors "github.com/flyteorg/flytestdlib/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-
 	"golang.org/x/time/rate"
-
 	v1 "k8s.io/api/core/v1"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -33,16 +14,31 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/validation"
-
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/util/workqueue"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/predicate"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+
+	"github.com/flyteorg/flyteplugins/go/tasks/errors"
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	pluginsUtils "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	compiler "github.com/flyteorg/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
+	nodeTaskConfig "github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	stdErrors "github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
 )
 
 const finalizer = "flyte/flytek8s"
@@ -58,8 +54,9 @@ const (
 )
 
 type PluginState struct {
-	Phase          PluginPhase
-	K8sPluginState k8s.PluginState
+	Phase           PluginPhase
+	K8sPluginState  k8s.PluginState
+	LastEventUpdate time.Time
 }
 
 type PluginMetrics struct {
@@ -84,7 +81,7 @@ func newPluginMetrics(s promutils.Scope) PluginMetrics {
 	}
 }
 
-func IsK8sObjectNotExists(err error) bool {
+func isK8sObjectNotExists(err error) bool {
 	return k8serrors.IsNotFound(err) || k8serrors.IsGone(err) || k8serrors.IsResourceExpired(err)
 }
 
@@ -99,12 +96,13 @@ type PluginManager struct {
 	// Per namespace-resource
 	backOffController    *backoff.Controller
 	resourceLevelMonitor *ResourceLevelMonitor
+	eventWatcher         EventWatcher
 }
 
-func (e *PluginManager) AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
+func (e *PluginManager) addObjectMetadata(taskCtx pluginsCore.TaskExecutionMetadata, o client.Object, cfg *config.K8sPluginConfig) {
 	o.SetNamespace(taskCtx.GetNamespace())
-	o.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), utils.CopyMap(taskCtx.GetAnnotations())))
-	o.SetLabels(utils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), utils.CopyMap(taskCtx.GetLabels())))
+	o.SetAnnotations(pluginsUtils.UnionMaps(cfg.DefaultAnnotations, o.GetAnnotations(), pluginsUtils.CopyMap(taskCtx.GetAnnotations())))
+	o.SetLabels(pluginsUtils.UnionMaps(cfg.DefaultLabels, o.GetLabels(), pluginsUtils.CopyMap(taskCtx.GetLabels())))
 	o.SetName(taskCtx.GetTaskExecutionID().GetGeneratedName())
 
 	if !e.plugin.GetProperties().DisableInjectOwnerReferences {
@@ -117,7 +115,7 @@ func (e *PluginManager) AddObjectMetadata(taskCtx pluginsCore.TaskExecutionMetad
 	}
 
 	if errs := validation.IsDNS1123Subdomain(o.GetName()); len(errs) > 0 {
-		o.SetName(utils.ConvertToDNS1123SubdomainCompatibleString(o.GetName()))
+		o.SetName(pluginsUtils.ConvertToDNS1123SubdomainCompatibleString(o.GetName()))
 	}
 }
 
@@ -184,7 +182,7 @@ func (e *PluginManager) getPodEffectiveResourceLimits(ctx context.Context, pod *
 	return podRequestedResources
 }
 
-func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
+func (e *PluginManager) launchResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
 	tmpl, err := tCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return pluginsCore.Transition{}, err
@@ -202,7 +200,7 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 		return pluginsCore.UnknownTransition, err
 	}
 
-	e.AddObjectMetadata(k8sTaskCtxMetadata, o, config.GetK8sPluginConfig())
+	e.addObjectMetadata(k8sTaskCtxMetadata, o, config.GetK8sPluginConfig())
 	logger.Infof(ctx, "Creating Object: Type:[%v], Object:[%v/%v]", o.GetObjectKind().GroupVersionKind(), o.GetNamespace(), o.GetName())
 
 	key := backoff.ComposeResourceKey(o)
@@ -251,18 +249,21 @@ func (e *PluginManager) LaunchResource(ctx context.Context, tCtx pluginsCore.Tas
 	return pluginsCore.DoTransition(pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "task submitted to K8s")), nil
 }
 
-func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, k8sPluginState *k8s.PluginState) (pluginsCore.Transition, error) {
+func (e *PluginManager) getResource(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
-		return pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskDefinition", fmt.Sprintf("Failed to build resource, caused by: %s", err.Error()), nil)), nil
+		return nil, err
 	}
+	e.addObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+	return o, nil
+}
 
-	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
+func (e *PluginManager) checkResourcePhase(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, o client.Object, k8sPluginState *k8s.PluginState) (pluginsCore.Transition, error) {
 	nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 	// Attempt to get resource from informer cache, if not found, retrieve it from API server.
 	if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
-		if IsK8sObjectNotExists(err) {
+		if isK8sObjectNotExists(err) {
 			// This happens sometimes because a node gets removed and K8s deletes the pod. This will result in a
 			// Pod does not exist error. This should be retried using the retry policy
 			logger.Warningf(ctx, "Failed to find the Resource with name: %v. Error: %v", nsName, err)
@@ -315,10 +316,11 @@ func (e *PluginManager) CheckResourcePhase(ctx context.Context, tCtx pluginsCore
 
 func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (pluginsCore.Transition, error) {
 	// read phase state
-	ps := PluginState{}
-	if v, err := tCtx.PluginStateReader().Get(&ps); err != nil {
+	pluginState := PluginState{}
+	if v, err := tCtx.PluginStateReader().Get(&pluginState); err != nil {
 		if v != pluginStateVersion {
-			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure(errors.CorruptedPluginState, fmt.Sprintf("plugin state version mismatch expected [%d] got [%d]", pluginStateVersion, v), nil)), nil
+			return pluginsCore.DoTransition(pluginsCore.PhaseInfoRetryableFailure(errors.CorruptedPluginState,
+				fmt.Sprintf("plugin state version mismatch expected [%d] got [%d]", pluginStateVersion, v), nil)), nil
 		}
 		return pluginsCore.UnknownTransition, errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
 	}
@@ -326,55 +328,74 @@ func (e PluginManager) Handle(ctx context.Context, tCtx pluginsCore.TaskExecutio
 	// evaluate plugin
 	var err error
 	var transition pluginsCore.Transition
-	pluginPhase := ps.Phase
-	if ps.Phase == PluginPhaseNotStarted {
-		transition, err = e.LaunchResource(ctx, tCtx)
+	var o client.Object
+	pluginPhase := pluginState.Phase
+	if pluginState.Phase == PluginPhaseNotStarted {
+		transition, err = e.launchResource(ctx, tCtx)
 		if err == nil && transition.Info().Phase() == pluginsCore.PhaseQueued {
 			pluginPhase = PluginPhaseStarted
 		}
 	} else {
-		transition, err = e.CheckResourcePhase(ctx, tCtx, &ps.K8sPluginState)
+		o, err = e.getResource(ctx, tCtx)
+		if err != nil {
+			transition, err = pluginsCore.DoTransition(pluginsCore.PhaseInfoFailure("BadTaskDefinition",
+				fmt.Sprintf("Failed to build resource, caused by: %s", err.Error()), nil)), nil
+		} else {
+			transition, err = e.checkResourcePhase(ctx, tCtx, o, &pluginState.K8sPluginState)
+		}
 	}
 
 	if err != nil {
 		return transition, err
 	}
 
-	// persist any changes in phase state
-	k8sPluginState := ps.K8sPluginState
-	if ps.Phase != pluginPhase || k8sPluginState.Phase != transition.Info().Phase() ||
-		k8sPluginState.PhaseVersion != transition.Info().Version() || k8sPluginState.Reason != transition.Info().Reason() {
-
-		newPluginState := PluginState{
-			Phase: pluginPhase,
-			K8sPluginState: k8s.PluginState{
-				Phase:        transition.Info().Phase(),
-				PhaseVersion: transition.Info().Version(),
-				Reason:       transition.Info().Reason(),
-			},
+	// Add events since last update
+	version := transition.Info().Version()
+	lastEventUpdate := pluginState.LastEventUpdate
+	if e.eventWatcher != nil && o != nil {
+		nsName := k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
+		recentEvents := e.eventWatcher.List(nsName, lastEventUpdate)
+		if len(recentEvents) > 0 {
+			taskInfo := transition.Info().Info()
+			taskInfo.AdditionalReasons = make([]pluginsCore.ReasonInfo, 0, len(recentEvents))
+			for _, event := range recentEvents {
+				taskInfo.AdditionalReasons = append(taskInfo.AdditionalReasons,
+					pluginsCore.ReasonInfo{Reason: event.Note, OccurredAt: &event.CreatedAt})
+				lastEventUpdate = event.CreatedAt
+			}
+			// Bump the version to ensure newly added events are picked up
+			version++
 		}
+	}
 
+	// persist any changes in phase state
+	newPluginState := PluginState{
+		Phase: pluginPhase,
+		K8sPluginState: k8s.PluginState{
+			Phase:        transition.Info().Phase(),
+			PhaseVersion: version,
+			Reason:       transition.Info().Reason(),
+		},
+		LastEventUpdate: lastEventUpdate,
+	}
+	if pluginState != newPluginState {
 		if err := tCtx.PluginStateWriter().Put(pluginStateVersion, &newPluginState); err != nil {
 			return pluginsCore.UnknownTransition, err
 		}
 	}
 
-	return transition, err
+	return transition, nil
 }
 
 func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) error {
 	logger.Infof(ctx, "KillTask invoked. We will attempt to delete object [%v].",
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 
-	o, err := e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
+	o, err := e.getResource(ctx, tCtx)
 	if err != nil {
-		// This will recurrent, so we will skip further finalize
-		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.",
-			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
+		logger.Errorf(ctx, "%v", err)
 		return nil
 	}
-
-	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 
 	deleteResource := true
 	abortOverride, hasAbortOverride := e.plugin.(k8s.PluginAbortOverride)
@@ -407,7 +428,7 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 		}
 	}
 
-	if err != nil && !IsK8sObjectNotExists(err) {
+	if err != nil && !isK8sObjectNotExists(err) {
 		logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
 			resourceToFinalize.GetNamespace(), resourceToFinalize.GetName(), err)
 		return err
@@ -416,11 +437,11 @@ func (e PluginManager) Abort(ctx context.Context, tCtx pluginsCore.TaskExecution
 	return nil
 }
 
-func (e *PluginManager) ClearFinalizers(ctx context.Context, o client.Object) error {
+func (e *PluginManager) clearFinalizers(ctx context.Context, o client.Object) error {
 	if len(o.GetFinalizers()) > 0 {
 		o.SetFinalizers([]string{})
 		err := e.kubeClient.GetClient().Update(ctx, o)
-		if err != nil && !IsK8sObjectNotExists(err) {
+		if err != nil && !isK8sObjectNotExists(err) {
 			logger.Warningf(ctx, "Failed to clear finalizers for Resource with name: %v/%v. Error: %v",
 				o.GetNamespace(), o.GetName(), err)
 			return err
@@ -434,25 +455,21 @@ func (e *PluginManager) ClearFinalizers(ctx context.Context, o client.Object) er
 
 func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (err error) {
 	errs := stdErrors.ErrorCollection{}
-	var o client.Object
 	var nsName k8stypes.NamespacedName
 	cfg := config.GetK8sPluginConfig()
 
-	o, err = e.plugin.BuildIdentityResource(ctx, tCtx.TaskExecutionMetadata())
+	o, err := e.getResource(ctx, tCtx)
 	if err != nil {
-		// This will recurrent, so we will skip further finalize
-		logger.Errorf(ctx, "Failed to build the Resource with name: %v. Error: %v, when finalizing.", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
+		logger.Errorf(ctx, "%v", err)
 		return nil
 	}
-
-	e.AddObjectMetadata(tCtx.TaskExecutionMetadata(), o, config.GetK8sPluginConfig())
 	nsName = k8stypes.NamespacedName{Namespace: o.GetNamespace(), Name: o.GetName()}
 
 	// Attempt to cleanup finalizers so that the object may be deleted/garbage collected. We try to clear them for all
 	// objects, regardless of whether or not InjectFinalizer is configured to handle all cases where InjectFinalizer is
 	// enabled/disabled during object execution.
 	if err := e.kubeClient.GetClient().Get(ctx, nsName, o); err != nil {
-		if IsK8sObjectNotExists(err) {
+		if isK8sObjectNotExists(err) {
 			return nil
 		}
 		// This happens sometimes because a node gets removed and K8s deletes the pod. This will result in a
@@ -464,7 +481,7 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 	// This must happen after sending admin event. It's safe against partial failures because if the event failed, we will
 	// simply retry in the next round. If the event succeeded but this failed, we will try again the next round to send
 	// the same event (idempotent) and then come here again...
-	err = e.ClearFinalizers(ctx, o)
+	err = e.clearFinalizers(ctx, o)
 	if err != nil {
 		errs.Append(err)
 	}
@@ -473,7 +490,7 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 	if cfg.DeleteResourceOnFinalize && !e.plugin.GetProperties().DisableDeleteResourceOnFinalize {
 		// Attempt to delete resource, if not found, return success.
 		if err := e.kubeClient.GetClient().Delete(ctx, o); err != nil {
-			if IsK8sObjectNotExists(err) {
+			if isK8sObjectNotExists(err) {
 				return errs.ErrorOrDefault()
 			}
 
@@ -488,9 +505,9 @@ func (e *PluginManager) Finalize(ctx context.Context, tCtx pluginsCore.TaskExecu
 }
 
 func NewPluginManagerWithBackOff(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry, backOffController *backoff.Controller,
-	monitorIndex *ResourceMonitorIndex) (*PluginManager, error) {
+	monitorIndex *ResourceMonitorIndex, kubeClientset kubernetes.Interface) (*PluginManager, error) {
 
-	mgr, err := NewPluginManager(ctx, iCtx, entry, monitorIndex)
+	mgr, err := NewPluginManager(ctx, iCtx, entry, monitorIndex, kubeClientset)
 	if err == nil {
 		mgr.backOffController = backOffController
 	}
@@ -499,7 +516,7 @@ func NewPluginManagerWithBackOff(ctx context.Context, iCtx pluginsCore.SetupCont
 
 // Creates a K8s generic task executor. This provides an easier way to build task executors that create K8s resources.
 func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry k8s.PluginEntry,
-	monitorIndex *ResourceMonitorIndex) (*PluginManager, error) {
+	monitorIndex *ResourceMonitorIndex, kubeClientset kubernetes.Interface) (*PluginManager, error) {
 
 	if iCtx.EnqueueOwner() == nil {
 		return nil, errors.Errorf(errors.PluginInitializationFailed, "Failed to initialize plugin, enqueue Owner cannot be nil or empty.")
@@ -617,16 +634,25 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return nil, err
 	}
 
-	// Construct the collector that will emit a gauge indicating current levels of the resource that this K8s plugin operates on
 	gvk, err := getPluginGvk(entry.ResourceToWatch)
 	if err != nil {
 		return nil, err
 	}
-	sharedInformer, err := getPluginSharedInformer(ctx, kubeClient, entry.ResourceToWatch)
+
+	var eventWatcher EventWatcher
+	if config.GetK8sPluginConfig().SendObjectEvents {
+		eventWatcher, err = NewEventWatcher(ctx, gvk, kubeClientset)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// Construct the collector that will emit a gauge indicating current levels of the resource that this K8s plugin operates on
+	pluginInformer, err := getPluginSharedInformer(ctx, kubeClient, entry.ResourceToWatch)
 	if err != nil {
 		return nil, err
 	}
-	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, sharedInformer, gvk)
+	rm := monitorIndex.GetOrCreateResourceLevelMonitor(ctx, metricsScope, pluginInformer, gvk)
 	// Start the poller and gauge emitter
 	rm.RunCollectorOnce(ctx)
 
@@ -637,6 +663,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		metrics:              newPluginMetrics(metricsScope),
 		kubeClient:           kubeClient,
 		resourceLevelMonitor: rm,
+		eventWatcher:         eventWatcher,
 	}, nil
 }
 
