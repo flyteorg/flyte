@@ -189,7 +189,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		return nil, err
 	}
 
-	if request.Event.Phase == core.TaskExecution_RUNNING && request.Event.PhaseVersion == 0 {
+	if request.Event.Phase == core.TaskExecution_RUNNING && request.Event.PhaseVersion == 0 { // TODO: need to be careful about missing inc/decs
 		m.metrics.ActiveTaskExecutions.Inc()
 	} else if common.IsTaskExecutionTerminal(request.Event.Phase) && request.Event.PhaseVersion == 0 {
 		m.metrics.ActiveTaskExecutions.Dec()

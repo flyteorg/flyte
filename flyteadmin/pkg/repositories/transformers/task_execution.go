@@ -153,19 +153,27 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 		CreatedAt:    input.Request.Event.OccurredAt,
 		Logs:         input.Request.Event.Logs,
 		CustomInfo:   input.Request.Event.CustomInfo,
-		Reason:       input.Request.Event.Reason,
 		TaskType:     input.Request.Event.TaskType,
 		Metadata:     metadata,
 		EventVersion: input.Request.Event.EventVersion,
 	}
 
-	if len(input.Request.Event.Reason) > 0 {
+	if len(input.Request.Event.Reasons) > 0 {
+		for _, reason := range input.Request.Event.Reasons {
+			closure.Reasons = append(closure.Reasons, &admin.Reason{
+				OccurredAt: reason.OccurredAt,
+				Message:    reason.Reason,
+			})
+		}
+		closure.Reason = input.Request.Event.Reasons[len(input.Request.Event.Reasons)-1].Reason
+	} else if len(input.Request.Event.Reason) > 0 {
 		closure.Reasons = []*admin.Reason{
-			&admin.Reason{
+			{
 				OccurredAt: input.Request.Event.OccurredAt,
 				Message:    input.Request.Event.Reason,
 			},
 		}
+		closure.Reason = input.Request.Event.Reason
 	}
 
 	eventPhase := input.Request.Event.Phase
@@ -386,7 +394,17 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 	}
 	taskExecutionClosure.UpdatedAt = reportedAt
 	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
-	if len(request.Event.Reason) > 0 {
+	if len(request.Event.Reasons) > 0 {
+		for _, reason := range request.Event.Reasons {
+			taskExecutionClosure.Reasons = append(
+				taskExecutionClosure.Reasons,
+				&admin.Reason{
+					OccurredAt: reason.OccurredAt,
+					Message:    reason.Reason,
+				})
+		}
+		taskExecutionClosure.Reason = request.Event.Reasons[len(request.Event.Reasons)-1].Reason
+	} else if len(request.Event.Reason) > 0 {
 		if taskExecutionClosure.Reason != request.Event.Reason {
 			// by tracking a time-series of reasons we increase the size of the TaskExecutionClosure in scenarios where
 			// a task reports a large number of unique reasons. if this size increase becomes problematic we this logic
