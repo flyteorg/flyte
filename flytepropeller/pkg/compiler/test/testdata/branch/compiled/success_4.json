@@ -1,0 +1,555 @@
+{
+  "primary": {
+    "template": {
+      "id": {
+        "resourceType": "WORKFLOW",
+        "project": "project",
+        "domain": "domain",
+        "name": "test_serialization.my_wf",
+        "version": "version"
+      },
+      "metadata": {
+
+      },
+      "interface": {
+        "inputs": {
+          "variables": {
+            "a": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "a"
+            }
+          }
+        },
+        "outputs": {
+          "variables": {
+            "out_0": {
+              "type": {
+                "simple": "INTEGER"
+              },
+              "description": "out_0"
+            }
+          }
+        }
+      },
+      "nodes": [
+        {
+          "id": "start-node"
+        },
+        {
+          "id": "end-node",
+          "inputs": [
+            {
+              "var": "out_0",
+              "binding": {
+                "promise": {
+                  "nodeId": "node-2",
+                  "var": "out_0"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "id": "node-0",
+          "metadata": {
+            "name": "flytekit.annotated.task.test_serialization.t3",
+            "retries": {
+
+            },
+            "interruptible": false
+          },
+          "inputs": [
+            {
+              "var": "a",
+              "binding": {
+                "promise": {
+                  "nodeId": "start-node",
+                  "var": "a"
+                }
+              }
+            }
+          ],
+          "taskNode": {
+            "referenceId": {
+              "resourceType": "TASK",
+              "project": "project",
+              "domain": "domain",
+              "name": "test_serialization.t3",
+              "version": "version"
+            }
+          }
+        },
+        {
+          "id": "node-1",
+          "metadata": {
+            "name": "test1",
+            "retries": {
+
+            },
+            "interruptible": false
+          },
+          "inputs": [
+            {
+              "var": ".a",
+              "binding": {
+                "promise": {
+                  "nodeId": "start-node",
+                  "var": "a"
+                }
+              }
+            },
+            {
+              "var": "node-0.out_0",
+              "binding": {
+                "promise": {
+                  "nodeId": "node-0",
+                  "var": "out_0"
+                }
+              }
+            }
+          ],
+          "upstreamNodeIds": [
+            "node-0"
+          ],
+          "branchNode": {
+            "ifElse": {
+              "case": {
+                "condition": {
+                  "comparison": {
+                    "leftValue": {
+                      "var": "node-0.out_0"
+                    },
+                    "rightValue": {
+                      "var": ".a"
+                    }
+                  }
+                },
+                "thenNode": {
+                  "id": "node-1-branchnode-0",
+                  "metadata": {
+                    "name": "flytekit.annotated.task.test_serialization.t3",
+                    "retries": {
+
+                    },
+                    "interruptible": false
+                  },
+                  "inputs": [
+                    {
+                      "var": "a",
+                      "binding": {
+                        "promise": {
+                          "nodeId": "node-0",
+                          "var": "out_0"
+                        }
+                      }
+                    }
+                  ],
+                  "upstreamNodeIds": [
+                    "node-0"
+                  ],
+                  "taskNode": {
+                    "referenceId": {
+                      "resourceType": "TASK",
+                      "project": "project",
+                      "domain": "domain",
+                      "name": "test_serialization.t3",
+                      "version": "version"
+                    }
+                  }
+                }
+              },
+              "error": {
+                "failedNodeId": "test1",
+                "message": "Unable to choose branch"
+              }
+            }
+          }
+        },
+        {
+          "id": "node-2",
+          "metadata": {
+            "name": "test2",
+            "retries": {
+
+            },
+            "interruptible": false
+          },
+          "inputs": [
+            {
+              "var": ".a",
+              "binding": {
+                "promise": {
+                  "nodeId": "start-node",
+                  "var": "a"
+                }
+              }
+            },
+            {
+              "var": "node-1.out_0",
+              "binding": {
+                "promise": {
+                  "nodeId": "node-1",
+                  "var": "out_0"
+                }
+              }
+            }
+          ],
+          "upstreamNodeIds": [
+            "node-1"
+          ],
+          "branchNode": {
+            "ifElse": {
+              "case": {
+                "condition": {
+                  "comparison": {
+                    "leftValue": {
+                      "var": "node-1.out_0"
+                    },
+                    "rightValue": {
+                      "var": ".a"
+                    }
+                  }
+                },
+                "thenNode": {
+                  "id": "node-2-branchnode-0",
+                  "metadata": {
+                    "name": "flytekit.annotated.task.test_serialization.t3",
+                    "retries": {
+
+                    },
+                    "interruptible": false
+                  },
+                  "inputs": [
+                    {
+                      "var": "a",
+                      "binding": {
+                        "promise": {
+                          "nodeId": "node-1",
+                          "var": "out_0"
+                        }
+                      }
+                    }
+                  ],
+                  "upstreamNodeIds": [
+                    "node-1"
+                  ],
+                  "taskNode": {
+                    "referenceId": {
+                      "resourceType": "TASK",
+                      "project": "project",
+                      "domain": "domain",
+                      "name": "test_serialization.t3",
+                      "version": "version"
+                    }
+                  }
+                }
+              },
+              "error": {
+                "failedNodeId": "test2",
+                "message": "Unable to choose a branch"
+              }
+            }
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "var": "out_0",
+          "binding": {
+            "promise": {
+              "nodeId": "node-2",
+              "var": "out_0"
+            }
+          }
+        }
+      ],
+      "metadataDefaults": {
+
+      }
+    },
+    "connections": {
+      "downstream": {
+        "node-0": {
+          "ids": [
+            "node-1"
+          ]
+        },
+        "node-1": {
+          "ids": [
+            "node-2"
+          ]
+        },
+        "node-2": {
+          "ids": [
+            "end-node"
+          ]
+        },
+        "start-node": {
+          "ids": [
+            "node-0",
+            "node-1",
+            "node-2"
+          ]
+        }
+      },
+      "upstream": {
+        "end-node": {
+          "ids": [
+            "node-2"
+          ]
+        },
+        "node-0": {
+          "ids": [
+            "start-node"
+          ]
+        },
+        "node-1": {
+          "ids": [
+            "node-0",
+            "start-node"
+          ]
+        },
+        "node-1-branchnode-0": {
+          "ids": [
+            "node-0"
+          ]
+        },
+        "node-2": {
+          "ids": [
+            "node-1",
+            "start-node"
+          ]
+        },
+        "node-2-branchnode-0": {
+          "ids": [
+            "node-1"
+          ]
+        }
+      }
+    }
+  },
+  "tasks": [
+    {
+      "template": {
+        "id": {
+          "resourceType": "TASK",
+          "project": "project",
+          "domain": "domain",
+          "name": "test_serialization.t1",
+          "version": "version"
+        },
+        "type": "python-task",
+        "metadata": {
+          "runtime": {
+            "type": "FLYTE_SDK",
+            "version": "1.2.3",
+            "flavor": "python"
+          },
+          "retries": {
+
+          },
+          "interruptible": false
+        },
+        "interface": {
+          "inputs": {
+
+          },
+          "outputs": {
+            "variables": {
+              "out_0": {
+                "type": {
+                  "simple": "STRING"
+                },
+                "description": "out_0"
+              }
+            }
+          }
+        },
+        "container": {
+          "image": "image",
+          "args": [
+            "pyflyte-execute",
+            "--task-module",
+            "test_serialization",
+            "--task-name",
+            "t1",
+            "--inputs",
+            "{{.input}}",
+            "--output-prefix",
+            "{{.outputPrefix}}",
+            "--raw-output-data-prefix",
+            "{{.rawOutputDataPrefix}}"
+          ],
+          "resources": {
+
+          },
+          "config": [
+            {
+              "key": "testKey1",
+              "value": "testValue1"
+            },
+            {
+              "key": "testKey2",
+              "value": "testValue2"
+            },
+            {
+              "key": "testKey3",
+              "value": "testValue3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "template": {
+        "id": {
+          "resourceType": "TASK",
+          "project": "project",
+          "domain": "domain",
+          "name": "test_serialization.t2",
+          "version": "version"
+        },
+        "type": "python-task",
+        "metadata": {
+          "runtime": {
+            "type": "FLYTE_SDK",
+            "version": "1.2.3",
+            "flavor": "python"
+          },
+          "retries": {
+
+          },
+          "interruptible": false
+        },
+        "interface": {
+          "inputs": {
+
+          },
+          "outputs": {
+            "variables": {
+              "out_0": {
+                "type": {
+                  "simple": "STRING"
+                },
+                "description": "out_0"
+              }
+            }
+          }
+        },
+        "container": {
+          "image": "image",
+          "args": [
+            "pyflyte-execute",
+            "--task-module",
+            "test_serialization",
+            "--task-name",
+            "t2",
+            "--inputs",
+            "{{.input}}",
+            "--output-prefix",
+            "{{.outputPrefix}}",
+            "--raw-output-data-prefix",
+            "{{.rawOutputDataPrefix}}"
+          ],
+          "resources": {
+
+          },
+          "config": [
+            {
+              "key": "testKey1",
+              "value": "testValue1"
+            },
+            {
+              "key": "testKey2",
+              "value": "testValue2"
+            },
+            {
+              "key": "testKey3",
+              "value": "testValue3"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "template": {
+        "id": {
+          "resourceType": "TASK",
+          "project": "project",
+          "domain": "domain",
+          "name": "test_serialization.t3",
+          "version": "version"
+        },
+        "type": "python-task",
+        "metadata": {
+          "runtime": {
+            "type": "FLYTE_SDK",
+            "version": "1.2.3",
+            "flavor": "python"
+          },
+          "retries": {
+
+          },
+          "interruptible": false
+        },
+        "interface": {
+          "inputs": {
+            "variables": {
+              "a": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "a"
+              }
+            }
+          },
+          "outputs": {
+            "variables": {
+              "out_0": {
+                "type": {
+                  "simple": "INTEGER"
+                },
+                "description": "out_0"
+              }
+            }
+          }
+        },
+        "container": {
+          "image": "image",
+          "args": [
+            "pyflyte-execute",
+            "--task-module",
+            "test_serialization",
+            "--task-name",
+            "t3",
+            "--inputs",
+            "{{.input}}",
+            "--output-prefix",
+            "{{.outputPrefix}}",
+            "--raw-output-data-prefix",
+            "{{.rawOutputDataPrefix}}"
+          ],
+          "resources": {
+
+          },
+          "config": [
+            {
+              "key": "testKey1",
+              "value": "testValue1"
+            },
+            {
+              "key": "testKey2",
+              "value": "testValue2"
+            },
+            {
+              "key": "testKey3",
+              "value": "testValue3"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

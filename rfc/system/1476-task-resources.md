@@ -10,7 +10,7 @@ Task resource allocation in Flyte includes the process of setting *CPU, memory, 
 
 ## 2 Motivation
 
-As the system control plane, flyteadmin is the authoritative store for defaults and per-project (and other) overrides. However, the process of converting a user-defined task to a Kubernetes object is handled by appropriate plugins. Therefore, it makes sense to have task resource resolution occur at execution time while leveraging admin to store and propage task default values.
+As the system control plane, flyteadmin is the authoritative store for defaults and per-project (and other) overrides. However, the process of converting a user-defined task to a Kubernetes object is handled by appropriate plugins. Therefore, it makes sense to have task resource resolution occur at execution time while leveraging admin to store and propagate task default values.
 
 ## 3 Proposed Implementation
 
@@ -18,7 +18,7 @@ Background
 ----------
 Kubernetes allows users to specify both [requests and limits](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/). **Requests** are used to schedule pods onto nodes. **Limits** are hard stops that running containers are not permitted to exceed.
 
-In the context of what a Flyte user can specify, flytekit [task decorators](https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task) permit setting both requests and limits. Furthermore, in their workflow definitions, users can specify node-level overrides which supercede static task definition resource values.
+In the context of what a Flyte user can specify, flytekit [task decorators](https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task) permit setting both requests and limits. Furthermore, in their workflow definitions, users can specify node-level overrides which supersede static task definition resource values.
 
 In the Flyte back-end, **default** values can be applied as requests and limits when a user omits them from a task specification. Furthermore, **max** values are used to enforce that either user-specified resource requests or limits do not exceed a configured threshold.
 

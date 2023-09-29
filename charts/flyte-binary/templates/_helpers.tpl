@@ -217,21 +217,3 @@ Flyte Agent selector labels
 {{ include "flyte-binary.baseLabels" . }}
 app.kubernetes.io/component: agent
 {{- end }}
-
-{{/*
-Get the name of the service account to use
-*/}}
-{{- define "flyte-binary.agent.serviceAccountName" -}}
-{{- if .Values.flyteagent.serviceAccount.create }}
-{{- default (include "flyte-binary.agent.name" .) .Values.flyteagent.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.flyteagent.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{/*
-Get the Flyte Agent service port.
-*/}}
-{{- define "flyte-binary.agent.servicePort" -}}
-{{- default 8000 .Values.flyteagent.service.port -}}
-{{- end -}}

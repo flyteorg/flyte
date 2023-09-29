@@ -4,6 +4,12 @@
 
 Chart for basic single Flyte executable deployment
 
+## Requirements
+
+| Repository | Name | Version |
+|------------|------|---------|
+| file://../flyteagent | flyteagent(flyteagent) | v0.1.10 |
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -32,7 +38,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v0.0.30"` |  |
+| configuration.co-pilot.image.tag | string | `"v1.9.4"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -107,59 +113,24 @@ Chart for basic single Flyte executable deployment
 | flyte-core-components.dataCatalog.disabled | bool | `false` |  |
 | flyte-core-components.propeller.disableWebhook | bool | `false` |  |
 | flyte-core-components.propeller.disabled | bool | `false` |  |
-| flyteagent.deployment.annotations | object | `{}` |  |
-| flyteagent.deployment.args | list | `[]` |  |
-| flyteagent.deployment.command | list | `[]` |  |
-| flyteagent.deployment.extraEnvVars | list | `[]` |  |
-| flyteagent.deployment.extraEnvVarsConfigMap | string | `""` |  |
-| flyteagent.deployment.extraEnvVarsSecret | string | `""` |  |
-| flyteagent.deployment.extraPodSpec | object | `{}` |  |
-| flyteagent.deployment.extraVolumeMounts | list | `[]` |  |
-| flyteagent.deployment.extraVolumes | list | `[]` |  |
-| flyteagent.deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
-| flyteagent.deployment.image.repository | string | `"ghcr.io/flyteorg/flyteagent"` |  |
-| flyteagent.deployment.image.tag | string | `"1.6.2b1"` |  |
-| flyteagent.deployment.initContainers | list | `[]` |  |
-| flyteagent.deployment.labels | object | `{}` |  |
-| flyteagent.deployment.lifecycleHooks | object | `{}` |  |
-| flyteagent.deployment.livenessProbe | object | `{}` |  |
-| flyteagent.deployment.podAnnotations | object | `{}` |  |
-| flyteagent.deployment.podLabels | object | `{}` |  |
-| flyteagent.deployment.podSecurityContext.enabled | bool | `false` |  |
-| flyteagent.deployment.podSecurityContext.fsGroup | int | `65534` |  |
-| flyteagent.deployment.podSecurityContext.runAsGroup | int | `65534` |  |
-| flyteagent.deployment.podSecurityContext.runAsUser | int | `65534` |  |
-| flyteagent.deployment.readinessProbe | object | `{}` |  |
-| flyteagent.deployment.replicas | int | `1` |  |
-| flyteagent.deployment.sidecars | list | `[]` |  |
-| flyteagent.deployment.startupProbe | object | `{}` |  |
-| flyteagent.enable | bool | `false` |  |
-| flyteagent.service.annotations | object | `{}` |  |
-| flyteagent.service.clusterIP | string | `""` |  |
-| flyteagent.service.externalTrafficPolicy | string | `"Cluster"` |  |
-| flyteagent.service.extraPorts | list | `[]` |  |
-| flyteagent.service.labels | object | `{}` |  |
-| flyteagent.service.loadBalancerIP | string | `""` |  |
-| flyteagent.service.loadBalancerSourceRanges | list | `[]` |  |
-| flyteagent.service.nodePort | string | `""` |  |
-| flyteagent.service.port | string | `""` |  |
-| flyteagent.service.type | string | `"ClusterIP"` |  |
-| flyteagent.serviceAccount.annotations | object | `{}` |  |
-| flyteagent.serviceAccount.create | bool | `true` |  |
-| flyteagent.serviceAccount.imagePullSecrets | list | `[]` |  |
-| flyteagent.serviceAccount.labels | object | `{}` |  |
-| flyteagent.serviceAccount.name | string | `""` |  |
+| flyteagent.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
 | ingress.create | bool | `false` |  |
 | ingress.grpcAnnotations | object | `{}` |  |
 | ingress.grpcExtraPaths.append | list | `[]` |  |
 | ingress.grpcExtraPaths.prepend | list | `[]` |  |
+| ingress.grpcIngressClassName | string | `""` |  |
+| ingress.grpcTls | list | `[]` |  |
 | ingress.host | string | `""` |  |
 | ingress.httpAnnotations | object | `{}` |  |
 | ingress.httpExtraPaths.append | list | `[]` |  |
 | ingress.httpExtraPaths.prepend | list | `[]` |  |
+| ingress.httpIngressClassName | string | `""` |  |
+| ingress.httpTls | list | `[]` |  |
+| ingress.ingressClassName | string | `""` |  |
 | ingress.labels | object | `{}` |  |
+| ingress.tls | list | `[]` |  |
 | nameOverride | string | `""` |  |
 | rbac.annotations | object | `{}` |  |
 | rbac.create | bool | `true` |  |

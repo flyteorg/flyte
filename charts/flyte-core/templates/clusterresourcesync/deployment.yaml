@@ -41,7 +41,7 @@ spec:
             name: config-volume
           {{- if gt (len .Values.configmap.clusters.labelClusterMap) 0 }}
           - mountPath: /var/run/credentials
-            name: flyte-admin-secrets
+            name: cluster-secrets
           {{- end }}
       serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
       {{- if .Values.cluster_resource_manager.resources }}
@@ -55,9 +55,9 @@ spec:
             name: flyte-clusterresourcesync-config
           name: config-volume
         {{- if gt (len .Values.configmap.clusters.labelClusterMap) 0 }}
-        - name: flyte-admin-secrets
+        - name: cluster-secrets
           secret:
-            secretName: flyte-admin-secrets
+            secretName: cluster-credentials
         {{- end }}
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
         - name: auth

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+// This message works with the 'presto' task type in the SDK and is the object that will be in the 'custom' field
+// of a Presto task's TaskTemplate
+message PrestoQuery {
+    string routing_group = 1;
+    string catalog = 2;
+    string schema = 3;
+    string statement = 4;
+}

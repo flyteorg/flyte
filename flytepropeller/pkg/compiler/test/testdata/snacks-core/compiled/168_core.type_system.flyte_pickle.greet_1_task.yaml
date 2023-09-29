@@ -1,0 +1,60 @@
+template:
+  Target:
+    Container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.type_system.flyte_pickle
+      - task-name
+      - greet
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+  id:
+    name: core.type_system.flyte_pickle.greet
+    resource_type: 1
+  interface:
+    inputs:
+      variables:
+        name:
+          description: name
+          type:
+            Type:
+              Simple: 3
+    outputs:
+      variables:
+        o0:
+          description: o0
+          type:
+            Type:
+              Blob:
+                format: PythonPickle
+            metadata:
+              python_class_name: People
+  metadata:
+    InterruptibleValue: null
+    retries: {}
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+  type: python-task

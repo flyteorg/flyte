@@ -160,7 +160,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
       - uses: unionai/flytectl-setup-action@v0.0.1
       - name: Setup sandbox
         run: |
@@ -178,7 +178,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flytekit
+          pip install flytekit flytekitplugins-deck-standard
           pip freeze
       - name: Checkout flytesnacks
         uses: actions/checkout@v3
@@ -189,17 +189,17 @@ jobs:
           # ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Register specific tests
         run: |
-          for f in basics/basics/basic_workflow.py \
+          for f in \
                   basics/basics/hello_world.py \
-                  basics/basics/lp.py \
+                  basics/basics/workflow.py \
                   basics/basics/named_outputs.py \
-                  control_flow/control_flow/chain_entities.py \
-                  control_flow/control_flow/dynamics.py \
-                  control_flow/control_flow/map_task.py \
-                  control_flow/control_flow/subworkflows.py \
-                  type_system/type_system/custom_objects.py \
-                  type_system/type_system/schema.py \
-                  type_system/type_system/typed_schema.py ;
+                  advanced_composition/advanced_composition/chain_entities.py \
+                  advanced_composition/advanced_composition/dynamics.py \
+                  advanced_composition/advanced_composition/map_task.py \
+                  advanced_composition/advanced_composition/subworkflows.py \
+                  data_types_and_io/data_types_and_io/custom_objects.py \
+                  data_types_and_io/data_types_and_io/schema.py \
+                  data_types_and_io/data_types_and_io/typed_schema.py ;
           do
               pyflyte --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
                   register \

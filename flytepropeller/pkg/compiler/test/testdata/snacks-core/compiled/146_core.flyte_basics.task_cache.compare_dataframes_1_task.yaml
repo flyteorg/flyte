@@ -1,0 +1,58 @@
+template:
+  Target:
+    Container:
+      args:
+      - pyflyte-execute
+      - --inputs
+      - '{{.input}}'
+      - --output-prefix
+      - '{{.outputPrefix}}'
+      - --raw-output-data-prefix
+      - '{{.rawOutputDataPrefix}}'
+      - --checkpoint-path
+      - '{{.checkpointOutputPrefix}}'
+      - --prev-checkpoint
+      - '{{.prevCheckpointPrefix}}'
+      - --resolver
+      - flytekit.core.python_auto_container.default_task_resolver
+      - --
+      - task-module
+      - core.flyte_basics.task_cache
+      - task-name
+      - compare_dataframes
+      config:
+      - key: testKey1
+        value: testValue1
+      - key: testKey2
+        value: testValue2
+      - key: testKey3
+        value: testValue3
+      image: ghcr.io/flyteorg/flytecookbook:core-8b8e1a849c9adfca88049a074b10dad278f70077
+      resources: {}
+  id:
+    name: core.flyte_basics.task_cache.compare_dataframes
+    resource_type: 1
+  interface:
+    inputs:
+      variables:
+        df1:
+          description: df1
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+        df2:
+          description: df2
+          type:
+            Type:
+              StructuredDatasetType:
+                format: parquet
+    outputs: {}
+  metadata:
+    InterruptibleValue: null
+    retries: {}
+    runtime:
+      flavor: python
+      type: 1
+      version: 0.32.6
+  type: python-task

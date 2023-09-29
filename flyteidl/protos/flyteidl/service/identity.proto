@@ -1,0 +1,51 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
+import "google/protobuf/struct.proto";
+// import "protoc-gen-swagger/options/annotations.proto";
+
+message UserInfoRequest {}
+
+// See the OpenID Connect spec at https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse for more information.
+message UserInfoResponse {
+  // Locally unique and never reassigned identifier within the Issuer for the End-User, which is intended to be consumed
+  // by the Client.
+  string subject = 1;
+
+  // Full name
+  string name = 2;
+
+  // Shorthand name by which the End-User wishes to be referred to
+  string preferred_username = 3;
+
+  // Given name(s) or first name(s)
+  string given_name = 4;
+
+  // Surname(s) or last name(s)
+  string family_name = 5;
+
+  // Preferred e-mail address
+  string email = 6;
+
+  // Profile picture URL
+  string picture = 7;
+
+  // Additional claims
+  google.protobuf.Struct additional_claims = 8;
+}
+
+// IdentityService defines an RPC Service that interacts with user/app identities.
+service IdentityService {
+  // Retrieves user information about the currently logged in user.
+  rpc UserInfo (UserInfoRequest) returns (UserInfoResponse) {
+    option (google.api.http) = {
+      get: "/me"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieves authenticated identity info."
+    // };
+  }
+}

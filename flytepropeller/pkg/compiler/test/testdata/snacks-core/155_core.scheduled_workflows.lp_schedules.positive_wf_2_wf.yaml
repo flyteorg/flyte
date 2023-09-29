@@ -1,0 +1,34 @@
+workflow:
+  id:
+    name: core.scheduled_workflows.lp_schedules.positive_wf
+    resource_type: 2
+  interface:
+    inputs:
+      variables:
+        name:
+          description: name
+          type:
+            Type:
+              Simple: 3
+    outputs: {}
+  metadata: {}
+  metadata_defaults: {}
+  nodes:
+  - Target:
+      TaskNode:
+        Reference:
+          ReferenceId:
+            name: core.scheduled_workflows.lp_schedules.be_positive
+            resource_type: 1
+        overrides: {}
+    id: n0
+    inputs:
+    - binding:
+        Value:
+          Promise:
+            var: name
+      var: name
+    metadata:
+      InterruptibleValue: null
+      name: be_positive
+      retries: {}

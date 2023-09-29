@@ -35,7 +35,7 @@ Some good practices when starting an RFC include:
     - If there's no objection (silence is approval) then create an Issue from the Discussion ([see how](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue#creating-an-issue-from-discussion))
     - Proceed to [open a PR](#opening-a-pull-request)
 - Discussing the topic on the [#contribute](https://flyte-org.slack.com/archives/C04NJPLRWUX) Slack channel
-- Adding the topic to the Contributor's [meeting agenda](https://hackmd.io/@davidmirror/rkqCpbK1n) to make sure it alligns with roadmap
+- Adding the topic to the Contributor's [meeting agenda](https://hackmd.io/@davidmirror/rkqCpbK1n) to make sure it aligns with roadmap
 - Taking the time to produce a well-written, well-thought-of document by using the template located [here](https://github.com/flyteorg/flyte/blob/RFC-Process/rfc/RFC-0000-Template.md).
 
 ## Where to store RFCs
@@ -44,7 +44,7 @@ The Flyte repo on GitHub has an RFC folder with 3 directories:
 - **Core language:** proposals to `FlyteIdl` that change the wire-format in any way are considered significant changes that require revision and approval.
   
   Reviewers: At least one of [Flyte maintainers](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md) and one of [Technical Steering Committee](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md).
-- **General System:** Changes to other repos that introduce signficant change of behavior or user-impacting features.
+- **General System:** Changes to other repos that introduce significant change of behavior or user-impacting features.
   
   Reviewers: At least one of [Flyte maintainers](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md) and one of [Technical Steering Committee](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md).
 - **CI-CD:** Significant changes to CI-CD System that have impact across different repositories.
@@ -63,7 +63,7 @@ The Flyte repo on GitHub has an RFC folder with 3 directories:
 
 Once a pull request is opened, the RFC is now in development and the following will happen:
 
-* It will be introduced in a future Contributor's meetup, happenning every other week, except othwerwise informed.
+* It will be introduced in a future Contributor's meetup, happening every other week, except otherwise informed.
 * The proposal will be discussed as much as possible in the RFC pull request directly. Any outside discussion will be summarized in the comment thread.
 * When deemed "ready", a maintainer or TSC member will propose a "motion for Final Comment Period (FCP)" along with a disposition of the outcome (merge, close, or postpone). This step is taken when enough discussions of the tradeoffs have taken place and the community is in a position to make a decision. 
 * The proposal enters FCP unless there's any objection (lazy consensus).
@@ -75,7 +75,7 @@ Once a pull request is opened, the RFC is now in development and the following w
 
 A proposal is considered Accepted when it has:
 * Completed the FCP with no significant objections
-* Received an approval vote from a supermajority (2/3) of the [Technical Steering Comittee](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md)'s members
+* Received an approval vote from a supermajority (2/3) of the [Technical Steering Committee](https://github.com/flyteorg/community/blob/main/MAINTAINERS.md)'s members
 
 
 ## Implementing RFCs

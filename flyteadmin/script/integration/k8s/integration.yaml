@@ -1,0 +1,434 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: flyte
+  annotations:
+    iam.amazonaws.com/permitted: ".*"
+spec:
+  finalizers:
+    - kubernetes
+status:
+  phase: Active
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  # name must match the spec fields below, and be in the form: <plural>.<group>
+  name: flyteworkflows.flyte.lyft.com
+spec:
+  # group name to use for REST API: /apis/<group>/<version>
+  group: flyte.lyft.com
+  # version name to use for REST API: /apis/<group>/<version>
+  version: v1alpha1
+  # either Namespaced or Cluster
+  names:
+    # plural name to be used in the URL: /apis/<group>/<version>/<plural>
+    plural: flyteworkflows
+    # singular name to be used as an alias on the CLI and for display
+    singular: flyteworkflow
+    # kind is normally the CamelCased singular type. Your resource manifests use this.
+    kind: FlyteWorkflow
+    # shortNames allow shorter string to match your resource on the CLI
+    shortNames:
+      - fly
+  scope: Namespaced
+
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-local-volume
+  namespace: flyte
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 128Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/postgres"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-local-volume-claim
+  namespace: flyte
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-local-volume-claim
+      containers:
+        - image: "postgres:10.1"
+          name: postgres
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: flyte
+spec:
+  ports:
+    - port: 5432
+  selector:
+    app: postgres
+
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: minio-volume
+  namespace: flyte
+  labels:
+    type: local
+spec:
+  storageClassName: minio
+  capacity:
+    storage: 128Mi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/minio"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: minio-volume-claim
+  namespace: flyte
+spec:
+  storageClassName: minio
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: flyte
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+        - name: minio-storage
+          persistentVolumeClaim:
+            claimName: minio-volume-claim
+      containers:
+        - image: "minio/minio:edge"
+          name: minio
+          env:
+            - name: MINIO_ACCESS_KEY
+              value: minio
+            - name: MINIO_SECRET_KEY
+              value: miniostorage
+          args:
+            - server
+            - /data
+          ports:
+            - containerPort: 9000
+              name: minio
+          volumeMounts:
+            - name: minio-storage
+              mountPath: /data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: flyte
+spec:
+  ports:
+    - port: 9000
+  selector:
+    app: minio
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: flyteadmin
+  namespace: flyte
+spec:
+  selector:
+    app: flyteadmin
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8088
+
+---
+# Role for flyteadmin
+# https://kubernetes.io/docs/admin/authorization/rbac/
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flyteadmin
+  namespace: flyte
+rules:
+  #Allow Access to all resources under flyte
+  - apiGroups:
+      - flyte.lyft.com
+    resources:
+      - flytegraphs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - patch
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: flyteadmin-binding
+  namespace: flyte
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: fyteadmin
+subjects:
+  - kind: ServiceAccount
+    name: flyteadmin
+    namespace: flyte
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  creationTimestamp: 2016-02-18T19:14:38Z
+  name: flyte-admin-config
+  namespace: flyte
+data:
+  # this will need to be templatized
+  development.integration: |-
+    server:
+      httpPort: 8088
+      grpcPort: 8089
+      kube-config: "$HOME/.kube/config"
+      grpcServerReflection: true
+      security:
+        secure: false
+        useAuth: false
+    flyteadmin:
+      runScheduler: false
+      roleNameKey: "iam.amazonaws.com/role"
+      metricsScope: "flyte:"
+      testing:
+        host: http://localhost:8088
+      metadataStoragePrefix:
+        - "metadata"
+        - "admin"
+    database:
+      postgres:
+        port: 5432
+        username: postgres
+        host: postgres
+        dbname: postgres
+        options: "sslmode=disable"
+    scheduler:
+      eventScheduler:
+        scheme: local
+        region: "my-region"
+        scheduleRole: "arn:aws:iam::abc123:role/my-iam-role"
+        targetName: "arn:aws:sqs:my-region:abc123:my-queue"
+      workflowExecutor:
+        scheme: local
+        region: "my-region"
+        scheduleQueueName: "won't-work-locally"
+        accountId: "abc123"
+    notifications:
+      type: local
+      region: "my-region"
+      publisher:
+        topicName: "foo"
+      processor:
+        queueName: "queue"
+        accountId: "bar"
+      emailer:
+        subject: "Notice: Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\"."
+        sender:  "flyte-notifications@example.com"
+        body: >
+          Execution \"{{ name }}\" has {{ phase }} in \"{{ domain }}\". View details at
+          <a href=\http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}>
+          http://example.com/projects/{{ project }}/domains/{{ domain }}/executions/{{ name }}</a>. {{ error }}
+    remoteData:
+      region: "my-region"
+      scheme: local
+      signedUrls:
+        durationMinutes: 3
+    Logger:
+      show-source: true
+      level: 5
+    storage:
+      type: minio
+      connection:
+        access-key: minio
+        auth-type: accesskey
+        secret-key: miniostorage
+        disable-ssl: true
+        endpoint: "http://minio:9000"
+        region: my-region
+      cache:
+        max_size_mbs: 10
+        target_gc_percent: 100
+      container: "flyte"
+    task_resources:
+      defaults:
+        cpu: 100m
+        gpu: 20m
+        memory: 1Mi
+        storage: 10M
+      limits:
+        cpu: 500m
+        gpu: 100m
+        memory: 1Mi
+        storage: 10G
+    queues:
+      executionQueues:
+        - dynamic: "gpu_dynamic"
+          attributes:
+            - gpu
+        - dynamic: "critical"
+          attributes:
+            - critical
+        - dynamic: "default"
+          attributes:
+            - default
+      workflowConfigs:
+        - project: "myProject"
+          domain: "production"
+          workflowName: "myWorkflow"
+          tags:
+            - critical
+    task_type_whitelist:
+      sparkonk8s:
+        - project: myProject
+          domain: production
+        - project: myProject2
+          domain: production
+      qubolespark:
+        - project: myProject3
+    domains:
+      - id: development
+        name: development
+      - id: staging
+        name: staging
+      - id: production
+        name: production
+      - id: domain
+        name: domain
+
+---
+# Create the actual deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteadmin
+  namespace: flyte
+  labels:
+    app: flyteadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flyteadmin
+  template:
+    metadata:
+      labels:
+        app: flyteadmin
+    spec:
+      volumes:
+        - name: shared-data
+          emptyDir: {}
+        - name: config-volume
+          configMap:
+            name: flyte-admin-config
+            items:
+              - key: development.integration
+                path: flyteadmin_config.yaml
+      imagePullSecrets:
+        - name: dockerhub
+      initContainers:
+        - name: check-db-ready
+          image: postgres:10.1
+          command: ['sh', '-c',
+              'until pg_isready -h postgres -p 5432;
+          do echo waiting for database; sleep 2; done;']
+        - name: run-migrations
+          image: flyteadmin:test
+          imagePullPolicy: IfNotPresent
+          command: ["flyteadmin", "migrate", "run", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+        - name: seed-projects
+          image: flyteadmin:test
+          imagePullPolicy: IfNotPresent
+          command: ["flyteadmin", "migrate", "seed-projects",
+                    "project", "admintests", "flytekit", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/flyte/config
+      containers:
+        - name: flyteadmin
+          image: flyteadmin:test
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8088
+          command: ["flyteadmin", "serve", "--config", "/etc/flyte/config/flyteadmin_config.yaml",
+                    "--server.kube-config", "/etc/flyte/config/flyteadmin_config.yaml"]
+          ports:
+            - containerPort: 8088
+          volumeMounts:
+            - name: shared-data
+              mountPath: /srv/flyte
+            - name: config-volume
+              mountPath: /etc/flyte/config

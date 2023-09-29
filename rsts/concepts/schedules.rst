@@ -5,7 +5,7 @@ Schedules
 
 .. tags:: Basic, Glossary
 
-Workflows can be run automatically using :ref:`schedules <cookbook:launchplan_schedules>` associated with launch plans.
+Workflows can be run automatically using :ref:`schedules <cookbook:scheduling_launch_plan>` associated with launch plans.
 
 Only one launch plan version for a given {Project, Domain, Name} combination can be active, which means only one schedule can be active for a launch plan. This is because a single active schedule can exist across all versions of the launch plan. 
 

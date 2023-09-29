@@ -1,0 +1,22 @@
+name: Mark stale issues
+
+on:
+  schedule:
+  - cron: "0 0 * * *"
+
+jobs:
+  stale:
+    name: Close stale issues
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v8
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        stale-issue-message: "Hello 👋, This issue has been inactive for over 9 months. To help maintain a clean and focused backlog, we'll be marking this issue as stale and will close the issue if we detect no activity in the next 7 days. Thank you for your contribution and understanding! 🙏"
+        close-issue-message: "Hello 👋, This issue has been inactive for over 9 months and hasn't received any updates since it was marked as stale. We'll be closing this issue for now, but if you believe this issue is still relevant, please feel free to reopen it. Thank you for your contribution and understanding! 🙏"
+        stale-issue-label: "stale"
+        exempt-issue-labels: "needs discussion"  # Comma-separated list of labels.
+        days-before-stale: 270
+        days-before-close: 7
+        ascending: true # https://github.com/actions/stale#ascending
+        operations-per-run: 500

@@ -1,0 +1,21 @@
+.idea/*
+.DS_Store
+vendor
+
+# Vim swapfiles
+*.swp
+*.swo
+
+dist
+gen/pb_python/flyteidl.egg-info/
+
+.virtualgo
+docs/build/
+
+.vscode/
+tmp/
+.python-version
+__pycache__/
+
+venv/
+build/

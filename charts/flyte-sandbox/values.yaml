@@ -46,6 +46,17 @@ flyte-binary:
         host: artifact-service.flyte.svc.cluster.local
         port: 50051
         insecure: true
+      task_resources:
+        defaults:
+          cpu: 500m
+          ephemeralStorage: 0
+          gpu: 0
+          memory: 1Gi
+        limits:
+          cpu: 0
+          ephemeralStorage: 0
+          gpu: 0
+          memory: 0
       storage:
         signedURL:
           stowConfigOverride:

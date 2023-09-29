@@ -22,6 +22,16 @@ metadata:
     {{- tpl ( .Values.ingress.httpAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
 spec:
+  {{- if .Values.ingress.httpIngressClassName }}
+  ingressClassName: {{ .Values.ingress.httpIngressClassName | quote }}
+  {{- else if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName | quote }}
+  {{- end }}
+  {{- if .Values.ingress.httpTls }}
+  tls: {{- tpl ( .Values.ingress.httpTls | toYaml ) . | nindent 2 }}
+  {{- else if .Values.ingress.tls }}
+  tls: {{- tpl ( .Values.ingress.tls | toYaml ) . | nindent 2 }}
+  {{- end }}
   rules:
   - http:
       paths:
