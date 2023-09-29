@@ -258,9 +258,9 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 func isAboveInterruptibleFailureThreshold(numFailures uint32, maxAttempts uint32, interruptibleThreshold int32) bool {
 	if interruptibleThreshold > 0 {
 		return numFailures >= uint32(interruptibleThreshold)
-	} else {
-		return numFailures >= maxAttempts-uint32(-interruptibleThreshold)
 	}
+
+	return numFailures >= maxAttempts-uint32(-interruptibleThreshold)
 }
 
 func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
