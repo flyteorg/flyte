@@ -6,21 +6,22 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
+	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flytestdlib/logger"
-
 	"github.com/flyteorg/flyteplugins/go/tasks/plugins/webapi/agent"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/backoff"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/k8s"
+	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const AgentServiceKey = "agent-service"
 
 var once sync.Once
 
-func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {
+func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPluginConfig, pr PluginRegistryIface,
+	kubeClientset kubernetes.Interface) (enabledPlugins []core.PluginEntry, defaultForTaskTypes map[pluginID][]taskType, err error) {
 	if cfg == nil {
 		return nil, nil, fmt.Errorf("unable to initialize plugin list, cfg is a required argument")
 	}
@@ -68,7 +69,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 				ID:                  id,
 				RegisteredTaskTypes: kpe.RegisteredTaskTypes,
 				LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (plugin core.Plugin, e error) {
-					return k8s.NewPluginManagerWithBackOff(ctx, iCtx, kpe, backOffController, monitorIndex)
+					return k8s.NewPluginManagerWithBackOff(ctx, iCtx, kpe, backOffController, monitorIndex, kubeClientset)
 				},
 				IsDefault: kpe.IsDefault,
 			}

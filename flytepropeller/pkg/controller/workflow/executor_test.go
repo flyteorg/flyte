@@ -9,58 +9,52 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/rand"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/flyteorg/flytestdlib/contextutils"
-	"github.com/flyteorg/flytestdlib/promutils/labeled"
-	"github.com/stretchr/testify/mock"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"k8s.io/apimachinery/pkg/util/sets"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
-	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flytestdlib/logger"
-
-	"github.com/flyteorg/flytepropeller/events"
-	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
-	eventMocks "github.com/flyteorg/flytepropeller/events/mocks"
-	mocks2 "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/catalog"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/factory"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
-	nodemocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/fakeplugins"
-
-	wfErrors "github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/promutils"
-	"github.com/flyteorg/flytestdlib/storage"
-	"github.com/flyteorg/flytestdlib/yamlutils"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/rand"
+	"k8s.io/apimachinery/pkg/util/sets"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/record"
 
+	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery"
+	pluginCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flytepropeller/events"
+	eventsErr "github.com/flyteorg/flytepropeller/events/errors"
+	eventMocks "github.com/flyteorg/flytepropeller/events/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flytepropeller/pkg/controller/config"
+	executorMocks "github.com/flyteorg/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes"
-	gatemocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/gate/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/catalog"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/factory"
+	gateMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/gate/mocks"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/handler"
+	nodemocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	recoveryMocks "github.com/flyteorg/flytepropeller/pkg/controller/nodes/recovery/mocks"
 	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
+	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/fakeplugins"
+	wfErrors "github.com/flyteorg/flytepropeller/pkg/controller/workflow/errors"
+	"github.com/flyteorg/flytestdlib/contextutils"
+	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flytestdlib/storage"
+	"github.com/flyteorg/flytestdlib/yamlutils"
 )
 
 var (
 	testScope      = promutils.NewScope("test_wfexec")
-	fakeKubeClient = mocks2.NewFakeKubeClient()
-	signalClient   = &gatemocks.SignalServiceClient{}
+	fakeKubeClient = executorMocks.NewFakeKubeClient()
+	mockClientset  = k8sfake.NewSimpleClientset()
+	signalClient   = &gateMocks.SignalServiceClient{}
 )
 
 const (
@@ -248,7 +242,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Error(t *testing.T) {
 	recoveryClient := &recoveryMocks.Client{}
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 
-	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
+	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
@@ -331,7 +325,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow(t *testing.T) {
 	recoveryClient := &recoveryMocks.Client{}
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 
-	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
+	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
@@ -607,7 +601,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 	adminClient := launchplan.NewFailFastLaunchPlanExecutor()
 	recoveryClient := &recoveryMocks.Client{}
 
-	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
+	handlerFactory, err := factory.NewHandlerFactory(ctx, adminClient, adminClient, fakeKubeClient, mockClientset, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, promutils.NewTestScope())
 	assert.NoError(t, err)
 
 	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
