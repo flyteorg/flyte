@@ -7,6 +7,7 @@ FROM --platform=${BUILDPLATFORM} golang:1.19.1-bullseye AS flytebuilder
 ARG TARGETARCH
 ENV GOARCH "${TARGETARCH}"
 ENV GOOS linux
+
 WORKDIR /flyteorg/build
 
 COPY datacatalog datacatalog
@@ -19,7 +20,6 @@ COPY flytestdlib flytestdlib
 
 COPY go.mod go.sum ./
 RUN go mod download
-
 COPY cmd cmd
 COPY --from=flyteconsole /app/ cmd/single/dist
 RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
