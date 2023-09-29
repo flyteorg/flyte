@@ -246,8 +246,8 @@ github.com/flyteorg/flyteidl v1.5.13 h1:IQ2Cw+u36ew3BPyRDAcHdzc/GyNEOXOxhKy9jbS4
 github.com/flyteorg/flyteidl v1.5.13/go.mod h1:EtE/muM2lHHgBabjYcxqe9TWeJSL0kXwbI0RgVwI4Og=
 github.com/flyteorg/flyteplugins v1.1.26-0.20230914220605-c548d23fbb52 h1:Vnye5/uCC03Qz/z6OYx8VIL9akQvwwWrrKL7rV8gEmM=
 github.com/flyteorg/flyteplugins v1.1.26-0.20230914220605-c548d23fbb52/go.mod h1:HEd4yf0H8XfxMcHFwrTdTIJ/9lEAz83OpgcFQe47L6I=
-github.com/flyteorg/flytestdlib v1.0.22 h1:8RAc+TmME54FInf4+t6+C7X8Z/dW6i6aTs6W8SEzpI8=
-github.com/flyteorg/flytestdlib v1.0.22/go.mod h1:6nXa5g00qFIsgdvQ7jKQMJmDniqO0hG6Z5X5olfduqQ=
+github.com/flyteorg/flytestdlib v1.0.24 h1:jDvymcjlsTRCwOtxPapro0WZBe3isTz+T3Tiq+mZUuk=
+github.com/flyteorg/flytestdlib v1.0.24/go.mod h1:6nXa5g00qFIsgdvQ7jKQMJmDniqO0hG6Z5X5olfduqQ=
 github.com/flyteorg/stow v0.3.7 h1:Cx7j8/Ux6+toD5hp5fy++927V+yAcAttDeQAlUD/864=
 github.com/flyteorg/stow v0.3.7/go.mod h1:5dfBitPM004dwaZdoVylVjxFT4GWAgI0ghAndhNUzCo=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible/go.mod h1:pbq4aXjuKjdthFRnoDwaVPLA+WlJuPGy+QneDUgJi2k=
