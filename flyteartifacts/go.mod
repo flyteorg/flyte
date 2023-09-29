@@ -21,4 +21,4 @@ require (
 	google.golang.org/protobuf v1.30.0 // indirect
 )
 
-replace github.com/flyteorg/flyteidl => ../flyteidl
+replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.14-0.20230928230632-4854ce7ad143
