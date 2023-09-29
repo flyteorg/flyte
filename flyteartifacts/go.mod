@@ -3,7 +3,6 @@ module github.com/flyteorg/flyte/flyteartifacts
 go 1.19
 
 require (
-	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/golang/glog v1.1.0
 	github.com/spf13/cobra v1.4.0
 	google.golang.org/grpc v1.56.1
@@ -11,6 +10,7 @@ require (
 )
 
 require (
+	github.com/flyteorg/flyteidl v1.5.14-0.20230928230632-4854ce7ad143 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -20,5 +20,3 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 )
-
-replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.14-0.20230928230632-4854ce7ad143
