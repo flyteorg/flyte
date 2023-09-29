@@ -48,20 +48,19 @@ requests successfully, the following environment-specific requirements should be
    
    .. code-block:: json
       
-      "Action": [
+        "Action": [
 
           "s3:DeleteObject*",
           "s3:GetObject*",
           "s3:ListBucket",
           "s3:PutObject*"
-
          ], 
 
-      "Resource": [ 
+        "Resource": [ 
 
           "arn:aws:s3:::<your-S3-bucket>*",
           "arn:aws:s3:::<your-S3-bucket>*/*"
-          
+
             ],   
 
    2. At least three IAM Roles configured: one for the controlplane components, another for the dataplane
@@ -148,10 +147,10 @@ requests successfully, the following environment-specific requirements should be
                     "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com",
                     "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:flyte:flytepropeller"
                     }
-                }
-            }
-         ]
-      }
+                  }
+              }
+           ]
+        }
 
    **Workers role**
 
@@ -169,23 +168,23 @@ requests successfully, the following environment-specific requirements should be
       .. code-block:: json
 
          {
-       "Version": "2012-10-17",
-       "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::<ACCOUNT-ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringLike": {
-                    "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:*:default",
-                    "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com"
-                  }
-               }
-            }
-          ]
-       }
+         "Version": "2012-10-17",
+         "Statement": [
+          {
+              "Effect": "Allow",
+              "Principal": {
+                  "Federated": "arn:aws:iam::<ACCOUNT-ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                  "StringLike": {
+                      "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:*:default",
+                      "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com"
+                    }
+                 }
+              }
+            ]
+         }
 
 .. _dataplane-deployment:
 
@@ -626,8 +625,8 @@ The process can be repeated for additional clusters.
                   }
                }
             }
-         ]
-      }
+          ]
+        }
 
   8.  Connect to your new EKS cluster and create the ``flyte`` namespace:
 
