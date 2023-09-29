@@ -7,6 +7,7 @@ FROM --platform=${BUILDPLATFORM} golang:1.19.1-bullseye AS flytebuilder
 ARG TARGETARCH
 ENV GOARCH "${TARGETARCH}"
 ENV GOOS linux
+
 WORKDIR /flyteorg/build
 
 COPY datacatalog datacatalog
