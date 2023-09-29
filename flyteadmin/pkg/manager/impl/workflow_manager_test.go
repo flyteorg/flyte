@@ -454,6 +454,13 @@ func TestListWorkflows(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("version %v", idx), workflow.Id.Version)
 		assert.True(t, proto.Equal(&admin.WorkflowClosure{
 			CreatedAt: testutils.MockCreatedAtProto,
+			CompiledWorkflow: &core.CompiledWorkflowClosure{
+				Primary: &core.CompiledWorkflow{
+					Template: &core.WorkflowTemplate{
+						Interface: &core.TypedInterface{},
+					},
+				},
+			},
 		}, workflow.Closure))
 	}
 	assert.Empty(t, workflowList.Token)
