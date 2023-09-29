@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1e\x66lyteidl/core/identifier.proto\x12\rflyteidl.core\"\xae\x01\n\nIdentifier\x12@\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceTypeR\x0cresourceType\x12\x18\n\x07project\x18\x02 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x03 \x01(\tR\x06\x64omain\x12\x12\n\x04name\x18\x04 \x01(\tR\x04name\x12\x18\n\x07version\x18\x05 \x01(\tR\x07version\"c\n\x1bWorkflowExecutionIdentifier\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x12\n\x04name\x18\x04 \x01(\tR\x04name\"\x81\x01\n\x17NodeExecutionIdentifier\x12\x17\n\x07node_id\x18\x01 \x01(\tR\x06nodeId\x12M\n\x0c\x65xecution_id\x18\x02 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifierR\x0b\x65xecutionId\"\xc6\x01\n\x17TaskExecutionIdentifier\x12\x32\n\x07task_id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.IdentifierR\x06taskId\x12R\n\x11node_execution_id\x18\x02 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifierR\x0fnodeExecutionId\x12#\n\rretry_attempt\x18\x03 \x01(\rR\x0cretryAttempt\"~\n\x10SignalIdentifier\x12\x1b\n\tsignal_id\x18\x01 \x01(\tR\x08signalId\x12M\n\x0c\x65xecution_id\x18\x02 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifierR\x0b\x65xecutionId\"S\n\x0b\x41rtifactKey\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x12\n\x04name\x18\x03 \x01(\tR\x04name\"n\n\x13\x41rtifactBindingData\x12\x14\n\x05index\x18\x01 \x01(\rR\x05index\x12#\n\rpartition_key\x18\x02 \x01(\tR\x0cpartitionKey\x12\x1c\n\ttransform\x18\x03 \x01(\tR\ttransform\"q\n\x0ePartitionValue\x12!\n\x0cstatic_value\x18\x01 \x01(\tR\x0bstaticValue\x12<\n\x07\x62inding\x18\x02 \x01(\x0b\x32\".flyteidl.core.ArtifactBindingDataR\x07\x62inding\"\xa1\x01\n\nPartitions\x12:\n\x05value\x18\x01 \x03(\x0b\x32$.flyteidl.core.Partitions.ValueEntryR\x05value\x1aW\n\nValueEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x33\n\x05value\x18\x02 \x01(\x0b\x32\x1d.flyteidl.core.PartitionValueR\x05value:\x02\x38\x01\"\xb0\x01\n\nArtifactID\x12=\n\x0c\x61rtifact_key\x18\x01 \x01(\x0b\x32\x1a.flyteidl.core.ArtifactKeyR\x0b\x61rtifactKey\x12\x18\n\x07version\x18\x02 \x01(\tR\x07version\x12;\n\npartitions\x18\x03 \x01(\x0b\x32\x19.flyteidl.core.PartitionsH\x00R\npartitionsB\x0c\n\ndimensions\"b\n\x0b\x41rtifactTag\x12=\n\x0c\x61rtifact_key\x18\x01 \x01(\x0b\x32\x1a.flyteidl.core.ArtifactKeyR\x0b\x61rtifactKey\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value\"\xf0\x01\n\rArtifactQuery\x12<\n\x0b\x61rtifact_id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.ArtifactIDH\x00R\nartifactId\x12?\n\x0c\x61rtifact_tag\x18\x02 \x01(\x0b\x32\x1a.flyteidl.core.ArtifactTagH\x00R\x0b\x61rtifactTag\x12\x12\n\x03uri\x18\x03 \x01(\tH\x00R\x03uri\x12>\n\x07\x62inding\x18\x04 \x01(\x0b\x32\".flyteidl.core.ArtifactBindingDataH\x00R\x07\x62indingB\x0c\n\nidentifier\"z\n\x07Trigger\x12\x38\n\ntrigger_id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.IdentifierR\ttriggerId\x12\x35\n\x08triggers\x18\x02 \x03(\x0b\x32\x19.flyteidl.core.ArtifactIDR\x08triggers*U\n\x0cResourceType\x12\x0f\n\x0bUNSPECIFIED\x10\x00\x12\x08\n\x04TASK\x10\x01\x12\x0c\n\x08WORKFLOW\x10\x02\x12\x0f\n\x0bLAUNCH_PLAN\x10\x03\x12\x0b\n\x07\x44\x41TASET\x10\x04\x42\xaf\x01\n\x11\x63om.flyteidl.coreB\x0fIdentifierProtoP\x01Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1e\x66lyteidl/core/identifier.proto\x12\rflyteidl.core\"\xae\x01\n\nIdentifier\x12@\n\rresource_type\x18\x01 \x01(\x0e\x32\x1b.flyteidl.core.ResourceTypeR\x0cresourceType\x12\x18\n\x07project\x18\x02 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x03 \x01(\tR\x06\x64omain\x12\x12\n\x04name\x18\x04 \x01(\tR\x04name\x12\x18\n\x07version\x18\x05 \x01(\tR\x07version\"c\n\x1bWorkflowExecutionIdentifier\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x12\n\x04name\x18\x04 \x01(\tR\x04name\"\x81\x01\n\x17NodeExecutionIdentifier\x12\x17\n\x07node_id\x18\x01 \x01(\tR\x06nodeId\x12M\n\x0c\x65xecution_id\x18\x02 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifierR\x0b\x65xecutionId\"\xc6\x01\n\x17TaskExecutionIdentifier\x12\x32\n\x07task_id\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.IdentifierR\x06taskId\x12R\n\x11node_execution_id\x18\x02 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifierR\x0fnodeExecutionId\x12#\n\rretry_attempt\x18\x03 \x01(\rR\x0cretryAttempt\"~\n\x10SignalIdentifier\x12\x1b\n\tsignal_id\x18\x01 \x01(\tR\x08signalId\x12M\n\x0c\x65xecution_id\x18\x02 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifierR\x0b\x65xecutionId*U\n\x0cResourceType\x12\x0f\n\x0bUNSPECIFIED\x10\x00\x12\x08\n\x04TASK\x10\x01\x12\x0c\n\x08WORKFLOW\x10\x02\x12\x0f\n\x0bLAUNCH_PLAN\x10\x03\x12\x0b\n\x07\x44\x41TASET\x10\x04\x42\xaf\x01\n\x11\x63om.flyteidl.coreB\x0fIdentifierProtoP\x01Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -22,10 +22,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\021com.flyteidl.coreB\017IdentifierProtoP\001Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core\242\002\003FCX\252\002\rFlyteidl.Core\312\002\rFlyteidl\\Core\342\002\031Flyteidl\\Core\\GPBMetadata\352\002\016Flyteidl::Core'
-  _PARTITIONS_VALUEENTRY._options = None
-  _PARTITIONS_VALUEENTRY._serialized_options = b'8\001'
-  _globals['_RESOURCETYPE']._serialized_start=1910
-  _globals['_RESOURCETYPE']._serialized_end=1995
+  _globals['_RESOURCETYPE']._serialized_start=788
+  _globals['_RESOURCETYPE']._serialized_end=873
   _globals['_IDENTIFIER']._serialized_start=50
   _globals['_IDENTIFIER']._serialized_end=224
   _globals['_WORKFLOWEXECUTIONIDENTIFIER']._serialized_start=226
@@ -36,22 +34,4 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_TASKEXECUTIONIDENTIFIER']._serialized_end=658
   _globals['_SIGNALIDENTIFIER']._serialized_start=660
   _globals['_SIGNALIDENTIFIER']._serialized_end=786
-  _globals['_ARTIFACTKEY']._serialized_start=788
-  _globals['_ARTIFACTKEY']._serialized_end=871
-  _globals['_ARTIFACTBINDINGDATA']._serialized_start=873
-  _globals['_ARTIFACTBINDINGDATA']._serialized_end=983
-  _globals['_PARTITIONVALUE']._serialized_start=985
-  _globals['_PARTITIONVALUE']._serialized_end=1098
-  _globals['_PARTITIONS']._serialized_start=1101
-  _globals['_PARTITIONS']._serialized_end=1262
-  _globals['_PARTITIONS_VALUEENTRY']._serialized_start=1175
-  _globals['_PARTITIONS_VALUEENTRY']._serialized_end=1262
-  _globals['_ARTIFACTID']._serialized_start=1265
-  _globals['_ARTIFACTID']._serialized_end=1441
-  _globals['_ARTIFACTTAG']._serialized_start=1443
-  _globals['_ARTIFACTTAG']._serialized_end=1541
-  _globals['_ARTIFACTQUERY']._serialized_start=1544
-  _globals['_ARTIFACTQUERY']._serialized_end=1784
-  _globals['_TRIGGER']._serialized_start=1786
-  _globals['_TRIGGER']._serialized_end=1908
 # @@protoc_insertion_point(module_scope)

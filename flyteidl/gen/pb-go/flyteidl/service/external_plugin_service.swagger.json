@@ -163,63 +163,6 @@
         }
       }
     },
-    "coreArtifactBindingData": {
-      "type": "object",
-      "properties": {
-        "index": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "partition_key": {
-          "type": "string",
-          "title": "These two fields are only relevant in the partition value case"
-        },
-        "transform": {
-          "type": "string"
-        }
-      },
-      "title": "Only valid for triggers"
-    },
-    "coreArtifactID": {
-      "type": "object",
-      "properties": {
-        "artifact_key": {
-          "$ref": "#/definitions/coreArtifactKey"
-        },
-        "version": {
-          "type": "string"
-        },
-        "partitions": {
-          "$ref": "#/definitions/corePartitions"
-        }
-      }
-    },
-    "coreArtifactKey": {
-      "type": "object",
-      "properties": {
-        "project": {
-          "type": "string",
-          "description": "Project and domain and suffix needs to be unique across a given artifact store."
-        },
-        "domain": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "coreArtifactTag": {
-      "type": "object",
-      "properties": {
-        "artifact_key": {
-          "$ref": "#/definitions/coreArtifactKey"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
     "coreBinary": {
       "type": "object",
       "properties": {
@@ -517,13 +460,6 @@
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
-        },
-        "metadata": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Rejected: We were going to add the Artifact (or at least ArtifactID) here as a way to keep track of lineage\nBut this was deemed too janky."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -649,28 +585,6 @@
       ],
       "default": "CLIENT_CREDENTIALS",
       "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
-    },
-    "corePartitionValue": {
-      "type": "object",
-      "properties": {
-        "static_value": {
-          "type": "string"
-        },
-        "binding": {
-          "$ref": "#/definitions/coreArtifactBindingData"
-        }
-      }
-    },
-    "corePartitions": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/corePartitionValue"
-          }
-        }
-      }
     },
     "corePrimitive": {
       "type": "object",
@@ -1114,13 +1028,6 @@
         "description": {
           "type": "string",
           "title": "+optional string describing input variable"
-        },
-        "artifact_partial_id": {
-          "$ref": "#/definitions/coreArtifactID",
-          "description": "+optional This object allows the user to specify how Artifacts are created.\nname, tag, partitions can be specified. The other fields (version and project/domain) are ignored."
-        },
-        "artifact_tag": {
-          "$ref": "#/definitions/coreArtifactTag"
         }
       },
       "description": "Defines a strongly typed variable."

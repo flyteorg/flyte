@@ -48,7 +48,7 @@ struct TableStruct_flyteidl_2fcore_2fliterals_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[23]
+  static const ::google::protobuf::internal::ParseTable schema[22]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -96,9 +96,6 @@ extern LiteralMapDefaultTypeInternal _LiteralMap_default_instance_;
 class LiteralMap_LiteralsEntry_DoNotUse;
 class LiteralMap_LiteralsEntry_DoNotUseDefaultTypeInternal;
 extern LiteralMap_LiteralsEntry_DoNotUseDefaultTypeInternal _LiteralMap_LiteralsEntry_DoNotUse_default_instance_;
-class Literal_MetadataEntry_DoNotUse;
-class Literal_MetadataEntry_DoNotUseDefaultTypeInternal;
-extern Literal_MetadataEntry_DoNotUseDefaultTypeInternal _Literal_MetadataEntry_DoNotUse_default_instance_;
 class Primitive;
 class PrimitiveDefaultTypeInternal;
 extern PrimitiveDefaultTypeInternal _Primitive_default_instance_;
@@ -143,7 +140,6 @@ template<> ::flyteidl::core::Literal* Arena::CreateMaybeMessage<::flyteidl::core
 template<> ::flyteidl::core::LiteralCollection* Arena::CreateMaybeMessage<::flyteidl::core::LiteralCollection>(Arena*);
 template<> ::flyteidl::core::LiteralMap* Arena::CreateMaybeMessage<::flyteidl::core::LiteralMap>(Arena*);
 template<> ::flyteidl::core::LiteralMap_LiteralsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::LiteralMap_LiteralsEntry_DoNotUse>(Arena*);
-template<> ::flyteidl::core::Literal_MetadataEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::Literal_MetadataEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::Primitive* Arena::CreateMaybeMessage<::flyteidl::core::Primitive>(Arena*);
 template<> ::flyteidl::core::RetryStrategy* Arena::CreateMaybeMessage<::flyteidl::core::RetryStrategy>(Arena*);
 template<> ::flyteidl::core::Scalar* Arena::CreateMaybeMessage<::flyteidl::core::Scalar>(Arena*);
@@ -1571,30 +1567,6 @@ class Scalar final :
 };
 // -------------------------------------------------------------------
 
-class Literal_MetadataEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<Literal_MetadataEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > {
-public:
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  typedef ::google::protobuf::internal::MapEntry<Literal_MetadataEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > SuperType;
-  Literal_MetadataEntry_DoNotUse();
-  Literal_MetadataEntry_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const Literal_MetadataEntry_DoNotUse& other);
-  static const Literal_MetadataEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const Literal_MetadataEntry_DoNotUse*>(&_Literal_MetadataEntry_DoNotUse_default_instance_); }
-  void MergeFrom(const ::google::protobuf::Message& other) final;
-  ::google::protobuf::Metadata GetMetadata() const;
-};
-
-// -------------------------------------------------------------------
-
 class Literal final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.Literal) */ {
  public:
@@ -1640,7 +1612,7 @@ class Literal final :
                &_Literal_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    10;
 
   void Swap(Literal* other);
   friend void swap(Literal& a, Literal& b) {
@@ -1695,17 +1667,7 @@ class Literal final :
 
   // nested types ----------------------------------------------------
 
-
   // accessors -------------------------------------------------------
-
-  // map<string, string> metadata = 5;
-  int metadata_size() const;
-  void clear_metadata();
-  static const int kMetadataFieldNumber = 5;
-  const ::google::protobuf::Map< ::std::string, ::std::string >&
-      metadata() const;
-  ::google::protobuf::Map< ::std::string, ::std::string >*
-      mutable_metadata();
 
   // string hash = 4;
   void clear_hash();
@@ -1761,12 +1723,6 @@ class Literal final :
   inline void clear_has_value();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::MapField<
-      Literal_MetadataEntry_DoNotUse,
-      ::std::string, ::std::string,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      0 > metadata_;
   ::google::protobuf::internal::ArenaStringPtr hash_;
   union ValueUnion {
     ValueUnion() {}
@@ -1819,7 +1775,7 @@ class LiteralCollection final :
                &_LiteralCollection_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    11;
 
   void Swap(LiteralCollection* other);
   friend void swap(LiteralCollection& a, LiteralCollection& b) {
@@ -1961,7 +1917,7 @@ class LiteralMap final :
                &_LiteralMap_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    13;
 
   void Swap(LiteralMap* other);
   friend void swap(LiteralMap& a, LiteralMap& b) {
@@ -2082,7 +2038,7 @@ class BindingDataCollection final :
                &_BindingDataCollection_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    14;
 
   void Swap(BindingDataCollection* other);
   friend void swap(BindingDataCollection& a, BindingDataCollection& b) {
@@ -2224,7 +2180,7 @@ class BindingDataMap final :
                &_BindingDataMap_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    16;
 
   void Swap(BindingDataMap* other);
   friend void swap(BindingDataMap& a, BindingDataMap& b) {
@@ -2345,7 +2301,7 @@ class UnionInfo final :
                &_UnionInfo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    17;
 
   void Swap(UnionInfo* other);
   friend void swap(UnionInfo& a, UnionInfo& b) {
@@ -2468,7 +2424,7 @@ class BindingData final :
                &_BindingData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    18;
 
   void Swap(BindingData* other);
   friend void swap(BindingData& a, BindingData& b) {
@@ -2637,7 +2593,7 @@ class Binding final :
                &_Binding_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    19;
 
   void Swap(Binding* other);
   friend void swap(Binding& a, Binding& b) {
@@ -2767,7 +2723,7 @@ class KeyValuePair final :
                &_KeyValuePair_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    20;
 
   void Swap(KeyValuePair* other);
   friend void swap(KeyValuePair& a, KeyValuePair& b) {
@@ -2902,7 +2858,7 @@ class RetryStrategy final :
                &_RetryStrategy_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    21;
 
   void Swap(RetryStrategy* other);
   friend void swap(RetryStrategy& a, RetryStrategy& b) {
@@ -4245,8 +4201,6 @@ inline Scalar::ValueCase Scalar::value_case() const {
 }
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
 // Literal
 
 // .flyteidl.core.Scalar scalar = 1;
@@ -4423,24 +4377,6 @@ inline void Literal::set_allocated_hash(::std::string* hash) {
   }
   hash_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), hash);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Literal.hash)
-}
-
-// map<string, string> metadata = 5;
-inline int Literal::metadata_size() const {
-  return metadata_.size();
-}
-inline void Literal::clear_metadata() {
-  metadata_.Clear();
-}
-inline const ::google::protobuf::Map< ::std::string, ::std::string >&
-Literal::metadata() const {
-  // @@protoc_insertion_point(field_map:flyteidl.core.Literal.metadata)
-  return metadata_.GetMap();
-}
-inline ::google::protobuf::Map< ::std::string, ::std::string >*
-Literal::mutable_metadata() {
-  // @@protoc_insertion_point(field_mutable_map:flyteidl.core.Literal.metadata)
-  return metadata_.MutableMap();
 }
 
 inline bool Literal::has_value() const {
@@ -5078,8 +5014,6 @@ inline void RetryStrategy::set_retries(::google::protobuf::uint32 value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

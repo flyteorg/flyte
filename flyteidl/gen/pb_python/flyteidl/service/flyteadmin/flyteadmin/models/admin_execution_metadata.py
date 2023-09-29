@@ -17,7 +17,6 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_system_metadata import AdminSystemMetadata  # noqa: F401,E501
-from flyteadmin.models.core_artifact_id import CoreArtifactID  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.execution_metadata_execution_mode import ExecutionMetadataExecutionMode  # noqa: F401,E501
@@ -43,8 +42,7 @@ class AdminExecutionMetadata(object):
         'scheduled_at': 'datetime',
         'parent_node_execution': 'CoreNodeExecutionIdentifier',
         'reference_execution': 'CoreWorkflowExecutionIdentifier',
-        'system_metadata': 'AdminSystemMetadata',
-        'artifact_ids': 'list[CoreArtifactID]'
+        'system_metadata': 'AdminSystemMetadata'
     }
 
     attribute_map = {
@@ -54,11 +52,10 @@ class AdminExecutionMetadata(object):
         'scheduled_at': 'scheduled_at',
         'parent_node_execution': 'parent_node_execution',
         'reference_execution': 'reference_execution',
-        'system_metadata': 'system_metadata',
-        'artifact_ids': 'artifact_ids'
+        'system_metadata': 'system_metadata'
     }
 
-    def __init__(self, mode=None, principal=None, nesting=None, scheduled_at=None, parent_node_execution=None, reference_execution=None, system_metadata=None, artifact_ids=None):  # noqa: E501
+    def __init__(self, mode=None, principal=None, nesting=None, scheduled_at=None, parent_node_execution=None, reference_execution=None, system_metadata=None):  # noqa: E501
         """AdminExecutionMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._mode = None
@@ -68,7 +65,6 @@ class AdminExecutionMetadata(object):
         self._parent_node_execution = None
         self._reference_execution = None
         self._system_metadata = None
-        self._artifact_ids = None
         self.discriminator = None
 
         if mode is not None:
@@ -85,8 +81,6 @@ class AdminExecutionMetadata(object):
             self.reference_execution = reference_execution
         if system_metadata is not None:
             self.system_metadata = system_metadata
-        if artifact_ids is not None:
-            self.artifact_ids = artifact_ids
 
     @property
     def mode(self):
@@ -244,29 +238,6 @@ class AdminExecutionMetadata(object):
         """
 
         self._system_metadata = system_metadata
-
-    @property
-    def artifact_ids(self):
-        """Gets the artifact_ids of this AdminExecutionMetadata.  # noqa: E501
-
-        Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping since we don't have a structure to handle nested ones anyways.  # noqa: E501
-
-        :return: The artifact_ids of this AdminExecutionMetadata.  # noqa: E501
-        :rtype: list[CoreArtifactID]
-        """
-        return self._artifact_ids
-
-    @artifact_ids.setter
-    def artifact_ids(self, artifact_ids):
-        """Sets the artifact_ids of this AdminExecutionMetadata.
-
-        Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping since we don't have a structure to handle nested ones anyways.  # noqa: E501
-
-        :param artifact_ids: The artifact_ids of this AdminExecutionMetadata.  # noqa: E501
-        :type: list[CoreArtifactID]
-        """
-
-        self._artifact_ids = artifact_ids
 
     def to_dict(self):
         """Returns the model properties as a dict"""

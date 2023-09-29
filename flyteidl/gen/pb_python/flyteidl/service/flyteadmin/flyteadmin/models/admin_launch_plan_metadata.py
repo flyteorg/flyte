@@ -18,7 +18,6 @@ import six
 
 from flyteadmin.models.admin_notification import AdminNotification  # noqa: F401,E501
 from flyteadmin.models.admin_schedule import AdminSchedule  # noqa: F401,E501
-from flyteadmin.models.protobuf_any import ProtobufAny  # noqa: F401,E501
 
 
 class AdminLaunchPlanMetadata(object):
@@ -36,30 +35,25 @@ class AdminLaunchPlanMetadata(object):
     """
     swagger_types = {
         'schedule': 'AdminSchedule',
-        'notifications': 'list[AdminNotification]',
-        'launch_conditions': 'ProtobufAny'
+        'notifications': 'list[AdminNotification]'
     }
 
     attribute_map = {
         'schedule': 'schedule',
-        'notifications': 'notifications',
-        'launch_conditions': 'launch_conditions'
+        'notifications': 'notifications'
     }
 
-    def __init__(self, schedule=None, notifications=None, launch_conditions=None):  # noqa: E501
+    def __init__(self, schedule=None, notifications=None):  # noqa: E501
         """AdminLaunchPlanMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._schedule = None
         self._notifications = None
-        self._launch_conditions = None
         self.discriminator = None
 
         if schedule is not None:
             self.schedule = schedule
         if notifications is not None:
             self.notifications = notifications
-        if launch_conditions is not None:
-            self.launch_conditions = launch_conditions
 
     @property
     def schedule(self):
@@ -102,27 +96,6 @@ class AdminLaunchPlanMetadata(object):
         """
 
         self._notifications = notifications
-
-    @property
-    def launch_conditions(self):
-        """Gets the launch_conditions of this AdminLaunchPlanMetadata.  # noqa: E501
-
-
-        :return: The launch_conditions of this AdminLaunchPlanMetadata.  # noqa: E501
-        :rtype: ProtobufAny
-        """
-        return self._launch_conditions
-
-    @launch_conditions.setter
-    def launch_conditions(self, launch_conditions):
-        """Sets the launch_conditions of this AdminLaunchPlanMetadata.
-
-
-        :param launch_conditions: The launch_conditions of this AdminLaunchPlanMetadata.  # noqa: E501
-        :type: ProtobufAny
-        """
-
-        self._launch_conditions = launch_conditions
 
     def to_dict(self):
         """Returns the model properties as a dict"""

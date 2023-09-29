@@ -9,7 +9,6 @@ import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
-import "flyteidl/artifact/artifacts.proto";
 
 
 message CreateUploadLocationResponse {
@@ -21,8 +20,6 @@ message CreateUploadLocationResponse {
 
   // ExpiresAt defines when will the signed URL expires.
   google.protobuf.Timestamp expires_at = 3;
-
-  artifact.Artifact artifact = 4;
 }
 
 // CreateUploadLocationRequest specified request for the CreateUploadLocation API.
@@ -58,9 +55,6 @@ message CreateUploadLocationRequest {
   // in data proxy config. This option is useful when uploading multiple files.
   // +optional
   string filename_root = 6;
-
-  // If provided, the Artifact that the upload creates will contain the information specified here.
-  artifact.ArtifactSpec artifact_spec = 7;
 }
 
 // CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
@@ -135,14 +129,11 @@ message PreSignedURLs {
 // General request artifact to retrieve data from a Flyte artifact url.
 message GetDataRequest {
   // A unique identifier in the form of flyte://<something> that uniquely, for a given Flyte
-  // backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+  // backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
   // e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
   //      flyte://v1/proj/development/execid/n2/i (for node execution input)
   //      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
-  oneof query {
-    string flyte_url = 1;
-    core.ArtifactID artifact_id = 2;
-  }
+  string flyte_url = 1;
 }
 
 message GetDataResponse {
@@ -156,8 +147,6 @@ message GetDataResponse {
     // Single literal will be returned. This is returned when the user/url requests a specific output or input
     // by name. See the o3 example above.
     core.Literal literal = 3;
-
-    artifact.Artifact artifact = 4;
   }
 }
 

@@ -12,14 +12,13 @@ export LC_ALL=C.UTF-8
 
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/service --with_gateway -l go --go_source_relative
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/admin --with_gateway -l go --go_source_relative --validate_out
-docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/artifact --with_gateway -l go --go_source_relative --validate_out
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/core --with_gateway -l go --go_source_relative --validate_out
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/event --with_gateway -l go --go_source_relative --validate_out
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/plugins -l go --go_source_relative --validate_out
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/datacatalog -l go --go_source_relative --validate_out
 
 languages=("cpp" "java")
-idlfolders=("service" "admin" "core" "event" "plugins" "datacatalog" "artifact")
+idlfolders=("service" "admin" "core" "event" "plugins" "datacatalog")
 
 for lang in "${languages[@]}"
 do
@@ -103,7 +102,7 @@ rm -f gen/pb-go/flyteidl/service/admin.pb.gw.go-e
 if [ -n "$DELTA_CHECK" ]; then
   DIRTY=$(git status --porcelain)
   if [ -n "$DIRTY" ]; then
-    echo "FAILED: Protos updated without commiting generated code."
+    echo "FAILED: Protos updated without committing generated code."
     echo "Ensure make generate has run and all changes are committed."
     DIFF=$(git diff)
     echo "diff detected: $DIFF"
