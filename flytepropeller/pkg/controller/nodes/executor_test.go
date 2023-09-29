@@ -2780,11 +2780,11 @@ func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
 		{"EligibleUserRetries", false, 0, 0, 2, 0, core.ExecutionError_USER, true},
 		{"IneligibleUserRetries", false, 1, 0, 2, 0, core.ExecutionError_USER, false},
 		{"EligibleSystemRetries", false, 0, 0, 1, 1, core.ExecutionError_SYSTEM, true},
-		{"IneligibleSystemRetries", false, 0, 1, 1, 1, core.ExecutionError_SYSTEM, false},
+		{"IneligibleSystemRetries", false, 1, 1, 1, 1, core.ExecutionError_SYSTEM, false},
 		{"IgnoreCauseEligibleUserRetries", true, 0, 0, 2, 0, core.ExecutionError_USER, true},
 		{"IgnoreCauseIneligibleUserRetries", true, 1, 0, 2, 0, core.ExecutionError_USER, false},
 		{"IgnoreCauseEligibleSystemRetries", true, 0, 0, 2, 0, core.ExecutionError_SYSTEM, true},
-		{"IgnoreCauseIneligibleSystemRetries", true, 0, 1, 2, 0, core.ExecutionError_SYSTEM, false},
+		{"IgnoreCauseIneligibleSystemRetries", true, 1, 1, 2, 0, core.ExecutionError_SYSTEM, false},
 	}
 
 	for _, test := range tests {
