@@ -9,7 +9,7 @@ Multiple Kubernetes Cluster Deployment
 .. note::
 
     The multicluster deployment described in this section, assumes you have deployed
-    the ``flyte-core`` Helm chart, which runs the individual Flyte componentes separately.
+    the ``flyte-core`` Helm chart, which runs the individual Flyte components separately.
     This is needed because in a multicluster setup, the execution engine is
     deployed to multiple K8s clusters; it won't work with the ``flyte-binary``
     Helm chart, since it deploys all Flyte services as one single binary.
@@ -502,7 +502,7 @@ Kubernetes cluster.
             example.training_workflow \
             --attrFile workflow-ecl.yaml
 
-    3. Execute a workflow indicationg project and domain:
+    3. Execute a workflow indicating project and domain:
 
       .. prompt:: bash $
 
@@ -720,6 +720,6 @@ The process can be repeated for additional clusters.
          pyflyte run --remote --project team1 --domain production example.py  training_workflow \                                                                                      ✔ ╱ base 
          --hyperparameters '{"C": 0.1}'
         
-  18. A succesful execution should be visible on the UI, confirming it ran in the new cluster:
+  18. A successful execution should be visible on the UI, confirming it ran in the new cluster:
 
      .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/common/multicluster-execution.png
