@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const DefaultPhaseVersion = uint32(0)
@@ -83,6 +84,11 @@ type ExternalResource struct {
 	Phase Phase
 }
 
+type ReasonInfo struct {
+	Reason     string
+	OccurredAt *time.Time
+}
+
 type TaskInfo struct {
 	// log information for the task execution
 	Logs []*core.TaskLog
@@ -96,6 +102,8 @@ type TaskInfo struct {
 	CustomInfo *structpb.Struct
 	// A collection of information about external resources launched by this task
 	ExternalResources []*ExternalResource
+	// Additional reasons for this case. Note, these are not included in the phase state.
+	AdditionalReasons []ReasonInfo
 }
 
 func (t *TaskInfo) String() string {

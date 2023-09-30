@@ -18,9 +18,21 @@ Discover the process of setting up Agents for Flyte.
     ^^^^^^^^^^^^
     Guide to setting up the Bigquery agent.
 
+    ---
+
+    .. link-button:: deployment-agent-setup-mmcloud
+       :type: ref
+       :text: MMCloud Agent
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the MMCloud agent.
+
+
 .. toctree::
     :maxdepth: 1
     :name: Agent setup
     :hidden:
 
     bigquery
+    mmcloud
+

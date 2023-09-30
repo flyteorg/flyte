@@ -37,7 +37,8 @@ k8s_integration_execute:
 
 .PHONY: compile
 compile:
-	go build -o flyteadmin -ldflags=$(LD_FLAGS) ./cmd/ && mv ./flyteadmin ${GOPATH}/bin
+	mkdir -p ./bin
+	go build -o bin/flyteadmin -ldflags=$(LD_FLAGS) ./cmd/
 
 .PHONY: compile_debug
 compile_debug:
@@ -46,7 +47,8 @@ compile_debug:
 
 .PHONY: compile_scheduler
 compile_scheduler:
-	go build -o flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/ && mv ./flytescheduler ${GOPATH}/bin
+	mkdir -p ./bin
+	go build -o bin/flytescheduler -ldflags=$(LD_FLAGS) ./cmd/scheduler/
 
 .PHONY: compile_scheduler_debug
 compile_scheduler_debug:
