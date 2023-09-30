@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
+	"time"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -41,6 +42,7 @@ type Plugin struct {
 type ResourceWrapper struct {
 	State   admin.State
 	Outputs *flyteIdl.LiteralMap
+	Message string
 }
 
 type ResourceMetaWrapper struct {
@@ -143,6 +145,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	return &ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
+		Message: res.Resource.Message,
 	}, nil
 }
 
@@ -173,6 +176,8 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	taskInfo := &core.TaskInfo{}
 
 	switch resource.State {
+	case admin.State_PENDING:
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:

@@ -8044,6 +8044,9 @@ export namespace flyteidl {
 
             /** Resource outputs */
             outputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** Resource message */
+            message?: (string|null);
         }
 
         /** Represents a Resource. */
@@ -8060,6 +8063,9 @@ export namespace flyteidl {
 
             /** Resource outputs. */
             public outputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** Resource message. */
+            public message: string;
 
             /**
              * Creates a new Resource instance using the specified properties.

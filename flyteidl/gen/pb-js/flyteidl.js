@@ -19623,6 +19623,7 @@
                  * @interface IResource
                  * @property {flyteidl.admin.State|null} [state] Resource state
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
+                 * @property {string|null} [message] Resource message
                  */
     
                 /**
@@ -19657,6 +19658,14 @@
                 Resource.prototype.outputs = null;
     
                 /**
+                 * Resource message.
+                 * @member {string} message
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.message = "";
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -19684,6 +19693,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.state);
                     if (message.outputs != null && message.hasOwnProperty("outputs"))
                         $root.flyteidl.core.LiteralMap.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.message);
                     return writer;
                 };
     
@@ -19710,6 +19721,9 @@
                             break;
                         case 2:
                             message.outputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.message = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -19746,6 +19760,9 @@
                         if (error)
                             return "outputs." + error;
                     }
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        if (!$util.isString(message.message))
+                            return "message: string expected";
                     return null;
                 };
     

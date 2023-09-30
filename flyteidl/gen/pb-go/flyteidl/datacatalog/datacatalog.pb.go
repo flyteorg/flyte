@@ -942,7 +942,7 @@ func (m *ReservationID) GetTagName() string {
 	return ""
 }
 
-// Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+// Try to acquire or extend an artifact reservation. If an active reservation exists, retrieve that instance.
 type GetOrExtendReservationRequest struct {
 	// The unique ID for the reservation
 	ReservationId *ReservationID `protobuf:"bytes,1,opt,name=reservation_id,json=reservationId,proto3" json:"reservation_id,omitempty"`

@@ -7244,7 +7244,7 @@ public final class WorkflowOuterClass {
   }
   /**
    * <pre>
-   * When a CreateWorkflowRequest failes due to matching id
+   * When a CreateWorkflowRequest fails due to matching id
    * </pre>
    *
    * Protobuf type {@code flyteidl.admin.CreateWorkflowFailureReason}
@@ -7620,7 +7620,7 @@ public final class WorkflowOuterClass {
     }
     /**
      * <pre>
-     * When a CreateWorkflowRequest failes due to matching id
+     * When a CreateWorkflowRequest fails due to matching id
      * </pre>
      *
      * Protobuf type {@code flyteidl.admin.CreateWorkflowFailureReason}
