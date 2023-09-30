@@ -178,6 +178,14 @@
       "type": "object",
       "description": "Response to delete a task."
     },
+    "adminDoTaskResponse": {
+      "type": "object",
+      "properties": {
+        "resource": {
+          "$ref": "#/definitions/adminResource"
+        }
+      }
+    },
     "adminGetTaskResponse": {
       "type": "object",
       "properties": {

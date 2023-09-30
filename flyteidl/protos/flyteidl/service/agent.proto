@@ -12,4 +12,6 @@ service AsyncAgentService {
   rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){};
   // Delete the task resource.
   rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){};
+  // Do a job and get response from the agent server.
+  rpc DoTask (flyteidl.admin.DoTaskRequest) returns (flyteidl.admin.DoTaskResponse){};
 }

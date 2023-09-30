@@ -95,6 +95,25 @@ pub struct DeleteTaskRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTaskResponse {
 }
+/// A message used to do a task
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DoTaskRequest {
+    /// The inputs required to start the execution. All required inputs must be
+    /// included in this map. If not required and not provided, defaults apply.
+    /// +optional
+    #[prost(message, optional, tag="1")]
+    pub inputs: ::core::option::Option<super::core::LiteralMap>,
+    /// Template of the task that encapsulates all the metadata of the task.
+    #[prost(message, optional, tag="2")]
+    pub template: ::core::option::Option<super::core::TaskTemplate>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DoTaskResponse {
+    #[prost(message, optional, tag="1")]
+    pub resource: ::core::option::Option<Resource>,
+}
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
@@ -1434,11 +1453,11 @@ pub struct LaunchPlanSpec {
     #[prost(message, optional, tag="2")]
     pub entity_metadata: ::core::option::Option<LaunchPlanMetadata>,
     /// Input values to be passed for the execution.
-    /// These can be overriden when an execution is created with this launch plan.
+    /// These can be overridden when an execution is created with this launch plan.
     #[prost(message, optional, tag="3")]
     pub default_inputs: ::core::option::Option<super::core::ParameterMap>,
     /// Fixed, non-overridable inputs for the Launch Plan.
-    /// These can not be overriden when an execution is created with this launch plan.
+    /// These can not be overridden when an execution is created with this launch plan.
     #[prost(message, optional, tag="4")]
     pub fixed_inputs: ::core::option::Option<super::core::LiteralMap>,
     /// String to indicate the role to use to execute the workflow underneath
@@ -2412,7 +2431,7 @@ pub struct ProjectDomainAttributesDeleteRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectDomainAttributesDeleteResponse {
 }
-/// SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+/// SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
 /// See :ref:`ref_flyteidl.admin.Signal` for more details
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2871,7 +2890,7 @@ pub struct WorkflowErrorExistsIdenticalStructure {
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<super::core::Identifier>,
 }
-/// When a CreateWorkflowRequest failes due to matching id
+/// When a CreateWorkflowRequest fails due to matching id
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateWorkflowFailureReason {

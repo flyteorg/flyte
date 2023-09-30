@@ -8198,6 +8198,116 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a DoTaskRequest. */
+        interface IDoTaskRequest {
+
+            /** DoTaskRequest inputs */
+            inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** DoTaskRequest template */
+            template?: (flyteidl.core.ITaskTemplate|null);
+        }
+
+        /** Represents a DoTaskRequest. */
+        class DoTaskRequest implements IDoTaskRequest {
+
+            /**
+             * Constructs a new DoTaskRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IDoTaskRequest);
+
+            /** DoTaskRequest inputs. */
+            public inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** DoTaskRequest template. */
+            public template?: (flyteidl.core.ITaskTemplate|null);
+
+            /**
+             * Creates a new DoTaskRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DoTaskRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IDoTaskRequest): flyteidl.admin.DoTaskRequest;
+
+            /**
+             * Encodes the specified DoTaskRequest message. Does not implicitly {@link flyteidl.admin.DoTaskRequest.verify|verify} messages.
+             * @param message DoTaskRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IDoTaskRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DoTaskRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DoTaskRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DoTaskRequest;
+
+            /**
+             * Verifies a DoTaskRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DoTaskResponse. */
+        interface IDoTaskResponse {
+
+            /** DoTaskResponse resource */
+            resource?: (flyteidl.admin.IResource|null);
+        }
+
+        /** Represents a DoTaskResponse. */
+        class DoTaskResponse implements IDoTaskResponse {
+
+            /**
+             * Constructs a new DoTaskResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IDoTaskResponse);
+
+            /** DoTaskResponse resource. */
+            public resource?: (flyteidl.admin.IResource|null);
+
+            /**
+             * Creates a new DoTaskResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DoTaskResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IDoTaskResponse): flyteidl.admin.DoTaskResponse;
+
+            /**
+             * Encodes the specified DoTaskResponse message. Does not implicitly {@link flyteidl.admin.DoTaskResponse.verify|verify} messages.
+             * @param message DoTaskResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IDoTaskResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DoTaskResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DoTaskResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DoTaskResponse;
+
+            /**
+             * Verifies a DoTaskResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ClusterAssignment. */
         interface IClusterAssignment {
 
@@ -19543,6 +19653,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public deleteTask(request: flyteidl.admin.IDeleteTaskRequest): Promise<flyteidl.admin.DeleteTaskResponse>;
+
+            /**
+             * Calls DoTask.
+             * @param request DoTaskRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and DoTaskResponse
+             */
+            public doTask(request: flyteidl.admin.IDoTaskRequest, callback: flyteidl.service.AsyncAgentService.DoTaskCallback): void;
+
+            /**
+             * Calls DoTask.
+             * @param request DoTaskRequest message or plain object
+             * @returns Promise
+             */
+            public doTask(request: flyteidl.admin.IDoTaskRequest): Promise<flyteidl.admin.DoTaskResponse>;
         }
 
         namespace AsyncAgentService {
@@ -19567,6 +19691,13 @@ export namespace flyteidl {
              * @param [response] DeleteTaskResponse
              */
             type DeleteTaskCallback = (error: (Error|null), response?: flyteidl.admin.DeleteTaskResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AsyncAgentService#doTask}.
+             * @param error Error, if any
+             * @param [response] DoTaskResponse
+             */
+            type DoTaskCallback = (error: (Error|null), response?: flyteidl.admin.DoTaskResponse) => void;
         }
 
         /** Properties of a OAuth2MetadataRequest. */

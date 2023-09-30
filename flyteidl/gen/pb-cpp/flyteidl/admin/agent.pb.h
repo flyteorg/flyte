@@ -49,7 +49,7 @@ struct TableStruct_flyteidl_2fadmin_2fagent_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[11]
+  static const ::google::protobuf::internal::ParseTable schema[13]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -70,6 +70,12 @@ extern DeleteTaskRequestDefaultTypeInternal _DeleteTaskRequest_default_instance_
 class DeleteTaskResponse;
 class DeleteTaskResponseDefaultTypeInternal;
 extern DeleteTaskResponseDefaultTypeInternal _DeleteTaskResponse_default_instance_;
+class DoTaskRequest;
+class DoTaskRequestDefaultTypeInternal;
+extern DoTaskRequestDefaultTypeInternal _DoTaskRequest_default_instance_;
+class DoTaskResponse;
+class DoTaskResponseDefaultTypeInternal;
+extern DoTaskResponseDefaultTypeInternal _DoTaskResponse_default_instance_;
 class GetTaskRequest;
 class GetTaskRequestDefaultTypeInternal;
 extern GetTaskRequestDefaultTypeInternal _GetTaskRequest_default_instance_;
@@ -99,6 +105,8 @@ template<> ::flyteidl::admin::CreateTaskRequest* Arena::CreateMaybeMessage<::fly
 template<> ::flyteidl::admin::CreateTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskResponse>(Arena*);
 template<> ::flyteidl::admin::DeleteTaskRequest* Arena::CreateMaybeMessage<::flyteidl::admin::DeleteTaskRequest>(Arena*);
 template<> ::flyteidl::admin::DeleteTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::DeleteTaskResponse>(Arena*);
+template<> ::flyteidl::admin::DoTaskRequest* Arena::CreateMaybeMessage<::flyteidl::admin::DoTaskRequest>(Arena*);
+template<> ::flyteidl::admin::DoTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::DoTaskResponse>(Arena*);
 template<> ::flyteidl::admin::GetTaskRequest* Arena::CreateMaybeMessage<::flyteidl::admin::GetTaskRequest>(Arena*);
 template<> ::flyteidl::admin::GetTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::GetTaskResponse>(Arena*);
 template<> ::flyteidl::admin::Resource* Arena::CreateMaybeMessage<::flyteidl::admin::Resource>(Arena*);
@@ -1280,6 +1288,246 @@ class DeleteTaskResponse final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
 };
+// -------------------------------------------------------------------
+
+class DoTaskRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.DoTaskRequest) */ {
+ public:
+  DoTaskRequest();
+  virtual ~DoTaskRequest();
+
+  DoTaskRequest(const DoTaskRequest& from);
+
+  inline DoTaskRequest& operator=(const DoTaskRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DoTaskRequest(DoTaskRequest&& from) noexcept
+    : DoTaskRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline DoTaskRequest& operator=(DoTaskRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DoTaskRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DoTaskRequest* internal_default_instance() {
+    return reinterpret_cast<const DoTaskRequest*>(
+               &_DoTaskRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  void Swap(DoTaskRequest* other);
+  friend void swap(DoTaskRequest& a, DoTaskRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DoTaskRequest* New() const final {
+    return CreateMaybeMessage<DoTaskRequest>(nullptr);
+  }
+
+  DoTaskRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DoTaskRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DoTaskRequest& from);
+  void MergeFrom(const DoTaskRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DoTaskRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.LiteralMap inputs = 1;
+  bool has_inputs() const;
+  void clear_inputs();
+  static const int kInputsFieldNumber = 1;
+  const ::flyteidl::core::LiteralMap& inputs() const;
+  ::flyteidl::core::LiteralMap* release_inputs();
+  ::flyteidl::core::LiteralMap* mutable_inputs();
+  void set_allocated_inputs(::flyteidl::core::LiteralMap* inputs);
+
+  // .flyteidl.core.TaskTemplate template = 2;
+  bool has_template_() const;
+  void clear_template_();
+  static const int kTemplateFieldNumber = 2;
+  const ::flyteidl::core::TaskTemplate& template_() const;
+  ::flyteidl::core::TaskTemplate* release_template_();
+  ::flyteidl::core::TaskTemplate* mutable_template_();
+  void set_allocated_template_(::flyteidl::core::TaskTemplate* template_);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.DoTaskRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::LiteralMap* inputs_;
+  ::flyteidl::core::TaskTemplate* template__;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DoTaskResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.DoTaskResponse) */ {
+ public:
+  DoTaskResponse();
+  virtual ~DoTaskResponse();
+
+  DoTaskResponse(const DoTaskResponse& from);
+
+  inline DoTaskResponse& operator=(const DoTaskResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  DoTaskResponse(DoTaskResponse&& from) noexcept
+    : DoTaskResponse() {
+    *this = ::std::move(from);
+  }
+
+  inline DoTaskResponse& operator=(DoTaskResponse&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const DoTaskResponse& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const DoTaskResponse* internal_default_instance() {
+    return reinterpret_cast<const DoTaskResponse*>(
+               &_DoTaskResponse_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    12;
+
+  void Swap(DoTaskResponse* other);
+  friend void swap(DoTaskResponse& a, DoTaskResponse& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DoTaskResponse* New() const final {
+    return CreateMaybeMessage<DoTaskResponse>(nullptr);
+  }
+
+  DoTaskResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DoTaskResponse>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const DoTaskResponse& from);
+  void MergeFrom(const DoTaskResponse& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DoTaskResponse* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.Resource resource = 1;
+  bool has_resource() const;
+  void clear_resource();
+  static const int kResourceFieldNumber = 1;
+  const ::flyteidl::admin::Resource& resource() const;
+  ::flyteidl::admin::Resource* release_resource();
+  ::flyteidl::admin::Resource* mutable_resource();
+  void set_allocated_resource(::flyteidl::admin::Resource* resource);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.DoTaskResponse)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::Resource* resource_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
+};
 // ===================================================================
 
 
@@ -2099,9 +2347,162 @@ inline void DeleteTaskRequest::set_allocated_resource_meta(::std::string* resour
 
 // DeleteTaskResponse
 
+// -------------------------------------------------------------------
+
+// DoTaskRequest
+
+// .flyteidl.core.LiteralMap inputs = 1;
+inline bool DoTaskRequest::has_inputs() const {
+  return this != internal_default_instance() && inputs_ != nullptr;
+}
+inline const ::flyteidl::core::LiteralMap& DoTaskRequest::inputs() const {
+  const ::flyteidl::core::LiteralMap* p = inputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.DoTaskRequest.inputs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
+      &::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* DoTaskRequest::release_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.DoTaskRequest.inputs)
+  
+  ::flyteidl::core::LiteralMap* temp = inputs_;
+  inputs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LiteralMap* DoTaskRequest::mutable_inputs() {
+  
+  if (inputs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
+    inputs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.DoTaskRequest.inputs)
+  return inputs_;
+}
+inline void DoTaskRequest::set_allocated_inputs(::flyteidl::core::LiteralMap* inputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(inputs_);
+  }
+  if (inputs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      inputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, inputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  inputs_ = inputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.DoTaskRequest.inputs)
+}
+
+// .flyteidl.core.TaskTemplate template = 2;
+inline bool DoTaskRequest::has_template_() const {
+  return this != internal_default_instance() && template__ != nullptr;
+}
+inline const ::flyteidl::core::TaskTemplate& DoTaskRequest::template_() const {
+  const ::flyteidl::core::TaskTemplate* p = template__;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.DoTaskRequest.template)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::TaskTemplate*>(
+      &::flyteidl::core::_TaskTemplate_default_instance_);
+}
+inline ::flyteidl::core::TaskTemplate* DoTaskRequest::release_template_() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.DoTaskRequest.template)
+  
+  ::flyteidl::core::TaskTemplate* temp = template__;
+  template__ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::TaskTemplate* DoTaskRequest::mutable_template_() {
+  
+  if (template__ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::TaskTemplate>(GetArenaNoVirtual());
+    template__ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.DoTaskRequest.template)
+  return template__;
+}
+inline void DoTaskRequest::set_allocated_template_(::flyteidl::core::TaskTemplate* template_) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(template__);
+  }
+  if (template_) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      template_ = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, template_, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  template__ = template_;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.DoTaskRequest.template)
+}
+
+// -------------------------------------------------------------------
+
+// DoTaskResponse
+
+// .flyteidl.admin.Resource resource = 1;
+inline bool DoTaskResponse::has_resource() const {
+  return this != internal_default_instance() && resource_ != nullptr;
+}
+inline void DoTaskResponse::clear_resource() {
+  if (GetArenaNoVirtual() == nullptr && resource_ != nullptr) {
+    delete resource_;
+  }
+  resource_ = nullptr;
+}
+inline const ::flyteidl::admin::Resource& DoTaskResponse::resource() const {
+  const ::flyteidl::admin::Resource* p = resource_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.DoTaskResponse.resource)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Resource*>(
+      &::flyteidl::admin::_Resource_default_instance_);
+}
+inline ::flyteidl::admin::Resource* DoTaskResponse::release_resource() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.DoTaskResponse.resource)
+  
+  ::flyteidl::admin::Resource* temp = resource_;
+  resource_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Resource* DoTaskResponse::mutable_resource() {
+  
+  if (resource_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Resource>(GetArenaNoVirtual());
+    resource_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.DoTaskResponse.resource)
+  return resource_;
+}
+inline void DoTaskResponse::set_allocated_resource(::flyteidl::admin::Resource* resource) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete resource_;
+  }
+  if (resource) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      resource = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, resource, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  resource_ = resource;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.DoTaskResponse.resource)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -648,3 +648,163 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteTaskResponseValidationError{}
+
+// Validate checks the field values on DoTaskRequest with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *DoTaskRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DoTaskRequestValidationError{
+				field:  "Inputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetTemplate()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DoTaskRequestValidationError{
+				field:  "Template",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DoTaskRequestValidationError is the validation error returned by
+// DoTaskRequest.Validate if the designated constraints aren't met.
+type DoTaskRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DoTaskRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DoTaskRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DoTaskRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DoTaskRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DoTaskRequestValidationError) ErrorName() string { return "DoTaskRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DoTaskRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDoTaskRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DoTaskRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DoTaskRequestValidationError{}
+
+// Validate checks the field values on DoTaskResponse with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *DoTaskResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetResource()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DoTaskResponseValidationError{
+				field:  "Resource",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// DoTaskResponseValidationError is the validation error returned by
+// DoTaskResponse.Validate if the designated constraints aren't met.
+type DoTaskResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DoTaskResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DoTaskResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DoTaskResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DoTaskResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DoTaskResponseValidationError) ErrorName() string { return "DoTaskResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e DoTaskResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDoTaskResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DoTaskResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DoTaskResponseValidationError{}

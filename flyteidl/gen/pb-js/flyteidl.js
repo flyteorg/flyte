@@ -19972,6 +19972,249 @@
                 return DeleteTaskResponse;
             })();
     
+            admin.DoTaskRequest = (function() {
+    
+                /**
+                 * Properties of a DoTaskRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IDoTaskRequest
+                 * @property {flyteidl.core.ILiteralMap|null} [inputs] DoTaskRequest inputs
+                 * @property {flyteidl.core.ITaskTemplate|null} [template] DoTaskRequest template
+                 */
+    
+                /**
+                 * Constructs a new DoTaskRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a DoTaskRequest.
+                 * @implements IDoTaskRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IDoTaskRequest=} [properties] Properties to set
+                 */
+                function DoTaskRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * DoTaskRequest inputs.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} inputs
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @instance
+                 */
+                DoTaskRequest.prototype.inputs = null;
+    
+                /**
+                 * DoTaskRequest template.
+                 * @member {flyteidl.core.ITaskTemplate|null|undefined} template
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @instance
+                 */
+                DoTaskRequest.prototype.template = null;
+    
+                /**
+                 * Creates a new DoTaskRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @static
+                 * @param {flyteidl.admin.IDoTaskRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.DoTaskRequest} DoTaskRequest instance
+                 */
+                DoTaskRequest.create = function create(properties) {
+                    return new DoTaskRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified DoTaskRequest message. Does not implicitly {@link flyteidl.admin.DoTaskRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @static
+                 * @param {flyteidl.admin.IDoTaskRequest} message DoTaskRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DoTaskRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.inputs != null && message.hasOwnProperty("inputs"))
+                        $root.flyteidl.core.LiteralMap.encode(message.inputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        $root.flyteidl.core.TaskTemplate.encode(message.template, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a DoTaskRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.DoTaskRequest} DoTaskRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DoTaskRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.DoTaskRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.inputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.template = $root.flyteidl.core.TaskTemplate.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a DoTaskRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                DoTaskRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.inputs != null && message.hasOwnProperty("inputs")) {
+                        var error = $root.flyteidl.core.LiteralMap.verify(message.inputs);
+                        if (error)
+                            return "inputs." + error;
+                    }
+                    if (message.template != null && message.hasOwnProperty("template")) {
+                        var error = $root.flyteidl.core.TaskTemplate.verify(message.template);
+                        if (error)
+                            return "template." + error;
+                    }
+                    return null;
+                };
+    
+                return DoTaskRequest;
+            })();
+    
+            admin.DoTaskResponse = (function() {
+    
+                /**
+                 * Properties of a DoTaskResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IDoTaskResponse
+                 * @property {flyteidl.admin.IResource|null} [resource] DoTaskResponse resource
+                 */
+    
+                /**
+                 * Constructs a new DoTaskResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a DoTaskResponse.
+                 * @implements IDoTaskResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IDoTaskResponse=} [properties] Properties to set
+                 */
+                function DoTaskResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * DoTaskResponse resource.
+                 * @member {flyteidl.admin.IResource|null|undefined} resource
+                 * @memberof flyteidl.admin.DoTaskResponse
+                 * @instance
+                 */
+                DoTaskResponse.prototype.resource = null;
+    
+                /**
+                 * Creates a new DoTaskResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.DoTaskResponse
+                 * @static
+                 * @param {flyteidl.admin.IDoTaskResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.DoTaskResponse} DoTaskResponse instance
+                 */
+                DoTaskResponse.create = function create(properties) {
+                    return new DoTaskResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified DoTaskResponse message. Does not implicitly {@link flyteidl.admin.DoTaskResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.DoTaskResponse
+                 * @static
+                 * @param {flyteidl.admin.IDoTaskResponse} message DoTaskResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DoTaskResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.resource != null && message.hasOwnProperty("resource"))
+                        $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a DoTaskResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.DoTaskResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.DoTaskResponse} DoTaskResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DoTaskResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.DoTaskResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a DoTaskResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.DoTaskResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                DoTaskResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.resource != null && message.hasOwnProperty("resource")) {
+                        var error = $root.flyteidl.admin.Resource.verify(message.resource);
+                        if (error)
+                            return "resource." + error;
+                    }
+                    return null;
+                };
+    
+                return DoTaskResponse;
+            })();
+    
             admin.ClusterAssignment = (function() {
     
                 /**
@@ -45717,6 +45960,39 @@
                  * @instance
                  * @param {flyteidl.admin.IDeleteTaskRequest} request DeleteTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.DeleteTaskResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AsyncAgentService#doTask}.
+                 * @memberof flyteidl.service.AsyncAgentService
+                 * @typedef DoTaskCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.DoTaskResponse} [response] DoTaskResponse
+                 */
+    
+                /**
+                 * Calls DoTask.
+                 * @function doTask
+                 * @memberof flyteidl.service.AsyncAgentService
+                 * @instance
+                 * @param {flyteidl.admin.IDoTaskRequest} request DoTaskRequest message or plain object
+                 * @param {flyteidl.service.AsyncAgentService.DoTaskCallback} callback Node-style callback called with the error, if any, and DoTaskResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AsyncAgentService.prototype.doTask = function doTask(request, callback) {
+                    return this.rpcCall(doTask, $root.flyteidl.admin.DoTaskRequest, $root.flyteidl.admin.DoTaskResponse, request, callback);
+                }, "name", { value: "DoTask" });
+    
+                /**
+                 * Calls DoTask.
+                 * @function doTask
+                 * @memberof flyteidl.service.AsyncAgentService
+                 * @instance
+                 * @param {flyteidl.admin.IDoTaskRequest} request DoTaskRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.DoTaskResponse>} Promise
                  * @variation 2
                  */
     

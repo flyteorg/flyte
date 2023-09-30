@@ -23,6 +23,7 @@ static const char* AsyncAgentService_method_names[] = {
   "/flyteidl.service.AsyncAgentService/CreateTask",
   "/flyteidl.service.AsyncAgentService/GetTask",
   "/flyteidl.service.AsyncAgentService/DeleteTask",
+  "/flyteidl.service.AsyncAgentService/DoTask",
 };
 
 std::unique_ptr< AsyncAgentService::Stub> AsyncAgentService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -35,6 +36,7 @@ AsyncAgentService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& 
   : channel_(channel), rpcmethod_CreateTask_(AsyncAgentService_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetTask_(AsyncAgentService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_DeleteTask_(AsyncAgentService_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DoTask_(AsyncAgentService_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AsyncAgentService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::CreateTaskRequest& request, ::flyteidl::admin::CreateTaskResponse* response) {
@@ -121,6 +123,34 @@ void AsyncAgentService::Stub::experimental_async::DeleteTask(::grpc::ClientConte
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DeleteTaskResponse>::Create(channel_.get(), cq, rpcmethod_DeleteTask_, context, request, false);
 }
 
+::grpc::Status AsyncAgentService::Stub::DoTask(::grpc::ClientContext* context, const ::flyteidl::admin::DoTaskRequest& request, ::flyteidl::admin::DoTaskResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_DoTask_, context, request, response);
+}
+
+void AsyncAgentService::Stub::experimental_async::DoTask(::grpc::ClientContext* context, const ::flyteidl::admin::DoTaskRequest* request, ::flyteidl::admin::DoTaskResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DoTask_, context, request, response, std::move(f));
+}
+
+void AsyncAgentService::Stub::experimental_async::DoTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DoTaskResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_DoTask_, context, request, response, std::move(f));
+}
+
+void AsyncAgentService::Stub::experimental_async::DoTask(::grpc::ClientContext* context, const ::flyteidl::admin::DoTaskRequest* request, ::flyteidl::admin::DoTaskResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DoTask_, context, request, response, reactor);
+}
+
+void AsyncAgentService::Stub::experimental_async::DoTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DoTaskResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_DoTask_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DoTaskResponse>* AsyncAgentService::Stub::AsyncDoTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DoTaskRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DoTaskResponse>::Create(channel_.get(), cq, rpcmethod_DoTask_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DoTaskResponse>* AsyncAgentService::Stub::PrepareAsyncDoTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DoTaskRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DoTaskResponse>::Create(channel_.get(), cq, rpcmethod_DoTask_, context, request, false);
+}
+
 AsyncAgentService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AsyncAgentService_method_names[0],
@@ -137,6 +167,11 @@ AsyncAgentService::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AsyncAgentService::Service, ::flyteidl::admin::DeleteTaskRequest, ::flyteidl::admin::DeleteTaskResponse>(
           std::mem_fn(&AsyncAgentService::Service::DeleteTask), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AsyncAgentService_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AsyncAgentService::Service, ::flyteidl::admin::DoTaskRequest, ::flyteidl::admin::DoTaskResponse>(
+          std::mem_fn(&AsyncAgentService::Service::DoTask), this)));
 }
 
 AsyncAgentService::Service::~Service() {
@@ -157,6 +192,13 @@ AsyncAgentService::Service::~Service() {
 }
 
 ::grpc::Status AsyncAgentService::Service::DeleteTask(::grpc::ServerContext* context, const ::flyteidl::admin::DeleteTaskRequest* request, ::flyteidl::admin::DeleteTaskResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AsyncAgentService::Service::DoTask(::grpc::ServerContext* context, const ::flyteidl::admin::DoTaskRequest* request, ::flyteidl::admin::DoTaskResponse* response) {
   (void) context;
   (void) request;
   (void) response;
