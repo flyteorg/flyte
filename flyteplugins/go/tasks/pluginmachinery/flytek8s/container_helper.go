@@ -136,61 +136,65 @@ func adjustResourceRequirement(resourceName v1.ResourceName, resourceRequirement
 // Furthermore, this function handles some clean-up such as converting GPU resources to the recognized Nvidia gpu
 // resource name and deleting unsupported Storage-type resources.
 func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements, assignIfUnset bool) v1.ResourceRequirements {
-	if len(resources.Requests) == 0 {
-		resources.Requests = make(v1.ResourceList)
-	}
+    if len(resources.Requests) == 0 {
+        resources.Requests = make(v1.ResourceList)
+    }
 
-	if len(resources.Limits) == 0 {
-		resources.Limits = make(v1.ResourceList)
-	}
+    if len(resources.Limits) == 0 {
+        resources.Limits = make(v1.ResourceList)
+    }
 
-	// As a fallback, in the case the Flyte workflow object does not have platformResource defaults set, the defaults
-	// come from the plugin config.
-	platformResources = resolvePlatformDefaults(platformResources, config.GetK8sPluginConfig().DefaultCPURequest,
-		config.GetK8sPluginConfig().DefaultMemoryRequest)
+    // As a fallback, in the case the Flyte workflow object does not have platformResource defaults set, the defaults
+    // come from the plugin config.
+    platformResources = resolvePlatformDefaults(platformResources, config.GetK8sPluginConfig().DefaultCPURequest,
+        config.GetK8sPluginConfig().DefaultMemoryRequest)
 
-	adjustResourceRequirement(v1.ResourceCPU, resources, platformResources, assignIfUnset)
-	adjustResourceRequirement(v1.ResourceMemory, resources, platformResources, assignIfUnset)
+    // Modify the behavior to only assign default values when the user hasn't specified them.
+    if assignIfUnset {
+        adjustResourceRequirement(v1.ResourceCPU, resources, platformResources, assignIfUnset)
+        adjustResourceRequirement(v1.ResourceMemory, resources, platformResources, assignIfUnset)
 
-	_, ephemeralStorageRequested := resources.Requests[v1.ResourceEphemeralStorage]
-	_, ephemeralStorageLimited := resources.Limits[v1.ResourceEphemeralStorage]
+        _, ephemeralStorageRequested := resources.Requests[v1.ResourceEphemeralStorage]
+        _, ephemeralStorageLimited := resources.Limits[v1.ResourceEphemeralStorage]
 
-	if ephemeralStorageRequested || ephemeralStorageLimited {
-		adjustResourceRequirement(v1.ResourceEphemeralStorage, resources, platformResources, assignIfUnset)
-	}
+        if ephemeralStorageRequested || ephemeralStorageLimited {
+            adjustResourceRequirement(v1.ResourceEphemeralStorage, resources, platformResources, assignIfUnset)
+        }
 
-	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
-	// https://github.com/kubernetes/enhancements/issues/362
-	delete(resources.Requests, v1.ResourceStorage)
-	delete(resources.Limits, v1.ResourceStorage)
+        // TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
+        // https://github.com/kubernetes/enhancements/issues/362
+        delete(resources.Requests, v1.ResourceStorage)
+        delete(resources.Limits, v1.ResourceStorage)
 
-	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
-	shouldAdjustGPU := false
-	_, gpuRequested := resources.Requests[gpuResourceName]
-	_, gpuLimited := resources.Limits[gpuResourceName]
-	if gpuRequested || gpuLimited {
-		shouldAdjustGPU = true
-	}
+        gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
+        shouldAdjustGPU := false
+        _, gpuRequested := resources.Requests[gpuResourceName]
+        _, gpuLimited := resources.Limits[gpuResourceName]
+        if gpuRequested || gpuLimited {
+            shouldAdjustGPU = true
+        }
 
-	// Override GPU
-	if res, found := resources.Requests[resourceGPU]; found {
-		resources.Requests[gpuResourceName] = res
-		delete(resources.Requests, resourceGPU)
-		shouldAdjustGPU = true
-	}
+        // Override GPU
+        if res, found := resources.Requests[resourceGPU]; found {
+            resources.Requests[gpuResourceName] = res
+            delete(resources.Requests, resourceGPU)
+            shouldAdjustGPU = true
+        }
 
-	if res, found := resources.Limits[resourceGPU]; found {
-		resources.Limits[gpuResourceName] = res
-		delete(resources.Limits, resourceGPU)
-		shouldAdjustGPU = true
-	}
+        if res, found := resources.Limits[resourceGPU]; found {
+            resources.Limits[gpuResourceName] = res
+            delete(resources.Limits, resourceGPU)
+            shouldAdjustGPU = true
+        }
 
-	if shouldAdjustGPU {
-		adjustResourceRequirement(gpuResourceName, resources, platformResources, assignIfUnset)
-	}
+        if shouldAdjustGPU {
+            adjustResourceRequirement(gpuResourceName, resources, platformResources, assignIfUnset)
+        }
+    }
 
-	return resources
+    return resources
 }
+
 
 // BuildRawContainer constructs a Container based on the definition passed by the TaskExecutionContext.
 func BuildRawContainer(ctx context.Context, tCtx pluginscore.TaskExecutionContext) (*v1.Container, error) {
