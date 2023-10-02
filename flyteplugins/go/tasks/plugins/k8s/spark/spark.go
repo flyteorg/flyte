@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"google.golang.org/protobuf/types/known/structpb"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"strconv"
@@ -20,14 +21,17 @@ import (
 	"github.com/flyteorg/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
 
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
+
 	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"regexp"
 	"strings"
@@ -59,6 +63,21 @@ func validateSparkJob(sparkJob *plugins.SparkJob) error {
 
 func (sparkResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
+}
+
+func getTolerations(podSpecPb *structpb.Struct) ([]v1.Toleration, error) {
+	tolerations := make([]v1.Toleration, 0)
+	tolerations = append(tolerations, config.GetK8sPluginConfig().DefaultTolerations...)
+	if podSpecPb != nil {
+		var podSpec v1.PodSpec
+		err := utils.UnmarshalStruct(podSpecPb, &podSpec)
+		if err != nil {
+			return nil, errors.Wrapf(errors.BadTaskSpecification, err,
+				"invalid pod spec [%v], failed to unmarshal", podSpec)
+		}
+		tolerations = append(tolerations, podSpec.Tolerations...)
+	}
+	return tolerations, nil
 }
 
 // Creates a new Job that will execute the main container as well as any generated types the result from the execution.
@@ -99,6 +118,11 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 	if len(serviceAccountName) == 0 {
 		serviceAccountName = sparkTaskType
 	}
+
+	tolerations, err := getTolerations(sparkJob.GetDriverPod().GetPodSpec())
+	if err != nil {
+		return nil, err
+	}
 	driverSpec := sparkOp.DriverSpec{
 		SparkPodSpec: sparkOp.SparkPodSpec{
 			Affinity:         config.GetK8sPluginConfig().DefaultAffinity,
@@ -108,12 +132,17 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 			Image:            &container.Image,
 			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
 			DNSConfig:        config.GetK8sPluginConfig().DefaultPodDNSConfig.DeepCopy(),
-			Tolerations:      config.GetK8sPluginConfig().DefaultTolerations,
+			Tolerations:      tolerations,
 			SchedulerName:    &config.GetK8sPluginConfig().SchedulerName,
 			NodeSelector:     config.GetK8sPluginConfig().DefaultNodeSelector,
 			HostNetwork:      config.GetK8sPluginConfig().EnableHostNetworkingPod,
 		},
 		ServiceAccount: &serviceAccountName,
+	}
+
+	tolerations, err = getTolerations(sparkJob.GetExecutorPod().GetPodSpec())
+	if err != nil {
+		return nil, err
 	}
 
 	executorSpec := sparkOp.ExecutorSpec{
@@ -125,7 +154,7 @@ func (sparkResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCo
 			EnvVars:          sparkEnvVars,
 			SecurityContenxt: config.GetK8sPluginConfig().DefaultPodSecurityContext.DeepCopy(),
 			DNSConfig:        config.GetK8sPluginConfig().DefaultPodDNSConfig.DeepCopy(),
-			Tolerations:      config.GetK8sPluginConfig().DefaultTolerations,
+			Tolerations:      tolerations,
 			SchedulerName:    &config.GetK8sPluginConfig().SchedulerName,
 			NodeSelector:     config.GetK8sPluginConfig().DefaultNodeSelector,
 			HostNetwork:      config.GetK8sPluginConfig().EnableHostNetworkingPod,
