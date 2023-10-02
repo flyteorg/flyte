@@ -99,6 +99,7 @@ require (
 	github.com/golangci/misspell v0.4.0 // indirect
 	github.com/golangci/revgrep v0.0.0-20220804021717-745bb2f7c2e6 // indirect
 	github.com/golangci/unconvert v0.0.0-20180507085042-28b1c447d1f4 // indirect
+<<<<<<< HEAD
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/s2a-go v0.1.4 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -108,6 +109,15 @@ require (
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/gostaticanalysis/comment v1.4.2 // indirect
 	github.com/gostaticanalysis/forcetypeassert v0.1.0 // indirect
+=======
+	github.com/google/go-cmp v0.5.5 // indirect
+	github.com/google/uuid v1.1.2 // indirect
+	github.com/googleapis/gax-go/v2 v2.0.5 // indirect
+	github.com/gordonklaus/ineffassign v0.0.0-20210225214923-2e10b2664254 // indirect
+	github.com/gostaticanalysis/analysisutil v0.4.1 // indirect
+	github.com/gostaticanalysis/comment v1.4.1 // indirect
+	github.com/gostaticanalysis/forcetypeassert v0.0.0-20200621232751-01d4955beaa5 // indirect
+>>>>>>> flyteplugins/dependabot/go_modules/boilerplate/flyte/golang_support_tools/github.com/prometheus/client_golang-1.11.1
 	github.com/gostaticanalysis/nilerr v0.1.1 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
@@ -158,11 +168,19 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+<<<<<<< HEAD
 	github.com/polyfloyd/go-errorlint v1.4.2 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
+=======
+	github.com/polyfloyd/go-errorlint v0.0.0-20201127212506-19bd8db6546f // indirect
+	github.com/prometheus/client_golang v1.11.1 // indirect
+	github.com/prometheus/client_model v0.2.0 // indirect
+	github.com/prometheus/common v0.26.0 // indirect
+	github.com/prometheus/procfs v0.6.0 // indirect
+>>>>>>> flyteplugins/dependabot/go_modules/boilerplate/flyte/golang_support_tools/github.com/prometheus/client_golang-1.11.1
 	github.com/pseudomuto/protokit v0.2.0 // indirect
 	github.com/quasilyte/go-ruleguard v0.3.19 // indirect
 	github.com/quasilyte/gogrep v0.5.0 // indirect
@@ -226,12 +244,19 @@ require (
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.126.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
+<<<<<<< HEAD
 	google.golang.org/genproto v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
 	google.golang.org/grpc v1.55.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
+=======
+	google.golang.org/genproto v0.0.0-20210126160654-44e461bb6506 // indirect
+	google.golang.org/grpc v1.35.0 // indirect
+	google.golang.org/protobuf v1.26.0-rc.1 // indirect
+	gopkg.in/ini.v1 v1.62.0 // indirect
+>>>>>>> flyteplugins/dependabot/go_modules/boilerplate/flyte/golang_support_tools/github.com/prometheus/client_golang-1.11.1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.4.3 // indirect
