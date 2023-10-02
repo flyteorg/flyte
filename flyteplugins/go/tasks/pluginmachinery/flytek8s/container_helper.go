@@ -148,7 +148,8 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
     // come from the plugin config.
     platformResources = resolvePlatformDefaults(platformResources, config.GetK8sPluginConfig().DefaultCPURequest,
         config.GetK8sPluginConfig().DefaultMemoryRequest)
-
+		
+		
     // Modify the behavior to only assign default values when the user hasn't specified them.
     if assignIfUnset {
         adjustResourceRequirement(v1.ResourceCPU, resources, platformResources, assignIfUnset)
