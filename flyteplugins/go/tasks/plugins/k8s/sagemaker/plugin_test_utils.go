@@ -314,11 +314,14 @@ func generateMockBlobLiteral(loc storage.DataReference) *flyteIdlCore.Literal {
 	}
 }
 
-func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate) pluginsCore.TaskExecutionContext {
+func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.TaskTemplate, taskType pluginsCore.TaskType) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
+<<<<<<< HEAD
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
 	inputReader.OnGetInputPath().Return("/input")
+=======
+>>>>>>> flyteplugins/bnsblue/hpo-new
 
 	trainBlobLoc := storage.DataReference("train-blob-loc")
 	validationBlobLoc := storage.DataReference("validation-blob-loc")
@@ -334,21 +337,13 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	}
 	hpoJobConfigByteArray, _ := proto.Marshal(&hpoJobConfig)
 
-	intParamRange := &structpb.Struct{}
-	err := utils.MarshalStruct(&sagemakerIdl.ParameterRangeOneOf{
-		ParameterRangeType: &sagemakerIdl.ParameterRangeOneOf_IntegerParameterRange{
-			IntegerParameterRange: &sagemakerIdl.IntegerParameterRange{
-				MaxValue:    2,
-				MinValue:    1,
-				ScalingType: sagemakerIdl.HyperparameterScalingType_LINEAR,
-			},
-		},
-	}, intParamRange)
+	intParamRange, err := generateMockIntegerParameterRange(100, 10, sagemakerIdl.HyperparameterScalingType_LINEAR)
 
 	if err != nil {
 		panic(err)
 	}
 
+<<<<<<< HEAD
 	inputReader.OnGetMatch(mock.Anything).Return(
 		&flyteIdlCore.LiteralMap{
 			Literals: map[string]*flyteIdlCore.Literal{
@@ -359,6 +354,48 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 				"a":                                coreutils.MakeGenericLiteral(intParamRange),
 			},
 		}, nil)
+=======
+	catPR1, err := generateMockCategoricalParameterRange([]string{"aaa", "bbb"})
+	if err != nil {
+		panic(err)
+	}
+
+	conPR1, err := generateMockContinuousParameterRange(5.7, 2.0, sagemakerIdl.HyperparameterScalingType_LOGARITHMIC)
+	if err != nil {
+		panic(err)
+	}
+
+	inputReader := &pluginIOMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/input/prefix"))
+	inputReader.OnGetInputPath().Return(storage.DataReference("/input"))
+	if taskType == trainingJobTaskType {
+		inputReader.OnGetMatch(mock.Anything).Return(
+			&flyteIdlCore.LiteralMap{
+				Literals: map[string]*flyteIdlCore.Literal{
+					"train":                            generateMockBlobLiteral(trainBlobLoc),
+					"validation":                       generateMockBlobLiteral(validationBlobLoc),
+					"static_hyperparameters":           utils.MakeGenericLiteral(shpStructObj),
+					"hyperparameter_tuning_job_config": utils.MakeBinaryLiteral(hpoJobConfigByteArray),
+					"a":                                utils.MakeGenericLiteral(intParamRange),
+				},
+			}, nil)
+
+	} else if taskType == customTrainingJobTaskType {
+
+		inputReader.OnGetMatch(mock.Anything).Return(
+			&flyteIdlCore.LiteralMap{
+				Literals: map[string]*flyteIdlCore.Literal{
+					"hyperparameter_tuning_job_config": utils.MakeBinaryLiteral(hpoJobConfigByteArray),
+					"cat_hp1":                          utils.MakeGenericLiteral(catPR1),
+					"val":                              generateMockBlobLiteral(validationBlobLoc),
+					"input_1":                          utils.MustMakeLiteral("123"),
+					"int_hp1":                          utils.MakeGenericLiteral(intParamRange),
+					"con_hp1":                          utils.MakeGenericLiteral(conPR1),
+				},
+			}, nil)
+	}
+
+>>>>>>> flyteplugins/bnsblue/hpo-new
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}
@@ -374,6 +411,48 @@ func generateMockHyperparameterTuningJobTaskContext(taskTemplate *flyteIdlCore.T
 	taskExecutionMetadata := genMockTaskExecutionMetadata()
 	taskCtx.OnTaskExecutionMetadata().Return(taskExecutionMetadata)
 	return taskCtx
+}
+
+func generateMockIntegerParameterRange(
+	maxValue, minValue int64, scaleType sagemakerIdl.HyperparameterScalingType_Value) (*structpb.Struct, error) {
+	intParamRange := &structpb.Struct{}
+	err := utils.MarshalStruct(&sagemakerIdl.ParameterRangeOneOf{
+		ParameterRangeType: &sagemakerIdl.ParameterRangeOneOf_IntegerParameterRange{
+			IntegerParameterRange: &sagemakerIdl.IntegerParameterRange{
+				MaxValue:    maxValue,
+				MinValue:    minValue,
+				ScalingType: scaleType,
+			},
+		},
+	}, intParamRange)
+	return intParamRange, err
+}
+
+func generateMockCategoricalParameterRange(values []string) (*structpb.Struct, error) {
+	catParamRange := &structpb.Struct{}
+	err := utils.MarshalStruct(&sagemakerIdl.ParameterRangeOneOf{
+		ParameterRangeType: &sagemakerIdl.ParameterRangeOneOf_CategoricalParameterRange{
+			CategoricalParameterRange: &sagemakerIdl.CategoricalParameterRange{
+				Values: values,
+			},
+		},
+	}, catParamRange)
+	return catParamRange, err
+}
+
+func generateMockContinuousParameterRange(
+	maxValue, minValue float64, scaleType sagemakerIdl.HyperparameterScalingType_Value) (*structpb.Struct, error) {
+	conParamRange := &structpb.Struct{}
+	err := utils.MarshalStruct(&sagemakerIdl.ParameterRangeOneOf{
+		ParameterRangeType: &sagemakerIdl.ParameterRangeOneOf_ContinuousParameterRange{
+			ContinuousParameterRange: &sagemakerIdl.ContinuousParameterRange{
+				MaxValue:    maxValue,
+				MinValue:    minValue,
+				ScalingType: scaleType,
+			},
+		},
+	}, conParamRange)
+	return conParamRange, err
 }
 
 func genMockTaskExecutionMetadata() *mocks.TaskExecutionMetadata {

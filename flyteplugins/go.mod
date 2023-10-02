@@ -136,6 +136,7 @@ require (
 )
 
 replace (
+<<<<<<< HEAD
 	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
 	github.com/flyteorg/flyte/datacatalog => ../datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
@@ -143,4 +144,12 @@ replace (
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	github.com/flyteorg/flyteidl => ../flyteidl
+=======
+	github.com/GoogleCloudPlatform/spark-on-k8s-operator => github.com/lyft/spark-on-k8s-operator v0.1.4-0.20201027003055-c76b67e3b6d0
+	github.com/googleapis/gnostic => github.com/googleapis/gnostic v0.3.1
+    github.com/lyft/flyteidl => /Users/changhonghsu/src/go/src/github.com/lyft/flyteidl
+	k8s.io/api => github.com/lyft/api v0.0.0-20191031200350-b49a72c274e0
+	k8s.io/apimachinery => github.com/lyft/apimachinery v0.0.0-20191031200210-047e3ea32d7f
+	k8s.io/client-go => k8s.io/client-go v0.0.0-20191016111102-bec269661e48
+>>>>>>> flyteplugins/bnsblue/hpo-new
 )
