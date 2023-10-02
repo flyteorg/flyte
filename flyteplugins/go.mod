@@ -14,8 +14,6 @@ require (
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyteidl v1.5.13
-	github.com/flyteorg/flyteplugins v1.1.32
-	github.com/flyteorg/flytestdlib v1.0.24
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.3
 	github.com/hashicorp/golang-lru v0.5.4
@@ -58,6 +56,7 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0 // indirect
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
+	github.com/adammck/venv v0.0.0-20200610172036-e77789703e7c // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.0.0 // indirect
