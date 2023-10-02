@@ -48,34 +48,34 @@ func (_m *TaskOverrides) GetConfig() *v1.ConfigMap {
 	return r0
 }
 
-type TaskOverrides_GetResourceMetadata struct {
+type TaskOverrides_GetResourceExtensions struct {
 	*mock.Call
 }
 
-func (_m TaskOverrides_GetResourceMetadata) Return(_a0 *flyteidlcore.ResourceMetadata) *TaskOverrides_GetResourceMetadata {
-	return &TaskOverrides_GetResourceMetadata{Call: _m.Call.Return(_a0)}
+func (_m TaskOverrides_GetResourceExtensions) Return(_a0 *flyteidlcore.ResourceExtensions) *TaskOverrides_GetResourceExtensions {
+	return &TaskOverrides_GetResourceExtensions{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *TaskOverrides) OnGetResourceMetadata() *TaskOverrides_GetResourceMetadata {
-	c_call := _m.On("GetResourceMetadata")
-	return &TaskOverrides_GetResourceMetadata{Call: c_call}
+func (_m *TaskOverrides) OnGetResourceExtensions() *TaskOverrides_GetResourceExtensions {
+	c_call := _m.On("GetResourceExtensions")
+	return &TaskOverrides_GetResourceExtensions{Call: c_call}
 }
 
-func (_m *TaskOverrides) OnGetResourceMetadataMatch(matchers ...interface{}) *TaskOverrides_GetResourceMetadata {
-	c_call := _m.On("GetResourceMetadata", matchers...)
-	return &TaskOverrides_GetResourceMetadata{Call: c_call}
+func (_m *TaskOverrides) OnGetResourceExtensionsMatch(matchers ...interface{}) *TaskOverrides_GetResourceExtensions {
+	c_call := _m.On("GetResourceExtensions", matchers...)
+	return &TaskOverrides_GetResourceExtensions{Call: c_call}
 }
 
-// GetResourceMetadata provides a mock function with given fields:
-func (_m *TaskOverrides) GetResourceMetadata() *flyteidlcore.ResourceMetadata {
+// GetResourceExtensions provides a mock function with given fields:
+func (_m *TaskOverrides) GetResourceExtensions() *flyteidlcore.ResourceExtensions {
 	ret := _m.Called()
 
-	var r0 *flyteidlcore.ResourceMetadata
-	if rf, ok := ret.Get(0).(func() *flyteidlcore.ResourceMetadata); ok {
+	var r0 *flyteidlcore.ResourceExtensions
+	if rf, ok := ret.Get(0).(func() *flyteidlcore.ResourceExtensions); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*flyteidlcore.ResourceMetadata)
+			r0 = ret.Get(0).(*flyteidlcore.ResourceExtensions)
 		}
 	}
 

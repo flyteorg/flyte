@@ -108,16 +108,16 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
 }
 
-// Specialized merging of overrides into a base *core.ResourceMetadata object. Note
+// Specialized merging of overrides into a base *core.ResourceExtensions object. Note
 // that doing a nested merge may not be the intended behavior all the time, so we
 // handle each field separately here.
-func applyResourceMetadataOverrides(base, overrides *core.ResourceMetadata) *core.ResourceMetadata {
+func applyResourceExtensionsOverrides(base, overrides *core.ResourceExtensions) *core.ResourceExtensions {
 	// Handle case where base might be nil
-	var new *core.ResourceMetadata
+	var new *core.ResourceExtensions
 	if base == nil {
-		new = &core.ResourceMetadata{}
+		new = &core.ResourceExtensions{}
 	} else {
-		new = proto.Clone(base).(*core.ResourceMetadata)
+		new = proto.Clone(base).(*core.ResourceExtensions)
 	}
 
 	// No overrides found
@@ -125,9 +125,9 @@ func applyResourceMetadataOverrides(base, overrides *core.ResourceMetadata) *cor
 		return new
 	}
 
-	// Accelerator
-	if overrides.GetAcceleratorValue() != nil {
-		new.AcceleratorValue = overrides.GetAcceleratorValue()
+	// GPU Accelerator
+	if overrides.GetGpuAccelerator() != nil {
+		new.GpuAccelerator = overrides.GetGpuAccelerator()
 	}
 
 	return new
@@ -399,18 +399,20 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
-	// handling for resource metadata
-	// Merge overrides with base resource meteadata
-	var resourceMetadataBase *core.ResourceMetadata
-	if taskTemplate.GetMetadata() != nil {
-		resourceMetadataBase = taskTemplate.GetMetadata().GetResourceMetadata()
+	// handling for resource extensions
+	// Merge overrides with base resource extensions
+	var resourceExtensions *core.ResourceExtensions
+	if taskTemplate.GetContainer() != nil && taskTemplate.GetContainer().GetResources() != nil {
+		resourceExtensions = taskTemplate.GetContainer().GetResources().GetExtensions()
 	}
-	resourceMetadataOverrides := tCtx.TaskExecutionMetadata().GetOverrides().GetResourceMetadata()
-	resourceMetadataFinal := applyResourceMetadataOverrides(resourceMetadataBase, resourceMetadataOverrides)
+	resourceExtensions = applyResourceExtensionsOverrides(
+		resourceExtensions,
+		tCtx.TaskExecutionMetadata().GetOverrides().GetResourceExtensions(),
+	)
 
 	// GPU accelerator
-	if resourceMetadataFinal.GetGpuAccelerator() != nil {
-		ApplyGPUNodeSelectors(podSpec, resourceMetadataFinal.GetGpuAccelerator())
+	if resourceExtensions.GetGpuAccelerator() != nil {
+		ApplyGPUNodeSelectors(podSpec, resourceExtensions.GetGpuAccelerator())
 	}
 
 	return podSpec, objectMeta, nil

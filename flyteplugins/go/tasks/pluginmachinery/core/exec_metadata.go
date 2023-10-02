@@ -10,7 +10,7 @@ import (
 // TaskOverrides interface to expose any overrides that have been set for this task (like resource overrides etc)
 type TaskOverrides interface {
 	GetResources() *v1.ResourceRequirements
-	GetResourceMetadata() *core.ResourceMetadata
+	GetResourceExtensions() *core.ResourceExtensions
 	GetConfig() *v1.ConfigMap
 }
 
