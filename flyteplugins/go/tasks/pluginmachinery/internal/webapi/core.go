@@ -6,17 +6,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	stdErrs "github.com/flyteorg/flyte/flytestdlib/errors"
 	"k8s.io/utils/clock"
 
-	stdErrs "github.com/flyteorg/flytestdlib/errors"
-
-	"github.com/flyteorg/flytestdlib/cache"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flytestdlib/logger"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
@@ -69,26 +66,55 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
-// syncHandle
-// TODO: ADD Sync Handle
-func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
+func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
 	if err != nil {
 		return core.UnknownTransition, err
 	}
 
+	var state *State
+	state = &incomingState
+	// TODO: This is incoming State
+	newCacheItem := CacheItem{
+		State: *state,
+	}
+	cacheItemID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
+	item, err := c.cache.GetOrCreate(cacheItemID, newCacheItem)
+	cacheItem, ok := item.(CacheItem)
+	if !ok {
+		logger.Errorf(ctx, "Error casting cache object into ExecutionState")
+		return core.UnknownTransition, err
+	}
+
+	res, err := c.sp.Do(ctx, tCtx)
+	if err != nil {
+		return core.UnknownTransition, err
+	}
+
+	cacheItem.Resource = res
+
+	phase := PhaseSucceeded
+	cacheItem.Phase = phase
+	err = c.cache.DeleteDelayed(cacheItemID)
+
+	if err := tCtx.PluginStateWriter().Put(pluginStateVersion, cacheItem.State); err != nil {
+		return core.UnknownTransition, err
+	}
+
+	taskInfo := &core.TaskInfo{}
+	return core.DoTransition(core.PhaseInfoSuccess(taskInfo)), nil
+}
+
+func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 
 	if taskTemplate.Type == "dispatcher" {
-		res, err := c.sp.Do(ctx, tCtx)
-		if err != nil {
-			return core.UnknownTransition, err
-		}
-		logger.Infof(ctx, "@@@ SyncPlugin [%v] returned result: %v", c.GetID(), res)
-		// if err := tCtx.PluginStateWriter().Put(pluginStateVersion, nextState); err != nil {
-		// 	return core.UnknownTransition, err
-		// }
-		return core.DoTransition(core.PhaseInfoSuccess(nil)), nil
+		return c.syncHandle(ctx, tCtx)
+	}
+
+	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
+	if err != nil {
+		return core.UnknownTransition, err
 	}
 
 	var nextState *State
@@ -163,6 +189,7 @@ func validateRangeFloat64(fieldName string, min, max, provided float64) error {
 
 	return nil
 }
+
 func validateConfig(cfg webapi.PluginConfig) error {
 	errs := stdErrs.ErrorCollection{}
 	errs.Append(validateRangeInt("cache size", minCacheSize, maxCacheSize, cfg.Caching.Size))

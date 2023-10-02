@@ -61,6 +61,77 @@ func (p Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionCo
 	return "default", p.cfg.ResourceConstraints, nil
 }
 
+func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (latest webapi.Resource, err error) {
+	// write the resource here
+	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	inputs, err := taskCtx.InputReader().Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if taskTemplate.GetContainer() != nil {
+		templateParameters := template.Parameters{
+			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
+			Inputs:           taskCtx.InputReader(),
+			OutputPath:       taskCtx.OutputWriter(),
+			Task:             taskCtx.TaskReader(),
+		}
+		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
+		if err != nil {
+			return nil, err
+		}
+		taskTemplate.GetContainer().Args = modifiedArgs
+	}
+
+	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find agent agent with error: %v", err)
+	}
+
+	client, err := p.getClient(ctx, agent, p.connectionCache)
+	if err != nil {
+		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
+	}
+
+	finalCtx, cancel := getFinalContext(ctx, "DoTask", agent)
+
+	defer cancel()
+
+	res, err := client.DoTask(finalCtx, &admin.DoTaskRequest{Inputs: inputs, Template: taskTemplate})
+	if err != nil {
+		return nil, err
+	}
+
+	resource := &ResourceWrapper{
+		State:   res.Resource.State,
+		Outputs: res.Resource.Outputs,
+	}
+
+	// Write the output
+	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
+		logger.Debugf(ctx, "The task declares no outputs. Skipping writing the outputs.")
+		return resource, nil
+	}
+
+	var opReader io.OutputReader
+	if resource.Outputs != nil {
+		logger.Debugf(ctx, "Agent returned an output.")
+		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
+	} else {
+		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
+		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+	}
+
+	return &ResourceWrapper{
+		State:   res.Resource.State,
+		Outputs: res.Resource.Outputs,
+	}, taskCtx.OutputWriter().Put(ctx, opReader)
+}
+
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
 	webapi.Resource, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
@@ -203,7 +274,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource *Re
 
 	var opReader io.OutputReader
 	if resource.Outputs != nil {
-		logger.Debugf(ctx, "Agent returned an output")
+		logger.Debugf(ctx, "Agent returned an output.")
 		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
@@ -306,13 +377,18 @@ func newAgentPlugin(supportedTaskTypes SupportedTaskTypes) webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
 			return &Plugin{
-				metricScope:     iCtx.MetricsScope(),
-				cfg:             GetConfig(),
-				getClient:       getClientFunc,
-				connectionCache: make(map[*Agent]*grpc.ClientConn),
-			}, nil
+					metricScope:     iCtx.MetricsScope(),
+					cfg:             GetConfig(),
+					getClient:       getClientFunc,
+					connectionCache: make(map[*Agent]*grpc.ClientConn),
+				}, &Plugin{
+					metricScope:     iCtx.MetricsScope(),
+					cfg:             GetConfig(),
+					getClient:       getClientFunc,
+					connectionCache: make(map[*Agent]*grpc.ClientConn),
+				}, nil
 		},
 	}
 }
