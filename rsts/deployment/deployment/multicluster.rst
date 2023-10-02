@@ -48,24 +48,6 @@ requests successfully, the following environment-specific requirements should be
    
    .. code-block:: json
       
-      {
-
-        "Action": [
-
-          "s3:DeleteObject*",
-          "s3:GetObject*",
-          "s3:ListBucket",
-          "s3:PutObject*"
-
-                  ],
-
-        "Resource": [
-
-         "arn:aws:s3:::<your-S3-bucket>*",
-         "arn:aws:s3:::<your-S3-bucket>/*"
-         
-                    ]
-      }  
 
    2. At least three IAM Roles configured: one for the controlplane components, another for the dataplane
    and one more for the worker Pods that are bootstraped by Flyte to execute workflow tasks. 
