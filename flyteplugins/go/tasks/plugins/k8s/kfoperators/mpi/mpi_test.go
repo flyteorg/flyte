@@ -149,13 +149,11 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resourceRequirements)
-	overrides.OnGetResourceMetadata().Return(&core.ResourceMetadata{
-		AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
-			GpuAccelerator: &core.GPUAccelerator{
-				Device: "nvidia-tesla-a100",
-				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
-					PartitionSize: "1g.5gb",
-				},
+	overrides.OnGetResourceExtensions().Return(&core.ResourceExtensions{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+				PartitionSize: "1g.5gb",
 			},
 		},
 	})

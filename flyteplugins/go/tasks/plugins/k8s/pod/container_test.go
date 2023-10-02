@@ -66,13 +66,11 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
-	to.OnGetResourceMetadata().Return(&core.ResourceMetadata{
-		AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
-			GpuAccelerator: &core.GPUAccelerator{
-				Device: "nvidia-tesla-a100",
-				PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
-					PartitionSize: "1g.5gb",
-				},
+	to.OnGetResourceExtensions().Return(&core.ResourceExtensions{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+				PartitionSize: "1g.5gb",
 			},
 		},
 	})
