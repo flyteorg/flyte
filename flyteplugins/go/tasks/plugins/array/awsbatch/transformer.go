@@ -48,12 +48,12 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 			"Required value not set, taskTemplate Container")
 	}
 
-	jobConfig := newJobConfig().
-		MergeFromKeyValuePairs(taskTemplate.GetContainer().GetConfig()).
-		MergeFromConfigMap(tCtx.TaskExecutionMetadata().GetOverrides().GetConfig())
-	if len(jobConfig.DynamicTaskQueue) == 0 {
-		return nil, errors.Errorf(errors.BadTaskSpecification, "config[%v] is missing", DynamicTaskQueueKey)
-	}
+	//jobConfig := newJobConfig().
+	//	MergeFromKeyValuePairs(taskTemplate.GetContainer().GetConfig()).
+	//	MergeFromConfigMap(tCtx.TaskExecutionMetadata().GetOverrides().GetConfig())
+	//if len(jobConfig.DynamicTaskQueue) == 0 {
+	//	return nil, errors.Errorf(errors.BadTaskSpecification, "config[%v] is missing", DynamicTaskQueueKey)
+	//}
 
 	inputReader := array.GetInputReader(tCtx, taskTemplate)
 	cmd, err := template.Render(
@@ -107,7 +107,7 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 		}
 	}
 	submitJobInput.SetJobName(tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()).
-		SetJobDefinition(jobDefinition).SetJobQueue(jobConfig.DynamicTaskQueue).
+		SetJobDefinition(jobDefinition).SetJobQueue("tutorial").
 		SetRetryStrategy(toRetryStrategy(ctx, toBackoffLimit(taskTemplate.Metadata), cfg.MinRetries, cfg.MaxRetries)).
 		SetContainerOverrides(toContainerOverrides(ctx, append(cmd, args...), &resources, envVars)).
 		SetTimeout(toTimeout(taskTemplate.Metadata.GetTimeout(), cfg.DefaultTimeOut.Duration))
