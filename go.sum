@@ -134,8 +134,8 @@ github.com/Shopify/sarama v1.26.4 h1:+17TxUq/PJEAfZAll0T7XJjSgQWCpaQSoki/x5yN8o8
 github.com/Shopify/sarama v1.26.4/go.mod h1:NbSGBSSndYaIhRcBtY9V0U7AyH+x71bG668AuWys/yU=
 github.com/Shopify/toxiproxy v2.1.4+incompatible h1:TKdv8HiTLgE5wdJuEML90aBgNWsokNbMijUGhmcoBJc=
 github.com/Shopify/toxiproxy v2.1.4+incompatible/go.mod h1:OXgGpZ6Cli1/URJOF1DMxUHB2q5Ap20/P/eIdh4G0pI=
+github.com/adammck/venv v0.0.0-20160819025605-8a9c907a37d3 h1:O+yARMhWahUt25JGj1yEdUdQX6JlKkSZ3eZARw2rp80=
 github.com/adammck/venv v0.0.0-20160819025605-8a9c907a37d3/go.mod h1:3zXR2a/VSQndtpShh783rUTaEA2mpqN2VqZclBARBc0=
-github.com/adammck/venv v0.0.0-20200610172036-e77789703e7c h1:RoL0r3mR3JSkLur8q8AD59cByJ+kRwJHODNimZBd7GI=
 github.com/agnivade/levenshtein v1.0.1/go.mod h1:CURSv5d9Uaml+FovSIICkLbAUZ9S4RqaHDIsdSBg7lM=
 github.com/ajg/form v0.0.0-20160822230020-523a5da1a92f/go.mod h1:uL1WgH+h2mgNtvBq0339dVnzXdBETtL2LeUXaIv25UY=
 github.com/ajstarks/svgo v0.0.0-20180226025133-644b8db467af/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
