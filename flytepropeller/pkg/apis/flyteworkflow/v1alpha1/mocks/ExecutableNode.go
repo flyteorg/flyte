@@ -386,34 +386,34 @@ func (_m *ExecutableNode) GetOutputAlias() []v1alpha1.Alias {
 	return r0
 }
 
-type ExecutableNode_GetResourceMetadata struct {
+type ExecutableNode_GetResourceExtensions struct {
 	*mock.Call
 }
 
-func (_m ExecutableNode_GetResourceMetadata) Return(_a0 *core.ResourceMetadata) *ExecutableNode_GetResourceMetadata {
-	return &ExecutableNode_GetResourceMetadata{Call: _m.Call.Return(_a0)}
+func (_m ExecutableNode_GetResourceExtensions) Return(_a0 *core.ResourceExtensions) *ExecutableNode_GetResourceExtensions {
+	return &ExecutableNode_GetResourceExtensions{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ExecutableNode) OnGetResourceMetadata() *ExecutableNode_GetResourceMetadata {
-	c_call := _m.On("GetResourceMetadata")
-	return &ExecutableNode_GetResourceMetadata{Call: c_call}
+func (_m *ExecutableNode) OnGetResourceExtensions() *ExecutableNode_GetResourceExtensions {
+	c_call := _m.On("GetResourceExtensions")
+	return &ExecutableNode_GetResourceExtensions{Call: c_call}
 }
 
-func (_m *ExecutableNode) OnGetResourceMetadataMatch(matchers ...interface{}) *ExecutableNode_GetResourceMetadata {
-	c_call := _m.On("GetResourceMetadata", matchers...)
-	return &ExecutableNode_GetResourceMetadata{Call: c_call}
+func (_m *ExecutableNode) OnGetResourceExtensionsMatch(matchers ...interface{}) *ExecutableNode_GetResourceExtensions {
+	c_call := _m.On("GetResourceExtensions", matchers...)
+	return &ExecutableNode_GetResourceExtensions{Call: c_call}
 }
 
-// GetResourceMetadata provides a mock function with given fields:
-func (_m *ExecutableNode) GetResourceMetadata() *core.ResourceMetadata {
+// GetResourceExtensions provides a mock function with given fields:
+func (_m *ExecutableNode) GetResourceExtensions() *core.ResourceExtensions {
 	ret := _m.Called()
 
-	var r0 *core.ResourceMetadata
-	if rf, ok := ret.Get(0).(func() *core.ResourceMetadata); ok {
+	var r0 *core.ResourceExtensions
+	if rf, ok := ret.Get(0).(func() *core.ResourceExtensions); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*core.ResourceMetadata)
+			r0 = ret.Get(0).(*core.ResourceExtensions)
 		}
 	}
 

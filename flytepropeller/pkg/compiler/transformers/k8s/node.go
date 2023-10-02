@@ -28,7 +28,6 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 	var task *core.TaskTemplate
 	var resources *core.Resources
-	var resourceMetadata *v1alpha1.ResourceMetadata
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -44,15 +43,15 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			return nil, !errs.HasErrors()
 		}
 
-		if n.GetTaskNode().Overrides != nil {
-			if n.GetTaskNode().Overrides.Resources != nil {
-				resources = n.GetTaskNode().Overrides.Resources
-			}
-			if n.GetTaskNode().Overrides.ResourceMetadata != nil {
-				resourceMetadata = &v1alpha1.ResourceMetadata{
-					ResourceMetadata: n.GetTaskNode().Overrides.ResourceMetadata,
-				}
-			}
+		if n.GetTaskNode().Overrides != nil && n.GetTaskNode().Overrides.Resources != nil {
+			resources = n.GetTaskNode().Overrides.Resources
+		}
+	}
+
+	var resourceExtensions *v1alpha1.ResourceExtensions
+	if resources != nil && resources.GetExtensions() != nil {
+		resourceExtensions = &v1alpha1.ResourceExtensions{
+			ResourceExtensions: resources.GetExtensions(),
 		}
 	}
 
@@ -84,16 +83,16 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	}
 
 	nodeSpec := &v1alpha1.NodeSpec{
-		ID:                n.GetId(),
-		Name:              name,
-		RetryStrategy:     computeRetryStrategy(n, task),
-		ExecutionDeadline: timeout,
-		Resources:         res,
-		ResourceMetadata:  resourceMetadata,
-		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
-		InputBindings:     toBindingValueArray(n.GetInputs()),
-		ActiveDeadline:    activeDeadline,
-		Interruptible:     interruptible,
+		ID:                 n.GetId(),
+		Name:               name,
+		RetryStrategy:      computeRetryStrategy(n, task),
+		ExecutionDeadline:  timeout,
+		Resources:          res,
+		ResourceExtensions: resourceExtensions,
+		OutputAliases:      toAliasValueArray(n.GetOutputAliases()),
+		InputBindings:      toBindingValueArray(n.GetInputs()),
+		ActiveDeadline:     activeDeadline,
+		Interruptible:      interruptible,
 	}
 
 	switch v := n.GetTarget().(type) {

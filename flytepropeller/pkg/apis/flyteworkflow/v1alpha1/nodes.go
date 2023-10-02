@@ -92,25 +92,25 @@ func (in *NodeMetadata) DeepCopyInto(out *NodeMetadata) {
 	// Once we figure out the autogenerate story we can replace this
 }
 
-type ResourceMetadata struct {
-	*core.ResourceMetadata
+type ResourceExtensions struct {
+	*core.ResourceExtensions
 }
 
-func (in *ResourceMetadata) MarshalJSON() ([]byte, error) {
+func (in *ResourceExtensions) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
-	if err := marshaler.Marshal(&buf, in.ResourceMetadata); err != nil {
+	if err := marshaler.Marshal(&buf, in.ResourceExtensions); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-func (in *ResourceMetadata) UnmarshalJSON(b []byte) error {
-	in.ResourceMetadata = &core.ResourceMetadata{}
-	return jsonpb.Unmarshal(bytes.NewReader(b), in.ResourceMetadata)
+func (in *ResourceExtensions) UnmarshalJSON(b []byte) error {
+	in.ResourceExtensions = &core.ResourceExtensions{}
+	return jsonpb.Unmarshal(bytes.NewReader(b), in.ResourceExtensions)
 }
 
-func (in *ResourceMetadata) DeepCopyInto(out *ResourceMetadata) {
+func (in *ResourceExtensions) DeepCopyInto(out *ResourceExtensions) {
 	*out = *in
 	// We do not manipulate the object, so its ok
 	// Once we figure out the autogenerate story we can replace this
@@ -158,10 +158,10 @@ type NodeSpec struct {
 	// If not specified, the pod will be dispatched by default scheduler.
 	// +optional
 	SchedulerName string `json:"schedulerName,omitempty" protobuf:"bytes,19,opt,name=schedulerName"`
-	// If specified, includes overrides for metadata about resources to allocate to the
+	// If specified, includes overrides for extended resources to allocate to the
 	// node.
 	// +optional
-	ResourceMetadata *ResourceMetadata `json:"resourceMetadata,omitempty" protobuf:"bytes,20,opt,name=resourceMetadata"`
+	ResourceExtensions *ResourceExtensions `json:"resourceExtensions,omitempty" protobuf:"bytes,20,opt,name=resourceExtensions"`
 	// If specified, the pod's tolerations.
 	// +optional
 	Tolerations []typesv1.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
@@ -210,8 +210,8 @@ func (in *NodeSpec) GetResources() *typesv1.ResourceRequirements {
 	return in.Resources
 }
 
-func (in *NodeSpec) GetResourceMetadata() *core.ResourceMetadata {
-	return in.ResourceMetadata.ResourceMetadata
+func (in *NodeSpec) GetResourceExtensions() *core.ResourceExtensions {
+	return in.ResourceExtensions.ResourceExtensions
 }
 
 func (in *NodeSpec) GetOutputAlias() []Alias {

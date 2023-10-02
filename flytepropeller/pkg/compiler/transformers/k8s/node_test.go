@@ -95,6 +95,7 @@ func TestBuildNodeSpec(t *testing.T) {
 
 	t.Run("node with resource overrides", func(t *testing.T) {
 		expectedCPU := resource.MustParse("20Mi")
+		expectedGpuDevice := "nvidia-tesla-t4"
 		n.Node.Target = &core.Node_TaskNode{
 			TaskNode: &core.TaskNode{
 				Reference: &core.TaskNode_ReferenceId{
@@ -108,6 +109,11 @@ func TestBuildNodeSpec(t *testing.T) {
 								Value: "20Mi",
 							},
 						},
+						Extensions: &core.ResourceExtensions{
+							GpuAccelerator: &core.GPUAccelerator{
+								Device: "nvidia-tesla-t4",
+							},
+						},
 					},
 				},
 			},
@@ -117,30 +123,9 @@ func TestBuildNodeSpec(t *testing.T) {
 		assert.NotNil(t, spec.Resources)
 		assert.NotNil(t, spec.Resources.Requests.Cpu())
 		assert.Equal(t, expectedCPU.Value(), spec.Resources.Requests.Cpu().Value())
-	})
-
-	t.Run("node with resource metadata overrides", func(t *testing.T) {
-		expectedResourceMetadata := &core.ResourceMetadata{
-			AcceleratorValue: &core.ResourceMetadata_GpuAccelerator{
-				GpuAccelerator: &core.GPUAccelerator{
-					Device: "nvidia-tesla-t4",
-				},
-			},
-		}
-		n.Node.Target = &core.Node_TaskNode{
-			TaskNode: &core.TaskNode{
-				Reference: &core.TaskNode_ReferenceId{
-					ReferenceId: &core.Identifier{Name: "ref_2"},
-				},
-				Overrides: &core.TaskNodeOverrides{
-					ResourceMetadata: expectedResourceMetadata,
-				},
-			},
-		}
-
-		spec := mustBuild(t, n, 1, errs.NewScope())
-		assert.NotNil(t, spec.GetResourceMetadata())
-		assert.Equal(t, expectedResourceMetadata, spec.GetResourceMetadata())
+		assert.NotNil(t, spec.GetResourceExtensions())
+		assert.NotNil(t, spec.GetResourceExtensions().GetGpuAccelerator())
+		assert.Equal(t, expectedGpuDevice, spec.GetResourceExtensions().GetGpuAccelerator().GetDevice())
 	})
 
 	t.Run("LaunchPlanRef", func(t *testing.T) {
