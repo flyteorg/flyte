@@ -67,42 +67,12 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 }
 
 func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
+	_, err := c.sp.Do(ctx, tCtx)
 	if err != nil {
 		return core.UnknownTransition, err
 	}
 
-	var state *State
-	state = &incomingState
-	// TODO: This is incoming State
-	newCacheItem := CacheItem{
-		State: *state,
-	}
-	cacheItemID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
-	item, err := c.cache.GetOrCreate(cacheItemID, newCacheItem)
-	cacheItem, ok := item.(CacheItem)
-	if !ok {
-		logger.Errorf(ctx, "Error casting cache object into ExecutionState")
-		return core.UnknownTransition, err
-	}
-
-	res, err := c.sp.Do(ctx, tCtx)
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
-	cacheItem.Resource = res
-
-	phase := PhaseSucceeded
-	cacheItem.Phase = phase
-	err = c.cache.DeleteDelayed(cacheItemID)
-
-	if err := tCtx.PluginStateWriter().Put(pluginStateVersion, cacheItem.State); err != nil {
-		return core.UnknownTransition, err
-	}
-
-	taskInfo := &core.TaskInfo{}
-	return core.DoTransition(core.PhaseInfoSuccess(taskInfo)), nil
+	return core.DoTransition(core.PhaseInfoSuccess(&core.TaskInfo{})), nil
 }
 
 func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {

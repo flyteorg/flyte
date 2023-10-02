@@ -150,6 +150,5 @@ type SyncPlugin interface {
 	GetConfig() PluginConfig
 
 	// Do performs the action associated with this plugin.
-	Do(ctx context.Context, tCtx TaskExecutionContext) (phase pluginsCore.PhaseInfo, err error)
 	Do(ctx context.Context, tCtx TaskExecutionContext) (latest Resource, err error)
 }
