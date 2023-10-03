@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	//"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -70,7 +71,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	arrayNode := nCtx.Node().GetArrayNode()
 	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
 
-	externalResources := make([]*event.ExternalResourceInfo, 0, len(arrayNodeState.SubNodePhases.GetItems()))
+	eventRecorder := newArrayEventRecorder(nCtx.EventsRecorder())
 	messageCollector := errorcollector.NewErrorMessageCollector()
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing:
@@ -84,8 +85,8 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			}
 
 			// create array contexts
-			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, _, err :=
-				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism)
+			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
+				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism, eventRecorder)
 			if err != nil {
 				return err
 			}
@@ -95,13 +96,14 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			if err != nil {
 				messageCollector.Collect(i, err.Error())
 			} else {
-				externalResources = append(externalResources, &event.ExternalResourceInfo{
+				// TODO @hamersaw - eventRecorder.RecordNodeEvent?
+				/*externalResources = append(externalResources, &event.ExternalResourceInfo{
 					ExternalId:   buildSubNodeID(nCtx, i, 0),
 					Index:        uint32(i),
 					Logs:         nil,
 					RetryAttempt: 0,
 					Phase:        idlcore.TaskExecution_ABORTED,
-				})
+				})*/
 			}
 		}
 	}
@@ -111,12 +113,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	}
 
 	// update aborted state for subNodes
-	taskExecutionEvent, err := buildTaskExecutionEvent(ctx, nCtx, idlcore.TaskExecution_ABORTED, 0, externalResources)
-	if err != nil {
-		return err
-	}
-
-	if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, a.eventConfig); err != nil {
+	if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_ABORTED, 0, a.eventConfig); err != nil {
 		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 		return err
 	}
@@ -129,6 +126,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	arrayNode := nCtx.Node().GetArrayNode()
 	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
 
+	eventRecorder := newArrayEventRecorder(nCtx.EventsRecorder())
 	messageCollector := errorcollector.NewErrorMessageCollector()
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing, v1alpha1.ArrayNodePhaseSucceeding:
@@ -142,8 +140,8 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 			}
 
 			// create array contexts
-			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, _, err :=
-				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism)
+			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
+				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism, eventRecorder)
 			if err != nil {
 				return err
 			}
@@ -159,6 +157,8 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	if messageCollector.Length() > 0 {
 		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength))
 	}
+
+	// TODO @hamersaw - call eventRecorder.finalize?1?!
 
 	return nil
 }
@@ -177,8 +177,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
 	currentArrayNodePhase := arrayNodeState.Phase
 
-	var externalResources []*event.ExternalResourceInfo
 	taskPhaseVersion := arrayNodeState.TaskPhaseVersion
+	eventRecorder := newArrayEventRecorder(nCtx.EventsRecorder())
 
 	switch currentArrayNodePhase {
 	case v1alpha1.ArrayNodePhaseNone:
@@ -238,7 +238,13 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// initialize externalResources
-		externalResources = make([]*event.ExternalResourceInfo, 0, size)
+		// TODO @hamersaw - add eventRecorder.RawExternalResources(...)
+		/*eventRecorder.RecordNodeEvent(ctx,
+			&event.NodeExecutionEvent{
+			},
+			a.eventConfig)*/
+
+		/*externalResources = make([]*event.ExternalResourceInfo, 0, size)
 		for i := 0; i < size; i++ {
 			externalResources = append(externalResources, &event.ExternalResourceInfo{
 				ExternalId:   buildSubNodeID(nCtx, i, 0),
@@ -247,7 +253,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				RetryAttempt: 0,
 				Phase:        idlcore.TaskExecution_QUEUED,
 			})
-		}
+		}*/
 
 		// transition ArrayNode to `ArrayNodePhaseExecuting`
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
@@ -255,7 +261,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// process array node subNodes
 		currentParallelism := uint32(0)
 		messageCollector := errorcollector.NewErrorMessageCollector()
-		externalResources = make([]*event.ExternalResourceInfo, 0)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 
@@ -265,8 +270,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			// create array contexts
-			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, subNodeStatus, arrayEventRecorder, err :=
-				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism)
+			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, subNodeStatus, err :=
+				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism, eventRecorder)
 			if err != nil {
 				return handler.UnknownTransition, err
 			}
@@ -283,44 +288,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			// process events
-			cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
-			for _, nodeExecutionEvent := range arrayEventRecorder.NodeEvents() {
-				switch target := nodeExecutionEvent.TargetMetadata.(type) {
-				case *event.NodeExecutionEvent_TaskNodeMetadata:
-					if target.TaskNodeMetadata != nil {
-						cacheStatus = target.TaskNodeMetadata.CacheStatus
-					}
-				}
-			}
-
-			retryAttempt := subNodeStatus.GetAttempts()
-
-			// fastcache will not emit task events for cache hits. we need to manually detect a
-			// transition to `SUCCEEDED` and add an `ExternalResourceInfo` for it.
-			if cacheStatus == idlcore.CatalogCacheStatus_CACHE_HIT && len(arrayEventRecorder.TaskEvents()) == 0 {
-				externalResources = append(externalResources, &event.ExternalResourceInfo{
-					ExternalId:   buildSubNodeID(nCtx, i, retryAttempt),
-					Index:        uint32(i),
-					RetryAttempt: retryAttempt,
-					Phase:        idlcore.TaskExecution_SUCCEEDED,
-					CacheStatus:  cacheStatus,
-				})
-			}
-
-			for _, taskExecutionEvent := range arrayEventRecorder.TaskEvents() {
-				for _, log := range taskExecutionEvent.Logs {
-					log.Name = fmt.Sprintf("%s-%d", log.Name, i)
-				}
-
-				externalResources = append(externalResources, &event.ExternalResourceInfo{
-					ExternalId:   buildSubNodeID(nCtx, i, retryAttempt),
-					Index:        uint32(i),
-					Logs:         taskExecutionEvent.Logs,
-					RetryAttempt: retryAttempt,
-					Phase:        taskExecutionEvent.Phase,
-					CacheStatus:  cacheStatus,
-				})
-			}
+			eventRecorder.process(ctx, nCtx, i, subNodeStatus.GetAttempts())
 
 			// update subNode state
 			arrayNodeState.SubNodePhases.SetItem(i, uint64(subNodeStatus.GetPhase()))
@@ -462,9 +430,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		return handler.UnknownTransition, errors.Errorf(errors.IllegalStateError, nCtx.NodeID(), "invalid ArrayNode phase %+v", arrayNodeState.Phase)
 	}
 
-	// if there were changes to subNode status externalResources will be populated and must be
-	// reported to admin through a TaskExecutionEvent.
-	if len(externalResources) > 0 {
+	// if there were changes to subNode status then the eventRecorder will require finalizing to
+	// report to admin through a TaskExecutionEvent.
+	if eventRecorder.finalizeRequired(ctx) {
 		// determine task phase from ArrayNodePhase
 		taskPhase := idlcore.TaskExecution_UNDEFINED
 		switch currentArrayNodePhase {
@@ -488,12 +456,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			arrayNodeState.TaskPhaseVersion = taskPhaseVersion + 1
 		}
 
-		taskExecutionEvent, err := buildTaskExecutionEvent(ctx, nCtx, taskPhase, taskPhaseVersion, externalResources)
-		if err != nil {
-			return handler.UnknownTransition, err
-		}
-
-		if err := nCtx.EventsRecorder().RecordTaskEvent(ctx, taskExecutionEvent, a.eventConfig); err != nil {
+		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, taskPhaseVersion, a.eventConfig); err != nil {
 			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 			return handler.UnknownTransition, err
 		}
@@ -541,8 +504,8 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 // but need many different execution details, for example setting input values as a singular item rather than a collection,
 // injecting environment variables for flytekit maptask execution, aggregating eventing so that rather than tracking state for
 // each subnode individually it sends a single event for the whole ArrayNode, and many more.
-func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNodeState *handler.ArrayNodeState, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, currentParallelism *uint32) (
-	interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, *arrayEventRecorder, error) {
+func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNodeState *handler.ArrayNodeState, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, currentParallelism *uint32, eventRecorder arrayEventRecorder) (
+	interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error) {
 
 	nodePhase := v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(subNodeIndex))
 	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))
@@ -550,7 +513,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
 	inputLiteralMap, err := constructLiteralMap(ctx, nCtx.InputReader(), subNodeIndex)
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, err
 	}
 
 	inputReader := newStaticInputReader(nCtx.InputReader(), inputLiteralMap)
@@ -579,7 +542,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	currentAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(subNodeIndex))
 	subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx, strconv.Itoa(subNodeIndex), strconv.Itoa(int(currentAttempt)))
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, err
 	}
 
 	subNodeStatus := &v1alpha1.NodeStatus{
@@ -597,12 +560,17 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// initialize mocks
 	arrayNodeLookup := newArrayNodeLookup(nCtx.ContextualNodeLookup(), subNodeID, &subNodeSpec, subNodeStatus)
 
-	arrayExecutionContext := newArrayExecutionContext(nCtx.ExecutionContext(), subNodeIndex, currentParallelism, arrayNode.GetParallelism())
+	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+	arrayExecutionContext := newArrayExecutionContext(
+		executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo),
+		subNodeIndex, currentParallelism, arrayNode.GetParallelism())
 
-	arrayEventRecorder := newArrayEventRecorder()
 	arrayNodeExecutionContextBuilder := newArrayNodeExecutionContextBuilder(a.nodeExecutor.GetNodeExecutionContextBuilder(),
-		subNodeID, subNodeIndex, subNodeStatus, inputReader, arrayEventRecorder, currentParallelism, arrayNode.GetParallelism())
+		subNodeID, subNodeIndex, subNodeStatus, inputReader, currentParallelism, arrayNode.GetParallelism(), eventRecorder)
 	arrayNodeExecutor := a.nodeExecutor.WithNodeExecutionContextBuilder(arrayNodeExecutionContextBuilder)
 
-	return arrayNodeExecutor, arrayExecutionContext, &arrayNodeLookup, &arrayNodeLookup, &subNodeSpec, subNodeStatus, arrayEventRecorder, nil
+	return arrayNodeExecutor, arrayExecutionContext, &arrayNodeLookup, &arrayNodeLookup, &subNodeSpec, subNodeStatus, nil
 }
