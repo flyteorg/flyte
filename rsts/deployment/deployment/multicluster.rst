@@ -47,9 +47,20 @@ requests successfully, the following environment-specific requirements should be
    1. An IAM Policy that defines the permissions needed for Flyte. A minimum set of permissions include:
    
    .. code-block:: json
+
+      "Action": [
+          "s3:DeleteObject*",
+          "s3:GetObject*",
+          "s3:ListBucket",
+          "s3:PutObject*"
+         ],
+       "Resource": [
+                "arn:aws:s3:::<your-S3-bucket>*",
+                "arn:aws:s3:::<your-S3-bucket>*/*"
+            ],
       
 
-   2. At least three IAM Roles configured: one for the controlplane components, another for the dataplane
+   2. At least three IAM Roles configured: one for the control plane components, another for the data plane
    and one more for the worker Pods that are bootstrapped by Flyte to execute workflow tasks. 
 
    3. An OIDC Provider associated with each of your EKS clusters. You can use the following command to create and connect the Provider:
@@ -58,7 +69,7 @@ requests successfully, the following environment-specific requirements should be
 
       eksctl utils associate-iam-oidc-provider --cluster <Name-EKS-Cluster> --approve  
 
-   4. An IAM Trust Relationship that associates each EKS cluster type (controlplane or dataplane) with the Service Account(s) and namespaces 
+   4. An IAM Trust Relationship that associates each EKS cluster type (control plane or data plane) with the Service Account(s) and namespaces 
       where the different elements of the system will run.
   
    Follow the steps in this section to complete the requirements indicated above:
@@ -212,7 +223,7 @@ the first cluster only.
 
 .. note:: 
 
-   Use the same ``values-eks.yaml`` or ``values-gcp.yaml`` file you used to deploy the controlplane.
+   Use the same ``values-eks.yaml`` or ``values-gcp.yaml`` file you used to deploy the control plane.
 
 .. tabbed:: AWS
 
@@ -246,7 +257,7 @@ In order to verify requests, the Kubernetes API Server expects a `signed bearer 
 attached to the Service Account. As of Kubernetes 1.24 and above, the bearer token has to be generated manually.
 
 
-1. Use the following manifest to create a long-lived bearer token for the ``flyteadmin`` Service Account in your dataplane cluster:
+1. Use the following manifest to create a long-lived bearer token for the ``flyteadmin`` Service Account in your data plane cluster:
 
    .. prompt:: bash 
    
@@ -278,14 +289,14 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
 .. note:: 
   The credentials have two parts (``CA cert`` and ``bearer token``). 
 
-3. Copy the bearer token of the first dataplane cluster's secret to your clipboard using the following command:
+3. Copy the bearer token of the first data plane cluster's secret to your clipboard using the following command:
 
 .. prompt:: bash $
 
   kubectl get secret -n flyte dataplane1-token \
       -o jsonpath='{.data.token}' | base64 -D | pbcopy
 
-4. Go to ``secrets.yaml`` and add a new entry under ``stringData`` with the dataplane cluster token:
+4. Go to ``secrets.yaml`` and add a new entry under ``stringData`` with the data plane cluster token:
 
 .. code-block:: yaml
    :caption: secrets.yaml
@@ -297,8 +308,7 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
      namespace: flyte
    type: Opaque
    stringData:
-     dataplane_1_token: eyJhbGciOiJSUzI1NiIsImtpZCI6IlM0WlhfMm1Yb1U4Z1V4R0t6STZDdkhGTVVvVDBZcDAxbjdVbDc1Y1VxR28ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJmbHl0ZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkYXRhcGxhbmUxLXRva2VuIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImZseXRlYWRtaW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJkNTdhNjMwZi00ZTZmLTQzNTgtYjQwOS00M2UyMTlhYjg4NTEiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6Zmx5dGU6Zmx5dGVhZG1pbiJ9.Fbn5qJjWP1wyJ08PgZXnrrUdKEhLRYqUzG9Vff1maFO3yBKkv_EBuYc2hjGeW5_ORCrT9qKcFAd3AE_tM3P8AQ-dRoA6K-RcJ2qinxabWmk9RYbtKFr1zujswU6dm-iB7JkjY7yYyBRewbw_m4QRacgG8K11c8bYZ9SZoV86EqGmsNdeCPuv5GiPBiJ0p3hgta4kZ1knCNf8qLBUQVZ-9G5vabYM0lyD6dvGOqlOs1bMzgLeijvpQN471dTLmIZ71anOG2gkuJW_AusnWDF_0rJ3yfISf3dRkhXkLswyq-awgtKbz6ZYjPaJ1eA8dNvSlbDoNrMXOGNlx7p7KhOY-w
-
+     dataplane_1_token: <dataplane1-token>
 5. Obtain the corresponding certificate:
 
 .. prompt:: bash $
@@ -318,29 +328,13 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
      namespace: flyte
    type: Opaque
    stringData:
-     dataplane_1_token: eyJhbGciOiJSUzI1NiIsImtpZCI6IlM0WlhfMm1Yb1U4Z1V4R0t6STZDdkhGTVVvVDBZcDAxbjdVbDc1Y1VxR28ifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJmbHl0ZSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJkYXRhcGxhbmUxLXRva2VuIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImZseXRlYWRtaW4iLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiJkNTdhNjMwZi00ZTZmLTQzNTgtYjQwOS00M2UyMTlhYjg4NTEiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6Zmx5dGU6Zmx5dGVhZG1pbiJ9.Fbn5qJjWP1wyJ08PgZXnrrUdKEhLRYqUzG9Vff1maFO3yBKkv_EBuYc2hjGeW5_ORCrT9qKcFAd3AE_tM3P8AQ-dRoA6K-RcJ2qinxabWmk9RYbtKFr1zujswU6dm-iB7JkjY7yYyBRewbw_m4QRacgG8K11c8bYZ9SZoV86EqGmsNdeCPuv5GiPBiJ0p3hgta4kZ1knCNf8qLBUQVZ-9G5vabYM0lyD6dvGOqlOs1bMzgLeijvpQN471dTLmIZ71anOG2gkuJW_AusnWDF_0rJ3yfISf3dRkhXkLswyq-awgtKbz6ZYjPaJ1eA8dNvSlbDoNrMXOGNlx7p7KhOY-w
+     dataplane_1_token: <your-dataplane1-token>
      dataplane_1_cacert:  |
          -----BEGIN CERTIFICATE-----
-         MIIDBTCCAe2gAwIBAgIIQREjtnmWbyYwDQYJKoZIhvcNAQELBQAwFTETMBEGA1UE
-         AxMKa3ViZXJuZXRlczAeFw0yMzA5MTIxNzIzMDhaFw0zMzA5MDkxNzIzMDhaMBUx
-         EzARBgNVBAMTCmt1YmVybmV0ZXMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
-         AoIBAQDn53QComJ6lhauUATrnV7DtDDxreGQDxxDp8HrU0nwvzT5e4ewRJ+6+VKH
-         ru6iV8hRSH99XdsbRhb5+HrM9bxwDduTZ4wOsdmI1ghXvbBpOEHQTJFiSoWY82LS
-         eyMrlwmo8TU8NUXhN+iE+z+cW/QQUKPnNnDcZYWpWOZYjtdtSoYbvU98/cMrRaNg
-         IoDMiC6uWz3aNE9SSodE5IpTQ6VhhmZfU8eGO6+2Nl0l73uVSiKUyaJm/DdyUnp1
-         iAx7qMPZw+Bfxa6P8PjrkFTpiccPFsy+9mnmoLfbA07QMx0txMFDb/YGOdBYox7n
-         V+yOst26TvfNnl4lW4o7cBzjwEuxAgMBAAGjWTBXMA4GA1UdDwEB/wQEAwICpDAP
-         BgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSPzcH1/5DDrurz+Tu8kWwUZoHlcTAV
-         BgNVHREEDjAMggprdWJlcm5ldGVzMA0GCSqGSIb3DQEBCwUAA4IBAQAXcAFgusLs
-         PfpqzeQcrmDYnywW067+VLwGn906lpceoJbjxL9NQsHSlluXzS8AqljabbweetKD
-         +eYfvSDa+yWHSA0ygS9ddCutMgNtsAm5H8LktKvnhERuZKBDUFYG2HFFlIh5mUak
-         5TkaYC3FzBsTUoHg+uBqOPSUKaQhzFsIj4a94oZfpGMF+2Yd7vjTeNjuXPbdpYVK
-         2avEma8RucJIhIs5w8pgnclSpNXwyz69HrUJ+FxADot6+YHuirpL31XLFPL/jqX4
-         Hde3eDWJs4p6Rr0bOGmolOznGUbLdlBsM1QsHfiipMe7XqrBheNWAQFU+rFeHr8L
-         tbjBbrxuMPKV
+         <your-dataplane1-token-certificate>
          -----END CERTIFICATE-----
 
-7. Connect to your controlplane cluster and create the ``cluster-credentials`` secret:
+7. Connect to your control plane cluster and create the ``cluster-credentials`` secret:
 
 .. prompt:: bash $
 
@@ -386,8 +380,10 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
       kubectl cluster-info
 
 In this configuration, ``label1`` and ``label2`` are just labels that we will use later in the process
-to configure the necessary mappings so workflow executions matching those labels, are scheduled
-on one or multiple clusters depending on the weight (e.g. ``label1`` on ``dataplane_1``)
+to configure mappings that enable workflow executions matching those labels, to be scheduled
+on one or multiple clusters depending on the weight (e.g. ``label1`` on ``dataplane_1``). The ``weight`` is the 
+priority of a specific cluster, relative to the other clusters under the ``labelClusterMap`` entry. The total sum of weights under a particular 
+label has to be 1. 
 
 9. Update the control plane Helm release:
 
@@ -417,7 +413,7 @@ Example output:
 
 .. prompt:: bash $
 
-   kubectl get pods -n flyte                                                                                                                    ✔ ╱ base  ╱ fthw-controlplane ⎈
+   kubectl get pods -n flyte                                                                                                                  
    NAME                             READY   STATUS    RESTARTS   AGE
    datacatalog-86f6b9bf64-bp2cj     1/1     Running   0          23h
    datacatalog-86f6b9bf64-fjzcp     1/1     Running   0          23h
@@ -620,8 +616,8 @@ The process can be repeated for additional clusters.
 
          kubectl create ns flyte
 
-  9. Install the dataplane Helm chart following the steps in the **Dataplane deployment** section. See :ref:`section <dataplane-deployment>`.
-  10. Follow steps 1-3 in the **Controlplane configuration** section (see :ref:`section <control-plane-deployment>`) to generate and populate a new section in your ``secrets.yaml`` file
+  9. Install the data plane Helm chart following the steps in the **Data plane deployment** section. See :ref:`section <dataplane-deployment>`.
+  10. Follow steps 1-3 in the **control plane configuration** section (see :ref:`section <control-plane-deployment>`) to generate and populate a new section in your ``secrets.yaml`` file
 
       Example:
 
@@ -634,18 +630,18 @@ The process can be repeated for additional clusters.
            namespace: flyte
          type: Opaque
          stringData:
-           dataplane_1_token: eyJhbGciOiJSUzI1NiIsImtpZCI6IlM0WlhfMm1Yb1U4Z1V4R0t6...
+           dataplane_1_token: <your-dataplane1-token>
            dataplane_1_cacert:  |
                -----BEGIN CERTIFICATE-----
-               MIIDB...
+                <your-dataplane1-token-certificate>
                -----END CERTIFICATE-----
-           dataplane_2_token: eyJhbGciOiJSUzI1NiIsImtpZCI6IjNxZ0tZRXBnNU0zWk1oLUJrUlc...
+           dataplane_2_token: <your-dataplane2-token>
            dataplane_2_cacert:  |
                -----BEGIN CERTIFICATE-----
-               MIIDBT...
+                <your-dataplane2-token-certificate>
                 -----END CERTIFICATE-----
   
-  12. Connect to the controlplane cluster and update the ``cluster-credentials`` Secret:
+  12. Connect to the control plane cluster and update the ``cluster-credentials`` Secret:
 
       .. prompt:: bash $
 
@@ -683,7 +679,7 @@ The process can be repeated for additional clusters.
                tokenPath: "/var/run/credentials/dataplane_2_token"
                certPath: "/var/run/credentials/dataplane_2_cacert"
 
-  14. Update the Helm release in the controlplane cluster:
+  14. Update the Helm release in the control plane cluster:
 
       .. prompt:: bash $
 
