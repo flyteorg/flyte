@@ -175,7 +175,7 @@ func (w *autoRefresh) Start(ctx context.Context) error {
 	return nil
 }
 
-// Update updates the item in the cache only if it exists, return true if we updated the item.
+// Update updates the item only if it exists in the cache, return true if we updated the item.
 func (w *autoRefresh) Update(id ItemID, item Item) (ok bool) {
 	w.lock.Lock()
 	ok = w.lruMap.Contains(id)
@@ -186,6 +186,7 @@ func (w *autoRefresh) Update(id ItemID, item Item) (ok bool) {
 	return ok
 }
 
+// Delete deletes the item from the cache if it exists.
 func (w *autoRefresh) Delete(key interface{}) {
 	w.lock.Lock()
 	w.toDelete.Remove(key)
