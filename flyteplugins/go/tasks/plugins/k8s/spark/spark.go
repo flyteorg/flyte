@@ -3,44 +3,30 @@ package spark
 import (
 	"context"
 	"fmt"
-
-	"google.golang.org/protobuf/types/known/structpb"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
+	"regexp"
 	"strconv"
+	"strings"
+	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
+	"google.golang.org/protobuf/types/known/structpb"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
-<<<<<<< HEAD
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-=======
-	v1 "k8s.io/api/core/v1"
->>>>>>> flyteplugins/spark-pod-templates
-	"k8s.io/client-go/kubernetes/scheme"
-
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/utils"
-
-	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-
-	"regexp"
-	"strings"
-	"time"
 )
 
 const KindSparkApplication = "SparkApplication"
