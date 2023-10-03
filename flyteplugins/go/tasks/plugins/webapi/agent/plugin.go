@@ -105,7 +105,7 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (la
 	if err != nil {
 		return nil, err
 	}
-
+	// TODO: Check if state is not succeeded, then return error
 	resource := &ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
@@ -121,9 +121,6 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (la
 	if resource.Outputs != nil {
 		logger.Debugf(ctx, "Agent returned an output.")
 		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
-	} else {
-		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
-		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
 	}
 
 	return &ResourceWrapper{
