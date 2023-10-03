@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type flyteTask = core.TaskTemplate //nolint:unused

@@ -6,7 +6,7 @@ import (
 	context "context"
 
 	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 

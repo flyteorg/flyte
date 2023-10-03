@@ -4,7 +4,7 @@ package mocks
 
 import (
 	bitarray "github.com/flyteorg/flyte/flytestdlib/bitarray"
-	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	mock "github.com/stretchr/testify/mock"
 

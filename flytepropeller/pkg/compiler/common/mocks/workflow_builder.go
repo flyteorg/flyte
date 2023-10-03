@@ -4,7 +4,7 @@ package mocks
 
 import (
 	common "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
-	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	errors "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 
