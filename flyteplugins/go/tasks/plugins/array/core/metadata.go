@@ -13,7 +13,7 @@ import (
 // initial state of the subtask. This involves labeling all cached subtasks as successful with a
 // cache hit and initializing others to undefined state.
 func InitializeExternalResources(ctx context.Context, tCtx core.TaskExecutionContext, state *State,
-	generateSubTaskID func(core.TaskExecutionContext, int) string) ([]*core.ExternalResource, error) {
+	generateSubTaskID func(core.TaskExecutionContext, int, int) string) ([]*core.ExternalResource, error) {
 	externalResources := make([]*core.ExternalResource, state.GetOriginalArraySize())
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -51,7 +51,7 @@ func InitializeExternalResources(ctx context.Context, tCtx core.TaskExecutionCon
 			cachedSubTaskCount++
 		}
 
-		subTaskID := generateSubTaskID(tCtx, childIndex)
+		subTaskID := generateSubTaskID(tCtx, childIndex, i)
 		externalResources[i] = &core.ExternalResource{
 			ExternalID:   subTaskID,
 			CacheStatus:  cacheStatus,
