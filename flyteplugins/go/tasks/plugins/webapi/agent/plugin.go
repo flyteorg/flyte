@@ -5,13 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
-
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
-
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/keepalive"
 
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
@@ -245,6 +244,15 @@ func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent
 
 	if len(agent.DefaultServiceConfig) != 0 {
 		opts = append(opts, grpc.WithDefaultServiceConfig(agent.DefaultServiceConfig))
+	}
+
+	if agent.KeepAliveParameters != nil {
+
+		opts = append(opts, grpc.WithKeepaliveParams(keepalive.ClientParameters{
+			Time:                agent.KeepAliveParameters.Time.Duration,
+			Timeout:             agent.KeepAliveParameters.Timeout.Duration,
+			PermitWithoutStream: agent.KeepAliveParameters.PermitWithoutStream,
+		}))
 	}
 
 	var err error

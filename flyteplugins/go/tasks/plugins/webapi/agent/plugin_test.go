@@ -65,7 +65,12 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getClientFunc more config", func(t *testing.T) {
-		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
+		client, err := getClientFunc(context.Background(), &Agent{
+			Endpoint:             "localhost:80",
+			Insecure:             true,
+			DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}",
+			KeepAliveParameters:  &KeepAliveParameters{Time: config.Duration{Duration: 10 * time.Second}}},
+			map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 	})

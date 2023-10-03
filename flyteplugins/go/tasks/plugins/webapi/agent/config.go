@@ -43,6 +43,11 @@ var (
 			Endpoint:       "dns:///flyteagent.flyte.svc.cluster.local:80",
 			Insecure:       true,
 			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
+			KeepAliveParameters: &KeepAliveParameters{
+				Time:                config.Duration{Duration: 10 * time.Second},
+				Timeout:             config.Duration{Duration: 5 * time.Second},
+				PermitWithoutStream: true,
+			},
 		},
 	}
 
@@ -67,6 +72,22 @@ type Config struct {
 	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
 }
 
+// KeepAliveParameters defines keepalive parameters on the client-side. For more details, check https://pkg.go.dev/google.golang.org/grpc/keepalive#ClientParameters
+type KeepAliveParameters struct {
+	// After a duration of this time if the client doesn't see any activity it
+	// pings the server to see if the transport is still alive.
+	// If set below 10s, a minimum value of 10s will be used instead.
+	Time config.Duration `json:"time"`
+	// After having pinged for keepalive check, the client waits for a duration
+	// of Timeout and if no activity is seen even after that the connection is
+	// closed.
+	Timeout config.Duration `json:"timeout"`
+	// If true, client sends keepalive pings even with no active RPCs. If false,
+	// when there are no active RPCs, Time and Timeout will be ignored and no
+	// keepalive pings will be sent.
+	PermitWithoutStream bool `json:"permitWithoutStream"`
+}
+
 type Agent struct {
 	// Endpoint points to an agent gRPC endpoint
 	Endpoint string `json:"endpoint"`
@@ -82,6 +103,9 @@ type Agent struct {
 
 	// DefaultTimeout gives the default RPC timeout if a more specific one is not defined in Timeouts; if neither DefaultTimeout nor Timeouts is defined for an operation, RPC timeout will not be enforced
 	DefaultTimeout config.Duration `json:"defaultTimeout"`
+
+	// KeepAliveParameters defines keepalive parameters for the gRPC client
+	KeepAliveParameters *KeepAliveParameters `json:"keepAliveParameters"`
 }
 
 func GetConfig() *Config {

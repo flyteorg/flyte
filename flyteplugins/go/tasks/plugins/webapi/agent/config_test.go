@@ -27,6 +27,11 @@ func TestGetAndSetConfig(t *testing.T) {
 		},
 	}
 	cfg.DefaultAgent.DefaultTimeout = config.Duration{Duration: 10 * time.Second}
+	cfg.DefaultAgent.KeepAliveParameters = &KeepAliveParameters{
+		Time:                config.Duration{Duration: 10 * time.Second},
+		Timeout:             config.Duration{Duration: 5 * time.Second},
+		PermitWithoutStream: true,
+	}
 	cfg.Agents = map[string]*Agent{
 		"agent_1": {
 			Insecure:             cfg.DefaultAgent.Insecure,
