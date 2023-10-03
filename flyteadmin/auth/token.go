@@ -14,9 +14,15 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 
+<<<<<<< HEAD
 	"github.com/coreos/go-oidc"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+=======
+	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/flyteorg/flytestdlib/errors"
+	"github.com/flyteorg/flytestdlib/logger"
+>>>>>>> flyteadmin/upgrade-coreos/go-oidc
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"golang.org/x/oauth2"
 )
