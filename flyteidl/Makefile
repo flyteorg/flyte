@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export REPOSITORY=flyteidl
-include boilerplate/flyte/golang_test_targets/Makefile
+include  ../boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
