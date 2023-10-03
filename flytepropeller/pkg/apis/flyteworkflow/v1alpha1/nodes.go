@@ -211,6 +211,9 @@ func (in *NodeSpec) GetResources() *typesv1.ResourceRequirements {
 }
 
 func (in *NodeSpec) GetResourceExtensions() *core.ResourceExtensions {
+	if in.ResourceExtensions == nil {
+		return nil
+	}
 	return in.ResourceExtensions.ResourceExtensions
 }
 
