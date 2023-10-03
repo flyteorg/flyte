@@ -309,6 +309,7 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
    type: Opaque
    stringData:
      dataplane_1_token: <dataplane1-token>
+     
 5. Obtain the corresponding certificate:
 
 .. prompt:: bash $
