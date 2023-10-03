@@ -18,8 +18,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 

@@ -14,9 +14,9 @@ import (
 
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	pb "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/stretchr/testify/assert"
 

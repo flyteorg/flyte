@@ -8,12 +8,12 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-	pluginsIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	pluginsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	pb "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocation string) error {

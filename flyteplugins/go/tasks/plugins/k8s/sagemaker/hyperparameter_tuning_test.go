@@ -9,13 +9,13 @@ import (
 
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 
 	hpojobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/hyperparametertuningjob"
-	sagemakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	sagemakerIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -10,7 +10,7 @@ import (
 	awsUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/awsutils"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"

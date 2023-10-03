@@ -5,10 +5,10 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/tests"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
@@ -16,7 +16,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 )
 
 type AdvanceIteration func(ctx context.Context, tCtx core.TaskExecutionContext) error

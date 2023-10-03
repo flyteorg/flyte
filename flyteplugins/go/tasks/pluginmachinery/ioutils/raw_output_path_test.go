@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	core2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core2 "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 

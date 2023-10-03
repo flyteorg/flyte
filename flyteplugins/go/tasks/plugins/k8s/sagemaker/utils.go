@@ -20,9 +20,9 @@ import (
 	awsSdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	flyteSagemakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	flyteSagemakerIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 	"github.com/golang/protobuf/proto"
 )
 

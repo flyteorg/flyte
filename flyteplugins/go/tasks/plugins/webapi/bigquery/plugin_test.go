@@ -18,7 +18,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/api/googleapi"

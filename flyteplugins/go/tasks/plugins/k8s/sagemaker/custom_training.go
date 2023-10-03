@@ -16,7 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 
@@ -25,7 +25,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 
 	trainingjobv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/trainingjob"
-	flyteSageMakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	flyteSageMakerIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 )
 
 func (m awsSagemakerPlugin) buildResourceForCustomTrainingJob(

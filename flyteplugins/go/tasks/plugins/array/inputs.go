@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // arrayJobInputReader is a proxy inputreader that overrides the inputpath to be the inputpathprefix for array jobs

@@ -20,7 +20,7 @@ import (
 
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/api/option"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"

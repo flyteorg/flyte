@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/mock"
 )
 

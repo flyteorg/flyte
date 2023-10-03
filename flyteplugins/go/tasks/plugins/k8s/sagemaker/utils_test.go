@@ -7,21 +7,21 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	sagemakerSpec "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	sagemakerSpec "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 	"github.com/stretchr/testify/assert"
 
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	sagemakerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
-	flyteSagemakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	flyteSagemakerIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 )
 
 func makeGenericLiteral(st *structpb.Struct) *core.Literal {
