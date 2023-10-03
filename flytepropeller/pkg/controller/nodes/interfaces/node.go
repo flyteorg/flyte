@@ -76,8 +76,12 @@ type Node interface {
 	// - 1. It finds a blocking node (not ready, or running)
 	// - 2. A node fails and hence the workflow will fail
 	// - 3. The final/end node has completed and the workflow should be stopped
+<<<<<<< HEAD:flytepropeller/pkg/controller/nodes/interfaces/node.go
 	RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure,
 		nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (NodeStatus, error)
+=======
+	RecursiveNodeHandler(ctx context.Context, execContext ExecutionContext, dag DAGStructure, nl NodeLookup, currentNode v1alpha1.ExecutableNode) error
+>>>>>>> flytepropeller/feature/parallel-node-executions:flytepropeller/pkg/controller/executors/node.go
 
 	// This aborts the given node. If the given node is complete then it recursively finds the running nodes and aborts them
 	AbortHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure,

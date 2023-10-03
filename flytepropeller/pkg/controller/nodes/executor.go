@@ -1379,6 +1379,460 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 	return c.handleQueuedOrRunningNode(ctx, nCtx, h)
 }
 
+<<<<<<< HEAD
+=======
+// The space search for the next node to execute is implemented like a DFS algorithm. handleDownstream visits all the nodes downstream from
+// the currentNode. Visit a node is the RecursiveNodeHandler. A visit may be partial, complete or may result in a failure.
+func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {
+	logger.Debugf(ctx, "Handling downstream Nodes")
+	// This node is success. Handle all downstream nodes
+	downstreamNodes, err := dag.FromNode(currentNode.GetID())
+	if err != nil {
+		logger.Debugf(ctx, "Error when retrieving downstream nodes, [%s]", err)
+		/*return executors.NodeStatusFailed(&core.ExecutionError{
+			Code:    errors.BadSpecificationError,
+			Message: fmt.Sprintf("failed to retrieve downstream nodes for [%s]", currentNode.GetID()),
+			Kind:    core.ExecutionError_SYSTEM,
+		}), nil*/
+		return errors2.Errorf("failed to retrieve downstream nodes for [%s]", currentNode.GetID())
+	}
+	for _, downstreamNodeName := range downstreamNodes {
+		downstreamNode, ok := nl.GetNode(downstreamNodeName)
+		if !ok {
+			/*return executors.NodeStatusFailed(&core.ExecutionError{
+				Code:    errors.BadSpecificationError,
+				Message: fmt.Sprintf("failed to retrieve downstream node [%s] for [%s]", downstreamNodeName, currentNode.GetID()),
+				Kind:    core.ExecutionError_SYSTEM,
+			}), nil*/
+			return errors2.Errorf("failed to retrieve downstream node [%s] for [%s]", downstreamNodeName, currentNode.GetID())
+		}
+
+		if err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// TODO @hamersaw - move to nodeExecutor.wait
+/*// The space search for the next node to execute is implemented like a DFS algorithm. handleDownstream visits all the nodes downstream from
+// the currentNode. Visit a node is the RecursiveNodeHandler. A visit may be partial, complete or may result in a failure.
+func (c *nodeExecutor) handleDownstream(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) (executors.NodeStatus, error) {
+	logger.Debugf(ctx, "Handling downstream Nodes")
+	// This node is success. Handle all downstream nodes
+	downstreamNodes, err := dag.FromNode(currentNode.GetID())
+	if err != nil {
+		logger.Debugf(ctx, "Error when retrieving downstream nodes, [%s]", err)
+		return executors.NodeStatusFailed(&core.ExecutionError{
+			Code:    errors.BadSpecificationError,
+			Message: fmt.Sprintf("failed to retrieve downstream nodes for [%s]", currentNode.GetID()),
+			Kind:    core.ExecutionError_SYSTEM,
+		}), nil
+	}
+	if len(downstreamNodes) == 0 {
+		logger.Debugf(ctx, "No downstream nodes found. Complete.")
+		return executors.NodeStatusComplete, nil
+	}
+	// If any downstream node is failed, fail, all
+	// Else if all are success then success
+	// Else if any one is running then Downstream is still running
+	allCompleted := true
+	partialNodeCompletion := false
+	onFailurePolicy := execContext.GetOnFailurePolicy()
+	stateOnComplete := executors.NodeStatusComplete
+	for _, downstreamNodeName := range downstreamNodes {
+		downstreamNode, ok := nl.GetNode(downstreamNodeName)
+		if !ok {
+			return executors.NodeStatusFailed(&core.ExecutionError{
+				Code:    errors.BadSpecificationError,
+				Message: fmt.Sprintf("failed to retrieve downstream node [%s] for [%s]", downstreamNodeName, currentNode.GetID()),
+				Kind:    core.ExecutionError_SYSTEM,
+			}), nil
+		}
+
+		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
+		if err != nil {
+			return executors.NodeStatusUndefined, err
+		}
+
+		if state.HasFailed() || state.HasTimedOut() {
+			logger.Debugf(ctx, "Some downstream node has failed. Failed: [%v]. TimedOut: [%v]. Error: [%s]", state.HasFailed(), state.HasTimedOut(), state.Err)
+			if onFailurePolicy == v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE) {
+				// If the failure policy allows other nodes to continue running, do not exit the loop,
+				// Keep track of the last failed state in the loop since it'll be the one to return.
+				// TODO: If multiple nodes fail (which this mode allows), consolidate/summarize failure states in one.
+				stateOnComplete = state
+			} else {
+				return state, nil
+			}
+		} else if !state.IsComplete() {
+			// A Failed/Timedout node is implicitly considered "complete" this means none of the downstream nodes from
+			// that node will ever be allowed to run.
+			// This else block, therefore, deals with all other states. IsComplete will return true if and only if this
+			// node as well as all of its downstream nodes have finished executing with success statuses. Otherwise we
+			// mark this node's state as not completed to ensure we will visit it again later.
+			allCompleted = false
+		}
+
+		if state.PartiallyComplete() {
+			// This implies that one of the downstream nodes has just succeeded and workflow is ready for propagation
+			// We do not propagate in current cycle to make it possible to store the state between transitions
+			partialNodeCompletion = true
+		}
+	}
+
+	if allCompleted {
+		logger.Debugf(ctx, "All downstream nodes completed")
+		return stateOnComplete, nil
+	}
+
+	if partialNodeCompletion {
+		return executors.NodeStatusSuccess, nil
+	}
+
+	return executors.NodeStatusPending, nil
+}*/
+
+func (c *nodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (executors.NodeStatus, error) {
+	startNode := dag.StartNode()
+	ctx = contextutils.WithNodeID(ctx, startNode.GetID())
+	if inputs == nil {
+		logger.Infof(ctx, "No inputs for the workflow. Skipping storing inputs")
+		return executors.NodeStatusComplete, nil
+	}
+
+	// StartNode is special. It does not have any processing step. It just takes the workflow (or subworkflow) inputs and converts to its own outputs
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, startNode.GetID())
+
+	if len(nodeStatus.GetDataDir()) == 0 {
+		return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, startNode.GetID(), "no data-dir set, cannot store inputs")
+	}
+	outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
+
+	so := storage.Options{}
+	if err := c.store.WriteProtobuf(ctx, outputFile, so, inputs); err != nil {
+		logger.Errorf(ctx, "Failed to write protobuf (metadata). Error [%v]", err)
+		return executors.NodeStatusUndefined, errors.Wrapf(errors.CausedByError, startNode.GetID(), err, "Failed to store workflow inputs (as start node)")
+	}
+
+	return executors.NodeStatusComplete, nil
+}
+
+func canHandleNode(phase v1alpha1.NodePhase) bool {
+	return phase == v1alpha1.NodePhaseNotYetStarted ||
+		phase == v1alpha1.NodePhaseQueued ||
+		phase == v1alpha1.NodePhaseRunning ||
+		phase == v1alpha1.NodePhaseFailing ||
+		phase == v1alpha1.NodePhaseTimingOut ||
+		phase == v1alpha1.NodePhaseRetryableFailure ||
+		phase == v1alpha1.NodePhaseSucceeding ||
+		phase == v1alpha1.NodePhaseDynamicRunning
+}
+
+// IsMaxParallelismAchieved checks if we have already achieved max parallelism. It returns true, if the desired max parallelism
+// value is achieved, false otherwise
+// MaxParallelism is defined as the maximum number of TaskNodes and LaunchPlans (together) that can be executed concurrently
+// by one workflow execution. A setting of `0` indicates that it is disabled.
+func IsMaxParallelismAchieved(ctx context.Context, currentNode v1alpha1.ExecutableNode, currentPhase v1alpha1.NodePhase,
+	execContext executors.ExecutionContext) bool {
+	maxParallelism := execContext.GetExecutionConfig().MaxParallelism
+	if maxParallelism == 0 {
+		logger.Debugf(ctx, "Parallelism control disabled")
+		return false
+	}
+
+	if currentNode.GetKind() == v1alpha1.NodeKindTask ||
+		(currentNode.GetKind() == v1alpha1.NodeKindWorkflow && currentNode.GetWorkflowNode() != nil && currentNode.GetWorkflowNode().GetLaunchPlanRefID() != nil) {
+		// If we are queued, let us see if we can proceed within the node parallelism bounds
+		if execContext.CurrentParallelism() >= maxParallelism {
+			logger.Infof(ctx, "Maximum Parallelism for task/launch-plan nodes achieved [%d] >= Max [%d], Round will be short-circuited.", execContext.CurrentParallelism(), maxParallelism)
+			return true
+		}
+		// We know that Propeller goes through each workflow in a single thread, thus every node is really processed
+		// sequentially. So, we can continue - now that we know we are under the parallelism limits and increment the
+		// parallelism if the node, enters a running state
+		logger.Debugf(ctx, "Parallelism criteria not met, Current [%d], Max [%d]", execContext.CurrentParallelism(), maxParallelism)
+	} else {
+		logger.Debugf(ctx, "NodeKind: %s in status [%s]. Parallelism control is not applicable. Current Parallelism [%d]",
+			currentNode.GetKind().String(), currentPhase.String(), execContext.CurrentParallelism())
+	}
+	return false
+}
+
+// RecursiveNodeHandler This is the entrypoint of executing a node in a workflow. A workflow consists of nodes, that are
+// nested within other nodes. The system follows an actor model, where the parent nodes control the execution of nested nodes
+// The recursive node-handler uses a modified depth-first type of algorithm to execute non-blocked nodes.
+func (c *nodeExecutor) RecursiveNodeHandler(ctx context.Context, execContext executors.ExecutionContext,
+	dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {
+
+	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodePhase := nodeStatus.GetPhase()
+
+	if canHandleNode(nodePhase) {
+		// TODO Follow up Pull Request,
+		// 1. Rename this method to DAGTraversalHandleNode (accepts a DAGStructure along-with) the remaining arguments
+		// 2. Create a new method called HandleNode (part of the interface) (remaining all args as the previous method, but no DAGStructure
+		// 3. Additional both methods will receive inputs reader
+		// 4. The Downstream nodes handler will Resolve the Inputs
+		// 5. the method will delegate all other node handling to HandleNode.
+		// 6. Thus we can get rid of SetInputs for StartNode as well
+		logger.Debugf(currentNodeCtx, "Handling node Status [%v]", nodeStatus.GetPhase().String())
+
+		t := c.metrics.NodeExecutionTime.Start(ctx)
+		defer t.Stop()
+
+		// This is an optimization to avoid creating the nodeContext object in case the node has already been looked at.
+		// If the overhead was zero, we would just do the isDirtyCheck after the nodeContext is created
+		if nodeStatus.IsDirty() {
+			return nil
+		}
+
+		if IsMaxParallelismAchieved(ctx, currentNode, nodePhase, execContext) {
+			return nil
+		}
+
+		execContext.AddNodeFuture(func(nodeFuture chan<- executors.NodeExecutionResult) {
+			nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
+			if err != nil {
+				// NodeExecution creation failure is a permanent fail / system error.
+				// Should a system failure always return an err?
+				nodeFuture <- executors.NodeExecutionResult{
+					NodeStatus: executors.NodeStatusFailed(&core.ExecutionError{
+						Code:    "InternalError",
+						Message: err.Error(),
+						Kind:    core.ExecutionError_SYSTEM,
+					}),
+					Err: err,
+				}
+				return
+			}
+
+			// Now depending on the node type decide
+			h, err := c.nodeHandlerFactory.GetHandler(nCtx.Node().GetKind())
+			if err != nil {
+				nodeFuture <- executors.NodeExecutionResult{
+					NodeStatus: executors.NodeStatusUndefined,
+					Err:        err,
+				}
+				return
+			}
+
+			// TODO @hamersaw - remove
+			//return c.handleNode(currentNodeCtx, dag, nCtx, h)
+			nodeStatus, err := c.handleNode(currentNodeCtx, dag, nCtx, h)
+			nodeFuture <- executors.NodeExecutionResult{
+				NodeStatus: nodeStatus,
+				Err:        err,
+			}
+		})
+		return nil
+
+		// TODO we can optimize skip state handling by iterating down the graph and marking all as skipped
+		// Currently we treat either Skip or Success the same way. In this approach only one node will be skipped
+		// at a time. As we iterate down, further nodes will be skipped
+	} else if nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseSkipped || nodePhase == v1alpha1.NodePhaseRecovered {
+		logger.Debugf(currentNodeCtx, "Node has [%v], traversing downstream.", nodePhase)
+		return c.handleDownstream(ctx, execContext, dag, nl, currentNode)
+	} else if nodePhase == v1alpha1.NodePhaseFailed {
+		logger.Debugf(currentNodeCtx, "Node has failed, traversing downstream.")
+		if err := c.handleDownstream(ctx, execContext, dag, nl, currentNode); err != nil {
+			return err
+		}
+
+		// TODO @hamersaw - remove
+		//return executors.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
+		execContext.AddNodeFuture(func(nodeFuture chan<- executors.NodeExecutionResult) {
+			nodeFuture <- executors.NodeExecutionResult{
+				NodeStatus: executors.NodeStatusFailed(nodeStatus.GetExecutionError()),
+			}
+		})
+		return nil
+	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
+		logger.Debugf(currentNodeCtx, "Node has timed out, traversing downstream.")
+		if err := c.handleDownstream(ctx, execContext, dag, nl, currentNode); err != nil {
+			return err
+		}
+
+		// TODO @hamersaw - remove
+		//return executors.NodeStatusTimedOut, nil
+		execContext.AddNodeFuture(func(nodeFuture chan<- executors.NodeExecutionResult) {
+			nodeFuture <- executors.NodeExecutionResult{
+				NodeStatus: executors.NodeStatusTimedOut,
+			}
+		})
+		return nil
+	}
+
+	// TODO @hamersaw - remove
+	//return executors.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, currentNode.GetID(),
+		//"Should never reach here. Current Phase: %v", nodePhase)
+	return errors.Errorf(errors.IllegalStateError, currentNode.GetID(),
+		"Should never reach here. Current Phase: %v", nodePhase)
+}
+
+func (c *nodeExecutor) FinalizeHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode) error {
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodePhase := nodeStatus.GetPhase()
+
+	if nodePhase == v1alpha1.NodePhaseNotYetStarted {
+		logger.Infof(ctx, "Node not yet started, will not finalize")
+		// Nothing to be aborted
+		return nil
+	}
+
+	if canHandleNode(nodePhase) {
+		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
+
+		// Now depending on the node type decide
+		h, err := c.nodeHandlerFactory.GetHandler(currentNode.GetKind())
+		if err != nil {
+			return err
+		}
+
+		nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
+		if err != nil {
+			return err
+		}
+		// Abort this node
+		err = c.finalize(ctx, h, nCtx)
+		if err != nil {
+			return err
+		}
+	} else {
+		// Abort downstream nodes
+		downstreamNodes, err := dag.FromNode(currentNode.GetID())
+		if err != nil {
+			logger.Debugf(ctx, "Error when retrieving downstream nodes. Error [%v]", err)
+			return nil
+		}
+
+		errs := make([]error, 0, len(downstreamNodes))
+		for _, d := range downstreamNodes {
+			downstreamNode, ok := nl.GetNode(d)
+			if !ok {
+				return errors.Errorf(errors.BadSpecificationError, currentNode.GetID(), "Unable to find Downstream Node [%v]", d)
+			}
+
+			if err := c.FinalizeHandler(ctx, execContext, dag, nl, downstreamNode); err != nil {
+				logger.Infof(ctx, "Failed to abort node [%v]. Error: %v", d, err)
+				errs = append(errs, err)
+			}
+		}
+
+		if len(errs) > 0 {
+			return errors.ErrorCollection{Errors: errs}
+		}
+
+		return nil
+	}
+
+	return nil
+}
+
+func (c *nodeExecutor) AbortHandler(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructure, nl executors.NodeLookup, currentNode v1alpha1.ExecutableNode, reason string) error {
+	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
+	nodePhase := nodeStatus.GetPhase()
+
+	if nodePhase == v1alpha1.NodePhaseNotYetStarted {
+		logger.Infof(ctx, "Node not yet started, will not finalize")
+		// Nothing to be aborted
+		return nil
+	}
+
+	if canHandleNode(nodePhase) {
+		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
+
+		// Now depending on the node type decide
+		h, err := c.nodeHandlerFactory.GetHandler(currentNode.GetKind())
+		if err != nil {
+			return err
+		}
+
+		nCtx, err := c.newNodeExecContextDefault(ctx, currentNode.GetID(), execContext, nl)
+		if err != nil {
+			return err
+		}
+		// Abort this node
+		err = c.abort(ctx, h, nCtx, reason)
+		if err != nil {
+			return err
+		}
+		nodeExecutionID := &core.NodeExecutionIdentifier{
+			ExecutionId: nCtx.NodeExecutionMetadata().GetNodeExecutionID().ExecutionId,
+			NodeId:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().NodeId,
+		}
+		if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+			currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
+			if err != nil {
+				return err
+			}
+			nodeExecutionID.NodeId = currentNodeUniqueID
+		}
+
+		err = c.IdempotentRecordEvent(ctx, &event.NodeExecutionEvent{
+			Id:         nodeExecutionID,
+			Phase:      core.NodeExecution_ABORTED,
+			OccurredAt: ptypes.TimestampNow(),
+			OutputResult: &event.NodeExecutionEvent_Error{
+				Error: &core.ExecutionError{
+					Code:    "NodeAborted",
+					Message: reason,
+				},
+			},
+			ProducerId: c.clusterID,
+			ReportedAt: ptypes.TimestampNow(),
+		})
+		if err != nil && !eventsErr.IsNotFound(err) && !eventsErr.IsEventIncompatibleClusterError(err) {
+			if errors2.IsCausedBy(err, errors.IllegalStateError) {
+				logger.Debugf(ctx, "Failed to record abort event due to illegal state transition. Ignoring the error. Error: %v", err)
+			} else {
+				logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
+				return errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
+			}
+		}
+	} else if nodePhase == v1alpha1.NodePhaseSucceeded || nodePhase == v1alpha1.NodePhaseSkipped || nodePhase == v1alpha1.NodePhaseRecovered {
+		// Abort downstream nodes
+		downstreamNodes, err := dag.FromNode(currentNode.GetID())
+		if err != nil {
+			logger.Debugf(ctx, "Error when retrieving downstream nodes. Error [%v]", err)
+			return nil
+		}
+
+		errs := make([]error, 0, len(downstreamNodes))
+		for _, d := range downstreamNodes {
+			downstreamNode, ok := nl.GetNode(d)
+			if !ok {
+				return errors.Errorf(errors.BadSpecificationError, currentNode.GetID(), "Unable to find Downstream Node [%v]", d)
+			}
+
+			if err := c.AbortHandler(ctx, execContext, dag, nl, downstreamNode, reason); err != nil {
+				logger.Infof(ctx, "Failed to abort node [%v]. Error: %v", d, err)
+				errs = append(errs, err)
+			}
+		}
+
+		if len(errs) > 0 {
+			return errors.ErrorCollection{Errors: errs}
+		}
+
+		return nil
+	} else {
+		ctx = contextutils.WithNodeID(ctx, currentNode.GetID())
+		logger.Warnf(ctx, "Trying to abort a node in state [%s]", nodeStatus.GetPhase().String())
+	}
+
+	return nil
+}
+
+func (c *nodeExecutor) Initialize(ctx context.Context) error {
+	logger.Infof(ctx, "Initializing Core Node Executor")
+	s := c.newSetupContext(ctx)
+	return c.nodeHandlerFactory.Setup(ctx, s)
+}
+
+>>>>>>> flytepropeller/feature/parallel-node-executions
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
 	catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,

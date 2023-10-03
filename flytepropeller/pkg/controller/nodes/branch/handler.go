@@ -147,7 +147,10 @@ func (b *branchHandler) recurseDownstream(ctx context.Context, nCtx interfaces.N
 	if err != nil {
 		return handler.UnknownTransition, err
 	}
-	downstreamStatus, err := b.nodeExecutor.RecursiveNodeHandler(ctx, execContext, dag, nCtx.ContextualNodeLookup(), branchTakenNode)
+	if err := b.nodeExecutor.RecursiveNodeHandler(ctx, execContext, dag, nCtx.ContextualNodeLookup(), branchTakenNode); err != nil {
+		return handler.UnknownTransition, err
+	}
+	downstreamStatus, err := execContext.Wait()
 	if err != nil {
 		return handler.UnknownTransition, err
 	}
