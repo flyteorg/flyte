@@ -51,6 +51,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
+	config := taskTemplate.GetConfig()
 	rayJob := plugins.RayJob{}
 	err = utils.UnmarshalStruct(taskTemplate.GetCustom(), &rayJob)
 	if err != nil {
@@ -168,6 +169,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		RuntimeEnv:               rayJob.RuntimeEnv,
 	}
 
+	objectMeta.Namespace = config["namespace"]
 	rayJobObject := rayv1alpha1.RayJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       KindRayJob,
