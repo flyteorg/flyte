@@ -11,8 +11,8 @@ import (
 )
 
 func TestEvaluate_int(t *testing.T) {
-	p1 := coreutils.MustMakePrimitive(1)
-	p2 := coreutils.MustMakePrimitive(2)
+	p1 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(1)}}
+	p2 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(2)}}
 	{
 		// p1 > p2 = false
 		b, err := Evaluate(p1, p2, core.ComparisonExpression_GT)
@@ -82,8 +82,8 @@ func TestEvaluate_int(t *testing.T) {
 }
 
 func TestEvaluate_float(t *testing.T) {
-	p1 := coreutils.MustMakePrimitive(1.0)
-	p2 := coreutils.MustMakePrimitive(2.0)
+	p1 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(1)}}
+	p2 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(2)}}
 	{
 		// p1 > p2 = false
 		b, err := Evaluate(p1, p2, core.ComparisonExpression_GT)
@@ -153,8 +153,8 @@ func TestEvaluate_float(t *testing.T) {
 }
 
 func TestEvaluate_string(t *testing.T) {
-	p1 := coreutils.MustMakePrimitive("a")
-	p2 := coreutils.MustMakePrimitive("b")
+	p1 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive("a")}}
+	p2 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive("b")}}
 	{
 		// p1 > p2 = false
 		b, err := Evaluate(p1, p2, core.ComparisonExpression_GT)
@@ -224,8 +224,8 @@ func TestEvaluate_string(t *testing.T) {
 }
 
 func TestEvaluate_datetime(t *testing.T) {
-	p1 := coreutils.MustMakePrimitive(time.Date(2018, 7, 4, 12, 00, 00, 00, time.UTC))
-	p2 := coreutils.MustMakePrimitive(time.Date(2018, 7, 4, 12, 00, 01, 00, time.UTC))
+	p1 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(time.Date(2018, 7, 4, 12, 00, 00, 00, time.UTC))}}
+	p2 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(time.Date(2018, 7, 4, 12, 00, 01, 00, time.UTC))}}
 	{
 		// p1 > p2 = false
 		b, err := Evaluate(p1, p2, core.ComparisonExpression_GT)
@@ -295,8 +295,8 @@ func TestEvaluate_datetime(t *testing.T) {
 }
 
 func TestEvaluate_duration(t *testing.T) {
-	p1 := coreutils.MustMakePrimitive(10 * time.Second)
-	p2 := coreutils.MustMakePrimitive(11 * time.Second)
+	p1 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(10 * time.Second)}}
+	p2 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(11 * time.Second)}}
 	{
 		// p1 > p2 = false
 		b, err := Evaluate(p1, p2, core.ComparisonExpression_GT)
@@ -366,8 +366,8 @@ func TestEvaluate_duration(t *testing.T) {
 }
 
 func TestEvaluate_boolean(t *testing.T) {
-	p1 := coreutils.MustMakePrimitive(true)
-	p2 := coreutils.MustMakePrimitive(false)
+	p1 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(true)}}
+	p2 := &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(false)}}
 	f := func(op core.ComparisonExpression_Operator) {
 		// GT/LT = false
 		msg := fmt.Sprintf("Evaluating: [%s]", op.String())

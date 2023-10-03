@@ -6,9 +6,15 @@ require (
 	github.com/DiSiqueira/GoTree v1.0.1-0.20180907134536-53a8e837f295
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/fatih/color v1.13.0
+<<<<<<< HEAD
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000
+=======
+	github.com/flyteorg/flyteidl v1.5.16
+	github.com/flyteorg/flyteplugins v1.1.30
+	github.com/flyteorg/flytestdlib v1.0.24
+>>>>>>> flytepropeller/is-none
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/go-test/deep v1.0.7

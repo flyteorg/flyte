@@ -56,6 +56,16 @@ func createUnaryConjunction(l *core.ComparisonExpression, op core.ConjunctionExp
 	}
 }
 
+func getNoneOperand() *core.Operand {
+	return &core.Operand{
+		Val: &core.Operand_Scalar{
+			Scalar: &core.Scalar{
+				Value: &core.Scalar_NoneType{NoneType: &core.Void{}},
+			},
+		},
+	}
+}
+
 func TestEvaluateComparison(t *testing.T) {
 	t.Run("ComparePrimitives", func(t *testing.T) {
 		// Compare primitives
@@ -99,6 +109,80 @@ func TestEvaluateComparison(t *testing.T) {
 		v, err := EvaluateComparison(exp, inputs)
 		assert.NoError(t, err)
 		assert.False(t, v)
+	})
+	t.Run("CompareNoneAndLiteral", func(t *testing.T) {
+		// Compare lVal -> None and rVal -> literal
+		exp := &core.ComparisonExpression{
+			LeftValue: getNoneOperand(),
+			Operator:  core.ComparisonExpression_EQ,
+			RightValue: &core.Operand{
+				Val: &core.Operand_Primitive{
+					Primitive: coreutils.MustMakePrimitive(1),
+				},
+			},
+		}
+		v, err := EvaluateComparison(exp, nil)
+		assert.NoError(t, err)
+		assert.False(t, v)
+	})
+	t.Run("CompareLiteralAndNone", func(t *testing.T) {
+		// Compare lVal -> literal and rVal -> None
+		exp := &core.ComparisonExpression{
+			LeftValue: &core.Operand{
+				Val: &core.Operand_Primitive{
+					Primitive: coreutils.MustMakePrimitive(1),
+				},
+			},
+			Operator:   core.ComparisonExpression_NEQ,
+			RightValue: getNoneOperand(),
+		}
+		v, err := EvaluateComparison(exp, nil)
+		assert.NoError(t, err)
+		assert.True(t, v)
+	})
+	t.Run("CompareUnionLiteralAndNone", func(t *testing.T) {
+		// Compare lVal -> literal and rVal -> None
+		exp := &core.ComparisonExpression{
+			LeftValue: &core.Operand{
+				Val: &core.Operand_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Union{
+							Union: &core.Union{
+								Value: &core.Literal{
+									Value: &core.Literal_Scalar{Scalar: &core.Scalar{Value: &core.Scalar_Primitive{Primitive: coreutils.MustMakePrimitive(1)}}},
+								},
+							},
+						},
+					},
+				},
+			},
+			Operator:   core.ComparisonExpression_NEQ,
+			RightValue: getNoneOperand(),
+		}
+		v, err := EvaluateComparison(exp, nil)
+		assert.NoError(t, err)
+		assert.True(t, v)
+	})
+	t.Run("CompareNoneAndNone", func(t *testing.T) {
+		// Compare lVal -> None and rVal -> None
+		exp := &core.ComparisonExpression{
+			LeftValue:  getNoneOperand(),
+			Operator:   core.ComparisonExpression_EQ,
+			RightValue: getNoneOperand(),
+		}
+		v, err := EvaluateComparison(exp, nil)
+		assert.NoError(t, err)
+		assert.True(t, v)
+	})
+	t.Run("CompareNoneAndNoneWithError", func(t *testing.T) {
+		// Compare lVal -> None and rVal -> None
+		exp := &core.ComparisonExpression{
+			LeftValue:  getNoneOperand(),
+			Operator:   core.ComparisonExpression_GTE,
+			RightValue: getNoneOperand(),
+		}
+		_, err := EvaluateComparison(exp, nil)
+		assert.Error(t, err)
 	})
 	t.Run("CompareLiteralAndPrimitive", func(t *testing.T) {
 
