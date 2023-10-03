@@ -249,9 +249,9 @@ Control Plane configuration
 
 For ``flyteadmin`` to access and create Kubernetes resources in one or more
 Flyte data plane clusters , it needs credentials to each cluster.
-Flyte makes use of Kubernetess Service Accounts to enable every data plane cluster to perform
-authenticated requests to the Kubernetes API Server.
-The default behaviour is that ``flyteadmin`` creates a `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_
+Flyte makes use of Kubernetes Service Accounts to enable every control plane cluster to perform
+authenticated requests to the data plane Kubernetes API Server.
+The default behaviour is that the Helm chart creates a `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_
 in each data plane cluster. 
 In order to verify requests, the Kubernetes API Server expects a `signed bearer token <https://kubernetes.io/docs/reference/access-authn-authz/authentication/#service-account-tokens>`__
 attached to the Service Account. As of Kubernetes 1.24 and above, the bearer token has to be generated manually.
@@ -309,7 +309,7 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
    type: Opaque
    stringData:
      dataplane_1_token: <dataplane1-token>
-     
+
 5. Obtain the corresponding certificate:
 
 .. prompt:: bash $
