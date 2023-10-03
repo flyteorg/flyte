@@ -86,7 +86,7 @@ There are three different paths for deploying a Flyte cluster:
    As of this writing, a single Flyte cluster can handle more than 13,000 nodes.
   
    Regardless of using single or multiple Kubernetes clusters for Flyte, note that ``FlytePropeller`` -the main data plane component- can be sharded as well if scale demands require it.
-   See `Automatic scale-out https://docs.flyte.org/en/latest/deployment/configuration/performance.html#automatic-scale-out`__ to learn more about the sharding strategy.
+   See `Automatic scale-out <https://docs.flyte.org/en/latest/deployment/configuration/performance.html#automatic-scale-out>`__ to learn more about the sharding strategy.
 
 
 
