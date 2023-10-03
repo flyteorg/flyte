@@ -110,13 +110,13 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fpytorch_2eproto[] =
   "\014max_restarts\030\005 \001(\005\"j\n\036DistributedPyTorc"
   "hTrainingTask\022\017\n\007workers\030\001 \001(\005\0227\n\016elasti"
   "c_config\030\002 \001(\0132\037.flyteidl.plugins.Elasti"
-  "cConfigB9Z7github.com/flyteorg/flyteidl/"
-  "gen/pb-go/flyteidl/pluginsb\006proto3"
+  "cConfigB\?Z=github.com/flyteorg/flyte/fly"
+  "teidl/gen/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fpytorch_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fpytorch_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fpytorch_2eproto,
-  "flyteidl/plugins/pytorch.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpytorch_2eproto, 354,
+  "flyteidl/plugins/pytorch.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpytorch_2eproto, 360,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fpytorch_2eproto() {

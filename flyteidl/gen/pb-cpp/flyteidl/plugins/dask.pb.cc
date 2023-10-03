@@ -143,13 +143,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fdask_2eproto[] =
   "2\030.flyteidl.core.Resources\"h\n\017DaskWorker"
   "Group\022\031\n\021number_of_workers\030\001 \001(\r\022\r\n\005imag"
   "e\030\002 \001(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.co"
-  "re.ResourcesB9Z7github.com/flyteorg/flyt"
-  "eidl/gen/pb-go/flyteidl/pluginsb\006proto3"
+  "re.ResourcesB\?Z=github.com/flyteorg/flyt"
+  "e/flyteidl/gen/pb-go/flyteidl/pluginsb\006p"
+  "roto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fdask_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fdask_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fdask_2eproto,
-  "flyteidl/plugins/dask.proto", &assign_descriptors_table_flyteidl_2fplugins_2fdask_2eproto, 439,
+  "flyteidl/plugins/dask.proto", &assign_descriptors_table_flyteidl_2fplugins_2fdask_2eproto, 445,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fdask_2eproto() {
