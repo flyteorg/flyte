@@ -180,10 +180,18 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_RETRYABLE_FAILURE:
 		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	case admin.State_SUCCEEDED:
+<<<<<<< HEAD
 		err = writeOutput(ctx, taskCtx, resource)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 			return core.PhaseInfoUndefined, err
+=======
+		if resource.Outputs != nil {
+			err := taskCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(resource.Outputs, nil, nil, nil))
+			if err != nil {
+				return core.PhaseInfoUndefined, err
+			}
+>>>>>>> flyteplugins/Flytekit-Metrics-Exploration
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	}

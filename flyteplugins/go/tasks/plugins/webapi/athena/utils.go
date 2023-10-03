@@ -33,7 +33,7 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocatio
 		return nil
 	}
 
-	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
+	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(
 		&pb.LiteralMap{
 			Literals: map[string]*pb.Literal{
 				"results": {
@@ -48,7 +48,7 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocatio
 					},
 				},
 			},
-		}, nil, nil))
+		}, nil, nil, nil))
 }
 
 type QueryInfo struct {

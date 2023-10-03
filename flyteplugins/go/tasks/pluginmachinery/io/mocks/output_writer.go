@@ -240,6 +240,38 @@ func (_m *OutputWriter) GetRawOutputPrefix() storage.DataReference {
 	return r0
 }
 
+type OutputWriter_GetSpanPath struct {
+	*mock.Call
+}
+
+func (_m OutputWriter_GetSpanPath) Return(_a0 storage.DataReference) *OutputWriter_GetSpanPath {
+	return &OutputWriter_GetSpanPath{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputWriter) OnGetSpanPath() *OutputWriter_GetSpanPath {
+	c_call := _m.On("GetSpanPath")
+	return &OutputWriter_GetSpanPath{Call: c_call}
+}
+
+func (_m *OutputWriter) OnGetSpanPathMatch(matchers ...interface{}) *OutputWriter_GetSpanPath {
+	c_call := _m.On("GetSpanPath", matchers...)
+	return &OutputWriter_GetSpanPath{Call: c_call}
+}
+
+// GetSpanPath provides a mock function with given fields:
+func (_m *OutputWriter) GetSpanPath() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
 type OutputWriter_Put struct {
 	*mock.Call
 }

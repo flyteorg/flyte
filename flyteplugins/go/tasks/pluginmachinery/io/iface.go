@@ -43,6 +43,8 @@ type OutputReader interface {
 	Read(ctx context.Context) (*core.LiteralMap, *ExecutionError, error)
 	// DeckExists checks if the deck file has been generated.
 	DeckExists(ctx context.Context) (bool, error)
+	// SpanExists checks if the span file has been generated.
+	SpanExists(ctx context.Context) (bool, error)
 }
 
 // CheckpointPaths provides the paths / keys to input Checkpoints directory and an output checkpoints directory.
@@ -81,6 +83,8 @@ type OutputFilePaths interface {
 	GetOutputPath() storage.DataReference
 	// GetDeckPath returns a fully qualified path (URN) to where the framework expects the deck.html to exist in the configured storage backend
 	GetDeckPath() storage.DataReference
+	// GetSpanPath returns a fully qualified path (URN) to where the framework expects the span.html to exist in the configured storage backend
+	GetSpanPath() storage.DataReference
 	// GetErrorPath returns a fully qualified path (URN) where the error information should be placed as a protobuf core.ErrorDocument. It is not directly
 	// used by the framework, but could be used in the future
 	GetErrorPath() storage.DataReference

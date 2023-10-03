@@ -123,6 +123,14 @@ func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
 	return md.Exists(), nil
 }
 
+func (r RemoteFileOutputReader) SpanExists(ctx context.Context) (bool, error) {
+	md, err := r.store.Head(ctx, r.outPath.GetSpanPath())
+	if err != nil {
+		return false, err
+	}
+	return md.Exists(), nil
+}
+
 func NewRemoteFileOutputReader(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) RemoteFileOutputReader {
 	return RemoteFileOutputReader{
 		outPath:        outPaths,
