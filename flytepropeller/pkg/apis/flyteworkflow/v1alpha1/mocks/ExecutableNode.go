@@ -3,9 +3,10 @@
 package mocks
 
 import (
-	time "time"
-
+	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
+
+	time "time"
 
 	v1 "k8s.io/api/core/v1"
 
@@ -379,6 +380,40 @@ func (_m *ExecutableNode) GetOutputAlias() []v1alpha1.Alias {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]v1alpha1.Alias)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNode_GetResourceExtensions struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetResourceExtensions) Return(_a0 *core.ResourceExtensions) *ExecutableNode_GetResourceExtensions {
+	return &ExecutableNode_GetResourceExtensions{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetResourceExtensions() *ExecutableNode_GetResourceExtensions {
+	c_call := _m.On("GetResourceExtensions")
+	return &ExecutableNode_GetResourceExtensions{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetResourceExtensionsMatch(matchers ...interface{}) *ExecutableNode_GetResourceExtensions {
+	c_call := _m.On("GetResourceExtensions", matchers...)
+	return &ExecutableNode_GetResourceExtensions{Call: c_call}
+}
+
+// GetResourceExtensions provides a mock function with given fields:
+func (_m *ExecutableNode) GetResourceExtensions() *core.ResourceExtensions {
+	ret := _m.Called()
+
+	var r0 *core.ResourceExtensions
+	if rf, ok := ret.Get(0).(func() *core.ResourceExtensions); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.ResourceExtensions)
 		}
 	}
 
