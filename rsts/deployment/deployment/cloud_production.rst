@@ -32,7 +32,7 @@ To turn on ingress, update your ``values.yaml`` file to include the following bl
          :language: yaml
          :lines: 127-135
 
-   .. group-tab:: ``flyte-binary`` on EKS using ALB 
+   .. group-tab:: ``flyte-binary``/ on EKS using ALB 
 
       .. code-block:: yaml
 
@@ -54,10 +54,10 @@ To turn on ingress, update your ``values.yaml`` file to include the following bl
 
    .. group-tab:: ``flyte-core`` on GCP using NGINX  
 
-      .. literalinclude:: ../../../charts/flyte-core/values-gcp.yaml
-      :caption: charts/flyte-core/values-gcp.yaml
-      :language: yaml
-      :lines: 156-164
+      .. literalinclude:: ../../../charts/flyte-core/values-gcp.yaml        
+         :caption: charts/flyte-core/values-gcp.yaml
+         :language: yaml
+         :lines: 156-164
 
 
 ***************
