@@ -5,7 +5,13 @@ import (
 	"fmt"
 	"runtime/debug"
 
+<<<<<<< HEAD
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+=======
+	"github.com/flyteorg/flyteadmin/pkg/async/webhook"
+
+	"github.com/flyteorg/flyteadmin/plugins"
+>>>>>>> flyteadmin/webhook-v2
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -105,6 +111,14 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
+	}()
+
+	webhookProcessors := webhook.NewWebhookProcessors(repo, *configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
+	go func() {
+		logger.Info(ctx, "Started processing webhook events.")
+		for _, webhookProcessor := range webhookProcessors {
+			webhookProcessor.StartProcessing()
+		}
 	}()
 
 	// Configure workflow scheduler async processes.

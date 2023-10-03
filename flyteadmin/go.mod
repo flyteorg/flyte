@@ -210,6 +210,7 @@ require (
 // This was published in error when attempting to create 1.5.1 Flyte release.
 retract v1.1.94
 
+<<<<<<< HEAD
 replace (
 	github.com/flyteorg/flyte/datacatalog => ../datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
@@ -219,3 +220,6 @@ replace (
 	github.com/flyteorg/flyteidl => ../flyteidl
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
 )
+=======
+replace github.com/flyteorg/flyteidl => github.com/flyteorg/flyteidl v1.5.17-0.20230821222808-485ae223c7f1
+>>>>>>> flyteadmin/webhook-v2

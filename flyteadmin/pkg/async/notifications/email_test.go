@@ -59,14 +59,14 @@ func TestSubstituteEmailParameters(t *testing.T) {
 		},
 	}
 	assert.Equal(t, "{{ unused }}. {{project }} and prod and e124 ended up in succeeded.",
-		substituteEmailParameters(message, request, workflowExecution))
+		SubstituteParameters(message, request, workflowExecution))
 	request.Event.OutputResult = &event.WorkflowExecutionEvent_Error{
 		Error: &core.ExecutionError{
 			Message: "uh-oh",
 		},
 	}
 	assert.Equal(t, "{{ unused }}. {{project }} and prod and e124 ended up in succeeded. The execution failed with error: [uh-oh].",
-		substituteEmailParameters(message, request, workflowExecution))
+		SubstituteParameters(message, request, workflowExecution))
 }
 
 func TestSubstituteAllTemplates(t *testing.T) {
@@ -95,7 +95,7 @@ func TestSubstituteAllTemplates(t *testing.T) {
 		},
 	}
 	assert.Equal(t, strings.Join(desiredResult, ","),
-		substituteEmailParameters(strings.Join(messageTemplate, ","), request, workflowExecution))
+		SubstituteParameters(strings.Join(messageTemplate, ","), request, workflowExecution))
 }
 
 func TestSubstituteAllTemplatesNoSpaces(t *testing.T) {
@@ -124,7 +124,7 @@ func TestSubstituteAllTemplatesNoSpaces(t *testing.T) {
 		},
 	}
 	assert.Equal(t, strings.Join(desiredResult, ","),
-		substituteEmailParameters(strings.Join(messageTemplate, ","), request, workflowExecution))
+		SubstituteParameters(strings.Join(messageTemplate, ","), request, workflowExecution))
 }
 
 func TestToEmailMessageFromWorkflowExecutionEvent(t *testing.T) {

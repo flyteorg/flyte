@@ -12,6 +12,7 @@ const flyteAdmin = "flyteadmin"
 const scheduler = "scheduler"
 const remoteData = "remoteData"
 const notifications = "notifications"
+const webhookNotifications = "webhookNotifications"
 const domains = "domains"
 const externalEvents = "externalEvents"
 const cloudEvents = "cloudEvents"
@@ -60,6 +61,9 @@ var remoteDataConfig = config.MustRegisterSection(remoteData, &interfaces.Remote
 	},
 })
 var notificationsConfig = config.MustRegisterSection(notifications, &interfaces.NotificationsConfig{
+	Type: common.Local,
+})
+var webhookNotificationsConfig = config.MustRegisterSection(webhookNotifications, &interfaces.WebhookNotificationsConfig{
 	Type: common.Local,
 })
 var domainsConfig = config.MustRegisterSection(domains, &interfaces.DomainsConfig{
@@ -117,6 +121,10 @@ func (p *ApplicationConfigurationProvider) GetExternalEventsConfig() *interfaces
 
 func (p *ApplicationConfigurationProvider) GetCloudEventsConfig() *interfaces.CloudEventsConfig {
 	return cloudEventsConfig.GetConfig().(*interfaces.CloudEventsConfig)
+}
+
+func (p *ApplicationConfigurationProvider) GetWebhookNotificationConfig() *interfaces.WebhookNotificationsConfig {
+	return webhookNotificationsConfig.GetConfig().(*interfaces.WebhookNotificationsConfig)
 }
 
 func NewApplicationConfigurationProvider() interfaces.ApplicationConfiguration {

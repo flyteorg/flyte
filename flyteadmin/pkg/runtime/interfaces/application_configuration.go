@@ -552,6 +552,30 @@ type NotificationsConfig struct {
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
+type WebHookConfig struct {
+	// Type of webhook service to use. Currently only "slack" is supported.
+	Name                         string                       `json:"name"`
+	URLSecretName                string                       `json:"urlSecretName" pflag:",Secret name to use for the webhook URL"`
+	Payload                      string                       `json:"payload"`
+	TokenSecretName              string                       `json:"tokenSecretName" pflag:",Secret name to use for the barer token"`
+	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
+}
+
+// WebhookNotificationsConfig defines the configuration for the webhook service.
+type WebhookNotificationsConfig struct {
+	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
+	// scheme is used.
+	Type      string    `json:"type"`
+	AWSConfig AWSConfig `json:"aws"`
+	GCPConfig GCPConfig `json:"gcp"`
+	// Defines the list of webhooks to be configured.
+	WebhooksConfig []WebHookConfig `json:"webhooks"`
+	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
+	ReconnectAttempts int `json:"reconnectAttempts"`
+	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
+	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
+}
+
 // Domains are always globally set in the application config, whereas individual projects can be individually registered.
 type Domain struct {
 	// Unique identifier for a domain.
@@ -572,4 +596,5 @@ type ApplicationConfiguration interface {
 	GetDomainsConfig() *DomainsConfig
 	GetExternalEventsConfig() *ExternalEventsConfig
 	GetCloudEventsConfig() *CloudEventsConfig
+	GetWebhookNotificationConfig() *WebhookNotificationsConfig
 }

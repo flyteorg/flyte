@@ -6,14 +6,19 @@ import (
 )
 
 type MockApplicationProvider struct {
-	dbConfig             database.DbConfig
-	topLevelConfig       interfaces.ApplicationConfig
-	schedulerConfig      interfaces.SchedulerConfig
-	remoteDataConfig     interfaces.RemoteDataConfig
-	notificationsConfig  interfaces.NotificationsConfig
-	domainsConfig        interfaces.DomainsConfig
-	externalEventsConfig interfaces.ExternalEventsConfig
-	cloudEventConfig     interfaces.CloudEventsConfig
+	dbConfig                   database.DbConfig
+	topLevelConfig             interfaces.ApplicationConfig
+	schedulerConfig            interfaces.SchedulerConfig
+	remoteDataConfig           interfaces.RemoteDataConfig
+	notificationsConfig        interfaces.NotificationsConfig
+	webhookNotificationsConfig interfaces.WebhookNotificationsConfig
+	domainsConfig              interfaces.DomainsConfig
+	externalEventsConfig       interfaces.ExternalEventsConfig
+	cloudEventConfig           interfaces.CloudEventsConfig
+}
+
+func (p *MockApplicationProvider) GetWebhookNotificationConfig() *interfaces.WebhookNotificationsConfig {
+	return &p.webhookNotificationsConfig
 }
 
 func (p *MockApplicationProvider) GetDbConfig() *database.DbConfig {

@@ -101,7 +101,7 @@ var getTemplateValueFuncs = map[string]GetTemplateValue{
 	launchPlanVersion: getLaunchPlanVersion,
 }
 
-func substituteEmailParameters(message string, request admin.WorkflowExecutionEventRequest, execution *admin.Execution) string {
+func SubstituteParameters(message string, request admin.WorkflowExecutionEventRequest, execution *admin.Execution) string {
 	for template, function := range getTemplateValueFuncs {
 		message = strings.Replace(message, fmt.Sprintf(substitutionParam, template), function(request, execution), replaceAllInstances)
 		message = strings.Replace(message, fmt.Sprintf(substitutionParamNoSpaces, template), function(request, execution), replaceAllInstances)
@@ -118,9 +118,9 @@ func ToEmailMessageFromWorkflowExecutionEvent(
 	execution *admin.Execution) *admin.EmailMessage {
 
 	return &admin.EmailMessage{
-		SubjectLine:     substituteEmailParameters(config.NotificationsEmailerConfig.Subject, request, execution),
+		SubjectLine:     SubstituteParameters(config.NotificationsEmailerConfig.Subject, request, execution),
 		SenderEmail:     config.NotificationsEmailerConfig.Sender,
 		RecipientsEmail: emailNotification.GetRecipientsEmail(),
-		Body:            substituteEmailParameters(config.NotificationsEmailerConfig.Body, request, execution),
+		Body:            SubstituteParameters(config.NotificationsEmailerConfig.Body, request, execution),
 	}
 }

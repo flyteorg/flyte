@@ -45,7 +45,7 @@ func TestGcpProcessor_StartProcessing(t *testing.T) {
 
 	// Check fornumber of messages processed.
 	m := &dto.Metric{}
-	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageSuccess.Write(m)
+	err := testGcpProcessor.(*GcpProcessor).SystemMetrics.MessageSuccess.Write(m)
 	assert.Nil(t, err)
 	assert.Equal(t, "counter:<value:1 > ", m.String())
 }
@@ -60,7 +60,7 @@ func TestGcpProcessor_StartProcessingNoMessages(t *testing.T) {
 
 	// Check fornumber of messages processed.
 	m := &dto.Metric{}
-	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageSuccess.Write(m)
+	err := testGcpProcessor.(*GcpProcessor).SystemMetrics.MessageSuccess.Write(m)
 	assert.Nil(t, err)
 	assert.Equal(t, "counter:<value:0 > ", m.String())
 }
@@ -93,7 +93,7 @@ func TestGcpProcessor_StartProcessingEmailError(t *testing.T) {
 
 	// Check for an email error stat.
 	m := &dto.Metric{}
-	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageProcessorError.Write(m)
+	err := testGcpProcessor.(*GcpProcessor).SystemMetrics.MessageProcessorError.Write(m)
 	assert.Nil(t, err)
 	assert.Equal(t, "counter:<value:1 > ", m.String())
 }

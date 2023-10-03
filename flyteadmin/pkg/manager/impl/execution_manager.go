@@ -1281,16 +1281,18 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		if err != nil {
 			// The only errors that publishNotifications will forward are those related
 			// to unexpected data and transformation errors.
-			logger.Debugf(ctx, "failed to publish notifications for CreateWorkflowEvent [%+v] due to err: %v",
+			logger.Errorf(ctx, "failed to publish notifications for CreateWorkflowEvent [%+v] due to err: %v",
 				request, err)
 			return nil, err
 		}
 	}
 
-	if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
-		m.systemMetrics.PublishEventError.Inc()
-		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
-	}
+	go func() {
+		if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+			m.systemMetrics.PublishEventError.Inc()
+			logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
+		}
+	}()
 
 	go func() {
 		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
