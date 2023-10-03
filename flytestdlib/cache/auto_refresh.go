@@ -332,7 +332,7 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 
 			for _, item := range updatedBatch {
 				if item.Action == Update {
-					// Add adds the item if it has been evicted or updates an existing one.
+					// Updates an existing item.
 					w.Update(item.ID, item.Item)
 				}
 			}
