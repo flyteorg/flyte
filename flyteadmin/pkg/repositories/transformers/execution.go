@@ -103,7 +103,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	for i, tag := range input.RequestSpec.Tags {
 		tags[i] = models.AdminTag{Name: tag}
 	}
-
+	
 	executionModel := &models.Execution{
 		ExecutionKey: models.ExecutionKey{
 			Project: input.WorkflowExecutionID.Project,
@@ -289,6 +289,37 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
 	}
 	executionModel.Closure = marshaledClosure
+	return nil
+}
+
+// Update tag information of existing execution model.
+func UpdateExecutionModelTag(executionModel *models.Execution, tagsUpdatedTo []string) error {
+
+	var spec admin.ExecutionSpec
+	var err error
+	if err = proto.Unmarshal(executionModel.Spec, &spec); err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
+	}
+
+	tagSet := sets.NewString()
+	for _, tag := range spec.Tags {
+		tagSet.Insert(tag)
+	}
+	for _, tag := range tagsUpdatedTo {
+		// if tag not in tagSet, append into executionModel.Tags
+		if !tagSet.Has(tag) {
+			executionModel.Tags = append(executionModel.Tags, models.AdminTag{Name: tag})
+		}
+		tagSet.Insert(tag)
+	}
+	spec.Tags = tagSet.List()
+	
+	marshaledSpec, err := proto.Marshal(&spec)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution spec: %v", err)
+	}
+	executionModel.Spec = marshaledSpec
+
 	return nil
 }
 

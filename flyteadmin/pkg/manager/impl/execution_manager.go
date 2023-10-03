@@ -1340,9 +1340,13 @@ func (m *ExecutionManager) UpdateExecution(ctx context.Context, request admin.Ex
 		logger.Debugf(ctx, "Failed to get execution model for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
-
+	
 	if err = transformers.UpdateExecutionModelStateChangeDetails(executionModel, request.State, requestedAt,
 		getUser(ctx)); err != nil {
+		return nil, err
+	}
+
+	if err = transformers.UpdateExecutionModelTag(executionModel, request.Tags); err != nil {
 		return nil, err
 	}
 
