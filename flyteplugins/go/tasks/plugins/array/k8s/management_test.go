@@ -97,6 +97,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 			v1.ResourceCPU: resource.MustParse("10"),
 		},
 	})
+	overrides.OnGetResourceExtensions().Return(&core2.ResourceExtensions{})
 
 	tMeta := &mocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
