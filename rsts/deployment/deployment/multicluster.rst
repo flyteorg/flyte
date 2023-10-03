@@ -50,7 +50,7 @@ requests successfully, the following environment-specific requirements should be
       
 
    2. At least three IAM Roles configured: one for the controlplane components, another for the dataplane
-   and one more for the worker Pods that are bootstraped by Flyte to execute workflow tasks. 
+   and one more for the worker Pods that are bootstrapped by Flyte to execute workflow tasks. 
 
    3. An OIDC Provider associated with each of your EKS clusters. You can use the following command to create and connect the Provider:
 
