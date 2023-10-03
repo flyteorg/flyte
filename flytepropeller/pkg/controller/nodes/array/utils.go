@@ -32,8 +32,8 @@ func appendLiteral(name string, literal *idlcore.Literal, outputLiterals map[str
 	collection.Literals = append(collection.Literals, literal)
 }
 
-func buildSubNodeID(nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) string {
-	return fmt.Sprintf("%s-n%d-%d", nCtx.NodeID(), index, retryAttempt)
+func buildSubNodeID(nCtx interfaces.NodeExecutionContext, index int) string {
+	return fmt.Sprintf("%s-n%d", nCtx.NodeID(), index)
 }
 
 func bytesFromK8sPluginState(pluginState k8s.PluginState) ([]byte, error) {

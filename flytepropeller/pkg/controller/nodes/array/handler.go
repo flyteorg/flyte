@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	//"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -29,6 +29,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+
+	"github.com/golang/protobuf/ptypes"
 )
 
 var (
@@ -237,23 +239,51 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 		}
 
-		// initialize externalResources
-		// TODO @hamersaw - add eventRecorder.RawExternalResources(...)
-		/*eventRecorder.RecordNodeEvent(ctx,
-			&event.NodeExecutionEvent{
-			},
-			a.eventConfig)*/
-
-		/*externalResources = make([]*event.ExternalResourceInfo, 0, size)
+		// initialize subNode status by faking events
 		for i := 0; i < size; i++ {
-			externalResources = append(externalResources, &event.ExternalResourceInfo{
-				ExternalId:   buildSubNodeID(nCtx, i, 0),
-				Index:        uint32(i),
-				Logs:         nil,
-				RetryAttempt: 0,
-				Phase:        idlcore.TaskExecution_QUEUED,
-			})
-		}*/
+			subNodeID := buildSubNodeID(nCtx, i)
+			timestamp := ptypes.TimestampNow()
+			workflowExecutionID := nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier
+
+			// send NodeExecutionEvent with UNDEFINED phase
+			nodeExecutionEvent := &event.NodeExecutionEvent{
+				Id: &idlcore.NodeExecutionIdentifier{
+					NodeId:      subNodeID,
+					ExecutionId: workflowExecutionID,
+				},
+				Phase: idlcore.NodeExecution_QUEUED,
+				OccurredAt: timestamp,
+				ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
+					NodeId: nCtx.NodeID(),	
+				},
+				ReportedAt: timestamp,
+			}
+
+			if err := eventRecorder.RecordNodeEvent(ctx, nodeExecutionEvent, a.eventConfig); err != nil {
+				logger.Warnf(ctx, "failed to record ArrayNode node event: %v", err)
+			}
+
+			// send TaskExeucutionEvent with UNDEFINED phase
+			taskExecutionEvent := &event.TaskExecutionEvent{
+				TaskId: &idlcore.Identifier{
+					ResourceType: idlcore.ResourceType_TASK,
+					Project:      workflowExecutionID.Project,
+					Domain:       workflowExecutionID.Domain,
+					Name:         fmt.Sprintf("%s-%d", buildSubNodeID(nCtx, i), 0),
+					Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
+				},
+				ParentNodeExecutionId: nodeExecutionEvent.Id,
+				Phase: idlcore.TaskExecution_QUEUED,
+				OccurredAt: timestamp,
+				ReportedAt: timestamp,
+			}
+
+			if err := eventRecorder.RecordTaskEvent(ctx, taskExecutionEvent, a.eventConfig); err != nil {
+				logger.Warnf(ctx, "failed to record ArrayNode task event: %v", err)
+			}
+
+			eventRecorder.process(ctx, nCtx, i, 0)
+		}
 
 		// transition ArrayNode to `ArrayNodePhaseExecuting`
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
@@ -521,7 +551,8 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// wrap node lookup
 	subNodeSpec := *arrayNode.GetSubNodeSpec()
 
-	subNodeID := fmt.Sprintf("%s-n%d", nCtx.NodeID(), subNodeIndex)
+	//subNodeID := fmt.Sprintf("%s-n%d", nCtx.NodeID(), subNodeIndex)
+	subNodeID := fmt.Sprintf("n%d", subNodeIndex)
 	subNodeSpec.ID = subNodeID
 	subNodeSpec.Name = subNodeID
 	// mock the input bindings for the subNode to nil to bypass input resolution in the

@@ -39,6 +39,8 @@ func (e *externalResourcesEventRecorder) RecordTaskEvent(ctx context.Context, ev
 }
 
 func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) {
+	externalResourceID := fmt.Sprintf("%s-%d", buildSubNodeID(nCtx, index), retryAttempt)
+
 	// process events
 	cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
 	for _, nodeExecutionEvent := range e.nodeEvents {
@@ -54,7 +56,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	// transition to `SUCCEEDED` and add an `ExternalResourceInfo` for it.
 	if cacheStatus == idlcore.CatalogCacheStatus_CACHE_HIT && len(e.taskEvents) == 0 {
 		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
-			ExternalId:   buildSubNodeID(nCtx, index, retryAttempt),
+			ExternalId:   externalResourceID,
 			Index:        uint32(index),
 			RetryAttempt: retryAttempt,
 			Phase:        idlcore.TaskExecution_SUCCEEDED,
@@ -68,7 +70,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 		}
 
 		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
-			ExternalId:   buildSubNodeID(nCtx, index, retryAttempt),
+			ExternalId:   externalResourceID,
 			Index:        uint32(index),
 			Logs:         taskExecutionEvent.Logs,
 			RetryAttempt: retryAttempt,
@@ -91,7 +93,7 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		return err
 	}
 
-	nodeExecutionID := nCtx.NodeExecutionMetadata().GetNodeExecutionID()
+	nodeExecutionID := *nCtx.NodeExecutionMetadata().GetNodeExecutionID()
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
 		if err != nil {
@@ -110,7 +112,7 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 			Name:         nCtx.NodeID(),
 			Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
 		},
-		ParentNodeExecutionId: nodeExecutionID,
+		ParentNodeExecutionId: &nodeExecutionID,
 		RetryAttempt:          0, // ArrayNode will never retry
 		Phase:                 taskPhase,
 		PhaseVersion:          taskPhaseVersion,
