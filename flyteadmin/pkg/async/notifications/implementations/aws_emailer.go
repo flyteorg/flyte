@@ -51,6 +51,7 @@ func FlyteEmailToSesEmailInput(email admin.EmailMessage) ses.SendEmailInput {
 }
 
 func (e *AwsEmailer) SendEmail(ctx context.Context, email admin.EmailMessage) error {
+	logger.Infof(ctx, "debugb64 Sending email %v", email.Body)
 	emailInput := FlyteEmailToSesEmailInput(email)
 	_, err := e.awsEmail.SendEmail(&emailInput)
 	e.systemMetrics.SendTotal.Inc()
