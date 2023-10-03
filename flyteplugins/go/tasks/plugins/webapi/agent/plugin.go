@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
+	"time"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
@@ -13,6 +14,7 @@ import (
 
 	"google.golang.org/grpc/grpclog"
 
+<<<<<<< HEAD
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -23,6 +25,9 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	flyteIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+=======
+	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+>>>>>>> flyteplugins/pending-state-in-agent
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"google.golang.org/grpc"
 )
@@ -40,7 +45,8 @@ type Plugin struct {
 
 type ResourceWrapper struct {
 	State   admin.State
-	Outputs *flyteIdl.LiteralMap
+	Outputs *flyteIdlCore.LiteralMap
+	Message string
 }
 
 type ResourceMetaWrapper struct {
@@ -143,6 +149,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	return &ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
+		Message: res.Resource.Message,
 	}, nil
 }
 
@@ -173,6 +180,8 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	taskInfo := &core.TaskInfo{}
 
 	switch resource.State {
+	case admin.State_PENDING:
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
