@@ -22,7 +22,7 @@ import (
 
 // A Lazy loading function, that will load the plugin. Plugins should be initialized in this method. It is guaranteed
 // that the plugin loader will be called before any Handle/Abort/Finalize functions are invoked
-type PluginLoader func(ctx context.Context, iCtx PluginSetupContext) (AsyncPlugin, error)
+type PluginLoader func(ctx context.Context, iCtx PluginSetupContext) (AsyncPlugin, SyncPlugin, error)
 
 // PluginEntry is a structure that is used to indicate to the system a K8s plugin
 type PluginEntry struct {
@@ -150,5 +150,5 @@ type SyncPlugin interface {
 	GetConfig() PluginConfig
 
 	// Do performs the action associated with this plugin.
-	Do(ctx context.Context, tCtx TaskExecutionContext) (phase pluginsCore.PhaseInfo, err error)
+	Do(ctx context.Context, tCtx TaskExecutionContextReader) (latest Resource, err error)
 }

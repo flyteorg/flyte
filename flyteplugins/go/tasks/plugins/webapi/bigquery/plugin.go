@@ -547,25 +547,25 @@ func (p Plugin) newBigQueryClient(ctx context.Context, identity google.Identity)
 	return bigquery.NewService(ctx, options...)
 }
 
-func NewPlugin(cfg *Config, metricScope promutils.Scope) (*Plugin, error) {
+func NewPlugin(cfg *Config, metricScope promutils.Scope) (*Plugin, webapi.SyncPlugin, error) {
 	googleTokenSource, err := google.NewTokenSourceFactory(cfg.GoogleTokenSource)
 
 	if err != nil {
-		return nil, pluginErrors.Wrapf(pluginErrors.PluginInitializationFailed, err, "failed to get google token source")
+		return nil, nil, pluginErrors.Wrapf(pluginErrors.PluginInitializationFailed, err, "failed to get google token source")
 	}
 
 	return &Plugin{
 		metricScope:       metricScope,
 		cfg:               cfg,
 		googleTokenSource: googleTokenSource,
-	}, nil
+	}, nil, nil
 }
 
 func newBigQueryJobTaskPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "bigquery",
 		SupportedTaskTypes: []core.TaskType{bigqueryQueryJobTask},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
 			cfg := GetConfig()
 
 			return NewPlugin(cfg, iCtx.MetricsScope())

@@ -275,12 +275,12 @@ func newSnowflakeJobTaskPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "snowflake",
 		SupportedTaskTypes: []core.TaskType{"snowflake"},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
 			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         GetConfig(),
 				client:      &http.Client{},
-			}, nil
+			}, nil, nil
 		},
 	}
 }
