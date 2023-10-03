@@ -163,10 +163,11 @@ func NewRedirectCookie(ctx context.Context, redirectURL string) *http.Cookie {
 	}
 }
 
+// GetAuthFlowEndRedirect returns the redirect URI according to data in request.
 // At the end of the OAuth flow, the server needs to send the user somewhere. This should have been stored as a cookie
 // during the initial /login call. If that cookie is missing from the request, it will default to the one configured
 // in this package's Config object.
-func getAuthFlowEndRedirect(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request) string {
+func GetAuthFlowEndRedirect(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request) string {
 	queryParams := request.URL.Query()
 	// Use the redirect URL specified in the request if one is available.
 	if redirectURL := queryParams.Get(RedirectURLParameter); len(redirectURL) > 0 {

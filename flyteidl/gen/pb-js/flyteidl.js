@@ -9845,6 +9845,7 @@
                  * @interface IOutputReference
                  * @property {string|null} [nodeId] OutputReference nodeId
                  * @property {string|null} ["var"] OutputReference var
+                 * @property {Array.<flyteidl.core.IPromiseAttribute>|null} [attrPath] OutputReference attrPath
                  */
     
                 /**
@@ -9856,6 +9857,7 @@
                  * @param {flyteidl.core.IOutputReference=} [properties] Properties to set
                  */
                 function OutputReference(properties) {
+                    this.attrPath = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -9877,6 +9879,14 @@
                  * @instance
                  */
                 OutputReference.prototype["var"] = "";
+    
+                /**
+                 * OutputReference attrPath.
+                 * @member {Array.<flyteidl.core.IPromiseAttribute>} attrPath
+                 * @memberof flyteidl.core.OutputReference
+                 * @instance
+                 */
+                OutputReference.prototype.attrPath = $util.emptyArray;
     
                 /**
                  * Creates a new OutputReference instance using the specified properties.
@@ -9906,6 +9916,9 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.nodeId);
                     if (message["var"] != null && message.hasOwnProperty("var"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message["var"]);
+                    if (message.attrPath != null && message.attrPath.length)
+                        for (var i = 0; i < message.attrPath.length; ++i)
+                            $root.flyteidl.core.PromiseAttribute.encode(message.attrPath[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -9933,6 +9946,11 @@
                         case 2:
                             message["var"] = reader.string();
                             break;
+                        case 3:
+                            if (!(message.attrPath && message.attrPath.length))
+                                message.attrPath = [];
+                            message.attrPath.push($root.flyteidl.core.PromiseAttribute.decode(reader, reader.uint32()));
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -9958,10 +9976,167 @@
                     if (message["var"] != null && message.hasOwnProperty("var"))
                         if (!$util.isString(message["var"]))
                             return "var: string expected";
+                    if (message.attrPath != null && message.hasOwnProperty("attrPath")) {
+                        if (!Array.isArray(message.attrPath))
+                            return "attrPath: array expected";
+                        for (var i = 0; i < message.attrPath.length; ++i) {
+                            var error = $root.flyteidl.core.PromiseAttribute.verify(message.attrPath[i]);
+                            if (error)
+                                return "attrPath." + error;
+                        }
+                    }
                     return null;
                 };
     
                 return OutputReference;
+            })();
+    
+            core.PromiseAttribute = (function() {
+    
+                /**
+                 * Properties of a PromiseAttribute.
+                 * @memberof flyteidl.core
+                 * @interface IPromiseAttribute
+                 * @property {string|null} [stringValue] PromiseAttribute stringValue
+                 * @property {number|null} [intValue] PromiseAttribute intValue
+                 */
+    
+                /**
+                 * Constructs a new PromiseAttribute.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a PromiseAttribute.
+                 * @implements IPromiseAttribute
+                 * @constructor
+                 * @param {flyteidl.core.IPromiseAttribute=} [properties] Properties to set
+                 */
+                function PromiseAttribute(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PromiseAttribute stringValue.
+                 * @member {string} stringValue
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @instance
+                 */
+                PromiseAttribute.prototype.stringValue = "";
+    
+                /**
+                 * PromiseAttribute intValue.
+                 * @member {number} intValue
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @instance
+                 */
+                PromiseAttribute.prototype.intValue = 0;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * PromiseAttribute value.
+                 * @member {"stringValue"|"intValue"|undefined} value
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @instance
+                 */
+                Object.defineProperty(PromiseAttribute.prototype, "value", {
+                    get: $util.oneOfGetter($oneOfFields = ["stringValue", "intValue"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new PromiseAttribute instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {flyteidl.core.IPromiseAttribute=} [properties] Properties to set
+                 * @returns {flyteidl.core.PromiseAttribute} PromiseAttribute instance
+                 */
+                PromiseAttribute.create = function create(properties) {
+                    return new PromiseAttribute(properties);
+                };
+    
+                /**
+                 * Encodes the specified PromiseAttribute message. Does not implicitly {@link flyteidl.core.PromiseAttribute.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {flyteidl.core.IPromiseAttribute} message PromiseAttribute message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PromiseAttribute.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.stringValue != null && message.hasOwnProperty("stringValue"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.stringValue);
+                    if (message.intValue != null && message.hasOwnProperty("intValue"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.intValue);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PromiseAttribute message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.PromiseAttribute} PromiseAttribute
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PromiseAttribute.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.PromiseAttribute();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.stringValue = reader.string();
+                            break;
+                        case 2:
+                            message.intValue = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PromiseAttribute message.
+                 * @function verify
+                 * @memberof flyteidl.core.PromiseAttribute
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PromiseAttribute.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.stringValue != null && message.hasOwnProperty("stringValue")) {
+                        properties.value = 1;
+                        if (!$util.isString(message.stringValue))
+                            return "stringValue: string expected";
+                    }
+                    if (message.intValue != null && message.hasOwnProperty("intValue")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        if (!$util.isInteger(message.intValue))
+                            return "intValue: integer expected";
+                    }
+                    return null;
+                };
+    
+                return PromiseAttribute;
             })();
     
             core.Error = (function() {
@@ -17433,6 +17608,135 @@
                 return ParentNodeExecutionMetadata;
             })();
     
+            event.EventReason = (function() {
+    
+                /**
+                 * Properties of an EventReason.
+                 * @memberof flyteidl.event
+                 * @interface IEventReason
+                 * @property {string|null} [reason] EventReason reason
+                 * @property {google.protobuf.ITimestamp|null} [occurredAt] EventReason occurredAt
+                 */
+    
+                /**
+                 * Constructs a new EventReason.
+                 * @memberof flyteidl.event
+                 * @classdesc Represents an EventReason.
+                 * @implements IEventReason
+                 * @constructor
+                 * @param {flyteidl.event.IEventReason=} [properties] Properties to set
+                 */
+                function EventReason(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * EventReason reason.
+                 * @member {string} reason
+                 * @memberof flyteidl.event.EventReason
+                 * @instance
+                 */
+                EventReason.prototype.reason = "";
+    
+                /**
+                 * EventReason occurredAt.
+                 * @member {google.protobuf.ITimestamp|null|undefined} occurredAt
+                 * @memberof flyteidl.event.EventReason
+                 * @instance
+                 */
+                EventReason.prototype.occurredAt = null;
+    
+                /**
+                 * Creates a new EventReason instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.event.EventReason
+                 * @static
+                 * @param {flyteidl.event.IEventReason=} [properties] Properties to set
+                 * @returns {flyteidl.event.EventReason} EventReason instance
+                 */
+                EventReason.create = function create(properties) {
+                    return new EventReason(properties);
+                };
+    
+                /**
+                 * Encodes the specified EventReason message. Does not implicitly {@link flyteidl.event.EventReason.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.event.EventReason
+                 * @static
+                 * @param {flyteidl.event.IEventReason} message EventReason message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                EventReason.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.reason != null && message.hasOwnProperty("reason"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.reason);
+                    if (message.occurredAt != null && message.hasOwnProperty("occurredAt"))
+                        $root.google.protobuf.Timestamp.encode(message.occurredAt, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an EventReason message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.event.EventReason
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.event.EventReason} EventReason
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                EventReason.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.event.EventReason();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.reason = reader.string();
+                            break;
+                        case 2:
+                            message.occurredAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an EventReason message.
+                 * @function verify
+                 * @memberof flyteidl.event.EventReason
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                EventReason.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.reason != null && message.hasOwnProperty("reason"))
+                        if (!$util.isString(message.reason))
+                            return "reason: string expected";
+                    if (message.occurredAt != null && message.hasOwnProperty("occurredAt")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.occurredAt);
+                        if (error)
+                            return "occurredAt." + error;
+                    }
+                    return null;
+                };
+    
+                return EventReason;
+            })();
+    
             event.TaskExecutionEvent = (function() {
     
                 /**
@@ -17454,6 +17758,7 @@
                  * @property {google.protobuf.IStruct|null} [customInfo] TaskExecutionEvent customInfo
                  * @property {number|null} [phaseVersion] TaskExecutionEvent phaseVersion
                  * @property {string|null} [reason] TaskExecutionEvent reason
+                 * @property {Array.<flyteidl.event.IEventReason>|null} [reasons] TaskExecutionEvent reasons
                  * @property {string|null} [taskType] TaskExecutionEvent taskType
                  * @property {flyteidl.event.ITaskExecutionMetadata|null} [metadata] TaskExecutionEvent metadata
                  * @property {number|null} [eventVersion] TaskExecutionEvent eventVersion
@@ -17470,6 +17775,7 @@
                  */
                 function TaskExecutionEvent(properties) {
                     this.logs = [];
+                    this.reasons = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -17597,6 +17903,14 @@
                 TaskExecutionEvent.prototype.reason = "";
     
                 /**
+                 * TaskExecutionEvent reasons.
+                 * @member {Array.<flyteidl.event.IEventReason>} reasons
+                 * @memberof flyteidl.event.TaskExecutionEvent
+                 * @instance
+                 */
+                TaskExecutionEvent.prototype.reasons = $util.emptyArray;
+    
+                /**
                  * TaskExecutionEvent taskType.
                  * @member {string} taskType
                  * @memberof flyteidl.event.TaskExecutionEvent
@@ -17716,6 +18030,9 @@
                         $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
                     if (message.reportedAt != null && message.hasOwnProperty("reportedAt"))
                         $root.google.protobuf.Timestamp.encode(message.reportedAt, writer.uint32(/* id 20, wireType 2 =*/162).fork()).ldelim();
+                    if (message.reasons != null && message.reasons.length)
+                        for (var i = 0; i < message.reasons.length; ++i)
+                            $root.flyteidl.event.EventReason.encode(message.reasons[i], writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
                     return writer;
                 };
     
@@ -17783,6 +18100,11 @@
                             break;
                         case 13:
                             message.reason = reader.string();
+                            break;
+                        case 21:
+                            if (!(message.reasons && message.reasons.length))
+                                message.reasons = [];
+                            message.reasons.push($root.flyteidl.event.EventReason.decode(reader, reader.uint32()));
                             break;
                         case 14:
                             message.taskType = reader.string();
@@ -17911,6 +18233,15 @@
                     if (message.reason != null && message.hasOwnProperty("reason"))
                         if (!$util.isString(message.reason))
                             return "reason: string expected";
+                    if (message.reasons != null && message.hasOwnProperty("reasons")) {
+                        if (!Array.isArray(message.reasons))
+                            return "reasons: array expected";
+                        for (var i = 0; i < message.reasons.length; ++i) {
+                            var error = $root.flyteidl.event.EventReason.verify(message.reasons[i]);
+                            if (error)
+                                return "reasons." + error;
+                        }
+                    }
                     if (message.taskType != null && message.hasOwnProperty("taskType"))
                         if (!$util.isString(message.taskType))
                             return "taskType: string expected";

@@ -29,8 +29,16 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 			errors.CacheFailed, "Failed to cast [%v]", cacheItem)
 	}
 
-	// If the cache has not syncd yet, just return
+	// If the cache has not synced yet, just return
 	if cacheItem.Resource == nil {
+		if cacheItem.Phase.IsTerminal() {
+			err = cache.DeleteDelayed(cacheItemID)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to queue item for deletion in the cache with Item Id: [%v]. Error: %v",
+					cacheItemID, err)
+			}
+			return state, core.PhaseInfoFailure(errors.CacheFailed, cacheItem.ErrorMessage, nil), nil
+		}
 		return state, core.PhaseInfoRunning(0, nil), nil
 	}
 
@@ -54,7 +62,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 		// Queue item for deletion in the cache.
 		err = cache.DeleteDelayed(cacheItemID)
 		if err != nil {
-			logger.Warnf(ctx, "Failed to queue item for deletion in the cache with Item Id: [%v]. Error: %v",
+			logger.Errorf(ctx, "Failed to queue item for deletion in the cache with Item Id: [%v]. Error: %v",
 				cacheItemID, err)
 		}
 	}

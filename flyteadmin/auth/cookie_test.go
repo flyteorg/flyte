@@ -131,7 +131,7 @@ func TestGetAuthFlowEndRedirect(t *testing.T) {
 		assert.NotNil(t, cookie)
 		request.AddCookie(cookie)
 		mockAuthCtx := &mocks.AuthenticationContext{}
-		redirect := getAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
 		assert.Equal(t, "/console", redirect)
 	})
 
@@ -145,7 +145,7 @@ func TestGetAuthFlowEndRedirect(t *testing.T) {
 				RedirectURL: stdConfig.URL{URL: mustParseURL(t, "/api/v1/projects")},
 			},
 		})
-		redirect := getAuthFlowEndRedirect(ctx, mockAuthCtx, request)
+		redirect := GetAuthFlowEndRedirect(ctx, mockAuthCtx, request)
 		assert.Equal(t, "/api/v1/projects", redirect)
 	})
 }

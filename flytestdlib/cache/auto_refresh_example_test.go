@@ -26,6 +26,10 @@ type ExampleCacheItem struct {
 	id     string
 }
 
+func (e *ExampleCacheItem) IsTerminal() bool {
+	return e.status == ExampleStatusSucceeded
+}
+
 func (e *ExampleCacheItem) ID() string {
 	return e.id
 }

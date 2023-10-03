@@ -205,6 +205,7 @@ from flyteadmin.models.core_output_reference import CoreOutputReference
 from flyteadmin.models.core_parameter import CoreParameter
 from flyteadmin.models.core_parameter_map import CoreParameterMap
 from flyteadmin.models.core_primitive import CorePrimitive
+from flyteadmin.models.core_promise_attribute import CorePromiseAttribute
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService
 from flyteadmin.models.core_quality_of_service_spec import CoreQualityOfServiceSpec
 from flyteadmin.models.core_resource_type import CoreResourceType
@@ -247,6 +248,7 @@ from flyteadmin.models.core_workflow_metadata_defaults import CoreWorkflowMetada
 from flyteadmin.models.core_workflow_node import CoreWorkflowNode
 from flyteadmin.models.core_workflow_template import CoreWorkflowTemplate
 from flyteadmin.models.data_loading_config_literal_map_format import DataLoadingConfigLiteralMapFormat
+from flyteadmin.models.event_event_reason import EventEventReason
 from flyteadmin.models.event_external_resource_info import EventExternalResourceInfo
 from flyteadmin.models.event_node_execution_event import EventNodeExecutionEvent
 from flyteadmin.models.event_parent_node_execution_metadata import EventParentNodeExecutionMetadata

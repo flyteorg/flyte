@@ -6473,6 +6473,12 @@
         "var": {
           "type": "string",
           "description": "Variable name must refer to an output variable for the node."
+        },
+        "attr_path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/corePromiseAttribute"
+          }
         }
       },
       "description": "A reference to an output produced by a node. The type can be retrieved -and validated- from\nthe underlying interface of the node."
@@ -6536,6 +6542,18 @@
         }
       },
       "title": "Primitive Types"
+    },
+    "corePromiseAttribute": {
+      "type": "object",
+      "properties": {
+        "string_value": {
+          "type": "string"
+        },
+        "int_value": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
     },
     "coreQualityOfService": {
       "type": "object",
@@ -7262,6 +7280,20 @@
       },
       "description": "Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,\ndirected acyclic graph."
     },
+    "eventEventReason": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "title": "An explanation for this event"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time this reason occurred"
+        }
+      }
+    },
     "eventExternalResourceInfo": {
       "type": "object",
       "properties": {
@@ -7484,7 +7516,14 @@
         },
         "reason": {
           "type": "string",
-          "description": "An optional explanation for the phase transition."
+          "description": "An optional explanation for the phase transition.\nDeprecated: Use reasons instead."
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventEventReason"
+          },
+          "description": "An optional list of explanations for the phase transition."
         },
         "task_type": {
           "type": "string",

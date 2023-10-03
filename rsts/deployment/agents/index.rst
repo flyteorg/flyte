@@ -20,6 +20,16 @@ Discover the process of setting up Agents for Flyte.
 
     ---
 
+    .. link-button:: deployment-agent-setup-mmcloud
+       :type: ref
+       :text: MMCloud Agent
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the MMCloud agent.
+
+
+    ---
+
     .. link-button:: deployment-agent-setup-databricks
        :type: ref
        :text: Databricks Agent
@@ -33,4 +43,5 @@ Discover the process of setting up Agents for Flyte.
     :hidden:
 
     bigquery
+    mmcloud
     databricks
