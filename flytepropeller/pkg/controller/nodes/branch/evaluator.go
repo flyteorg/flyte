@@ -20,31 +20,53 @@ const ErrorCodeFailedFetchOutputs = "FailedFetchOutputs"
 func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.LiteralMap) (bool, error) {
 	var lValue *core.Literal
 	var rValue *core.Literal
-	var lPrim *core.Primitive
-	var rPrim *core.Primitive
+	var lPrim *core.Scalar
+	var rPrim *core.Scalar
 
 	if expr.GetLeftValue().GetPrimitive() == nil {
-		if nodeInputs == nil {
-			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+		if expr.GetLeftValue().GetScalar().GetNoneType() != nil {
+			lValue = &core.Literal{Value: &core.Literal_Scalar{Scalar: expr.GetLeftValue().GetScalar()}}
+		} else if expr.GetLeftValue().GetScalar().GetUnion() != nil {
+			lValue = expr.GetLeftValue().GetScalar().GetUnion().GetValue()
+		} else {
+			if nodeInputs == nil {
+				return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+			}
+			input := nodeInputs.Literals[expr.GetLeftValue().GetVar()]
+			if input.GetScalar().GetUnion().GetValue() != nil {
+				lValue = input.GetScalar().GetUnion().GetValue()
+			} else {
+				lValue = input
+			}
 		}
-		lValue = nodeInputs.Literals[expr.GetLeftValue().GetVar()]
 		if lValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
 	} else {
-		lPrim = expr.GetLeftValue().GetPrimitive()
+		lPrim = &core.Scalar{Value: &core.Scalar_Primitive{Primitive: expr.GetLeftValue().GetPrimitive()}}
 	}
 
 	if expr.GetRightValue().GetPrimitive() == nil {
-		if nodeInputs == nil {
-			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+		if expr.GetRightValue().GetScalar().GetNoneType() != nil {
+			rValue = &core.Literal{Value: &core.Literal_Scalar{Scalar: expr.GetRightValue().GetScalar()}}
+		} else if expr.GetRightValue().GetScalar().GetUnion() != nil {
+			rValue = expr.GetRightValue().GetScalar().GetUnion().GetValue()
+		} else {
+			if nodeInputs == nil {
+				return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
+			}
+			input := nodeInputs.Literals[expr.GetRightValue().GetVar()]
+			if input.GetScalar().GetUnion().GetValue() != nil {
+				rValue = input.GetScalar().GetUnion().GetValue()
+			} else {
+				rValue = input
+			}
 		}
-		rValue = nodeInputs.Literals[expr.GetRightValue().GetVar()]
 		if rValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetRightValue().GetVar())
 		}
 	} else {
-		rPrim = expr.GetRightValue().GetPrimitive()
+		rPrim = &core.Scalar{Value: &core.Scalar_Primitive{Primitive: expr.GetRightValue().GetPrimitive()}}
 	}
 
 	if lValue != nil && rValue != nil {
