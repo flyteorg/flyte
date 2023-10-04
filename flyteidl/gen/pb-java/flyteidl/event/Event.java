@@ -2445,6 +2445,15 @@ public final class Event {
      */
     com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder();
 
+    /**
+     * <pre>
+     * Indicates if this node is an ArrayNode.
+     * </pre>
+     *
+     * <code>bool is_array = 22;</code>
+     */
+    boolean getIsArray();
+
     public flyteidl.event.Event.NodeExecutionEvent.InputValueCase getInputValueCase();
 
     public flyteidl.event.Event.NodeExecutionEvent.OutputResultCase getOutputResultCase();
@@ -2692,6 +2701,11 @@ public final class Event {
                 reportedAt_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 176: {
+
+              isArray_ = input.readBool();
               break;
             }
             default: {
@@ -3547,6 +3561,19 @@ public final class Event {
       return getReportedAt();
     }
 
+    public static final int IS_ARRAY_FIELD_NUMBER = 22;
+    private boolean isArray_;
+    /**
+     * <pre>
+     * Indicates if this node is an ArrayNode.
+     * </pre>
+     *
+     * <code>bool is_array = 22;</code>
+     */
+    public boolean getIsArray() {
+      return isArray_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3623,6 +3650,9 @@ public final class Event {
       }
       if (reportedAt_ != null) {
         output.writeMessage(21, getReportedAt());
+      }
+      if (isArray_ != false) {
+        output.writeBool(22, isArray_);
       }
       unknownFields.writeTo(output);
     }
@@ -3710,6 +3740,10 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(21, getReportedAt());
       }
+      if (isArray_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(22, isArray_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3767,6 +3801,8 @@ public final class Event {
         if (!getReportedAt()
             .equals(other.getReportedAt())) return false;
       }
+      if (getIsArray()
+          != other.getIsArray()) return false;
       if (!getInputValueCase().equals(other.getInputValueCase())) return false;
       switch (inputValueCase_) {
         case 5:
@@ -3861,6 +3897,9 @@ public final class Event {
         hash = (37 * hash) + REPORTED_AT_FIELD_NUMBER;
         hash = (53 * hash) + getReportedAt().hashCode();
       }
+      hash = (37 * hash) + IS_ARRAY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getIsArray());
       switch (inputValueCase_) {
         case 5:
           hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
@@ -4082,6 +4121,8 @@ public final class Event {
           reportedAt_ = null;
           reportedAtBuilder_ = null;
         }
+        isArray_ = false;
+
         inputValueCase_ = 0;
         inputValue_ = null;
         outputResultCase_ = 0;
@@ -4189,6 +4230,7 @@ public final class Event {
         } else {
           result.reportedAt_ = reportedAtBuilder_.build();
         }
+        result.isArray_ = isArray_;
         result.inputValueCase_ = inputValueCase_;
         result.outputResultCase_ = outputResultCase_;
         result.targetMetadataCase_ = targetMetadataCase_;
@@ -4286,6 +4328,9 @@ public final class Event {
         }
         if (other.hasReportedAt()) {
           mergeReportedAt(other.getReportedAt());
+        }
+        if (other.getIsArray() != false) {
+          setIsArray(other.getIsArray());
         }
         switch (other.getInputValueCase()) {
           case INPUT_URI: {
@@ -6782,6 +6827,44 @@ public final class Event {
           reportedAt_ = null;
         }
         return reportedAtBuilder_;
+      }
+
+      private boolean isArray_ ;
+      /**
+       * <pre>
+       * Indicates if this node is an ArrayNode.
+       * </pre>
+       *
+       * <code>bool is_array = 22;</code>
+       */
+      public boolean getIsArray() {
+        return isArray_;
+      }
+      /**
+       * <pre>
+       * Indicates if this node is an ArrayNode.
+       * </pre>
+       *
+       * <code>bool is_array = 22;</code>
+       */
+      public Builder setIsArray(boolean value) {
+        
+        isArray_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates if this node is an ArrayNode.
+       * </pre>
+       *
+       * <code>bool is_array = 22;</code>
+       */
+      public Builder clearIsArray() {
+        
+        isArray_ = false;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -21619,7 +21702,7 @@ public final class Event {
       "\noutput_uri\030\005 \001(\tH\000\022.\n\005error\030\006 \001(\0132\035.fly" +
       "teidl.core.ExecutionErrorH\000\0220\n\013output_da" +
       "ta\030\007 \001(\0132\031.flyteidl.core.LiteralMapH\000B\017\n" +
-      "\routput_result\"\217\007\n\022NodeExecutionEvent\0222\n" +
+      "\routput_result\"\241\007\n\022NodeExecutionEvent\0222\n" +
       "\002id\030\001 \001(\0132&.flyteidl.core.NodeExecutionI" +
       "dentifier\022\023\n\013producer_id\030\002 \001(\t\0221\n\005phase\030" +
       "\003 \001(\0162\".flyteidl.core.NodeExecution.Phas" +
@@ -21640,66 +21723,66 @@ public final class Event {
       "_id\030\014 \001(\t\022\021\n\tnode_name\030\r \001(\t\022\025\n\revent_ve" +
       "rsion\030\020 \001(\005\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dyn" +
       "amic\030\022 \001(\010\022\020\n\010deck_uri\030\023 \001(\t\022/\n\013reported" +
-      "_at\030\025 \001(\0132\032.google.protobuf.TimestampB\r\n" +
-      "\013input_valueB\017\n\routput_resultB\021\n\017target_" +
-      "metadata\"X\n\024WorkflowNodeMetadata\022@\n\014exec" +
-      "ution_id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
-      "xecutionIdentifier\"\245\002\n\020TaskNodeMetadata\022" +
-      "7\n\014cache_status\030\001 \001(\0162!.flyteidl.core.Ca" +
-      "talogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132\036." +
-      "flyteidl.core.CatalogMetadata\022D\n\022reserva" +
-      "tion_status\030\003 \001(\0162(.flyteidl.core.Catalo" +
-      "gReservation.Status\022\026\n\016checkpoint_uri\030\004 " +
-      "\001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.flyteidl" +
-      ".event.DynamicWorkflowNodeMetadata\"\245\001\n\033D" +
-      "ynamicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031" +
-      ".flyteidl.core.Identifier\022A\n\021compiled_wo" +
-      "rkflow\030\002 \001(\0132&.flyteidl.core.CompiledWor" +
-      "kflowClosure\022\034\n\024dynamic_job_spec_uri\030\003 \001" +
-      "(\t\"Q\n\033ParentTaskExecutionMetadata\0222\n\002id\030" +
-      "\001 \001(\0132&.flyteidl.core.TaskExecutionIdent" +
-      "ifier\".\n\033ParentNodeExecutionMetadata\022\017\n\007" +
-      "node_id\030\001 \001(\t\"N\n\013EventReason\022\016\n\006reason\030\001" +
-      " \001(\t\022/\n\013occurred_at\030\002 \001(\0132\032.google.proto" +
-      "buf.Timestamp\"\271\006\n\022TaskExecutionEvent\022*\n\007" +
-      "task_id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
-      "\022H\n\030parent_node_execution_id\030\002 \001(\0132&.fly" +
-      "teidl.core.NodeExecutionIdentifier\022\025\n\rre" +
-      "try_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyte" +
-      "idl.core.TaskExecution.Phase\022\023\n\013producer" +
-      "_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core." +
-      "TaskLog\022/\n\013occurred_at\030\007 \001(\0132\032.google.pr" +
-      "otobuf.Timestamp\022\023\n\tinput_uri\030\010 \001(\tH\000\022/\n" +
-      "\ninput_data\030\023 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapH\000\022\024\n\noutput_uri\030\t \001(\tH\001\022.\n\005error\030\n " +
-      "\001(\0132\035.flyteidl.core.ExecutionErrorH\001\0220\n\013" +
-      "output_data\030\021 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapH\001\022,\n\013custom_info\030\013 \001(\0132\027.google.pro" +
-      "tobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022\022\n\006r" +
-      "eason\030\r \001(\tB\002\030\001\022,\n\007reasons\030\025 \003(\0132\033.flyte" +
-      "idl.event.EventReason\022\021\n\ttask_type\030\016 \001(\t" +
-      "\0227\n\010metadata\030\020 \001(\0132%.flyteidl.event.Task" +
-      "ExecutionMetadata\022\025\n\revent_version\030\022 \001(\005" +
-      "\022/\n\013reported_at\030\024 \001(\0132\032.google.protobuf." +
-      "TimestampB\r\n\013input_valueB\017\n\routput_resul" +
-      "t\"\343\001\n\024ExternalResourceInfo\022\023\n\013external_i" +
-      "d\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretry_attempt\030" +
-      "\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl.core.Tas" +
-      "kExecution.Phase\0227\n\014cache_status\030\005 \001(\0162!" +
-      ".flyteidl.core.CatalogCacheStatus\022$\n\004log" +
-      "s\030\006 \003(\0132\026.flyteidl.core.TaskLog\"?\n\020Resou" +
-      "rcePoolInfo\022\030\n\020allocation_token\030\001 \001(\t\022\021\n" +
-      "\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecutionMetada" +
-      "ta\022\026\n\016generated_name\030\001 \001(\t\022@\n\022external_r" +
-      "esources\030\002 \003(\0132$.flyteidl.event.External" +
-      "ResourceInfo\022<\n\022resource_pool_info\030\003 \003(\013" +
-      "2 .flyteidl.event.ResourcePoolInfo\022\031\n\021pl" +
-      "ugin_identifier\030\004 \001(\t\022K\n\016instance_class\030" +
-      "\020 \001(\01623.flyteidl.event.TaskExecutionMeta" +
-      "data.InstanceClass\"/\n\rInstanceClass\022\013\n\007D" +
-      "EFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/e" +
-      "ventb\006proto3"
+      "_at\030\025 \001(\0132\032.google.protobuf.Timestamp\022\020\n" +
+      "\010is_array\030\026 \001(\010B\r\n\013input_valueB\017\n\routput" +
+      "_resultB\021\n\017target_metadata\"X\n\024WorkflowNo" +
+      "deMetadata\022@\n\014execution_id\030\001 \001(\0132*.flyte" +
+      "idl.core.WorkflowExecutionIdentifier\"\245\002\n" +
+      "\020TaskNodeMetadata\0227\n\014cache_status\030\001 \001(\0162" +
+      "!.flyteidl.core.CatalogCacheStatus\0223\n\013ca" +
+      "talog_key\030\002 \001(\0132\036.flyteidl.core.CatalogM" +
+      "etadata\022D\n\022reservation_status\030\003 \001(\0162(.fl" +
+      "yteidl.core.CatalogReservation.Status\022\026\n" +
+      "\016checkpoint_uri\030\004 \001(\t\022E\n\020dynamic_workflo" +
+      "w\030\020 \001(\0132+.flyteidl.event.DynamicWorkflow" +
+      "NodeMetadata\"\245\001\n\033DynamicWorkflowNodeMeta" +
+      "data\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
+      "ier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyteid" +
+      "l.core.CompiledWorkflowClosure\022\034\n\024dynami" +
+      "c_job_spec_uri\030\003 \001(\t\"Q\n\033ParentTaskExecut" +
+      "ionMetadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core." +
+      "TaskExecutionIdentifier\".\n\033ParentNodeExe" +
+      "cutionMetadata\022\017\n\007node_id\030\001 \001(\t\"N\n\013Event" +
+      "Reason\022\016\n\006reason\030\001 \001(\t\022/\n\013occurred_at\030\002 " +
+      "\001(\0132\032.google.protobuf.Timestamp\"\271\006\n\022Task" +
+      "ExecutionEvent\022*\n\007task_id\030\001 \001(\0132\031.flytei" +
+      "dl.core.Identifier\022H\n\030parent_node_execut" +
+      "ion_id\030\002 \001(\0132&.flyteidl.core.NodeExecuti" +
+      "onIdentifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005p" +
+      "hase\030\004 \001(\0162\".flyteidl.core.TaskExecution" +
+      ".Phase\022\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(" +
+      "\0132\026.flyteidl.core.TaskLog\022/\n\013occurred_at" +
+      "\030\007 \001(\0132\032.google.protobuf.Timestamp\022\023\n\tin" +
+      "put_uri\030\010 \001(\tH\000\022/\n\ninput_data\030\023 \001(\0132\031.fl" +
+      "yteidl.core.LiteralMapH\000\022\024\n\noutput_uri\030\t" +
+      " \001(\tH\001\022.\n\005error\030\n \001(\0132\035.flyteidl.core.Ex" +
+      "ecutionErrorH\001\0220\n\013output_data\030\021 \001(\0132\031.fl" +
+      "yteidl.core.LiteralMapH\001\022,\n\013custom_info\030" +
+      "\013 \001(\0132\027.google.protobuf.Struct\022\025\n\rphase_" +
+      "version\030\014 \001(\r\022\022\n\006reason\030\r \001(\tB\002\030\001\022,\n\007rea" +
+      "sons\030\025 \003(\0132\033.flyteidl.event.EventReason\022" +
+      "\021\n\ttask_type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132%.f" +
+      "lyteidl.event.TaskExecutionMetadata\022\025\n\re" +
+      "vent_version\030\022 \001(\005\022/\n\013reported_at\030\024 \001(\0132" +
+      "\032.google.protobuf.TimestampB\r\n\013input_val" +
+      "ueB\017\n\routput_result\"\343\001\n\024ExternalResource" +
+      "Info\022\023\n\013external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r" +
+      "\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\"" +
+      ".flyteidl.core.TaskExecution.Phase\0227\n\014ca" +
+      "che_status\030\005 \001(\0162!.flyteidl.core.Catalog" +
+      "CacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.cor" +
+      "e.TaskLog\"?\n\020ResourcePoolInfo\022\030\n\020allocat" +
+      "ion_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025T" +
+      "askExecutionMetadata\022\026\n\016generated_name\030\001" +
+      " \001(\t\022@\n\022external_resources\030\002 \003(\0132$.flyte" +
+      "idl.event.ExternalResourceInfo\022<\n\022resour" +
+      "ce_pool_info\030\003 \003(\0132 .flyteidl.event.Reso" +
+      "urcePoolInfo\022\031\n\021plugin_identifier\030\004 \001(\t\022" +
+      "K\n\016instance_class\030\020 \001(\01623.flyteidl.event" +
+      ".TaskExecutionMetadata.InstanceClass\"/\n\r" +
+      "InstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTI" +
+      "BLE\020\001B7Z5github.com/flyteorg/flyteidl/ge" +
+      "n/pb-go/flyteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21731,7 +21814,7 @@ public final class Event {
     internal_static_flyteidl_event_NodeExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_NodeExecutionEvent_descriptor,
-        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "InputValue", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "IsArray", "InputValue", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_event_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_event_WorkflowNodeMetadata_fieldAccessorTable = new

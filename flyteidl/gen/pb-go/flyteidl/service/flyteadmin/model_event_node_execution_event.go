@@ -44,4 +44,6 @@ type EventNodeExecutionEvent struct {
 	DeckUri string `json:"deck_uri,omitempty"`
 	// This timestamp represents the instant when the event was reported by the executing framework. For example, when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when literal inputs are initially copied. The event however will not be sent until after the copy completes. Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
 	ReportedAt time.Time `json:"reported_at,omitempty"`
+	// Indicates if this node is an ArrayNode.
+	IsArray bool `json:"is_array,omitempty"`
 }

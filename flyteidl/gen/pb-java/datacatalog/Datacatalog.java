@@ -13335,7 +13335,7 @@ public final class Datacatalog {
   }
   /**
    * <pre>
-   * Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+   * Try to acquire or extend an artifact reservation. If an active reservation exists, retrieve that instance.
    * </pre>
    *
    * Protobuf type {@code datacatalog.GetOrExtendReservationRequest}
@@ -13737,7 +13737,7 @@ public final class Datacatalog {
     }
     /**
      * <pre>
-     * Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+     * Try to acquire or extend an artifact reservation. If an active reservation exists, retrieve that instance.
      * </pre>
      *
      * Protobuf type {@code datacatalog.GetOrExtendReservationRequest}
