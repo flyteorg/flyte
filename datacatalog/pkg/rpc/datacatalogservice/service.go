@@ -22,7 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	catalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	catalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 type DataCatalogService struct {

@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
