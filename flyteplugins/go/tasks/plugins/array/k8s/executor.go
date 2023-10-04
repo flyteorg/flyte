@@ -94,8 +94,8 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 			// job configuration has then been validated and all of the metadata necessary to report subtask
 			// status (ie. cache hit / etc) is available.
 			externalResources, err = arrayCore.InitializeExternalResources(ctx, tCtx, nextState,
-				func(tCtx core.TaskExecutionContext, childIndex int) string {
-					subTaskExecutionID := NewSubTaskExecutionID(tCtx.TaskExecutionMetadata().GetTaskExecutionID(), childIndex, 0)
+				func(tCtx core.TaskExecutionContext, executionIndex, originalIndex int) string {
+					subTaskExecutionID := NewSubTaskExecutionID(tCtx.TaskExecutionMetadata().GetTaskExecutionID(), executionIndex, originalIndex, 0)
 					return subTaskExecutionID.GetGeneratedName()
 				},
 			)

@@ -48,7 +48,7 @@ func TestInitializeExternalResources(t *testing.T) {
 	}
 
 	externalResources, err := InitializeExternalResources(ctx, tCtx, &state,
-		func(_ core.TaskExecutionContext, i int) string {
+		func(_ core.TaskExecutionContext, i, j int) string {
 			return ""
 		},
 	)
