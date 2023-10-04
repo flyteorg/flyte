@@ -248,7 +248,7 @@ Control Plane configuration
 *********************************
 
 For ``flyteadmin`` to access and create Kubernetes resources in one or more
-Flyte data plane clusters , it needs credentials to each cluster.
+Flyte data plane clusters, it needs credentials to each cluster.
 Flyte makes use of Kubernetes Service Accounts to enable every control plane cluster to perform
 authenticated requests to the data plane Kubernetes API Server.
 The default behaviour is that the Helm chart creates a `ServiceAccount <https://github.com/flyteorg/flyte/blob/master/charts/flyte-core/templates/admin/rbac.yaml#L4>`_
@@ -284,7 +284,7 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
      name: cluster-credentials
      namespace: flyte
    type: Opaque
-   stringData:
+   data:
 
 .. note:: 
   The credentials have two parts (``CA cert`` and ``bearer token``). 
@@ -294,7 +294,7 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
 .. prompt:: bash $
 
   kubectl get secret -n flyte dataplane1-token \
-      -o jsonpath='{.data.token}' | base64 -D | pbcopy
+      -o jsonpath='{.data.token}' | pbcopy
 
 4. Go to ``secrets.yaml`` and add a new entry under ``stringData`` with the data plane cluster token:
 
@@ -307,17 +307,17 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
      name: cluster-credentials
      namespace: flyte
    type: Opaque
-   stringData:
-     dataplane_1_token: <dataplane1-token>
+   data:
+     dataplane_1_token: <your-dataplane1-token>
 
 5. Obtain the corresponding certificate:
 
 .. prompt:: bash $
 
   kubectl get secret -n flyte dataplane1-token \
-      -o jsonpath='{.data.ca\.crt}' | base64 -D | pbcopy
+      -o jsonpath='{.data.ca\.crt}' | pbcopy
 
-6. Add another entry on your ``secrets.yaml`` file for the cert, making sure that indentation resembles the following example:
+6. Add another entry on your ``secrets.yaml`` file for the certificate:
 
 .. code-block:: yaml
    :caption: secrets.yaml
@@ -328,12 +328,9 @@ attached to the Service Account. As of Kubernetes 1.24 and above, the bearer tok
      name: cluster-credentials
      namespace: flyte
    type: Opaque
-   stringData:
+   data:
      dataplane_1_token: <your-dataplane1-token>
-     dataplane_1_cacert:  |
-         -----BEGIN CERTIFICATE-----
-         <your-dataplane1-token-certificate>
-         -----END CERTIFICATE-----
+     dataplane_1_cacert: <your-dataplane1-token-certificate>
 
 7. Connect to your control plane cluster and create the ``cluster-credentials`` secret:
 
@@ -630,17 +627,11 @@ The process can be repeated for additional clusters.
            name: cluster-credentials
            namespace: flyte
          type: Opaque
-         stringData:
+         data:
            dataplane_1_token: <your-dataplane1-token>
-           dataplane_1_cacert:  |
-               -----BEGIN CERTIFICATE-----
-                <your-dataplane1-token-certificate>
-               -----END CERTIFICATE-----
+           dataplane_1_cacert: <your-dataplane1-token-certificate>
            dataplane_2_token: <your-dataplane2-token>
-           dataplane_2_cacert:  |
-               -----BEGIN CERTIFICATE-----
-                <your-dataplane2-token-certificate>
-                -----END CERTIFICATE-----
+           dataplane_2_cacert:  <your-dataplane2-token-certificate>
   
   12. Connect to the control plane cluster and update the ``cluster-credentials`` Secret:
 
