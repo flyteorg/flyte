@@ -328,6 +328,32 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreExtendedResources": {
+      "type": "object",
+      "properties": {
+        "gpu_accelerator": {
+          "$ref": "#/definitions/coreGPUAccelerator",
+          "description": "GPU accelerator to select for task. Contains information about device type, and\nfor multi-instance GPUs, the partition size to use."
+        }
+      },
+      "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
+    },
+    "coreGPUAccelerator": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "type": "string"
+        },
+        "unpartitioned": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "partition_size": {
+          "type": "string"
+        }
+      },
+      "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
+    },
     "coreIOStrategy": {
       "type": "object",
       "properties": {
@@ -950,6 +976,10 @@
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
+        },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Encapsulates all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
         },
         "config": {
           "type": "object",

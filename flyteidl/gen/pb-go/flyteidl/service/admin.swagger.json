@@ -4263,11 +4263,11 @@
         },
         "default_inputs": {
           "$ref": "#/definitions/coreParameterMap",
-          "description": "Input values to be passed for the execution.\nThese can be overriden when an execution is created with this launch plan."
+          "description": "Input values to be passed for the execution.\nThese can be overridden when an execution is created with this launch plan."
         },
         "fixed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overriden when an execution is created with this launch plan."
+          "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan."
         },
         "role": {
           "type": "string",
@@ -6026,6 +6026,32 @@
       },
       "description": "Represents the error message from the execution."
     },
+    "coreExtendedResources": {
+      "type": "object",
+      "properties": {
+        "gpu_accelerator": {
+          "$ref": "#/definitions/coreGPUAccelerator",
+          "description": "GPU accelerator to select for task. Contains information about device type, and\nfor multi-instance GPUs, the partition size to use."
+        }
+      },
+      "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
+    },
+    "coreGPUAccelerator": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "type": "string"
+        },
+        "unpartitioned": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "partition_size": {
+          "type": "string"
+        }
+      },
+      "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
+    },
     "coreGateNode": {
       "type": "object",
       "properties": {
@@ -7009,6 +7035,10 @@
         "resources": {
           "$ref": "#/definitions/coreResources",
           "description": "A customizable interface to convey resources requested for a task container."
+        },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Overrides for all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
         }
       },
       "description": "Optional task node overrides that will be applied at task execution time."
@@ -7053,6 +7083,10 @@
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
+        },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Encapsulates all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
         },
         "config": {
           "type": "object",

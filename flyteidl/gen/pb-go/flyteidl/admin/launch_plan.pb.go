@@ -310,10 +310,10 @@ type LaunchPlanSpec struct {
 	// Metadata for the Launch Plan
 	EntityMetadata *LaunchPlanMetadata `protobuf:"bytes,2,opt,name=entity_metadata,json=entityMetadata,proto3" json:"entity_metadata,omitempty"`
 	// Input values to be passed for the execution.
-	// These can be overriden when an execution is created with this launch plan.
+	// These can be overridden when an execution is created with this launch plan.
 	DefaultInputs *core.ParameterMap `protobuf:"bytes,3,opt,name=default_inputs,json=defaultInputs,proto3" json:"default_inputs,omitempty"`
 	// Fixed, non-overridable inputs for the Launch Plan.
-	// These can not be overriden when an execution is created with this launch plan.
+	// These can not be overridden when an execution is created with this launch plan.
 	FixedInputs *core.LiteralMap `protobuf:"bytes,4,opt,name=fixed_inputs,json=fixedInputs,proto3" json:"fixed_inputs,omitempty"`
 	// String to indicate the role to use to execute the workflow underneath
 	Role string `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"` // Deprecated: Do not use.
