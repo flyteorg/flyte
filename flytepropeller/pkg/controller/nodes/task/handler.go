@@ -6,6 +6,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	"k8s.io/client-go/kubernetes"
+
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
@@ -195,6 +197,7 @@ type Handler struct {
 	metrics         *metrics
 	pluginRegistry  PluginRegistryIface
 	kubeClient      pluginCore.KubeClient
+	kubeClientset   kubernetes.Interface
 	secretManager   pluginCore.SecretManager
 	resourceManager resourcemanager.BaseResourceManager
 	cfg             *config.Config
@@ -229,7 +232,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
-	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry)
+	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry, t.kubeClientset)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to finalize enabled plugins. Error: %s", err)
 		return err
@@ -533,13 +536,6 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	ts := nCtx.NodeStateReader().GetTaskNodeState()
 
 	pluginTrns := &pluginRequestedTransition{}
-	defer func() {
-		// increment parallelism if the final pluginTrns is not in a terminal state
-		if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
-			eCtx := nCtx.ExecutionContext()
-			logger.Infof(ctx, "Parallelism now set to [%d].", eCtx.IncrementParallelism())
-		}
-	}()
 
 	// We will start with the assumption that catalog is disabled
 	pluginTrns.PopulateCacheInfo(catalog.NewFailedCatalogEntry(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil)))
@@ -664,6 +660,10 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		return handler.UnknownTransition, err
 	}
 
+	// increment parallelism if the final pluginTrns is not in a terminal state
+	if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
+		logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+	}
 	return pluginTrns.FinalTransition(ctx)
 }
 
@@ -840,7 +840,8 @@ func (t Handler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionCont
 	}()
 }
 
-func New(ctx context.Context, kubeClient executors.Client, client catalog.Client, eventConfig *controllerConfig.EventConfig, clusterID string, scope promutils.Scope) (*Handler, error) {
+func New(ctx context.Context, kubeClient executors.Client, kubeClientset kubernetes.Interface, client catalog.Client,
+	eventConfig *controllerConfig.EventConfig, clusterID string, scope promutils.Scope) (*Handler, error) {
 	// TODO New should take a pointer
 	async, err := catalog.NewAsyncClient(client, *catalog.GetConfig(), scope.NewSubScope("async_catalog"))
 	if err != nil {
@@ -866,6 +867,7 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 		},
 		pluginScope:     scope.NewSubScope("plugin"),
 		kubeClient:      kubeClient,
+		kubeClientset:   kubeClientset,
 		catalog:         client,
 		asyncCatalog:    async,
 		resourceManager: nil,
