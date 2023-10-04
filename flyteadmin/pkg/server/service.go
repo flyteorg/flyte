@@ -130,6 +130,13 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	service.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
 
+	additionalService := plugins.Get[common.RegisterAdditionalGRPCService](pluginRegistry, plugins.PluginIDAdditionalGRPCService)
+	if additionalService != nil {
+		if err := additionalService(ctx, grpcServer); err != nil {
+			return nil, err
+		}
+	}
+
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus("flyteadmin", grpc_health_v1.HealthCheckResponse_SERVING)
 	grpc_health_v1.RegisterHealthServer(grpcServer, healthServer)
