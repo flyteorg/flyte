@@ -7,7 +7,6 @@ import (
 	"strconv"
 
 	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
@@ -29,8 +28,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/golang/protobuf/ptypes"
 )
 
 var (
@@ -98,14 +95,13 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 			if err != nil {
 				messageCollector.Collect(i, err.Error())
 			} else {
-				// TODO @hamersaw - eventRecorder.RecordNodeEvent?
-				/*externalResources = append(externalResources, &event.ExternalResourceInfo{
-					ExternalId:   buildSubNodeID(nCtx, i, 0),
-					Index:        uint32(i),
-					Logs:         nil,
-					RetryAttempt: 0,
-					Phase:        idlcore.TaskExecution_ABORTED,
-				})*/
+				// record events transitioning subNodes to aborted
+				retryAttempt := uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
+				if err := sendEvents(ctx, nCtx, i, retryAttempt, idlcore.NodeExecution_ABORTED, idlcore.TaskExecution_ABORTED, eventRecorder, a.eventConfig); err != nil {
+					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
+				}
+
+				eventRecorder.process(ctx, nCtx, i, retryAttempt)
 			}
 		}
 	}
@@ -114,7 +110,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength))
 	}
 
-	// update aborted state for subNodes
+	// update state for subNodes
 	if err := eventRecorder.finalize(ctx, nCtx, idlcore.TaskExecution_ABORTED, 0, a.eventConfig); err != nil {
 		logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 		return err
@@ -159,8 +155,6 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	if messageCollector.Length() > 0 {
 		return fmt.Errorf(messageCollector.Summary(events.MaxErrorMessageLength))
 	}
-
-	// TODO @hamersaw - call eventRecorder.finalize?1?!
 
 	return nil
 }
@@ -241,45 +235,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		// initialize subNode status by faking events
 		for i := 0; i < size; i++ {
-			subNodeID := buildSubNodeID(nCtx, i)
-			timestamp := ptypes.TimestampNow()
-			workflowExecutionID := nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier
-
-			// send NodeExecutionEvent with UNDEFINED phase
-			nodeExecutionEvent := &event.NodeExecutionEvent{
-				Id: &idlcore.NodeExecutionIdentifier{
-					NodeId:      subNodeID,
-					ExecutionId: workflowExecutionID,
-				},
-				Phase: idlcore.NodeExecution_QUEUED,
-				OccurredAt: timestamp,
-				ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
-					NodeId: nCtx.NodeID(),	
-				},
-				ReportedAt: timestamp,
-			}
-
-			if err := eventRecorder.RecordNodeEvent(ctx, nodeExecutionEvent, a.eventConfig); err != nil {
-				logger.Warnf(ctx, "failed to record ArrayNode node event: %v", err)
-			}
-
-			// send TaskExeucutionEvent with UNDEFINED phase
-			taskExecutionEvent := &event.TaskExecutionEvent{
-				TaskId: &idlcore.Identifier{
-					ResourceType: idlcore.ResourceType_TASK,
-					Project:      workflowExecutionID.Project,
-					Domain:       workflowExecutionID.Domain,
-					Name:         fmt.Sprintf("%s-%d", buildSubNodeID(nCtx, i), 0),
-					Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
-				},
-				ParentNodeExecutionId: nodeExecutionEvent.Id,
-				Phase: idlcore.TaskExecution_QUEUED,
-				OccurredAt: timestamp,
-				ReportedAt: timestamp,
-			}
-
-			if err := eventRecorder.RecordTaskEvent(ctx, taskExecutionEvent, a.eventConfig); err != nil {
-				logger.Warnf(ctx, "failed to record ArrayNode task event: %v", err)
+			if err := sendEvents(ctx, nCtx, i, 0, idlcore.NodeExecution_UNDEFINED, idlcore.TaskExecution_UNDEFINED, eventRecorder, a.eventConfig); err != nil {
+				logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 			}
 
 			eventRecorder.process(ctx, nCtx, i, 0)

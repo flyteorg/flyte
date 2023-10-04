@@ -158,3 +158,51 @@ func newArrayEventRecorder(eventRecorder interfaces.EventRecorder) arrayEventRec
 		EventRecorder: eventRecorder,
 	}
 }
+
+func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32, nodePhase idlcore.NodeExecution_Phase,
+	taskPhase idlcore.TaskExecution_Phase, eventRecorder interfaces.EventRecorder, eventConfig *config.EventConfig) error {
+
+	subNodeID := buildSubNodeID(nCtx, index)
+	timestamp := ptypes.TimestampNow()
+	workflowExecutionID := nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier
+
+	// send NodeExecutionEvent with UNDEFINED phase
+	nodeExecutionEvent := &event.NodeExecutionEvent{
+		Id: &idlcore.NodeExecutionIdentifier{
+			NodeId:      subNodeID,
+			ExecutionId: workflowExecutionID,
+		},
+		Phase: idlcore.NodeExecution_UNDEFINED,
+		OccurredAt: timestamp,
+		ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
+			NodeId: nCtx.NodeID(),	
+		},
+		ReportedAt: timestamp,
+	}
+
+	if err := eventRecorder.RecordNodeEvent(ctx, nodeExecutionEvent, eventConfig); err != nil {
+		return err
+	}
+
+	// send TaskExeucutionEvent with UNDEFINED phase
+	taskExecutionEvent := &event.TaskExecutionEvent{
+		TaskId: &idlcore.Identifier{
+			ResourceType: idlcore.ResourceType_TASK,
+			Project:      workflowExecutionID.Project,
+			Domain:       workflowExecutionID.Domain,
+			Name:         fmt.Sprintf("%s-%d", buildSubNodeID(nCtx, index), retryAttempt),
+			Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
+		},
+		ParentNodeExecutionId: nodeExecutionEvent.Id,
+		Phase:                 idlcore.TaskExecution_UNDEFINED,
+		TaskType:              "k8s-array",
+		OccurredAt:            timestamp,
+		ReportedAt:            timestamp,
+	}
+
+	if err := eventRecorder.RecordTaskEvent(ctx, taskExecutionEvent, eventConfig); err != nil {
+		return err
+	}
+
+	return nil
+}
