@@ -120,7 +120,7 @@ This file will be executed by the Spark driver node, overriding the default comm
   if __name__ == '__main__':
       main()
 
-Specify plugin configuration
+Specify agent configuration
 ----------------------------
 
 .. tabs::
@@ -131,9 +131,10 @@ Specify plugin configuration
       
       .. group-tab:: Demo cluster
 
-        Enable the Databricks plugin on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
+        Enable the Databricks agent on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
 
         .. code-block:: yaml
+          :emphasize-lines: 7,12
 
           tasks:
             task-plugins:
@@ -141,12 +142,12 @@ Specify plugin configuration
                 container: container
                 container_array: k8s-array
                 sidecar: sidecar
-                spark: databricks
+                spark: agent-service
               enabled-plugins:
                 - container
                 - sidecar
                 - k8s-array
-                - databricks
+                - agent-service
           plugins:
             databricks:
               entrypointFile: dbfs:///FileStore/tables/entrypoint.py
@@ -198,11 +199,11 @@ Specify plugin configuration
                 - container
                 - sidecar
                 - k8s-array
-                - databricks
+                - agent-service
               default-for-task-types:
                 - container: container
                 - container_array: k8s-array
-                - spark: databricks
+                - spark: agent-service
         
         .. code-block:: yaml
           :emphasize-lines: 3-5
@@ -230,12 +231,12 @@ Specify plugin configuration
                 - container
                 - sidecar
                 - k8s-array
-                - databricks
+                - agent-service
               default-for-task-types:
                 container: container
                 sidecar: sidecar
                 container_array: k8s-array
-                spark: databricks
+                spark: agent-service
       databricks:
         enabled: True
         plugin_config:
@@ -249,92 +250,50 @@ Specify plugin configuration
 Add the Databricks access token
 -------------------------------
 
-Add the Databricks access token to FlytePropeller:
+You have to set the Databricks token to the Flyte configuration.
 
-.. tabs::
+1. Install flyteagent pod using helm
+  
+    .. code-block:: bash
+      
+      cd flyte/charts/flyteagent
 
-  .. group-tab:: Flyte binary
+      helm install flyteagent . -n flyte
+  
 
-    .. tabs::
-
-      .. group-tab:: Demo cluster
-
-        Add the access token as an environment variable to the ``flyte-sandbox`` deployment.
-
-        .. code-block:: bash
-
-          kubectl edit deploy flyte-sandbox -n flyte
-
-        Update the ``env`` configuration:
-
-        .. code-block:: yaml
-          :emphasize-lines: 12-13
-
-          env:
-          - name: POD_NAME
-            valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.name
-          - name: POD_NAMESPACE
-            valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: metadata.namespace
-          - name: FLYTE_SECRET_FLYTE_DATABRICKS_API_TOKEN
-            value: <ACCESS_TOKEN>
-          image: flyte-binary:sandbox
-          ...
-
-      .. group-tab:: Helm chart
-
-        Create an external secret as follows:
-
-        .. code-block:: bash
-
-          cat <<EOF | kubectl apply -f -
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: flyte-binary-client-secrets-external-secret
-            namespace: flyte
-          type: Opaque
-          stringData:
-            FLYTE_DATABRICKS_API_TOKEN: <ACCESS_TOKEN>
-          EOF
-        
-        Reference the newly created secret in 
-        ``.Values.configuration.auth.clientSecretsExternalSecretRef``
-        in your YAML file as follows:
-
-        .. code-block:: yaml
-          :emphasize-lines: 3
-
-          configuration:
-            auth:
-              clientSecretsExternalSecretRef: flyte-binary-client-secrets-external-secret 
-    
-    Replace ``<ACCESS_TOKEN>`` with your access token.
-
-  .. group-tab:: Flyte core
-
-    Add the access token as a secret to ``flyte-secret-auth``.
+2. Get the base64 value of your Databricks token.
 
     .. code-block:: bash
+  
+      echo -n "<DATABRICKS_TOKEN>" | base64
 
-      kubectl edit secret -n flyte flyte-secret-auth
+3. Edit the flyteagent secret
+  
+      .. code-block:: bash
+    
+        kubectl edit secret flyteagent -n flyte
+    
+      .. code-block:: yaml
+        :emphasize-lines: 3
 
-    .. code-block:: yaml
-      :emphasize-lines: 3
+        apiVersion: v1
+        data:
+          flyte_databricks_access_token: <BASE64_ENCODED_DATABRICKS_TOKEN>
+          username: User
+        kind: Secret
+        metadata:
+          annotations:
+            meta.helm.sh/release-name: flyteagent
+            meta.helm.sh/release-namespace: flyte
+          creationTimestamp: "2023-10-04T04:09:03Z"
+          labels:
+            app.kubernetes.io/managed-by: Helm
+          name: flyteagent
+          namespace: flyte
+          resourceVersion: "753"
+          uid: 5ac1e1b6-2a4c-4e26-9001-d4ba72c39e54
+        type: Opaque
 
-      apiVersion: v1
-      data:
-        FLYTE_DATABRICKS_API_TOKEN: <ACCESS_TOKEN>
-        client_secret: Zm9vYmFy
-      kind: Secret
-      ...
-
-    Replace ``<ACCESS_TOKEN>`` with your access token.
 
 Upgrade the deployment
 ----------------------
@@ -381,43 +340,3 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
   Make sure you enable `custom containers 
   <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__
   on your Databricks cluster before you trigger the workflow.
-
-Databricks Agent Service configuration
---------------------------------------
-
-You can use Spark via the Databricks Agent Service.
-
-To do so, follow these steps:
-
-1. Configure the Databricks Agent Service.
-2. Create a secret with the group "databricks" and the key "access_token".
-
-.. code-block::
-
-  kubectl create secret generic databricks --namespace=flyte --from-literal=access_token=your_databricks_access_token
-
-3. Mount the secret to the Flyte agent deployment
-    
-   For more details, you can refer to
-   `here <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/use_secrets.html#secrets>`__.
-
-
-.. code-block:: yaml
-
-  tasks:
-    task-plugins:
-      enabled-plugins:
-        - agent-service
-      default-for-task-types:
-        - spark: agent-service
-  plugins:
-    agent-service:
-      supportedTaskTypes:
-        - spark
-      # By default, all the request will be sent to the default agent.
-      defaultAgent:
-        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
-        insecure: true
-        timeouts:
-          GetTask: 100s
-        defaultTimeout: 100s
