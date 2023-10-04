@@ -235,7 +235,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 		// initialize subNode status by faking events
 		for i := 0; i < size; i++ {
-			if err := sendEvents(ctx, nCtx, i, 0, idlcore.NodeExecution_UNDEFINED, idlcore.TaskExecution_UNDEFINED, eventRecorder, a.eventConfig); err != nil {
+			if err := sendEvents(ctx, nCtx, i, 0, idlcore.NodeExecution_QUEUED, idlcore.TaskExecution_UNDEFINED, eventRecorder, a.eventConfig); err != nil {
 				logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 			}
 

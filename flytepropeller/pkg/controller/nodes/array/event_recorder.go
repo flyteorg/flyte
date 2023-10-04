@@ -172,7 +172,7 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 			NodeId:      subNodeID,
 			ExecutionId: workflowExecutionID,
 		},
-		Phase: idlcore.NodeExecution_UNDEFINED,
+		Phase: nodePhase,
 		OccurredAt: timestamp,
 		ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
 			NodeId: nCtx.NodeID(),	
@@ -194,7 +194,7 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 			Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
 		},
 		ParentNodeExecutionId: nodeExecutionEvent.Id,
-		Phase:                 idlcore.TaskExecution_UNDEFINED,
+		Phase:                 taskPhase,
 		TaskType:              "k8s-array",
 		OccurredAt:            timestamp,
 		ReportedAt:            timestamp,
