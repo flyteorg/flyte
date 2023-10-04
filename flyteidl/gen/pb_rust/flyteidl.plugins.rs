@@ -290,7 +290,7 @@ pub struct SparkJob {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedTensorflowTrainingTask {
-    /// number of worker, ps, chief replicas spawned in the cluster for this job
+    /// number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
     #[prost(int32, tag="1")]
     pub workers: i32,
     /// PS -> Parameter server
@@ -298,6 +298,8 @@ pub struct DistributedTensorflowTrainingTask {
     pub ps_replicas: i32,
     #[prost(int32, tag="3")]
     pub chief_replicas: i32,
+    #[prost(int32, tag="4")]
+    pub evaluator_replicas: i32,
 }
 /// Represents an Execution that was launched and could be waited on.
 #[allow(clippy::derive_partial_eq_without_eq)]
