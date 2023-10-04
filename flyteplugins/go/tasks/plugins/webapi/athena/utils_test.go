@@ -12,11 +12,11 @@ import (
 	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 
 	"github.com/stretchr/testify/assert"
 

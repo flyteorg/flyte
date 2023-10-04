@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/go-test/deep"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 

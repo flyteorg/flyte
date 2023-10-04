@@ -3,8 +3,8 @@ package io
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 //go:generate mockery -all -case=underscore

@@ -7,8 +7,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // This event writer acts to asynchronously persist node execution events. As flytepropeller sends node

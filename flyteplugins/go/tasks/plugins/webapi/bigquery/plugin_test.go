@@ -16,9 +16,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"k8s.io/apimachinery/pkg/util/rand"
 
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/api/googleapi"

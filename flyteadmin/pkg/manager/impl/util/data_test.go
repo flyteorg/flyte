@@ -6,9 +6,9 @@ import (
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	urlMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"

@@ -6,9 +6,9 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

@@ -18,9 +18,9 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"

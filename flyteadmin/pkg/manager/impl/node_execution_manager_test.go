@@ -19,10 +19,10 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"

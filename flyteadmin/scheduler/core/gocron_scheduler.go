@@ -10,9 +10,9 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/snapshoter"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/robfig/cron/v3"

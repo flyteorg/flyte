@@ -35,13 +35,13 @@ import (
 	runtime2 "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 var defaultCorsHeaders = []string{"Content-Type"}

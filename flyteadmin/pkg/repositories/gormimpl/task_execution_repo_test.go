@@ -6,8 +6,8 @@ import (
 	"time"
 
 	mocket "github.com/Selvatico/go-mocket"
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"

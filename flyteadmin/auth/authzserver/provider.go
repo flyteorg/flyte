@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 

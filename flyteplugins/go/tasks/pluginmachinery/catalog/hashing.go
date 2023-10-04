@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 
-	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 )
 
 var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
