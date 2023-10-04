@@ -18,10 +18,13 @@ message DistributedTensorflowTrainingTask {
   // Chief replicas spec
   DistributedTensorflowTrainingReplicaSpec chief_replicas = 3;
 
+  // Evaluator replicas spec
+  DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;
+
   // RunPolicy encapsulates various runtime policies of the distributed training
   // job, for example how to clean up resources and how long the job can stay
   // active.
-  RunPolicy run_policy = 4;
+  RunPolicy run_policy = 5;
 }
 
 message DistributedTensorflowTrainingReplicaSpec {

@@ -21,7 +21,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-// SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+// SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
 // See :ref:`ref_flyteidl.admin.Signal` for more details
 type SignalGetOrCreateRequest struct {
 	// A unique identifier for the requested signal.

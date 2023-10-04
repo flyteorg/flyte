@@ -95,12 +95,37 @@ public final class Tensorflow {
 
     /**
      * <pre>
+     * Evaluator replicas spec
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+     */
+    boolean hasEvaluatorReplicas();
+    /**
+     * <pre>
+     * Evaluator replicas spec
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+     */
+    flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec getEvaluatorReplicas();
+    /**
+     * <pre>
+     * Evaluator replicas spec
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+     */
+    flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpecOrBuilder getEvaluatorReplicasOrBuilder();
+
+    /**
+     * <pre>
      * RunPolicy encapsulates various runtime policies of the distributed training
      * job, for example how to clean up resources and how long the job can stay
      * active.
      * </pre>
      *
-     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
      */
     boolean hasRunPolicy();
     /**
@@ -110,7 +135,7 @@ public final class Tensorflow {
      * active.
      * </pre>
      *
-     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
      */
     flyteidl.plugins.kubeflow.Common.RunPolicy getRunPolicy();
     /**
@@ -120,7 +145,7 @@ public final class Tensorflow {
      * active.
      * </pre>
      *
-     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
      */
     flyteidl.plugins.kubeflow.Common.RunPolicyOrBuilder getRunPolicyOrBuilder();
   }
@@ -207,6 +232,19 @@ public final class Tensorflow {
               break;
             }
             case 34: {
+              flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.Builder subBuilder = null;
+              if (evaluatorReplicas_ != null) {
+                subBuilder = evaluatorReplicas_.toBuilder();
+              }
+              evaluatorReplicas_ = input.readMessage(flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(evaluatorReplicas_);
+                evaluatorReplicas_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
               flyteidl.plugins.kubeflow.Common.RunPolicy.Builder subBuilder = null;
               if (runPolicy_ != null) {
                 subBuilder = runPolicy_.toBuilder();
@@ -350,7 +388,40 @@ public final class Tensorflow {
       return getChiefReplicas();
     }
 
-    public static final int RUN_POLICY_FIELD_NUMBER = 4;
+    public static final int EVALUATOR_REPLICAS_FIELD_NUMBER = 4;
+    private flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec evaluatorReplicas_;
+    /**
+     * <pre>
+     * Evaluator replicas spec
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+     */
+    public boolean hasEvaluatorReplicas() {
+      return evaluatorReplicas_ != null;
+    }
+    /**
+     * <pre>
+     * Evaluator replicas spec
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+     */
+    public flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec getEvaluatorReplicas() {
+      return evaluatorReplicas_ == null ? flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.getDefaultInstance() : evaluatorReplicas_;
+    }
+    /**
+     * <pre>
+     * Evaluator replicas spec
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+     */
+    public flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpecOrBuilder getEvaluatorReplicasOrBuilder() {
+      return getEvaluatorReplicas();
+    }
+
+    public static final int RUN_POLICY_FIELD_NUMBER = 5;
     private flyteidl.plugins.kubeflow.Common.RunPolicy runPolicy_;
     /**
      * <pre>
@@ -359,7 +430,7 @@ public final class Tensorflow {
      * active.
      * </pre>
      *
-     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
      */
     public boolean hasRunPolicy() {
       return runPolicy_ != null;
@@ -371,7 +442,7 @@ public final class Tensorflow {
      * active.
      * </pre>
      *
-     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
      */
     public flyteidl.plugins.kubeflow.Common.RunPolicy getRunPolicy() {
       return runPolicy_ == null ? flyteidl.plugins.kubeflow.Common.RunPolicy.getDefaultInstance() : runPolicy_;
@@ -383,7 +454,7 @@ public final class Tensorflow {
      * active.
      * </pre>
      *
-     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+     * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
      */
     public flyteidl.plugins.kubeflow.Common.RunPolicyOrBuilder getRunPolicyOrBuilder() {
       return getRunPolicy();
@@ -412,8 +483,11 @@ public final class Tensorflow {
       if (chiefReplicas_ != null) {
         output.writeMessage(3, getChiefReplicas());
       }
+      if (evaluatorReplicas_ != null) {
+        output.writeMessage(4, getEvaluatorReplicas());
+      }
       if (runPolicy_ != null) {
-        output.writeMessage(4, getRunPolicy());
+        output.writeMessage(5, getRunPolicy());
       }
       unknownFields.writeTo(output);
     }
@@ -436,9 +510,13 @@ public final class Tensorflow {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getChiefReplicas());
       }
+      if (evaluatorReplicas_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getEvaluatorReplicas());
+      }
       if (runPolicy_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getRunPolicy());
+          .computeMessageSize(5, getRunPolicy());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -470,6 +548,11 @@ public final class Tensorflow {
         if (!getChiefReplicas()
             .equals(other.getChiefReplicas())) return false;
       }
+      if (hasEvaluatorReplicas() != other.hasEvaluatorReplicas()) return false;
+      if (hasEvaluatorReplicas()) {
+        if (!getEvaluatorReplicas()
+            .equals(other.getEvaluatorReplicas())) return false;
+      }
       if (hasRunPolicy() != other.hasRunPolicy()) return false;
       if (hasRunPolicy()) {
         if (!getRunPolicy()
@@ -497,6 +580,10 @@ public final class Tensorflow {
       if (hasChiefReplicas()) {
         hash = (37 * hash) + CHIEF_REPLICAS_FIELD_NUMBER;
         hash = (53 * hash) + getChiefReplicas().hashCode();
+      }
+      if (hasEvaluatorReplicas()) {
+        hash = (37 * hash) + EVALUATOR_REPLICAS_FIELD_NUMBER;
+        hash = (53 * hash) + getEvaluatorReplicas().hashCode();
       }
       if (hasRunPolicy()) {
         hash = (37 * hash) + RUN_POLICY_FIELD_NUMBER;
@@ -657,6 +744,12 @@ public final class Tensorflow {
           chiefReplicas_ = null;
           chiefReplicasBuilder_ = null;
         }
+        if (evaluatorReplicasBuilder_ == null) {
+          evaluatorReplicas_ = null;
+        } else {
+          evaluatorReplicas_ = null;
+          evaluatorReplicasBuilder_ = null;
+        }
         if (runPolicyBuilder_ == null) {
           runPolicy_ = null;
         } else {
@@ -703,6 +796,11 @@ public final class Tensorflow {
           result.chiefReplicas_ = chiefReplicas_;
         } else {
           result.chiefReplicas_ = chiefReplicasBuilder_.build();
+        }
+        if (evaluatorReplicasBuilder_ == null) {
+          result.evaluatorReplicas_ = evaluatorReplicas_;
+        } else {
+          result.evaluatorReplicas_ = evaluatorReplicasBuilder_.build();
         }
         if (runPolicyBuilder_ == null) {
           result.runPolicy_ = runPolicy_;
@@ -765,6 +863,9 @@ public final class Tensorflow {
         }
         if (other.hasChiefReplicas()) {
           mergeChiefReplicas(other.getChiefReplicas());
+        }
+        if (other.hasEvaluatorReplicas()) {
+          mergeEvaluatorReplicas(other.getEvaluatorReplicas());
         }
         if (other.hasRunPolicy()) {
           mergeRunPolicy(other.getRunPolicy());
@@ -1257,6 +1358,159 @@ public final class Tensorflow {
         return chiefReplicasBuilder_;
       }
 
+      private flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec evaluatorReplicas_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec, flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.Builder, flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpecOrBuilder> evaluatorReplicasBuilder_;
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public boolean hasEvaluatorReplicas() {
+        return evaluatorReplicasBuilder_ != null || evaluatorReplicas_ != null;
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec getEvaluatorReplicas() {
+        if (evaluatorReplicasBuilder_ == null) {
+          return evaluatorReplicas_ == null ? flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.getDefaultInstance() : evaluatorReplicas_;
+        } else {
+          return evaluatorReplicasBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public Builder setEvaluatorReplicas(flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec value) {
+        if (evaluatorReplicasBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          evaluatorReplicas_ = value;
+          onChanged();
+        } else {
+          evaluatorReplicasBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public Builder setEvaluatorReplicas(
+          flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.Builder builderForValue) {
+        if (evaluatorReplicasBuilder_ == null) {
+          evaluatorReplicas_ = builderForValue.build();
+          onChanged();
+        } else {
+          evaluatorReplicasBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public Builder mergeEvaluatorReplicas(flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec value) {
+        if (evaluatorReplicasBuilder_ == null) {
+          if (evaluatorReplicas_ != null) {
+            evaluatorReplicas_ =
+              flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.newBuilder(evaluatorReplicas_).mergeFrom(value).buildPartial();
+          } else {
+            evaluatorReplicas_ = value;
+          }
+          onChanged();
+        } else {
+          evaluatorReplicasBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public Builder clearEvaluatorReplicas() {
+        if (evaluatorReplicasBuilder_ == null) {
+          evaluatorReplicas_ = null;
+          onChanged();
+        } else {
+          evaluatorReplicas_ = null;
+          evaluatorReplicasBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.Builder getEvaluatorReplicasBuilder() {
+        
+        onChanged();
+        return getEvaluatorReplicasFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      public flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpecOrBuilder getEvaluatorReplicasOrBuilder() {
+        if (evaluatorReplicasBuilder_ != null) {
+          return evaluatorReplicasBuilder_.getMessageOrBuilder();
+        } else {
+          return evaluatorReplicas_ == null ?
+              flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.getDefaultInstance() : evaluatorReplicas_;
+        }
+      }
+      /**
+       * <pre>
+       * Evaluator replicas spec
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec, flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.Builder, flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpecOrBuilder> 
+          getEvaluatorReplicasFieldBuilder() {
+        if (evaluatorReplicasBuilder_ == null) {
+          evaluatorReplicasBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec, flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.Builder, flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpecOrBuilder>(
+                  getEvaluatorReplicas(),
+                  getParentForChildren(),
+                  isClean());
+          evaluatorReplicas_ = null;
+        }
+        return evaluatorReplicasBuilder_;
+      }
+
       private flyteidl.plugins.kubeflow.Common.RunPolicy runPolicy_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.plugins.kubeflow.Common.RunPolicy, flyteidl.plugins.kubeflow.Common.RunPolicy.Builder, flyteidl.plugins.kubeflow.Common.RunPolicyOrBuilder> runPolicyBuilder_;
@@ -1267,7 +1521,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public boolean hasRunPolicy() {
         return runPolicyBuilder_ != null || runPolicy_ != null;
@@ -1279,7 +1533,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public flyteidl.plugins.kubeflow.Common.RunPolicy getRunPolicy() {
         if (runPolicyBuilder_ == null) {
@@ -1295,7 +1549,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public Builder setRunPolicy(flyteidl.plugins.kubeflow.Common.RunPolicy value) {
         if (runPolicyBuilder_ == null) {
@@ -1317,7 +1571,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public Builder setRunPolicy(
           flyteidl.plugins.kubeflow.Common.RunPolicy.Builder builderForValue) {
@@ -1337,7 +1591,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public Builder mergeRunPolicy(flyteidl.plugins.kubeflow.Common.RunPolicy value) {
         if (runPolicyBuilder_ == null) {
@@ -1361,7 +1615,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public Builder clearRunPolicy() {
         if (runPolicyBuilder_ == null) {
@@ -1381,7 +1635,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public flyteidl.plugins.kubeflow.Common.RunPolicy.Builder getRunPolicyBuilder() {
         
@@ -1395,7 +1649,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       public flyteidl.plugins.kubeflow.Common.RunPolicyOrBuilder getRunPolicyOrBuilder() {
         if (runPolicyBuilder_ != null) {
@@ -1412,7 +1666,7 @@ public final class Tensorflow {
        * active.
        * </pre>
        *
-       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;</code>
+       * <code>.flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.plugins.kubeflow.Common.RunPolicy, flyteidl.plugins.kubeflow.Common.RunPolicy.Builder, flyteidl.plugins.kubeflow.Common.RunPolicyOrBuilder> 
@@ -2553,7 +2807,7 @@ public final class Tensorflow {
       "\n*flyteidl/plugins/kubeflow/tensorflow.p" +
       "roto\022\031flyteidl.plugins.kubeflow\032\031flyteid" +
       "l/core/tasks.proto\032&flyteidl/plugins/kub" +
-      "eflow/common.proto\"\362\002\n!DistributedTensor" +
+      "eflow/common.proto\"\323\003\n!DistributedTensor" +
       "flowTrainingTask\022\\\n\017worker_replicas\030\001 \001(" +
       "\0132C.flyteidl.plugins.kubeflow.Distribute" +
       "dTensorflowTrainingReplicaSpec\022X\n\013ps_rep" +
@@ -2561,15 +2815,17 @@ public final class Tensorflow {
       "DistributedTensorflowTrainingReplicaSpec" +
       "\022[\n\016chief_replicas\030\003 \001(\0132C.flyteidl.plug" +
       "ins.kubeflow.DistributedTensorflowTraini" +
-      "ngReplicaSpec\0228\n\nrun_policy\030\004 \001(\0132$.flyt" +
-      "eidl.plugins.kubeflow.RunPolicy\"\272\001\n(Dist" +
-      "ributedTensorflowTrainingReplicaSpec\022\020\n\010" +
-      "replicas\030\001 \001(\005\022\r\n\005image\030\002 \001(\t\022+\n\tresourc" +
-      "es\030\003 \001(\0132\030.flyteidl.core.Resources\022@\n\016re" +
-      "start_policy\030\004 \001(\0162(.flyteidl.plugins.ku" +
-      "beflow.RestartPolicyB9Z7github.com/flyte" +
-      "org/flyteidl/gen/pb-go/flyteidl/pluginsb" +
-      "\006proto3"
+      "ngReplicaSpec\022_\n\022evaluator_replicas\030\004 \001(" +
+      "\0132C.flyteidl.plugins.kubeflow.Distribute" +
+      "dTensorflowTrainingReplicaSpec\0228\n\nrun_po" +
+      "licy\030\005 \001(\0132$.flyteidl.plugins.kubeflow.R" +
+      "unPolicy\"\272\001\n(DistributedTensorflowTraini" +
+      "ngReplicaSpec\022\020\n\010replicas\030\001 \001(\005\022\r\n\005image" +
+      "\030\002 \001(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.cor" +
+      "e.Resources\022@\n\016restart_policy\030\004 \001(\0162(.fl" +
+      "yteidl.plugins.kubeflow.RestartPolicyB9Z" +
+      "7github.com/flyteorg/flyteidl/gen/pb-go/" +
+      "flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2590,7 +2846,7 @@ public final class Tensorflow {
     internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingTask_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingTask_descriptor,
-        new java.lang.String[] { "WorkerReplicas", "PsReplicas", "ChiefReplicas", "RunPolicy", });
+        new java.lang.String[] { "WorkerReplicas", "PsReplicas", "ChiefReplicas", "EvaluatorReplicas", "RunPolicy", });
     internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_fieldAccessorTable = new

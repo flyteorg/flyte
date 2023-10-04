@@ -70,7 +70,7 @@ public final class SignalOuterClass {
   }
   /**
    * <pre>
-   * SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+   * SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
    * See :ref:`ref_flyteidl.admin.Signal` for more details
    * </pre>
    *
@@ -414,7 +414,7 @@ public final class SignalOuterClass {
     }
     /**
      * <pre>
-     * SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+     * SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
      * See :ref:`ref_flyteidl.admin.Signal` for more details
      * </pre>
      *

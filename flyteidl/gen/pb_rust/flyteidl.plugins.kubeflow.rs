@@ -177,10 +177,13 @@ pub struct DistributedTensorflowTrainingTask {
     /// Chief replicas spec
     #[prost(message, optional, tag="3")]
     pub chief_replicas: ::core::option::Option<DistributedTensorflowTrainingReplicaSpec>,
+    /// Evaluator replicas spec
+    #[prost(message, optional, tag="4")]
+    pub evaluator_replicas: ::core::option::Option<DistributedTensorflowTrainingReplicaSpec>,
     /// RunPolicy encapsulates various runtime policies of the distributed training
     /// job, for example how to clean up resources and how long the job can stay
     /// active.
-    #[prost(message, optional, tag="4")]
+    #[prost(message, optional, tag="5")]
     pub run_policy: ::core::option::Option<RunPolicy>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -196,10 +196,19 @@ class DistributedTensorflowTrainingTask final :
   ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* mutable_chief_replicas();
   void set_allocated_chief_replicas(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* chief_replicas);
 
-  // .flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;
+  // .flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;
+  bool has_evaluator_replicas() const;
+  void clear_evaluator_replicas();
+  static const int kEvaluatorReplicasFieldNumber = 4;
+  const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec& evaluator_replicas() const;
+  ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* release_evaluator_replicas();
+  ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* mutable_evaluator_replicas();
+  void set_allocated_evaluator_replicas(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* evaluator_replicas);
+
+  // .flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;
   bool has_run_policy() const;
   void clear_run_policy();
-  static const int kRunPolicyFieldNumber = 4;
+  static const int kRunPolicyFieldNumber = 5;
   const ::flyteidl::plugins::kubeflow::RunPolicy& run_policy() const;
   ::flyteidl::plugins::kubeflow::RunPolicy* release_run_policy();
   ::flyteidl::plugins::kubeflow::RunPolicy* mutable_run_policy();
@@ -213,6 +222,7 @@ class DistributedTensorflowTrainingTask final :
   ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* worker_replicas_;
   ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* ps_replicas_;
   ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* chief_replicas_;
+  ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* evaluator_replicas_;
   ::flyteidl::plugins::kubeflow::RunPolicy* run_policy_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto;
@@ -525,7 +535,58 @@ inline void DistributedTensorflowTrainingTask::set_allocated_chief_replicas(::fl
   // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.kubeflow.DistributedTensorflowTrainingTask.chief_replicas)
 }
 
-// .flyteidl.plugins.kubeflow.RunPolicy run_policy = 4;
+// .flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 4;
+inline bool DistributedTensorflowTrainingTask::has_evaluator_replicas() const {
+  return this != internal_default_instance() && evaluator_replicas_ != nullptr;
+}
+inline void DistributedTensorflowTrainingTask::clear_evaluator_replicas() {
+  if (GetArenaNoVirtual() == nullptr && evaluator_replicas_ != nullptr) {
+    delete evaluator_replicas_;
+  }
+  evaluator_replicas_ = nullptr;
+}
+inline const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec& DistributedTensorflowTrainingTask::evaluator_replicas() const {
+  const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* p = evaluator_replicas_;
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.kubeflow.DistributedTensorflowTrainingTask.evaluator_replicas)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec*>(
+      &::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingReplicaSpec_default_instance_);
+}
+inline ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* DistributedTensorflowTrainingTask::release_evaluator_replicas() {
+  // @@protoc_insertion_point(field_release:flyteidl.plugins.kubeflow.DistributedTensorflowTrainingTask.evaluator_replicas)
+  
+  ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* temp = evaluator_replicas_;
+  evaluator_replicas_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* DistributedTensorflowTrainingTask::mutable_evaluator_replicas() {
+  
+  if (evaluator_replicas_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec>(GetArenaNoVirtual());
+    evaluator_replicas_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.plugins.kubeflow.DistributedTensorflowTrainingTask.evaluator_replicas)
+  return evaluator_replicas_;
+}
+inline void DistributedTensorflowTrainingTask::set_allocated_evaluator_replicas(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* evaluator_replicas) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete evaluator_replicas_;
+  }
+  if (evaluator_replicas) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      evaluator_replicas = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, evaluator_replicas, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  evaluator_replicas_ = evaluator_replicas;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.kubeflow.DistributedTensorflowTrainingTask.evaluator_replicas)
+}
+
+// .flyteidl.plugins.kubeflow.RunPolicy run_policy = 5;
 inline bool DistributedTensorflowTrainingTask::has_run_policy() const {
   return this != internal_default_instance() && run_policy_ != nullptr;
 }

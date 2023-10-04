@@ -74,6 +74,16 @@ func (m *DistributedTensorflowTrainingTask) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetEvaluatorReplicas()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DistributedTensorflowTrainingTaskValidationError{
+				field:  "EvaluatorReplicas",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetRunPolicy()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return DistributedTensorflowTrainingTaskValidationError{
