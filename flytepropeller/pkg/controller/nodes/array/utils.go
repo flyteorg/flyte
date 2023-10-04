@@ -5,13 +5,13 @@ import (
 	"context"
 	"fmt"
 
-	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/codex"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func appendLiteral(name string, literal *idlcore.Literal, outputLiterals map[string]*idlcore.Literal, length int) {

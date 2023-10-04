@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	idlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/ptypes"
 )
 
@@ -22,10 +22,10 @@ type arrayEventRecorder interface {
 }
 
 type externalResourcesEventRecorder struct {
-    interfaces.EventRecorder
+	interfaces.EventRecorder
 	externalResources []*event.ExternalResourceInfo
-    nodeEvents        []*event.NodeExecutionEvent
-    taskEvents        []*event.TaskExecutionEvent
+	nodeEvents        []*event.NodeExecutionEvent
+	taskEvents        []*event.TaskExecutionEvent
 }
 
 func (e *externalResourcesEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
@@ -136,7 +136,8 @@ type passThroughEventRecorder struct {
 	interfaces.EventRecorder
 }
 
-func (*passThroughEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) {}
+func (*passThroughEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) {
+}
 
 func (*passThroughEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error {
@@ -166,16 +167,16 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 	timestamp := ptypes.TimestampNow()
 	workflowExecutionID := nCtx.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier
 
-	// send NodeExecutionEvent with UNDEFINED phase
+	// send NodeExecutionEvent
 	nodeExecutionEvent := &event.NodeExecutionEvent{
 		Id: &idlcore.NodeExecutionIdentifier{
 			NodeId:      subNodeID,
 			ExecutionId: workflowExecutionID,
 		},
-		Phase: nodePhase,
+		Phase:      nodePhase,
 		OccurredAt: timestamp,
 		ParentNodeMetadata: &event.ParentNodeExecutionMetadata{
-			NodeId: nCtx.NodeID(),	
+			NodeId: nCtx.NodeID(),
 		},
 		ReportedAt: timestamp,
 	}
@@ -184,7 +185,7 @@ func sendEvents(ctx context.Context, nCtx interfaces.NodeExecutionContext, index
 		return err
 	}
 
-	// send TaskExeucutionEvent with UNDEFINED phase
+	// send TaskExeucutionEvent
 	taskExecutionEvent := &event.TaskExecutionEvent{
 		TaskId: &idlcore.Identifier{
 			ResourceType: idlcore.ResourceType_TASK,
