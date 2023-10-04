@@ -117,9 +117,9 @@ type arrayNodeExecutionContext struct {
 	taskReader       interfaces.TaskReader
 }
 
-func (a *arrayNodeExecutionContext) EventsRecorder() interfaces.EventRecorder {
+/*func (a *arrayNodeExecutionContext) EventsRecorder() interfaces.EventRecorder {
 	return a.eventRecorder
-}
+}*/
 
 func (a *arrayNodeExecutionContext) ExecutionContext() executors.ExecutionContext {
 	return a.executionContext
