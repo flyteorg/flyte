@@ -7,11 +7,20 @@ import (
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
+<<<<<<< HEAD
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+=======
+	pluginsCore "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCoreMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytek8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsIOMock "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+>>>>>>> flyteplugins/jeev/gpu-type
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -25,8 +34,9 @@ import (
 
 var containerResourceRequirements = &v1.ResourceRequirements{
 	Limits: v1.ResourceList{
-		v1.ResourceCPU:     resource.MustParse("1024m"),
-		v1.ResourceStorage: resource.MustParse("100M"),
+		v1.ResourceCPU:             resource.MustParse("1024m"),
+		v1.ResourceStorage:         resource.MustParse("100M"),
+		flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 	},
 }
 
@@ -64,6 +74,14 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
+	to.OnGetResourceExtensions().Return(&core.ResourceExtensions{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+				PartitionSize: "1g.5gb",
+			},
+		},
+	})
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
@@ -143,6 +161,45 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 	assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
 
 	assert.Equal(t, "service-account", j.Spec.ServiceAccountName)
+
+	assert.EqualValues(
+		t,
+		[]v1.NodeSelectorTerm{
+			v1.NodeSelectorTerm{
+				MatchExpressions: []v1.NodeSelectorRequirement{
+					v1.NodeSelectorRequirement{
+						Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+						Operator: v1.NodeSelectorOpIn,
+						Values:   []string{"nvidia-tesla-a100"},
+					},
+					v1.NodeSelectorRequirement{
+						Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+						Operator: v1.NodeSelectorOpIn,
+						Values:   []string{"1g.5gb"},
+					},
+				},
+			},
+		},
+		j.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+	)
+	assert.EqualValues(
+		t,
+		[]v1.Toleration{
+			{
+				Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+				Value:    "nvidia-tesla-a100",
+				Operator: v1.TolerationOpEqual,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+			{
+				Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Value:    "1g.5gb",
+				Operator: v1.TolerationOpEqual,
+				Effect:   v1.TaintEffectNoSchedule,
+			},
+		},
+		j.Spec.Tolerations,
+	)
 }
 
 func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {

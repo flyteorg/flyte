@@ -8,9 +8,16 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 
+<<<<<<< HEAD
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+=======
+	"github.com/flyteorg/flyteplugins/go/tasks/logs"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytek8sConfig "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/k8s"
+>>>>>>> flyteplugins/jeev/gpu-type
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -160,8 +167,8 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	})
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
-	resources := &mocks.TaskOverrides{}
-	resources.OnGetResources().Return(&corev1.ResourceRequirements{
+	overrides := &mocks.TaskOverrides{}
+	overrides.OnGetResources().Return(&corev1.ResourceRequirements{
 		Limits: corev1.ResourceList{
 			corev1.ResourceCPU:         resource.MustParse("1000m"),
 			corev1.ResourceMemory:      resource.MustParse("1Gi"),
@@ -171,6 +178,14 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 			corev1.ResourceCPU:         resource.MustParse("100m"),
 			corev1.ResourceMemory:      resource.MustParse("512Mi"),
 			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+		},
+	})
+	overrides.OnGetResourceExtensions().Return(&core.ResourceExtensions{
+		GpuAccelerator: &core.GPUAccelerator{
+			Device: "nvidia-tesla-a100",
+			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+				PartitionSize: "1g.5gb",
+			},
 		},
 	})
 
@@ -184,7 +199,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 		Name: "blah",
 	})
 	taskExecutionMetadata.OnIsInterruptible().Return(true)
-	taskExecutionMetadata.OnGetOverrides().Return(resources)
+	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskExecutionMetadata.OnGetK8sServiceAccount().Return(serviceAccount)
 	taskExecutionMetadata.OnGetPlatformResources().Return(&corev1.ResourceRequirements{})
 	taskExecutionMetadata.OnGetEnvironmentVariables().Return(nil)
@@ -337,14 +352,16 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 	assert.Equal(t, 1, len(pytorchJob.Spec.PyTorchReplicaSpecs))
 	assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
 
-	var hasContainerWithDefaultPytorchName = false
-
-	for _, container := range pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Template.Spec.Containers {
-		if container.Name == kubeflowv1.PytorchJobDefaultContainerName {
-			hasContainerWithDefaultPytorchName = true
+	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+		var hasContainerWithDefaultPytorchName = false
+		podSpec := replicaSpec.Template.Spec
+		for _, container := range podSpec.Containers {
+			if container.Name == kubeflowv1.PytorchJobDefaultContainerName {
+				hasContainerWithDefaultPytorchName = true
+			}
 		}
-	}
 
+<<<<<<< HEAD
 	assert.True(t, hasContainerWithDefaultPytorchName)
 
 	// verify TaskExecutionMetadata labels and annotations are copied to the PyTorchJob
@@ -357,6 +374,48 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 		for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
 			assert.Equal(t, v, replicaSpec.Template.ObjectMeta.Labels[k])
 		}
+=======
+		assert.EqualValues(
+			t,
+			[]corev1.NodeSelectorTerm{
+				corev1.NodeSelectorTerm{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]corev1.Toleration{
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+					Value:    "nvidia-tesla-a100",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Value:    "1g.5gb",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
+
+		assert.True(t, hasContainerWithDefaultPytorchName)
+>>>>>>> flyteplugins/jeev/gpu-type
 	}
 }
 
@@ -389,8 +448,8 @@ func TestBuildResourcePytorch(t *testing.T) {
 
 	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
 		var hasContainerWithDefaultPytorchName = false
-
-		for _, container := range replicaSpec.Template.Spec.Containers {
+		podSpec := replicaSpec.Template.Spec
+		for _, container := range podSpec.Containers {
 			if container.Name == kubeflowv1.PytorchJobDefaultContainerName {
 				hasContainerWithDefaultPytorchName = true
 			}
@@ -398,6 +457,45 @@ func TestBuildResourcePytorch(t *testing.T) {
 			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests, fmt.Sprintf(" container.Resources.Requests [%+v]", container.Resources.Requests.Cpu().String()))
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits, fmt.Sprintf(" container.Resources.Limits [%+v]", container.Resources.Limits.Cpu().String()))
 		}
+
+		assert.EqualValues(
+			t,
+			[]corev1.NodeSelectorTerm{
+				corev1.NodeSelectorTerm{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						corev1.NodeSelectorRequirement{
+							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+		)
+		assert.EqualValues(
+			t,
+			[]corev1.Toleration{
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+					Value:    "nvidia-tesla-a100",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Value:    "1g.5gb",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+			podSpec.Tolerations,
+		)
 
 		assert.True(t, hasContainerWithDefaultPytorchName)
 	}

@@ -21,9 +21,16 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+<<<<<<< HEAD
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
+=======
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalogMocks "github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	"github.com/flyteorg/flyteplugins/go/tasks/pluginmachinery/workqueue"
+>>>>>>> flyteplugins/jeev/gpu-type
 
 	v1 "k8s.io/api/core/v1"
 
@@ -156,6 +163,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 		Requests: map[v1.ResourceName]resource.Quantity{},
 		Limits:   map[v1.ResourceName]resource.Quantity{},
 	})
+	overrides.OnGetResourceExtensions().Return(&core.ResourceExtensions{})
 
 	tMeta := &coreMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
