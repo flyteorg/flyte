@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
@@ -18,9 +18,9 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	genModel "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gen/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 

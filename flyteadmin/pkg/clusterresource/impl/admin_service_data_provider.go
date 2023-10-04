@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"

@@ -13,7 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/futures"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"golang.org/x/time/rate"
 	"k8s.io/apimachinery/pkg/util/wait"

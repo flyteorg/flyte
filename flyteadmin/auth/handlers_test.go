@@ -13,7 +13,7 @@ import (
 
 	"github.com/coreos/go-oidc"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"

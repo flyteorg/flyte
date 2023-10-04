@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"gorm.io/gorm"

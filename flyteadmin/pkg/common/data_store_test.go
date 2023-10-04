@@ -12,7 +12,7 @@ import (
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 )

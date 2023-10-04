@@ -8,10 +8,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 
@@ -23,7 +23,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"

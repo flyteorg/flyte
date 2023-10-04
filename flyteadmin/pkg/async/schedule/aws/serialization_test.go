@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/stretchr/testify/assert"

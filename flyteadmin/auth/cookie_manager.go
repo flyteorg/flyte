@@ -10,7 +10,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"golang.org/x/oauth2"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
