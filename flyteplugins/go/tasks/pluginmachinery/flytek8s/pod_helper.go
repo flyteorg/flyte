@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 
@@ -32,6 +33,53 @@ const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
 
+const GpuPartitionSizeNotSet = "NotSet"
+
+// AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
+// objects to an existing v1.Affinity object. If there are no existing required
+// node selectors, the new v1.NodeSelectorRequirement will be added as-is.
+// However, if there are existing required node selectors, we iterate over all existing
+// node selector terms and append the node selector requirement. Note that multiple node
+// selector terms are OR'd, and match expressions within a single node selector term
+// are AND'd during scheduling.
+// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelectorRequirement) {
+	if base.NodeAffinity == nil {
+		base.NodeAffinity = &v1.NodeAffinity{}
+	}
+	if base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
+	}
+	if len(base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
+		nodeSelectorTerms := base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+		for i := range nodeSelectorTerms {
+			nst := &nodeSelectorTerms[i]
+			nst.MatchExpressions = append(nst.MatchExpressions, new...)
+		}
+	} else {
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: new}}
+	}
+}
+
+// AddPreferredNodeSelectorRequirements appends the provided v1.NodeSelectorRequirement
+// objects to an existing v1.Affinity object's list of preferred scheduling terms.
+// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity-weight
+// for how weights are used during scheduling.
+func AddPreferredNodeSelectorRequirements(base *v1.Affinity, weight int32, new ...v1.NodeSelectorRequirement) {
+	if base.NodeAffinity == nil {
+		base.NodeAffinity = &v1.NodeAffinity{}
+	}
+	base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(
+		base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		v1.PreferredSchedulingTerm{
+			Weight: weight,
+			Preference: v1.NodeSelectorTerm{
+				MatchExpressions: new,
+			},
+		},
+	)
+}
+
 // ApplyInterruptibleNodeSelectorRequirement configures the node selector requirement of the node-affinity using the configuration specified.
 func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.Affinity) {
 	// Determine node selector terms to add to node affinity
@@ -48,22 +96,7 @@ func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.
 		nodeSelectorRequirement = *config.GetK8sPluginConfig().NonInterruptibleNodeSelectorRequirement
 	}
 
-	if affinity.NodeAffinity == nil {
-		affinity.NodeAffinity = &v1.NodeAffinity{}
-	}
-	if affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
-		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
-	}
-	if len(affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
-		nodeSelectorTerms := affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
-		for i := range nodeSelectorTerms {
-			nst := &nodeSelectorTerms[i]
-			nst.MatchExpressions = append(nst.MatchExpressions, nodeSelectorRequirement)
-		}
-	} else {
-		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
-	}
-
+	AddRequiredNodeSelectorRequirements(affinity, nodeSelectorRequirement)
 }
 
 // ApplyInterruptibleNodeAffinity configures the node-affinity for the pod using the configuration specified.
@@ -73,6 +106,121 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	}
 
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
+}
+
+// Specialized merging of overrides into a base *core.ExtendedResources object. Note
+// that doing a nested merge may not be the intended behavior all the time, so we
+// handle each field separately here.
+func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *core.ExtendedResources {
+	// Handle case where base might be nil
+	var new *core.ExtendedResources
+	if base == nil {
+		new = &core.ExtendedResources{}
+	} else {
+		new = proto.Clone(base).(*core.ExtendedResources)
+	}
+
+	// No overrides found
+	if overrides == nil {
+		return new
+	}
+
+	// GPU Accelerator
+	if overrides.GetGpuAccelerator() != nil {
+		new.GpuAccelerator = overrides.GetGpuAccelerator()
+	}
+
+	return new
+}
+
+func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
+	// Short circuit if pod spec does not contain any containers that use GPUs
+	requiresGPUs := false
+	for _, cnt := range podSpec.Containers {
+		if _, ok := cnt.Resources.Limits[config.GetK8sPluginConfig().GpuResourceName]; ok {
+			requiresGPUs = true
+			break
+		}
+	}
+	if !requiresGPUs {
+		return
+	}
+
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+
+	// Apply changes for GPU device
+	device := gpuAccelerator.GetDevice()
+	if len(device) > 0 {
+		// Add node selector requirement for GPU device
+		deviceNsr := v1.NodeSelectorRequirement{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{device},
+		}
+		AddRequiredNodeSelectorRequirements(podSpec.Affinity, deviceNsr)
+		// Add toleration for GPU device
+		deviceTol := v1.Toleration{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Value:    device,
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+		podSpec.Tolerations = append(podSpec.Tolerations, deviceTol)
+	}
+
+	// Short circuit if a partition size preference is not specified
+	partitionSizeValue := gpuAccelerator.GetPartitionSizeValue()
+	if partitionSizeValue == nil {
+		return
+	}
+
+	// Apply changes for GPU partition size, if applicable
+	var partitionSizeNsr *v1.NodeSelectorRequirement
+	var partitionSizeTol *v1.Toleration
+	switch partitionSizeValue.(type) {
+	case *core.GPUAccelerator_Unpartitioned:
+		if !gpuAccelerator.GetUnpartitioned() {
+			break
+		}
+		if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
+			partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
+		} else {
+			partitionSizeNsr = &v1.NodeSelectorRequirement{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Operator: v1.NodeSelectorOpDoesNotExist,
+			}
+		}
+		if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
+			partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
+		} else {
+			partitionSizeTol = &v1.Toleration{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Value:    GpuPartitionSizeNotSet,
+				Operator: v1.TolerationOpEqual,
+				Effect:   v1.TaintEffectNoSchedule,
+			}
+		}
+	case *core.GPUAccelerator_PartitionSize:
+		partitionSizeNsr = &v1.NodeSelectorRequirement{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{gpuAccelerator.GetPartitionSize()},
+		}
+		partitionSizeTol = &v1.Toleration{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Value:    gpuAccelerator.GetPartitionSize(),
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+	}
+	if partitionSizeNsr != nil {
+		AddRequiredNodeSelectorRequirements(podSpec.Affinity, *partitionSizeNsr)
+	}
+	if partitionSizeTol != nil {
+		podSpec.Tolerations = append(podSpec.Tolerations, *partitionSizeTol)
+	}
 }
 
 // UpdatePod updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
@@ -248,6 +396,18 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	podSpec, objectMeta, err = MergeWithBasePodTemplate(ctx, tCtx, podSpec, objectMeta, primaryContainerName)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	// handling for extended resources
+	// Merge overrides with base extended resources
+	extendedResources := applyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+	)
+
+	// GPU accelerator
+	if extendedResources.GetGpuAccelerator() != nil {
+		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 	}
 
 	return podSpec, objectMeta, nil

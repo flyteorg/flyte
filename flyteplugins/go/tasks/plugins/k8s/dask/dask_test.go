@@ -192,6 +192,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(nil)
 	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
