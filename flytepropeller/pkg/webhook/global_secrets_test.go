@@ -11,8 +11,8 @@ import (
 
 	"github.com/go-test/deep"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
 	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
 )

@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/events/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/golang/protobuf/proto"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"

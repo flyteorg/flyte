@@ -5,8 +5,8 @@ package mocks
 import (
 	context "context"
 
-	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	executors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 
 	interfaces "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 

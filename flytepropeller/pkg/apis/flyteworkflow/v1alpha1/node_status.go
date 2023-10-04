@@ -9,10 +9,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

@@ -6,11 +6,11 @@ import (
 	"hash/fnv"
 	"strings"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

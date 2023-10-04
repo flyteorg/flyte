@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
 	compilerErrors "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 

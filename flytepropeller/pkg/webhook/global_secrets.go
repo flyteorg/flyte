@@ -7,8 +7,8 @@ import (
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	corev1 "k8s.io/api/core/v1"
 )
 

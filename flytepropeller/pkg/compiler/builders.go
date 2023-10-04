@@ -3,8 +3,8 @@ package compiler
 import (
 	"fmt"
 
-	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 )
 
 type flyteTask = core.TaskTemplate //nolint:unused

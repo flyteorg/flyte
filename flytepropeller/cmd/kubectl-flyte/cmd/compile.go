@@ -5,10 +5,10 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	compilerErrors "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

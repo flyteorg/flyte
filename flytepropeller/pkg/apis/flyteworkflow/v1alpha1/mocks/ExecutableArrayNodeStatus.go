@@ -3,8 +3,8 @@
 package mocks
 
 import (
-	bitarray "github.com/flyteorg/flyte/flytestdlib/bitarray"
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	bitarray "github.com/flyteorg/flyte/flytestdlib/bitarray"
 
 	mock "github.com/stretchr/testify/mock"
 
