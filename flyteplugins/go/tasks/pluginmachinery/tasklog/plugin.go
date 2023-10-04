@@ -3,7 +3,7 @@ package tasklog
 import (
 	"regexp"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 //go:generate enumer --type=TemplateScheme --trimprefix=TemplateScheme -json -yaml

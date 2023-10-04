@@ -405,14 +405,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n"
   "\022DeleteTaskResponse*^\n\005State\022\025\n\021RETRYABL"
   "E_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PE"
-  "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B7Z5g"
-  "ithub.com/flyteorg/flyteidl/gen/pb-go/fl"
-  "yteidl/adminb\006proto3"
+  "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;g"
+  "ithub.com/flyteorg/flyte/flyteidl/gen/pb"
+  "-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1420,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1426,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {

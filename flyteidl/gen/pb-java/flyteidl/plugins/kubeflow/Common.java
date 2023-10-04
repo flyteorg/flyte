@@ -1046,8 +1046,8 @@ public final class Common {
       "RESTART_POLICY_ALWAYS\020\002*`\n\016CleanPodPolic" +
       "y\022\030\n\024CLEANPOD_POLICY_NONE\020\000\022\033\n\027CLEANPOD_" +
       "POLICY_RUNNING\020\001\022\027\n\023CLEANPOD_POLICY_ALL\020" +
-      "\002B9Z7github.com/flyteorg/flyteidl/gen/pb" +
-      "-go/flyteidl/pluginsb\006proto3"
+      "\002B?Z=github.com/flyteorg/flyte/flyteidl/" +
+      "gen/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

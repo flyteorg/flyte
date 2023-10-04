@@ -212,13 +212,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fidentifier_2eproto[] =
   ".core.WorkflowExecutionIdentifier*U\n\014Res"
   "ourceType\022\017\n\013UNSPECIFIED\020\000\022\010\n\004TASK\020\001\022\014\n\010"
   "WORKFLOW\020\002\022\017\n\013LAUNCH_PLAN\020\003\022\013\n\007DATASET\020\004"
-  "B6Z4github.com/flyteorg/flyteidl/gen/pb-"
-  "go/flyteidl/coreb\006proto3"
+  "B<Z:github.com/flyteorg/flyte/flyteidl/g"
+  "en/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fidentifier_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fidentifier_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fidentifier_2eproto,
-  "flyteidl/core/identifier.proto", &assign_descriptors_table_flyteidl_2fcore_2fidentifier_2eproto, 784,
+  "flyteidl/core/identifier.proto", &assign_descriptors_table_flyteidl_2fcore_2fidentifier_2eproto, 790,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto() {

@@ -7430,9 +7430,9 @@ public final class Agent {
       "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n" +
       "\022DeleteTaskResponse*^\n\005State\022\025\n\021RETRYABL" +
       "E_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PE" +
-      "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B7Z5g" +
-      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
-      "yteidl/adminb\006proto3"
+      "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

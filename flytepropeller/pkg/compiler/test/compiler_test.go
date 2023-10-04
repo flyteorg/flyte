@@ -13,7 +13,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -21,12 +21,12 @@ import (
 
 	"github.com/ghodss/yaml"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"

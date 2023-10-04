@@ -9,7 +9,7 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 

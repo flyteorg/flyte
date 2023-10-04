@@ -127,14 +127,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_
   "replicas\030\001 \001(\005\022\r\n\005image\030\002 \001(\t\022+\n\tresourc"
   "es\030\003 \001(\0132\030.flyteidl.core.Resources\022@\n\016re"
   "start_policy\030\004 \001(\0162(.flyteidl.plugins.ku"
-  "beflow.RestartPolicyB9Z7github.com/flyte"
-  "org/flyteidl/gen/pb-go/flyteidl/pluginsb"
-  "\006proto3"
+  "beflow.RestartPolicyB\?Z=github.com/flyte"
+  "org/flyte/flyteidl/gen/pb-go/flyteidl/pl"
+  "uginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto,
-  "flyteidl/plugins/kubeflow/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 767,
+  "flyteidl/plugins/kubeflow/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 773,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto() {

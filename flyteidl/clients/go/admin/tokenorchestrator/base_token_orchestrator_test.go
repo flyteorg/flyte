@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
+	cacheMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	cacheMocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 func TestRefreshTheToken(t *testing.T) {

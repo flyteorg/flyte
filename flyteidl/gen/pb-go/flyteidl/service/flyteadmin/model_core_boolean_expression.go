@@ -12,5 +12,5 @@ package flyteadmin
 // Defines a boolean expression tree. It can be a simple or a conjunction expression. Multiple expressions can be combined using a conjunction or a disjunction to result in a final boolean result.
 type CoreBooleanExpression struct {
 	Conjunction *CoreConjunctionExpression `json:"conjunction,omitempty"`
-	Comparison *CoreComparisonExpression `json:"comparison,omitempty"`
+	Comparison  *CoreComparisonExpression  `json:"comparison,omitempty"`
 }

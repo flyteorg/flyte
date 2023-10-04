@@ -10,13 +10,13 @@
 package flyteadmin
 
 type CoreScalar struct {
-	Primitive *CorePrimitive `json:"primitive,omitempty"`
-	Blob *CoreBlob `json:"blob,omitempty"`
-	Binary *CoreBinary `json:"binary,omitempty"`
-	Schema *CoreSchema `json:"schema,omitempty"`
-	NoneType *CoreVoid `json:"none_type,omitempty"`
-	Error_ *CoreError `json:"error,omitempty"`
-	Generic *ProtobufStruct `json:"generic,omitempty"`
+	Primitive         *CorePrimitive         `json:"primitive,omitempty"`
+	Blob              *CoreBlob              `json:"blob,omitempty"`
+	Binary            *CoreBinary            `json:"binary,omitempty"`
+	Schema            *CoreSchema            `json:"schema,omitempty"`
+	NoneType          *CoreVoid              `json:"none_type,omitempty"`
+	Error_            *CoreError             `json:"error,omitempty"`
+	Generic           *ProtobufStruct        `json:"generic,omitempty"`
 	StructuredDataset *CoreStructuredDataset `json:"structured_dataset,omitempty"`
-	Union *CoreUnion `json:"union,omitempty"`
+	Union             *CoreUnion             `json:"union,omitempty"`
 }

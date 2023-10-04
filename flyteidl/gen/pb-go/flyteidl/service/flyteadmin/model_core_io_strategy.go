@@ -11,5 +11,5 @@ package flyteadmin
 
 type CoreIoStrategy struct {
 	DownloadMode *IoStrategyDownloadMode `json:"download_mode,omitempty"`
-	UploadMode *IoStrategyUploadMode `json:"upload_mode,omitempty"`
+	UploadMode   *IoStrategyUploadMode   `json:"upload_mode,omitempty"`
 }

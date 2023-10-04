@@ -4263,11 +4263,11 @@
         },
         "default_inputs": {
           "$ref": "#/definitions/coreParameterMap",
-          "description": "Input values to be passed for the execution.\nThese can be overriden when an execution is created with this launch plan."
+          "description": "Input values to be passed for the execution.\nThese can be overridden when an execution is created with this launch plan."
         },
         "fixed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overriden when an execution is created with this launch plan."
+          "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan."
         },
         "role": {
           "type": "string",

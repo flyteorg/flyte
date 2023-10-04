@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 )
 
 // ClientsetBuilder is used to build the clientset. This allows custom token cache implementations to be plugged in.

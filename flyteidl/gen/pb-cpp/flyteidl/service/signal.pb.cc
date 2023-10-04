@@ -50,13 +50,13 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fsignal_2eproto[] =
   "on_id.name}\022l\n\tSetSignal\022 .flyteidl.admi"
   "n.SignalSetRequest\032!.flyteidl.admin.Sign"
   "alSetResponse\"\032\202\323\344\223\002\024\"\017/api/v1/signals:\001"
-  "*B9Z7github.com/flyteorg/flyteidl/gen/pb"
-  "-go/flyteidl/serviceb\006proto3"
+  "*B\?Z=github.com/flyteorg/flyte/flyteidl/"
+  "gen/pb-go/flyteidl/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fsignal_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fsignal_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fsignal_2eproto,
-  "flyteidl/service/signal.proto", &assign_descriptors_table_flyteidl_2fservice_2fsignal_2eproto, 588,
+  "flyteidl/service/signal.proto", &assign_descriptors_table_flyteidl_2fservice_2fsignal_2eproto, 594,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fsignal_2eproto() {
