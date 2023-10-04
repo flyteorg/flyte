@@ -59,9 +59,12 @@ requests successfully, the following environment-specific requirements should be
                 "arn:aws:s3:::<your-S3-bucket>*/*"
             ],
       
+  
+   2. Two IAM Roles configured: one for the control plane components, and another for the data plane where the worker Pods and ``flytepropeller`` run.
 
-   2. At least three IAM Roles configured: one for the control plane components, another for the data plane
-   and one more for the worker Pods that are bootstrapped by Flyte to execute workflow tasks. 
+   .. note::
+    
+      Using the guidance from this document, make sure to follow your organization's policies to configure IAM resources.
 
    3. An OIDC Provider associated with each of your EKS clusters. You can use the following command to create and connect the Provider:
 
@@ -85,8 +88,12 @@ requests successfully, the following environment-specific requirements should be
    2. Go to the **IAM** section in your **AWS Management Console** and select the role that was just created
    3. Go to the **Trust Relationships** tab and **Edit the Trust Policy**
    4. Add the ``datacatalog`` Service Account to the ``sub`` section 
+
+   .. note:: 
+
+      When caching is enabled, the ``datacatalog`` service store hashes of workflow inputs alongside with outputs on blob storage. Learn more `here <https://docs.flyte.org/en/latest/concepts/catalog.html#divedeep-catalog>`__.
    
-   The end result should look similar to the following example:
+   Example configuration:
 
    .. code-block:: json
 
@@ -120,69 +127,41 @@ requests successfully, the following environment-specific requirements should be
       
       eksctl create iamserviceaccount --cluster=<dataplane1-cluster-name> --name=flytepropeller --role-only --role-name=flyte-dataplane-role --attach-policy-arn <ARN-of-your-IAM-policy> --approve --region <AWS-REGION-CODE> --namespace flyte
       
-   2. Verify the Trust Relationship configuration:
+   2. Edit the **Trust Relationship** of the data plane role
 
-   .. prompt:: bash
+   .. note:: 
 
-      aws iam get-role --role-name flyte-dataplane-role --query Role.AssumeRolePolicyDocument
+      By default, every Pod created for Task execution, uses the ``default`` Service Account on their respective namespace. In your cluster, you'll have as many
+      namespaces as ``project`` and ``domain`` combinations you may have. Hence, it might be useful to use a ``StringLike`` condition and to use a wildcard for the namespace name in the Trust Policy
+
+   3. Add the ``default`` Service Account:
    
-   Example output:
+   
+   Example configuration for one data plane cluster:
 
    .. code-block:: json
 
       {
-        "Version": "2012-10-17",
-        "Statement": [
+      "Version": "2012-10-17",
+      "Statement": [
         {
             "Effect": "Allow",
             "Principal": {
-                "Federated": "arn:aws:iam::<ACCOUNT-ID>:oidc-provider/oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
+                "Federated": "arn:aws:iam::<AWS-ACCOUNT-ID>:oidc-provider/oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
-                "StringEquals": {
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com",
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:flyte:flytepropeller"
-                    }
-                  }
-              }
-           ]
+                "StringLike": {
+                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>.:aud": "sts.amazonaws.com",
+                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>.:sub": [
+                        "system:serviceaccount:flyte:flytepropeller",
+                        "system:serviceaccount:*:default"
+                    ]
+                }
+            }
         }
 
-   **Workers role**
-
-   1. Create role and initial Trust Relationship:
-
-      .. prompt:: bash
-      
-         eksctl create iamserviceaccount --cluster=<dataplane1-cluster-name> --name=default --role-only --role-name=flyte-workers-role --attach-policy-arn <ARN-of-your-IAM-policy> --approve --region <AWS-REGION-CODE> --namespace flyte
-      
-   2. Go to the **IAM** section in your **AWS Management Console** and select the role that was just created
-   3. Go to the **Trust Relationships** tab and **Edit the Trust Policy**
-   4. By default, every Pod created for Task execution, uses the ``default`` Service Account on their respective namespace. In your cluster, you'll have as many
-      namespaces as ``project`` and ``domain`` combinations you may have. Hence, it might be useful to use a ``StringLike`` condition and to set a wildcard for the namespace in the Trust Policy:
-
-      .. code-block:: json
-
-         {
-         "Version": "2012-10-17",
-         "Statement": [
-          {
-              "Effect": "Allow",
-              "Principal": {
-                  "Federated": "arn:aws:iam::<ACCOUNT-ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
-              },
-              "Action": "sts:AssumeRoleWithWebIdentity",
-              "Condition": {
-                  "StringLike": {
-                      "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:*:default",
-                      "oidc.eks.<REGION>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com"
-                    }
-                 }
-              }
-            ]
-         }
-
+    
 .. _dataplane-deployment:
 
 Data Plane Deployment
@@ -383,7 +362,9 @@ on one or multiple clusters depending on the weight (e.g. ``label1`` on ``datapl
 priority of a specific cluster, relative to the other clusters under the ``labelClusterMap`` entry. The total sum of weights under a particular 
 label has to be 1. 
 
-9. Update the control plane Helm release:
+9. Add the ``flyte-dataplane-role`` IAM Role as the ``defaultIamRole`` in your ``values-eks.yaml`` file. `See section here <https://github.com/flyteorg/flyte/blob/97a79c030555eaefa3e27383d9b933ba1fdc1140/charts/flyte-core/values-eks.yaml#L351-L365>`__
+ 
+10. Update the control plane Helm release:
 
 .. note:: 
    This step will disable ``flytepropeller`` in the control plane cluster, leaving no possibility of running workflows there.
@@ -405,7 +386,7 @@ label has to be 1.
             --values values-controlplane.yaml \
             --values values-override.yaml
 
-10. Verify that all Pods in the ``flyte`` namespace are ``Running``: 
+11. Verify that all Pods in the ``flyte`` namespace are ``Running``: 
 
 Example output:
 
@@ -552,7 +533,11 @@ The process can be repeated for additional clusters.
             "Condition": {
                 "StringLike": {
                     "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com",
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:flyte:flytepropeller"
+
+                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": [
+                    "system:serviceaccount:flyte:flytepropeller",
+                    "system:serviceaccount:*:default"
+                    ]
                   }
               }
             },
@@ -565,57 +550,20 @@ The process can be repeated for additional clusters.
             "Condition": {
                 "StringLike": {
                     "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE2-OIDC-PROVIDER>:aud": "sts.amazonaws.com",
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE2-OIDC-PROVIDER>:sub": "system:serviceaccount:flyte:flytepropeller"
-                    }
+                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE2-OIDC-PROVIDER>:sub": [
+                    "system:serviceaccount:flyte:flytepropeller",
+                    "system:serviceaccount:*:default"
+                    ]
+                   }
                 }
              }
           ]
         }
 
-  7. Repeat the previous step for the ``flyte-workers-role``. The result should look like the example:
 
-  .. code-block:: json
 
-     {
-      "Version": "2012-10-17",
-      "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::<AWS-ACCOUNT-ID>:oidc-provider/oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringLike": {
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:aud": "sts.amazonaws.com",
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE1-OIDC-PROVIDER>:sub": "system:serviceaccount:*:default"
-                }
-            }
-        },
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Federated": "arn:aws:iam::<AWS-ACCOUNT-ID>:oidc-provider/oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE2-OIDC-PROVIDER>"
-            },
-            "Action": "sts:AssumeRoleWithWebIdentity",
-            "Condition": {
-                "StringLike": {
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE2-OIDC-PROVIDER>:aud": "sts.amazonaws.com",
-                    "oidc.eks.<AWS-REGION-CODE>.amazonaws.com/id/<DATAPLANE2-OIDC-PROVIDER>:sub": "system:serviceaccount:*:default"
-                  }
-               }
-            }
-          ]
-        }
-
-  8.  Connect to your new EKS cluster and create the ``flyte`` namespace:
-
-      .. prompt:: bash $
-
-         kubectl create ns flyte
-
-  9. Install the data plane Helm chart following the steps in the **Data plane deployment** section. See :ref:`section <dataplane-deployment>`.
-  10. Follow steps 1-3 in the **control plane configuration** section (see :ref:`section <control-plane-deployment>`) to generate and populate a new section in your ``secrets.yaml`` file
+  7. Install the data plane Helm chart following the steps in the **Data plane deployment** section. See :ref:`section <dataplane-deployment>`.
+  8. Follow steps 1-3 in the **control plane configuration** section (see :ref:`section <control-plane-deployment>`) to generate and populate a new section in your ``secrets.yaml`` file
 
       Example:
 
@@ -633,13 +581,13 @@ The process can be repeated for additional clusters.
            dataplane_2_token: <your-dataplane2-token>
            dataplane_2_cacert:  <your-dataplane2-token-certificate>
   
-  12. Connect to the control plane cluster and update the ``cluster-credentials`` Secret:
+  9. Connect to the control plane cluster and update the ``cluster-credentials`` Secret:
 
       .. prompt:: bash $
 
          kubect apply -f secrets.yaml
 
-  13. Go to your ``values-override.yaml`` file and add the information of the new cluster. Adding a new label is not entirely needed.
+  10. Go to your ``values-override.yaml`` file and add the information of the new cluster. Adding a new label is not entirely needed.
       Nevertheless, in the following example a new label is created to illustrate Flyte's capability to schedule workloads on different clusters 
       in response to user-defined mappings of ``project``, ``domain`` and ``label``:abbr:
 
@@ -671,13 +619,13 @@ The process can be repeated for additional clusters.
                tokenPath: "/var/run/credentials/dataplane_2_token"
                certPath: "/var/run/credentials/dataplane_2_cacert"
 
-  14. Update the Helm release in the control plane cluster:
+  11. Update the Helm release in the control plane cluster:
 
       .. prompt:: bash $
 
          helm upgrade flyte-core-control flyteorg/flyte-core  -n flyte --values values-controlplane.yaml --values values-eks.yaml --values values-override.yaml
 
-  15. Create a new execution cluster labels file with the following sample content:
+  12. Create a new execution cluster labels file with the following sample content:
 
       .. code-block:: yaml
 
@@ -685,19 +633,19 @@ The process can be repeated for additional clusters.
          project: team1
          value: label2
   
-  16. Update the cluster execution labels for the project:
+  13. Update the cluster execution labels for the project:
 
       .. prompt:: bash $
 
          flytectl update execution-cluster-label --attrFile ecl-production.yaml
 
-  17. Finally, submit a workflow execution that matches the label of the new cluster:
+  14. Finally, submit a workflow execution that matches the label of the new cluster:
  
       .. prompt:: bash $
 
          pyflyte run --remote --project team1 --domain production example.py  training_workflow \                                                                                      ✔ ╱ base 
          --hyperparameters '{"C": 0.1}'
         
-  18. A successful execution should be visible on the UI, confirming it ran in the new cluster:
+  15. A successful execution should be visible on the UI, confirming it ran in the new cluster:
 
      .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/common/multicluster-execution.png
