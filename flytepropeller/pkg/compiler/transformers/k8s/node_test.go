@@ -117,6 +117,32 @@ func TestBuildNodeSpec(t *testing.T) {
 		assert.NotNil(t, spec.Resources)
 		assert.NotNil(t, spec.Resources.Requests.Cpu())
 		assert.Equal(t, expectedCPU.Value(), spec.Resources.Requests.Cpu().Value())
+		assert.Nil(t, spec.GetResourceExtensions())
+	})
+
+	t.Run("node with resource extensions overrides", func(t *testing.T) {
+		expectedGpuDevice := "nvidia-tesla-t4"
+		n.Node.Target = &core.Node_TaskNode{
+			TaskNode: &core.TaskNode{
+				Reference: &core.TaskNode_ReferenceId{
+					ReferenceId: &core.Identifier{Name: "ref_2"},
+				},
+				Overrides: &core.TaskNodeOverrides{
+					Resources: &core.Resources{
+						Extensions: &core.ResourceExtensions{
+							GpuAccelerator: &core.GPUAccelerator{
+								Device: "nvidia-tesla-t4",
+							},
+						},
+					},
+				},
+			},
+		}
+
+		spec := mustBuild(t, n, 1, errs.NewScope())
+		assert.NotNil(t, spec.GetResourceExtensions())
+		assert.NotNil(t, spec.GetResourceExtensions().GetGpuAccelerator())
+		assert.Equal(t, expectedGpuDevice, spec.GetResourceExtensions().GetGpuAccelerator().GetDevice())
 	})
 
 	t.Run("LaunchPlanRef", func(t *testing.T) {

@@ -48,6 +48,13 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		}
 	}
 
+	var resourceExtensions *v1alpha1.ResourceExtensions
+	if resources != nil && resources.GetExtensions() != nil {
+		resourceExtensions = &v1alpha1.ResourceExtensions{
+			ResourceExtensions: resources.GetExtensions(),
+		}
+	}
+
 	res, err := flytek8s.ToK8sResourceRequirements(resources)
 	if err != nil {
 		errs.Collect(errors.NewWorkflowBuildError(err))
@@ -76,15 +83,16 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	}
 
 	nodeSpec := &v1alpha1.NodeSpec{
-		ID:                n.GetId(),
-		Name:              name,
-		RetryStrategy:     computeRetryStrategy(n, task),
-		ExecutionDeadline: timeout,
-		Resources:         res,
-		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
-		InputBindings:     toBindingValueArray(n.GetInputs()),
-		ActiveDeadline:    activeDeadline,
-		Interruptible:     interruptible,
+		ID:                 n.GetId(),
+		Name:               name,
+		RetryStrategy:      computeRetryStrategy(n, task),
+		ExecutionDeadline:  timeout,
+		Resources:          res,
+		ResourceExtensions: resourceExtensions,
+		OutputAliases:      toAliasValueArray(n.GetOutputAliases()),
+		InputBindings:      toBindingValueArray(n.GetInputs()),
+		ActiveDeadline:     activeDeadline,
+		Interruptible:      interruptible,
 	}
 
 	switch v := n.GetTarget().(type) {
