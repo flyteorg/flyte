@@ -11,5 +11,5 @@ package flyteadmin
 
 type CoreConnectionSet struct {
 	Downstream map[string]ConnectionSetIdList `json:"downstream,omitempty"`
-	Upstream   map[string]ConnectionSetIdList `json:"upstream,omitempty"`
+	Upstream map[string]ConnectionSetIdList `json:"upstream,omitempty"`
 }

@@ -11,7 +11,7 @@ package flyteadmin
 
 // Defines a conjunction expression of two boolean expressions.
 type CoreConjunctionExpression struct {
-	Operator        *ConjunctionExpressionLogicalOperator `json:"operator,omitempty"`
-	LeftExpression  *CoreBooleanExpression                `json:"left_expression,omitempty"`
-	RightExpression *CoreBooleanExpression                `json:"right_expression,omitempty"`
+	Operator *ConjunctionExpressionLogicalOperator `json:"operator,omitempty"`
+	LeftExpression *CoreBooleanExpression `json:"left_expression,omitempty"`
+	RightExpression *CoreBooleanExpression `json:"right_expression,omitempty"`
 }
