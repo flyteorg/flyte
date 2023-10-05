@@ -16,6 +16,6 @@ type FlyteidladminNodeExecution struct {
 	// Path to remote data store where input blob is stored.
 	InputUri string `json:"input_uri,omitempty"`
 	// Computed results associated with this node execution.
-	Closure *AdminNodeExecutionClosure `json:"closure,omitempty"`
+	Closure  *AdminNodeExecutionClosure  `json:"closure,omitempty"`
 	Metadata *AdminNodeExecutionMetaData `json:"metadata,omitempty"`
 }

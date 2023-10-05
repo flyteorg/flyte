@@ -4679,9 +4679,9 @@ public final class ExternalPluginServiceOuterClass {
       "GetRequest\032!.flyteidl.service.TaskGetRes" +
       "ponse\"\003\210\002\001\022\\\n\nDeleteTask\022#.flyteidl.serv" +
       "ice.TaskDeleteRequest\032$.flyteidl.service" +
-      ".TaskDeleteResponse\"\003\210\002\001B9Z7github.com/f" +
-      "lyteorg/flyteidl/gen/pb-go/flyteidl/serv" +
-      "iceb\006proto3"
+      ".TaskDeleteResponse\"\003\210\002\001B?Z=github.com/f" +
+      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
+      "l/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

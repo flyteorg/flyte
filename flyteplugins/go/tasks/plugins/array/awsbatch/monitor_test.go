@@ -13,8 +13,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
 
+	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	flyteIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/batch"

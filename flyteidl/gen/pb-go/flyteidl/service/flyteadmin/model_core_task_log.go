@@ -10,8 +10,8 @@
 package flyteadmin
 
 type CoreTaskLog struct {
-	Uri string `json:"uri,omitempty"`
-	Name string `json:"name,omitempty"`
+	Uri           string                `json:"uri,omitempty"`
+	Name          string                `json:"name,omitempty"`
 	MessageFormat *TaskLogMessageFormat `json:"message_format,omitempty"`
-	Ttl string `json:"ttl,omitempty"`
+	Ttl           string                `json:"ttl,omitempty"`
 }

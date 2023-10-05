@@ -3,7 +3,7 @@ package validators
 import (
 	"strings"
 
-	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.admin;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
 // Represents the Email object that is sent to a publisher/subscriber
 // to forward the notification.

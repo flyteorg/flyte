@@ -8,11 +8,12 @@
  */
 
 package flyteadmin
+
 // PluginOverrideMissingPluginBehavior :  - FAIL: By default, if this plugin is not enabled for a Flyte deployment then execution will fail.  - USE_DEFAULT: Uses the system-configured default implementation.
 type PluginOverrideMissingPluginBehavior string
 
 // List of PluginOverrideMissingPluginBehavior
 const (
-	PluginOverrideMissingPluginBehaviorFAIL PluginOverrideMissingPluginBehavior = "FAIL"
+	PluginOverrideMissingPluginBehaviorFAIL        PluginOverrideMissingPluginBehavior = "FAIL"
 	PluginOverrideMissingPluginBehaviorUSE_DEFAULT PluginOverrideMissingPluginBehavior = "USE_DEFAULT"
 )

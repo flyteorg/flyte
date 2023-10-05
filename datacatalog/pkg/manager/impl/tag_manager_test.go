@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"

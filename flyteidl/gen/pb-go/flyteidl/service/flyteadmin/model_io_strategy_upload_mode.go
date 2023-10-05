@@ -8,12 +8,13 @@
  */
 
 package flyteadmin
+
 // IoStrategyUploadMode : - UPLOAD_ON_EXIT: All data will be uploaded after the main container exits  - UPLOAD_EAGER: Data will be uploaded as it appears. Refer to protocol specification for details  - DO_NOT_UPLOAD: Data will not be uploaded, only references will be written
 type IoStrategyUploadMode string
 
 // List of IOStrategyUploadMode
 const (
 	IoStrategyUploadModeUPLOAD_ON_EXIT IoStrategyUploadMode = "UPLOAD_ON_EXIT"
-	IoStrategyUploadModeUPLOAD_EAGER IoStrategyUploadMode = "UPLOAD_EAGER"
-	IoStrategyUploadModeDO_NOT_UPLOAD IoStrategyUploadMode = "DO_NOT_UPLOAD"
+	IoStrategyUploadModeUPLOAD_EAGER   IoStrategyUploadMode = "UPLOAD_EAGER"
+	IoStrategyUploadModeDO_NOT_UPLOAD  IoStrategyUploadMode = "DO_NOT_UPLOAD"
 )

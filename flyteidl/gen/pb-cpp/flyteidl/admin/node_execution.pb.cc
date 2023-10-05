@@ -477,6 +477,7 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto
   "ionIdentifier\022\021\n\tinput_uri\030\002 \001(\t\0225\n\007clos"
   "ure\030\003 \001(\0132$.flyteidl.admin.NodeExecution"
   "Closure\0227\n\010metadata\030\004 \001(\0132%.flyteidl.adm"
+<<<<<<< HEAD
   "in.NodeExecutionMetaData\"\200\001\n\025NodeExecuti"
   "onMetaData\022\023\n\013retry_group\030\001 \001(\t\022\026\n\016is_pa"
   "rent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\022\022\n"
@@ -521,11 +522,61 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto
   "etadata\022-\n\nflyte_urls\030\021 \001(\0132\031.flyteidl.a"
   "dmin.FlyteURLsB7Z5github.com/flyteorg/fl"
   "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
+=======
+  "in.NodeExecutionMetaData\"n\n\025NodeExecutio"
+  "nMetaData\022\023\n\013retry_group\030\001 \001(\t\022\026\n\016is_par"
+  "ent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\022\022\n\n"
+  "is_dynamic\030\004 \001(\010\"Z\n\021NodeExecutionList\0226\n"
+  "\017node_executions\030\001 \003(\0132\035.flyteidl.admin."
+  "NodeExecution\022\r\n\005token\030\002 \001(\t\"\342\004\n\024NodeExe"
+  "cutionClosure\022\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022"
+  ".\n\005error\030\002 \001(\0132\035.flyteidl.core.Execution"
+  "ErrorH\000\0224\n\013output_data\030\n \001(\0132\031.flyteidl."
+  "core.LiteralMapB\002\030\001H\000\0221\n\005phase\030\003 \001(\0162\".f"
+  "lyteidl.core.NodeExecution.Phase\022.\n\nstar"
+  "ted_at\030\004 \001(\0132\032.google.protobuf.Timestamp"
+  "\022+\n\010duration\030\005 \001(\0132\031.google.protobuf.Dur"
+  "ation\022.\n\ncreated_at\030\006 \001(\0132\032.google.proto"
+  "buf.Timestamp\022.\n\nupdated_at\030\007 \001(\0132\032.goog"
+  "le.protobuf.Timestamp\022F\n\026workflow_node_m"
+  "etadata\030\010 \001(\0132$.flyteidl.admin.WorkflowN"
+  "odeMetadataH\001\022>\n\022task_node_metadata\030\t \001("
+  "\0132 .flyteidl.admin.TaskNodeMetadataH\001\022\020\n"
+  "\010deck_uri\030\013 \001(\t\022\034\n\024dynamic_job_spec_uri\030"
+  "\014 \001(\tB\017\n\routput_resultB\021\n\017target_metadat"
+  "a\"W\n\024WorkflowNodeMetadata\022\?\n\013executionId"
+  "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution"
+  "Identifier\"\230\001\n\020TaskNodeMetadata\0227\n\014cache"
+  "_status\030\001 \001(\0162!.flyteidl.core.CatalogCac"
+  "heStatus\0223\n\013catalog_key\030\002 \001(\0132\036.flyteidl"
+  ".core.CatalogMetadata\022\026\n\016checkpoint_uri\030"
+  "\004 \001(\t\"\245\001\n\033DynamicWorkflowNodeMetadata\022%\n"
+  "\002id\030\001 \001(\0132\031.flyteidl.core.Identifier\022A\n\021"
+  "compiled_workflow\030\002 \001(\0132&.flyteidl.core."
+  "CompiledWorkflowClosure\022\034\n\024dynamic_job_s"
+  "pec_uri\030\003 \001(\t\"Q\n\033NodeExecutionGetDataReq"
+  "uest\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeExe"
+  "cutionIdentifier\"\320\002\n\034NodeExecutionGetDat"
+  "aResponse\022+\n\006inputs\030\001 \001(\0132\027.flyteidl.adm"
+  "in.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flytei"
+  "dl.admin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001("
+  "\0132\031.flyteidl.core.LiteralMap\022/\n\014full_out"
+  "puts\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n"
+  "\020dynamic_workflow\030\020 \001(\0132+.flyteidl.admin"
+  ".DynamicWorkflowNodeMetadata\022-\n\nflyte_ur"
+  "ls\030\021 \001(\0132\031.flyteidl.admin.FlyteURLsB=Z;g"
+  "ithub.com/flyteorg/flyte/flyteidl/gen/pb"
+  "-go/flyteidl/adminb\006proto3"
+>>>>>>> master
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto,
+<<<<<<< HEAD
   "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2719,
+=======
+  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2706,
+>>>>>>> master
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fnode_5fexecution_2eproto() {

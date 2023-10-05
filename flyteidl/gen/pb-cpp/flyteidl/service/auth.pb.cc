@@ -186,14 +186,14 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fauth_2eproto[] =
   "ClientConfig\022/.flyteidl.service.PublicCl"
   "ientAuthConfigRequest\0320.flyteidl.service"
   ".PublicClientAuthConfigResponse\"\037\202\323\344\223\002\031\022"
-  "\027/config/v1/flyte_clientB9Z7github.com/f"
-  "lyteorg/flyteidl/gen/pb-go/flyteidl/serv"
-  "iceb\006proto3"
+  "\027/config/v1/flyte_clientB\?Z=github.com/f"
+  "lyteorg/flyte/flyteidl/gen/pb-go/flyteid"
+  "l/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fauth_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fauth_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fauth_2eproto,
-  "flyteidl/service/auth.proto", &assign_descriptors_table_flyteidl_2fservice_2fauth_2eproto, 1051,
+  "flyteidl/service/auth.proto", &assign_descriptors_table_flyteidl_2fservice_2fauth_2eproto, 1057,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fauth_2eproto() {

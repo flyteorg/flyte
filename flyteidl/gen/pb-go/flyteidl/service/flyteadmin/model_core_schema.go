@@ -11,6 +11,6 @@ package flyteadmin
 
 // A strongly typed schema that defines the interface of data retrieved from the underlying storage medium.
 type CoreSchema struct {
-	Uri string `json:"uri,omitempty"`
+	Uri   string          `json:"uri,omitempty"`
 	Type_ *CoreSchemaType `json:"type,omitempty"`
 }

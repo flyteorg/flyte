@@ -12,5 +12,5 @@ package flyteadmin
 // A simple byte array with a tag to help different parts of the system communicate about what is in the byte array. It's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data.
 type CoreBinary struct {
 	Value string `json:"value,omitempty"`
-	Tag string `json:"tag,omitempty"`
+	Tag   string `json:"tag,omitempty"`
 }

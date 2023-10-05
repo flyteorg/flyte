@@ -12,8 +12,8 @@ package flyteadmin
 // Request to recover the referenced execution.
 type AdminExecutionRecoverRequest struct {
 	// Identifier of the workflow execution to recover.
-	Id *CoreWorkflowExecutionIdentifier `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
+	Id   *CoreWorkflowExecutionIdentifier `json:"id,omitempty"`
+	Name string                           `json:"name,omitempty"`
 	// Additional metadata which will be used to overwrite any metadata in the reference execution when triggering a recovery execution.
 	Metadata *AdminExecutionMetadata `json:"metadata,omitempty"`
 }

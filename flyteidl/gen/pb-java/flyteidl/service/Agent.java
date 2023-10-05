@@ -31,9 +31,9 @@ public final class Agent {
       "lyteidl.admin.GetTaskRequest\032\037.flyteidl." +
       "admin.GetTaskResponse\"\000\022U\n\nDeleteTask\022!." +
       "flyteidl.admin.DeleteTaskRequest\032\".flyte" +
-      "idl.admin.DeleteTaskResponse\"\000B9Z7github" +
-      ".com/flyteorg/flyteidl/gen/pb-go/flyteid" +
-      "l/serviceb\006proto3"
+      "idl.admin.DeleteTaskResponse\"\000B?Z=github" +
+      ".com/flyteorg/flyte/flyteidl/gen/pb-go/f" +
+      "lyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
