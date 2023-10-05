@@ -21723,7 +21723,6 @@ public final class Event {
       "_id\030\014 \001(\t\022\021\n\tnode_name\030\r \001(\t\022\025\n\revent_ve" +
       "rsion\030\020 \001(\005\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dyn" +
       "amic\030\022 \001(\010\022\020\n\010deck_uri\030\023 \001(\t\022/\n\013reported" +
-<<<<<<< HEAD
       "_at\030\025 \001(\0132\032.google.protobuf.Timestamp\022\020\n" +
       "\010is_array\030\026 \001(\010B\r\n\013input_valueB\017\n\routput" +
       "_resultB\021\n\017target_metadata\"X\n\024WorkflowNo" +
@@ -21782,70 +21781,8 @@ public final class Event {
       "K\n\016instance_class\030\020 \001(\01623.flyteidl.event" +
       ".TaskExecutionMetadata.InstanceClass\"/\n\r" +
       "InstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTI" +
-      "BLE\020\001B7Z5github.com/flyteorg/flyteidl/ge" +
-      "n/pb-go/flyteidl/eventb\006proto3"
-=======
-      "_at\030\025 \001(\0132\032.google.protobuf.TimestampB\r\n" +
-      "\013input_valueB\017\n\routput_resultB\021\n\017target_" +
-      "metadata\"X\n\024WorkflowNodeMetadata\022@\n\014exec" +
-      "ution_id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
-      "xecutionIdentifier\"\245\002\n\020TaskNodeMetadata\022" +
-      "7\n\014cache_status\030\001 \001(\0162!.flyteidl.core.Ca" +
-      "talogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132\036." +
-      "flyteidl.core.CatalogMetadata\022D\n\022reserva" +
-      "tion_status\030\003 \001(\0162(.flyteidl.core.Catalo" +
-      "gReservation.Status\022\026\n\016checkpoint_uri\030\004 " +
-      "\001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.flyteidl" +
-      ".event.DynamicWorkflowNodeMetadata\"\245\001\n\033D" +
-      "ynamicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031" +
-      ".flyteidl.core.Identifier\022A\n\021compiled_wo" +
-      "rkflow\030\002 \001(\0132&.flyteidl.core.CompiledWor" +
-      "kflowClosure\022\034\n\024dynamic_job_spec_uri\030\003 \001" +
-      "(\t\"Q\n\033ParentTaskExecutionMetadata\0222\n\002id\030" +
-      "\001 \001(\0132&.flyteidl.core.TaskExecutionIdent" +
-      "ifier\".\n\033ParentNodeExecutionMetadata\022\017\n\007" +
-      "node_id\030\001 \001(\t\"N\n\013EventReason\022\016\n\006reason\030\001" +
-      " \001(\t\022/\n\013occurred_at\030\002 \001(\0132\032.google.proto" +
-      "buf.Timestamp\"\271\006\n\022TaskExecutionEvent\022*\n\007" +
-      "task_id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
-      "\022H\n\030parent_node_execution_id\030\002 \001(\0132&.fly" +
-      "teidl.core.NodeExecutionIdentifier\022\025\n\rre" +
-      "try_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyte" +
-      "idl.core.TaskExecution.Phase\022\023\n\013producer" +
-      "_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core." +
-      "TaskLog\022/\n\013occurred_at\030\007 \001(\0132\032.google.pr" +
-      "otobuf.Timestamp\022\023\n\tinput_uri\030\010 \001(\tH\000\022/\n" +
-      "\ninput_data\030\023 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapH\000\022\024\n\noutput_uri\030\t \001(\tH\001\022.\n\005error\030\n " +
-      "\001(\0132\035.flyteidl.core.ExecutionErrorH\001\0220\n\013" +
-      "output_data\030\021 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapH\001\022,\n\013custom_info\030\013 \001(\0132\027.google.pro" +
-      "tobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022\022\n\006r" +
-      "eason\030\r \001(\tB\002\030\001\022,\n\007reasons\030\025 \003(\0132\033.flyte" +
-      "idl.event.EventReason\022\021\n\ttask_type\030\016 \001(\t" +
-      "\0227\n\010metadata\030\020 \001(\0132%.flyteidl.event.Task" +
-      "ExecutionMetadata\022\025\n\revent_version\030\022 \001(\005" +
-      "\022/\n\013reported_at\030\024 \001(\0132\032.google.protobuf." +
-      "TimestampB\r\n\013input_valueB\017\n\routput_resul" +
-      "t\"\343\001\n\024ExternalResourceInfo\022\023\n\013external_i" +
-      "d\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretry_attempt\030" +
-      "\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl.core.Tas" +
-      "kExecution.Phase\0227\n\014cache_status\030\005 \001(\0162!" +
-      ".flyteidl.core.CatalogCacheStatus\022$\n\004log" +
-      "s\030\006 \003(\0132\026.flyteidl.core.TaskLog\"?\n\020Resou" +
-      "rcePoolInfo\022\030\n\020allocation_token\030\001 \001(\t\022\021\n" +
-      "\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecutionMetada" +
-      "ta\022\026\n\016generated_name\030\001 \001(\t\022@\n\022external_r" +
-      "esources\030\002 \003(\0132$.flyteidl.event.External" +
-      "ResourceInfo\022<\n\022resource_pool_info\030\003 \003(\013" +
-      "2 .flyteidl.event.ResourcePoolInfo\022\031\n\021pl" +
-      "ugin_identifier\030\004 \001(\t\022K\n\016instance_class\030" +
-      "\020 \001(\01623.flyteidl.event.TaskExecutionMeta" +
-      "data.InstanceClass\"/\n\rInstanceClass\022\013\n\007D" +
-      "EFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B=Z;github.co" +
-      "m/flyteorg/flyte/flyteidl/gen/pb-go/flyt" +
-      "eidl/eventb\006proto3"
->>>>>>> master
+      "BLE\020\001B=Z;github.com/flyteorg/flyte/flyte" +
+      "idl/gen/pb-go/flyteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
