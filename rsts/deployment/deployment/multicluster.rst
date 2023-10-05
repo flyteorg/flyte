@@ -375,7 +375,9 @@ label has to be 1.
 10. Update the control plane Helm release:
 
 .. note:: 
-   This step will disable ``flytepropeller`` in the control plane cluster, leaving no possibility of running workflows there.
+   This step will disable ``flytepropeller`` in the control plane cluster, leaving no possibility of running workflows there. If you require
+   the control plane to run workflows, edit the ``values-controlplane.yaml`` file and set ``flytepropeller.enabled`` to ``true``. Then, perform the ``helm upgrade`` operation and complete the steps in :ref:`this section <dataplane-deployment>` to configure it 
+   as a dataplane cluster.
 
 .. tabbed:: AWS
 
@@ -651,7 +653,7 @@ The process can be repeated for additional clusters.
  
       .. prompt:: bash $
 
-         pyflyte run --remote --project team1 --domain production example.py  training_workflow \                                                                                      ✔ ╱ base 
+         pyflyte run --remote --project team1 --domain production example.py  training_workflow \                                                                                   
          --hyperparameters '{"C": 0.1}'
         
   15. A successful execution should be visible on the UI, confirming it ran in the new cluster:
