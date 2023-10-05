@@ -131,7 +131,7 @@ func CheckValidExecutionID(executionID, fieldName string) error {
 	matched := executionIDRegex.MatchString(executionID)
 
 	if !matched {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s format: %s", fieldName, executionID)
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s format: %s, does not match regex '^[a-z][a-z\-0-9]*$'", fieldName, executionID)
 	}
 
 	return nil
