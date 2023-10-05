@@ -161,6 +161,10 @@ requests successfully, the following environment-specific requirements should be
             }
         }
 
+   .. note:: 
+
+      To further refine the Trust Relationship, consider using a ``StringEquals`` condition and adding the ``default`` Service Account only for the ``project``-``domain``
+      namespaces where Flyte tasks will run, instead of using a wildcard. 
     
 .. _dataplane-deployment:
 
@@ -192,11 +196,15 @@ the first cluster only.
           admin:
             endpoint: <your-Ingress-FQDN>:443 #indicate the URL you're using to connect to Flyte
             insecure: false #enables secure communication over SSL. Requires a signed certificate
+        catalog:
+          catalog-cache:
+            endpoint: <your-Ingress-FQDN>:443
+            insecure: false 
 
 .. note:: 
 
    This step is needed so the ``flytepropeller`` instance in the data plane cluster is able to send notifications
-   back to the ``flyteadmin`` service in the control plane.
+   back to the ``flyteadmin`` service in the control plane. The ``catalog`` service runs in the control plane and is used when caching is enabled.
 
 3. Install Flyte data plane Helm chart:
 
