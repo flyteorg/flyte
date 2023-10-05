@@ -451,7 +451,7 @@ func writeOutput(ctx context.Context, tCtx core.TaskExecutionContext, externalLo
 
 	results := taskTemplate.Interface.Outputs.Variables["results"]
 
-	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
+	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReaderWithSpan(
 		&pb.LiteralMap{
 			Literals: map[string]*pb.Literal{
 				"results": {
@@ -466,7 +466,7 @@ func writeOutput(ctx context.Context, tCtx core.TaskExecutionContext, externalLo
 					},
 				},
 			},
-		}, nil, nil))
+		}, nil, nil, nil))
 }
 
 // The 'PhaseInfoRunning' occurs 15 times (3 for each of the 5 Presto queries that get run for every Presto task) which

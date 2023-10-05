@@ -37,7 +37,9 @@ func TestReadOrigin(t *testing.T) {
 	opath := &pluginsIOMock.OutputFilePaths{}
 	opath.OnGetErrorPath().Return("")
 	deckPath := "deck.html"
+	spanPath := "span.pb"
 	opath.OnGetDeckPath().Return(storage.DataReference(deckPath))
+	opath.OnGetSpanPath().Return(storage.DataReference(spanPath))
 
 	t.Run("user", func(t *testing.T) {
 		errorDoc := &core.ErrorDocument{
@@ -56,7 +58,10 @@ func TestReadOrigin(t *testing.T) {
 			casted.Error = errorDoc.Error
 		}).Return(nil)
 
-		store.OnHead(ctx, storage.DataReference("deck.html")).Return(MemoryMetadata{
+		store.OnHead(ctx, storage.DataReference(deckPath)).Return(MemoryMetadata{
+			exists: true,
+		}, nil)
+		store.OnHead(ctx, storage.DataReference(spanPath)).Return(MemoryMetadata{
 			exists: true,
 		}, nil)
 
@@ -71,6 +76,9 @@ func TestReadOrigin(t *testing.T) {
 		assert.Equal(t, core.ExecutionError_USER, ee.Kind)
 		assert.False(t, ee.IsRecoverable)
 		exists, err := r.DeckExists(ctx)
+		assert.NoError(t, err)
+		assert.True(t, exists)
+		exists, err = r.SpanExists(ctx)
 		assert.NoError(t, err)
 		assert.True(t, exists)
 	})

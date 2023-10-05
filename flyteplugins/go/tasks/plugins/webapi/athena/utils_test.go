@@ -93,7 +93,7 @@ func Test_writeOutput(t *testing.T) {
 
 		ow := &mocks3.OutputWriter{}
 		externalLocation := "s3://my-external-bucket/key"
-		ow.OnPut(ctx, ioutils.NewInMemoryOutputReader(
+		ow.OnPut(ctx, ioutils.NewInMemoryOutputReaderWithSpan(
 			&pb.LiteralMap{
 				Literals: map[string]*pb.Literal{
 					"results": {
@@ -111,7 +111,7 @@ func Test_writeOutput(t *testing.T) {
 						},
 					},
 				},
-			}, nil, nil)).Return(nil)
+			}, nil, nil, nil)).Return(nil)
 		statusContext.OnOutputWriter().Return(ow)
 
 		err = writeOutput(context.Background(), statusContext, externalLocation)

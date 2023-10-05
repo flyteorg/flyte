@@ -235,3 +235,35 @@ func (_m *OutputFilePaths) GetRawOutputPrefix() storage.DataReference {
 
 	return r0
 }
+
+type OutputFilePaths_GetSpanPath struct {
+	*mock.Call
+}
+
+func (_m OutputFilePaths_GetSpanPath) Return(_a0 storage.DataReference) *OutputFilePaths_GetSpanPath {
+	return &OutputFilePaths_GetSpanPath{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *OutputFilePaths) OnGetSpanPath() *OutputFilePaths_GetSpanPath {
+	c_call := _m.On("GetSpanPath")
+	return &OutputFilePaths_GetSpanPath{Call: c_call}
+}
+
+func (_m *OutputFilePaths) OnGetSpanPathMatch(matchers ...interface{}) *OutputFilePaths_GetSpanPath {
+	c_call := _m.On("GetSpanPath", matchers...)
+	return &OutputFilePaths_GetSpanPath{Call: c_call}
+}
+
+// GetSpanPath provides a mock function with given fields:
+func (_m *OutputFilePaths) GetSpanPath() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
