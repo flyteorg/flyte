@@ -21,7 +21,7 @@ type AdminExecutionMetadata struct {
 	// Indicates the nestedness of this execution. If a user launches a workflow execution, the default nesting is 0. If this execution further launches a workflow (child workflow), the nesting level is incremented by 0 => 1 Generally, if workflow at nesting level k launches a workflow then the child workflow will have nesting = k + 1.
 	Nesting int64 `json:"nesting,omitempty"`
 	// For scheduled executions, the requested time for execution for this specific schedule invocation.
-	ScheduledAt         time.Time                    `json:"scheduled_at,omitempty"`
+	ScheduledAt time.Time `json:"scheduled_at,omitempty"`
 	ParentNodeExecution *CoreNodeExecutionIdentifier `json:"parent_node_execution,omitempty"`
 	// Optional, a reference workflow execution related to this execution. In the case of a relaunch, this references the original workflow execution.
 	ReferenceExecution *CoreWorkflowExecutionIdentifier `json:"reference_execution,omitempty"`

@@ -122,7 +122,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		workerReplicaSpec := kfTensorflowTaskExtraArgs.GetWorkerReplicas()
 		if workerReplicaSpec != nil {
 			err := common.OverrideContainerSpec(
-				replicaSpecMap[kubeflowv1.MPIJobReplicaTypeWorker].PodSpec,
+				replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker].PodSpec,
 				kubeflowv1.TFJobDefaultContainerName,
 				workerReplicaSpec.GetImage(),
 				workerReplicaSpec.GetResources(),

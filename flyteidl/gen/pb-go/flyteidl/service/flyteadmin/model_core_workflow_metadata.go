@@ -15,5 +15,5 @@ type CoreWorkflowMetadata struct {
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`
 	// Defines how the system should behave when a failure is detected in the workflow execution.
 	OnFailure *WorkflowMetadataOnFailurePolicy `json:"on_failure,omitempty"`
-	Tags      map[string]string                `json:"tags,omitempty"`
+	Tags map[string]string `json:"tags,omitempty"`
 }

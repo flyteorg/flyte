@@ -13,6 +13,6 @@ type BlobTypeBlobDimensionality string
 
 // List of BlobTypeBlobDimensionality
 const (
-	BlobTypeBlobDimensionalitySINGLE    BlobTypeBlobDimensionality = "SINGLE"
+	BlobTypeBlobDimensionalitySINGLE BlobTypeBlobDimensionality = "SINGLE"
 	BlobTypeBlobDimensionalityMULTIPART BlobTypeBlobDimensionality = "MULTIPART"
 )

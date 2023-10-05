@@ -18,6 +18,6 @@ type CoreBindingData struct {
 	// References an output promised by another node.
 	Promise *CoreOutputReference `json:"promise,omitempty"`
 	// A map of bindings. The key is always a string.
-	Map_  *CoreBindingDataMap `json:"map,omitempty"`
-	Union *CoreUnionInfo      `json:"union,omitempty"`
+	Map_ *CoreBindingDataMap `json:"map,omitempty"`
+	Union *CoreUnionInfo `json:"union,omitempty"`
 }
