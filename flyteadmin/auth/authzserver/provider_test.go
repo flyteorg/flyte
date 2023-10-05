@@ -13,7 +13,7 @@ import (
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/stretchr/testify/assert"
 

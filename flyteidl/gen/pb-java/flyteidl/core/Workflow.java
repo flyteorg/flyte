@@ -21477,8 +21477,8 @@ public final class Workflow {
       "s\"~\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001(" +
       "\0132\030.flyteidl.core.Resources\022<\n\022extended_" +
       "resources\030\002 \001(\0132 .flyteidl.core.Extended" +
-      "ResourcesB6Z4github.com/flyteorg/flyteid" +
-      "l/gen/pb-go/flyteidl/coreb\006proto3"
+      "ResourcesB<Z:github.com/flyteorg/flyte/f" +
+      "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

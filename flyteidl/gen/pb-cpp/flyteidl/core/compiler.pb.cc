@@ -276,13 +276,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fcompiler_2eproto[] =
   "yteidl.core.CompiledWorkflow\0226\n\rsub_work"
   "flows\030\002 \003(\0132\037.flyteidl.core.CompiledWork"
   "flow\022*\n\005tasks\030\003 \003(\0132\033.flyteidl.core.Comp"
-  "iledTaskB6Z4github.com/flyteorg/flyteidl"
-  "/gen/pb-go/flyteidl/coreb\006proto3"
+  "iledTaskB<Z:github.com/flyteorg/flyte/fl"
+  "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fcompiler_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fcompiler_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fcompiler_2eproto,
-  "flyteidl/core/compiler.proto", &assign_descriptors_table_flyteidl_2fcore_2fcompiler_2eproto, 872,
+  "flyteidl/core/compiler.proto", &assign_descriptors_table_flyteidl_2fcore_2fcompiler_2eproto, 878,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fcompiler_2eproto() {

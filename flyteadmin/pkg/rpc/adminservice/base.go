@@ -14,7 +14,7 @@ import (
 
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/implementations"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 

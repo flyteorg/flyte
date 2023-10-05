@@ -10,11 +10,11 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	idlPlugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 

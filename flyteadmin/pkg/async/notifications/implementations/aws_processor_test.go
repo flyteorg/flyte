@@ -8,7 +8,7 @@ import (
 	"encoding/base64"
 
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	"github.com/stretchr/testify/assert"

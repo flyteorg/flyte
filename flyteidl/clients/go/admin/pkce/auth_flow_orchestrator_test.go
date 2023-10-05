@@ -7,9 +7,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
-	"github.com/flyteorg/flyteidl/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
 )
 
 func TestFetchFromAuthFlow(t *testing.T) {

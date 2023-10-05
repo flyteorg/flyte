@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 type CreateTaskExecutionEventFunc func(ctx context.Context, request admin.TaskExecutionEventRequest) (

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
@@ -122,7 +122,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		workerReplicaSpec := kfTensorflowTaskExtraArgs.GetWorkerReplicas()
 		if workerReplicaSpec != nil {
 			err := common.OverrideContainerSpec(
-				replicaSpecMap[kubeflowv1.MPIJobReplicaTypeWorker].PodSpec,
+				replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker].PodSpec,
 				kubeflowv1.TFJobDefaultContainerName,
 				workerReplicaSpec.GetImage(),
 				workerReplicaSpec.GetResources(),

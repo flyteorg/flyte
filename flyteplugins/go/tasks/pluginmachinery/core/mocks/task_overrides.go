@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	flyteidlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
 
 	v1 "k8s.io/api/core/v1"

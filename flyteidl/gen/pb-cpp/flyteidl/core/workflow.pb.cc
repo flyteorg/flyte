@@ -678,13 +678,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
   "s\"~\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001("
   "\0132\030.flyteidl.core.Resources\022<\n\022extended_"
   "resources\030\002 \001(\0132 .flyteidl.core.Extended"
-  "ResourcesB6Z4github.com/flyteorg/flyteid"
-  "l/gen/pb-go/flyteidl/coreb\006proto3"
+  "ResourcesB<Z:github.com/flyteorg/flyte/f"
+  "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto,
-  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 3033,
+  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 3039,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {

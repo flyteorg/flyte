@@ -6,7 +6,6 @@ on:
       - 'datacatalog/**'
       - 'flyteadmin/**'
       - 'flytecopilot/**'
-      - 'flyteidl/**'
       - 'flyteplugins/**'
       - 'flytepropeller/**'
       - 'flytestdlib/**'
@@ -65,8 +64,6 @@ jobs:
           - datacatalog
           - flyteadmin
           - flytecopilot
-          # TODO(monorepo): Enable flyteidl unit tests
-          # - flyteidl
           - flyteplugins
           - flytepropeller
           - flytestdlib
