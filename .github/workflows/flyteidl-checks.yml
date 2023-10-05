@@ -20,6 +20,16 @@ jobs:
       - id: step
         run: |
           echo "go-version=${{ env.GO_VERSION }}" >> $GITHUB_OUTPUT
+  lint:
+    name: Lint
+    needs:
+      - unpack-envvars
+    strategy:
+      fail-fast: false
+    uses: ./.github/workflows/lint.yml
+    with:
+      component: flyteidl
+      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
   unit-tests:
     name: Unit Tests
     needs:
