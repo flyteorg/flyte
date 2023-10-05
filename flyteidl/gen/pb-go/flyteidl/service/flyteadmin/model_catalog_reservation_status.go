@@ -8,7 +8,6 @@
  */
 
 package flyteadmin
-
 // CatalogReservationStatus : Indicates the status of a catalog reservation operation.   - RESERVATION_DISABLED: Used to indicate that reservations are disabled  - RESERVATION_ACQUIRED: Used to indicate that a reservation was successfully acquired or extended  - RESERVATION_EXISTS: Used to indicate that an active reservation currently exists  - RESERVATION_RELEASED: Used to indicate that the reservation has been successfully released  - RESERVATION_FAILURE: Used to indicate that a reservation operation resulted in failure
 type CatalogReservationStatus string
 
@@ -16,7 +15,7 @@ type CatalogReservationStatus string
 const (
 	CatalogReservationStatusDISABLED CatalogReservationStatus = "RESERVATION_DISABLED"
 	CatalogReservationStatusACQUIRED CatalogReservationStatus = "RESERVATION_ACQUIRED"
-	CatalogReservationStatusEXISTS   CatalogReservationStatus = "RESERVATION_EXISTS"
+	CatalogReservationStatusEXISTS CatalogReservationStatus = "RESERVATION_EXISTS"
 	CatalogReservationStatusRELEASED CatalogReservationStatus = "RESERVATION_RELEASED"
-	CatalogReservationStatusFAILURE  CatalogReservationStatus = "RESERVATION_FAILURE"
+	CatalogReservationStatusFAILURE CatalogReservationStatus = "RESERVATION_FAILURE"
 )

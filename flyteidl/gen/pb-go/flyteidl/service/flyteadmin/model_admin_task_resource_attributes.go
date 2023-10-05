@@ -12,5 +12,5 @@ package flyteadmin
 // Defines task resource defaults and limits that will be applied at task registration.
 type AdminTaskResourceAttributes struct {
 	Defaults *AdminTaskResourceSpec `json:"defaults,omitempty"`
-	Limits   *AdminTaskResourceSpec `json:"limits,omitempty"`
+	Limits *AdminTaskResourceSpec `json:"limits,omitempty"`
 }

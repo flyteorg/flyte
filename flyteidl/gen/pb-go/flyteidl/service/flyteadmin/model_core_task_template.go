@@ -20,13 +20,13 @@ type CoreTaskTemplate struct {
 	// A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees compile-time validation of the workflow to avoid costly runtime failures.
 	Interface_ *CoreTypedInterface `json:"interface,omitempty"`
 	// Custom data about the task. This is extensible to allow various plugins in the system.
-	Custom    *ProtobufStruct `json:"custom,omitempty"`
-	Container *CoreContainer  `json:"container,omitempty"`
-	K8sPod    *CoreK8sPod     `json:"k8s_pod,omitempty"`
-	Sql       *CoreSql        `json:"sql,omitempty"`
+	Custom *ProtobufStruct `json:"custom,omitempty"`
+	Container *CoreContainer `json:"container,omitempty"`
+	K8sPod *CoreK8sPod `json:"k8s_pod,omitempty"`
+	Sql *CoreSql `json:"sql,omitempty"`
 	// This can be used to customize task handling at execution time for the same task type.
 	TaskTypeVersion int32 `json:"task_type_version,omitempty"`
 	// security_context encapsulates security attributes requested to run this task.
 	SecurityContext *CoreSecurityContext `json:"security_context,omitempty"`
-	Config          map[string]string    `json:"config,omitempty"`
+	Config map[string]string `json:"config,omitempty"`
 }

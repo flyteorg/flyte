@@ -13,6 +13,6 @@ type AdminProjectDomainAttributes struct {
 	// Unique project id for which this set of attributes will be applied.
 	Project string `json:"project,omitempty"`
 	// Unique domain id for which this set of attributes will be applied.
-	Domain             string                   `json:"domain,omitempty"`
+	Domain string `json:"domain,omitempty"`
 	MatchingAttributes *AdminMatchingAttributes `json:"matching_attributes,omitempty"`
 }

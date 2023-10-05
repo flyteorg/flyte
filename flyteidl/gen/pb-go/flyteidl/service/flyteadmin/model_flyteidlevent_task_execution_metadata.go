@@ -18,6 +18,6 @@ type FlyteidleventTaskExecutionMetadata struct {
 	// Includes additional data on concurrent resource management used during execution.. This is a repeated field because a plugin can request multiple resource allocations during execution.
 	ResourcePoolInfo []EventResourcePoolInfo `json:"resource_pool_info,omitempty"`
 	// The identifier of the plugin used to execute this task.
-	PluginIdentifier string                              `json:"plugin_identifier,omitempty"`
-	InstanceClass    *TaskExecutionMetadataInstanceClass `json:"instance_class,omitempty"`
+	PluginIdentifier string `json:"plugin_identifier,omitempty"`
+	InstanceClass *TaskExecutionMetadataInstanceClass `json:"instance_class,omitempty"`
 }

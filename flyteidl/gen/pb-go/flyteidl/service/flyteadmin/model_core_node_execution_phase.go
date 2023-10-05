@@ -13,15 +13,15 @@ type CoreNodeExecutionPhase string
 
 // List of coreNodeExecutionPhase
 const (
-	CoreNodeExecutionPhaseUNDEFINED       CoreNodeExecutionPhase = "UNDEFINED"
-	CoreNodeExecutionPhaseQUEUED          CoreNodeExecutionPhase = "QUEUED"
-	CoreNodeExecutionPhaseRUNNING         CoreNodeExecutionPhase = "RUNNING"
-	CoreNodeExecutionPhaseSUCCEEDED       CoreNodeExecutionPhase = "SUCCEEDED"
-	CoreNodeExecutionPhaseFAILING         CoreNodeExecutionPhase = "FAILING"
-	CoreNodeExecutionPhaseFAILED          CoreNodeExecutionPhase = "FAILED"
-	CoreNodeExecutionPhaseABORTED         CoreNodeExecutionPhase = "ABORTED"
-	CoreNodeExecutionPhaseSKIPPED         CoreNodeExecutionPhase = "SKIPPED"
-	CoreNodeExecutionPhaseTIMED_OUT       CoreNodeExecutionPhase = "TIMED_OUT"
+	CoreNodeExecutionPhaseUNDEFINED CoreNodeExecutionPhase = "UNDEFINED"
+	CoreNodeExecutionPhaseQUEUED CoreNodeExecutionPhase = "QUEUED"
+	CoreNodeExecutionPhaseRUNNING CoreNodeExecutionPhase = "RUNNING"
+	CoreNodeExecutionPhaseSUCCEEDED CoreNodeExecutionPhase = "SUCCEEDED"
+	CoreNodeExecutionPhaseFAILING CoreNodeExecutionPhase = "FAILING"
+	CoreNodeExecutionPhaseFAILED CoreNodeExecutionPhase = "FAILED"
+	CoreNodeExecutionPhaseABORTED CoreNodeExecutionPhase = "ABORTED"
+	CoreNodeExecutionPhaseSKIPPED CoreNodeExecutionPhase = "SKIPPED"
+	CoreNodeExecutionPhaseTIMED_OUT CoreNodeExecutionPhase = "TIMED_OUT"
 	CoreNodeExecutionPhaseDYNAMIC_RUNNING CoreNodeExecutionPhase = "DYNAMIC_RUNNING"
-	CoreNodeExecutionPhaseRECOVERED       CoreNodeExecutionPhase = "RECOVERED"
+	CoreNodeExecutionPhaseRECOVERED CoreNodeExecutionPhase = "RECOVERED"
 )

@@ -13,7 +13,7 @@ package flyteadmin
 type CoreExecutionError struct {
 	Code string `json:"code,omitempty"`
 	// Detailed description of the error - including stack trace.
-	Message  string                   `json:"message,omitempty"`
-	ErrorUri string                   `json:"error_uri,omitempty"`
-	Kind     *ExecutionErrorErrorKind `json:"kind,omitempty"`
+	Message string `json:"message,omitempty"`
+	ErrorUri string `json:"error_uri,omitempty"`
+	Kind *ExecutionErrorErrorKind `json:"kind,omitempty"`
 }

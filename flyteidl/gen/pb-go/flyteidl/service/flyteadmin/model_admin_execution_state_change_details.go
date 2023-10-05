@@ -18,5 +18,5 @@ type AdminExecutionStateChangeDetails struct {
 	State *AdminExecutionState `json:"state,omitempty"`
 	// This timestamp represents when the state changed.
 	OccurredAt time.Time `json:"occurred_at,omitempty"`
-	Principal  string    `json:"principal,omitempty"`
+	Principal string `json:"principal,omitempty"`
 }
