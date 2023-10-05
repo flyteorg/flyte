@@ -52,7 +52,7 @@ func TestActivateProjectFunc(t *testing.T) {
 	err := updateProjectsFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
 	s.MockAdminClient.AssertCalled(t, "UpdateProject", s.Ctx, projectUpdateRequest)
-	tearDownAndVerify(t, s.Writer, "Project dummyProject updated\n")
+	s.TearDownAndVerify(t, "Project dummyProject updated\n")
 }
 
 func TestActivateProjectFuncWithError(t *testing.T) {
@@ -73,7 +73,7 @@ func TestActivateProjectFuncWithError(t *testing.T) {
 	err := updateProjectsFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	s.MockAdminClient.AssertCalled(t, "UpdateProject", s.Ctx, projectUpdateRequest)
-	tearDownAndVerify(t, s.Writer, "Project dummyProject failed to update due to Error Updating Project\n")
+	s.TearDownAndVerify(t, "Project dummyProject failed to update due to Error Updating Project\n")
 }
 
 func TestArchiveProjectFunc(t *testing.T) {
@@ -95,7 +95,7 @@ func TestArchiveProjectFunc(t *testing.T) {
 	err := updateProjectsFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.Nil(t, err)
 	s.MockAdminClient.AssertCalled(t, "UpdateProject", s.Ctx, projectUpdateRequest)
-	tearDownAndVerify(t, s.Writer, "Project dummyProject updated\n")
+	s.TearDownAndVerify(t, "Project dummyProject updated\n")
 }
 
 func TestArchiveProjectFuncWithError(t *testing.T) {
@@ -116,7 +116,7 @@ func TestArchiveProjectFuncWithError(t *testing.T) {
 	err := updateProjectsFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	s.MockAdminClient.AssertCalled(t, "UpdateProject", s.Ctx, projectUpdateRequest)
-	tearDownAndVerify(t, s.Writer, "Project dummyProject failed to update"+
+	s.TearDownAndVerify(t, "Project dummyProject failed to update"+
 		" due to Error Updating Project\n")
 }
 
@@ -139,5 +139,5 @@ func TestInvalidInput(t *testing.T) {
 	err := updateProjectsFunc(s.Ctx, []string{}, s.CmdCtx)
 	assert.NotNil(t, err)
 	assert.Equal(t, fmt.Errorf(clierrors.ErrInvalidStateUpdate), err)
-	tearDownAndVerify(t, s.Writer, "")
+	s.TearDownAndVerify(t, "")
 }

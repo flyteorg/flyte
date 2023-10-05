@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/config/subcommand/clusterresourceattribute"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/clusterresourceattribute"
 )
 
 func updateClusterResourceAttributeSetup() {
@@ -20,7 +21,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		err := updateClusterResourceAttributesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("attrFile is mandatory while calling update for cluster resource attribute"), err)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successfully updated project domain attribute", func(t *testing.T) {
 		s := setup()
@@ -31,7 +32,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 			mock.Anything).Return(nil)
 		err := updateClusterResourceAttributesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, s.Writer, `Updated attributes from flytesnacks project and domain development`)
+		s.TearDownAndVerify(t, `Updated attributes from flytesnacks project and domain development`)
 	})
 	t.Run("failed to update project domain attribute", func(t *testing.T) {
 		s := setup()
@@ -43,7 +44,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		err := updateClusterResourceAttributesFunc(s.Ctx, []string{}, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("failed to update attributes"), err)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successfully updated workflow attribute", func(t *testing.T) {
 		s := setup()
@@ -54,7 +55,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 			mock.Anything, mock.Anything).Return(nil)
 		err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
 		assert.Nil(t, err)
-		tearDownAndVerify(t, s.Writer, `Updated attributes from flytesnacks project and domain development and workflow core.control_flow.merge_sort.merge_sort`)
+		s.TearDownAndVerify(t, `Updated attributes from flytesnacks project and domain development and workflow core.control_flow.merge_sort.merge_sort`)
 	})
 	t.Run("failed to update workflow attribute", func(t *testing.T) {
 		s := setup()
@@ -66,7 +67,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("failed to update attributes"), err)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("non existent file", func(t *testing.T) {
 		s := setup()
@@ -75,7 +76,7 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("unable to read from testdata/non-existent-file yaml file"), err)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("invalid update file", func(t *testing.T) {
 		s := setup()
@@ -84,6 +85,6 @@ func TestUpdateClusterResourceAttributes(t *testing.T) {
 		err := updateClusterResourceAttributesFunc(s.Ctx, nil, s.CmdCtx)
 		assert.NotNil(t, err)
 		assert.Equal(t, fmt.Errorf("error unmarshaling JSON: while decoding JSON: json: unknown field \"InvalidDomain\""), err)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 }

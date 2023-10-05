@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
@@ -202,7 +203,7 @@ func (s *createSuite) Test_CreateTaskExecution() {
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
 
 	s.NoError(err)
-	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"ff513c0e44b5b4a35aa5" `)
+	s.TearDownAndVerify(s.T(), `execution identifier project:"flytesnacks" domain:"development" name:"ff513c0e44b5b4a35aa5" `)
 }
 
 func (s *createSuite) Test_CreateTaskExecution_GetTaskError() {
@@ -243,7 +244,7 @@ func (s *createSuite) Test_CreateLaunchPlanExecution() {
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
 
 	s.NoError(err)
-	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e" `)
+	s.TearDownAndVerify(s.T(), `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e" `)
 }
 
 func (s *createSuite) Test_CreateLaunchPlan_GetLaunchPlanError() {
@@ -277,7 +278,7 @@ func (s *createSuite) Test_CreateRelaunchExecution() {
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
 
 	s.NoError(err)
-	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
+	s.TearDownAndVerify(s.T(), `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e" `)
 }
 
 func (s *createSuite) Test_CreateRecoverExecution() {
@@ -302,7 +303,7 @@ func (s *createSuite) Test_CreateRecoverExecution() {
 	err := createExecutionCommand(s.Ctx, nil, s.CmdCtx)
 
 	s.NoError(err)
-	tearDownAndVerify(s.T(), s.Writer, `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
+	s.TearDownAndVerify(s.T(), `execution identifier project:"flytesnacks" domain:"development" name:"f652ea3596e7f4d80a0e"`)
 }
 
 func (s *createSuite) TestCreateExecutionFuncInvalid() {

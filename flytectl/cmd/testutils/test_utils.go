@@ -3,6 +3,7 @@ package testutils
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -14,10 +15,11 @@ import (
 
 	"github.com/flyteorg/flyteidl/clients/go/admin"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	extMocks "github.com/flyteorg/flytectl/pkg/ext/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
 const projectValue = "dummyProject"
@@ -97,15 +99,31 @@ func SetupWithExt() (s TestStruct) {
 }
 
 // TearDownAndVerify TODO: Change this to verify log lines from context
-func TearDownAndVerify(t *testing.T, reader io.Reader, expectedLog string) {
-	var buf bytes.Buffer
-	if _, err := io.Copy(&buf, reader); err == nil {
-		assert.Equal(t, sanitizeString(expectedLog), sanitizeString(buf.String()))
+func (s *TestStruct) TearDownAndVerify(t *testing.T, expectedLog string) {
+	if err := s.Writer.Close(); err != nil {
+		panic(fmt.Errorf("could not close test context writer: %w", err))
 	}
+
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, s.Reader); err != nil {
+		panic(fmt.Errorf("could not read from test context reader: %w", err))
+	}
+
+	assert.Equal(t, sanitizeString(expectedLog), sanitizeString(buf.String()))
 }
 
 func sanitizeString(str string) string {
-	// Not the most comprehensive ANSI pattern, but this should capture common color operations such as \x1b[107;0m and \x1b[0m. Expand if needed (insert regex 2 problems joke here).
+	// Not the most comprehensive ANSI pattern, but this should capture common color operations
+	// such as \x1b[107;0m and \x1b[0m. Expand if needed (insert regex 2 problems joke here).
 	ansiRegex := regexp.MustCompile("\u001B\\[[\\d+\\;]*\\d+m")
-	return ansiRegex.ReplaceAllString(strings.Trim(strings.ReplaceAll(strings.ReplaceAll(strings.ReplaceAll(str, "\n", ""), "\t", ""), "", ""), " \t"), "")
+	replacer := strings.NewReplacer(
+		"\n", "",
+		"\t", "",
+	)
+
+	str = replacer.Replace(str)
+	str = ansiRegex.ReplaceAllString(str, "")
+	str = strings.Trim(str, " ")
+
+	return str
 }

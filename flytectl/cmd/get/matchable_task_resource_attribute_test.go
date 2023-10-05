@@ -65,7 +65,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		assert.Nil(t, err)
 		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_TASK_RESOURCE)
-		tearDownAndVerify(t, s.Writer, `{"project":"dummyProject","domain":"dummyDomain","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"350Mi"}}`)
+		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"350Mi"}}`)
 	})
 	t.Run("successful get project domain attribute and write to file", func(t *testing.T) {
 		s := testutils.SetupWithExt()
@@ -78,7 +78,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		assert.Nil(t, err)
 		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_TASK_RESOURCE)
-		tearDownAndVerify(t, s.Writer, `wrote the config to file temp-output-file`)
+		s.TearDownAndVerify(t, `wrote the config to file temp-output-file`)
 	})
 	t.Run("successful get project domain attribute and write to file failure", func(t *testing.T) {
 		s := testutils.SetupWithExt()
@@ -92,7 +92,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("error dumping in file due to open non-existent-dir/temp-output-file: no such file or directory"), err)
 		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_TASK_RESOURCE)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("failed get project domain attribute", func(t *testing.T) {
 		s := testutils.SetupWithExt()
@@ -105,7 +105,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		assert.Equal(t, fmt.Errorf("failed to fetch response"), err)
 		s.FetcherExt.AssertCalled(t, "FetchProjectDomainAttributes",
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, admin.MatchableResource_TASK_RESOURCE)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 	t.Run("successful get workflow attribute", func(t *testing.T) {
 		s := testutils.SetupWithExt()
@@ -118,7 +118,7 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		s.FetcherExt.AssertCalled(t, "FetchWorkflowAttributes",
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, "workflow",
 			admin.MatchableResource_TASK_RESOURCE)
-		tearDownAndVerify(t, s.Writer, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"350Mi"}}`)
+		s.TearDownAndVerify(t, `{"project":"dummyProject","domain":"dummyDomain","workflow":"workflow","defaults":{"cpu":"1","memory":"150Mi"},"limits":{"cpu":"2","memory":"350Mi"}}`)
 	})
 	t.Run("failed get workflow attribute", func(t *testing.T) {
 		s := testutils.SetupWithExt()
@@ -132,6 +132,6 @@ func TestGetTaskResourceAttributes(t *testing.T) {
 		s.FetcherExt.AssertCalled(t, "FetchWorkflowAttributes",
 			s.Ctx, config.GetConfig().Project, config.GetConfig().Domain, "workflow",
 			admin.MatchableResource_TASK_RESOURCE)
-		tearDownAndVerify(t, s.Writer, ``)
+		s.TearDownAndVerify(t, ``)
 	})
 }

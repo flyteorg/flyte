@@ -12,11 +12,12 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
 	"github.com/flyteorg/flytectl/pkg/ext/mocks"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/workflow"
 )
@@ -169,7 +170,7 @@ func TestGetWorkflowFuncLatestWithTable(t *testing.T) {
 	s.FetcherExt.OnFetchWorkflowLatestVersionMatch(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflow1, nil)
 	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, s.Writer, `
+	s.TearDownAndVerify(t, `
  --------- ----------- --------------------------- --------- ---------------------- 
 | VERSION | NAME      | INPUTS                    | OUTPUTS | CREATED AT           |
  --------- ----------- --------------------------- --------- ---------------------- 
@@ -187,7 +188,7 @@ func TestListWorkflowFuncWithTable(t *testing.T) {
 	s.FetcherExt.OnFetchAllVerOfWorkflowMatch(s.Ctx, "workflow1", projectValue, domainValue, filters.Filters{}).Return(workflows, nil)
 	err := getWorkflowFunc(s.Ctx, argsWf, s.CmdCtx)
 	assert.Nil(t, err)
-	tearDownAndVerify(t, s.Writer, `
+	s.TearDownAndVerify(t, `
  --------- ----------- ---------------------- 
 | VERSION | NAME      | CREATED AT           |
  --------- ----------- ---------------------- 

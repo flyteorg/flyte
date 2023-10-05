@@ -4,8 +4,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flytectl/cmd/testutils"
 )
 
 const (
@@ -14,7 +15,6 @@ const (
 )
 
 var setup = testutils.Setup
-var tearDownAndVerify = testutils.TearDownAndVerify
 
 func TestDeleteCommand(t *testing.T) {
 	deleteCommand := RemoteDeleteCommand()

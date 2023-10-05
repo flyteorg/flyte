@@ -42,7 +42,7 @@ func TestTerminateExecutionFunc(t *testing.T) {
 	assert.Nil(t, err)
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[0])
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[1])
-	tearDownAndVerify(t, s.Writer, "")
+	s.TearDownAndVerify(t, "")
 }
 
 func TestTerminateExecutionFuncWithError(t *testing.T) {
@@ -55,7 +55,7 @@ func TestTerminateExecutionFuncWithError(t *testing.T) {
 	assert.Equal(t, errors.New("failed to terminate"), err)
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[0])
 	s.MockAdminClient.AssertNotCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[1])
-	tearDownAndVerify(t, s.Writer, "")
+	s.TearDownAndVerify(t, "")
 }
 
 func TestTerminateExecutionFuncWithPartialSuccess(t *testing.T) {
@@ -68,5 +68,5 @@ func TestTerminateExecutionFuncWithPartialSuccess(t *testing.T) {
 	assert.Equal(t, errors.New("failed to terminate"), err)
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[0])
 	s.MockAdminClient.AssertCalled(t, "TerminateExecution", s.Ctx, terminateExecRequests[1])
-	tearDownAndVerify(t, s.Writer, "")
+	s.TearDownAndVerify(t, "")
 }

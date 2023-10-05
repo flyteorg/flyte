@@ -5,8 +5,9 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flytectl/cmd/testutils"
 )
 
 const projectValue = "dummyProject"
@@ -20,7 +21,6 @@ const workflowVersionValue = "wf_version"
 const testDataFolder = "../testdata/"
 
 var setup = testutils.Setup
-var tearDownAndVerify = testutils.TearDownAndVerify
 
 const (
 	testDataTempFile            = "temp-output-file"
