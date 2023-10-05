@@ -378,8 +378,7 @@ func TestBuildResourcePytorch(t *testing.T) {
 
 	for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
 		var hasContainerWithDefaultPytorchName = false
-		podSpec := replicaSpec.Template.Spec
-		for _, container := range podSpec.Containers {
+		for _, container := range replicaSpec.Template.Spec.Containers {
 			if container.Name == kubeflowv1.PytorchJobDefaultContainerName {
 				hasContainerWithDefaultPytorchName = true
 			}

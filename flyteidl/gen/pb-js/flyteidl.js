@@ -12517,7 +12517,7 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.gpuAccelerator != null && message.hasOwnProperty("gpuAccelerator"))
-                        $root.flyteidl.core.GPUAccelerator.encode(message.gpuAccelerator, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                        $root.flyteidl.core.GPUAccelerator.encode(message.gpuAccelerator, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     return writer;
                 };
     
@@ -12539,7 +12539,7 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 3:
+                        case 1:
                             message.gpuAccelerator = $root.flyteidl.core.GPUAccelerator.decode(reader, reader.uint32());
                             break;
                         default:

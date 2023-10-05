@@ -65,7 +65,7 @@ message GPUAccelerator {
 message ExtendedResources {
     // GPU accelerator to select for task. Contains information about device type, and
     // for multi-instance GPUs, the partition size to use.
-    GPUAccelerator gpu_accelerator = 3;
+    GPUAccelerator gpu_accelerator = 1;
 }
 
 // Runtime information. This is loosely defined to allow for extensibility.

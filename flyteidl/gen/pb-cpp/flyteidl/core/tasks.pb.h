@@ -857,10 +857,10 @@ class ExtendedResources final :
 
   // accessors -------------------------------------------------------
 
-  // .flyteidl.core.GPUAccelerator gpu_accelerator = 3;
+  // .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
   bool has_gpu_accelerator() const;
   void clear_gpu_accelerator();
-  static const int kGpuAcceleratorFieldNumber = 3;
+  static const int kGpuAcceleratorFieldNumber = 1;
   const ::flyteidl::core::GPUAccelerator& gpu_accelerator() const;
   ::flyteidl::core::GPUAccelerator* release_gpu_accelerator();
   ::flyteidl::core::GPUAccelerator* mutable_gpu_accelerator();
@@ -3134,7 +3134,7 @@ inline GPUAccelerator::PartitionSizeValueCase GPUAccelerator::partition_size_val
 
 // ExtendedResources
 
-// .flyteidl.core.GPUAccelerator gpu_accelerator = 3;
+// .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
 inline bool ExtendedResources::has_gpu_accelerator() const {
   return this != internal_default_instance() && gpu_accelerator_ != nullptr;
 }

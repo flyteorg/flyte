@@ -656,7 +656,7 @@ const char descriptor_table_protodef_flyteidl_2fcore_2ftasks_2eproto[] =
   "ice\030\001 \001(\t\022\027\n\runpartitioned\030\002 \001(\010H\000\022\030\n\016pa"
   "rtition_size\030\003 \001(\tH\000B\026\n\024partition_size_v"
   "alue\"K\n\021ExtendedResources\0226\n\017gpu_acceler"
-  "ator\030\003 \001(\0132\035.flyteidl.core.GPUAccelerato"
+  "ator\030\001 \001(\0132\035.flyteidl.core.GPUAccelerato"
   "r\"\225\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.fl"
   "yteidl.core.RuntimeMetadata.RuntimeType\022"
   "\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\"\'\n\013Runt"
@@ -2150,9 +2150,9 @@ const char* ExtendedResources::_InternalParse(const char* begin, const char* end
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.core.GPUAccelerator gpu_accelerator = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+      // .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::core::GPUAccelerator::_InternalParse;
@@ -2193,9 +2193,9 @@ bool ExtendedResources::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.core.GPUAccelerator gpu_accelerator = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+      // .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_gpu_accelerator()));
         } else {
@@ -2231,10 +2231,10 @@ void ExtendedResources::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.GPUAccelerator gpu_accelerator = 3;
+  // .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
   if (this->has_gpu_accelerator()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, HasBitSetters::gpu_accelerator(this), output);
+      1, HasBitSetters::gpu_accelerator(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2250,11 +2250,11 @@ void ExtendedResources::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.GPUAccelerator gpu_accelerator = 3;
+  // .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
   if (this->has_gpu_accelerator()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        3, HasBitSetters::gpu_accelerator(this), target);
+        1, HasBitSetters::gpu_accelerator(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2278,7 +2278,7 @@ size_t ExtendedResources::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .flyteidl.core.GPUAccelerator gpu_accelerator = 3;
+  // .flyteidl.core.GPUAccelerator gpu_accelerator = 1;
   if (this->has_gpu_accelerator()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(

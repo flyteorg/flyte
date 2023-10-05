@@ -3291,7 +3291,7 @@ public final class Tasks {
      * for multi-instance GPUs, the partition size to use.
      * </pre>
      *
-     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
      */
     boolean hasGpuAccelerator();
     /**
@@ -3300,7 +3300,7 @@ public final class Tasks {
      * for multi-instance GPUs, the partition size to use.
      * </pre>
      *
-     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
      */
     flyteidl.core.Tasks.GPUAccelerator getGpuAccelerator();
     /**
@@ -3309,7 +3309,7 @@ public final class Tasks {
      * for multi-instance GPUs, the partition size to use.
      * </pre>
      *
-     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
      */
     flyteidl.core.Tasks.GPUAcceleratorOrBuilder getGpuAcceleratorOrBuilder();
   }
@@ -3357,7 +3357,7 @@ public final class Tasks {
             case 0:
               done = true;
               break;
-            case 26: {
+            case 10: {
               flyteidl.core.Tasks.GPUAccelerator.Builder subBuilder = null;
               if (gpuAccelerator_ != null) {
                 subBuilder = gpuAccelerator_.toBuilder();
@@ -3402,7 +3402,7 @@ public final class Tasks {
               flyteidl.core.Tasks.ExtendedResources.class, flyteidl.core.Tasks.ExtendedResources.Builder.class);
     }
 
-    public static final int GPU_ACCELERATOR_FIELD_NUMBER = 3;
+    public static final int GPU_ACCELERATOR_FIELD_NUMBER = 1;
     private flyteidl.core.Tasks.GPUAccelerator gpuAccelerator_;
     /**
      * <pre>
@@ -3410,7 +3410,7 @@ public final class Tasks {
      * for multi-instance GPUs, the partition size to use.
      * </pre>
      *
-     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
      */
     public boolean hasGpuAccelerator() {
       return gpuAccelerator_ != null;
@@ -3421,7 +3421,7 @@ public final class Tasks {
      * for multi-instance GPUs, the partition size to use.
      * </pre>
      *
-     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
      */
     public flyteidl.core.Tasks.GPUAccelerator getGpuAccelerator() {
       return gpuAccelerator_ == null ? flyteidl.core.Tasks.GPUAccelerator.getDefaultInstance() : gpuAccelerator_;
@@ -3432,7 +3432,7 @@ public final class Tasks {
      * for multi-instance GPUs, the partition size to use.
      * </pre>
      *
-     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
      */
     public flyteidl.core.Tasks.GPUAcceleratorOrBuilder getGpuAcceleratorOrBuilder() {
       return getGpuAccelerator();
@@ -3453,7 +3453,7 @@ public final class Tasks {
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       if (gpuAccelerator_ != null) {
-        output.writeMessage(3, getGpuAccelerator());
+        output.writeMessage(1, getGpuAccelerator());
       }
       unknownFields.writeTo(output);
     }
@@ -3466,7 +3466,7 @@ public final class Tasks {
       size = 0;
       if (gpuAccelerator_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getGpuAccelerator());
+          .computeMessageSize(1, getGpuAccelerator());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3767,7 +3767,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public boolean hasGpuAccelerator() {
         return gpuAcceleratorBuilder_ != null || gpuAccelerator_ != null;
@@ -3778,7 +3778,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public flyteidl.core.Tasks.GPUAccelerator getGpuAccelerator() {
         if (gpuAcceleratorBuilder_ == null) {
@@ -3793,7 +3793,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public Builder setGpuAccelerator(flyteidl.core.Tasks.GPUAccelerator value) {
         if (gpuAcceleratorBuilder_ == null) {
@@ -3814,7 +3814,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public Builder setGpuAccelerator(
           flyteidl.core.Tasks.GPUAccelerator.Builder builderForValue) {
@@ -3833,7 +3833,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public Builder mergeGpuAccelerator(flyteidl.core.Tasks.GPUAccelerator value) {
         if (gpuAcceleratorBuilder_ == null) {
@@ -3856,7 +3856,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public Builder clearGpuAccelerator() {
         if (gpuAcceleratorBuilder_ == null) {
@@ -3875,7 +3875,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public flyteidl.core.Tasks.GPUAccelerator.Builder getGpuAcceleratorBuilder() {
         
@@ -3888,7 +3888,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       public flyteidl.core.Tasks.GPUAcceleratorOrBuilder getGpuAcceleratorOrBuilder() {
         if (gpuAcceleratorBuilder_ != null) {
@@ -3904,7 +3904,7 @@ public final class Tasks {
        * for multi-instance GPUs, the partition size to use.
        * </pre>
        *
-       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 3;</code>
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Tasks.GPUAccelerator, flyteidl.core.Tasks.GPUAccelerator.Builder, flyteidl.core.Tasks.GPUAcceleratorOrBuilder> 
@@ -20635,7 +20635,7 @@ public final class Tasks {
       "ice\030\001 \001(\t\022\027\n\runpartitioned\030\002 \001(\010H\000\022\030\n\016pa" +
       "rtition_size\030\003 \001(\tH\000B\026\n\024partition_size_v" +
       "alue\"K\n\021ExtendedResources\0226\n\017gpu_acceler" +
-      "ator\030\003 \001(\0132\035.flyteidl.core.GPUAccelerato" +
+      "ator\030\001 \001(\0132\035.flyteidl.core.GPUAccelerato" +
       "r\"\225\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.fl" +
       "yteidl.core.RuntimeMetadata.RuntimeType\022" +
       "\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\"\'\n\013Runt" +

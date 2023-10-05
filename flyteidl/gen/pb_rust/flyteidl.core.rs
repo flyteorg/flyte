@@ -1043,7 +1043,7 @@ pub mod gpu_accelerator {
 pub struct ExtendedResources {
     /// GPU accelerator to select for task. Contains information about device type, and
     /// for multi-instance GPUs, the partition size to use.
-    #[prost(message, optional, tag="3")]
+    #[prost(message, optional, tag="1")]
     pub gpu_accelerator: ::core::option::Option<GpuAccelerator>,
 }
 /// Runtime information. This is loosely defined to allow for extensibility.

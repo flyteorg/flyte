@@ -57,14 +57,12 @@ var (
 
 	resourceRequirements = &corev1.ResourceRequirements{
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:         resource.MustParse("1000m"),
-			corev1.ResourceMemory:      resource.MustParse("1Gi"),
-			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+			corev1.ResourceCPU:    resource.MustParse("1000m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
 		},
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:         resource.MustParse("100m"),
-			corev1.ResourceMemory:      resource.MustParse("512Mi"),
-			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+			corev1.ResourceCPU:    resource.MustParse("100m"),
+			corev1.ResourceMemory: resource.MustParse("512Mi"),
 		},
 	}
 
@@ -329,8 +327,7 @@ func TestBuildResourceMPI(t *testing.T) {
 	}
 
 	for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
-		podSpec := replicaSpec.Template.Spec
-		for _, container := range podSpec.Containers {
+		for _, container := range replicaSpec.Template.Spec.Containers {
 			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests)
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits)
 		}
