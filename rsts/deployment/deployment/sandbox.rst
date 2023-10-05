@@ -41,7 +41,7 @@ Requirements
 - Install `docker <https://docs.docker.com/engine/install/>`__ or any other OCI-compatible tool, like Podman or LXD.
 - Install `flytectl <https://github.com/flyteorg/flytectl>`__, the official CLI for Flyte.
 
-While Flyte can run any OCI-compatible task image using the default Kubernetes container runtime (cri-o), the Flyte
+While Flyte can run any OCI-compatible task image using the default Kubernetes container runtime (``containerd``), the Flyte
 core maintainers typically use Docker. Note that the ``flytectl demo`` command does rely on Docker APIs, but as this
 demo environment is just one self-contained image, you can also run the image directly using another run time.
 

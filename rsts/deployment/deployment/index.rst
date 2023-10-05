@@ -85,8 +85,8 @@ There are three different paths for deploying a Flyte cluster:
    This option is appropriate if all your compute can `fit on one EKS cluster <https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html>`__ .
    As of this writing, a single Flyte cluster can handle more than 13,000 nodes.
   
-   Regardless of using single or multiple Kubernetes clusters for Flyte, note that ``FlytePropeller`` -the main data plane component- can be sharded as well if scale demands require it.
-   See `Automatic scale-out <https://docs.flyte.org/en/latest/deployment/configuration/performance.html#automatic-scale-out>`__ to learn more about the sharding strategy.
+   Regardless of using single or multiple Kubernetes clusters for Flyte, note that ``FlytePropeller`` -the main data plane component- can be scaled out as well by using ``sharding`` if scale demands require it.
+   See `Automatic scale-out <https://docs.flyte.org/en/latest/deployment/configuration/performance.html#automatic-scale-out>`__ to learn more about the sharding mechanism.
 
 
 
