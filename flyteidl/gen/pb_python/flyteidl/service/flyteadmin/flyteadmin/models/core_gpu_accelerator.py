@@ -61,6 +61,7 @@ class CoreGPUAccelerator(object):
     def device(self):
         """Gets the device of this CoreGPUAccelerator.  # noqa: E501
 
+        This can be any arbitrary string, and should be informed by the labels or taints associated with the nodes in question. Default cloud provider labels typically use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.  # noqa: E501
 
         :return: The device of this CoreGPUAccelerator.  # noqa: E501
         :rtype: str
@@ -71,6 +72,7 @@ class CoreGPUAccelerator(object):
     def device(self, device):
         """Sets the device of this CoreGPUAccelerator.
 
+        This can be any arbitrary string, and should be informed by the labels or taints associated with the nodes in question. Default cloud provider labels typically use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.  # noqa: E501
 
         :param device: The device of this CoreGPUAccelerator.  # noqa: E501
         :type: str
@@ -103,6 +105,7 @@ class CoreGPUAccelerator(object):
     def partition_size(self):
         """Gets the partition_size of this CoreGPUAccelerator.  # noqa: E501
 
+        Like `device`, this can be any arbitrary string, and should be informed by the labels or taints associated with the nodes in question. Default cloud provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.  # noqa: E501
 
         :return: The partition_size of this CoreGPUAccelerator.  # noqa: E501
         :rtype: str
@@ -113,6 +116,7 @@ class CoreGPUAccelerator(object):
     def partition_size(self, partition_size):
         """Sets the partition_size of this CoreGPUAccelerator.
 
+        Like `device`, this can be any arbitrary string, and should be informed by the labels or taints associated with the nodes in question. Default cloud provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.  # noqa: E501
 
         :param partition_size: The partition_size of this CoreGPUAccelerator.  # noqa: E501
         :type: str

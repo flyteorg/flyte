@@ -2307,10 +2307,22 @@ public final class Tasks {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
      * <code>string device = 1;</code>
      */
     java.lang.String getDevice();
     /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
      * <code>string device = 1;</code>
      */
     com.google.protobuf.ByteString
@@ -2322,10 +2334,22 @@ public final class Tasks {
     boolean getUnpartitioned();
 
     /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
      * <code>string partition_size = 3;</code>
      */
     java.lang.String getPartitionSize();
     /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
      * <code>string partition_size = 3;</code>
      */
     com.google.protobuf.ByteString
@@ -2469,6 +2493,12 @@ public final class Tasks {
     public static final int DEVICE_FIELD_NUMBER = 1;
     private volatile java.lang.Object device_;
     /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
      * <code>string device = 1;</code>
      */
     public java.lang.String getDevice() {
@@ -2484,6 +2514,12 @@ public final class Tasks {
       }
     }
     /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
      * <code>string device = 1;</code>
      */
     public com.google.protobuf.ByteString
@@ -2513,6 +2549,12 @@ public final class Tasks {
 
     public static final int PARTITION_SIZE_FIELD_NUMBER = 3;
     /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
      * <code>string partition_size = 3;</code>
      */
     public java.lang.String getPartitionSize() {
@@ -2533,6 +2575,12 @@ public final class Tasks {
       }
     }
     /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
      * <code>string partition_size = 3;</code>
      */
     public com.google.protobuf.ByteString
@@ -2944,6 +2992,12 @@ public final class Tasks {
 
       private java.lang.Object device_ = "";
       /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
        * <code>string device = 1;</code>
        */
       public java.lang.String getDevice() {
@@ -2959,6 +3013,12 @@ public final class Tasks {
         }
       }
       /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
        * <code>string device = 1;</code>
        */
       public com.google.protobuf.ByteString
@@ -2975,6 +3035,12 @@ public final class Tasks {
         }
       }
       /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
        * <code>string device = 1;</code>
        */
       public Builder setDevice(
@@ -2988,6 +3054,12 @@ public final class Tasks {
         return this;
       }
       /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
        * <code>string device = 1;</code>
        */
       public Builder clearDevice() {
@@ -2997,6 +3069,12 @@ public final class Tasks {
         return this;
       }
       /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
        * <code>string device = 1;</code>
        */
       public Builder setDeviceBytes(
@@ -3042,6 +3120,12 @@ public final class Tasks {
       }
 
       /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
        * <code>string partition_size = 3;</code>
        */
       public java.lang.String getPartitionSize() {
@@ -3062,6 +3146,12 @@ public final class Tasks {
         }
       }
       /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
        * <code>string partition_size = 3;</code>
        */
       public com.google.protobuf.ByteString
@@ -3083,6 +3173,12 @@ public final class Tasks {
         }
       }
       /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
        * <code>string partition_size = 3;</code>
        */
       public Builder setPartitionSize(
@@ -3096,6 +3192,12 @@ public final class Tasks {
         return this;
       }
       /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
        * <code>string partition_size = 3;</code>
        */
       public Builder clearPartitionSize() {
@@ -3107,6 +3209,12 @@ public final class Tasks {
         return this;
       }
       /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
        * <code>string partition_size = 3;</code>
        */
       public Builder setPartitionSizeBytes(

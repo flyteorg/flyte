@@ -379,14 +379,16 @@
       "type": "object",
       "properties": {
         "device": {
-          "type": "string"
+          "type": "string",
+          "description": "This can be any arbitrary string, and should be informed by the labels or taints\nassociated with the nodes in question. Default cloud provider labels typically\nuse the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc."
         },
         "unpartitioned": {
           "type": "boolean",
           "format": "boolean"
         },
         "partition_size": {
-          "type": "string"
+          "type": "string",
+          "description": "Like `device`, this can be any arbitrary string, and should be informed by\nthe labels or taints associated with the nodes in question. Default cloud\nprovider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc."
         }
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."

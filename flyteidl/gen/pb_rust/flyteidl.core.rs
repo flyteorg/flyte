@@ -1014,6 +1014,9 @@ pub mod resources {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GpuAccelerator {
+    /// This can be any arbitrary string, and should be informed by the labels or taints
+    /// associated with the nodes in question. Default cloud provider labels typically
+    /// use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
     #[prost(string, tag="1")]
     pub device: ::prost::alloc::string::String,
     #[prost(oneof="gpu_accelerator::PartitionSizeValue", tags="2, 3")]
@@ -1026,6 +1029,9 @@ pub mod gpu_accelerator {
     pub enum PartitionSizeValue {
         #[prost(bool, tag="2")]
         Unpartitioned(bool),
+        /// Like `device`, this can be any arbitrary string, and should be informed by
+        /// the labels or taints associated with the nodes in question. Default cloud
+        /// provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
         #[prost(string, tag="3")]
         PartitionSize(::prost::alloc::string::String),
     }
