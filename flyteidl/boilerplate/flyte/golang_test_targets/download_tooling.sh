@@ -25,6 +25,11 @@ tools=(
 tmp_dir=$(mktemp -d -t gotooling-XXX)
 echo "Using temp directory ${tmp_dir}"
 cp -R boilerplate/flyte/golang_support_tools/* $tmp_dir
+
+# Compile pflags
+make -C ../flytestdlib compile
+cp ../flytestdlib/bin/pflags $(go env GOPATH)/bin
+
 pushd "$tmp_dir"
 
 for tool in "${tools[@]}"; do
