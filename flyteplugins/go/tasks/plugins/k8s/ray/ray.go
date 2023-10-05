@@ -79,10 +79,22 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	cfg := GetConfig()
 	headReplicas := int32(1)
 	headNodeRayStartParams := make(map[string]string)
+<<<<<<< HEAD
 	if rayJob.RayCluster.HeadGroupSpec != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
 		headNodeRayStartParams = rayJob.RayCluster.HeadGroupSpec.RayStartParams
 	} else if headNode := cfg.Defaults.HeadNode; len(headNode.StartParameters) > 0 {
 		headNodeRayStartParams = headNode.StartParameters
+=======
+	headGroupResources := &v1.ResourceRequirements{}
+	if rayJob.RayCluster.HeadGroupSpec != nil{
+		if rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
+			headNodeRayStartParams = rayJob.RayCluster.HeadGroupSpec.RayStartParams
+		}
+		headGroupResources, err = flytek8s.ToK8sResourceRequirements(rayJob.RayCluster.HeadGroupSpec.Resources)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources[%v], Err: [%v]", headGroupResources, err.Error())
+		}
+>>>>>>> flyteplugins/add-ray-head-worker-resources
 	}
 
 	if _, exist := headNodeRayStartParams[IncludeDashboard]; !exist {
@@ -101,11 +113,20 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		headNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
 	}
 
+	if rayJob.RayCluster.Namespace != "" {
+		objectMeta.Namespace = rayJob.RayCluster.Namespace
+	}
+
 	enableIngress := true
 	rayClusterSpec := rayv1alpha1.RayClusterSpec{
 		HeadGroupSpec: rayv1alpha1.HeadGroupSpec{
+<<<<<<< HEAD
 			Template:       buildHeadPodTemplate(&container, podSpec, objectMeta, taskCtx),
 			ServiceType:    v1.ServiceType(cfg.ServiceType),
+=======
+			Template:       buildHeadPodTemplate(&container, podSpec, objectMeta, taskCtx, headGroupResources),
+			ServiceType:    v1.ServiceType(GetConfig().ServiceType),
+>>>>>>> flyteplugins/add-ray-head-worker-resources
 			Replicas:       &headReplicas,
 			EnableIngress:  &enableIngress,
 			RayStartParams: headNodeRayStartParams,
@@ -114,7 +135,12 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
-		workerPodTemplate := buildWorkerPodTemplate(&container, podSpec, objectMeta, taskCtx)
+		workerGroupResources, err := flytek8s.ToK8sResourceRequirements(spec.Resources)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources[%v], Err: [%v]", workerGroupResources, err.Error())
+		}
+
+		workerPodTemplate := buildWorkerPodTemplate(&container, podSpec, objectMeta, taskCtx, workerGroupResources)
 
 		minReplicas := spec.Replicas
 		maxReplicas := spec.Replicas
@@ -153,7 +179,10 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
 	}
 
-	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	serviceAccountName := rayJob.RayCluster.K8SServiceAccount
+	if serviceAccountName == "" {
+		serviceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	}
 
 	rayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName = serviceAccountName
 	for index := range rayClusterSpec.WorkerGroupSpecs {
@@ -180,11 +209,15 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	return &rayJobObject, nil
 }
 
-func buildHeadPodTemplate(container *v1.Container, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
+func buildHeadPodTemplate(container *v1.Container, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, resources *v1.ResourceRequirements) v1.PodTemplateSpec {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L97
 	// They should always be the same, so we could hard code here.
 	primaryContainer := container.DeepCopy()
 	primaryContainer.Name = "ray-head"
+
+	if len(resources.Requests) >= 1 || len(resources.Limits) >= 1 {
+		primaryContainer.Resources = *resources
+	}
 
 	envs := []v1.EnvVar{
 		{
@@ -232,7 +265,7 @@ func buildHeadPodTemplate(container *v1.Container, podSpec *v1.PodSpec, objectMe
 	return podTemplateSpec
 }
 
-func buildWorkerPodTemplate(container *v1.Container, podSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
+func buildWorkerPodTemplate(container *v1.Container, podSpec *v1.PodSpec, objectMetadata *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext, resources *v1.ResourceRequirements) v1.PodTemplateSpec {
 	// Some configs are copy from  https://github.com/ray-project/kuberay/blob/b72e6bdcd9b8c77a9dc6b5da8560910f3a0c3ffd/apiserver/pkg/util/cluster.go#L185
 	// They should always be the same, so we could hard code here.
 	initContainers := []v1.Container{
@@ -251,6 +284,10 @@ func buildWorkerPodTemplate(container *v1.Container, podSpec *v1.PodSpec, object
 	primaryContainer.Name = "ray-worker"
 
 	primaryContainer.Args = []string{}
+
+	if len(resources.Requests) >= 1 || len(resources.Limits) >= 1 {
+		primaryContainer.Resources = *resources
+	}
 
 	envs := []v1.EnvVar{
 		{
