@@ -129,7 +129,7 @@ func dummyPytorchTaskTemplate(id string, args ...interface{}) *core.TaskTemplate
 	}
 }
 
-func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
+func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -162,26 +162,8 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskEx
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(&corev1.ResourceRequirements{
-		Limits: corev1.ResourceList{
-			corev1.ResourceCPU:         resource.MustParse("1000m"),
-			corev1.ResourceMemory:      resource.MustParse("1Gi"),
-			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
-		},
-		Requests: corev1.ResourceList{
-			corev1.ResourceCPU:         resource.MustParse("100m"),
-			corev1.ResourceMemory:      resource.MustParse("512Mi"),
-			flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
-		},
-	})
-	overrides.OnGetExtendedResources().Return(&core.ExtendedResources{
-		GpuAccelerator: &core.GPUAccelerator{
-			Device: "nvidia-tesla-a100",
-			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
-				PartitionSize: "1g.5gb",
-			},
-		},
-	})
+	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(extendedResources)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -302,7 +284,7 @@ func dummyPytorchJobResource(pytorchResourceHandler pytorchOperatorResourceHandl
 
 	ptObj := dummyPytorchCustomObj(workers)
 	taskTemplate := dummyPytorchTaskTemplate("job1", ptObj)
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	if err != nil {
 		panic(err)
 	}
@@ -330,7 +312,7 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 	ptObj := dummyElasticPytorchCustomObj(2, plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"})
 	taskTemplate := dummyPytorchTaskTemplate("job2", ptObj)
 
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -355,45 +337,6 @@ func TestBuildResourcePytorchElastic(t *testing.T) {
 			}
 		}
 
-		assert.EqualValues(
-			t,
-			[]corev1.NodeSelectorTerm{
-				corev1.NodeSelectorTerm{
-					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
-							Operator: corev1.NodeSelectorOpIn,
-							Values:   []string{"nvidia-tesla-a100"},
-						},
-						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-							Operator: corev1.NodeSelectorOpIn,
-							Values:   []string{"1g.5gb"},
-						},
-					},
-				},
-			},
-			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-		)
-		assert.EqualValues(
-			t,
-			[]corev1.Toleration{
-				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
-					Value:    "nvidia-tesla-a100",
-					Operator: corev1.TolerationOpEqual,
-					Effect:   corev1.TaintEffectNoSchedule,
-				},
-				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-					Value:    "1g.5gb",
-					Operator: corev1.TolerationOpEqual,
-					Effect:   corev1.TaintEffectNoSchedule,
-				},
-			},
-			podSpec.Tolerations,
-		)
-
 		assert.True(t, hasContainerWithDefaultPytorchName)
 
 		// verify TaskExecutionMetadata labels and annotations are copied to the PyTorchJob
@@ -412,7 +355,7 @@ func TestBuildResourcePytorch(t *testing.T) {
 	ptObj := dummyPytorchCustomObj(100)
 	taskTemplate := dummyPytorchTaskTemplate("job3", ptObj)
 
-	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
@@ -445,46 +388,152 @@ func TestBuildResourcePytorch(t *testing.T) {
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits, fmt.Sprintf(" container.Resources.Limits [%+v]", container.Resources.Limits.Cpu().String()))
 		}
 
-		assert.EqualValues(
-			t,
+		assert.True(t, hasContainerWithDefaultPytorchName)
+	}
+}
+
+func TestBuildResourcePytorchExtendedResources(t *testing.T) {
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+	}))
+
+	fixtures := []struct {
+		name                      string
+		resources                 *corev1.ResourceRequirements
+		extendedResourcesBase     *core.ExtendedResources
+		extendedResourcesOverride *core.ExtendedResources
+		expectedNsr               []corev1.NodeSelectorTerm
+		expectedTol               []corev1.Toleration
+	}{
+		{
+			"without overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			nil,
 			[]corev1.NodeSelectorTerm{
-				corev1.NodeSelectorTerm{
+				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
 						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Key:      "gpu-node-label",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-t4"},
+						},
+					},
+				},
+			},
+			[]corev1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-t4",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+		},
+		{
+			"with overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-a100",
+					PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+						PartitionSize: "1g.5gb",
+					},
+				},
+			},
+			[]corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
 						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Key:      "gpu-partition-size",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
 						},
 					},
 				},
 			},
-			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-		)
-		assert.EqualValues(
-			t,
 			[]corev1.Toleration{
 				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+					Key:      "gpu-node-label",
 					Value:    "nvidia-tesla-a100",
 					Operator: corev1.TolerationOpEqual,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Key:      "gpu-partition-size",
 					Value:    "1g.5gb",
 					Operator: corev1.TolerationOpEqual,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 			},
-			podSpec.Tolerations,
-		)
+		},
+	}
 
-		assert.True(t, hasContainerWithDefaultPytorchName)
+	testConfigs := []struct {
+		name   string
+		plugin *plugins.DistributedPyTorchTrainingTask
+	}{
+		{
+			"pytorch",
+			dummyPytorchCustomObj(100),
+		},
+		{
+			"elastic pytorch",
+			dummyElasticPytorchCustomObj(2, plugins.ElasticConfig{MinReplicas: 1, MaxReplicas: 2, NprocPerNode: 4, RdzvBackend: "c10d"}),
+		},
+	}
+
+	for _, tCfg := range testConfigs {
+		for _, f := range fixtures {
+			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
+				taskTemplate := dummyPytorchTaskTemplate("job", tCfg.plugin)
+				taskTemplate.ExtendedResources = f.extendedResourcesBase
+				taskContext := dummyPytorchTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
+				pytorchResourceHandler := pytorchOperatorResourceHandler{}
+				r, err := pytorchResourceHandler.BuildResource(context.TODO(), taskContext)
+				assert.NoError(t, err)
+				assert.NotNil(t, r)
+				pytorchJob, ok := r.(*kubeflowv1.PyTorchJob)
+				assert.True(t, ok)
+
+				for _, replicaSpec := range pytorchJob.Spec.PyTorchReplicaSpecs {
+					assert.EqualValues(
+						t,
+						f.expectedNsr,
+						replicaSpec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+					)
+					assert.EqualValues(
+						t,
+						f.expectedTol,
+						replicaSpec.Template.Spec.Tolerations,
+					)
+				}
+			})
+		}
 	}
 }
 
@@ -496,7 +545,7 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyPytorchJobResource(pytorchResourceHandler, 2, conditionType)
 	}
 
-	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)))
+	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(2)), resourceRequirements, nil)
 	taskPhase, err := pytorchResourceHandler.GetTaskPhase(ctx, taskCtx, dummyPytorchJobResourceCreator(commonOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -539,7 +588,7 @@ func TestGetLogs(t *testing.T) {
 
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, commonOp.JobRunning)
-	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)))
+	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, nil)
 	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
@@ -559,7 +608,7 @@ func TestGetLogsElastic(t *testing.T) {
 
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	pytorchJob := dummyPytorchJobResource(pytorchResourceHandler, workers, commonOp.JobRunning)
-	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)))
+	taskCtx := dummyPytorchTaskContext(dummyPytorchTaskTemplate("", dummyPytorchCustomObj(workers)), resourceRequirements, nil)
 	jobLogs, err := common.GetLogs(taskCtx, common.PytorchTaskType, pytorchJob.ObjectMeta, hasMaster, workers, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
@@ -590,7 +639,7 @@ func TestReplicaCounts(t *testing.T) {
 			ptObj := dummyPytorchCustomObj(test.workerReplicaCount)
 			taskTemplate := dummyPytorchTaskTemplate("the job", ptObj)
 
-			res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+			res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 			if test.expectError {
 				assert.Error(t, err)
 				assert.Nil(t, res)
@@ -664,7 +713,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 	taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
@@ -708,7 +757,7 @@ func TestBuildResourcePytorchV1WithRunPolicy(t *testing.T) {
 	taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
@@ -764,7 +813,7 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 	taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, res)
 
@@ -797,7 +846,7 @@ func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 	taskTemplate.TaskTypeVersion = 1
 
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
-	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -833,7 +882,7 @@ func TestBuildResourcePytorchV1WithZeroWorker(t *testing.T) {
 	pytorchResourceHandler := pytorchOperatorResourceHandler{}
 	taskTemplate := dummyPytorchTaskTemplate("job5", taskConfig)
 	taskTemplate.TaskTypeVersion = 1
-	_, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate))
+	_, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.Error(t, err)
 }
 

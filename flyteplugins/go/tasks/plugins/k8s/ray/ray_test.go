@@ -69,7 +69,6 @@ func dummyRayCustomObj() *plugins.RayJob {
 }
 
 func dummyRayTaskTemplate(id string, rayJobObj *plugins.RayJob) *core.TaskTemplate {
-
 	ptObjJSON, err := utils.MarshalToString(rayJobObj)
 	if err != nil {
 		panic(err)
@@ -96,7 +95,7 @@ func dummyRayTaskTemplate(id string, rayJobObj *plugins.RayJob) *core.TaskTempla
 	}
 }
 
-func dummyRayTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
+func dummyRayTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -129,15 +128,8 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resourceRequirements)
-	overrides.OnGetExtendedResources().Return(&core.ExtendedResources{
-		GpuAccelerator: &core.GPUAccelerator{
-			Device: "nvidia-tesla-a100",
-			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
-				PartitionSize: "1g.5gb",
-			},
-		},
-	})
+	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(extendedResources)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -160,76 +152,19 @@ func dummyRayTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	return taskCtx
 }
 
-func checkTolerations(t *testing.T, podSpec corev1.PodSpec) {
-	// Assert user-specified tolerations don't get overridden
-	assert.Len(t, podSpec.Tolerations, 3)
-	for _, tol := range []corev1.Toleration{
-		{
-			Key:      "storage",
-			Value:    "dedicated",
-			Operator: corev1.TolerationOpExists,
-			Effect:   corev1.TaintEffectNoSchedule,
-		},
-		{
-			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-			Value:    "nvidia-tesla-a100",
-			Operator: corev1.TolerationOpEqual,
-			Effect:   corev1.TaintEffectNoSchedule,
-		},
-		{
-			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-			Value:    "1g.5gb",
-			Operator: corev1.TolerationOpEqual,
-			Effect:   corev1.TaintEffectNoSchedule,
-		},
-	} {
-		assert.Contains(t, podSpec.Tolerations, tol)
-	}
-}
-
-func checkNodeAffinity(t *testing.T, podSpec corev1.PodSpec) {
-	assert.EqualValues(
-		t,
-		[]corev1.NodeSelectorTerm{
-			corev1.NodeSelectorTerm{
-				MatchExpressions: []corev1.NodeSelectorRequirement{
-					corev1.NodeSelectorRequirement{
-						Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
-						Operator: corev1.NodeSelectorOpIn,
-						Values:   []string{"nvidia-tesla-a100"},
-					},
-					corev1.NodeSelectorRequirement{
-						Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-						Operator: corev1.NodeSelectorOpIn,
-						Values:   []string{"1g.5gb"},
-					},
-				},
-			},
-		},
-		podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-	)
-}
-
 func TestBuildResourceRay(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
-	toleration := []corev1.Toleration{
-		{
-			Key:      "storage",
-			Value:    "dedicated",
-			Operator: corev1.TolerationOpExists,
-			Effect:   corev1.TaintEffectNoSchedule,
-		},
-	}
-	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{
-		DefaultTolerations:        toleration,
-		GpuDeviceNodeLabel:        "gpu-node-label",
-		GpuPartitionSizeNodeLabel: "gpu-partition-size",
-		GpuResourceName:           config.ResourceNvidiaGPU,
-	})
+	toleration := []corev1.Toleration{{
+		Key:      "storage",
+		Value:    "dedicated",
+		Operator: corev1.TolerationOpExists,
+		Effect:   corev1.TaintEffectNoSchedule,
+	}}
+	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultTolerations: toleration})
 	assert.Nil(t, err)
 
-	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate))
+	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.Nil(t, err)
 
 	assert.NotNil(t, RayResource)
@@ -245,8 +180,7 @@ func TestBuildResourceRay(t *testing.T) {
 			"node-ip-address": "$MY_POD_IP", "num-cpus": "1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
-	checkTolerations(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec)
-	checkNodeAffinity(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec)
+	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, &workerReplica)
@@ -257,8 +191,149 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
-	checkTolerations(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec)
-	checkNodeAffinity(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec)
+	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+}
+
+func TestBuildResourceRayExtendedResources(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+	}))
+
+	fixtures := []struct {
+		name                      string
+		resources                 *corev1.ResourceRequirements
+		extendedResourcesBase     *core.ExtendedResources
+		extendedResourcesOverride *core.ExtendedResources
+		expectedNsr               []corev1.NodeSelectorTerm
+		expectedTol               []corev1.Toleration
+	}{
+		{
+			"without overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			nil,
+			[]corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-t4"},
+						},
+					},
+				},
+			},
+			[]corev1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-t4",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+		},
+		{
+			"with overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-a100",
+					PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+						PartitionSize: "1g.5gb",
+					},
+				},
+			},
+			[]corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-partition-size",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			[]corev1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-a100",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "gpu-partition-size",
+					Value:    "1g.5gb",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+		},
+	}
+
+	for _, f := range fixtures {
+		t.Run(f.name, func(t *testing.T) {
+			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+			taskTemplate.ExtendedResources = f.extendedResourcesBase
+			taskContext := dummyRayTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
+			rayJobResourceHandler := rayJobResourceHandler{}
+			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			rayJob, ok := r.(*rayv1alpha1.RayJob)
+			assert.True(t, ok)
+
+			// Head node
+			headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+			assert.EqualValues(
+				t,
+				f.expectedNsr,
+				headNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+			)
+			assert.EqualValues(
+				t,
+				f.expectedTol,
+				headNodeSpec.Tolerations,
+			)
+
+			// Worker node
+			workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
+			assert.EqualValues(
+				t,
+				f.expectedNsr,
+				workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+			)
+			assert.EqualValues(
+				t,
+				f.expectedTol,
+				workerNodeSpec.Tolerations,
+			)
+		})
+	}
 }
 
 func TestDefaultStartParameters(t *testing.T) {
@@ -280,7 +355,7 @@ func TestDefaultStartParameters(t *testing.T) {
 	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{DefaultTolerations: toleration})
 	assert.Nil(t, err)
 
-	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate))
+	RayResource, err := rayJobResourceHandler.BuildResource(context.TODO(), dummyRayTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.Nil(t, err)
 
 	assert.NotNil(t, RayResource)

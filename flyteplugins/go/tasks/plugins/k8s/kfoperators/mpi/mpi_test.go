@@ -123,7 +123,7 @@ func dummyMPITaskTemplate(id string, args ...interface{}) *core.TaskTemplate {
 	}
 }
 
-func dummyMPITaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
+func dummyMPITaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -156,15 +156,8 @@ func dummyMPITaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecut
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resourceRequirements)
-	overrides.OnGetExtendedResources().Return(&core.ExtendedResources{
-		GpuAccelerator: &core.GPUAccelerator{
-			Device: "nvidia-tesla-a100",
-			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
-				PartitionSize: "1g.5gb",
-			},
-		},
-	})
+	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(extendedResources)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -286,7 +279,7 @@ func dummyMPIJobResource(mpiResourceHandler mpiOperatorResourceHandler,
 
 	mpiObj := dummyMPICustomObj(workers, launcher, slots)
 	taskTemplate := dummyMPITaskTemplate(mpiID, mpiObj)
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	if err != nil {
 		panic(err)
 	}
@@ -313,7 +306,7 @@ func TestBuildResourceMPI(t *testing.T) {
 	mpiObj := dummyMPICustomObj(100, 50, 1)
 	taskTemplate := dummyMPITaskTemplate(mpiID2, mpiObj)
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -341,44 +334,6 @@ func TestBuildResourceMPI(t *testing.T) {
 			assert.Equal(t, resourceRequirements.Requests, container.Resources.Requests)
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits)
 		}
-		assert.EqualValues(
-			t,
-			[]corev1.NodeSelectorTerm{
-				corev1.NodeSelectorTerm{
-					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
-							Operator: corev1.NodeSelectorOpIn,
-							Values:   []string{"nvidia-tesla-a100"},
-						},
-						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-							Operator: corev1.NodeSelectorOpIn,
-							Values:   []string{"1g.5gb"},
-						},
-					},
-				},
-			},
-			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-		)
-		assert.EqualValues(
-			t,
-			[]corev1.Toleration{
-				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
-					Value:    "nvidia-tesla-a100",
-					Operator: corev1.TolerationOpEqual,
-					Effect:   corev1.TaintEffectNoSchedule,
-				},
-				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-					Value:    "1g.5gb",
-					Operator: corev1.TolerationOpEqual,
-					Effect:   corev1.TaintEffectNoSchedule,
-				},
-			},
-			podSpec.Tolerations,
-		)
 	}
 }
 
@@ -388,24 +343,154 @@ func TestBuildResourceMPIForWrongInput(t *testing.T) {
 	mpiObj := dummyMPICustomObj(0, 0, 1)
 	taskTemplate := dummyMPITaskTemplate(mpiID, mpiObj)
 
-	_, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	_, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	assert.Error(t, err)
 
 	mpiObj = dummyMPICustomObj(1, 0, 1)
 	taskTemplate = dummyMPITaskTemplate(mpiID2, mpiObj)
 
-	_, err = mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	_, err = mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	assert.Error(t, err)
 
 	mpiObj = dummyMPICustomObj(1, 1, 1)
 	taskTemplate = dummyMPITaskTemplate(mpiID2, mpiObj)
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	app, ok := resource.(*kubeflowv1.MPIJob)
 	assert.Nil(t, err)
 	assert.Equal(t, true, ok)
 	assert.Equal(t, []string{}, app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Command)
 	assert.Equal(t, []string{}, app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
+}
+
+func TestBuildResourceMPIExtendedResources(t *testing.T) {
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+	}))
+
+	fixtures := []struct {
+		name                      string
+		resources                 *corev1.ResourceRequirements
+		extendedResourcesBase     *core.ExtendedResources
+		extendedResourcesOverride *core.ExtendedResources
+		expectedNsr               []corev1.NodeSelectorTerm
+		expectedTol               []corev1.Toleration
+	}{
+		{
+			"without overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			nil,
+			[]corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-t4"},
+						},
+					},
+				},
+			},
+			[]corev1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-t4",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+		},
+		{
+			"with overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-a100",
+					PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+						PartitionSize: "1g.5gb",
+					},
+				},
+			},
+			[]corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-partition-size",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			[]corev1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-a100",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "gpu-partition-size",
+					Value:    "1g.5gb",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+		},
+	}
+
+	for _, f := range fixtures {
+		t.Run(f.name, func(t *testing.T) {
+			mpiObj := dummyMPICustomObj(100, 50, 1)
+			taskTemplate := dummyMPITaskTemplate(mpiID2, mpiObj)
+			taskTemplate.ExtendedResources = f.extendedResourcesBase
+			taskContext := dummyMPITaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
+			mpiResourceHandler := mpiOperatorResourceHandler{}
+			r, err := mpiResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			mpiJob, ok := r.(*kubeflowv1.MPIJob)
+			assert.True(t, ok)
+
+			for _, replicaSpec := range mpiJob.Spec.MPIReplicaSpecs {
+				assert.EqualValues(
+					t,
+					f.expectedNsr,
+					replicaSpec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+				)
+				assert.EqualValues(
+					t,
+					f.expectedTol,
+					replicaSpec.Template.Spec.Tolerations,
+				)
+			}
+		})
+	}
 }
 
 func TestGetTaskPhase(t *testing.T) {
@@ -416,7 +501,7 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyMPIJobResource(mpiResourceHandler, 2, 1, 1, conditionType)
 	}
 
-	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)))
+	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(2, 1, 1)), resourceRequirements, nil)
 	taskPhase, err := mpiResourceHandler.GetTaskPhase(ctx, taskCtx, dummyMPIJobResourceCreator(mpiOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -460,7 +545,7 @@ func TestGetLogs(t *testing.T) {
 
 	mpiResourceHandler := mpiOperatorResourceHandler{}
 	mpiJob := dummyMPIJobResource(mpiResourceHandler, workers, launcher, slots, mpiOp.JobRunning)
-	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)))
+	taskCtx := dummyMPITaskContext(dummyMPITaskTemplate("", dummyMPICustomObj(workers, launcher, slots)), resourceRequirements, nil)
 	jobLogs, err := common.GetLogs(taskCtx, common.MPITaskType, mpiJob.ObjectMeta, false, workers, launcher, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
@@ -493,7 +578,7 @@ func TestReplicaCounts(t *testing.T) {
 			mpiObj := dummyMPICustomObj(test.workerReplicaCount, test.launcherReplicaCount, 1)
 			taskTemplate := dummyMPITaskTemplate(mpiID2, mpiObj)
 
-			resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+			resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 			if test.expectError {
 				assert.Error(t, err)
 				assert.Nil(t, resource)
@@ -571,7 +656,7 @@ func TestBuildResourceMPIV1(t *testing.T) {
 	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -619,7 +704,7 @@ func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
 	taskTemplate := dummyMPITaskTemplate(mpiID2, taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate))
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 

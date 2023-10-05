@@ -122,7 +122,7 @@ func dummyTensorFlowTaskTemplate(id string, args ...interface{}) *core.TaskTempl
 	}
 }
 
-func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.TaskExecutionContext {
+func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
@@ -155,15 +155,8 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate) pluginsCore.Tas
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
 
 	overrides := &mocks.TaskOverrides{}
-	overrides.OnGetResources().Return(resourceRequirements)
-	overrides.OnGetExtendedResources().Return(&core.ExtendedResources{
-		GpuAccelerator: &core.GPUAccelerator{
-			Device: "nvidia-tesla-a100",
-			PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
-				PartitionSize: "1g.5gb",
-			},
-		},
-	})
+	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(extendedResources)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -285,7 +278,7 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 
 	tfObj := dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas)
 	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
-	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
 	if err != nil {
 		panic(err)
 	}
@@ -312,7 +305,7 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 	tfObj := dummyTensorFlowCustomObj(100, 50, 1)
 	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
 
-	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -346,46 +339,159 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 			assert.Equal(t, resourceRequirements.Limits, container.Resources.Limits)
 		}
 
-		assert.EqualValues(
-			t,
+		assert.True(t, hasContainerWithDefaultTensorFlowName)
+	}
+}
+
+func TestBuildResourceTensorFlowExtendedResources(t *testing.T) {
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+	}))
+
+	fixtures := []struct {
+		name                      string
+		resources                 *corev1.ResourceRequirements
+		extendedResourcesBase     *core.ExtendedResources
+		extendedResourcesOverride *core.ExtendedResources
+		expectedNsr               []corev1.NodeSelectorTerm
+		expectedTol               []corev1.Toleration
+	}{
+		{
+			"without overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			nil,
 			[]corev1.NodeSelectorTerm{
-				corev1.NodeSelectorTerm{
+				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
 						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+							Key:      "gpu-node-label",
+							Operator: corev1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-t4"},
+						},
+					},
+				},
+			},
+			[]corev1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-t4",
+					Operator: corev1.TolerationOpEqual,
+					Effect:   corev1.TaintEffectNoSchedule,
+				},
+			},
+		},
+		{
+			"with overrides",
+			&corev1.ResourceRequirements{
+				Limits: corev1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-a100",
+					PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+						PartitionSize: "1g.5gb",
+					},
+				},
+			},
+			[]corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						corev1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
 						corev1.NodeSelectorRequirement{
-							Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+							Key:      "gpu-partition-size",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
 						},
 					},
 				},
 			},
-			podSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
-		)
-		assert.EqualValues(
-			t,
 			[]corev1.Toleration{
 				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuDeviceNodeLabel,
+					Key:      "gpu-node-label",
 					Value:    "nvidia-tesla-a100",
 					Operator: corev1.TolerationOpEqual,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 				{
-					Key:      flytek8sConfig.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+					Key:      "gpu-partition-size",
 					Value:    "1g.5gb",
 					Operator: corev1.TolerationOpEqual,
 					Effect:   corev1.TaintEffectNoSchedule,
 				},
 			},
-			podSpec.Tolerations,
-		)
+		},
+	}
 
-		assert.True(t, hasContainerWithDefaultTensorFlowName)
+	v0TaskTemplate := dummyTensorFlowTaskTemplate("v0", dummyTensorFlowCustomObj(100, 50, 1))
+	v1TaskTemplate := dummyTensorFlowTaskTemplate("v1", &kfplugins.DistributedTensorflowTrainingTask{
+		ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+			Replicas: 1,
+		},
+		WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+			Replicas: 100,
+		},
+		PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+			Replicas: 50,
+		},
+	})
+	v1TaskTemplate.TaskTypeVersion = 1
+	testConfigs := []struct {
+		name         string
+		taskTemplate *core.TaskTemplate
+	}{
+		{"v0", v0TaskTemplate},
+		{"v1", v1TaskTemplate},
+	}
+
+	for _, tCfg := range testConfigs {
+		for _, f := range fixtures {
+			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
+				taskTemplate := *tCfg.taskTemplate
+				taskTemplate.ExtendedResources = f.extendedResourcesBase
+				tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+				taskContext := dummyTensorFlowTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
+				r, err := tensorflowResourceHandler.BuildResource(context.TODO(), taskContext)
+				assert.NoError(t, err)
+				assert.NotNil(t, r)
+				tensorflowJob, ok := r.(*kubeflowv1.TFJob)
+				assert.True(t, ok)
+
+				for _, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
+					assert.EqualValues(
+						t,
+						f.expectedNsr,
+						replicaSpec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+					)
+					assert.EqualValues(
+						t,
+						f.expectedTol,
+						replicaSpec.Template.Spec.Tolerations,
+					)
+				}
+			})
+		}
 	}
 }
 
@@ -397,7 +503,7 @@ func TestGetTaskPhase(t *testing.T) {
 		return dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, conditionType)
 	}
 
-	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1)))
+	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1)), resourceRequirements, nil)
 	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(commonOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -441,7 +547,7 @@ func TestGetLogs(t *testing.T) {
 
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, commonOp.JobRunning)
-	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas)))
+	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas)), resourceRequirements, nil)
 	jobLogs, err := common.GetLogs(taskCtx, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, false,
 		workers, psReplicas, chiefReplicas)
 	assert.NoError(t, err)
@@ -482,7 +588,7 @@ func TestReplicaCounts(t *testing.T) {
 			tfObj := dummyTensorFlowCustomObj(test.workerReplicaCount, test.psReplicaCount, test.chiefReplicaCount)
 			taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
 
-			resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
+			resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
 			if test.expectError {
 				assert.Error(t, err)
 				assert.Nil(t, resource)
@@ -589,7 +695,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 	taskTemplate := dummyTensorFlowTaskTemplate("v1", taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
@@ -650,7 +756,7 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 	taskTemplate := dummyTensorFlowTaskTemplate("v1 with only worker replica", taskConfig)
 	taskTemplate.TaskTypeVersion = 1
 
-	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate))
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
 	assert.NoError(t, err)
 	assert.NotNil(t, resource)
 
