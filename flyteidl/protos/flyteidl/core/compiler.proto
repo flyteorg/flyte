@@ -19,9 +19,6 @@ message ConnectionSet {
 
     // A list of all the node ids, that are upstream of this node id
     map<string, IdList> upstream = 8;
-
-    // Just a test
-    string start_node_id = 9;
 }
 
 // Output of the compilation Step. This object represents one workflow. We store more metadata at this layer
