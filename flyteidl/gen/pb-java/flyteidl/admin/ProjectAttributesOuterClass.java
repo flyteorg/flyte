@@ -4479,9 +4479,9 @@ public final class ProjectAttributesOuterClass {
       "\n\036ProjectAttributesDeleteRequest\022\017\n\007proj" +
       "ect\030\001 \001(\t\0228\n\rresource_type\030\002 \001(\0162!.flyte" +
       "idl.admin.MatchableResource\"!\n\037ProjectAt" +
-      "tributesDeleteResponseB7Z5github.com/fly" +
-      "teorg/flyteidl/gen/pb-go/flyteidl/adminb" +
-      "\006proto3"
+      "tributesDeleteResponseB=Z;github.com/fly" +
+      "teorg/flyte/flyteidl/gen/pb-go/flyteidl/" +
+      "adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

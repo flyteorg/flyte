@@ -19,9 +19,9 @@ import (
 
 	workflowengine "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	workflowMocks "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 )

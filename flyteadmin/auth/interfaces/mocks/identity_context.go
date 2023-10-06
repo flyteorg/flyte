@@ -7,7 +7,7 @@ import (
 
 	mock "github.com/stretchr/testify/mock"
 
-	service "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	service "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	sets "k8s.io/apimachinery/pkg/util/sets"
 

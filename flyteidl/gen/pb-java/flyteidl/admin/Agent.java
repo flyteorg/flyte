@@ -7599,13 +7599,13 @@ public final class Agent {
       "resource\030\001 \001(\0132\030.flyteidl.admin.Resource" +
       "\"m\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a" +
       "dmin.State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.c" +
-      "ore.LiteralMap\022\017\n\007message\030\003 \001(\t\"=\n\021Delet" +
-      "eTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresou" +
-      "rce_meta\030\002 \001(\014\"\024\n\022DeleteTaskResponse*^\n\005" +
-      "State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANEN" +
-      "T_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n" +
-      "\tSUCCEEDED\020\004B7Z5github.com/flyteorg/flyt" +
-      "eidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "ore.LiteralMap\"=\n\021DeleteTaskRequest\022\021\n\tt" +
+      "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n" +
+      "\022DeleteTaskResponse*^\n\005State\022\025\n\021RETRYABL" +
+      "E_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PE" +
+      "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

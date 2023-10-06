@@ -2,9 +2,9 @@ package mocks
 
 import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type MockCompiler struct {

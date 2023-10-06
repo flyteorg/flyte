@@ -1,7 +1,7 @@
 syntax = "proto3";
 package flyteidl.service;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
 import "google/protobuf/struct.proto";

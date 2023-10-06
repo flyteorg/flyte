@@ -287,9 +287,9 @@ public final class Admin {
       "orkflowExecutionGetMetricsRequest\0323.flyt" +
       "eidl.admin.WorkflowExecutionGetMetricsRe" +
       "sponse\"E\202\323\344\223\002?\022=/api/v1/metrics/executio" +
-      "ns/{id.project}/{id.domain}/{id.name}B9Z" +
-      "7github.com/flyteorg/flyteidl/gen/pb-go/" +
-      "flyteidl/serviceb\006proto3"
+      "ns/{id.project}/{id.domain}/{id.name}B?Z" +
+      "=github.com/flyteorg/flyte/flyteidl/gen/" +
+      "pb-go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

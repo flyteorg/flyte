@@ -3,7 +3,7 @@ package bigquery
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/bigquery/v2"
