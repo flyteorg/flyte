@@ -4123,8 +4123,9 @@ public final class Ray {
       "\020ray_start_params\030\005 \003(\01325.flyteidl.plugi" +
       "ns.WorkerGroupSpec.RayStartParamsEntry\0325" +
       "\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
-      "lue\030\002 \001(\t:\0028\001B9Z7github.com/flyteorg/fly" +
-      "teidl/gen/pb-go/flyteidl/pluginsb\006proto3"
+      "lue\030\002 \001(\t:\0028\001B?Z=github.com/flyteorg/fly" +
+      "te/flyteidl/gen/pb-go/flyteidl/pluginsb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

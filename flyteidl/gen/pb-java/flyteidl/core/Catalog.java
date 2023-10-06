@@ -2868,9 +2868,9 @@ public final class Catalog {
       "logCacheStatus\022\022\n\016CACHE_DISABLED\020\000\022\016\n\nCA" +
       "CHE_MISS\020\001\022\r\n\tCACHE_HIT\020\002\022\023\n\017CACHE_POPUL" +
       "ATED\020\003\022\030\n\024CACHE_LOOKUP_FAILURE\020\004\022\025\n\021CACH" +
-      "E_PUT_FAILURE\020\005\022\021\n\rCACHE_SKIPPED\020\006B6Z4gi" +
-      "thub.com/flyteorg/flyteidl/gen/pb-go/fly" +
-      "teidl/coreb\006proto3"
+      "E_PUT_FAILURE\020\005\022\021\n\rCACHE_SKIPPED\020\006B<Z:gi" +
+      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
+      "go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

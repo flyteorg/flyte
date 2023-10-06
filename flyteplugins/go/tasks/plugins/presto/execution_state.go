@@ -17,8 +17,8 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
@@ -27,7 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	pb "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type ExecutionPhase int

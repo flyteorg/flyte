@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"

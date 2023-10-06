@@ -18749,9 +18749,9 @@ public final class Tasks {
       "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstate" +
       "ment\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.c" +
       "ore.Sql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020" +
-      "\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4gith" +
-      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
-      "idl/coreb\006proto3"
+      "\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B<Z:gith" +
+      "ub.com/flyteorg/flyte/flyteidl/gen/pb-go" +
+      "/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

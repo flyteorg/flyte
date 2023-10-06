@@ -11,8 +11,8 @@ import (
 	runtimeIFaceMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 )

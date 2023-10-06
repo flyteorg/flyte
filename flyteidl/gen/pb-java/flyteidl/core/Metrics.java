@@ -2554,9 +2554,9 @@ public final class Metrics {
       "cutionIdentifierH\000\0229\n\007task_id\030\005 \001(\0132&.fl" +
       "yteidl.core.TaskExecutionIdentifierH\000\022\026\n" +
       "\014operation_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.f" +
-      "lyteidl.core.SpanB\004\n\002idB6Z4github.com/fl" +
-      "yteorg/flyteidl/gen/pb-go/flyteidl/coreb" +
-      "\006proto3"
+      "lyteidl.core.SpanB\004\n\002idB<Z:github.com/fl" +
+      "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +
+      "/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

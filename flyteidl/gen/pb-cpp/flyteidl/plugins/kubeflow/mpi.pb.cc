@@ -126,13 +126,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto
   "(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.core.Re"
   "sources\022@\n\016restart_policy\030\004 \001(\0162(.flytei"
   "dl.plugins.kubeflow.RestartPolicy\022\017\n\007com"
-  "mand\030\005 \003(\tB9Z7github.com/flyteorg/flytei"
-  "dl/gen/pb-go/flyteidl/pluginsb\006proto3"
+  "mand\030\005 \003(\tB\?Z=github.com/flyteorg/flyte/"
+  "flyteidl/gen/pb-go/flyteidl/pluginsb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto,
-  "flyteidl/plugins/kubeflow/mpi.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 677,
+  "flyteidl/plugins/kubeflow/mpi.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 683,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto() {
