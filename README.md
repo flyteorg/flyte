@@ -100,9 +100,6 @@ The [deployment guide](https://docs.flyte.org/en/latest/deployment/index.html) p
 
 Join the likes of LinkedIn, Spotify, Freenome, Pachama, Gojek, and Woven Planet in adopting Flyte. For a full list of adopters and information on how to add your organization or project, please visit our [ADOPTERS](https://github.com/flyteorg/community/blob/main/ADOPTERS.md) page.
 
-## Roadmap
-
-Stay up to date with the latest project roadmap by checking out our live [roadmap](https://github.com/orgs/flyteorg/projects/3) on GitHub.
 
 ## Resources
 
