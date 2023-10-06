@@ -5,8 +5,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"google.golang.org/grpc"
 
@@ -104,7 +104,7 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test PENDING Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
-		taskContext.On("Resource").Return(&ResourceWrapper{
+		taskContext.On("Resource").Return(ResourceWrapper{
 			State:   admin.State_PENDING,
 			Outputs: nil,
 			Message: "Waiting for cluster",
@@ -118,7 +118,7 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test RUNNING Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
-		taskContext.On("Resource").Return(&ResourceWrapper{
+		taskContext.On("Resource").Return(ResourceWrapper{
 			State:   admin.State_RUNNING,
 			Outputs: nil,
 			Message: "Job is running",
@@ -131,7 +131,7 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
-		taskContext.On("Resource").Return(&ResourceWrapper{
+		taskContext.On("Resource").Return(ResourceWrapper{
 			State:   admin.State_PERMANENT_FAILURE,
 			Outputs: nil,
 			Message: "",
@@ -144,7 +144,7 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test RETRYABLE_FAILURE Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
-		taskContext.On("Resource").Return(&ResourceWrapper{
+		taskContext.On("Resource").Return(ResourceWrapper{
 			State:   admin.State_RETRYABLE_FAILURE,
 			Outputs: nil,
 			Message: "",
@@ -157,7 +157,7 @@ func TestPlugin(t *testing.T) {
 
 	t.Run("test UNDEFINED Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
-		taskContext.On("Resource").Return(&ResourceWrapper{
+		taskContext.On("Resource").Return(ResourceWrapper{
 			State:   5,
 			Outputs: nil,
 			Message: "",
