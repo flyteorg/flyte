@@ -134,6 +134,42 @@ func (m *SparkJob) Validate() error {
 
 	// no validation rules for DatabricksInstance
 
+	// no validation rules for DriverPodTemplateName
+
+	// no validation rules for ExecutorPodTemplateName
+
+	switch m.DriverPodValue.(type) {
+
+	case *SparkJob_DriverPod:
+
+		if v, ok := interface{}(m.GetDriverPod()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SparkJobValidationError{
+					field:  "DriverPod",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	switch m.ExecutorPodValue.(type) {
+
+	case *SparkJob_ExecutorPod:
+
+		if v, ok := interface{}(m.GetExecutorPod()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return SparkJobValidationError{
+					field:  "ExecutorPod",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 

@@ -285,6 +285,45 @@ pub struct SparkJob {
     /// This instance name can be set in either flytepropeller or flytekit.
     #[prost(string, tag="9")]
     pub databricks_instance: ::prost::alloc::string::String,
+    /// Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
+    /// driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
+    /// identically as, the default PodTemplate configured in FlytePropeller.
+    /// +optional
+    #[prost(string, tag="11")]
+    pub driver_pod_template_name: ::prost::alloc::string::String,
+    /// Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
+    /// executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
+    /// identically as, the default PodTemplate configured in FlytePropeller.
+    /// +optional
+    #[prost(string, tag="13")]
+    pub executor_pod_template_name: ::prost::alloc::string::String,
+    /// The pod spec and metadata to be used as the base configuration when creating the driver Pod for this task.
+    /// +optional
+    #[prost(oneof="spark_job::DriverPodValue", tags="10")]
+    pub driver_pod_value: ::core::option::Option<spark_job::DriverPodValue>,
+    /// The pod spec and metadata to be used as the base configuration when creating the executor Pods for this task.
+    /// +optional
+    #[prost(oneof="spark_job::ExecutorPodValue", tags="12")]
+    pub executor_pod_value: ::core::option::Option<spark_job::ExecutorPodValue>,
+}
+/// Nested message and enum types in `SparkJob`.
+pub mod spark_job {
+    /// The pod spec and metadata to be used as the base configuration when creating the driver Pod for this task.
+    /// +optional
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum DriverPodValue {
+        #[prost(message, tag="10")]
+        DriverPod(super::super::core::K8sPod),
+    }
+    /// The pod spec and metadata to be used as the base configuration when creating the executor Pods for this task.
+    /// +optional
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum ExecutorPodValue {
+        #[prost(message, tag="12")]
+        ExecutorPod(super::super::core::K8sPod),
+    }
 }
 /// Custom proto for plugin that enables distributed training using <https://github.com/kubeflow/tf-operator>
 #[allow(clippy::derive_partial_eq_without_eq)]
