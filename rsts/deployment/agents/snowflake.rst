@@ -252,7 +252,7 @@ You can run snowflake query through agent service, here are the steps to follow.
 
 .. code-block:: bash
 
-   kubectl create secret generic snowflake --namespace=flytesnacks-development --from-file=private_key=your_private_key_above
+   kubectl create secret generic snowflake-private-key --namespace=flytesnacks-development --from-file=your_private_key_above
 
 3. Update flyte-single-binary-local.yaml in flyte:
 
