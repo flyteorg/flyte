@@ -94,8 +94,6 @@ spec:
       kind: task
       name: enum_stringify
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.enums.enum_stringify" '
     n1:
       id: n1
@@ -108,8 +106,6 @@ spec:
       kind: task
       name: string_to_enum
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.enums.string_to_enum" '
     start-node:
       id: start-node

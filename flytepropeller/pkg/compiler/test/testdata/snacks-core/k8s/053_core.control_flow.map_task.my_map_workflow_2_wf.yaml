@@ -106,8 +106,6 @@ spec:
       kind: task
       name: coalesce
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.map_task.coalesce" '
     start-node:
       id: start-node
