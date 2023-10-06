@@ -468,7 +468,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.33"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.9.4"
       k8s-array:
         logs:
           config:
@@ -483,6 +483,9 @@ data:
           insecure: true
           timeouts:
             GetTask: 10s
+        supportedTaskTypes:
+        - custom_task_type
+        - default_task
   002-database.yaml: |
     database:
       postgres:
@@ -814,7 +817,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: bzRZSkZTS1ZleXlCUUJNTA==
+  haSharedSecret: R3N1WE9Zc2YxR0VjNEFYWQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1244,7 +1247,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: d8bf73644712bd050aa462a0478b0c779bd6d170645efe98feb5ffcacf52010e
+        checksum/configuration: 0b3ee539fc9f10b911b7c8df1ad9dd268ff499d8b465378bc9b66699424d622d
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1407,7 +1410,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 15c81ab2a1897ff8695808087385766accafd54576f22a85773047617ee892cb
+        checksum/secret: 0918d405038ca24be8d685294ff2bba76ce79d7effd91f54b0b6058bbed28073
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1736,7 +1739,7 @@ spec:
       - command:
         - pyflyte
         - serve
-        image: ghcr.io/flyteorg/flyteagent:1.8.3
+        image: ghcr.io/flyteorg/flyteagent:1.9.1
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

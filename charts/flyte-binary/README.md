@@ -25,6 +25,8 @@ Chart for basic single Flyte executable deployment
 | configuration.agentService.defaultAgent.endpoint | string | `"dns:///flyteagent.flyte.svc.cluster.local:8000"` |  |
 | configuration.agentService.defaultAgent.insecure | bool | `true` |  |
 | configuration.agentService.defaultAgent.timeouts.GetTask | string | `"10s"` |  |
+| configuration.agentService.supportedTaskTypes[0] | string | `"custom_task_type"` |  |
+| configuration.agentService.supportedTaskTypes[1] | string | `"default_task"` |  |
 | configuration.annotations | object | `{}` |  |
 | configuration.auth.authorizedUris | list | `[]` |  |
 | configuration.auth.clientSecretsExternalSecretRef | string | `""` |  |
