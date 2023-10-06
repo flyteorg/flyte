@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"

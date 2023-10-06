@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	mocket "github.com/Selvatico/go-mocket"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"

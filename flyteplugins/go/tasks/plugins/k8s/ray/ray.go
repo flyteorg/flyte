@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"

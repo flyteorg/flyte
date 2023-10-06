@@ -1219,9 +1219,9 @@ public final class WorkflowClosureOuterClass {
       "oto\032\031flyteidl/core/tasks.proto\"p\n\017Workfl" +
       "owClosure\0221\n\010workflow\030\001 \001(\0132\037.flyteidl.c" +
       "ore.WorkflowTemplate\022*\n\005tasks\030\002 \003(\0132\033.fl" +
-      "yteidl.core.TaskTemplateB6Z4github.com/f" +
-      "lyteorg/flyteidl/gen/pb-go/flyteidl/core" +
-      "b\006proto3"
+      "yteidl.core.TaskTemplateB<Z:github.com/f" +
+      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
+      "l/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

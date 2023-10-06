@@ -7,7 +7,7 @@ import (
 
 	catalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 
-	datacatalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	datacatalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 
 	io "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 

@@ -45,14 +45,14 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto[] =
   "lyteidl.admin.GetTaskRequest\032\037.flyteidl."
   "admin.GetTaskResponse\"\000\022U\n\nDeleteTask\022!."
   "flyteidl.admin.DeleteTaskRequest\032\".flyte"
-  "idl.admin.DeleteTaskResponse\"\000B9Z7github"
-  ".com/flyteorg/flyteidl/gen/pb-go/flyteid"
-  "l/serviceb\006proto3"
+  "idl.admin.DeleteTaskResponse\"\000B\?Z=github"
+  ".com/flyteorg/flyte/flyteidl/gen/pb-go/f"
+  "lyteidl/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto,
-  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 417,
+  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 423,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fagent_2eproto() {

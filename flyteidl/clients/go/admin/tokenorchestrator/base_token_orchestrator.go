@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"golang.org/x/oauth2"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
 )
 
 // BaseTokenOrchestrator implements the main logic to initiate device authorization flow

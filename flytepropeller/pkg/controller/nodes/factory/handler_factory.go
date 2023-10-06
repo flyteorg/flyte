@@ -5,7 +5,7 @@ import (
 
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 

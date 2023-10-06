@@ -253,14 +253,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fproject_5fattributes_2ep
   "\n\036ProjectAttributesDeleteRequest\022\017\n\007proj"
   "ect\030\001 \001(\t\0228\n\rresource_type\030\002 \001(\0162!.flyte"
   "idl.admin.MatchableResource\"!\n\037ProjectAt"
-  "tributesDeleteResponseB7Z5github.com/fly"
-  "teorg/flyteidl/gen/pb-go/flyteidl/adminb"
-  "\006proto3"
+  "tributesDeleteResponseB=Z;github.com/fly"
+  "teorg/flyte/flyteidl/gen/pb-go/flyteidl/"
+  "adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fproject_5fattributes_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fproject_5fattributes_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fproject_5fattributes_2eproto,
-  "flyteidl/admin/project_attributes.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_5fattributes_2eproto, 727,
+  "flyteidl/admin/project_attributes.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_5fattributes_2eproto, 733,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fproject_5fattributes_2eproto() {

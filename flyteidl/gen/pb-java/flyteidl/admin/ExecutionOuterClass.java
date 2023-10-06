@@ -28547,9 +28547,9 @@ public final class ExecutionOuterClass {
       "\n\005depth\030\002 \001(\005\"H\n#WorkflowExecutionGetMet" +
       "ricsResponse\022!\n\004span\030\001 \001(\0132\023.flyteidl.co" +
       "re.Span*>\n\016ExecutionState\022\024\n\020EXECUTION_A" +
-      "CTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7Z5githu" +
-      "b.com/flyteorg/flyteidl/gen/pb-go/flytei" +
-      "dl/adminb\006proto3"
+      "CTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B=Z;githu" +
+      "b.com/flyteorg/flyte/flyteidl/gen/pb-go/" +
+      "flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

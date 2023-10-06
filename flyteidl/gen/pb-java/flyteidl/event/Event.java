@@ -21697,9 +21697,9 @@ public final class Event {
       "ugin_identifier\030\004 \001(\t\022K\n\016instance_class\030" +
       "\020 \001(\01623.flyteidl.event.TaskExecutionMeta" +
       "data.InstanceClass\"/\n\rInstanceClass\022\013\n\007D" +
-      "EFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/e" +
-      "ventb\006proto3"
+      "EFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B=Z;github.co" +
+      "m/flyteorg/flyte/flyteidl/gen/pb-go/flyt" +
+      "eidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
