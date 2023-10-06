@@ -14,6 +14,6 @@ type TaskLogMessageFormat string
 // List of TaskLogMessageFormat
 const (
 	TaskLogMessageFormatUNKNOWN TaskLogMessageFormat = "UNKNOWN"
-	TaskLogMessageFormatCSV     TaskLogMessageFormat = "CSV"
-	TaskLogMessageFormatJSON    TaskLogMessageFormat = "JSON"
+	TaskLogMessageFormatCSV TaskLogMessageFormat = "CSV"
+	TaskLogMessageFormatJSON TaskLogMessageFormat = "JSON"
 )

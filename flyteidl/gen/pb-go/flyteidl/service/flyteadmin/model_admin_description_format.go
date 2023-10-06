@@ -8,14 +8,13 @@
  */
 
 package flyteadmin
-
 // AdminDescriptionFormat : - DESCRIPTION_FORMAT_RST: python default documentation - comments is rst
 type AdminDescriptionFormat string
 
 // List of adminDescriptionFormat
 const (
-	AdminDescriptionFormatUNKNOWN  AdminDescriptionFormat = "DESCRIPTION_FORMAT_UNKNOWN"
+	AdminDescriptionFormatUNKNOWN AdminDescriptionFormat = "DESCRIPTION_FORMAT_UNKNOWN"
 	AdminDescriptionFormatMARKDOWN AdminDescriptionFormat = "DESCRIPTION_FORMAT_MARKDOWN"
-	AdminDescriptionFormatHTML     AdminDescriptionFormat = "DESCRIPTION_FORMAT_HTML"
-	AdminDescriptionFormatRST      AdminDescriptionFormat = "DESCRIPTION_FORMAT_RST"
+	AdminDescriptionFormatHTML AdminDescriptionFormat = "DESCRIPTION_FORMAT_HTML"
+	AdminDescriptionFormatRST AdminDescriptionFormat = "DESCRIPTION_FORMAT_RST"
 )

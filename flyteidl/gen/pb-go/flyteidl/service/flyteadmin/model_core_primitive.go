@@ -14,10 +14,10 @@ import (
 )
 
 type CorePrimitive struct {
-	Integer     string    `json:"integer,omitempty"`
-	FloatValue  float64   `json:"float_value,omitempty"`
-	StringValue string    `json:"string_value,omitempty"`
-	Boolean     bool      `json:"boolean,omitempty"`
-	Datetime    time.Time `json:"datetime,omitempty"`
-	Duration    string    `json:"duration,omitempty"`
+	Integer string `json:"integer,omitempty"`
+	FloatValue float64 `json:"float_value,omitempty"`
+	StringValue string `json:"string_value,omitempty"`
+	Boolean bool `json:"boolean,omitempty"`
+	Datetime time.Time `json:"datetime,omitempty"`
+	Duration string `json:"duration,omitempty"`
 }

@@ -11,7 +11,7 @@ package flyteadmin
 
 // These URLs are returned as part of node and task execution data requests.
 type AdminFlyteUrLs struct {
-	Inputs  string `json:"inputs,omitempty"`
+	Inputs string `json:"inputs,omitempty"`
 	Outputs string `json:"outputs,omitempty"`
-	Deck    string `json:"deck,omitempty"`
+	Deck string `json:"deck,omitempty"`
 }

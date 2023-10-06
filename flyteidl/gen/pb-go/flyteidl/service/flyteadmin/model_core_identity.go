@@ -16,6 +16,6 @@ type CoreIdentity struct {
 	// k8s_service_account references a kubernetes service account to impersonate.
 	K8sServiceAccount string `json:"k8s_service_account,omitempty"`
 	// oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when making external calls.
-	Oauth2Client      *CoreOAuth2Client `json:"oauth2_client,omitempty"`
-	ExecutionIdentity string            `json:"execution_identity,omitempty"`
+	Oauth2Client *CoreOAuth2Client `json:"oauth2_client,omitempty"`
+	ExecutionIdentity string `json:"execution_identity,omitempty"`
 }

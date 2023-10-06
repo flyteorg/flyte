@@ -11,7 +11,7 @@ package flyteadmin
 
 type FlyteidladminTaskNodeMetadata struct {
 	// Captures the status of caching for this execution.
-	CacheStatus   *CoreCatalogCacheStatus `json:"cache_status,omitempty"`
-	CatalogKey    *CoreCatalogMetadata    `json:"catalog_key,omitempty"`
-	CheckpointUri string                  `json:"checkpoint_uri,omitempty"`
+	CacheStatus *CoreCatalogCacheStatus `json:"cache_status,omitempty"`
+	CatalogKey *CoreCatalogMetadata `json:"catalog_key,omitempty"`
+	CheckpointUri string `json:"checkpoint_uri,omitempty"`
 }

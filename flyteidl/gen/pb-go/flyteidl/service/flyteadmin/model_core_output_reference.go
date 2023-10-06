@@ -14,6 +14,6 @@ type CoreOutputReference struct {
 	// Node id must exist at the graph layer.
 	NodeId string `json:"node_id,omitempty"`
 	// Variable name must refer to an output variable for the node.
-	Var_     string                 `json:"var,omitempty"`
+	Var_ string `json:"var,omitempty"`
 	AttrPath []CorePromiseAttribute `json:"attr_path,omitempty"`
 }
