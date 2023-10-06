@@ -55,7 +55,7 @@ type NodeExecutionMetadata_GetInterruptibleFailureThreshold struct {
 	*mock.Call
 }
 
-func (_m NodeExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 uint32) *NodeExecutionMetadata_GetInterruptibleFailureThreshold {
+func (_m NodeExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 int32) *NodeExecutionMetadata_GetInterruptibleFailureThreshold {
 	return &NodeExecutionMetadata_GetInterruptibleFailureThreshold{Call: _m.Call.Return(_a0)}
 }
 
@@ -70,14 +70,14 @@ func (_m *NodeExecutionMetadata) OnGetInterruptibleFailureThresholdMatch(matcher
 }
 
 // GetInterruptibleFailureThreshold provides a mock function with given fields:
-func (_m *NodeExecutionMetadata) GetInterruptibleFailureThreshold() uint32 {
+func (_m *NodeExecutionMetadata) GetInterruptibleFailureThreshold() int32 {
 	ret := _m.Called()
 
-	var r0 uint32
-	if rf, ok := ret.Get(0).(func() uint32); ok {
+	var r0 int32
+	if rf, ok := ret.Get(0).(func() int32); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(uint32)
+		r0 = ret.Get(0).(int32)
 	}
 
 	return r0

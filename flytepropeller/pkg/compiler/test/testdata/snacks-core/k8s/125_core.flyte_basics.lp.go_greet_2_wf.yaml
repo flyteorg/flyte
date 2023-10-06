@@ -98,8 +98,6 @@ spec:
       kind: task
       name: greet
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.lp.greet" '
     start-node:
       id: start-node
