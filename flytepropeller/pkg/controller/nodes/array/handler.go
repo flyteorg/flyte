@@ -508,7 +508,6 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// wrap node lookup
 	subNodeSpec := *arrayNode.GetSubNodeSpec()
 
-	//subNodeID := fmt.Sprintf("%s-n%d", nCtx.NodeID(), subNodeIndex)
 	subNodeID := fmt.Sprintf("n%d", subNodeIndex)
 	subNodeSpec.ID = subNodeID
 	subNodeSpec.Name = subNodeID
