@@ -6,7 +6,7 @@
 package v1alpha1
 
 import (
-	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"

@@ -6,8 +6,8 @@ import (
 	"math"
 	"strconv"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	idlPlugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
 

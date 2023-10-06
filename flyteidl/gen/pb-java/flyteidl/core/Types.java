@@ -13920,9 +13920,9 @@ public final class Types {
       "(\t*\206\001\n\nSimpleType\022\010\n\004NONE\020\000\022\013\n\007INTEGER\020\001" +
       "\022\t\n\005FLOAT\020\002\022\n\n\006STRING\020\003\022\013\n\007BOOLEAN\020\004\022\014\n\010" +
       "DATETIME\020\005\022\014\n\010DURATION\020\006\022\n\n\006BINARY\020\007\022\t\n\005" +
-      "ERROR\020\010\022\n\n\006STRUCT\020\tB6Z4github.com/flyteo" +
-      "rg/flyteidl/gen/pb-go/flyteidl/coreb\006pro" +
-      "to3"
+      "ERROR\020\010\022\n\n\006STRUCT\020\tB<Z:github.com/flyteo" +
+      "rg/flyte/flyteidl/gen/pb-go/flyteidl/cor" +
+      "eb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

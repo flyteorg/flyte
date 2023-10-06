@@ -370,13 +370,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto
   "ts\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014f"
   "ull_outputs\030\004 \001(\0132\031.flyteidl.core.Litera"
   "lMap\022-\n\nflyte_urls\030\005 \001(\0132\031.flyteidl.admi"
-  "n.FlyteURLsB7Z5github.com/flyteorg/flyte"
-  "idl/gen/pb-go/flyteidl/adminb\006proto3"
+  "n.FlyteURLsB=Z;github.com/flyteorg/flyte"
+  "/flyteidl/gen/pb-go/flyteidl/adminb\006prot"
+  "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2ftask_5fexecution_2eproto,
-  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1956,
+  "flyteidl/admin/task_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_5fexecution_2eproto, 1962,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2ftask_5fexecution_2eproto() {

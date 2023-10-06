@@ -1,9 +1,9 @@
 package validators
 
 import (
+	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func validateOutputVar(n c.NodeBuilder, paramName string, errs errors.CompileErrors) (

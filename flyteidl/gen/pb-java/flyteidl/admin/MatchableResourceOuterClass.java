@@ -13141,9 +13141,9 @@ public final class MatchableResourceOuterClass {
       "UEUE\020\002\022\033\n\027EXECUTION_CLUSTER_LABEL\020\003\022$\n Q" +
       "UALITY_OF_SERVICE_SPECIFICATION\020\004\022\023\n\017PLU" +
       "GIN_OVERRIDE\020\005\022\035\n\031WORKFLOW_EXECUTION_CON" +
-      "FIG\020\006\022\026\n\022CLUSTER_ASSIGNMENT\020\007B7Z5github." +
-      "com/flyteorg/flyteidl/gen/pb-go/flyteidl" +
-      "/adminb\006proto3"
+      "FIG\020\006\022\026\n\022CLUSTER_ASSIGNMENT\020\007B=Z;github." +
+      "com/flyteorg/flyte/flyteidl/gen/pb-go/fl" +
+      "yteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

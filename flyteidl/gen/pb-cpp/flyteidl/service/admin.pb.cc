@@ -301,14 +301,14 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto[] =
   "orkflowExecutionGetMetricsRequest\0323.flyt"
   "eidl.admin.WorkflowExecutionGetMetricsRe"
   "sponse\"E\202\323\344\223\002\?\022=/api/v1/metrics/executio"
-  "ns/{id.project}/{id.domain}/{id.name}B9Z"
-  "7github.com/flyteorg/flyteidl/gen/pb-go/"
-  "flyteidl/serviceb\006proto3"
+  "ns/{id.project}/{id.domain}/{id.name}B\?Z"
+  "=github.com/flyteorg/flyte/flyteidl/gen/"
+  "pb-go/flyteidl/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fadmin_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fadmin_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto,
-  "flyteidl/service/admin.proto", &assign_descriptors_table_flyteidl_2fservice_2fadmin_2eproto, 10664,
+  "flyteidl/service/admin.proto", &assign_descriptors_table_flyteidl_2fservice_2fadmin_2eproto, 10670,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fadmin_2eproto() {

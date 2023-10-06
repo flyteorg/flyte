@@ -2567,9 +2567,9 @@ public final class Tensorflow {
       "replicas\030\001 \001(\005\022\r\n\005image\030\002 \001(\t\022+\n\tresourc" +
       "es\030\003 \001(\0132\030.flyteidl.core.Resources\022@\n\016re" +
       "start_policy\030\004 \001(\0162(.flyteidl.plugins.ku" +
-      "beflow.RestartPolicyB9Z7github.com/flyte" +
-      "org/flyteidl/gen/pb-go/flyteidl/pluginsb" +
-      "\006proto3"
+      "beflow.RestartPolicyB?Z=github.com/flyte" +
+      "org/flyte/flyteidl/gen/pb-go/flyteidl/pl" +
+      "uginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
