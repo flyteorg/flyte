@@ -12,8 +12,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0
 	github.com/coocood/freecache v1.1.1
 	github.com/dask/dask-kubernetes/v2023 v2023.0.0-20230626103304-abd02cd17b26
+	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000
+	github.com/flyteorg/flyteidl v1.5.21
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.3
 	github.com/hashicorp/golang-lru v0.5.4
@@ -142,8 +143,8 @@ replace (
 	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
 	github.com/flyteorg/flyte/datacatalog => ../datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteidl => ../flyteidl
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
-	github.com/flyteorg/flyteidl => ../flyteidl
 )

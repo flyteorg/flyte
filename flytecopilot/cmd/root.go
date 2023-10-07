@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"

@@ -5,8 +5,8 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/ptypes"
 )
 
@@ -19,13 +19,13 @@ func refStr(s string) *string {
 }
 
 func computeRetryStrategy(n *core.Node, t *core.TaskTemplate) *v1alpha1.RetryStrategy {
-	if n.GetMetadata() != nil && n.GetMetadata().GetRetries() != nil {
+	if n.GetMetadata() != nil && n.GetMetadata().GetRetries() != nil && n.GetMetadata().GetRetries().Retries != 0 {
 		return &v1alpha1.RetryStrategy{
 			MinAttempts: refInt(int(n.GetMetadata().GetRetries().Retries + 1)),
 		}
 	}
 
-	if t != nil && t.GetMetadata() != nil && t.GetMetadata().GetRetries() != nil {
+	if t != nil && t.GetMetadata() != nil && t.GetMetadata().GetRetries() != nil && t.GetMetadata().GetRetries().Retries != 0 {
 		return &v1alpha1.RetryStrategy{
 			MinAttempts: refInt(int(t.GetMetadata().GetRetries().Retries + 1)),
 		}

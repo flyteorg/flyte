@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func MustCreateRegex(varName string) *regexp.Regexp {

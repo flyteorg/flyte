@@ -6,7 +6,7 @@ import (
 
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/stretchr/testify/mock"
 

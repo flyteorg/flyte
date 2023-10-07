@@ -10,9 +10,9 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 )
 

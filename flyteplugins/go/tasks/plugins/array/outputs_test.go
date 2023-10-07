@@ -17,7 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 
@@ -30,10 +30,10 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue/mocks"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestOutputAssembler_Queue(t *testing.T) {

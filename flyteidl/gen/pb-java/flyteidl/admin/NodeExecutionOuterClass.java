@@ -15756,9 +15756,9 @@ public final class NodeExecutionOuterClass {
       "puts\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n" +
       "\020dynamic_workflow\030\020 \001(\0132+.flyteidl.admin" +
       ".DynamicWorkflowNodeMetadata\022-\n\nflyte_ur" +
-      "ls\030\021 \001(\0132\031.flyteidl.admin.FlyteURLsB7Z5g" +
-      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
-      "yteidl/adminb\006proto3"
+      "ls\030\021 \001(\0132\031.flyteidl.admin.FlyteURLsB=Z;g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

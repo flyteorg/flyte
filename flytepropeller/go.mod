@@ -6,9 +6,9 @@ require (
 	github.com/DiSiqueira/GoTree v1.0.1-0.20180907134536-53a8e837f295
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/fatih/color v1.13.0
+	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/go-test/deep v1.0.7
@@ -25,7 +25,7 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.4
-	golang.org/x/exp v0.0.0-20220722155223-a9213eeb770e
+	golang.org/x/exp v0.0.0-20231005195138-3e424a577f31
 	golang.org/x/sync v0.1.0
 	golang.org/x/time v0.1.0
 	google.golang.org/grpc v1.56.1
@@ -114,7 +114,6 @@ require (
 	github.com/prometheus/common v0.42.0 // indirect
 	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/ray-project/kuberay/ray-operator v0.0.0-20220728052838-eaa75fa6707c // indirect
-	github.com/sercand/kuberesolver/v5 v5.1.1 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
@@ -125,7 +124,7 @@ require (
 	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
 	golang.org/x/net v0.9.0 // indirect
 	golang.org/x/oauth2 v0.7.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
 	golang.org/x/term v0.7.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
@@ -150,8 +149,8 @@ replace (
 	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
 	github.com/flyteorg/flyte/datacatalog => ../datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
+	github.com/flyteorg/flyte/flyteidl => ../flyteidl
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
-	github.com/flyteorg/flyteidl => ../flyteidl
 )

@@ -22686,8 +22686,9 @@ public final class Common {
       "\001 \001(\t\022\017\n\007outputs\030\002 \001(\t\022\014\n\004deck\030\003 \001(\t*\\\n\020" +
       "NamedEntityState\022\027\n\023NAMED_ENTITY_ACTIVE\020" +
       "\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001\022\024\n\020SYSTEM_G" +
-      "ENERATED\020\002B7Z5github.com/flyteorg/flytei" +
-      "dl/gen/pb-go/flyteidl/adminb\006proto3"
+      "ENERATED\020\002B=Z;github.com/flyteorg/flyte/" +
+      "flyteidl/gen/pb-go/flyteidl/adminb\006proto" +
+      "3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

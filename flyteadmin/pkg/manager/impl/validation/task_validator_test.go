@@ -10,7 +10,7 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/stretchr/testify/assert"
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	mocket "github.com/Selvatico/go-mocket"
 	"gorm.io/driver/postgres"
