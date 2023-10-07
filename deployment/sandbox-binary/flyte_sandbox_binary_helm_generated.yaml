@@ -131,7 +131,6 @@ data:
           timeouts:
             GetTask: 10s
         supportedTaskTypes:
-        - custom_task_type
         - default_task
   002-database.yaml: |
     database:
@@ -368,7 +367,7 @@ spec:
         app.kubernetes.io/instance: flyte
         app.kubernetes.io/component: flyte-binary
       annotations:
-        checksum/configuration: ca166b824b050aad2cc47d8250af2ea34163c5cacf4a3d43885a6d938a47d26f
+        checksum/configuration: d220769393e7acbe0372fdccbf3d588797864ec934661f08912e88ec084cdfde
         checksum/configuration-secret: d5d93f4e67780b21593dc3799f0f6682aab0765e708e4020939975d14d44f929
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:

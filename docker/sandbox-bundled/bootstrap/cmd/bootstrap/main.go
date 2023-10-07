@@ -17,7 +17,7 @@ const (
 	clusterResourceTemplatesConfigMapName = "flyte-sandbox-extra-cluster-resource-templates"
 	deploymentName                        = "flyte-sandbox"
 	devModeEnvVar                         = "FLYTE_DEV"
-	completeAgentModeEnvVar               = "FLYTE_COMPLETE_AGENT"
+	disableAgentModeEnvVar                = "DISABLE_AGENT"
 	dockerHost                            = "host.docker.internal"
 	namespace                             = "flyte"
 
@@ -37,9 +37,8 @@ func main() {
 	} else {
 		// If we are not running in dev mode, look for user-specified configuration
 		// to load into the sandbox deployment
-		if os.Getenv(completeAgentModeEnvVar) == "True" {
-			tmplPath = fullAgentTemplatePath
-		} else {
+		tmplPath = fullAgentTemplatePath
+		if os.Getenv(disableAgentModeEnvVar) == "True" {
 			tmplPath = fullTemplatePath
 		}
 

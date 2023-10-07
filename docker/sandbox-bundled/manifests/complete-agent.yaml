@@ -484,7 +484,6 @@ data:
           timeouts:
             GetTask: 10s
         supportedTaskTypes:
-        - custom_task_type
         - default_task
   002-database.yaml: |
     database:
@@ -817,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: R3N1WE9Zc2YxR0VjNEFYWQ==
+  haSharedSecret: R2JRWFVRYThnRFVLbHpuSA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1247,7 +1246,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 0b3ee539fc9f10b911b7c8df1ad9dd268ff499d8b465378bc9b66699424d622d
+        checksum/configuration: b765a68950c83acd0c069dac2a6569cf2b0f0f76a2760eea3561d1d04d6be831
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1410,7 +1409,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0918d405038ca24be8d685294ff2bba76ce79d7effd91f54b0b6058bbed28073
+        checksum/secret: 0ee1553aec7c03152a0a44e7b1a82985795774412a779f7b607a57e59f42c8ef
       labels:
         app: docker-registry
         release: flyte-sandbox
