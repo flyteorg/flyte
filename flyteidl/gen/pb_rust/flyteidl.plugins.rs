@@ -290,14 +290,17 @@ pub struct SparkJob {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedTensorflowTrainingTask {
-    /// number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
+    /// number of worker replicas spawned in the cluster for this job
     #[prost(int32, tag="1")]
     pub workers: i32,
     /// PS -> Parameter server
+    /// number of ps replicas spawned in the cluster for this job
     #[prost(int32, tag="2")]
     pub ps_replicas: i32,
+    /// number of chief replicas spawned in the cluster for this job
     #[prost(int32, tag="3")]
     pub chief_replicas: i32,
+    /// number of evaluator replicas spawned in the cluster for this job
     #[prost(int32, tag="4")]
     pub evaluator_replicas: i32,
 }

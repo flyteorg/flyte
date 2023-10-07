@@ -22,11 +22,14 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Custom proto for plugin that enables distributed training using https://github.com/kubeflow/tf-operator
 type DistributedTensorflowTrainingTask struct {
-	// number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
+	// number of worker replicas spawned in the cluster for this job
 	Workers int32 `protobuf:"varint,1,opt,name=workers,proto3" json:"workers,omitempty"`
 	// PS -> Parameter server
-	PsReplicas           int32    `protobuf:"varint,2,opt,name=ps_replicas,json=psReplicas,proto3" json:"ps_replicas,omitempty"`
-	ChiefReplicas        int32    `protobuf:"varint,3,opt,name=chief_replicas,json=chiefReplicas,proto3" json:"chief_replicas,omitempty"`
+	// number of ps replicas spawned in the cluster for this job
+	PsReplicas int32 `protobuf:"varint,2,opt,name=ps_replicas,json=psReplicas,proto3" json:"ps_replicas,omitempty"`
+	// number of chief replicas spawned in the cluster for this job
+	ChiefReplicas int32 `protobuf:"varint,3,opt,name=chief_replicas,json=chiefReplicas,proto3" json:"chief_replicas,omitempty"`
+	// number of evaluator replicas spawned in the cluster for this job
 	EvaluatorReplicas    int32    `protobuf:"varint,4,opt,name=evaluator_replicas,json=evaluatorReplicas,proto3" json:"evaluator_replicas,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

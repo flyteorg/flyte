@@ -20,7 +20,7 @@ public final class Tensorflow {
 
     /**
      * <pre>
-     * number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
+     * number of worker replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 workers = 1;</code>
@@ -30,6 +30,7 @@ public final class Tensorflow {
     /**
      * <pre>
      * PS -&gt; Parameter server
+     * number of ps replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 ps_replicas = 2;</code>
@@ -37,11 +38,19 @@ public final class Tensorflow {
     int getPsReplicas();
 
     /**
+     * <pre>
+     * number of chief replicas spawned in the cluster for this job
+     * </pre>
+     *
      * <code>int32 chief_replicas = 3;</code>
      */
     int getChiefReplicas();
 
     /**
+     * <pre>
+     * number of evaluator replicas spawned in the cluster for this job
+     * </pre>
+     *
      * <code>int32 evaluator_replicas = 4;</code>
      */
     int getEvaluatorReplicas();
@@ -145,7 +154,7 @@ public final class Tensorflow {
     private int workers_;
     /**
      * <pre>
-     * number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
+     * number of worker replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 workers = 1;</code>
@@ -159,6 +168,7 @@ public final class Tensorflow {
     /**
      * <pre>
      * PS -&gt; Parameter server
+     * number of ps replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 ps_replicas = 2;</code>
@@ -170,6 +180,10 @@ public final class Tensorflow {
     public static final int CHIEF_REPLICAS_FIELD_NUMBER = 3;
     private int chiefReplicas_;
     /**
+     * <pre>
+     * number of chief replicas spawned in the cluster for this job
+     * </pre>
+     *
      * <code>int32 chief_replicas = 3;</code>
      */
     public int getChiefReplicas() {
@@ -179,6 +193,10 @@ public final class Tensorflow {
     public static final int EVALUATOR_REPLICAS_FIELD_NUMBER = 4;
     private int evaluatorReplicas_;
     /**
+     * <pre>
+     * number of evaluator replicas spawned in the cluster for this job
+     * </pre>
+     *
      * <code>int32 evaluator_replicas = 4;</code>
      */
     public int getEvaluatorReplicas() {
@@ -545,7 +563,7 @@ public final class Tensorflow {
       private int workers_ ;
       /**
        * <pre>
-       * number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
+       * number of worker replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 workers = 1;</code>
@@ -555,7 +573,7 @@ public final class Tensorflow {
       }
       /**
        * <pre>
-       * number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
+       * number of worker replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 workers = 1;</code>
@@ -568,7 +586,7 @@ public final class Tensorflow {
       }
       /**
        * <pre>
-       * number of worker, ps, chief and evaluator replicas spawned in the cluster for this job
+       * number of worker replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 workers = 1;</code>
@@ -584,6 +602,7 @@ public final class Tensorflow {
       /**
        * <pre>
        * PS -&gt; Parameter server
+       * number of ps replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 ps_replicas = 2;</code>
@@ -594,6 +613,7 @@ public final class Tensorflow {
       /**
        * <pre>
        * PS -&gt; Parameter server
+       * number of ps replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 ps_replicas = 2;</code>
@@ -607,6 +627,7 @@ public final class Tensorflow {
       /**
        * <pre>
        * PS -&gt; Parameter server
+       * number of ps replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 ps_replicas = 2;</code>
@@ -620,12 +641,20 @@ public final class Tensorflow {
 
       private int chiefReplicas_ ;
       /**
+       * <pre>
+       * number of chief replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 chief_replicas = 3;</code>
        */
       public int getChiefReplicas() {
         return chiefReplicas_;
       }
       /**
+       * <pre>
+       * number of chief replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 chief_replicas = 3;</code>
        */
       public Builder setChiefReplicas(int value) {
@@ -635,6 +664,10 @@ public final class Tensorflow {
         return this;
       }
       /**
+       * <pre>
+       * number of chief replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 chief_replicas = 3;</code>
        */
       public Builder clearChiefReplicas() {
@@ -646,12 +679,20 @@ public final class Tensorflow {
 
       private int evaluatorReplicas_ ;
       /**
+       * <pre>
+       * number of evaluator replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 evaluator_replicas = 4;</code>
        */
       public int getEvaluatorReplicas() {
         return evaluatorReplicas_;
       }
       /**
+       * <pre>
+       * number of evaluator replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 evaluator_replicas = 4;</code>
        */
       public Builder setEvaluatorReplicas(int value) {
@@ -661,6 +702,10 @@ public final class Tensorflow {
         return this;
       }
       /**
+       * <pre>
+       * number of evaluator replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 evaluator_replicas = 4;</code>
        */
       public Builder clearEvaluatorReplicas() {
