@@ -5,9 +5,9 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
-
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -24,7 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	flyteIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"google.golang.org/grpc"
+	"github.com/sercand/kuberesolver/v5"
 )
 
 type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
@@ -299,6 +299,8 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 }
 
 func newAgentPlugin(supportedTaskTypes SupportedTaskTypes) webapi.PluginEntry {
+	kuberesolver.RegisterInCluster()
+
 	if len(supportedTaskTypes) == 0 {
 		supportedTaskTypes = SupportedTaskTypes{"default_supported_task_type"}
 	}

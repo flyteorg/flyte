@@ -8,7 +8,7 @@ require (
 	github.com/flyteorg/flyte/flytepropeller v1.9.4
 	github.com/flyteorg/flyte/flytestdlib v1.9.4
 	github.com/golang/glog v1.1.0
-	github.com/prometheus/client_golang v1.12.1
+	github.com/prometheus/client_golang v1.15.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sync v0.1.0
@@ -74,7 +74,7 @@ require (
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/flyteidl v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/stow v0.3.7 // indirect
-	github.com/fsnotify/fsnotify v1.5.1 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-gormigrate/gormigrate/v2 v2.0.0 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
@@ -137,7 +137,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/mattn/goveralls v0.0.6 // indirect
-	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
+	github.com/matttproud/golang_protobuf_extensions v1.0.4 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -157,14 +157,15 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
-	github.com/prometheus/client_model v0.2.0 // indirect
-	github.com/prometheus/common v0.32.1 // indirect
-	github.com/prometheus/procfs v0.7.3 // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
+	github.com/prometheus/common v0.42.0 // indirect
+	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/ray-project/kuberay/ray-operator v0.0.0-20220728052838-eaa75fa6707c // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/sendgrid/rest v2.6.8+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
+	github.com/sercand/kuberesolver/v5 v5.1.1 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/cast v1.4.1 // indirect
