@@ -115,6 +115,14 @@ hello world example:
    cd flytesnacks/cookbook
    pyflyte run --remote core/flyte_basics/hello_world.py my_wf
 
+***********************************
+Flyte in on-premises infrastructure
+***********************************
+
+Sometimes, it's also helpful to be able to set up a Flyte environment in an on-premises Kubernetes environment or even on a laptop for testing and development purposes.
+Check out `this community-maintained tutorial <https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/on-premises/001-configure-local-k8s.md>`__ to learn how to setup the required dependencies and deploy the `flyte-binary` chart to a local Kubernetes cluster.
+
+
 *************
 What's Next?
 *************
