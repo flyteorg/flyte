@@ -2,6 +2,7 @@ package validators
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/exp/slices"
 
@@ -184,7 +185,7 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	}
 
 	// sort inner types to ensure consistent union types are generated
-	slices.SortFunc(innerType, func(a, b *core.LiteralType) bool { return a.String() < b.String() })
+	slices.SortFunc(innerType, func(a, b *core.LiteralType) int { return strings.Compare(a.String(), b.String()) })
 
 	return &core.LiteralType{
 		Type: &core.LiteralType_UnionType{

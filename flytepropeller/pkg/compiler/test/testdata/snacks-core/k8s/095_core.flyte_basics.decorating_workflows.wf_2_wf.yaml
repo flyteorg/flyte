@@ -98,8 +98,6 @@ spec:
       kind: task
       name: setup
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.setup" '
     n1:
       id: n1
@@ -112,8 +110,6 @@ spec:
       kind: task
       name: t1
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.t1" '
     n2:
       id: n2
@@ -126,16 +122,12 @@ spec:
       kind: task
       name: t2
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.t2" '
     n3:
       id: n3
       kind: task
       name: teardown
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.teardown" '
     start-node:
       id: start-node
