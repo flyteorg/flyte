@@ -42,7 +42,7 @@ func TestValidateExecInvalidName(t *testing.T) {
 	request := testutils.GetExecutionRequest()
 	request.Name = "12345"
 	err := ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
-	assert.EqualError(t, err, "invalid name format: 12345")
+	assert.EqualError(t, err, "invalid name format: 12345, does not match regex '^[a-z][a-z\\-0-9]*$'")
 
 	request.Name = "e2345"
 	err = ValidateExecutionRequest(context.Background(), request, testutils.GetRepoWithDefaultProject(), execConfig)
