@@ -86,8 +86,6 @@ spec:
       kind: task
       name: get_df
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.schema.get_df" '
     n1:
       id: n1
@@ -100,8 +98,6 @@ spec:
       kind: task
       name: add_df
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.schema.add_df" '
     start-node:
       id: start-node
