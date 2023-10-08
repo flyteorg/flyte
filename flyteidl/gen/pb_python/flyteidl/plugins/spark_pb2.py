@@ -11,11 +11,11 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from flyteidl.core import tasks_pb2 as flyteidl_dot_core_dot_tasks__pb2
+from flyteidl.plugins import common_pb2 as flyteidl_dot_plugins_dot_common__pb2
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1c\x66lyteidl/plugins/spark.proto\x12\x10\x66lyteidl.plugins\x1a\x19\x66lyteidl/core/tasks.proto\x1a\x1cgoogle/protobuf/struct.proto\"B\n\x10SparkApplication\".\n\x04Type\x12\n\n\x06PYTHON\x10\x00\x12\x08\n\x04JAVA\x10\x01\x12\t\n\x05SCALA\x10\x02\x12\x05\n\x01R\x10\x03\"\x86\x07\n\x08SparkJob\x12Q\n\x0f\x61pplicationType\x18\x01 \x01(\x0e\x32\'.flyteidl.plugins.SparkApplication.TypeR\x0f\x61pplicationType\x12\x30\n\x13mainApplicationFile\x18\x02 \x01(\tR\x13mainApplicationFile\x12\x1c\n\tmainClass\x18\x03 \x01(\tR\tmainClass\x12G\n\tsparkConf\x18\x04 \x03(\x0b\x32).flyteidl.plugins.SparkJob.SparkConfEntryR\tsparkConf\x12J\n\nhadoopConf\x18\x05 \x03(\x0b\x32*.flyteidl.plugins.SparkJob.HadoopConfEntryR\nhadoopConf\x12\"\n\x0c\x65xecutorPath\x18\x06 \x01(\tR\x0c\x65xecutorPath\x12?\n\x0e\x64\x61tabricksConf\x18\x07 \x01(\x0b\x32\x17.google.protobuf.StructR\x0e\x64\x61tabricksConf\x12(\n\x0f\x64\x61tabricksToken\x18\x08 \x01(\tR\x0f\x64\x61tabricksToken\x12.\n\x12\x64\x61tabricksInstance\x18\t \x01(\tR\x12\x64\x61tabricksInstance\x12\x35\n\tdriverPod\x18\n \x01(\x0b\x32\x15.flyteidl.core.K8sPodH\x00R\tdriverPod\x12\x34\n\x15\x64riverPodTemplateName\x18\x0b \x01(\tR\x15\x64riverPodTemplateName\x12\x39\n\x0b\x65xecutorPod\x18\x0c \x01(\x0b\x32\x15.flyteidl.core.K8sPodH\x01R\x0b\x65xecutorPod\x12\x38\n\x17\x65xecutorPodTemplateName\x18\r \x01(\tR\x17\x65xecutorPodTemplateName\x1a<\n\x0eSparkConfEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x1a=\n\x0fHadoopConfEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\x10\n\x0e\x64riverPodValueB\x12\n\x10\x65xecutorPodValueB\xc2\x01\n\x14\x63om.flyteidl.pluginsB\nSparkProtoP\x01Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins\xa2\x02\x03\x46PX\xaa\x02\x10\x46lyteidl.Plugins\xca\x02\x10\x46lyteidl\\Plugins\xe2\x02\x1c\x46lyteidl\\Plugins\\GPBMetadata\xea\x02\x11\x46lyteidl::Pluginsb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1c\x66lyteidl/plugins/spark.proto\x12\x10\x66lyteidl.plugins\x1a\x1d\x66lyteidl/plugins/common.proto\x1a\x1cgoogle/protobuf/struct.proto\"B\n\x10SparkApplication\".\n\x04Type\x12\n\n\x06PYTHON\x10\x00\x12\x08\n\x04JAVA\x10\x01\x12\t\n\x05SCALA\x10\x02\x12\x05\n\x01R\x10\x03\"\xfa\x05\n\x08SparkJob\x12Q\n\x0f\x61pplicationType\x18\x01 \x01(\x0e\x32\'.flyteidl.plugins.SparkApplication.TypeR\x0f\x61pplicationType\x12\x30\n\x13mainApplicationFile\x18\x02 \x01(\tR\x13mainApplicationFile\x12\x1c\n\tmainClass\x18\x03 \x01(\tR\tmainClass\x12G\n\tsparkConf\x18\x04 \x03(\x0b\x32).flyteidl.plugins.SparkJob.SparkConfEntryR\tsparkConf\x12J\n\nhadoopConf\x18\x05 \x03(\x0b\x32*.flyteidl.plugins.SparkJob.HadoopConfEntryR\nhadoopConf\x12\"\n\x0c\x65xecutorPath\x18\x06 \x01(\tR\x0c\x65xecutorPath\x12?\n\x0e\x64\x61tabricksConf\x18\x07 \x01(\x0b\x32\x17.google.protobuf.StructR\x0e\x64\x61tabricksConf\x12(\n\x0f\x64\x61tabricksToken\x18\x08 \x01(\tR\x0f\x64\x61tabricksToken\x12.\n\x12\x64\x61tabricksInstance\x18\t \x01(\tR\x12\x64\x61tabricksInstance\x12:\n\ndriverSpec\x18\n \x01(\x0b\x32\x1a.flyteidl.plugins.RoleSpecR\ndriverSpec\x12>\n\x0c\x65xecutorSpec\x18\x0b \x01(\x0b\x32\x1a.flyteidl.plugins.RoleSpecR\x0c\x65xecutorSpec\x1a<\n\x0eSparkConfEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x1a=\n\x0fHadoopConfEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x42\xc2\x01\n\x14\x63om.flyteidl.pluginsB\nSparkProtoP\x01Z=github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins\xa2\x02\x03\x46PX\xaa\x02\x10\x46lyteidl.Plugins\xca\x02\x10\x46lyteidl\\Plugins\xe2\x02\x1c\x46lyteidl\\Plugins\\GPBMetadata\xea\x02\x11\x46lyteidl::Pluginsb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -28,14 +28,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _SPARKJOB_SPARKCONFENTRY._serialized_options = b'8\001'
   _SPARKJOB_HADOOPCONFENTRY._options = None
   _SPARKJOB_HADOOPCONFENTRY._serialized_options = b'8\001'
-  _globals['_SPARKAPPLICATION']._serialized_start=107
-  _globals['_SPARKAPPLICATION']._serialized_end=173
-  _globals['_SPARKAPPLICATION_TYPE']._serialized_start=127
-  _globals['_SPARKAPPLICATION_TYPE']._serialized_end=173
-  _globals['_SPARKJOB']._serialized_start=176
-  _globals['_SPARKJOB']._serialized_end=1078
-  _globals['_SPARKJOB_SPARKCONFENTRY']._serialized_start=917
-  _globals['_SPARKJOB_SPARKCONFENTRY']._serialized_end=977
-  _globals['_SPARKJOB_HADOOPCONFENTRY']._serialized_start=979
-  _globals['_SPARKJOB_HADOOPCONFENTRY']._serialized_end=1040
+  _globals['_SPARKAPPLICATION']._serialized_start=111
+  _globals['_SPARKAPPLICATION']._serialized_end=177
+  _globals['_SPARKAPPLICATION_TYPE']._serialized_start=131
+  _globals['_SPARKAPPLICATION_TYPE']._serialized_end=177
+  _globals['_SPARKJOB']._serialized_start=180
+  _globals['_SPARKJOB']._serialized_end=942
+  _globals['_SPARKJOB_SPARKCONFENTRY']._serialized_start=819
+  _globals['_SPARKJOB_SPARKCONFENTRY']._serialized_end=879
+  _globals['_SPARKJOB_HADOOPCONFENTRY']._serialized_start=881
+  _globals['_SPARKJOB_HADOOPCONFENTRY']._serialized_end=942
 # @@protoc_insertion_point(module_scope)

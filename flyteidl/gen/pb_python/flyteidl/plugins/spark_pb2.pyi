@@ -1,4 +1,4 @@
-from flyteidl.core import tasks_pb2 as _tasks_pb2
+from flyteidl.plugins import common_pb2 as _common_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -23,7 +23,7 @@ class SparkApplication(_message.Message):
     def __init__(self) -> None: ...
 
 class SparkJob(_message.Message):
-    __slots__ = ["applicationType", "mainApplicationFile", "mainClass", "sparkConf", "hadoopConf", "executorPath", "databricksConf", "databricksToken", "databricksInstance", "driverPod", "driverPodTemplateName", "executorPod", "executorPodTemplateName"]
+    __slots__ = ["applicationType", "mainApplicationFile", "mainClass", "sparkConf", "hadoopConf", "executorPath", "databricksConf", "databricksToken", "databricksInstance", "driverSpec", "executorSpec"]
     class SparkConfEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -47,10 +47,8 @@ class SparkJob(_message.Message):
     DATABRICKSCONF_FIELD_NUMBER: _ClassVar[int]
     DATABRICKSTOKEN_FIELD_NUMBER: _ClassVar[int]
     DATABRICKSINSTANCE_FIELD_NUMBER: _ClassVar[int]
-    DRIVERPOD_FIELD_NUMBER: _ClassVar[int]
-    DRIVERPODTEMPLATENAME_FIELD_NUMBER: _ClassVar[int]
-    EXECUTORPOD_FIELD_NUMBER: _ClassVar[int]
-    EXECUTORPODTEMPLATENAME_FIELD_NUMBER: _ClassVar[int]
+    DRIVERSPEC_FIELD_NUMBER: _ClassVar[int]
+    EXECUTORSPEC_FIELD_NUMBER: _ClassVar[int]
     applicationType: SparkApplication.Type
     mainApplicationFile: str
     mainClass: str
@@ -60,8 +58,6 @@ class SparkJob(_message.Message):
     databricksConf: _struct_pb2.Struct
     databricksToken: str
     databricksInstance: str
-    driverPod: _tasks_pb2.K8sPod
-    driverPodTemplateName: str
-    executorPod: _tasks_pb2.K8sPod
-    executorPodTemplateName: str
-    def __init__(self, applicationType: _Optional[_Union[SparkApplication.Type, str]] = ..., mainApplicationFile: _Optional[str] = ..., mainClass: _Optional[str] = ..., sparkConf: _Optional[_Mapping[str, str]] = ..., hadoopConf: _Optional[_Mapping[str, str]] = ..., executorPath: _Optional[str] = ..., databricksConf: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., databricksToken: _Optional[str] = ..., databricksInstance: _Optional[str] = ..., driverPod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., driverPodTemplateName: _Optional[str] = ..., executorPod: _Optional[_Union[_tasks_pb2.K8sPod, _Mapping]] = ..., executorPodTemplateName: _Optional[str] = ...) -> None: ...
+    driverSpec: _common_pb2.RoleSpec
+    executorSpec: _common_pb2.RoleSpec
+    def __init__(self, applicationType: _Optional[_Union[SparkApplication.Type, str]] = ..., mainApplicationFile: _Optional[str] = ..., mainClass: _Optional[str] = ..., sparkConf: _Optional[_Mapping[str, str]] = ..., hadoopConf: _Optional[_Mapping[str, str]] = ..., executorPath: _Optional[str] = ..., databricksConf: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., databricksToken: _Optional[str] = ..., databricksInstance: _Optional[str] = ..., driverSpec: _Optional[_Union[_common_pb2.RoleSpec, _Mapping]] = ..., executorSpec: _Optional[_Union[_common_pb2.RoleSpec, _Mapping]] = ...) -> None: ...

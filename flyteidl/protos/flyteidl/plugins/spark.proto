@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "flyteidl/core/tasks.proto";
+import "flyteidl/plugins/common.proto";
 import "google/protobuf/struct.proto";
 
 package flyteidl.plugins;
@@ -33,24 +33,8 @@ message SparkJob {
     // Domain name of your deployment. Use the form <account>.cloud.databricks.com.
     // This instance name can be set in either flytepropeller or flytekit.
     string databricksInstance = 9;
-    // The pod spec and metadata to be used as the base configuration when creating the driver Pod for this task.
-    // +optional
-    oneof driverPodValue {
-        core.K8sPod driverPod = 10;
-    }
-    // Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-    // driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-    // identically as, the default PodTemplate configured in FlytePropeller.
-    // +optional
-    string driverPodTemplateName = 11;
-    // The pod spec and metadata to be used as the base configuration when creating the executor Pods for this task.
-    // +optional
-    oneof executorPodValue {
-        core.K8sPod executorPod = 12;
-    }
-    // Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-    // executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-    // identically as, the default PodTemplate configured in FlytePropeller.
-    // +optional
-    string executorPodTemplateName = 13;
+    // The driver spec, used in place of the task's pod template
+    RoleSpec driverSpec = 10;
+    // The executor spec, used in place of the task's pod template
+    RoleSpec executorSpec = 11;
 }

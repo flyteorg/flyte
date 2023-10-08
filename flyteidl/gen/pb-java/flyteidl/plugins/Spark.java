@@ -729,82 +729,54 @@ public final class Spark {
         getDatabricksInstanceBytes();
 
     /**
-     * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+     * <pre>
+     * The driver spec, used in place of the task's pod template
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
      */
-    boolean hasDriverPod();
+    boolean hasDriverSpec();
     /**
-     * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+     * <pre>
+     * The driver spec, used in place of the task's pod template
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
      */
-    flyteidl.core.Tasks.K8sPod getDriverPod();
+    flyteidl.plugins.Common.RoleSpec getDriverSpec();
     /**
-     * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+     * <pre>
+     * The driver spec, used in place of the task's pod template
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
      */
-    flyteidl.core.Tasks.K8sPodOrBuilder getDriverPodOrBuilder();
+    flyteidl.plugins.Common.RoleSpecOrBuilder getDriverSpecOrBuilder();
 
     /**
      * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
+     * The executor spec, used in place of the task's pod template
      * </pre>
      *
-     * <code>string driverPodTemplateName = 11;</code>
+     * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
      */
-    java.lang.String getDriverPodTemplateName();
+    boolean hasExecutorSpec();
     /**
      * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
+     * The executor spec, used in place of the task's pod template
      * </pre>
      *
-     * <code>string driverPodTemplateName = 11;</code>
+     * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
      */
-    com.google.protobuf.ByteString
-        getDriverPodTemplateNameBytes();
-
-    /**
-     * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
-     */
-    boolean hasExecutorPod();
-    /**
-     * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
-     */
-    flyteidl.core.Tasks.K8sPod getExecutorPod();
-    /**
-     * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
-     */
-    flyteidl.core.Tasks.K8sPodOrBuilder getExecutorPodOrBuilder();
-
+    flyteidl.plugins.Common.RoleSpec getExecutorSpec();
     /**
      * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
+     * The executor spec, used in place of the task's pod template
      * </pre>
      *
-     * <code>string executorPodTemplateName = 13;</code>
+     * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
      */
-    java.lang.String getExecutorPodTemplateName();
-    /**
-     * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
-     * </pre>
-     *
-     * <code>string executorPodTemplateName = 13;</code>
-     */
-    com.google.protobuf.ByteString
-        getExecutorPodTemplateNameBytes();
-
-    public flyteidl.plugins.Spark.SparkJob.DriverPodValueCase getDriverPodValueCase();
-
-    public flyteidl.plugins.Spark.SparkJob.ExecutorPodValueCase getExecutorPodValueCase();
+    flyteidl.plugins.Common.RoleSpecOrBuilder getExecutorSpecOrBuilder();
   }
   /**
    * <pre>
@@ -829,8 +801,6 @@ public final class Spark {
       executorPath_ = "";
       databricksToken_ = "";
       databricksInstance_ = "";
-      driverPodTemplateName_ = "";
-      executorPodTemplateName_ = "";
     }
 
     @java.lang.Override
@@ -933,43 +903,29 @@ public final class Spark {
               break;
             }
             case 82: {
-              flyteidl.core.Tasks.K8sPod.Builder subBuilder = null;
-              if (driverPodValueCase_ == 10) {
-                subBuilder = ((flyteidl.core.Tasks.K8sPod) driverPodValue_).toBuilder();
+              flyteidl.plugins.Common.RoleSpec.Builder subBuilder = null;
+              if (driverSpec_ != null) {
+                subBuilder = driverSpec_.toBuilder();
               }
-              driverPodValue_ =
-                  input.readMessage(flyteidl.core.Tasks.K8sPod.parser(), extensionRegistry);
+              driverSpec_ = input.readMessage(flyteidl.plugins.Common.RoleSpec.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((flyteidl.core.Tasks.K8sPod) driverPodValue_);
-                driverPodValue_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(driverSpec_);
+                driverSpec_ = subBuilder.buildPartial();
               }
-              driverPodValueCase_ = 10;
+
               break;
             }
             case 90: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              driverPodTemplateName_ = s;
-              break;
-            }
-            case 98: {
-              flyteidl.core.Tasks.K8sPod.Builder subBuilder = null;
-              if (executorPodValueCase_ == 12) {
-                subBuilder = ((flyteidl.core.Tasks.K8sPod) executorPodValue_).toBuilder();
+              flyteidl.plugins.Common.RoleSpec.Builder subBuilder = null;
+              if (executorSpec_ != null) {
+                subBuilder = executorSpec_.toBuilder();
               }
-              executorPodValue_ =
-                  input.readMessage(flyteidl.core.Tasks.K8sPod.parser(), extensionRegistry);
+              executorSpec_ = input.readMessage(flyteidl.plugins.Common.RoleSpec.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((flyteidl.core.Tasks.K8sPod) executorPodValue_);
-                executorPodValue_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(executorSpec_);
+                executorSpec_ = subBuilder.buildPartial();
               }
-              executorPodValueCase_ = 12;
-              break;
-            }
-            case 106: {
-              java.lang.String s = input.readStringRequireUtf8();
 
-              executorPodTemplateName_ = s;
               break;
             }
             default: {
@@ -1019,78 +975,6 @@ public final class Spark {
     }
 
     private int bitField0_;
-    private int driverPodValueCase_ = 0;
-    private java.lang.Object driverPodValue_;
-    public enum DriverPodValueCase
-        implements com.google.protobuf.Internal.EnumLite {
-      DRIVERPOD(10),
-      DRIVERPODVALUE_NOT_SET(0);
-      private final int value;
-      private DriverPodValueCase(int value) {
-        this.value = value;
-      }
-      /**
-       * @deprecated Use {@link #forNumber(int)} instead.
-       */
-      @java.lang.Deprecated
-      public static DriverPodValueCase valueOf(int value) {
-        return forNumber(value);
-      }
-
-      public static DriverPodValueCase forNumber(int value) {
-        switch (value) {
-          case 10: return DRIVERPOD;
-          case 0: return DRIVERPODVALUE_NOT_SET;
-          default: return null;
-        }
-      }
-      public int getNumber() {
-        return this.value;
-      }
-    };
-
-    public DriverPodValueCase
-    getDriverPodValueCase() {
-      return DriverPodValueCase.forNumber(
-          driverPodValueCase_);
-    }
-
-    private int executorPodValueCase_ = 0;
-    private java.lang.Object executorPodValue_;
-    public enum ExecutorPodValueCase
-        implements com.google.protobuf.Internal.EnumLite {
-      EXECUTORPOD(12),
-      EXECUTORPODVALUE_NOT_SET(0);
-      private final int value;
-      private ExecutorPodValueCase(int value) {
-        this.value = value;
-      }
-      /**
-       * @deprecated Use {@link #forNumber(int)} instead.
-       */
-      @java.lang.Deprecated
-      public static ExecutorPodValueCase valueOf(int value) {
-        return forNumber(value);
-      }
-
-      public static ExecutorPodValueCase forNumber(int value) {
-        switch (value) {
-          case 12: return EXECUTORPOD;
-          case 0: return EXECUTORPODVALUE_NOT_SET;
-          default: return null;
-        }
-      }
-      public int getNumber() {
-        return this.value;
-      }
-    };
-
-    public ExecutorPodValueCase
-    getExecutorPodValueCase() {
-      return ExecutorPodValueCase.forNumber(
-          executorPodValueCase_);
-    }
-
     public static final int APPLICATIONTYPE_FIELD_NUMBER = 1;
     private int applicationType_;
     /**
@@ -1494,152 +1378,70 @@ public final class Spark {
       }
     }
 
-    public static final int DRIVERPOD_FIELD_NUMBER = 10;
+    public static final int DRIVERSPEC_FIELD_NUMBER = 10;
+    private flyteidl.plugins.Common.RoleSpec driverSpec_;
     /**
-     * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+     * <pre>
+     * The driver spec, used in place of the task's pod template
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
      */
-    public boolean hasDriverPod() {
-      return driverPodValueCase_ == 10;
+    public boolean hasDriverSpec() {
+      return driverSpec_ != null;
     }
     /**
-     * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+     * <pre>
+     * The driver spec, used in place of the task's pod template
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
      */
-    public flyteidl.core.Tasks.K8sPod getDriverPod() {
-      if (driverPodValueCase_ == 10) {
-         return (flyteidl.core.Tasks.K8sPod) driverPodValue_;
-      }
-      return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+    public flyteidl.plugins.Common.RoleSpec getDriverSpec() {
+      return driverSpec_ == null ? flyteidl.plugins.Common.RoleSpec.getDefaultInstance() : driverSpec_;
     }
     /**
-     * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+     * <pre>
+     * The driver spec, used in place of the task's pod template
+     * </pre>
+     *
+     * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
      */
-    public flyteidl.core.Tasks.K8sPodOrBuilder getDriverPodOrBuilder() {
-      if (driverPodValueCase_ == 10) {
-         return (flyteidl.core.Tasks.K8sPod) driverPodValue_;
-      }
-      return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+    public flyteidl.plugins.Common.RoleSpecOrBuilder getDriverSpecOrBuilder() {
+      return getDriverSpec();
     }
 
-    public static final int DRIVERPODTEMPLATENAME_FIELD_NUMBER = 11;
-    private volatile java.lang.Object driverPodTemplateName_;
+    public static final int EXECUTORSPEC_FIELD_NUMBER = 11;
+    private flyteidl.plugins.Common.RoleSpec executorSpec_;
     /**
      * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
+     * The executor spec, used in place of the task's pod template
      * </pre>
      *
-     * <code>string driverPodTemplateName = 11;</code>
+     * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
      */
-    public java.lang.String getDriverPodTemplateName() {
-      java.lang.Object ref = driverPodTemplateName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        driverPodTemplateName_ = s;
-        return s;
-      }
+    public boolean hasExecutorSpec() {
+      return executorSpec_ != null;
     }
     /**
      * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
+     * The executor spec, used in place of the task's pod template
      * </pre>
      *
-     * <code>string driverPodTemplateName = 11;</code>
+     * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
      */
-    public com.google.protobuf.ByteString
-        getDriverPodTemplateNameBytes() {
-      java.lang.Object ref = driverPodTemplateName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        driverPodTemplateName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int EXECUTORPOD_FIELD_NUMBER = 12;
-    /**
-     * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
-     */
-    public boolean hasExecutorPod() {
-      return executorPodValueCase_ == 12;
-    }
-    /**
-     * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
-     */
-    public flyteidl.core.Tasks.K8sPod getExecutorPod() {
-      if (executorPodValueCase_ == 12) {
-         return (flyteidl.core.Tasks.K8sPod) executorPodValue_;
-      }
-      return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
-    }
-    /**
-     * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
-     */
-    public flyteidl.core.Tasks.K8sPodOrBuilder getExecutorPodOrBuilder() {
-      if (executorPodValueCase_ == 12) {
-         return (flyteidl.core.Tasks.K8sPod) executorPodValue_;
-      }
-      return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
-    }
-
-    public static final int EXECUTORPODTEMPLATENAME_FIELD_NUMBER = 13;
-    private volatile java.lang.Object executorPodTemplateName_;
-    /**
-     * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
-     * </pre>
-     *
-     * <code>string executorPodTemplateName = 13;</code>
-     */
-    public java.lang.String getExecutorPodTemplateName() {
-      java.lang.Object ref = executorPodTemplateName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        executorPodTemplateName_ = s;
-        return s;
-      }
+    public flyteidl.plugins.Common.RoleSpec getExecutorSpec() {
+      return executorSpec_ == null ? flyteidl.plugins.Common.RoleSpec.getDefaultInstance() : executorSpec_;
     }
     /**
      * <pre>
-     * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-     * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-     * identically as, the default PodTemplate configured in FlytePropeller.
-     * +optional
+     * The executor spec, used in place of the task's pod template
      * </pre>
      *
-     * <code>string executorPodTemplateName = 13;</code>
+     * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
      */
-    public com.google.protobuf.ByteString
-        getExecutorPodTemplateNameBytes() {
-      java.lang.Object ref = executorPodTemplateName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        executorPodTemplateName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public flyteidl.plugins.Common.RoleSpecOrBuilder getExecutorSpecOrBuilder() {
+      return getExecutorSpec();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1689,17 +1491,11 @@ public final class Spark {
       if (!getDatabricksInstanceBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 9, databricksInstance_);
       }
-      if (driverPodValueCase_ == 10) {
-        output.writeMessage(10, (flyteidl.core.Tasks.K8sPod) driverPodValue_);
+      if (driverSpec_ != null) {
+        output.writeMessage(10, getDriverSpec());
       }
-      if (!getDriverPodTemplateNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 11, driverPodTemplateName_);
-      }
-      if (executorPodValueCase_ == 12) {
-        output.writeMessage(12, (flyteidl.core.Tasks.K8sPod) executorPodValue_);
-      }
-      if (!getExecutorPodTemplateNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 13, executorPodTemplateName_);
+      if (executorSpec_ != null) {
+        output.writeMessage(11, getExecutorSpec());
       }
       unknownFields.writeTo(output);
     }
@@ -1753,19 +1549,13 @@ public final class Spark {
       if (!getDatabricksInstanceBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(9, databricksInstance_);
       }
-      if (driverPodValueCase_ == 10) {
+      if (driverSpec_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(10, (flyteidl.core.Tasks.K8sPod) driverPodValue_);
+          .computeMessageSize(10, getDriverSpec());
       }
-      if (!getDriverPodTemplateNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(11, driverPodTemplateName_);
-      }
-      if (executorPodValueCase_ == 12) {
+      if (executorSpec_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(12, (flyteidl.core.Tasks.K8sPod) executorPodValue_);
-      }
-      if (!getExecutorPodTemplateNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(13, executorPodTemplateName_);
+          .computeMessageSize(11, getExecutorSpec());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1802,27 +1592,15 @@ public final class Spark {
           .equals(other.getDatabricksToken())) return false;
       if (!getDatabricksInstance()
           .equals(other.getDatabricksInstance())) return false;
-      if (!getDriverPodTemplateName()
-          .equals(other.getDriverPodTemplateName())) return false;
-      if (!getExecutorPodTemplateName()
-          .equals(other.getExecutorPodTemplateName())) return false;
-      if (!getDriverPodValueCase().equals(other.getDriverPodValueCase())) return false;
-      switch (driverPodValueCase_) {
-        case 10:
-          if (!getDriverPod()
-              .equals(other.getDriverPod())) return false;
-          break;
-        case 0:
-        default:
+      if (hasDriverSpec() != other.hasDriverSpec()) return false;
+      if (hasDriverSpec()) {
+        if (!getDriverSpec()
+            .equals(other.getDriverSpec())) return false;
       }
-      if (!getExecutorPodValueCase().equals(other.getExecutorPodValueCase())) return false;
-      switch (executorPodValueCase_) {
-        case 12:
-          if (!getExecutorPod()
-              .equals(other.getExecutorPod())) return false;
-          break;
-        case 0:
-        default:
+      if (hasExecutorSpec() != other.hasExecutorSpec()) return false;
+      if (hasExecutorSpec()) {
+        if (!getExecutorSpec()
+            .equals(other.getExecutorSpec())) return false;
       }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -1859,25 +1637,13 @@ public final class Spark {
       hash = (53 * hash) + getDatabricksToken().hashCode();
       hash = (37 * hash) + DATABRICKSINSTANCE_FIELD_NUMBER;
       hash = (53 * hash) + getDatabricksInstance().hashCode();
-      hash = (37 * hash) + DRIVERPODTEMPLATENAME_FIELD_NUMBER;
-      hash = (53 * hash) + getDriverPodTemplateName().hashCode();
-      hash = (37 * hash) + EXECUTORPODTEMPLATENAME_FIELD_NUMBER;
-      hash = (53 * hash) + getExecutorPodTemplateName().hashCode();
-      switch (driverPodValueCase_) {
-        case 10:
-          hash = (37 * hash) + DRIVERPOD_FIELD_NUMBER;
-          hash = (53 * hash) + getDriverPod().hashCode();
-          break;
-        case 0:
-        default:
+      if (hasDriverSpec()) {
+        hash = (37 * hash) + DRIVERSPEC_FIELD_NUMBER;
+        hash = (53 * hash) + getDriverSpec().hashCode();
       }
-      switch (executorPodValueCase_) {
-        case 12:
-          hash = (37 * hash) + EXECUTORPOD_FIELD_NUMBER;
-          hash = (53 * hash) + getExecutorPod().hashCode();
-          break;
-        case 0:
-        default:
+      if (hasExecutorSpec()) {
+        hash = (37 * hash) + EXECUTORSPEC_FIELD_NUMBER;
+        hash = (53 * hash) + getExecutorSpec().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -2062,14 +1828,18 @@ public final class Spark {
 
         databricksInstance_ = "";
 
-        driverPodTemplateName_ = "";
-
-        executorPodTemplateName_ = "";
-
-        driverPodValueCase_ = 0;
-        driverPodValue_ = null;
-        executorPodValueCase_ = 0;
-        executorPodValue_ = null;
+        if (driverSpecBuilder_ == null) {
+          driverSpec_ = null;
+        } else {
+          driverSpec_ = null;
+          driverSpecBuilder_ = null;
+        }
+        if (executorSpecBuilder_ == null) {
+          executorSpec_ = null;
+        } else {
+          executorSpec_ = null;
+          executorSpecBuilder_ = null;
+        }
         return this;
       }
 
@@ -2113,25 +1883,17 @@ public final class Spark {
         }
         result.databricksToken_ = databricksToken_;
         result.databricksInstance_ = databricksInstance_;
-        if (driverPodValueCase_ == 10) {
-          if (driverPodBuilder_ == null) {
-            result.driverPodValue_ = driverPodValue_;
-          } else {
-            result.driverPodValue_ = driverPodBuilder_.build();
-          }
+        if (driverSpecBuilder_ == null) {
+          result.driverSpec_ = driverSpec_;
+        } else {
+          result.driverSpec_ = driverSpecBuilder_.build();
         }
-        result.driverPodTemplateName_ = driverPodTemplateName_;
-        if (executorPodValueCase_ == 12) {
-          if (executorPodBuilder_ == null) {
-            result.executorPodValue_ = executorPodValue_;
-          } else {
-            result.executorPodValue_ = executorPodBuilder_.build();
-          }
+        if (executorSpecBuilder_ == null) {
+          result.executorSpec_ = executorSpec_;
+        } else {
+          result.executorSpec_ = executorSpecBuilder_.build();
         }
-        result.executorPodTemplateName_ = executorPodTemplateName_;
         result.bitField0_ = to_bitField0_;
-        result.driverPodValueCase_ = driverPodValueCase_;
-        result.executorPodValueCase_ = executorPodValueCase_;
         onBuilt();
         return result;
       }
@@ -2210,31 +1972,11 @@ public final class Spark {
           databricksInstance_ = other.databricksInstance_;
           onChanged();
         }
-        if (!other.getDriverPodTemplateName().isEmpty()) {
-          driverPodTemplateName_ = other.driverPodTemplateName_;
-          onChanged();
+        if (other.hasDriverSpec()) {
+          mergeDriverSpec(other.getDriverSpec());
         }
-        if (!other.getExecutorPodTemplateName().isEmpty()) {
-          executorPodTemplateName_ = other.executorPodTemplateName_;
-          onChanged();
-        }
-        switch (other.getDriverPodValueCase()) {
-          case DRIVERPOD: {
-            mergeDriverPod(other.getDriverPod());
-            break;
-          }
-          case DRIVERPODVALUE_NOT_SET: {
-            break;
-          }
-        }
-        switch (other.getExecutorPodValueCase()) {
-          case EXECUTORPOD: {
-            mergeExecutorPod(other.getExecutorPod());
-            break;
-          }
-          case EXECUTORPODVALUE_NOT_SET: {
-            break;
-          }
+        if (other.hasExecutorSpec()) {
+          mergeExecutorSpec(other.getExecutorSpec());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2264,36 +2006,6 @@ public final class Spark {
         }
         return this;
       }
-      private int driverPodValueCase_ = 0;
-      private java.lang.Object driverPodValue_;
-      public DriverPodValueCase
-          getDriverPodValueCase() {
-        return DriverPodValueCase.forNumber(
-            driverPodValueCase_);
-      }
-
-      public Builder clearDriverPodValue() {
-        driverPodValueCase_ = 0;
-        driverPodValue_ = null;
-        onChanged();
-        return this;
-      }
-
-      private int executorPodValueCase_ = 0;
-      private java.lang.Object executorPodValue_;
-      public ExecutorPodValueCase
-          getExecutorPodValueCase() {
-        return ExecutorPodValueCase.forNumber(
-            executorPodValueCase_);
-      }
-
-      public Builder clearExecutorPodValue() {
-        executorPodValueCase_ = 0;
-        executorPodValue_ = null;
-        onChanged();
-        return this;
-      }
-
       private int bitField0_;
 
       private int applicationType_ = 0;
@@ -3164,484 +2876,310 @@ public final class Spark {
         return this;
       }
 
+      private flyteidl.plugins.Common.RoleSpec driverSpec_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder> driverPodBuilder_;
+          flyteidl.plugins.Common.RoleSpec, flyteidl.plugins.Common.RoleSpec.Builder, flyteidl.plugins.Common.RoleSpecOrBuilder> driverSpecBuilder_;
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public boolean hasDriverPod() {
-        return driverPodValueCase_ == 10;
+      public boolean hasDriverSpec() {
+        return driverSpecBuilder_ != null || driverSpec_ != null;
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public flyteidl.core.Tasks.K8sPod getDriverPod() {
-        if (driverPodBuilder_ == null) {
-          if (driverPodValueCase_ == 10) {
-            return (flyteidl.core.Tasks.K8sPod) driverPodValue_;
-          }
-          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+      public flyteidl.plugins.Common.RoleSpec getDriverSpec() {
+        if (driverSpecBuilder_ == null) {
+          return driverSpec_ == null ? flyteidl.plugins.Common.RoleSpec.getDefaultInstance() : driverSpec_;
         } else {
-          if (driverPodValueCase_ == 10) {
-            return driverPodBuilder_.getMessage();
-          }
-          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+          return driverSpecBuilder_.getMessage();
         }
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public Builder setDriverPod(flyteidl.core.Tasks.K8sPod value) {
-        if (driverPodBuilder_ == null) {
+      public Builder setDriverSpec(flyteidl.plugins.Common.RoleSpec value) {
+        if (driverSpecBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          driverPodValue_ = value;
+          driverSpec_ = value;
           onChanged();
         } else {
-          driverPodBuilder_.setMessage(value);
+          driverSpecBuilder_.setMessage(value);
         }
-        driverPodValueCase_ = 10;
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public Builder setDriverPod(
-          flyteidl.core.Tasks.K8sPod.Builder builderForValue) {
-        if (driverPodBuilder_ == null) {
-          driverPodValue_ = builderForValue.build();
+      public Builder setDriverSpec(
+          flyteidl.plugins.Common.RoleSpec.Builder builderForValue) {
+        if (driverSpecBuilder_ == null) {
+          driverSpec_ = builderForValue.build();
           onChanged();
         } else {
-          driverPodBuilder_.setMessage(builderForValue.build());
+          driverSpecBuilder_.setMessage(builderForValue.build());
         }
-        driverPodValueCase_ = 10;
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public Builder mergeDriverPod(flyteidl.core.Tasks.K8sPod value) {
-        if (driverPodBuilder_ == null) {
-          if (driverPodValueCase_ == 10 &&
-              driverPodValue_ != flyteidl.core.Tasks.K8sPod.getDefaultInstance()) {
-            driverPodValue_ = flyteidl.core.Tasks.K8sPod.newBuilder((flyteidl.core.Tasks.K8sPod) driverPodValue_)
-                .mergeFrom(value).buildPartial();
+      public Builder mergeDriverSpec(flyteidl.plugins.Common.RoleSpec value) {
+        if (driverSpecBuilder_ == null) {
+          if (driverSpec_ != null) {
+            driverSpec_ =
+              flyteidl.plugins.Common.RoleSpec.newBuilder(driverSpec_).mergeFrom(value).buildPartial();
           } else {
-            driverPodValue_ = value;
+            driverSpec_ = value;
           }
           onChanged();
         } else {
-          if (driverPodValueCase_ == 10) {
-            driverPodBuilder_.mergeFrom(value);
-          }
-          driverPodBuilder_.setMessage(value);
+          driverSpecBuilder_.mergeFrom(value);
         }
-        driverPodValueCase_ = 10;
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public Builder clearDriverPod() {
-        if (driverPodBuilder_ == null) {
-          if (driverPodValueCase_ == 10) {
-            driverPodValueCase_ = 0;
-            driverPodValue_ = null;
-            onChanged();
-          }
+      public Builder clearDriverSpec() {
+        if (driverSpecBuilder_ == null) {
+          driverSpec_ = null;
+          onChanged();
         } else {
-          if (driverPodValueCase_ == 10) {
-            driverPodValueCase_ = 0;
-            driverPodValue_ = null;
-          }
-          driverPodBuilder_.clear();
+          driverSpec_ = null;
+          driverSpecBuilder_ = null;
         }
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public flyteidl.core.Tasks.K8sPod.Builder getDriverPodBuilder() {
-        return getDriverPodFieldBuilder().getBuilder();
+      public flyteidl.plugins.Common.RoleSpec.Builder getDriverSpecBuilder() {
+        
+        onChanged();
+        return getDriverSpecFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
-      public flyteidl.core.Tasks.K8sPodOrBuilder getDriverPodOrBuilder() {
-        if ((driverPodValueCase_ == 10) && (driverPodBuilder_ != null)) {
-          return driverPodBuilder_.getMessageOrBuilder();
+      public flyteidl.plugins.Common.RoleSpecOrBuilder getDriverSpecOrBuilder() {
+        if (driverSpecBuilder_ != null) {
+          return driverSpecBuilder_.getMessageOrBuilder();
         } else {
-          if (driverPodValueCase_ == 10) {
-            return (flyteidl.core.Tasks.K8sPod) driverPodValue_;
-          }
-          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+          return driverSpec_ == null ?
+              flyteidl.plugins.Common.RoleSpec.getDefaultInstance() : driverSpec_;
         }
       }
       /**
-       * <code>.flyteidl.core.K8sPod driverPod = 10;</code>
+       * <pre>
+       * The driver spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec driverSpec = 10;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder> 
-          getDriverPodFieldBuilder() {
-        if (driverPodBuilder_ == null) {
-          if (!(driverPodValueCase_ == 10)) {
-            driverPodValue_ = flyteidl.core.Tasks.K8sPod.getDefaultInstance();
-          }
-          driverPodBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder>(
-                  (flyteidl.core.Tasks.K8sPod) driverPodValue_,
+          flyteidl.plugins.Common.RoleSpec, flyteidl.plugins.Common.RoleSpec.Builder, flyteidl.plugins.Common.RoleSpecOrBuilder> 
+          getDriverSpecFieldBuilder() {
+        if (driverSpecBuilder_ == null) {
+          driverSpecBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.plugins.Common.RoleSpec, flyteidl.plugins.Common.RoleSpec.Builder, flyteidl.plugins.Common.RoleSpecOrBuilder>(
+                  getDriverSpec(),
                   getParentForChildren(),
                   isClean());
-          driverPodValue_ = null;
+          driverSpec_ = null;
         }
-        driverPodValueCase_ = 10;
-        onChanged();;
-        return driverPodBuilder_;
+        return driverSpecBuilder_;
       }
 
-      private java.lang.Object driverPodTemplateName_ = "";
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string driverPodTemplateName = 11;</code>
-       */
-      public java.lang.String getDriverPodTemplateName() {
-        java.lang.Object ref = driverPodTemplateName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          driverPodTemplateName_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string driverPodTemplateName = 11;</code>
-       */
-      public com.google.protobuf.ByteString
-          getDriverPodTemplateNameBytes() {
-        java.lang.Object ref = driverPodTemplateName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          driverPodTemplateName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string driverPodTemplateName = 11;</code>
-       */
-      public Builder setDriverPodTemplateName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        driverPodTemplateName_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string driverPodTemplateName = 11;</code>
-       */
-      public Builder clearDriverPodTemplateName() {
-        
-        driverPodTemplateName_ = getDefaultInstance().getDriverPodTemplateName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * driver Pod for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string driverPodTemplateName = 11;</code>
-       */
-      public Builder setDriverPodTemplateNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        driverPodTemplateName_ = value;
-        onChanged();
-        return this;
-      }
-
+      private flyteidl.plugins.Common.RoleSpec executorSpec_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder> executorPodBuilder_;
+          flyteidl.plugins.Common.RoleSpec, flyteidl.plugins.Common.RoleSpec.Builder, flyteidl.plugins.Common.RoleSpecOrBuilder> executorSpecBuilder_;
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public boolean hasExecutorPod() {
-        return executorPodValueCase_ == 12;
+      public boolean hasExecutorSpec() {
+        return executorSpecBuilder_ != null || executorSpec_ != null;
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public flyteidl.core.Tasks.K8sPod getExecutorPod() {
-        if (executorPodBuilder_ == null) {
-          if (executorPodValueCase_ == 12) {
-            return (flyteidl.core.Tasks.K8sPod) executorPodValue_;
-          }
-          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+      public flyteidl.plugins.Common.RoleSpec getExecutorSpec() {
+        if (executorSpecBuilder_ == null) {
+          return executorSpec_ == null ? flyteidl.plugins.Common.RoleSpec.getDefaultInstance() : executorSpec_;
         } else {
-          if (executorPodValueCase_ == 12) {
-            return executorPodBuilder_.getMessage();
-          }
-          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+          return executorSpecBuilder_.getMessage();
         }
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public Builder setExecutorPod(flyteidl.core.Tasks.K8sPod value) {
-        if (executorPodBuilder_ == null) {
+      public Builder setExecutorSpec(flyteidl.plugins.Common.RoleSpec value) {
+        if (executorSpecBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          executorPodValue_ = value;
+          executorSpec_ = value;
           onChanged();
         } else {
-          executorPodBuilder_.setMessage(value);
+          executorSpecBuilder_.setMessage(value);
         }
-        executorPodValueCase_ = 12;
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public Builder setExecutorPod(
-          flyteidl.core.Tasks.K8sPod.Builder builderForValue) {
-        if (executorPodBuilder_ == null) {
-          executorPodValue_ = builderForValue.build();
+      public Builder setExecutorSpec(
+          flyteidl.plugins.Common.RoleSpec.Builder builderForValue) {
+        if (executorSpecBuilder_ == null) {
+          executorSpec_ = builderForValue.build();
           onChanged();
         } else {
-          executorPodBuilder_.setMessage(builderForValue.build());
+          executorSpecBuilder_.setMessage(builderForValue.build());
         }
-        executorPodValueCase_ = 12;
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public Builder mergeExecutorPod(flyteidl.core.Tasks.K8sPod value) {
-        if (executorPodBuilder_ == null) {
-          if (executorPodValueCase_ == 12 &&
-              executorPodValue_ != flyteidl.core.Tasks.K8sPod.getDefaultInstance()) {
-            executorPodValue_ = flyteidl.core.Tasks.K8sPod.newBuilder((flyteidl.core.Tasks.K8sPod) executorPodValue_)
-                .mergeFrom(value).buildPartial();
+      public Builder mergeExecutorSpec(flyteidl.plugins.Common.RoleSpec value) {
+        if (executorSpecBuilder_ == null) {
+          if (executorSpec_ != null) {
+            executorSpec_ =
+              flyteidl.plugins.Common.RoleSpec.newBuilder(executorSpec_).mergeFrom(value).buildPartial();
           } else {
-            executorPodValue_ = value;
+            executorSpec_ = value;
           }
           onChanged();
         } else {
-          if (executorPodValueCase_ == 12) {
-            executorPodBuilder_.mergeFrom(value);
-          }
-          executorPodBuilder_.setMessage(value);
+          executorSpecBuilder_.mergeFrom(value);
         }
-        executorPodValueCase_ = 12;
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public Builder clearExecutorPod() {
-        if (executorPodBuilder_ == null) {
-          if (executorPodValueCase_ == 12) {
-            executorPodValueCase_ = 0;
-            executorPodValue_ = null;
-            onChanged();
-          }
+      public Builder clearExecutorSpec() {
+        if (executorSpecBuilder_ == null) {
+          executorSpec_ = null;
+          onChanged();
         } else {
-          if (executorPodValueCase_ == 12) {
-            executorPodValueCase_ = 0;
-            executorPodValue_ = null;
-          }
-          executorPodBuilder_.clear();
+          executorSpec_ = null;
+          executorSpecBuilder_ = null;
         }
+
         return this;
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public flyteidl.core.Tasks.K8sPod.Builder getExecutorPodBuilder() {
-        return getExecutorPodFieldBuilder().getBuilder();
+      public flyteidl.plugins.Common.RoleSpec.Builder getExecutorSpecBuilder() {
+        
+        onChanged();
+        return getExecutorSpecFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
-      public flyteidl.core.Tasks.K8sPodOrBuilder getExecutorPodOrBuilder() {
-        if ((executorPodValueCase_ == 12) && (executorPodBuilder_ != null)) {
-          return executorPodBuilder_.getMessageOrBuilder();
+      public flyteidl.plugins.Common.RoleSpecOrBuilder getExecutorSpecOrBuilder() {
+        if (executorSpecBuilder_ != null) {
+          return executorSpecBuilder_.getMessageOrBuilder();
         } else {
-          if (executorPodValueCase_ == 12) {
-            return (flyteidl.core.Tasks.K8sPod) executorPodValue_;
-          }
-          return flyteidl.core.Tasks.K8sPod.getDefaultInstance();
+          return executorSpec_ == null ?
+              flyteidl.plugins.Common.RoleSpec.getDefaultInstance() : executorSpec_;
         }
       }
       /**
-       * <code>.flyteidl.core.K8sPod executorPod = 12;</code>
+       * <pre>
+       * The executor spec, used in place of the task's pod template
+       * </pre>
+       *
+       * <code>.flyteidl.plugins.RoleSpec executorSpec = 11;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder> 
-          getExecutorPodFieldBuilder() {
-        if (executorPodBuilder_ == null) {
-          if (!(executorPodValueCase_ == 12)) {
-            executorPodValue_ = flyteidl.core.Tasks.K8sPod.getDefaultInstance();
-          }
-          executorPodBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Tasks.K8sPod, flyteidl.core.Tasks.K8sPod.Builder, flyteidl.core.Tasks.K8sPodOrBuilder>(
-                  (flyteidl.core.Tasks.K8sPod) executorPodValue_,
+          flyteidl.plugins.Common.RoleSpec, flyteidl.plugins.Common.RoleSpec.Builder, flyteidl.plugins.Common.RoleSpecOrBuilder> 
+          getExecutorSpecFieldBuilder() {
+        if (executorSpecBuilder_ == null) {
+          executorSpecBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.plugins.Common.RoleSpec, flyteidl.plugins.Common.RoleSpec.Builder, flyteidl.plugins.Common.RoleSpecOrBuilder>(
+                  getExecutorSpec(),
                   getParentForChildren(),
                   isClean());
-          executorPodValue_ = null;
+          executorSpec_ = null;
         }
-        executorPodValueCase_ = 12;
-        onChanged();;
-        return executorPodBuilder_;
-      }
-
-      private java.lang.Object executorPodTemplateName_ = "";
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string executorPodTemplateName = 13;</code>
-       */
-      public java.lang.String getExecutorPodTemplateName() {
-        java.lang.Object ref = executorPodTemplateName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          executorPodTemplateName_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string executorPodTemplateName = 13;</code>
-       */
-      public com.google.protobuf.ByteString
-          getExecutorPodTemplateNameBytes() {
-        java.lang.Object ref = executorPodTemplateName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          executorPodTemplateName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string executorPodTemplateName = 13;</code>
-       */
-      public Builder setExecutorPodTemplateName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        executorPodTemplateName_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string executorPodTemplateName = 13;</code>
-       */
-      public Builder clearExecutorPodTemplateName() {
-        
-        executorPodTemplateName_ = getDefaultInstance().getExecutorPodTemplateName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating the 
-       * executor Pods for this task. If this value is set, the specified PodTemplate will be used instead of, but applied
-       * identically as, the default PodTemplate configured in FlytePropeller.
-       * +optional
-       * </pre>
-       *
-       * <code>string executorPodTemplateName = 13;</code>
-       */
-      public Builder setExecutorPodTemplateNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        executorPodTemplateName_ = value;
-        onChanged();
-        return this;
+        return executorSpecBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -3726,28 +3264,26 @@ public final class Spark {
   static {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/plugins/spark.proto\022\020flyteidl" +
-      ".plugins\032\031flyteidl/core/tasks.proto\032\034goo" +
-      "gle/protobuf/struct.proto\"B\n\020SparkApplic" +
-      "ation\".\n\004Type\022\n\n\006PYTHON\020\000\022\010\n\004JAVA\020\001\022\t\n\005S" +
-      "CALA\020\002\022\005\n\001R\020\003\"\233\005\n\010SparkJob\022@\n\017applicatio" +
-      "nType\030\001 \001(\0162\'.flyteidl.plugins.SparkAppl" +
-      "ication.Type\022\033\n\023mainApplicationFile\030\002 \001(" +
-      "\t\022\021\n\tmainClass\030\003 \001(\t\022<\n\tsparkConf\030\004 \003(\0132" +
-      ").flyteidl.plugins.SparkJob.SparkConfEnt" +
-      "ry\022>\n\nhadoopConf\030\005 \003(\0132*.flyteidl.plugin" +
-      "s.SparkJob.HadoopConfEntry\022\024\n\014executorPa" +
-      "th\030\006 \001(\t\022/\n\016databricksConf\030\007 \001(\0132\027.googl" +
-      "e.protobuf.Struct\022\027\n\017databricksToken\030\010 \001" +
-      "(\t\022\032\n\022databricksInstance\030\t \001(\t\022*\n\tdriver" +
-      "Pod\030\n \001(\0132\025.flyteidl.core.K8sPodH\000\022\035\n\025dr" +
-      "iverPodTemplateName\030\013 \001(\t\022,\n\013executorPod" +
-      "\030\014 \001(\0132\025.flyteidl.core.K8sPodH\001\022\037\n\027execu" +
-      "torPodTemplateName\030\r \001(\t\0320\n\016SparkConfEnt" +
-      "ry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0321\n\017Ha" +
-      "doopConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(" +
-      "\t:\0028\001B\020\n\016driverPodValueB\022\n\020executorPodVa" +
-      "lueB?Z=github.com/flyteorg/flyte/flyteid" +
-      "l/gen/pb-go/flyteidl/pluginsb\006proto3"
+      ".plugins\032\035flyteidl/plugins/common.proto\032" +
+      "\034google/protobuf/struct.proto\"B\n\020SparkAp" +
+      "plication\".\n\004Type\022\n\n\006PYTHON\020\000\022\010\n\004JAVA\020\001\022" +
+      "\t\n\005SCALA\020\002\022\005\n\001R\020\003\"\275\004\n\010SparkJob\022@\n\017applic" +
+      "ationType\030\001 \001(\0162\'.flyteidl.plugins.Spark" +
+      "Application.Type\022\033\n\023mainApplicationFile\030" +
+      "\002 \001(\t\022\021\n\tmainClass\030\003 \001(\t\022<\n\tsparkConf\030\004 " +
+      "\003(\0132).flyteidl.plugins.SparkJob.SparkCon" +
+      "fEntry\022>\n\nhadoopConf\030\005 \003(\0132*.flyteidl.pl" +
+      "ugins.SparkJob.HadoopConfEntry\022\024\n\014execut" +
+      "orPath\030\006 \001(\t\022/\n\016databricksConf\030\007 \001(\0132\027.g" +
+      "oogle.protobuf.Struct\022\027\n\017databricksToken" +
+      "\030\010 \001(\t\022\032\n\022databricksInstance\030\t \001(\t\022.\n\ndr" +
+      "iverSpec\030\n \001(\0132\032.flyteidl.plugins.RoleSp" +
+      "ec\0220\n\014executorSpec\030\013 \001(\0132\032.flyteidl.plug" +
+      "ins.RoleSpec\0320\n\016SparkConfEntry\022\013\n\003key\030\001 " +
+      "\001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0321\n\017HadoopConfEntr" +
+      "y\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B?Z=git" +
+      "hub.com/flyteorg/flyte/flyteidl/gen/pb-g" +
+      "o/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3760,7 +3296,7 @@ public final class Spark {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          flyteidl.core.Tasks.getDescriptor(),
+          flyteidl.plugins.Common.getDescriptor(),
           com.google.protobuf.StructProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_plugins_SparkApplication_descriptor =
@@ -3774,7 +3310,7 @@ public final class Spark {
     internal_static_flyteidl_plugins_SparkJob_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_SparkJob_descriptor,
-        new java.lang.String[] { "ApplicationType", "MainApplicationFile", "MainClass", "SparkConf", "HadoopConf", "ExecutorPath", "DatabricksConf", "DatabricksToken", "DatabricksInstance", "DriverPod", "DriverPodTemplateName", "ExecutorPod", "ExecutorPodTemplateName", "DriverPodValue", "ExecutorPodValue", });
+        new java.lang.String[] { "ApplicationType", "MainApplicationFile", "MainClass", "SparkConf", "HadoopConf", "ExecutorPath", "DatabricksConf", "DatabricksToken", "DatabricksInstance", "DriverSpec", "ExecutorSpec", });
     internal_static_flyteidl_plugins_SparkJob_SparkConfEntry_descriptor =
       internal_static_flyteidl_plugins_SparkJob_descriptor.getNestedTypes().get(0);
     internal_static_flyteidl_plugins_SparkJob_SparkConfEntry_fieldAccessorTable = new
@@ -3787,7 +3323,7 @@ public final class Spark {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_SparkJob_HadoopConfEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    flyteidl.core.Tasks.getDescriptor();
+    flyteidl.plugins.Common.getDescriptor();
     com.google.protobuf.StructProto.getDescriptor();
   }
 

@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+import "flyteidl/core/tasks.proto";
+
+package flyteidl.plugins;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
+
+// Used in place of the pod template references in core.TaskTemplate and core.TaskMetdata. This allows
+// specifying pod configuration on a per role basis.
+message RoleSpec {
+    // The pod spec and metadata to be used as the base configuration when creating a Pod for this role.
+    // +optional
+    oneof pod_value {
+        core.K8sPod pod = 1;
+    }
+    // Reference to an existing PodTemplate k8s resource to be used as the base configuration when creating a
+    // Pod for this role. If this value is set, the specified PodTemplate will be used instead of, but applied
+    // identically as, the default PodTemplate configured in FlytePropeller.
+    // +optional
+    string pod_template_name = 2;
+}

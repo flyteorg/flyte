@@ -35,7 +35,7 @@
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
-#include "flyteidl/core/tasks.pb.h"
+#include "flyteidl/plugins/common.pb.h"
 #include <google/protobuf/struct.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -321,16 +321,6 @@ class SparkJob final :
   }
   static const SparkJob& default_instance();
 
-  enum DriverPodValueCase {
-    kDriverPod = 10,
-    DRIVERPODVALUE_NOT_SET = 0,
-  };
-
-  enum ExecutorPodValueCase {
-    kExecutorPod = 12,
-    EXECUTORPODVALUE_NOT_SET = 0,
-  };
-
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const SparkJob* internal_default_instance() {
     return reinterpret_cast<const SparkJob*>(
@@ -483,34 +473,6 @@ class SparkJob final :
   ::std::string* release_databricksinstance();
   void set_allocated_databricksinstance(::std::string* databricksinstance);
 
-  // string driverPodTemplateName = 11;
-  void clear_driverpodtemplatename();
-  static const int kDriverPodTemplateNameFieldNumber = 11;
-  const ::std::string& driverpodtemplatename() const;
-  void set_driverpodtemplatename(const ::std::string& value);
-  #if LANG_CXX11
-  void set_driverpodtemplatename(::std::string&& value);
-  #endif
-  void set_driverpodtemplatename(const char* value);
-  void set_driverpodtemplatename(const char* value, size_t size);
-  ::std::string* mutable_driverpodtemplatename();
-  ::std::string* release_driverpodtemplatename();
-  void set_allocated_driverpodtemplatename(::std::string* driverpodtemplatename);
-
-  // string executorPodTemplateName = 13;
-  void clear_executorpodtemplatename();
-  static const int kExecutorPodTemplateNameFieldNumber = 13;
-  const ::std::string& executorpodtemplatename() const;
-  void set_executorpodtemplatename(const ::std::string& value);
-  #if LANG_CXX11
-  void set_executorpodtemplatename(::std::string&& value);
-  #endif
-  void set_executorpodtemplatename(const char* value);
-  void set_executorpodtemplatename(const char* value, size_t size);
-  ::std::string* mutable_executorpodtemplatename();
-  ::std::string* release_executorpodtemplatename();
-  void set_allocated_executorpodtemplatename(::std::string* executorpodtemplatename);
-
   // .google.protobuf.Struct databricksConf = 7;
   bool has_databricksconf() const;
   void clear_databricksconf();
@@ -520,45 +482,33 @@ class SparkJob final :
   ::google::protobuf::Struct* mutable_databricksconf();
   void set_allocated_databricksconf(::google::protobuf::Struct* databricksconf);
 
+  // .flyteidl.plugins.RoleSpec driverSpec = 10;
+  bool has_driverspec() const;
+  void clear_driverspec();
+  static const int kDriverSpecFieldNumber = 10;
+  const ::flyteidl::plugins::RoleSpec& driverspec() const;
+  ::flyteidl::plugins::RoleSpec* release_driverspec();
+  ::flyteidl::plugins::RoleSpec* mutable_driverspec();
+  void set_allocated_driverspec(::flyteidl::plugins::RoleSpec* driverspec);
+
+  // .flyteidl.plugins.RoleSpec executorSpec = 11;
+  bool has_executorspec() const;
+  void clear_executorspec();
+  static const int kExecutorSpecFieldNumber = 11;
+  const ::flyteidl::plugins::RoleSpec& executorspec() const;
+  ::flyteidl::plugins::RoleSpec* release_executorspec();
+  ::flyteidl::plugins::RoleSpec* mutable_executorspec();
+  void set_allocated_executorspec(::flyteidl::plugins::RoleSpec* executorspec);
+
   // .flyteidl.plugins.SparkApplication.Type applicationType = 1;
   void clear_applicationtype();
   static const int kApplicationTypeFieldNumber = 1;
   ::flyteidl::plugins::SparkApplication_Type applicationtype() const;
   void set_applicationtype(::flyteidl::plugins::SparkApplication_Type value);
 
-  // .flyteidl.core.K8sPod driverPod = 10;
-  bool has_driverpod() const;
-  void clear_driverpod();
-  static const int kDriverPodFieldNumber = 10;
-  const ::flyteidl::core::K8sPod& driverpod() const;
-  ::flyteidl::core::K8sPod* release_driverpod();
-  ::flyteidl::core::K8sPod* mutable_driverpod();
-  void set_allocated_driverpod(::flyteidl::core::K8sPod* driverpod);
-
-  // .flyteidl.core.K8sPod executorPod = 12;
-  bool has_executorpod() const;
-  void clear_executorpod();
-  static const int kExecutorPodFieldNumber = 12;
-  const ::flyteidl::core::K8sPod& executorpod() const;
-  ::flyteidl::core::K8sPod* release_executorpod();
-  ::flyteidl::core::K8sPod* mutable_executorpod();
-  void set_allocated_executorpod(::flyteidl::core::K8sPod* executorpod);
-
-  void clear_driverPodValue();
-  DriverPodValueCase driverPodValue_case() const;
-  void clear_executorPodValue();
-  ExecutorPodValueCase executorPodValue_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.plugins.SparkJob)
  private:
   class HasBitSetters;
-  void set_has_driverpod();
-  void set_has_executorpod();
-
-  inline bool has_driverPodValue() const;
-  inline void clear_has_driverPodValue();
-
-  inline bool has_executorPodValue() const;
-  inline void clear_has_executorPodValue();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::MapField<
@@ -578,21 +528,11 @@ class SparkJob final :
   ::google::protobuf::internal::ArenaStringPtr executorpath_;
   ::google::protobuf::internal::ArenaStringPtr databrickstoken_;
   ::google::protobuf::internal::ArenaStringPtr databricksinstance_;
-  ::google::protobuf::internal::ArenaStringPtr driverpodtemplatename_;
-  ::google::protobuf::internal::ArenaStringPtr executorpodtemplatename_;
   ::google::protobuf::Struct* databricksconf_;
+  ::flyteidl::plugins::RoleSpec* driverspec_;
+  ::flyteidl::plugins::RoleSpec* executorspec_;
   int applicationtype_;
-  union DriverPodValueUnion {
-    DriverPodValueUnion() {}
-    ::flyteidl::core::K8sPod* driverpod_;
-  } driverPodValue_;
-  union ExecutorPodValueUnion {
-    ExecutorPodValueUnion() {}
-    ::flyteidl::core::K8sPod* executorpod_;
-  } executorPodValue_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[2];
-
   friend struct ::TableStruct_flyteidl_2fplugins_2fspark_2eproto;
 };
 // ===================================================================
@@ -975,200 +915,96 @@ inline void SparkJob::set_allocated_databricksinstance(::std::string* databricks
   // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.SparkJob.databricksInstance)
 }
 
-// .flyteidl.core.K8sPod driverPod = 10;
-inline bool SparkJob::has_driverpod() const {
-  return driverPodValue_case() == kDriverPod;
+// .flyteidl.plugins.RoleSpec driverSpec = 10;
+inline bool SparkJob::has_driverspec() const {
+  return this != internal_default_instance() && driverspec_ != nullptr;
 }
-inline void SparkJob::set_has_driverpod() {
-  _oneof_case_[0] = kDriverPod;
+inline const ::flyteidl::plugins::RoleSpec& SparkJob::driverspec() const {
+  const ::flyteidl::plugins::RoleSpec* p = driverspec_;
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.SparkJob.driverSpec)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::plugins::RoleSpec*>(
+      &::flyteidl::plugins::_RoleSpec_default_instance_);
 }
-inline ::flyteidl::core::K8sPod* SparkJob::release_driverpod() {
-  // @@protoc_insertion_point(field_release:flyteidl.plugins.SparkJob.driverPod)
-  if (has_driverpod()) {
-    clear_has_driverPodValue();
-      ::flyteidl::core::K8sPod* temp = driverPodValue_.driverpod_;
-    driverPodValue_.driverpod_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
+inline ::flyteidl::plugins::RoleSpec* SparkJob::release_driverspec() {
+  // @@protoc_insertion_point(field_release:flyteidl.plugins.SparkJob.driverSpec)
+  
+  ::flyteidl::plugins::RoleSpec* temp = driverspec_;
+  driverspec_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::plugins::RoleSpec* SparkJob::mutable_driverspec() {
+  
+  if (driverspec_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::plugins::RoleSpec>(GetArenaNoVirtual());
+    driverspec_ = p;
   }
+  // @@protoc_insertion_point(field_mutable:flyteidl.plugins.SparkJob.driverSpec)
+  return driverspec_;
 }
-inline const ::flyteidl::core::K8sPod& SparkJob::driverpod() const {
-  // @@protoc_insertion_point(field_get:flyteidl.plugins.SparkJob.driverPod)
-  return has_driverpod()
-      ? *driverPodValue_.driverpod_
-      : *reinterpret_cast< ::flyteidl::core::K8sPod*>(&::flyteidl::core::_K8sPod_default_instance_);
-}
-inline ::flyteidl::core::K8sPod* SparkJob::mutable_driverpod() {
-  if (!has_driverpod()) {
-    clear_driverPodValue();
-    set_has_driverpod();
-    driverPodValue_.driverpod_ = CreateMaybeMessage< ::flyteidl::core::K8sPod >(
-        GetArenaNoVirtual());
+inline void SparkJob::set_allocated_driverspec(::flyteidl::plugins::RoleSpec* driverspec) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(driverspec_);
   }
-  // @@protoc_insertion_point(field_mutable:flyteidl.plugins.SparkJob.driverPod)
-  return driverPodValue_.driverpod_;
-}
-
-// string driverPodTemplateName = 11;
-inline void SparkJob::clear_driverpodtemplatename() {
-  driverpodtemplatename_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SparkJob::driverpodtemplatename() const {
-  // @@protoc_insertion_point(field_get:flyteidl.plugins.SparkJob.driverPodTemplateName)
-  return driverpodtemplatename_.GetNoArena();
-}
-inline void SparkJob::set_driverpodtemplatename(const ::std::string& value) {
-  
-  driverpodtemplatename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.plugins.SparkJob.driverPodTemplateName)
-}
-#if LANG_CXX11
-inline void SparkJob::set_driverpodtemplatename(::std::string&& value) {
-  
-  driverpodtemplatename_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.plugins.SparkJob.driverPodTemplateName)
-}
-#endif
-inline void SparkJob::set_driverpodtemplatename(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  driverpodtemplatename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.plugins.SparkJob.driverPodTemplateName)
-}
-inline void SparkJob::set_driverpodtemplatename(const char* value, size_t size) {
-  
-  driverpodtemplatename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.plugins.SparkJob.driverPodTemplateName)
-}
-inline ::std::string* SparkJob::mutable_driverpodtemplatename() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.plugins.SparkJob.driverPodTemplateName)
-  return driverpodtemplatename_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SparkJob::release_driverpodtemplatename() {
-  // @@protoc_insertion_point(field_release:flyteidl.plugins.SparkJob.driverPodTemplateName)
-  
-  return driverpodtemplatename_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SparkJob::set_allocated_driverpodtemplatename(::std::string* driverpodtemplatename) {
-  if (driverpodtemplatename != nullptr) {
+  if (driverspec) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      driverspec = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, driverspec, submessage_arena);
+    }
     
   } else {
     
   }
-  driverpodtemplatename_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), driverpodtemplatename);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.SparkJob.driverPodTemplateName)
+  driverspec_ = driverspec;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.SparkJob.driverSpec)
 }
 
-// .flyteidl.core.K8sPod executorPod = 12;
-inline bool SparkJob::has_executorpod() const {
-  return executorPodValue_case() == kExecutorPod;
+// .flyteidl.plugins.RoleSpec executorSpec = 11;
+inline bool SparkJob::has_executorspec() const {
+  return this != internal_default_instance() && executorspec_ != nullptr;
 }
-inline void SparkJob::set_has_executorpod() {
-  _oneof_case_[1] = kExecutorPod;
+inline const ::flyteidl::plugins::RoleSpec& SparkJob::executorspec() const {
+  const ::flyteidl::plugins::RoleSpec* p = executorspec_;
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.SparkJob.executorSpec)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::plugins::RoleSpec*>(
+      &::flyteidl::plugins::_RoleSpec_default_instance_);
 }
-inline ::flyteidl::core::K8sPod* SparkJob::release_executorpod() {
-  // @@protoc_insertion_point(field_release:flyteidl.plugins.SparkJob.executorPod)
-  if (has_executorpod()) {
-    clear_has_executorPodValue();
-      ::flyteidl::core::K8sPod* temp = executorPodValue_.executorpod_;
-    executorPodValue_.executorpod_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
+inline ::flyteidl::plugins::RoleSpec* SparkJob::release_executorspec() {
+  // @@protoc_insertion_point(field_release:flyteidl.plugins.SparkJob.executorSpec)
+  
+  ::flyteidl::plugins::RoleSpec* temp = executorspec_;
+  executorspec_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::plugins::RoleSpec* SparkJob::mutable_executorspec() {
+  
+  if (executorspec_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::plugins::RoleSpec>(GetArenaNoVirtual());
+    executorspec_ = p;
   }
+  // @@protoc_insertion_point(field_mutable:flyteidl.plugins.SparkJob.executorSpec)
+  return executorspec_;
 }
-inline const ::flyteidl::core::K8sPod& SparkJob::executorpod() const {
-  // @@protoc_insertion_point(field_get:flyteidl.plugins.SparkJob.executorPod)
-  return has_executorpod()
-      ? *executorPodValue_.executorpod_
-      : *reinterpret_cast< ::flyteidl::core::K8sPod*>(&::flyteidl::core::_K8sPod_default_instance_);
-}
-inline ::flyteidl::core::K8sPod* SparkJob::mutable_executorpod() {
-  if (!has_executorpod()) {
-    clear_executorPodValue();
-    set_has_executorpod();
-    executorPodValue_.executorpod_ = CreateMaybeMessage< ::flyteidl::core::K8sPod >(
-        GetArenaNoVirtual());
+inline void SparkJob::set_allocated_executorspec(::flyteidl::plugins::RoleSpec* executorspec) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(executorspec_);
   }
-  // @@protoc_insertion_point(field_mutable:flyteidl.plugins.SparkJob.executorPod)
-  return executorPodValue_.executorpod_;
-}
-
-// string executorPodTemplateName = 13;
-inline void SparkJob::clear_executorpodtemplatename() {
-  executorpodtemplatename_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& SparkJob::executorpodtemplatename() const {
-  // @@protoc_insertion_point(field_get:flyteidl.plugins.SparkJob.executorPodTemplateName)
-  return executorpodtemplatename_.GetNoArena();
-}
-inline void SparkJob::set_executorpodtemplatename(const ::std::string& value) {
-  
-  executorpodtemplatename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.plugins.SparkJob.executorPodTemplateName)
-}
-#if LANG_CXX11
-inline void SparkJob::set_executorpodtemplatename(::std::string&& value) {
-  
-  executorpodtemplatename_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.plugins.SparkJob.executorPodTemplateName)
-}
-#endif
-inline void SparkJob::set_executorpodtemplatename(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  executorpodtemplatename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.plugins.SparkJob.executorPodTemplateName)
-}
-inline void SparkJob::set_executorpodtemplatename(const char* value, size_t size) {
-  
-  executorpodtemplatename_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.plugins.SparkJob.executorPodTemplateName)
-}
-inline ::std::string* SparkJob::mutable_executorpodtemplatename() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.plugins.SparkJob.executorPodTemplateName)
-  return executorpodtemplatename_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* SparkJob::release_executorpodtemplatename() {
-  // @@protoc_insertion_point(field_release:flyteidl.plugins.SparkJob.executorPodTemplateName)
-  
-  return executorpodtemplatename_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void SparkJob::set_allocated_executorpodtemplatename(::std::string* executorpodtemplatename) {
-  if (executorpodtemplatename != nullptr) {
+  if (executorspec) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      executorspec = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, executorspec, submessage_arena);
+    }
     
   } else {
     
   }
-  executorpodtemplatename_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), executorpodtemplatename);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.SparkJob.executorPodTemplateName)
+  executorspec_ = executorspec;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.SparkJob.executorSpec)
 }
 
-inline bool SparkJob::has_driverPodValue() const {
-  return driverPodValue_case() != DRIVERPODVALUE_NOT_SET;
-}
-inline void SparkJob::clear_has_driverPodValue() {
-  _oneof_case_[0] = DRIVERPODVALUE_NOT_SET;
-}
-inline bool SparkJob::has_executorPodValue() const {
-  return executorPodValue_case() != EXECUTORPODVALUE_NOT_SET;
-}
-inline void SparkJob::clear_has_executorPodValue() {
-  _oneof_case_[1] = EXECUTORPODVALUE_NOT_SET;
-}
-inline SparkJob::DriverPodValueCase SparkJob::driverPodValue_case() const {
-  return SparkJob::DriverPodValueCase(_oneof_case_[0]);
-}
-inline SparkJob::ExecutorPodValueCase SparkJob::executorPodValue_case() const {
-  return SparkJob::ExecutorPodValueCase(_oneof_case_[1]);
-}
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
