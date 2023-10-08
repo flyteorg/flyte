@@ -37,7 +37,7 @@ func Test_monitor(t *testing.T) {
 	client.OnStatusMatch(ctx, mock.Anything).Return(core2.PhaseInfoSuccess(nil), nil)
 
 	wg := sync.WaitGroup{}
-	wg.Add(4)
+	wg.Add(8)
 	cacheObj, err := cache.NewAutoRefreshCache(rand.String(5), func(ctx context.Context, batch cache.Batch) (updatedBatch []cache.ItemSyncResponse, err error) {
 		wg.Done()
 		t.Logf("Syncing Item [%+v]", batch[0])
