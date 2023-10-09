@@ -5,6 +5,8 @@ package controller
 import (
 	"context"
 	"fmt"
+	resolver2 "github.com/flyteorg/flyte/flytepropeller/pkg/resolver"
+	"google.golang.org/grpc/resolver"
 	"os"
 	"runtime/pprof"
 	"time"
@@ -561,6 +563,8 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	if err != nil {
 		return errors.Wrapf(err, "error building Kubernetes Clientset")
 	}
+
+	resolver.Register(resolver2.NewBuilder(kubeClient, resolver2.KubernetesSchema))
 
 	flyteworkflowClient, err := clientset.NewForConfig(kubecfg)
 	if err != nil {

@@ -30,10 +30,10 @@ require (
 	golang.org/x/time v0.1.0
 	google.golang.org/grpc v1.56.1
 	google.golang.org/protobuf v1.30.0
-	k8s.io/api v0.24.1
+	k8s.io/api v0.24.17
 	k8s.io/apiextensions-apiserver v0.24.1
-	k8s.io/apimachinery v0.24.1
-	k8s.io/client-go v0.24.1
+	k8s.io/apimachinery v0.24.17
+	k8s.io/client-go v0.24.17
 	k8s.io/klog v1.0.0
 	sigs.k8s.io/controller-runtime v0.12.1
 )

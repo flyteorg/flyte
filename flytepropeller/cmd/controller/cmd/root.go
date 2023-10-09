@@ -4,8 +4,6 @@ package cmd
 import (
 	"context"
 	"flag"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-	"google.golang.org/grpc/resolver"
 	"net/http"
 	"os"
 	"runtime"
@@ -13,7 +11,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-	resolver2 "github.com/flyteorg/flyte/flytepropeller/pkg/resolver"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -116,14 +113,6 @@ func logAndExit(err error) {
 }
 
 func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
-	// register k8s resolver
-	kubeClient, _, err := utils.GetKubeConfig(baseCtx, cfg)
-	if err != nil {
-		logger.Fatalf(baseCtx, "error building kubernetes client [%v]", err)
-		return err
-	}
-	resolver.Register(resolver2.NewBuilder(kubeClient, resolver2.KubernetesSchema))
-
 	// set up signals, so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(baseCtx)
 
