@@ -4693,6 +4693,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.\nThis is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true."
+        },
+        "is_array": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean flag indicating if the node is an array node. This is intended to uniquely identify\narray nodes from other nodes which can have is_parent_node as true."
         }
       },
       "title": "Represents additional attributes related to a Node Execution"
@@ -7415,6 +7420,11 @@
           "type": "string",
           "format": "date-time",
           "description": "This timestamp represents the instant when the event was reported by the executing framework. For example,\nwhen first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when\nliteral inputs are initially copied. The event however will not be sent until after the copy completes.\nExtracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series."
+        },
+        "is_array": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Indicates if this node is an ArrayNode."
         }
       }
     },

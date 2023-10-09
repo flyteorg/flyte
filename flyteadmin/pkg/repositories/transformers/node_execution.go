@@ -131,6 +131,7 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 		SpecNodeId:   input.Request.Event.SpecNodeId,
 		IsParentNode: input.Request.Event.IsParent,
 		IsDynamic:    input.Request.Event.IsDynamic,
+		IsArray:      input.Request.Event.IsArray,
 	}
 	err := handleNodeExecutionInputs(ctx, nodeExecution, input.Request, input.StorageClient)
 	if err != nil {
@@ -303,6 +304,9 @@ func UpdateNodeExecutionModel(
 		}
 		if request.Event.IsDynamic {
 			nodeExecutionMetadata.IsDynamic = true
+		}
+		if request.Event.IsArray {
+			nodeExecutionMetadata.IsArray = true
 		}
 		nodeExecMetadataBytes, err := proto.Marshal(&nodeExecutionMetadata)
 		if err != nil {

@@ -250,6 +250,8 @@ func (m *NodeExecutionEvent) Validate() error {
 		}
 	}
 
+	// no validation rules for IsArray
+
 	switch m.InputValue.(type) {
 
 	case *NodeExecutionEvent_InputUri:

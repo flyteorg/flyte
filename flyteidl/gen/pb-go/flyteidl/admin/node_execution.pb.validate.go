@@ -421,6 +421,8 @@ func (m *NodeExecutionMetaData) Validate() error {
 
 	// no validation rules for IsDynamic
 
+	// no validation rules for IsArray
+
 	return nil
 }
 
