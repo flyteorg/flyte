@@ -517,14 +517,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto
   "puts\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n"
   "\020dynamic_workflow\030\020 \001(\0132+.flyteidl.admin"
   ".DynamicWorkflowNodeMetadata\022-\n\nflyte_ur"
-  "ls\030\021 \001(\0132\031.flyteidl.admin.FlyteURLsB7Z5g"
-  "ithub.com/flyteorg/flyteidl/gen/pb-go/fl"
-  "yteidl/adminb\006proto3"
+  "ls\030\021 \001(\0132\031.flyteidl.admin.FlyteURLsB=Z;g"
+  "ithub.com/flyteorg/flyte/flyteidl/gen/pb"
+  "-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fnode_5fexecution_2eproto,
-  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2700,
+  "flyteidl/admin/node_execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fnode_5fexecution_2eproto, 2706,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fnode_5fexecution_2eproto() {

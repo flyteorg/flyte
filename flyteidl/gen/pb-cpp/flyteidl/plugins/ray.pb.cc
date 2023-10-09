@@ -240,13 +240,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fray_2eproto[] =
   "\020ray_start_params\030\005 \003(\01325.flyteidl.plugi"
   "ns.WorkerGroupSpec.RayStartParamsEntry\0325"
   "\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va"
-  "lue\030\002 \001(\t:\0028\001B9Z7github.com/flyteorg/fly"
-  "teidl/gen/pb-go/flyteidl/pluginsb\006proto3"
+  "lue\030\002 \001(\t:\0028\001B\?Z=github.com/flyteorg/fly"
+  "te/flyteidl/gen/pb-go/flyteidl/pluginsb\006"
+  "proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fray_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fray_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fray_2eproto,
-  "flyteidl/plugins/ray.proto", &assign_descriptors_table_flyteidl_2fplugins_2fray_2eproto, 720,
+  "flyteidl/plugins/ray.proto", &assign_descriptors_table_flyteidl_2fplugins_2fray_2eproto, 726,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fray_2eproto() {

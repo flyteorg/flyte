@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var (

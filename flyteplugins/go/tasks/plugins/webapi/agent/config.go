@@ -44,6 +44,7 @@ var (
 			Insecure:       true,
 			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
 		},
+		SupportedTaskTypes: []string{"task_type_1", "task_type_2"},
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("agent-service", &defaultConfig)
@@ -65,6 +66,9 @@ type Config struct {
 
 	// Maps task types to their agents. {TaskType: AgentId}
 	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
+
+	// SupportedTaskTypes is a list of task types that are supported by this plugin.
+	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
 }
 
 type Agent struct {

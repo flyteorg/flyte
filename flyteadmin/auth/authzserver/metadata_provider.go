@@ -11,7 +11,7 @@ import (
 
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 type OAuth2MetadataProvider struct {

@@ -3,11 +3,11 @@ package nodes
 import (
 	"context"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func ResolveBindingData(ctx context.Context, outputResolver OutputResolver, nl executors.NodeLookup, bindingData *core.BindingData) (*core.Literal, error) {

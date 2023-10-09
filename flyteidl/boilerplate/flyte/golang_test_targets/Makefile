@@ -50,7 +50,7 @@ test_unit_cover:
 test_unit_visual:
 	go test ./... -coverprofile /tmp/cover.out -covermode=count
 	go tool cover -html=/tmp/cover.out
-	
+
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic

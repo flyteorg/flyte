@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-test/deep"
 
-	coreIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	corev1 "k8s.io/api/core/v1"
 )
 

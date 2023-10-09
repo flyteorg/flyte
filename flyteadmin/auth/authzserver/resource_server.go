@@ -19,7 +19,7 @@ import (
 	"github.com/coreos/go-oidc"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"golang.org/x/oauth2"
 )
 

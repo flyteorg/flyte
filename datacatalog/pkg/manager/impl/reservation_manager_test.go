@@ -13,7 +13,7 @@ import (
 	errors3 "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

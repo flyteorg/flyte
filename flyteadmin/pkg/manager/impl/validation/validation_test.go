@@ -7,13 +7,13 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 )

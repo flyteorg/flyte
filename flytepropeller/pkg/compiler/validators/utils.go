@@ -2,10 +2,11 @@ package validators
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.org/x/exp/slices"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -184,7 +185,7 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	}
 
 	// sort inner types to ensure consistent union types are generated
-	slices.SortFunc(innerType, func(a, b *core.LiteralType) bool { return a.String() < b.String() })
+	slices.SortFunc(innerType, func(a, b *core.LiteralType) int { return strings.Compare(a.String(), b.String()) })
 
 	return &core.LiteralType{
 		Type: &core.LiteralType_UnionType{

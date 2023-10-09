@@ -23,10 +23,10 @@ import (
 	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 
 	"google.golang.org/grpc"

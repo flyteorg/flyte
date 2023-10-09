@@ -15,7 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 )
 

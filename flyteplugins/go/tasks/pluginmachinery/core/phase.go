@@ -6,7 +6,7 @@ import (
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const DefaultPhaseVersion = uint32(0)

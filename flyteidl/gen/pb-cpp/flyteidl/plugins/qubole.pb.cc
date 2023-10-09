@@ -141,14 +141,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fqubole_2eproto[] =
   "veJob\022\025\n\rcluster_label\030\001 \001(\t\022C\n\020query_co"
   "llection\030\002 \001(\0132%.flyteidl.plugins.HiveQu"
   "eryCollectionB\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query"
-  "\030\004 \001(\0132\033.flyteidl.plugins.HiveQueryB9Z7g"
-  "ithub.com/flyteorg/flyteidl/gen/pb-go/fl"
-  "yteidl/pluginsb\006proto3"
+  "\030\004 \001(\0132\033.flyteidl.plugins.HiveQueryB\?Z=g"
+  "ithub.com/flyteorg/flyte/flyteidl/gen/pb"
+  "-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fqubole_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fqubole_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fqubole_2eproto,
-  "flyteidl/plugins/qubole.proto", &assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto, 422,
+  "flyteidl/plugins/qubole.proto", &assign_descriptors_table_flyteidl_2fplugins_2fqubole_2eproto, 428,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fqubole_2eproto() {
