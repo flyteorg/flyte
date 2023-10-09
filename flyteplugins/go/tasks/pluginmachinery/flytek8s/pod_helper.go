@@ -135,9 +135,10 @@ func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *c
 
 func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
 	// Short circuit if pod spec does not contain any containers that use GPUs
+	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
 	requiresGPUs := false
 	for _, cnt := range podSpec.Containers {
-		if _, ok := cnt.Resources.Limits[config.GetK8sPluginConfig().GpuResourceName]; ok {
+		if _, ok := cnt.Resources.Limits[gpuResourceName]; ok {
 			requiresGPUs = true
 			break
 		}
@@ -179,9 +180,9 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 	// Apply changes for GPU partition size, if applicable
 	var partitionSizeNsr *v1.NodeSelectorRequirement
 	var partitionSizeTol *v1.Toleration
-	switch partitionSizeValue.(type) {
+	switch p := partitionSizeValue.(type) {
 	case *core.GPUAccelerator_Unpartitioned:
-		if !gpuAccelerator.GetUnpartitioned() {
+		if !p.Unpartitioned {
 			break
 		}
 		if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
@@ -206,11 +207,11 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		partitionSizeNsr = &v1.NodeSelectorRequirement{
 			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
 			Operator: v1.NodeSelectorOpIn,
-			Values:   []string{gpuAccelerator.GetPartitionSize()},
+			Values:   []string{p.PartitionSize},
 		}
 		partitionSizeTol = &v1.Toleration{
 			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-			Value:    gpuAccelerator.GetPartitionSize(),
+			Value:    p.PartitionSize,
 			Operator: v1.TolerationOpEqual,
 			Effect:   v1.TaintEffectNoSchedule,
 		}
