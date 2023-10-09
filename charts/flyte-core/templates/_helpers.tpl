@@ -74,6 +74,20 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flyteagent.name" -}}
+flyteagent
+{{- end -}}
+
+{{- define "flyteagent.selectorLabels" -}}
+app.kubernetes.io/name: {{ template "flyteagent.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{- define "flyteagent.labels" -}}
+{{ include "flyteagent.selectorLabels" . }}
+helm.sh/chart: {{ include "flyte.chart" . }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
 
 {{- define "flytepropeller.name" -}}
 flytepropeller
@@ -161,7 +175,7 @@ storage:
     config:
       json: ""
       project_id: {{ .Values.storage.gcs.projectId }}
-      scopes: https://www.googleapis.com/auth/devstorage.read_write
+      scopes: https://www.googleapis.com/auth/cloud-platform
   container: {{ .Values.storage.bucketName | quote }}
 {{- else if eq .Values.storage.type "sandbox" }}
   type: minio

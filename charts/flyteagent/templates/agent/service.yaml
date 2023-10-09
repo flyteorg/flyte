@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "flyteagent.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels: {{ include "flyteagent.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.service.type}}
+  type: {{ . }}
+  {{- end }}
+  ports:
+  - name: {{ .Values.ports.name }}
+    port: {{ .Values.ports.containerPort }}
+    protocol: TCP
+    targetPort: {{ .Values.ports.name }}
+  selector: {{ include "flyteagent.selectorLabels" . | nindent 4 }}

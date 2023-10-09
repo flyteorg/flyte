@@ -1,0 +1,80 @@
+name: Flyte copilot Checks
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  lint:
+    name: Lint
+    uses: flyteorg/flytetools/.github/workflows/lint.yml@master
+
+  tests:
+    name: Unit Tests
+    uses: flyteorg/flytetools/.github/workflows/tests.yml@master
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+
+  dry_run:
+    name: Dry run goreleaser
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.19'
+      - name: Run GoReleaser dry run
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: --snapshot  --skip-publish --rm-dist
+
+  build_docker_image:
+    name: Build & Push Flyte copilot Image
+    uses: flyteorg/flytetools/.github/workflows/publish.yml@master
+    with:
+      version: v1
+      dockerfile: Dockerfile
+      push: false
+      repository: ${{ github.repository }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}
+
+  generate:
+    name: Check Go Gennerate
+    uses: flyteorg/flytetools/.github/workflows/go_generate.yml@master
+
+  bump_version:
+    name: Bump Version
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: [ lint, tests, generate, dry_run, build_docker_image ] # Only to ensure it can successfully build
+    uses: flyteorg/flytetools/.github/workflows/bump_version.yml@master
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+
+  goreleaser:
+    name: Goreleaser
+    needs: [ bump_version ] # Only to ensure it can successfully build
+    uses: flyteorg/flytetools/.github/workflows/goreleaser.yml@master
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+
+  push_docker_image:
+    name: Build & Push Flyte copilot Image
+    needs: [ bump_version ]
+    uses: flyteorg/flytetools/.github/workflows/publish.yml@master
+    with:
+      version: ${{ needs.bump_version.outputs.version }}
+      dockerfile: Dockerfile
+      push: true
+      repository: ${{ github.repository }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
+      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}

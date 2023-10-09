@@ -1,0 +1,8 @@
+appAuth:
+  selfAuthServer:
+    accessTokenLifespan: 5h
+    refreshTokenLifespan: 6h
+    staticClients:
+      - my-client:
+          id: my-client
+          client_secret: JDJhJDA2JHB4czFBa0c4MUt2cmhwbWwxUWlMU09RYVRrOWVlUHJVLzdZYWI5eTA3aDN4MFRnbGJhb1Q2

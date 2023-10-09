@@ -1,0 +1,86 @@
+project_name: kubectl-flyte
+before:
+  hooks:
+    - go mod download
+builds:
+  - id: kubectl-flyte
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/kubectl-flyte/main.go
+    binary: kubectl-flyte
+    goos:
+      - linux
+      - windows
+      - darwin
+    ldflags:
+      - -s -w -X github.com/lyft/flytepropeller/version.Version={{.Version}} -X github.com/lyft/flytepropeller/version.Build={{.ShortCommit}} -X github.com/lyft/flytepropeller/version.BuildTime={{.Date}}
+  - id: flytepropeller
+    env:
+      - CGO_ENABLED=0
+    main: ./cmd/controller/main.go
+    ldflags:
+      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+
+    binary: flytepropeller
+    goos:
+      - linux
+      - windows
+      - darwin
+archives:
+  - id: kubectl-flyte-archive
+    name_template: |-
+      kubectl-flyte_{{ .Tag }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    builds:
+      - kubectl-flyte
+    format_overrides:
+      - goos: windows
+        format: zip
+  - id: flytepropeller-archive
+    name_template: |-
+      flytepropeller_{{ .Tag }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    builds:
+      - flytepropeller
+    format_overrides:
+      - goos: windows
+        format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+# scoop:
+#   # Default is "https://github.com/<repo_owner>/<repo_name>/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+#   # url_template: "http://github.mycompany.com/foo/bar/releases/{{ .Tag }}/{{ .ArtifactName }}"
+
+#   # Repository to push the app manifest to.
+#   bucket:
+#     owner: lyft
+#     name: flytepropeller
+
+#   # Git author used to commit to the repository.
+#   # Defaults are shown.
+#   commit_author:
+#     name: goreleaserbot
+#     email: goreleaser@carlosbecker.com
+
+#   # Your app's homepage.
+#   # Default is empty.
+#   homepage: "https://godoc.org/github.com/lyft/flytepropeller"
+
+#   # Your app's description.
+#   # Default is empty.
+#   description: "kubectl-flyte is an command line tool that can be used as an extension to kubectl"
+
+#   # Your app's license
+#   # Default is empty.
+#   license: Apache-2.0

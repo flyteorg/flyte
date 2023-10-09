@@ -1,5 +1,6 @@
 export REPOSITORY=flyte
 include boilerplate/flyte/end2end/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose --resolver=backtracking
@@ -42,6 +43,7 @@ release_automation:
 	mkdir -p release
 	bash script/release.sh
 	bash script/generate_config_docs.sh
+	$(MAKE) -C docker/sandbox-bundled manifests
 
 .PHONY: deploy_sandbox
 deploy_sandbox: 
@@ -54,10 +56,6 @@ install-piptools: ## Install pip-tools
 .PHONY: doc-requirements.txt
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
-
-.PHONY: requirements.txt
-requirements.txt: requirements.in install-piptools
-	$(call PIP_COMPILE,requirements.in)
 
 .PHONY: stats
 stats:

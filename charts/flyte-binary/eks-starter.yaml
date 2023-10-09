@@ -25,4 +25,4 @@ configuration:
 serviceAccount:
   create: true
   annotations:
-  eks.amazonaws.com/role-arn: "<FLYTE_BACKEND_IAM_ARN>"
+    eks.amazonaws.com/role-arn: "<FLYTE_BACKEND_IAM_ARN>"

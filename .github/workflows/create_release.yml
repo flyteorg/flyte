@@ -46,7 +46,7 @@ jobs:
       - name: Tag image to release version
         run: |
           for release in latest ${{ needs.bump-version.outputs.version }}; do
-            docker buildx imagetools create --tag "ghcr.io/flyteorg/flyte-binary-release:${release}" "ghcr.io/flyteorg/flyte-binary:sha-${{ github.sha }}"
+            docker buildx imagetools create --tag "ghcr.io/${{ github.repository_owner }}/flyte-binary-release:${release}" "ghcr.io/${{ github.repository_owner }}/flyte-binary:sha-${{ github.sha }}"
           done
 
   publish-flyte-component-image:
@@ -93,7 +93,7 @@ jobs:
       - name: Tag Image to release version
         run: |
           for release in latest ${{ needs.bump-version.outputs.version }}; do
-            docker buildx imagetools create --tag "ghcr.io/flyteorg/${{ matrix.component }}-release:${release}" "ghcr.io/flyteorg/${{ matrix.component }}:${{ steps.set_version.outputs.version }}"
+            docker buildx imagetools create --tag "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}-release:${release}" "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}:${{ steps.set_version.outputs.version }}"
           done
 
   helm-release:
@@ -116,7 +116,7 @@ jobs:
         run: |
           git config user.name "${{ github.actor }}"
           git config user.email "${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>"
-      - name: Preprare Flyte Helm Release
+      - name: Prepare Flyte Helm Release
         env:
           VERSION: ${{ needs.bump-version.outputs.version }}
           REPOSITORY: "https://flyteorg.github.io/flyte"
@@ -138,7 +138,7 @@ jobs:
         with:
           fetch-depth: "0"
 
-      - name: Preprare Flyte Release
+      - name: Prepare Flyte Release
         env:
           VERSION: ${{ needs.bump-version.outputs.version }}
         run: |

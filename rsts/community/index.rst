@@ -32,28 +32,44 @@ Please join us on:
 .. .. link-button:: https://www.getrevue.co/profile/flyte
 ..     :type: url
 ..     :text: Flyte Monthly
-..     :classes: btn-outline-secondary
+..    :classes: btn-outline-secondary
 
 
-Open Source Community Sync
---------------------------
+Open Source Community Meeting 
+-----------------------------
 
-We host an Open Source Community Sync every other Tuesday, 9:00 AM PDT/PST.
-Check it out, subscribe to the `calendar <https://www.addevent.com/calendar/kE355955>`_, or just pop in!
+When: every other Tuesday, 9:00 AM Pacific Time.
+You're welcome to join and learn from other community members sharing their experiences with Flyte or any other technology from the AI ecosystem.
+Check out the event details and add it to your `calendar <https://www.addevent.com/event/EA7823958>`_, or just pop in! 
 
 .. image:: https://img.shields.io/badge/Join-Zoom-blue?style=for-the-badge
-    :target: https://zoom.us/s/93875115830?pwd=YWZWOHl1ODRRVjhjVkxSV0pmZkJaZz09#success
+    :target: https://www.addevent.com/event/EA7823958
     :alt: Zoom Link
 
 Office Hours
 ------------
 
-Flyte maintainers are available on Zoom for you to ask anything, weekly on Wednesdays:
+`Book a 30 minutes session <https://calendly.com/flyte-office-hours-01/30min>`_ with a Flyte maintainer and get your questions answered!   
 
-.. image:: https://img.shields.io/badge/Join-7am%20PT/3pm%20GMT-yellow?style=for-the-badge
-    :target: https://www.addevent.com/event/zF10349020/
-    :alt: 7am PT / 3pm GMT Office Hours
+Schedule your session depending on the topic to secure the availability of a maintainer with expertise in the area:
 
-.. image:: https://img.shields.io/badge/Join-9pm%20PT/10.30am%20IST-yellow?style=for-the-badge
-    :target: https://www.addevent.com/event/zF10349020/
-    :alt: 7am PT / 3pm GMT Office Hours
+- **7:00a.m. PT**: 
+   - Anything flytekit-related
+   - Flyte releases
+   - flytepropeller features
+   - Plugin implementation
+   - Platform configuration
+- **1:00p.m. PT**:
+   - Flyte deployment on cloud
+- **9:00p.m. PT**:
+   - Flytekit-related
+   - Use cases 
+   - Getting started (workflow onboarding)
+   - Integrations
+
+
+
+Newsletter
+----------
+
+`Join the Flyte mailing list <https://lists.lfaidata.foundation/g/flyte-announce/join>`_ to receive the monthly newsletter 

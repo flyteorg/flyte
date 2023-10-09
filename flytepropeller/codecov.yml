@@ -1,0 +1,15 @@
+comment:
+  layout: "header"
+  behavior: default
+  require_changes: false  # if true: only post the comment if coverage changes
+  require_base: no        # [yes :: must have a base report to post]
+  require_head: yes       # [yes :: must have a head report to post]
+  branches: null          # branch names that can post comment
+
+coverage:
+  status:
+    patch: no
+    project:
+      default:
+        target: 52%
+        threshold: 0.5%

@@ -1,15 +1,13 @@
 .. _deployment-plugin-setup:
 
-############
 Plugin Setup
-############
+============
 
-Flyte integrates with a wide variety of [data, ML, and analytical tools](https://flyte.org/integrations).
-Some of these plugins, like the Databricks, Kubeflow, and Ray integrations, require
-the Flyte cluster administrator to enable them.
+Flyte integrates with a wide variety of `data, ML and analytical tools <https://flyte.org/integrations>`__.
+Some of these plugins, such as Databricks, Kubeflow, and Ray integrations, require the Flyte cluster administrator to enable them.
 
 This section of the *Deployment Guides* will cover how to configure your cluster
-to use these plugins in your workflows written in `flytekit`.
+to use these plugins in your workflows written in ``flytekit``.
 
 
 .. panels::

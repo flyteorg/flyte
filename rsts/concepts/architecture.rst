@@ -38,6 +38,8 @@ Flyte components are separated into 3 logical planes. The planes are summarized 
 |                   | It sends status events back to the control plane so the information can be stored and surfaced to end-users.  |
 +-------------------+---------------------------------------------------------------------------------------------------------------+
 
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/architecture/flyte-logical-architecture.png
+
 User Plane
 ----------
 
@@ -89,7 +91,7 @@ Complex task types require workloads to be distributed across hundreds of pods.
 
 The type-specific task logic is separated into isolated code modules known as **plugins**.
 Each task type has an associated plugin that is responsible for handling tasks of its type.
-For each task in a workflow, FlytePropeller activates the appropriate plugin based on the task type in order to fullfill the task.
+For each task in a workflow, FlytePropeller activates the appropriate plugin based on the task type in order to fulfill the task.
 
 The Flyte team has pre-built plugins for Hive, Spark, AWS Batch, and :ref:`more <integrations>`.
 To support new use-cases, developers can create their own plugins and bundle them in their FlytePropeller deployment.

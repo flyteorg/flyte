@@ -1,0 +1,17 @@
+my-component:
+  itemsMap:
+    - itemA:
+        - itemAa:
+            id: abc1
+            name: "A b c"
+            randomValue: "hello world"
+        - itemAb:
+            id: xyz1
+            name: "x y z"
+    - itemB:
+        - itemBa:
+            id: abc2
+            name: "A b c"
+        - itemBb:
+            id: xyz2
+            name: "x y z"

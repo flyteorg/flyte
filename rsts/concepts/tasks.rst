@@ -103,7 +103,7 @@ System retry can be of two types:
 
 .. note::
   
-   Recoverable vs. Non-Recoverable failures: Recoverable failures will be retried and counted against the task’s retry count. Non-recoverable failures will just fail, i.e., the task isn’t retried irrespective of user/system retry configurations. All user exceptions are considered non-recoverable unless the exception is a subclass of FlyteRecoverableException.
+   Recoverable vs. Non-Recoverable failures: Recoverable failures will be retried and counted against the task's retry count. Non-recoverable failures will just fail, i.e., the task isn’t retried irrespective of user/system retry configurations. All user exceptions are considered non-recoverable unless the exception is a subclass of FlyteRecoverableException.
 
 
 **Timeouts**
@@ -114,5 +114,5 @@ To ensure that the system is always making progress, tasks must be guaranteed to
 Caching/Memoization
 ^^^^^^^^^^^^^^^^^^^
 
-Flyte supports memoization of task outputs to ensure that identical invocations of a task are not executed repeatedly, thereby saving compute resources and execution time. For example, if you wish to run the same piece of code multiple times, you can re-use the output instead of re-computing it.
-For more information on memoization, refer to the :std:ref:`Caching Example <cookbook:sphx_glr_auto_core_flyte_basics_task_cache.py>`.
+Flyte supports memoization of task outputs to ensure that identical invocations of a task are not executed repeatedly, thereby saving compute resources and execution time. For example, if you wish to run the same piece of code multiple times, you can reuse the output instead of re-computing it.
+For more information on memoization, refer to the :std:doc:`Caching Example <cookbook:auto_examples/development_lifecycle/task_cache>`.

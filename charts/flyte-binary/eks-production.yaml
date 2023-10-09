@@ -41,6 +41,8 @@ configuration:
       - development:
         - defaultIamRole:
             value: <FLYTE_USER_IAM_ARN>
+    flyteadmin:
+      roleNameKey: "iam.amazonaws.com/role"
     plugins:
       k8s:
         inject-finalizer: true
@@ -130,7 +132,7 @@ ingress:
     nginx.ingress.kubernetes.io/app-root: /console
   grpcAnnotations:
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
-  host: development.uniondemo.run
+  host: <your-Flyte-URL> # change for the URL you'll use to connect to Flyte
 rbac:
   extraRules:
     - apiGroups:

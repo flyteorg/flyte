@@ -60,3 +60,5 @@ sed -i "s,image:[^P]*# FLYTECOPILOT_IMAGE,image: cr.flyte.org/flyteorg/flytecopi
 
 sed -i "s,repository:[^P]*# FLYTE_IMAGE,repository: cr.flyte.org/flyteorg/flyte-binary-release # FLYTE_IMAGE," ./charts/flyte-binary/values.yaml
 sed -i "s,tag:[^P]*# FLYTE_TAG,tag: ${VERSION} # FLYTE_TAG," ./charts/flyte-binary/values.yaml
+sed -i "s,repository:[^P]*# FLYTECOPILOT_IMAGE,repository: cr.flyte.org/flyteorg/flytecopilot-release # FLYTECOPILOT_IMAGE," ./charts/flyte-binary/values.yaml
+sed -i "s,tag:[^P]*# FLYTECOPILOT_TAG,tag: ${VERSION} # FLYTECOPILOT_TAG," ./charts/flyte-binary/values.yaml

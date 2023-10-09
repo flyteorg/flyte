@@ -1,0 +1,14 @@
+plugins:
+  sagemaker:
+    roleArn: "config_role"
+    region: "us-west-2"
+    roleAnnotationKey: "blah"
+    prebuiltAlgorithms:
+      - name: "XGBOOST"
+        regionalConfigs:
+          - region: "us-west-2"
+            versionConfigs:
+              - version: "0.90"
+                image: "image-0.90"
+              - version: "1.0"
+                image: "image-1.0"

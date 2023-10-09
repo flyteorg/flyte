@@ -53,6 +53,13 @@ build-gpu: flyte manifests-gpu
                 --tag flyte-sandbox-gpu:latest -f Dockerfile.gpu .
 
 
+# Port map
+# 6443 - k8s API server
+# 30000 - Docker Registry
+# 30001 - DB
+# 30002 - Minio
+# 30003 - Buildkit
+# 30080 - Flyte Proxy
 .PHONY: start
 start: FLYTE_SANDBOX_IMAGE := flyte-sandbox:latest
 start: FLYTE_DEV := False
@@ -71,9 +78,10 @@ start:
 			--publish "30000:30000" \
 			--publish "30001:30001" \
 			--publish "30002:30002" \
+			--publish "30003:30003" \
 			--publish "30080:30080" \
 			$(FLYTE_SANDBOX_IMAGE)
-		export KUBECONFIG=.kube/kubeconfig
+		export KUBECONFIG=$(PWD)/.kube/kubeconfig
 .PHONY: kubeconfig
 .SILENT: kubeconfig
 kubeconfig:
