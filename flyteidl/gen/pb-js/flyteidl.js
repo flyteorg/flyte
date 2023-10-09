@@ -16720,6 +16720,7 @@
                  * @property {boolean|null} [isDynamic] NodeExecutionEvent isDynamic
                  * @property {string|null} [deckUri] NodeExecutionEvent deckUri
                  * @property {google.protobuf.ITimestamp|null} [reportedAt] NodeExecutionEvent reportedAt
+                 * @property {boolean|null} [isArray] NodeExecutionEvent isArray
                  */
     
                 /**
@@ -16905,6 +16906,14 @@
                  */
                 NodeExecutionEvent.prototype.reportedAt = null;
     
+                /**
+                 * NodeExecutionEvent isArray.
+                 * @member {boolean} isArray
+                 * @memberof flyteidl.event.NodeExecutionEvent
+                 * @instance
+                 */
+                NodeExecutionEvent.prototype.isArray = false;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -17007,6 +17016,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 20, wireType 2 =*/162).fork()).ldelim();
                     if (message.reportedAt != null && message.hasOwnProperty("reportedAt"))
                         $root.google.protobuf.Timestamp.encode(message.reportedAt, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
+                    if (message.isArray != null && message.hasOwnProperty("isArray"))
+                        writer.uint32(/* id 22, wireType 0 =*/176).bool(message.isArray);
                     return writer;
                 };
     
@@ -17090,6 +17101,9 @@
                             break;
                         case 21:
                             message.reportedAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 22:
+                            message.isArray = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17235,6 +17249,9 @@
                         if (error)
                             return "reportedAt." + error;
                     }
+                    if (message.isArray != null && message.hasOwnProperty("isArray"))
+                        if (typeof message.isArray !== "boolean")
+                            return "isArray: boolean expected";
                     return null;
                 };
     
@@ -34424,6 +34441,7 @@
                  * @property {boolean|null} [isParentNode] NodeExecutionMetaData isParentNode
                  * @property {string|null} [specNodeId] NodeExecutionMetaData specNodeId
                  * @property {boolean|null} [isDynamic] NodeExecutionMetaData isDynamic
+                 * @property {boolean|null} [isArray] NodeExecutionMetaData isArray
                  */
     
                 /**
@@ -34474,6 +34492,14 @@
                 NodeExecutionMetaData.prototype.isDynamic = false;
     
                 /**
+                 * NodeExecutionMetaData isArray.
+                 * @member {boolean} isArray
+                 * @memberof flyteidl.admin.NodeExecutionMetaData
+                 * @instance
+                 */
+                NodeExecutionMetaData.prototype.isArray = false;
+    
+                /**
                  * Creates a new NodeExecutionMetaData instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.NodeExecutionMetaData
@@ -34505,6 +34531,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.specNodeId);
                     if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
                         writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isDynamic);
+                    if (message.isArray != null && message.hasOwnProperty("isArray"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).bool(message.isArray);
                     return writer;
                 };
     
@@ -34538,6 +34566,9 @@
                         case 4:
                             message.isDynamic = reader.bool();
                             break;
+                        case 5:
+                            message.isArray = reader.bool();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -34569,6 +34600,9 @@
                     if (message.isDynamic != null && message.hasOwnProperty("isDynamic"))
                         if (typeof message.isDynamic !== "boolean")
                             return "isDynamic: boolean expected";
+                    if (message.isArray != null && message.hasOwnProperty("isArray"))
+                        if (typeof message.isArray !== "boolean")
+                            return "isArray: boolean expected";
                     return null;
                 };
     

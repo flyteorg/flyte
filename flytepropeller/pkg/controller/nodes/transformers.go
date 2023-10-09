@@ -178,6 +178,9 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 	}
 	if node.GetKind() == v1alpha1.NodeKindWorkflow && node.GetWorkflowNode() != nil && node.GetWorkflowNode().GetSubWorkflowRef() != nil {
 		nev.IsParent = true
+	} else if node.GetKind() == v1alpha1.NodeKindArray {
+		nev.IsParent = true
+		nev.IsArray = true
 	} else if dynamicNodePhase != v1alpha1.DynamicNodePhaseNone {
 		nev.IsDynamic = true
 		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().DynamicWorkflow != nil {

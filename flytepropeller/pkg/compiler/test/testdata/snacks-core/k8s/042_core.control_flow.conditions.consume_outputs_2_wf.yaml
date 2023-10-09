@@ -100,8 +100,6 @@ spec:
       kind: task
       name: coin_toss
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.coin_toss" '
     n1:
       branch:
@@ -125,8 +123,6 @@ spec:
       kind: branch
       name: double_or_square
       resources: {}
-      retry:
-        minAttempts: 1
     n1-n0:
       id: n1-n0
       inputBindings:
@@ -138,8 +134,6 @@ spec:
       kind: task
       name: square
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.square" '
     n1-n1:
       id: n1-n1
@@ -157,8 +151,6 @@ spec:
       kind: task
       name: calc_sum
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.calc_sum" '
     n2:
       id: n2
@@ -171,8 +163,6 @@ spec:
       kind: task
       name: double
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.double" '
     start-node:
       id: start-node

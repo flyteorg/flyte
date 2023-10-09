@@ -83,16 +83,12 @@ spec:
       kind: task
       name: say_hello
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.named_outputs.say_hello" '
     n1:
       id: n1
       kind: task
       name: say_hello
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.named_outputs.say_hello" '
     start-node:
       id: start-node

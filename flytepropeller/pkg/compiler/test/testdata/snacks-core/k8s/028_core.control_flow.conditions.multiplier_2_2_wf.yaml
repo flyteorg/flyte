@@ -128,8 +128,6 @@ spec:
       kind: branch
       name: fractions
       resources: {}
-      retry:
-        minAttempts: 1
     n0-n0:
       id: n0-n0
       inputBindings:
@@ -141,8 +139,6 @@ spec:
       kind: task
       name: double
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.double" '
     n0-n1:
       id: n0-n1
@@ -155,8 +151,6 @@ spec:
       kind: task
       name: square
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.square" '
     start-node:
       id: start-node
