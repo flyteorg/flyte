@@ -161,16 +161,14 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		SecurityContenxt: podSpec.SecurityContext.DeepCopy(),
 		DNSConfig:        podSpec.DNSConfig.DeepCopy(),
 		Tolerations:      podSpec.Tolerations,
-		SchedulerName:    &config.GetK8sPluginConfig().SchedulerName,
+		SchedulerName:    &podSpec.SchedulerName,
 		NodeSelector:     podSpec.NodeSelector,
-		HostNetwork:      config.GetK8sPluginConfig().EnableHostNetworkingPod,
+		HostNetwork:      &podSpec.HostNetwork,
 	}
 	return &spec, nil
 }
 
 type driverSpec struct {
-	podSpec   *v1.PodSpec
-	container *v1.Container
 	sparkSpec *sparkOp.DriverSpec
 }
 
@@ -191,8 +189,6 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	}
 	serviceAccountName := serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata())
 	spec := driverSpec{
-		podSpec,
-		primaryContainer,
 		&sparkOp.DriverSpec{
 			SparkPodSpec:   *sparkPodSpec,
 			ServiceAccount: &serviceAccountName,
@@ -206,7 +202,6 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 }
 
 type executorSpec struct {
-	podSpec            *v1.PodSpec
 	container          *v1.Container
 	sparkSpec          *sparkOp.ExecutorSpec
 	serviceAccountName string
@@ -227,7 +222,6 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	}
 	serviceAccountName := serviceAccountName(taskCtx.TaskExecutionMetadata())
 	spec := executorSpec{
-		podSpec,
 		primaryContainer,
 		&sparkOp.ExecutorSpec{
 			SparkPodSpec: *sparkPodSpec,
