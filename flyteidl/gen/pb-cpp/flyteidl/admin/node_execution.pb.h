@@ -856,6 +856,12 @@ class NodeExecutionMetaData final :
   bool is_dynamic() const;
   void set_is_dynamic(bool value);
 
+  // bool is_array = 5;
+  void clear_is_array();
+  static const int kIsArrayFieldNumber = 5;
+  bool is_array() const;
+  void set_is_array(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NodeExecutionMetaData)
  private:
   class HasBitSetters;
@@ -865,6 +871,7 @@ class NodeExecutionMetaData final :
   ::google::protobuf::internal::ArenaStringPtr spec_node_id_;
   bool is_parent_node_;
   bool is_dynamic_;
+  bool is_array_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fnode_5fexecution_2eproto;
 };
@@ -2826,6 +2833,20 @@ inline void NodeExecutionMetaData::set_is_dynamic(bool value) {
   
   is_dynamic_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionMetaData.is_dynamic)
+}
+
+// bool is_array = 5;
+inline void NodeExecutionMetaData::clear_is_array() {
+  is_array_ = false;
+}
+inline bool NodeExecutionMetaData::is_array() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionMetaData.is_array)
+  return is_array_;
+}
+inline void NodeExecutionMetaData::set_is_array(bool value) {
+  
+  is_array_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionMetaData.is_array)
 }
 
 // -------------------------------------------------------------------

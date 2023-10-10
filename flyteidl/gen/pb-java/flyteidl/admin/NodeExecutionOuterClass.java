@@ -5116,6 +5116,16 @@ public final class NodeExecutionOuterClass {
      * <code>bool is_dynamic = 4;</code>
      */
     boolean getIsDynamic();
+
+    /**
+     * <pre>
+     * Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+     * array nodes from other nodes which can have is_parent_node as true.
+     * </pre>
+     *
+     * <code>bool is_array = 5;</code>
+     */
+    boolean getIsArray();
   }
   /**
    * <pre>
@@ -5182,6 +5192,11 @@ public final class NodeExecutionOuterClass {
             case 32: {
 
               isDynamic_ = input.readBool();
+              break;
+            }
+            case 40: {
+
+              isArray_ = input.readBool();
               break;
             }
             default: {
@@ -5333,6 +5348,20 @@ public final class NodeExecutionOuterClass {
       return isDynamic_;
     }
 
+    public static final int IS_ARRAY_FIELD_NUMBER = 5;
+    private boolean isArray_;
+    /**
+     * <pre>
+     * Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+     * array nodes from other nodes which can have is_parent_node as true.
+     * </pre>
+     *
+     * <code>bool is_array = 5;</code>
+     */
+    public boolean getIsArray() {
+      return isArray_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5359,6 +5388,9 @@ public final class NodeExecutionOuterClass {
       if (isDynamic_ != false) {
         output.writeBool(4, isDynamic_);
       }
+      if (isArray_ != false) {
+        output.writeBool(5, isArray_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5381,6 +5413,10 @@ public final class NodeExecutionOuterClass {
       if (isDynamic_ != false) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(4, isDynamic_);
+      }
+      if (isArray_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, isArray_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5405,6 +5441,8 @@ public final class NodeExecutionOuterClass {
           .equals(other.getSpecNodeId())) return false;
       if (getIsDynamic()
           != other.getIsDynamic()) return false;
+      if (getIsArray()
+          != other.getIsArray()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5426,6 +5464,9 @@ public final class NodeExecutionOuterClass {
       hash = (37 * hash) + IS_DYNAMIC_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getIsDynamic());
+      hash = (37 * hash) + IS_ARRAY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getIsArray());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5571,6 +5612,8 @@ public final class NodeExecutionOuterClass {
 
         isDynamic_ = false;
 
+        isArray_ = false;
+
         return this;
       }
 
@@ -5601,6 +5644,7 @@ public final class NodeExecutionOuterClass {
         result.isParentNode_ = isParentNode_;
         result.specNodeId_ = specNodeId_;
         result.isDynamic_ = isDynamic_;
+        result.isArray_ = isArray_;
         onBuilt();
         return result;
       }
@@ -5662,6 +5706,9 @@ public final class NodeExecutionOuterClass {
         }
         if (other.getIsDynamic() != false) {
           setIsDynamic(other.getIsDynamic());
+        }
+        if (other.getIsArray() != false) {
+          setIsArray(other.getIsArray());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -5961,6 +6008,47 @@ public final class NodeExecutionOuterClass {
       public Builder clearIsDynamic() {
         
         isDynamic_ = false;
+        onChanged();
+        return this;
+      }
+
+      private boolean isArray_ ;
+      /**
+       * <pre>
+       * Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+       * array nodes from other nodes which can have is_parent_node as true.
+       * </pre>
+       *
+       * <code>bool is_array = 5;</code>
+       */
+      public boolean getIsArray() {
+        return isArray_;
+      }
+      /**
+       * <pre>
+       * Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+       * array nodes from other nodes which can have is_parent_node as true.
+       * </pre>
+       *
+       * <code>bool is_array = 5;</code>
+       */
+      public Builder setIsArray(boolean value) {
+        
+        isArray_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+       * array nodes from other nodes which can have is_parent_node as true.
+       * </pre>
+       *
+       * <code>bool is_array = 5;</code>
+       */
+      public Builder clearIsArray() {
+        
+        isArray_ = false;
         onChanged();
         return this;
       }
@@ -15715,50 +15803,51 @@ public final class NodeExecutionOuterClass {
       "ionIdentifier\022\021\n\tinput_uri\030\002 \001(\t\0225\n\007clos" +
       "ure\030\003 \001(\0132$.flyteidl.admin.NodeExecution" +
       "Closure\0227\n\010metadata\030\004 \001(\0132%.flyteidl.adm" +
-      "in.NodeExecutionMetaData\"n\n\025NodeExecutio" +
-      "nMetaData\022\023\n\013retry_group\030\001 \001(\t\022\026\n\016is_par" +
-      "ent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\022\022\n\n" +
-      "is_dynamic\030\004 \001(\010\"Z\n\021NodeExecutionList\0226\n" +
-      "\017node_executions\030\001 \003(\0132\035.flyteidl.admin." +
-      "NodeExecution\022\r\n\005token\030\002 \001(\t\"\342\004\n\024NodeExe" +
-      "cutionClosure\022\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022" +
-      ".\n\005error\030\002 \001(\0132\035.flyteidl.core.Execution" +
-      "ErrorH\000\0224\n\013output_data\030\n \001(\0132\031.flyteidl." +
-      "core.LiteralMapB\002\030\001H\000\0221\n\005phase\030\003 \001(\0162\".f" +
-      "lyteidl.core.NodeExecution.Phase\022.\n\nstar" +
-      "ted_at\030\004 \001(\0132\032.google.protobuf.Timestamp" +
-      "\022+\n\010duration\030\005 \001(\0132\031.google.protobuf.Dur" +
-      "ation\022.\n\ncreated_at\030\006 \001(\0132\032.google.proto" +
-      "buf.Timestamp\022.\n\nupdated_at\030\007 \001(\0132\032.goog" +
-      "le.protobuf.Timestamp\022F\n\026workflow_node_m" +
-      "etadata\030\010 \001(\0132$.flyteidl.admin.WorkflowN" +
-      "odeMetadataH\001\022>\n\022task_node_metadata\030\t \001(" +
-      "\0132 .flyteidl.admin.TaskNodeMetadataH\001\022\020\n" +
-      "\010deck_uri\030\013 \001(\t\022\034\n\024dynamic_job_spec_uri\030" +
-      "\014 \001(\tB\017\n\routput_resultB\021\n\017target_metadat" +
-      "a\"W\n\024WorkflowNodeMetadata\022?\n\013executionId" +
-      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
-      "Identifier\"\230\001\n\020TaskNodeMetadata\0227\n\014cache" +
-      "_status\030\001 \001(\0162!.flyteidl.core.CatalogCac" +
-      "heStatus\0223\n\013catalog_key\030\002 \001(\0132\036.flyteidl" +
-      ".core.CatalogMetadata\022\026\n\016checkpoint_uri\030" +
-      "\004 \001(\t\"\245\001\n\033DynamicWorkflowNodeMetadata\022%\n" +
-      "\002id\030\001 \001(\0132\031.flyteidl.core.Identifier\022A\n\021" +
-      "compiled_workflow\030\002 \001(\0132&.flyteidl.core." +
-      "CompiledWorkflowClosure\022\034\n\024dynamic_job_s" +
-      "pec_uri\030\003 \001(\t\"Q\n\033NodeExecutionGetDataReq" +
-      "uest\0222\n\002id\030\001 \001(\0132&.flyteidl.core.NodeExe" +
-      "cutionIdentifier\"\320\002\n\034NodeExecutionGetDat" +
-      "aResponse\022+\n\006inputs\030\001 \001(\0132\027.flyteidl.adm" +
-      "in.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flytei" +
-      "dl.admin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(" +
-      "\0132\031.flyteidl.core.LiteralMap\022/\n\014full_out" +
-      "puts\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022E\n" +
-      "\020dynamic_workflow\030\020 \001(\0132+.flyteidl.admin" +
-      ".DynamicWorkflowNodeMetadata\022-\n\nflyte_ur" +
-      "ls\030\021 \001(\0132\031.flyteidl.admin.FlyteURLsB=Z;g" +
-      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
-      "-go/flyteidl/adminb\006proto3"
+      "in.NodeExecutionMetaData\"\200\001\n\025NodeExecuti" +
+      "onMetaData\022\023\n\013retry_group\030\001 \001(\t\022\026\n\016is_pa" +
+      "rent_node\030\002 \001(\010\022\024\n\014spec_node_id\030\003 \001(\t\022\022\n" +
+      "\nis_dynamic\030\004 \001(\010\022\020\n\010is_array\030\005 \001(\010\"Z\n\021N" +
+      "odeExecutionList\0226\n\017node_executions\030\001 \003(" +
+      "\0132\035.flyteidl.admin.NodeExecution\022\r\n\005toke" +
+      "n\030\002 \001(\t\"\342\004\n\024NodeExecutionClosure\022\030\n\noutp" +
+      "ut_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.flyt" +
+      "eidl.core.ExecutionErrorH\000\0224\n\013output_dat" +
+      "a\030\n \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000" +
+      "\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.NodeExec" +
+      "ution.Phase\022.\n\nstarted_at\030\004 \001(\0132\032.google" +
+      ".protobuf.Timestamp\022+\n\010duration\030\005 \001(\0132\031." +
+      "google.protobuf.Duration\022.\n\ncreated_at\030\006" +
+      " \001(\0132\032.google.protobuf.Timestamp\022.\n\nupda" +
+      "ted_at\030\007 \001(\0132\032.google.protobuf.Timestamp" +
+      "\022F\n\026workflow_node_metadata\030\010 \001(\0132$.flyte" +
+      "idl.admin.WorkflowNodeMetadataH\001\022>\n\022task" +
+      "_node_metadata\030\t \001(\0132 .flyteidl.admin.Ta" +
+      "skNodeMetadataH\001\022\020\n\010deck_uri\030\013 \001(\t\022\034\n\024dy" +
+      "namic_job_spec_uri\030\014 \001(\tB\017\n\routput_resul" +
+      "tB\021\n\017target_metadata\"W\n\024WorkflowNodeMeta" +
+      "data\022?\n\013executionId\030\001 \001(\0132*.flyteidl.cor" +
+      "e.WorkflowExecutionIdentifier\"\230\001\n\020TaskNo" +
+      "deMetadata\0227\n\014cache_status\030\001 \001(\0162!.flyte" +
+      "idl.core.CatalogCacheStatus\0223\n\013catalog_k" +
+      "ey\030\002 \001(\0132\036.flyteidl.core.CatalogMetadata" +
+      "\022\026\n\016checkpoint_uri\030\004 \001(\t\"\245\001\n\033DynamicWork" +
+      "flowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.flyteidl." +
+      "core.Identifier\022A\n\021compiled_workflow\030\002 \001" +
+      "(\0132&.flyteidl.core.CompiledWorkflowClosu" +
+      "re\022\034\n\024dynamic_job_spec_uri\030\003 \001(\t\"Q\n\033Node" +
+      "ExecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.fl" +
+      "yteidl.core.NodeExecutionIdentifier\"\320\002\n\034" +
+      "NodeExecutionGetDataResponse\022+\n\006inputs\030\001" +
+      " \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007out" +
+      "puts\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022" +
+      ".\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Lit" +
+      "eralMap\022/\n\014full_outputs\030\004 \001(\0132\031.flyteidl" +
+      ".core.LiteralMap\022E\n\020dynamic_workflow\030\020 \001" +
+      "(\0132+.flyteidl.admin.DynamicWorkflowNodeM" +
+      "etadata\022-\n\nflyte_urls\030\021 \001(\0132\031.flyteidl.a" +
+      "dmin.FlyteURLsB=Z;github.com/flyteorg/fl" +
+      "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -15809,7 +15898,7 @@ public final class NodeExecutionOuterClass {
     internal_static_flyteidl_admin_NodeExecutionMetaData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionMetaData_descriptor,
-        new java.lang.String[] { "RetryGroup", "IsParentNode", "SpecNodeId", "IsDynamic", });
+        new java.lang.String[] { "RetryGroup", "IsParentNode", "SpecNodeId", "IsDynamic", "IsArray", });
     internal_static_flyteidl_admin_NodeExecutionList_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_NodeExecutionList_fieldAccessorTable = new
