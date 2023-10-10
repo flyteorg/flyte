@@ -145,7 +145,7 @@ func (k *kResolver) resolve(e *v1.Endpoints) {
 	}
 	logger.Infof(k.ctx, "k8s resolver: resolved %d addresses", len(newAddrs))
 	logger.Infof(k.ctx, "k8s resolver: resolved addresses: %v", newAddrs)
-	err := k.cc.UpdateState(resolver.State{Addresses: newAddrs, ServiceConfig: k.cc.ParseServiceConfig("{\"loadBalancingConfig\": [{\"round_robin\":{}}]}")})
+	err := k.cc.UpdateState(resolver.State{Addresses: newAddrs})
 	if err != nil {
 		grpclog.Errorf("k8s resolver: failed  : %v", err)
 	}
