@@ -170,10 +170,10 @@ func TestValidExecutionIdInvalidLength(t *testing.T) {
 func TestValidExecutionIdInvalidChars(t *testing.T) {
 	err := CheckValidExecutionID("a_sdd", "a")
 	assert.NotNil(t, err)
-	assert.EqualError(t, err, "invalid a format: a_sdd")
+	assert.EqualError(t, err, "invalid a format: a_sdd, does not match regex '^[a-zA-Z0-9_]+$'")
 	err = CheckValidExecutionID("asd@", "a")
 	assert.NotNil(t, err)
-	assert.EqualError(t, err, "invalid a format: asd@")
+	assert.EqualError(t, err, "invalid a format: asd@, does not match regex '^[a-zA-Z0-9_]+$'")
 }
 
 func TestValidateCreateWorkflowEventRequest(t *testing.T) {
