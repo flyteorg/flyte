@@ -104,7 +104,7 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (la
 		return nil, err
 	}
 	// TODO: Check if state is not succeeded, then return error
-	resource := &ResourceWrapper{
+	resource := ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
 	}
@@ -121,7 +121,7 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (la
 		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
 	}
 
-	return &ResourceWrapper{
+	return ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
 	}, taskCtx.OutputWriter().Put(ctx, opReader)
