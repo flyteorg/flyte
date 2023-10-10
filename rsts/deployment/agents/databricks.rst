@@ -133,8 +133,12 @@ Specify agent configuration
 
         Enable the Databricks agent on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
 
+        .. code-block:: bash
+
+          kubectl edit configmap flyte-sandbox-config -n flyte
+
         .. code-block:: yaml
-          :emphasize-lines: 7,12
+          :emphasize-lines: 7,12,16
 
           tasks:
             task-plugins:
@@ -149,6 +153,9 @@ Specify agent configuration
                 - k8s-array
                 - agent-service
           plugins:
+            agent-service:
+              supportedTaskTypes:
+              - spark
             databricks:
               entrypointFile: dbfs:///FileStore/tables/entrypoint.py
               databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
@@ -191,7 +198,7 @@ Specify agent configuration
         Edit the relevant YAML file to specify the plugin.
 
         .. code-block:: yaml
-          :emphasize-lines: 7,11
+          :emphasize-lines: 7,11,15
 
           tasks:
             task-plugins:
@@ -204,6 +211,10 @@ Specify agent configuration
                 - container: container
                 - container_array: k8s-array
                 - spark: agent-service
+            plugins:
+              agent-service:
+                supportedTaskTypes:
+                - spark
         
         .. code-block:: yaml
           :emphasize-lines: 3-5
@@ -223,7 +234,6 @@ Specify agent configuration
     .. code-block:: yaml
       :emphasize-lines: 9,14,15-21
 
-      configmap:
         enabled_plugins:
           tasks:
             task-plugins:
@@ -237,6 +247,10 @@ Specify agent configuration
                 sidecar: sidecar
                 container_array: k8s-array
                 spark: agent-service
+          plugins:
+            agent-service:
+              supportedTaskTypes:
+              - spark
       databricks:
         enabled: True
         plugin_config:
