@@ -13,7 +13,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/util/clock"
+	"k8s.io/utils/clock"
 )
 
 var (

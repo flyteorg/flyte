@@ -56,7 +56,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/util/clock"
+	"k8s.io/utils/clock"
 
 	k8sInformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"

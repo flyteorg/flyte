@@ -2,13 +2,14 @@ package cmd
 
 import (
 	"context"
-
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -100,19 +101,29 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	}
 
 	webhookScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("webhook")
-	limitNamespace := ""
+	var namespaceConfigs map[string]cache.Config
 	if propellerCfg.LimitNamespace != defaultNamespace {
-		limitNamespace = propellerCfg.LimitNamespace
+		namespaceConfigs = map[string]cache.Config{
+			propellerCfg.LimitNamespace: {},
+		}
 	}
+
 	options := manager.Options{
-		Namespace:  limitNamespace,
-		SyncPeriod: &propellerCfg.DownstreamEval.Duration,
-		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(webhookScope).Build(cache, config, options)
+		Cache: cache.Options{
+			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
+			DefaultNamespaces: namespaceConfigs,
 		},
-		CertDir:            cfg.CertDir,
-		Port:               cfg.ListenPort,
-		MetricsBindAddress: "0",
+		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
+			return executors.NewFallbackClientBuilder(webhookScope).Build(nil, config, options)
+		},
+		Metrics: metricsserver.Options{
+			// Disable metrics serving
+			BindAddress: "0",
+		},
+		WebhookServer: ctrlWebhook.NewServer(ctrlWebhook.Options{
+			CertDir: cfg.CertDir,
+			Port:    cfg.ListenPort,
+		}),
 	}
 
 	mgr, err := controller.CreateControllerManager(ctx, propellerCfg, options)

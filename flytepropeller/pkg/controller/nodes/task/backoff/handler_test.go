@@ -18,7 +18,7 @@ import (
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/util/clock"
+	"k8s.io/utils/clock"
 )
 
 func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
@@ -38,7 +38,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 	}
 
 	ctx := context.TODO()
-	tc := clock.NewFakeClock(time.Now())
+	tc := testing.NewFakeClock(time.Now())
 	type fields struct {
 		SimpleBackOffBlocker    *SimpleBackOffBlocker
 		ComputeResourceCeilings *ComputeResourceCeilings
@@ -475,7 +475,7 @@ func TestIsResourceQuotaExceeded(t *testing.T) {
 }
 
 func TestSimpleBackOffBlocker_backOff(t *testing.T) {
-	tc := clock.NewFakeClock(time.Now())
+	tc := testing.NewFakeClock(time.Now())
 	maxBackOffDuration := 10 * time.Minute
 	type fields struct {
 		Clock              clock.Clock

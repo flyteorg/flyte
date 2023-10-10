@@ -4,6 +4,7 @@ package k8s
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
@@ -75,21 +76,8 @@ func (f *fallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilde
 	return f
 }
 
-func (f fallbackClientBuilder) Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
-	c, err := client.New(config, options)
-	if err != nil {
-		return nil, err
-	}
-
-	return client.NewDelegatingClient(client.NewDelegatingClientInput{
-		Client: c,
-		CacheReader: fallbackClientReader{
-			orderedClients: []client.Reader{cache, c},
-		},
-		UncachedObjects: f.uncached,
-		// TODO figure out if this should be true?
-		// CacheUnstructured: true,
-	})
+func (f *fallbackClientBuilder) Build(_ cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
+	return client.New(config, options)
 }
 
 // Creates a new k8s client that uses the cached client for reads and falls back to making API
@@ -109,7 +97,7 @@ type Options struct {
 func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error) {
 	if options.MapperProvider == nil {
 		options.MapperProvider = func(c *rest.Config) (meta.RESTMapper, error) {
-			return apiutil.NewDynamicRESTMapper(config)
+			return apiutil.NewDynamicRESTMapper(config, http.DefaultClient)
 		}
 	}
 	mapper, err := options.MapperProvider(config)

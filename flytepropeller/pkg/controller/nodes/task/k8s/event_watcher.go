@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"k8s.io/client-go/tools/cache"
 	"sort"
 	"sync"
 	"time"
@@ -28,6 +29,7 @@ type EventWatcher interface {
 // Note that cardinality of per object events is relatively low (10s), while they may occur repeatedly. For example
 // the ImagePullBackOff event may continue to fire, but this is only backed by a single event.
 type eventWatcher struct {
+	cache.ResourceEventHandler
 	informer    informerEventsv1.EventInformer
 	objectCache sync.Map
 }
@@ -46,7 +48,7 @@ type EventInfo struct {
 	RecordedAt time.Time
 }
 
-func (e *eventWatcher) OnAdd(obj interface{}) {
+func (e *eventWatcher) OnAdd(obj interface{}, isInInitialList bool) {
 	event := obj.(*eventsv1.Event)
 	objectNsName := types.NamespacedName{Namespace: event.Regarding.Namespace, Name: event.Regarding.Name}
 	eventNsName := types.NamespacedName{Namespace: event.Namespace, Name: event.Name}

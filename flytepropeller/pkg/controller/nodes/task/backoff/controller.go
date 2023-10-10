@@ -11,7 +11,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"k8s.io/apimachinery/pkg/util/clock"
+	"k8s.io/utils/clock"
 )
 
 // Controller is a name-spaced collection of back-off handlers

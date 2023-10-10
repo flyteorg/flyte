@@ -70,26 +70,12 @@ func (f *FallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilde
 	return f
 }
 
-func (f FallbackClientBuilder) Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
-	c, err := client.New(config, options)
-	if err != nil {
-		return nil, err
+func (f *FallbackClientBuilder) Build(_ cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
+	if len(f.uncached) > 0 {
+		options.Cache.DisableFor = f.uncached
 	}
 
-	c, err = newWriteThroughCachingWriter(c, 50000, f.scope)
-	if err != nil {
-		return nil, err
-	}
-
-	return client.NewDelegatingClient(client.NewDelegatingClientInput{
-		Client: c,
-		CacheReader: fallbackClientReader{
-			orderedClients: []client.Reader{cache, c},
-		},
-		UncachedObjects: f.uncached,
-		// TODO figure out if this should be true?
-		// CacheUnstructured: true,
-	})
+	return client.New(config, options)
 }
 
 // NewFallbackClientBuilder Creates a new k8s client that uses the cached client for reads and falls back to making API
