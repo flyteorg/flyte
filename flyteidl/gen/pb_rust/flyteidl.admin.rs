@@ -1991,6 +1991,10 @@ pub struct NodeExecutionMetaData {
     /// This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
     #[prost(bool, tag="4")]
     pub is_dynamic: bool,
+    /// Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+    /// array nodes from other nodes which can have is_parent_node as true.
+    #[prost(bool, tag="5")]
+    pub is_array: bool,
 }
 /// Request structure to retrieve a list of node execution entities.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details

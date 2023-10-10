@@ -587,9 +587,9 @@ public final class ClusterAssignmentOuterClass {
     java.lang.String[] descriptorData = {
       "\n\'flyteidl/admin/cluster_assignment.prot" +
       "o\022\016flyteidl.admin\":\n\021ClusterAssignment\022\031" +
-      "\n\021cluster_pool_name\030\003 \001(\tJ\004\010\001\020\002J\004\010\002\020\003B7Z" +
-      "5github.com/flyteorg/flyteidl/gen/pb-go/" +
-      "flyteidl/adminb\006proto3"
+      "\n\021cluster_pool_name\030\003 \001(\tJ\004\010\001\020\002J\004\010\002\020\003B=Z" +
+      ";github.com/flyteorg/flyte/flyteidl/gen/" +
+      "pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

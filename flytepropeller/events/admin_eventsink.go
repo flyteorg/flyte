@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/time/rate"
 )

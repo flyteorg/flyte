@@ -34,23 +34,26 @@ class AdminNodeExecutionMetaData(object):
         'retry_group': 'str',
         'is_parent_node': 'bool',
         'spec_node_id': 'str',
-        'is_dynamic': 'bool'
+        'is_dynamic': 'bool',
+        'is_array': 'bool'
     }
 
     attribute_map = {
         'retry_group': 'retry_group',
         'is_parent_node': 'is_parent_node',
         'spec_node_id': 'spec_node_id',
-        'is_dynamic': 'is_dynamic'
+        'is_dynamic': 'is_dynamic',
+        'is_array': 'is_array'
     }
 
-    def __init__(self, retry_group=None, is_parent_node=None, spec_node_id=None, is_dynamic=None):  # noqa: E501
+    def __init__(self, retry_group=None, is_parent_node=None, spec_node_id=None, is_dynamic=None, is_array=None):  # noqa: E501
         """AdminNodeExecutionMetaData - a model defined in Swagger"""  # noqa: E501
 
         self._retry_group = None
         self._is_parent_node = None
         self._spec_node_id = None
         self._is_dynamic = None
+        self._is_array = None
         self.discriminator = None
 
         if retry_group is not None:
@@ -61,6 +64,8 @@ class AdminNodeExecutionMetaData(object):
             self.spec_node_id = spec_node_id
         if is_dynamic is not None:
             self.is_dynamic = is_dynamic
+        if is_array is not None:
+            self.is_array = is_array
 
     @property
     def retry_group(self):
@@ -151,6 +156,29 @@ class AdminNodeExecutionMetaData(object):
         """
 
         self._is_dynamic = is_dynamic
+
+    @property
+    def is_array(self):
+        """Gets the is_array of this AdminNodeExecutionMetaData.  # noqa: E501
+
+        Boolean flag indicating if the node is an array node. This is intended to uniquely identify array nodes from other nodes which can have is_parent_node as true.  # noqa: E501
+
+        :return: The is_array of this AdminNodeExecutionMetaData.  # noqa: E501
+        :rtype: bool
+        """
+        return self._is_array
+
+    @is_array.setter
+    def is_array(self, is_array):
+        """Sets the is_array of this AdminNodeExecutionMetaData.
+
+        Boolean flag indicating if the node is an array node. This is intended to uniquely identify array nodes from other nodes which can have is_parent_node as true.  # noqa: E501
+
+        :param is_array: The is_array of this AdminNodeExecutionMetaData.  # noqa: E501
+        :type: bool
+        """
+
+        self._is_array = is_array
 
     def to_dict(self):
         """Returns the model properties as a dict"""

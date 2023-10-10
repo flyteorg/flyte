@@ -36,8 +36,8 @@ public final class Signal {
       "on_id.name}\022l\n\tSetSignal\022 .flyteidl.admi" +
       "n.SignalSetRequest\032!.flyteidl.admin.Sign" +
       "alSetResponse\"\032\202\323\344\223\002\024\"\017/api/v1/signals:\001" +
-      "*B9Z7github.com/flyteorg/flyteidl/gen/pb" +
-      "-go/flyteidl/serviceb\006proto3"
+      "*B?Z=github.com/flyteorg/flyte/flyteidl/" +
+      "gen/pb-go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

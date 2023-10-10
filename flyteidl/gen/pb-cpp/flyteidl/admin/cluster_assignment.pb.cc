@@ -71,14 +71,14 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_flyteidl_2fadmin_2fcluster_5fassignment_2eproto[] =
   "\n\'flyteidl/admin/cluster_assignment.prot"
   "o\022\016flyteidl.admin\":\n\021ClusterAssignment\022\031"
-  "\n\021cluster_pool_name\030\003 \001(\tJ\004\010\001\020\002J\004\010\002\020\003B7Z"
-  "5github.com/flyteorg/flyteidl/gen/pb-go/"
-  "flyteidl/adminb\006proto3"
+  "\n\021cluster_pool_name\030\003 \001(\tJ\004\010\001\020\002J\004\010\002\020\003B=Z"
+  ";github.com/flyteorg/flyte/flyteidl/gen/"
+  "pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fcluster_5fassignment_2eproto,
-  "flyteidl/admin/cluster_assignment.proto", &assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 182,
+  "flyteidl/admin/cluster_assignment.proto", &assign_descriptors_table_flyteidl_2fadmin_2fcluster_5fassignment_2eproto, 188,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fcluster_5fassignment_2eproto() {

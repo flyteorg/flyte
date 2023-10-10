@@ -2832,8 +2832,9 @@ public final class ScheduleOuterClass {
       "2\034.flyteidl.admin.CronScheduleH\000\022\036\n\026kick" +
       "off_time_input_arg\030\003 \001(\tB\024\n\022ScheduleExpr" +
       "ession*.\n\rFixedRateUnit\022\n\n\006MINUTE\020\000\022\010\n\004H" +
-      "OUR\020\001\022\007\n\003DAY\020\002B7Z5github.com/flyteorg/fl" +
-      "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "OUR\020\001\022\007\n\003DAY\020\002B=Z;github.com/flyteorg/fl" +
+      "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

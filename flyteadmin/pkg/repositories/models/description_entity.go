@@ -1,6 +1,6 @@
 package models
 
-import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+import "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 // DescriptionEntityKey DescriptionEntity primary key
 type DescriptionEntityKey struct {

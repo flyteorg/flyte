@@ -15,8 +15,8 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 
 	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 

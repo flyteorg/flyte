@@ -247,14 +247,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fsignal_2eproto[] =
   "ignalSetResponse\"\206\001\n\006Signal\022+\n\002id\030\001 \001(\0132"
   "\037.flyteidl.core.SignalIdentifier\022(\n\004type"
   "\030\002 \001(\0132\032.flyteidl.core.LiteralType\022%\n\005va"
-  "lue\030\003 \001(\0132\026.flyteidl.core.LiteralB7Z5git"
-  "hub.com/flyteorg/flyteidl/gen/pb-go/flyt"
-  "eidl/adminb\006proto3"
+  "lue\030\003 \001(\0132\026.flyteidl.core.LiteralB=Z;git"
+  "hub.com/flyteorg/flyte/flyteidl/gen/pb-g"
+  "o/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fsignal_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fsignal_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fsignal_2eproto,
-  "flyteidl/admin/signal.proto", &assign_descriptors_table_flyteidl_2fadmin_2fsignal_2eproto, 858,
+  "flyteidl/admin/signal.proto", &assign_descriptors_table_flyteidl_2fadmin_2fsignal_2eproto, 864,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fsignal_2eproto() {

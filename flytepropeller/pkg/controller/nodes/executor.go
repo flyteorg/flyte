@@ -21,10 +21,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
@@ -484,7 +484,7 @@ type nodeExecutor struct {
 	defaultExecutionDeadline        time.Duration
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
-	interruptibleFailureThreshold   uint32
+	interruptibleFailureThreshold   int32
 	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
@@ -795,15 +795,20 @@ func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 }
 
 func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
-	if err.Kind == core.ExecutionError_SYSTEM {
-		currentAttempt = nodeStatus.GetSystemFailures()
-		maxAttempts = c.maxNodeRetriesForSystemFailures
-		isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
-		return
-	}
+	if config.GetConfig().NodeConfig.IgnoreRetryCause {
+		currentAttempt = nodeStatus.GetAttempts() + 1
+	} else {
+		if err.Kind == core.ExecutionError_SYSTEM {
+			currentAttempt = nodeStatus.GetSystemFailures()
+			maxAttempts = c.maxNodeRetriesForSystemFailures
+			isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
+			return
+		}
 
-	currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
-	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
+		currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
+	}
+	maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 1 {
 		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
 	}
 	isEligible = currentAttempt < maxAttempts
@@ -1432,7 +1437,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
-		interruptibleFailureThreshold:   uint32(nodeConfig.InterruptibleFailureThreshold),
+		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
 		maxDatasetSizeBytes:             maxDatasetSize,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,

@@ -6842,6 +6842,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent reportedAt */
             reportedAt?: (google.protobuf.ITimestamp|null);
+
+            /** NodeExecutionEvent isArray */
+            isArray?: (boolean|null);
         }
 
         /** Represents a NodeExecutionEvent. */
@@ -6915,6 +6918,9 @@ export namespace flyteidl {
 
             /** NodeExecutionEvent reportedAt. */
             public reportedAt?: (google.protobuf.ITimestamp|null);
+
+            /** NodeExecutionEvent isArray. */
+            public isArray: boolean;
 
             /** NodeExecutionEvent inputValue. */
             public inputValue?: ("inputUri"|"inputData");
@@ -14285,6 +14291,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isDynamic */
             isDynamic?: (boolean|null);
+
+            /** NodeExecutionMetaData isArray */
+            isArray?: (boolean|null);
         }
 
         /** Represents a NodeExecutionMetaData. */
@@ -14307,6 +14316,9 @@ export namespace flyteidl {
 
             /** NodeExecutionMetaData isDynamic. */
             public isDynamic: boolean;
+
+            /** NodeExecutionMetaData isArray. */
+            public isArray: boolean;
 
             /**
              * Creates a new NodeExecutionMetaData instance using the specified properties.

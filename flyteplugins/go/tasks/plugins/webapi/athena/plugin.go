@@ -12,7 +12,7 @@ import (
 	athenaTypes "github.com/aws/aws-sdk-go-v2/service/athena/types"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/aws"
 
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

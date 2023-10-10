@@ -100,14 +100,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fmetrics_2eproto[] =
   "cutionIdentifierH\000\0229\n\007task_id\030\005 \001(\0132&.fl"
   "yteidl.core.TaskExecutionIdentifierH\000\022\026\n"
   "\014operation_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.f"
-  "lyteidl.core.SpanB\004\n\002idB6Z4github.com/fl"
-  "yteorg/flyteidl/gen/pb-go/flyteidl/coreb"
-  "\006proto3"
+  "lyteidl.core.SpanB\004\n\002idB<Z:github.com/fl"
+  "yteorg/flyte/flyteidl/gen/pb-go/flyteidl"
+  "/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fmetrics_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fmetrics_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fmetrics_2eproto,
-  "flyteidl/core/metrics.proto", &assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto, 527,
+  "flyteidl/core/metrics.proto", &assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto, 533,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto() {

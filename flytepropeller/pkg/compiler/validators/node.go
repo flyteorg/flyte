@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"sort"
 
+	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // Computes output parameters after applying all aliases -if any-.

@@ -8217,8 +8217,9 @@ public final class WorkflowOuterClass {
       "ErrorExistsDifferentStructureH\000\022[\n\032exist" +
       "s_identical_structure\030\002 \001(\01325.flyteidl.a" +
       "dmin.WorkflowErrorExistsIdenticalStructu" +
-      "reH\000B\010\n\006reasonB7Z5github.com/flyteorg/fl" +
-      "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "reH\000B\010\n\006reasonB=Z;github.com/flyteorg/fl" +
+      "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

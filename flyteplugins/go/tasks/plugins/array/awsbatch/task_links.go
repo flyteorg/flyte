@@ -10,8 +10,8 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"golang.org/x/net/context"
 )
 

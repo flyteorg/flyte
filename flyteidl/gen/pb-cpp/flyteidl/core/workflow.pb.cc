@@ -673,14 +673,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
   "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013"
   "2\'.flyteidl.core.WorkflowMetadataDefault"
   "s\"@\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001("
-  "\0132\030.flyteidl.core.ResourcesB6Z4github.co"
-  "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c"
-  "oreb\006proto3"
+  "\0132\030.flyteidl.core.ResourcesB<Z:github.co"
+  "m/flyteorg/flyte/flyteidl/gen/pb-go/flyt"
+  "eidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto,
-  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2971,
+  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2977,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {
