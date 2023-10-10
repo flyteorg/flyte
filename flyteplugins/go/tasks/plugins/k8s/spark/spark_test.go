@@ -570,7 +570,6 @@ func TestBuildResourceSpark(t *testing.T) {
 
 	// Validate
 	// * Interruptible Toleration and NodeSelector set for Executor but not Driver.
-	// TODO: confirm expected behavior
 	// * Validate Default NodeSelector set for Driver but overwritten with Interruptible NodeSelector for Executor.
 	// * Default Tolerations set for both Driver and Executor.
 	// * Interruptible/Non-Interruptible NodeSelectorRequirements set for Executor Affinity but not Driver Affinity.
@@ -584,8 +583,11 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, tolDriverDefault.Effect, corev1.TaintEffect("NoSchedule"))
 
 	assert.Equal(t, 2, len(sparkApp.Spec.Executor.Tolerations))
-	assert.Equal(t, 1, len(sparkApp.Spec.Executor.NodeSelector))
-	assert.Equal(t, interruptibleNodeSelector, sparkApp.Spec.Executor.NodeSelector)
+	assert.Equal(t, 2, len(sparkApp.Spec.Executor.NodeSelector))
+	assert.Equal(t, map[string]string{
+		"x/default":       "true",
+		"x/interruptible": "true",
+	}, sparkApp.Spec.Executor.NodeSelector)
 
 	tolExecInterrupt := sparkApp.Spec.Executor.Tolerations[0]
 	assert.Equal(t, tolExecInterrupt.Key, "x/flyte")
@@ -598,8 +600,6 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, tolExecDefault.Value, "default")
 	assert.Equal(t, tolExecDefault.Operator, corev1.TolerationOperator("Equal"))
 	assert.Equal(t, tolExecDefault.Effect, corev1.TaintEffect("NoSchedule"))
-
-	assert.Equal(t, "true", sparkApp.Spec.Executor.NodeSelector["x/interruptible"])
 
 	for confKey, confVal := range dummySparkConf {
 		exists := false
