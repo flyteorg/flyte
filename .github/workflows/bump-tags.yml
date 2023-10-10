@@ -43,6 +43,7 @@ jobs:
               "datacatalog",
               "flyteadmin",
               "flytecopilot",
+              "flyteidl",
               "flyteplugins",
               "flytepropeller",
               "flytestdlib",

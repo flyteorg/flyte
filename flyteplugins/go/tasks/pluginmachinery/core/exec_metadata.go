@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -44,6 +44,6 @@ type TaskExecutionMetadata interface {
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
-	GetInterruptibleFailureThreshold() uint32
+	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
 }

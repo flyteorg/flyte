@@ -596,6 +596,12 @@ class NodeExecutionEvent final :
   bool is_dynamic() const;
   void set_is_dynamic(bool value);
 
+  // bool is_array = 22;
+  void clear_is_array();
+  static const int kIsArrayFieldNumber = 22;
+  bool is_array() const;
+  void set_is_array(bool value);
+
   // string input_uri = 5;
   private:
   bool has_input_uri() const;
@@ -716,6 +722,7 @@ class NodeExecutionEvent final :
   ::google::protobuf::int32 event_version_;
   bool is_parent_;
   bool is_dynamic_;
+  bool is_array_;
   union InputValueUnion {
     InputValueUnion() {}
     ::google::protobuf::internal::ArenaStringPtr input_uri_;
@@ -3640,6 +3647,20 @@ inline void NodeExecutionEvent::set_allocated_reported_at(::google::protobuf::Ti
   }
   reported_at_ = reported_at;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.NodeExecutionEvent.reported_at)
+}
+
+// bool is_array = 22;
+inline void NodeExecutionEvent::clear_is_array() {
+  is_array_ = false;
+}
+inline bool NodeExecutionEvent::is_array() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.is_array)
+  return is_array_;
+}
+inline void NodeExecutionEvent::set_is_array(bool value) {
+  
+  is_array_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.NodeExecutionEvent.is_array)
 }
 
 inline bool NodeExecutionEvent::has_input_value() const {

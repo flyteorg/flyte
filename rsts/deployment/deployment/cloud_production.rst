@@ -23,23 +23,48 @@ guide already contains the ingress rules, but they are not enabled by default.
 
 To turn on ingress, update your ``values.yaml`` file to include the following block.
 
-.. tabbed:: AWS - ``flyte-binary``
-
-   .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
-      :caption: charts/flyte-binary/eks-production.yaml
-      :language: yaml
-      :lines: 123-131
-
-.. note::
+.. tabs:: 
    
-   This currently assumes that you have nginx ingress. We'll be updating these
-   in the near future to use the ALB ingress controller instead.
+   .. group-tab:: ``flyte-binary`` on EKS using NGINX
+
+      .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
+         :caption: charts/flyte-binary/eks-production.yaml
+         :language: yaml
+         :lines: 127-135
+
+   .. group-tab:: ``flyte-binary``/ on EKS using ALB 
+
+      .. code-block:: yaml
+
+         ingress:
+           create: true
+           commonAnnotations:
+             alb.ingress.kubernetes.io/certificate-arn: '<your-SSL-certificate-ARN>'
+             alb.ingress.kubernetes.io/group.name: flyte
+             alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+             alb.ingress.kubernetes.io/scheme: internet-facing
+             alb.ingress.kubernetes.io/ssl-redirect: '443'
+             alb.ingress.kubernetes.io/target-type: ip
+             kubernetes.io/ingress.class: alb
+           httpAnnotations:
+             alb.ingress.kubernetes.io/actions.app-root: '{"Type": "redirect", "RedirectConfig": {"Path": "/console", "StatusCode": "HTTP_302"}}'
+           grpcAnnotations:
+             alb.ingress.kubernetes.io/backend-protocol-version: GRPC 
+           host: <your-URL> #use a DNS CNAME pointing to your ALB
+
+   .. group-tab:: ``flyte-core`` on GCP using NGINX  
+
+      .. literalinclude:: ../../../charts/flyte-core/values-gcp.yaml        
+         :caption: charts/flyte-core/values-gcp.yaml
+         :language: yaml
+         :lines: 156-164
+
 
 ***************
 Authentication
 ***************
 
-Authentication comes with Flyte in the form of OAuth 2. Please see the
+Authentication comes with Flyte in the form of OAuth 2.0. Please see the
 `authentication guide <deployment-configuration-auth-setup>`__ for instructions.
 
 .. note::
@@ -60,10 +85,3 @@ compatibility being maintained, for the most part.
 
 If you're using the :ref:`multi-cluster <deployment-deployment-multicluster>`
 deployment model for Flyte, components should be upgraded together.
-
-.. note::
-
-   Expect to see minor version releases roughly 4-6 times a year - we aim to
-   release monthly, or whenever there is a large enough set of features to
-   warrant a release. Expect to see patch releases at more regular intervals,
-   especially for flytekit, the Python SDK.

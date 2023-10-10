@@ -19,7 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 )

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	adminversion "github.com/flyteorg/flyte/flytestdlib/version"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 )
 

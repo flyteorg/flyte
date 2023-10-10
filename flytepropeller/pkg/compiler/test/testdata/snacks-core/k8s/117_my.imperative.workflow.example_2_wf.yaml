@@ -112,16 +112,12 @@ spec:
       kind: task
       name: t1
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t1" '
     n1:
       id: n1
       kind: task
       name: t2
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t2" '
     n2:
       id: n2
@@ -139,8 +135,6 @@ spec:
       kind: task
       name: t3
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t3" '
     start-node:
       id: start-node

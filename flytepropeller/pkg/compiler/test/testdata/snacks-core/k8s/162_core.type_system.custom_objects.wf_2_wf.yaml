@@ -116,8 +116,6 @@ spec:
       kind: task
       name: upload_result
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.custom_objects.upload_result" '
     n1:
       id: n1
@@ -130,8 +128,6 @@ spec:
       kind: task
       name: download_result
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.custom_objects.download_result" '
     n2:
       id: n2
@@ -144,8 +140,6 @@ spec:
       kind: task
       name: stringify
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.custom_objects.stringify" '
     n3:
       id: n3
@@ -158,8 +152,6 @@ spec:
       kind: task
       name: stringify
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.custom_objects.stringify" '
     n4:
       id: n4
@@ -177,8 +169,6 @@ spec:
       kind: task
       name: add
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.custom_objects.add" '
     start-node:
       id: start-node

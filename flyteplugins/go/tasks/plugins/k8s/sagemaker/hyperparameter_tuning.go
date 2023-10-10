@@ -14,7 +14,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -26,7 +26,7 @@ import (
 
 	taskError "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 
-	flyteSageMakerIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	flyteSageMakerIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 )

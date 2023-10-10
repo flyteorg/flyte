@@ -237,14 +237,14 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fexternal_5fplugin_5fse
   "GetRequest\032!.flyteidl.service.TaskGetRes"
   "ponse\"\003\210\002\001\022\\\n\nDeleteTask\022#.flyteidl.serv"
   "ice.TaskDeleteRequest\032$.flyteidl.service"
-  ".TaskDeleteResponse\"\003\210\002\001B9Z7github.com/f"
-  "lyteorg/flyteidl/gen/pb-go/flyteidl/serv"
-  "iceb\006proto3"
+  ".TaskDeleteResponse\"\003\210\002\001B\?Z=github.com/f"
+  "lyteorg/flyte/flyteidl/gen/pb-go/flyteid"
+  "l/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto,
-  "flyteidl/service/external_plugin_service.proto", &assign_descriptors_table_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto, 1051,
+  "flyteidl/service/external_plugin_service.proto", &assign_descriptors_table_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto, 1057,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto() {

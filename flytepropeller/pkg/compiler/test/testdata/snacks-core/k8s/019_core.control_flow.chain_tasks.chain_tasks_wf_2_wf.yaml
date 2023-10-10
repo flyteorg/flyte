@@ -75,16 +75,12 @@ spec:
       kind: task
       name: write
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.chain_tasks.write" '
     n1:
       id: n1
       kind: task
       name: read
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.chain_tasks.read" '
     start-node:
       id: start-node

@@ -1,7 +1,7 @@
 syntax = "proto3";
 package flyteidl.service;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
 import "flyteidl/core/interface.proto";

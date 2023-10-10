@@ -6795,8 +6795,8 @@ public final class Security {
       "\006run_as\030\001 \001(\0132\027.flyteidl.core.Identity\022&" +
       "\n\007secrets\030\002 \003(\0132\025.flyteidl.core.Secret\0221" +
       "\n\006tokens\030\003 \003(\0132!.flyteidl.core.OAuth2Tok" +
-      "enRequestB6Z4github.com/flyteorg/flyteid" +
-      "l/gen/pb-go/flyteidl/coreb\006proto3"
+      "enRequestB<Z:github.com/flyteorg/flyte/f" +
+      "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

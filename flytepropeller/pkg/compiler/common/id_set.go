@@ -3,7 +3,7 @@ package common
 import (
 	"sort"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type Empty struct{}
