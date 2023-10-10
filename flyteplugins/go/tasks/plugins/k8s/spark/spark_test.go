@@ -6,28 +6,24 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
-	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-
-	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-
 	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 const sparkMainClass = "MainClass"
@@ -87,7 +83,7 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplate("blah-1", dummySparkConf), false)
+	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false)
 	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
@@ -157,7 +153,7 @@ func TestGetTaskPhase(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 
 	ctx := context.TODO()
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplate("", dummySparkConf), false)
+	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false)
 	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.NewState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
@@ -250,8 +246,20 @@ func dummySparkCustomObj(sparkConf map[string]string) *plugins.SparkJob {
 	return &sparkJob
 }
 
-func dummySparkTaskTemplate(id string, sparkConf map[string]string) *core.TaskTemplate {
+func dummyPodSpec() *corev1.PodSpec {
+	return &corev1.PodSpec{
+		Containers: []corev1.Container{
+			{
+				Name:  "primary",
+				Image: testImage,
+				Args:  testArgs,
+				Env:   flytek8s.ToK8sEnvVar(dummyEnvVars),
+			},
+		},
+	}
+}
 
+func dummySparkTaskTemplateContainer(id string, sparkConf map[string]string) *core.TaskTemplate {
 	sparkJob := dummySparkCustomObj(sparkConf)
 	sparkJobJSON, err := utils.MarshalToString(sparkJob)
 	if err != nil {
@@ -274,6 +282,40 @@ func dummySparkTaskTemplate(id string, sparkConf map[string]string) *core.TaskTe
 				Args:  testArgs,
 				Env:   dummyEnvVars,
 			},
+		},
+		Custom: &structObj,
+	}
+}
+
+func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *corev1.PodSpec) *core.TaskTemplate {
+	sparkJob := dummySparkCustomObj(sparkConf)
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	if err != nil {
+		panic(err)
+	}
+
+	structObj := structpb.Struct{}
+
+	err = jsonpb.UnmarshalString(sparkJobJSON, &structObj)
+	if err != nil {
+		panic(err)
+	}
+
+	podSpecPb, err := utils.MarshalObjToStruct(podSpec)
+	if err != nil {
+		panic(err)
+	}
+
+	return &core.TaskTemplate{
+		Id:   &core.Identifier{Name: id},
+		Type: "k8s_pod",
+		Target: &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				PodSpec: podSpecPb,
+			},
+		},
+		Config: map[string]string{
+			flytek8s.PrimaryContainerKey: "primary",
 		},
 		Custom: &structObj,
 	}
@@ -312,6 +354,9 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	})
 	tID.On("GetGeneratedName").Return("some-acceptable-name")
 
+	overrides := &mocks.TaskOverrides{}
+	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
+
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
 	taskExecutionMetadata.On("GetNamespace").Return("test-namespace")
@@ -327,6 +372,9 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
 	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
 	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
+	taskExecutionMetadata.On("GetOverrides").Return(overrides)
+	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
 }
@@ -335,7 +383,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 
 	// Case1: Valid Spark Task-Template
-	taskTemplate := dummySparkTaskTemplate("blah-1", dummySparkConf)
+	taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
 
 	// Set spark custom feature config.
 	assert.NoError(t, setSparkConfig(&Config{
@@ -522,6 +570,7 @@ func TestBuildResourceSpark(t *testing.T) {
 
 	// Validate
 	// * Interruptible Toleration and NodeSelector set for Executor but not Driver.
+	// TODO: confirm expected behavior
 	// * Validate Default NodeSelector set for Driver but overwritten with Interruptible NodeSelector for Executor.
 	// * Default Tolerations set for both Driver and Executor.
 	// * Interruptible/Non-Interruptible NodeSelectorRequirements set for Executor Affinity but not Driver Affinity.
@@ -538,17 +587,18 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, 1, len(sparkApp.Spec.Executor.NodeSelector))
 	assert.Equal(t, interruptibleNodeSelector, sparkApp.Spec.Executor.NodeSelector)
 
-	tolExecDefault := sparkApp.Spec.Executor.Tolerations[0]
+	tolExecInterrupt := sparkApp.Spec.Executor.Tolerations[0]
+	assert.Equal(t, tolExecInterrupt.Key, "x/flyte")
+	assert.Equal(t, tolExecInterrupt.Value, "interruptible")
+	assert.Equal(t, tolExecInterrupt.Operator, corev1.TolerationOperator("Equal"))
+	assert.Equal(t, tolExecInterrupt.Effect, corev1.TaintEffect("NoSchedule"))
+
+	tolExecDefault := sparkApp.Spec.Executor.Tolerations[1]
 	assert.Equal(t, tolExecDefault.Key, "x/flyte")
 	assert.Equal(t, tolExecDefault.Value, "default")
 	assert.Equal(t, tolExecDefault.Operator, corev1.TolerationOperator("Equal"))
 	assert.Equal(t, tolExecDefault.Effect, corev1.TaintEffect("NoSchedule"))
 
-	tolExecInterrupt := sparkApp.Spec.Executor.Tolerations[1]
-	assert.Equal(t, tolExecInterrupt.Key, "x/flyte")
-	assert.Equal(t, tolExecInterrupt.Value, "interruptible")
-	assert.Equal(t, tolExecInterrupt.Operator, corev1.TolerationOperator("Equal"))
-	assert.Equal(t, tolExecInterrupt.Effect, corev1.TaintEffect("NoSchedule"))
 	assert.Equal(t, "true", sparkApp.Spec.Executor.NodeSelector["x/interruptible"])
 
 	for confKey, confVal := range dummySparkConf {
@@ -619,7 +669,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	dummyConfWithRequest["spark.kubernetes.driver.request.cores"] = "3"
 	dummyConfWithRequest["spark.kubernetes.executor.request.cores"] = "4"
 
-	taskTemplate = dummySparkTaskTemplate("blah-1", dummyConfWithRequest)
+	taskTemplate = dummySparkTaskTemplateContainer("blah-1", dummyConfWithRequest)
 	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.Nil(t, err)
 	assert.NotNil(t, resource)
@@ -676,6 +726,47 @@ func TestBuildResourceSpark(t *testing.T) {
 	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.NotNil(t, err)
 	assert.Nil(t, resource)
+}
+
+func TestBuildResourcePodTemplate(t *testing.T) {
+	defaultToleration := corev1.Toleration{
+
+		Key:      "x/flyte",
+		Value:    "default",
+		Operator: "Equal",
+	}
+	err := config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		DefaultTolerations: []corev1.Toleration{
+			defaultToleration,
+		},
+	})
+	assert.NoError(t, err)
+	extraToleration := corev1.Toleration{
+		Key:      "x/flyte",
+		Value:    "extra",
+		Operator: "Equal",
+	}
+	podSpec := dummyPodSpec()
+	podSpec.Tolerations = append(podSpec.Tolerations, extraToleration)
+	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec)
+	taskTemplate.GetK8SPod()
+	sparkResourceHandler := sparkResourceHandler{}
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
+	assert.Nil(t, err)
+
+	assert.NotNil(t, resource)
+	sparkApp, ok := resource.(*sj.SparkApplication)
+	assert.True(t, ok)
+	assert.Equal(t, 2, len(sparkApp.Spec.Driver.Tolerations))
+	assert.Equal(t, sparkApp.Spec.Driver.Tolerations, []corev1.Toleration{
+		defaultToleration,
+		extraToleration,
+	})
+	assert.Equal(t, 2, len(sparkApp.Spec.Executor.Tolerations))
+	assert.Equal(t, sparkApp.Spec.Executor.Tolerations, []corev1.Toleration{
+		defaultToleration,
+		extraToleration,
+	})
 }
 
 func TestGetPropertiesSpark(t *testing.T) {
