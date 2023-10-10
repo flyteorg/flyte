@@ -27,6 +27,15 @@ Discover the process of setting up Agents for Flyte.
     ^^^^^^^^^^^^
     Guide to setting up the MMCloud agent.
 
+    ---
+
+    .. link-button:: deployment-agent-setup-sensor
+       :type: ref
+       :text: Sensor Agent
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Sensor agent.
+
 
 .. toctree::
     :maxdepth: 1
