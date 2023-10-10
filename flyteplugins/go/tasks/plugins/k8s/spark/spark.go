@@ -141,8 +141,7 @@ func serviceAccountName(metadata pluginsCore.TaskExecutionMetadata) string {
 	return name
 }
 
-func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, container *v1.Container) (
-	*sparkOp.SparkPodSpec, error) {
+func createSparkPodSpec(taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, container *v1.Container) *sparkOp.SparkPodSpec {
 	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
@@ -165,7 +164,7 @@ func createSparkPodSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 		NodeSelector:     podSpec.NodeSelector,
 		HostNetwork:      &podSpec.HostNetwork,
 	}
-	return &spec, nil
+	return &spec
 }
 
 type driverSpec struct {
@@ -183,10 +182,7 @@ func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCont
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec, err := createSparkPodSpec(ctx, nonInterruptibleTaskCtx, podSpec, primaryContainer)
-	if err != nil {
-		return nil, err
-	}
+	sparkPodSpec := createSparkPodSpec(nonInterruptibleTaskCtx, podSpec, primaryContainer)
 	serviceAccountName := serviceAccountName(nonInterruptibleTaskCtx.TaskExecutionMetadata())
 	spec := driverSpec{
 		&sparkOp.DriverSpec{
@@ -216,10 +212,7 @@ func createExecutorSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionCo
 	if err != nil {
 		return nil, err
 	}
-	sparkPodSpec, err := createSparkPodSpec(ctx, taskCtx, podSpec, primaryContainer)
-	if err != nil {
-		return nil, err
-	}
+	sparkPodSpec := createSparkPodSpec(taskCtx, podSpec, primaryContainer)
 	serviceAccountName := serviceAccountName(taskCtx.TaskExecutionMetadata())
 	spec := executorSpec{
 		primaryContainer,
