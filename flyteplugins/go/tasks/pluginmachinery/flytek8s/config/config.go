@@ -8,12 +8,11 @@ package config
 import (
 	"time"
 
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
-	v1 "k8s.io/api/core/v1"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 //go:generate pflags K8sPluginConfig --default-var=defaultK8sConfig
