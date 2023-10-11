@@ -1,7 +1,11 @@
 package server
 
 import (
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/pkg/errors"
 	"google.golang.org/grpc"
 	"net"
 
@@ -18,8 +22,18 @@ func NewArtifactService() *ArtifactService {
 	return &ArtifactService{}
 }
 
+func HttpRegistrationHook(ctx context.Context, gwmux *runtime.ServeMux, grpcAddress string, grpcConnectionOpts []grpc.DialOption, _ promutils.Scope) error {
+	//err := executionsvc.RegisterExecutionServiceHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
+	if err != nil {
+		return errors.Wrap(err, "error registering execution service")
+	}
+	return nil
+}
+
 func Serve(ctx context.Context, opts ...grpc.ServerOption) error {
 	var serverOpts []grpc.ServerOption
+
+	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
 
 	serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(3000000))
 	serverOpts = append(serverOpts, opts...)
