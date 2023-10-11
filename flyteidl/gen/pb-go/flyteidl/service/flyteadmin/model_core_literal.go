@@ -18,4 +18,6 @@ type CoreLiteral struct {
 	// A map of strings to literals.
 	Map_ *CoreLiteralMap `json:"map,omitempty"`
 	Hash string `json:"hash,omitempty"`
+	// Additional metadata for literals.
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
