@@ -18,6 +18,15 @@ Discover the process of setting up Agents for Flyte.
     ^^^^^^^^^^^^
     Guide to setting up the Bigquery agent.
 
+    ---
+
+    .. link-button:: deployment-plugin-setup-webapi-snowflake:
+       :type: ref
+       :text: Snowflake Agent
+       :classes: btn-block stretched-link
+    ^^^^^^^^^^^^
+    Guide to setting up the Snowflake agent.
+
 .. toctree::
     :maxdepth: 1
     :name: Agent setup
