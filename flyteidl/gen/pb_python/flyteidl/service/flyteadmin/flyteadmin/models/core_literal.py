@@ -38,23 +38,26 @@ class CoreLiteral(object):
         'scalar': 'CoreScalar',
         'collection': 'CoreLiteralCollection',
         'map': 'CoreLiteralMap',
-        'hash': 'str'
+        'hash': 'str',
+        'metadata': 'dict(str, str)'
     }
 
     attribute_map = {
         'scalar': 'scalar',
         'collection': 'collection',
         'map': 'map',
-        'hash': 'hash'
+        'hash': 'hash',
+        'metadata': 'metadata'
     }
 
-    def __init__(self, scalar=None, collection=None, map=None, hash=None):  # noqa: E501
+    def __init__(self, scalar=None, collection=None, map=None, hash=None, metadata=None):  # noqa: E501
         """CoreLiteral - a model defined in Swagger"""  # noqa: E501
 
         self._scalar = None
         self._collection = None
         self._map = None
         self._hash = None
+        self._metadata = None
         self.discriminator = None
 
         if scalar is not None:
@@ -65,6 +68,8 @@ class CoreLiteral(object):
             self.map = map
         if hash is not None:
             self.hash = hash
+        if metadata is not None:
+            self.metadata = metadata
 
     @property
     def scalar(self):
@@ -155,6 +160,29 @@ class CoreLiteral(object):
         """
 
         self._hash = hash
+
+    @property
+    def metadata(self):
+        """Gets the metadata of this CoreLiteral.  # noqa: E501
+
+        Additional metadata for literals.  # noqa: E501
+
+        :return: The metadata of this CoreLiteral.  # noqa: E501
+        :rtype: dict(str, str)
+        """
+        return self._metadata
+
+    @metadata.setter
+    def metadata(self, metadata):
+        """Sets the metadata of this CoreLiteral.
+
+        Additional metadata for literals.  # noqa: E501
+
+        :param metadata: The metadata of this CoreLiteral.  # noqa: E501
+        :type: dict(str, str)
+        """
+
+        self._metadata = metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""

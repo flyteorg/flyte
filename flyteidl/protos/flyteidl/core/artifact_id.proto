@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/identifier.proto";
+
+
+message ArtifactKey {
+  // Project and domain and suffix needs to be unique across a given artifact store.
+  string project = 1;
+  string domain = 2;
+  string name = 3;
+}
+
+// Only valid for triggers
+message ArtifactBindingData {
+  uint32 index = 1;
+
+  // These two fields are only relevant in the partition value case
+  string partition_key = 2;
+  string transform = 3;
+}
+
+message InputBindingData {
+  string var = 1;
+}
+
+message LabelValue {
+  oneof value {
+    string static_value = 1;
+    ArtifactBindingData triggered_binding = 2;
+    InputBindingData input_binding = 3;
+  }
+}
+message Partitions {
+  map<string, LabelValue> value = 1;
+}
+
+message ArtifactID {
+  ArtifactKey artifact_key = 1;
+
+  string version = 2;
+
+  // Think of a partition as a tag on an Artifact, except it's a key-value pair.
+  // Different partitions naturally have different versions (execution ids).
+  // This is a oneof because of partition querying... we need a way to distinguish between
+  // a user not-specifying partitions when searching, and specifically searching for an Artifact
+  // that is not partitioned (this can happen if an Artifact goes from partitioned to non-
+  // partitioned across executions).
+  oneof dimensions {
+    Partitions partitions = 3;
+  }
+}
+
+message ArtifactTag {
+  ArtifactKey artifact_key = 1;
+
+  LabelValue value = 2;
+}
+
+// Uniqueness constraints for Artifacts
+//  - project, domain, name, version, partitions
+// Option 2 (tags are standalone, point to an individual artifact id):
+//  - project, domain, name, alias (points to one partition if partitioned)
+//  - project, domain, name, partition key, partition value
+message ArtifactQuery {
+  oneof identifier {
+    ArtifactID artifact_id = 1;
+    ArtifactTag artifact_tag = 2;
+    string uri = 3;
+
+    // This is used in the trigger case, where a user specifies a value for an input that is one of the triggering
+    // artifacts, or a partition value derived from a triggering artifact.
+    ArtifactBindingData binding = 4;
+  }
+}
+
+message Trigger {
+  // This will be set to a launch plan type, but note that this is different than the actual launch plan type.
+  Identifier trigger_id = 1;
+
+  // These are partial artifact IDs that will be triggered on
+  // Consider making these ArtifactQuery instead.
+  repeated core.ArtifactID triggers = 2;
+}
