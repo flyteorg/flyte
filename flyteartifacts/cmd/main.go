@@ -69,16 +69,20 @@ func init() {
 }
 
 func initConfig(flags *pflag.FlagSet) error {
-	fmt.Println("initConfig called")
 	configAccessor = viper.NewAccessor(config.Options{
-		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/flyte/flyteartifacts"},
+		SearchPaths: []string{cfgFile, "./artifact_config.yaml", ".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/flyte/flyteartifacts"},
 		StrictMode:  false,
 	})
 
 	logger.Infof(context.TODO(), "Using config file: %v", configAccessor.ConfigFilesUsed())
 
 	configAccessor.InitializePflags(flags)
-	fmt.Println("initConfig finish")
+
+	err := flag.CommandLine.Parse([]string{})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
 
 	return configAccessor.UpdateConfig(context.TODO())
 }
