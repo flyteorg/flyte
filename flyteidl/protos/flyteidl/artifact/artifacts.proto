@@ -1,7 +1,7 @@
 syntax = "proto3";
 package flyteidl.artifact;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact";
 
 import "google/protobuf/any.proto";
 
