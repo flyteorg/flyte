@@ -108,6 +108,9 @@ message Literal {
     // This is used for caching purposes. For more details refer to RFC 1893
     // (https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)
     string hash = 4;
+
+    // Additional metadata for literals.
+    map<string, string> metadata = 5;
 }
 
 // A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.

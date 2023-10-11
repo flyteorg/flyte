@@ -17,4 +17,7 @@ type CoreParameter struct {
 	Default_ *CoreLiteral `json:"default,omitempty"`
 	// +optional, is this value required to be filled.
 	Required bool `json:"required,omitempty"`
+	// This is an execution time search basically that should result in exactly one Artifact with a Type that matches the type of the variable.
+	ArtifactQuery *CoreArtifactQuery `json:"artifact_query,omitempty"`
+	ArtifactId *CoreArtifactId `json:"artifact_id,omitempty"`
 }

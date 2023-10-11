@@ -7,8 +7,10 @@ import "google/api/annotations.proto";
 // import "protoc-gen-swagger/options/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
+import "flyteidl/artifact/artifacts.proto";
 
 
 message CreateUploadLocationResponse {
@@ -20,6 +22,8 @@ message CreateUploadLocationResponse {
 
   // ExpiresAt defines when will the signed URL expires.
   google.protobuf.Timestamp expires_at = 3;
+
+  artifact.Artifact artifact = 4;
 }
 
 // CreateUploadLocationRequest specified request for the CreateUploadLocation API.
@@ -55,6 +59,9 @@ message CreateUploadLocationRequest {
   // in data proxy config. This option is useful when uploading multiple files.
   // +optional
   string filename_root = 6;
+
+  // If provided, the Artifact that the upload creates will contain the information specified here.
+  artifact.ArtifactSpec artifact_spec = 7;
 }
 
 // CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
@@ -67,7 +74,6 @@ message CreateDownloadLocationRequest {
   // exceeds the platform allowed max.
   // +optional. The default value comes from a global config.
   google.protobuf.Duration expires_in = 2;
-
 }
 
 message CreateDownloadLocationResponse {
@@ -133,7 +139,10 @@ message GetDataRequest {
   // e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
   //      flyte://v1/proj/development/execid/n2/i (for node execution input)
   //      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
-  string flyte_url = 1;
+  oneof query {
+    string flyte_url = 1;
+    core.ArtifactID artifact_id = 2;
+  }
 }
 
 message GetDataResponse {
@@ -147,6 +156,8 @@ message GetDataResponse {
     // Single literal will be returned. This is returned when the user/url requests a specific output or input
     // by name. See the o3 example above.
     core.Literal literal = 3;
+
+    artifact.Artifact artifact = 4;
   }
 }
 
