@@ -2,6 +2,7 @@ package pkce
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -63,8 +64,15 @@ func (f TokenOrchestrator) FetchTokenFromAuthFlow(ctx context.Context) (*oauth2.
 	serveMux := http.NewServeMux()
 	server := &http.Server{Addr: redirectURL.Host, Handler: serveMux, ReadHeaderTimeout: 0}
 	// Register the call back handler
+
+	// Pass along http client used in oauth2
+	httpClient, ok := ctx.Value(oauth2.HTTPClient).(*http.Client)
+	if !ok {
+		return nil, errors.New("Unable to retrieve httpClient used in oauth2 from context")
+	}
+
 	serveMux.HandleFunc(redirectURL.Path, getAuthServerCallbackHandler(f.ClientConfig, pkceCodeVerifier,
-		tokenChannel, errorChannel, stateString)) // the oauth2 callback endpoint
+		tokenChannel, errorChannel, stateString, httpClient)) // the oauth2 callback endpoint
 	defer server.Close()
 
 	go func() {

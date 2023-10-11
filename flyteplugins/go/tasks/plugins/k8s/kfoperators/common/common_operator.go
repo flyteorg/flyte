@@ -93,7 +93,7 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 
 // GetLogs will return the logs for kubeflow job
 func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
-	workersCount int32, psReplicasCount int32, chiefReplicasCount int32) ([]*core.TaskLog, error) {
+	workersCount int32, psReplicasCount int32, chiefReplicasCount int32, evaluatorReplicasCount int32) ([]*core.TaskLog, error) {
 	name := objectMeta.Name
 	namespace := objectMeta.Namespace
 
@@ -180,6 +180,18 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 			return nil, err
 		}
 		taskLogs = append(taskLogs, chiefReplicaLog.TaskLogs...)
+	}
+	// get evaluator log, and the max number of evaluator is 1
+	if evaluatorReplicasCount != 0 {
+		evaluatorReplicasCount, err := logPlugin.GetTaskLogs(tasklog.Input{
+			PodName:                 name + fmt.Sprintf("-evaluatorReplica-%d", 0),
+			Namespace:               namespace,
+			TaskExecutionIdentifier: &taskExecID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		taskLogs = append(taskLogs, evaluatorReplicasCount.TaskLogs...)
 	}
 
 	return taskLogs, nil
