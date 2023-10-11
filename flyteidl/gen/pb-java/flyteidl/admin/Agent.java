@@ -5770,7 +5770,7 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 3;</code>
+     * <code>.flyteidl.core.OutputData outputs = 4;</code>
      */
     boolean hasOutputs();
     /**
@@ -5780,7 +5780,7 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 3;</code>
+     * <code>.flyteidl.core.OutputData outputs = 4;</code>
      */
     flyteidl.core.Literals.OutputData getOutputs();
     /**
@@ -5790,9 +5790,27 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 3;</code>
+     * <code>.flyteidl.core.OutputData outputs = 4;</code>
      */
     flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder();
+
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    java.lang.String getMessage();
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
   }
   /**
    * Protobuf type {@code flyteidl.admin.Resource}
@@ -5808,6 +5826,7 @@ public final class Agent {
     }
     private Resource() {
       state_ = 0;
+      message_ = "";
     }
 
     @java.lang.Override
@@ -5854,6 +5873,12 @@ public final class Agent {
               break;
             }
             case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              message_ = s;
+              break;
+            }
+            case 34: {
               flyteidl.core.Literals.OutputData.Builder subBuilder = null;
               if (outputs_ != null) {
                 subBuilder = outputs_.toBuilder();
@@ -5965,7 +5990,7 @@ public final class Agent {
       return getDeprecatedOutputs();
     }
 
-    public static final int OUTPUTS_FIELD_NUMBER = 3;
+    public static final int OUTPUTS_FIELD_NUMBER = 4;
     private flyteidl.core.Literals.OutputData outputs_;
     /**
      * <pre>
@@ -5974,7 +5999,7 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 3;</code>
+     * <code>.flyteidl.core.OutputData outputs = 4;</code>
      */
     public boolean hasOutputs() {
       return outputs_ != null;
@@ -5986,7 +6011,7 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 3;</code>
+     * <code>.flyteidl.core.OutputData outputs = 4;</code>
      */
     public flyteidl.core.Literals.OutputData getOutputs() {
       return outputs_ == null ? flyteidl.core.Literals.OutputData.getDefaultInstance() : outputs_;
@@ -5998,10 +6023,52 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 3;</code>
+     * <code>.flyteidl.core.OutputData outputs = 4;</code>
      */
     public flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder() {
       return getOutputs();
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 3;
+    private volatile java.lang.Object message_;
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -6024,8 +6091,11 @@ public final class Agent {
       if (deprecatedOutputs_ != null) {
         output.writeMessage(2, getDeprecatedOutputs());
       }
+      if (!getMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, message_);
+      }
       if (outputs_ != null) {
-        output.writeMessage(3, getOutputs());
+        output.writeMessage(4, getOutputs());
       }
       unknownFields.writeTo(output);
     }
@@ -6044,9 +6114,12 @@ public final class Agent {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getDeprecatedOutputs());
       }
+      if (!getMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, message_);
+      }
       if (outputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getOutputs());
+          .computeMessageSize(4, getOutputs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6074,6 +6147,8 @@ public final class Agent {
         if (!getOutputs()
             .equals(other.getOutputs())) return false;
       }
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6095,6 +6170,8 @@ public final class Agent {
         hash = (37 * hash) + OUTPUTS_FIELD_NUMBER;
         hash = (53 * hash) + getOutputs().hashCode();
       }
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6242,6 +6319,8 @@ public final class Agent {
           outputs_ = null;
           outputsBuilder_ = null;
         }
+        message_ = "";
+
         return this;
       }
 
@@ -6279,6 +6358,7 @@ public final class Agent {
         } else {
           result.outputs_ = outputsBuilder_.build();
         }
+        result.message_ = message_;
         onBuilt();
         return result;
       }
@@ -6335,6 +6415,10 @@ public final class Agent {
         }
         if (other.hasOutputs()) {
           mergeOutputs(other.getOutputs());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6620,7 +6704,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public boolean hasOutputs() {
         return outputsBuilder_ != null || outputs_ != null;
@@ -6632,7 +6716,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public flyteidl.core.Literals.OutputData getOutputs() {
         if (outputsBuilder_ == null) {
@@ -6648,7 +6732,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public Builder setOutputs(flyteidl.core.Literals.OutputData value) {
         if (outputsBuilder_ == null) {
@@ -6670,7 +6754,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public Builder setOutputs(
           flyteidl.core.Literals.OutputData.Builder builderForValue) {
@@ -6690,7 +6774,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public Builder mergeOutputs(flyteidl.core.Literals.OutputData value) {
         if (outputsBuilder_ == null) {
@@ -6714,7 +6798,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public Builder clearOutputs() {
         if (outputsBuilder_ == null) {
@@ -6734,7 +6818,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public flyteidl.core.Literals.OutputData.Builder getOutputsBuilder() {
         
@@ -6748,7 +6832,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       public flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder() {
         if (outputsBuilder_ != null) {
@@ -6765,7 +6849,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 3;</code>
+       * <code>.flyteidl.core.OutputData outputs = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
@@ -6779,6 +6863,95 @@ public final class Agent {
           outputs_ = null;
         }
         return outputsBuilder_;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8023,17 +8196,17 @@ public final class Agent {
       "rce_meta\030\001 \001(\014\":\n\016GetTaskRequest\022\021\n\ttask" +
       "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"=\n\017Ge" +
       "tTaskResponse\022*\n\010resource\030\001 \001(\0132\030.flytei" +
-      "dl.admin.Resource\"\227\001\n\010Resource\022$\n\005state\030" +
+      "dl.admin.Resource\"\250\001\n\010Resource\022$\n\005state\030" +
       "\001 \001(\0162\025.flyteidl.admin.State\0229\n\022deprecat" +
       "ed_outputs\030\002 \001(\0132\031.flyteidl.core.Literal" +
-      "MapB\002\030\001\022*\n\007outputs\030\003 \001(\0132\031.flyteidl.core" +
-      ".OutputData\"=\n\021DeleteTaskRequest\022\021\n\ttask" +
-      "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022De" +
-      "leteTaskResponse*^\n\005State\022\025\n\021RETRYABLE_F" +
-      "AILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDI" +
-      "NG\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;gith" +
-      "ub.com/flyteorg/flyte/flyteidl/gen/pb-go" +
-      "/flyteidl/adminb\006proto3"
+      "MapB\002\030\001\022*\n\007outputs\030\004 \001(\0132\031.flyteidl.core" +
+      ".OutputData\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTa" +
+      "skRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource" +
+      "_meta\030\002 \001(\014\"\024\n\022DeleteTaskResponse*^\n\005Sta" +
+      "te\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_F" +
+      "AILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSU" +
+      "CCEEDED\020\004B=Z;github.com/flyteorg/flyte/f" +
+      "lyteidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -8104,7 +8277,7 @@ public final class Agent {
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Resource_descriptor,
-        new java.lang.String[] { "State", "DeprecatedOutputs", "Outputs", });
+        new java.lang.String[] { "State", "DeprecatedOutputs", "Outputs", "Message", });
     internal_static_flyteidl_admin_DeleteTaskRequest_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_DeleteTaskRequest_fieldAccessorTable = new

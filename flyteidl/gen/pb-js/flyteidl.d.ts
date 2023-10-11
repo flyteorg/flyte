@@ -8193,6 +8193,9 @@ export namespace flyteidl {
 
             /** Resource outputs */
             outputs?: (flyteidl.core.IOutputData|null);
+
+            /** Resource message */
+            message?: (string|null);
         }
 
         /** Represents a Resource. */
@@ -8212,6 +8215,9 @@ export namespace flyteidl {
 
             /** Resource outputs. */
             public outputs?: (flyteidl.core.IOutputData|null);
+
+            /** Resource message. */
+            public message: string;
 
             /**
              * Creates a new Resource instance using the specified properties.

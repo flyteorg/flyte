@@ -1025,6 +1025,20 @@ class Resource final :
 
   // accessors -------------------------------------------------------
 
+  // string message = 3;
+  void clear_message();
+  static const int kMessageFieldNumber = 3;
+  const ::std::string& message() const;
+  void set_message(const ::std::string& value);
+  #if LANG_CXX11
+  void set_message(::std::string&& value);
+  #endif
+  void set_message(const char* value);
+  void set_message(const char* value, size_t size);
+  ::std::string* mutable_message();
+  ::std::string* release_message();
+  void set_allocated_message(::std::string* message);
+
   // .flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];
   PROTOBUF_DEPRECATED bool has_deprecated_outputs() const;
   PROTOBUF_DEPRECATED void clear_deprecated_outputs();
@@ -1034,10 +1048,10 @@ class Resource final :
   PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_deprecated_outputs();
   PROTOBUF_DEPRECATED void set_allocated_deprecated_outputs(::flyteidl::core::LiteralMap* deprecated_outputs);
 
-  // .flyteidl.core.OutputData outputs = 3;
+  // .flyteidl.core.OutputData outputs = 4;
   bool has_outputs() const;
   void clear_outputs();
-  static const int kOutputsFieldNumber = 3;
+  static const int kOutputsFieldNumber = 4;
   const ::flyteidl::core::OutputData& outputs() const;
   ::flyteidl::core::OutputData* release_outputs();
   ::flyteidl::core::OutputData* mutable_outputs();
@@ -1054,6 +1068,7 @@ class Resource final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr message_;
   ::flyteidl::core::LiteralMap* deprecated_outputs_;
   ::flyteidl::core::OutputData* outputs_;
   int state_;
@@ -2050,7 +2065,7 @@ inline void Resource::set_allocated_deprecated_outputs(::flyteidl::core::Literal
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Resource.deprecated_outputs)
 }
 
-// .flyteidl.core.OutputData outputs = 3;
+// .flyteidl.core.OutputData outputs = 4;
 inline bool Resource::has_outputs() const {
   return this != internal_default_instance() && outputs_ != nullptr;
 }
@@ -2093,6 +2108,59 @@ inline void Resource::set_allocated_outputs(::flyteidl::core::OutputData* output
   }
   outputs_ = outputs;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Resource.outputs)
+}
+
+// string message = 3;
+inline void Resource::clear_message() {
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Resource::message() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Resource.message)
+  return message_.GetNoArena();
+}
+inline void Resource::set_message(const ::std::string& value) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Resource.message)
+}
+#if LANG_CXX11
+inline void Resource::set_message(::std::string&& value) {
+  
+  message_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Resource.message)
+}
+#endif
+inline void Resource::set_message(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Resource.message)
+}
+inline void Resource::set_message(const char* value, size_t size) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Resource.message)
+}
+inline ::std::string* Resource::mutable_message() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Resource.message)
+  return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Resource::release_message() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Resource.message)
+  
+  return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Resource::set_allocated_message(::std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Resource.message)
 }
 
 // -------------------------------------------------------------------

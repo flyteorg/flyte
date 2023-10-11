@@ -201,6 +201,10 @@
         "outputs": {
           "$ref": "#/definitions/coreOutputData",
           "title": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional"
+        },
+        "message": {
+          "type": "string",
+          "description": "A descriptive message for the current state. e.g. waiting for cluster."
         }
       }
     },

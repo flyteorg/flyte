@@ -90,8 +90,11 @@ pub struct Resource {
     /// The outputs of the execution. It's typically used by sql task. Agent service will create a
     /// Structured dataset pointing to the query result table.
     /// +optional
-    #[prost(message, optional, tag="3")]
+    #[prost(message, optional, tag="4")]
     pub outputs: ::core::option::Option<super::core::OutputData>,
+    /// A descriptive message for the current state. e.g. waiting for cluster.
+    #[prost(string, tag="3")]
+    pub message: ::prost::alloc::string::String,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]

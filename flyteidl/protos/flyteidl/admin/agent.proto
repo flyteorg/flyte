@@ -82,7 +82,9 @@ message Resource {
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
-  core.OutputData outputs = 3;
+  core.OutputData outputs = 4;
+  // A descriptive message for the current state. e.g. waiting for cluster.
+  string message = 3;
 }
 
 // A message used to delete a task.

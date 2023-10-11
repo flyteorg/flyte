@@ -95,14 +95,16 @@ class GetTaskResponse(_message.Message):
     def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
 
 class Resource(_message.Message):
-    __slots__ = ["state", "deprecated_outputs", "outputs"]
+    __slots__ = ["state", "deprecated_outputs", "outputs", "message"]
     STATE_FIELD_NUMBER: _ClassVar[int]
     DEPRECATED_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
     state: State
     deprecated_outputs: _literals_pb2.LiteralMap
     outputs: _literals_pb2.OutputData
-    def __init__(self, state: _Optional[_Union[State, str]] = ..., deprecated_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ...) -> None: ...
+    message: str
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., deprecated_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., message: _Optional[str] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]
