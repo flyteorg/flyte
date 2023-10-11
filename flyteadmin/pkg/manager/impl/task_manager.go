@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -36,11 +37,12 @@ type taskMetrics struct {
 }
 
 type TaskManager struct {
-	db              repoInterfaces.Repository
-	config          runtimeInterfaces.Configuration
-	compiler        workflowengine.Compiler
-	metrics         taskMetrics
-	resourceManager interfaces.ResourceInterface
+	db               repoInterfaces.Repository
+	config           runtimeInterfaces.Configuration
+	compiler         workflowengine.Compiler
+	metrics          taskMetrics
+	resourceManager  interfaces.ResourceInterface
+	artifactRegistry artifacts.ArtifactRegistry
 }
 
 func getTaskContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -130,6 +132,14 @@ func (t *TaskManager) CreateTask(
 			contextWithRuntimeMeta, common.RuntimeVersionKey, finalizedRequest.Spec.Template.Metadata.Runtime.Version)
 		t.metrics.Registered.Inc(contextWithRuntimeMeta)
 	}
+	go func() {
+		ceCtx := context.TODO()
+		if finalizedRequest.Spec.Template.Interface == nil {
+			logger.Debugf(ceCtx, "Task [%+v] has no interface, skipping registration", finalizedRequest.Id)
+			return
+		}
+		t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *finalizedRequest.Spec.Template.Interface)
+	}()
 
 	return &admin.TaskCreateResponse{}, nil
 }
@@ -261,7 +271,9 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 func NewTaskManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration, compiler workflowengine.Compiler,
-	scope promutils.Scope) interfaces.TaskInterface {
+	scope promutils.Scope,
+	artifactRegistry artifacts.ArtifactRegistry) interfaces.TaskInterface {
+
 	metrics := taskMetrics{
 		Scope:            scope,
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized task closure"),
@@ -269,10 +281,11 @@ func NewTaskManager(
 	}
 	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
 	return &TaskManager{
-		db:              db,
-		config:          config,
-		compiler:        compiler,
-		metrics:         metrics,
-		resourceManager: resourceManager,
+		db:               db,
+		config:           config,
+		compiler:         compiler,
+		metrics:          metrics,
+		resourceManager:  resourceManager,
+		artifactRegistry: artifactRegistry,
 	}
 }

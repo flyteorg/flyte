@@ -9,5 +9,6 @@ const (
 	GCP     CloudProvider = "gcp"
 	Sandbox CloudProvider = "sandbox"
 	Local   CloudProvider = "local"
+	Redis   CloudProvider = "redis"
 	None    CloudProvider = "none"
 )

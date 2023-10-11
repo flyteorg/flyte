@@ -3,11 +3,17 @@ package impl
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/benbjohnson/clock"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -26,7 +32,6 @@ import (
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/executions"
@@ -91,6 +96,7 @@ type ExecutionManager struct {
 	cloudEventPublisher       notificationInterfaces.Publisher
 	dbEventWriter             eventWriter.WorkflowExecutionEventWriter
 	pluginRegistry            *plugins.Registry
+	artifactRegistry          artifacts.ArtifactRegistry
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -701,9 +707,271 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 	}
 }
 
+// ExtractArtifactKeys pulls out artifact keys from Literals for lineage
+func (m *ExecutionManager) ExtractArtifactKeys(input *core.Literal) []string {
+	var artifactKeys []string
+
+	if input == nil {
+		return artifactKeys
+	}
+	if input.GetMetadata() != nil {
+		if artifactKey, ok := input.GetMetadata()["_ua"]; ok {
+			artifactKeys = append(artifactKeys, artifactKey)
+		}
+	}
+	if input.GetCollection() != nil {
+		// TODO: Make recursive
+		for _, v := range input.GetCollection().Literals {
+			mapKeys := m.ExtractArtifactKeys(v)
+			artifactKeys = append(artifactKeys, mapKeys...)
+		}
+	} else if input.GetMap() != nil {
+		for _, v := range input.GetMap().Literals {
+			mapKeys := m.ExtractArtifactKeys(v)
+			artifactKeys = append(artifactKeys, mapKeys...)
+		}
+	}
+	return artifactKeys
+}
+
+var re = regexp.MustCompile(`.*({{\s*\.?inputs\.([a-zA-Z0-9_]+)\s*}}).*`)
+var reExecutionMetadata = regexp.MustCompile(`.*({{\s*\.execution\.([a-zA-Z0-9_]+)\s*}}).*`)
+
+// templateInputString uses regex to take a string that looks like "{{ .inputs.var1 }}" and replace it with the
+// string value of var1
+func (m *ExecutionManager) templateInputString(ctx context.Context, input string, inputs map[string]*core.Literal, metadata *admin.ExecutionMetadata) (string, error) {
+
+	matches := re.FindStringSubmatch(input)
+	if len(matches) == 3 {
+		val, ok := inputs[matches[2]]
+		if !ok {
+			return input, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "input var [%s] not found", matches[2])
+		}
+		if val.GetScalar() == nil || val.GetScalar().GetPrimitive() == nil {
+			return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input value [%+v]", val)
+		}
+		var strVal = ""
+		p := val.GetScalar().GetPrimitive()
+		switch p.GetValue().(type) {
+		case *core.Primitive_Integer:
+			strVal = fmt.Sprintf("%s", p.GetStringValue())
+		case *core.Primitive_Datetime:
+			t := time.Unix(p.GetDatetime().Seconds, int64(p.GetDatetime().Nanos))
+			strVal = t.Format("2006-01-02")
+		case *core.Primitive_StringValue:
+			strVal = fmt.Sprintf("%s", p.GetStringValue())
+		case *core.Primitive_FloatValue:
+			strVal = fmt.Sprintf("%s", p.GetFloatValue())
+		case *core.Primitive_Boolean:
+			strVal = fmt.Sprintf("%s", p.GetBoolean())
+		default:
+			strVal = fmt.Sprintf("%s", p.GetValue())
+		}
+
+		logger.Debugf(ctx, "String templating returning [%s] for [%s]", strVal, input)
+		x := strings.Replace(input, matches[1], strVal, -1)
+		return x, nil
+	} else {
+		logger.Debugf(ctx, "No input matches found for input string [%s]", input)
+	}
+
+	// TODO: This whole block/regex is just demo code and should be removed until there is user demand.
+	matches = reExecutionMetadata.FindStringSubmatch(input)
+	if len(matches) == 3 {
+		metadataKey := matches[2]
+		if metadataKey == "kickoff_time" {
+			// timestamp formatting datetime is harder in the current proto library we're using.
+			// manually convert
+			var customFormattedTime string
+			if metadata != nil && metadata.ScheduledAt != nil {
+				t := time.Unix(metadata.ScheduledAt.GetSeconds(), 0)
+				customFormattedTime = fmt.Sprintf("%d-%02d-%02d", t.Year(), int(t.Month()), t.Day())
+			} else {
+				customFormattedTime = "2023-09-58"
+			}
+			x := strings.Replace(input, matches[1], customFormattedTime, -1)
+			return x, nil
+		} else {
+			logger.Warningf(ctx, "unknown execution templating key found [%s], leaving unchanged [%s]", metadataKey, input)
+		}
+	}
+
+	// By default just return the original string
+	return input, nil
+}
+
+func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.ArtifactQuery, inputs map[string]*core.Literal, metadata *admin.ExecutionMetadata) (core.ArtifactQuery, error) {
+
+	if query.GetUri() != "" {
+		// If a query string, then just pass it through, nothing to fill in.
+		return query, nil
+	} else if query.GetArtifactTag() != nil {
+		t := query.GetArtifactTag()
+		ak := t.GetArtifactKey()
+		if ak == nil {
+			return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "tag doesn't have key")
+		}
+		var project, domain string
+		if ak.GetProject() == "" {
+			project = contextutils.Value(ctx, contextutils.ProjectKey)
+		} else {
+			project = ak.GetProject()
+		}
+		if ak.GetDomain() == "" {
+			domain = contextutils.Value(ctx, contextutils.DomainKey)
+		} else {
+			domain = ak.GetDomain()
+		}
+
+		newValue, err := m.templateInputString(ctx, t.GetValue(), inputs, metadata)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to template input string [%s] [%v]", t.GetValue(), err)
+			return query, err
+		}
+
+		return core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactTag{
+				ArtifactTag: &core.ArtifactTag{
+					ArtifactKey: &core.ArtifactKey{
+						Project: project,
+						Domain:  domain,
+						Name:    ak.GetName(),
+					},
+					Value: newValue,
+				},
+			},
+		}, nil
+	} else if query.GetArtifactId() != nil {
+		artifactID := query.GetArtifactId()
+		ak := artifactID.GetArtifactKey()
+		if ak == nil {
+			return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "id doesn't have key")
+		}
+		var project, domain string
+		if ak.GetProject() == "" {
+			project = contextutils.Value(ctx, contextutils.ProjectKey)
+		} else {
+			project = ak.GetProject()
+		}
+		if ak.GetDomain() == "" {
+			domain = contextutils.Value(ctx, contextutils.DomainKey)
+		} else {
+			domain = ak.GetDomain()
+		}
+
+		var partitions map[string]*core.PartitionValue
+
+		if artifactID.GetPartitions() != nil && artifactID.GetPartitions().GetValue() != nil {
+			partitions = make(map[string]*core.PartitionValue, len(artifactID.GetPartitions().Value))
+			for k, v := range artifactID.GetPartitions().GetValue() {
+				newValue, err := m.templateInputString(ctx, v.StaticValue, inputs, metadata)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to template input string [%s] [%v]", v, err)
+					return query, err
+				}
+				partitions[k] = &core.PartitionValue{StaticValue: newValue}
+			}
+		}
+		return core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey: &core.ArtifactKey{
+						Project: project,
+						Domain:  domain,
+						Name:    ak.GetName(),
+					},
+					Dimensions: &core.ArtifactID_Partitions{
+						Partitions: &core.Partitions{
+							Value: partitions,
+						},
+					},
+				},
+			},
+		}, nil
+	}
+	return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "query doesn't have uri, tag, or id")
+}
+
+// ResolveParameterMapArtifacts will go through the parameter map, and resolve any artifact queries.
+func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, inputsForQueryTemplating map[string]*core.Literal, metadata *admin.ExecutionMetadata) (*core.ParameterMap, map[string]*core.ArtifactID, error) {
+
+	// only top level replace for now. Need to make this recursive
+	var artifactIDs = make(map[string]*core.ArtifactID)
+	if inputs == nil {
+		return nil, artifactIDs, nil
+	}
+	outputs := map[string]*core.Parameter{}
+
+	for k, v := range inputs.Parameters {
+		if inputsForQueryTemplating != nil {
+			if _, ok := inputsForQueryTemplating[k]; ok {
+				// Mark these as required as they're already provided by the other two LiteralMaps
+				outputs[k] = &core.Parameter{
+					Var:      v.Var,
+					Behavior: &core.Parameter_Required{Required: true},
+				}
+				continue
+			}
+		}
+		if v.GetArtifactQuery() != nil {
+			// This case handles when an Artifact query is specified as a default value.
+			if m.artifactRegistry.GetClient() == nil {
+				return nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "artifact client is not initialized, can't resolve queries")
+			}
+			filledInQuery, err := m.fillInTemplateArgs(ctx, *v.GetArtifactQuery(), inputsForQueryTemplating, metadata)
+			if err != nil {
+				logger.Errorf(ctx, "Failed to fill in template args for [%s] [%v]", k, err)
+				return nil, nil, err
+			}
+			req := &artifact.GetArtifactRequest{
+				Query:   &filledInQuery,
+				Details: false,
+			}
+
+			resp, err := m.artifactRegistry.GetClient().GetArtifact(ctx, req)
+			if err != nil {
+				return nil, nil, err
+			}
+			artifactIDs[k] = resp.Artifact.GetArtifactId()
+			logger.Debugf(ctx, "Resolved query for [%s] to [%+v]", k, resp.Artifact.ArtifactId)
+			outputs[k] = &core.Parameter{
+				Var:      v.Var,
+				Behavior: &core.Parameter_Default{Default: resp.Artifact.Spec.Value},
+			}
+		} else if v.GetArtifactId() != nil {
+			// This case is for when someone hard-codes a known ArtifactID as a default value.
+			req := &artifact.GetArtifactRequest{
+				Query: &core.ArtifactQuery{
+					Identifier: &core.ArtifactQuery_ArtifactId{
+						ArtifactId: v.GetArtifactId(),
+					},
+				},
+				Details: false,
+			}
+			resp, err := m.artifactRegistry.GetClient().GetArtifact(ctx, req)
+			if err != nil {
+				return nil, nil, err
+			}
+			artifactIDs[k] = v.GetArtifactId()
+			logger.Debugf(ctx, "Using specified artifactID for [%+v] for [%s]", v.GetArtifactId(), k)
+			outputs[k] = &core.Parameter{
+				Var:      v.Var,
+				Behavior: &core.Parameter_Default{Default: resp.Artifact.Spec.Value},
+			}
+		} else {
+			outputs[k] = v
+		}
+	}
+	pm := &core.ParameterMap{Parameters: outputs}
+	return pm, artifactIDs, nil
+}
+
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
+
+	ctxPD := contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
+
 	err := validation.ValidateExecutionRequest(ctx, request, m.db, m.config.ApplicationConfiguration())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to validate ExecutionCreateRequest %+v with err %v", request, err)
@@ -711,7 +979,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
-		return m.launchSingleTaskExecution(ctx, request, requestedAt)
+		// When tasks can have defaults this will need to handle Artifacts as well.
+		ctx, model, err := m.launchSingleTaskExecution(ctx, request, requestedAt)
+		return ctx, model, err
 	}
 
 	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Spec.LaunchPlan)
@@ -724,16 +994,61 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
 		return nil, nil, err
 	}
+
+	// Literals may have an artifact key in the metadata field. This is something the artifact service should have
+	// added. Pull these back out so we can keep track of them for lineage purposes. Use a dummy wrapper object for
+	// easier recursion.
+	requestInputMap := &core.Literal{
+		Value: &core.Literal_Map{Map: request.Inputs},
+	}
+	fixedInputMap := &core.Literal{
+		Value: &core.Literal_Map{Map: launchPlan.Spec.FixedInputs},
+	}
+	requestInputArtifactKeys := m.ExtractArtifactKeys(requestInputMap)
+	fixedInputArtifactKeys := m.ExtractArtifactKeys(fixedInputMap)
+	requestInputArtifactKeys = append(requestInputArtifactKeys, fixedInputArtifactKeys...)
+
+	// Put together the inputs that we've already resolved so that the artifact querying bit can fill them in.
+	// This is to support artifact queries that depend on other inputs using the {{ .inputs.var }} construct.
+	var inputsForQueryTemplating = make(map[string]*core.Literal)
+	if request.Inputs != nil {
+		for k, v := range request.Inputs.Literals {
+			inputsForQueryTemplating[k] = v
+		}
+	}
+	for k, v := range launchPlan.Spec.FixedInputs.Literals {
+		inputsForQueryTemplating[k] = v
+	}
+	logger.Debugf(ctx, "Inputs for query templating: [%+v]", inputsForQueryTemplating)
+
+	// Resolve artifact queries
+	//   Within the launch plan, the artifact will be in the Parameter map, and can come in form of an ArtifactID,
+	//     or as an ArtifactQuery.
+	// Also send in the inputsForQueryTemplating for two reasons, so we don't run queries for things we don't need to
+	// and so we can fill in template args.
+	// ArtifactIDs are also returned for lineage purposes.
+	resolvedExpectedInputs, usedArtifactIDs, err := m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating, request.Spec.Metadata)
+	if err != nil {
+		logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
+		return nil, nil, err
+	}
+
+	logger.Debugf(ctx, "Resolved launch plan closure expected inputs from [%+v] to [%+v]", launchPlan.Closure.ExpectedInputs, resolvedExpectedInputs)
+	logger.Debugf(ctx, "Found artifact keys: %v", requestInputArtifactKeys)
+	logger.Debugf(ctx, "Found artifact IDs: %v", usedArtifactIDs)
+
+	// Artifacts retrieved will need to be stored somewhere to ensure that we can re-emit events if necessary
+	// in the future, and also to make sure that relaunch and recover can use it if necessary.
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
 		request.Inputs,
 		launchPlan.Spec.FixedInputs,
-		launchPlan.Closure.ExpectedInputs,
+		resolvedExpectedInputs,
 	)
 
 	if err != nil {
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
-			request.Inputs, launchPlan.Spec.FixedInputs, launchPlan.Closure.ExpectedInputs, err)
+			request.Inputs, launchPlan.Spec.FixedInputs, resolvedExpectedInputs, err)
 		return nil, nil, err
 	}
 
@@ -767,6 +1082,13 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
+	// Construct a list of the values and save to request spec metadata.
+	// Avoids going through the model creation step.
+	artifactIDs := make([]*core.ArtifactID, 0, len(usedArtifactIDs))
+	for _, value := range usedArtifactIDs {
+		artifactIDs = append(artifactIDs, value)
+	}
+	requestSpec.Metadata.ArtifactIds = artifactIDs
 
 	// Get the node and parent execution (if any) that launched this execution
 	var parentNodeExecutionID uint
@@ -884,6 +1206,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
+	m.publishExecutionStart(ctx, workflowExecutionID, request.Spec.LaunchPlan, workflow.Id, requestInputArtifactKeys, requestSpec.Metadata.ArtifactIds)
+
 	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
@@ -912,6 +1236,29 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	return ctx, executionModel, nil
 }
 
+// publishExecutionStart is an event that Admin publishes for artifact lineage.
+func (m *ExecutionManager) publishExecutionStart(ctx context.Context, executionID core.WorkflowExecutionIdentifier,
+	launchPlanID *core.Identifier, workflowID *core.Identifier, inputArtifactKeys []string, usedArtifactIDs []*core.ArtifactID) {
+	if len(inputArtifactKeys) > 0 || len(usedArtifactIDs) > 0 {
+		logger.Debugf(ctx, "Sending execution start event for execution [%+v] with input artifact keys [%+v] and used artifact ids [%+v]", executionID, inputArtifactKeys, usedArtifactIDs)
+
+		request := event.CloudEventExecutionStart{
+			ExecutionId:  &executionID,
+			LaunchPlanId: launchPlanID,
+			WorkflowId:   workflowID,
+			ArtifactIds:  usedArtifactIDs,
+			ArtifactKeys: inputArtifactKeys,
+		}
+		go func() {
+			ceCtx := context.TODO()
+			if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
+				m.systemMetrics.PublishEventError.Inc()
+				logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request, err)
+			}
+		}()
+	}
+}
+
 // Inserts an execution model into the database store and emits platform metrics.
 func (m *ExecutionManager) createExecutionModel(
 	ctx context.Context, executionModel *models.Execution) (*core.WorkflowExecutionIdentifier, error) {
@@ -936,7 +1283,8 @@ func (m *ExecutionManager) createExecutionModel(
 func (m *ExecutionManager) CreateExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
-	// Prior to  flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
+
+	// Prior to flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
 	if request.Inputs == nil || len(request.Inputs.Literals) == 0 {
 		request.Inputs = request.GetSpec().GetInputs()
 	}
@@ -1293,7 +1641,8 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 	}
 
 	go func() {
-		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+		ceCtx := context.TODO()
+		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
 			m.systemMetrics.PublishEventError.Inc()
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
 		}
@@ -1629,7 +1978,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
-	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
+	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry artifacts.ArtifactRegistry) interfaces.ExecutionInterface {
+
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
@@ -1662,6 +2012,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		cloudEventPublisher:       cloudEventPublisher,
 		dbEventWriter:             eventWriter,
 		pluginRegistry:            pluginRegistry,
+		artifactRegistry:          artifactRegistry,
 	}
 }
 
