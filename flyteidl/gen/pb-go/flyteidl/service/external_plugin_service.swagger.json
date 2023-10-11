@@ -390,6 +390,14 @@
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
     },
+    "coreInputData": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap"
+        }
+      }
+    },
     "coreK8sObjectMetadata": {
       "type": "object",
       "properties": {
@@ -585,6 +593,14 @@
       ],
       "default": "CLIENT_CREDENTIALS",
       "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
+    },
+    "coreOutputData": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap"
+        }
+      }
     },
     "corePrimitive": {
       "type": "object",
@@ -1147,8 +1163,12 @@
           "$ref": "#/definitions/flyteidlserviceState",
           "description": "The state of the execution is used to control its visibility in the UI/CLI."
         },
-        "outputs": {
+        "deprecated_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
+          "title": "The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a\nStructured dataset pointing to the query result table.\n+optional\nDeprecated: Please use outputs instead"
+        },
+        "outputs": {
+          "$ref": "#/definitions/coreOutputData",
           "title": "The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a\nStructured dataset pointing to the query result table.\n+optional"
         }
       },

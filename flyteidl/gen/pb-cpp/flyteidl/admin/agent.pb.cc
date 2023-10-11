@@ -19,9 +19,11 @@
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskExecutionMetadata_AnnotationsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskExecutionMetadata_LabelsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Resource_flyteidl_2fadmin_2fagent_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Resource_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<4> scc_info_TaskExecutionMetadata_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_TaskExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_InputData_flyteidl_2fcore_2fliterals_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_OutputData_flyteidl_2fcore_2fliterals_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
 namespace flyteidl {
@@ -140,11 +142,12 @@ static void InitDefaultsCreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto() {
   ::flyteidl::admin::CreateTaskRequest::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<3> scc_info_CreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsCreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto}, {
+::google::protobuf::internal::SCCInfo<4> scc_info_CreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 4, InitDefaultsCreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto}, {
       &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base,
       &scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto.base,
-      &scc_info_TaskExecutionMetadata_flyteidl_2fadmin_2fagent_2eproto.base,}};
+      &scc_info_TaskExecutionMetadata_flyteidl_2fadmin_2fagent_2eproto.base,
+      &scc_info_InputData_flyteidl_2fcore_2fliterals_2eproto.base,}};
 
 static void InitDefaultsCreateTaskResponse_flyteidl_2fadmin_2fagent_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -200,9 +203,10 @@ static void InitDefaultsResource_flyteidl_2fadmin_2fagent_2eproto() {
   ::flyteidl::admin::Resource::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_Resource_flyteidl_2fadmin_2fagent_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsResource_flyteidl_2fadmin_2fagent_2eproto}, {
-      &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_Resource_flyteidl_2fadmin_2fagent_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsResource_flyteidl_2fadmin_2fagent_2eproto}, {
+      &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base,
+      &scc_info_OutputData_flyteidl_2fcore_2fliterals_2eproto.base,}};
 
 static void InitDefaultsDeleteTaskRequest_flyteidl_2fadmin_2fagent_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -294,10 +298,11 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, inputs_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, deprecated_inputs_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, template__),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, output_prefix_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, task_execution_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, inputs_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskResponse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -323,6 +328,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, state_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, deprecated_outputs_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, outputs_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::DeleteTaskRequest, _internal_metadata_),
@@ -343,12 +349,12 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 18, 25, sizeof(::flyteidl::admin::TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse)},
   { 27, -1, sizeof(::flyteidl::admin::TaskExecutionMetadata)},
   { 38, -1, sizeof(::flyteidl::admin::CreateTaskRequest)},
-  { 47, -1, sizeof(::flyteidl::admin::CreateTaskResponse)},
-  { 53, -1, sizeof(::flyteidl::admin::GetTaskRequest)},
-  { 60, -1, sizeof(::flyteidl::admin::GetTaskResponse)},
-  { 66, -1, sizeof(::flyteidl::admin::Resource)},
-  { 73, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
-  { 80, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
+  { 48, -1, sizeof(::flyteidl::admin::CreateTaskResponse)},
+  { 54, -1, sizeof(::flyteidl::admin::GetTaskRequest)},
+  { 61, -1, sizeof(::flyteidl::admin::GetTaskResponse)},
+  { 67, -1, sizeof(::flyteidl::admin::Resource)},
+  { 75, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
+  { 82, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -389,30 +395,33 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020Anno"
   "tationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t"
   ":\0028\001\032;\n\031EnvironmentVariablesEntry\022\013\n\003key"
-  "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTask"
-  "Request\022)\n\006inputs\030\001 \001(\0132\031.flyteidl.core."
-  "LiteralMap\022-\n\010template\030\002 \001(\0132\033.flyteidl."
-  "core.TaskTemplate\022\025\n\routput_prefix\030\003 \001(\t"
-  "\022F\n\027task_execution_metadata\030\004 \001(\0132%.flyt"
-  "eidl.admin.TaskExecutionMetadata\"+\n\022Crea"
-  "teTaskResponse\022\025\n\rresource_meta\030\001 \001(\014\":\n"
-  "\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre"
-  "source_meta\030\002 \001(\014\"=\n\017GetTaskResponse\022*\n\010"
-  "resource\030\001 \001(\0132\030.flyteidl.admin.Resource"
-  "\"\\\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a"
-  "dmin.State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.c"
-  "ore.LiteralMap\"=\n\021DeleteTaskRequest\022\021\n\tt"
-  "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n"
-  "\022DeleteTaskResponse*^\n\005State\022\025\n\021RETRYABL"
-  "E_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PE"
-  "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;g"
-  "ithub.com/flyteorg/flyte/flyteidl/gen/pb"
-  "-go/flyteidl/adminb\006proto3"
+  "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\205\002\n\021CreateTask"
+  "Request\0228\n\021deprecated_inputs\030\001 \001(\0132\031.fly"
+  "teidl.core.LiteralMapB\002\030\001\022-\n\010template\030\002 "
+  "\001(\0132\033.flyteidl.core.TaskTemplate\022\025\n\routp"
+  "ut_prefix\030\003 \001(\t\022F\n\027task_execution_metada"
+  "ta\030\004 \001(\0132%.flyteidl.admin.TaskExecutionM"
+  "etadata\022(\n\006inputs\030\005 \001(\0132\030.flyteidl.core."
+  "InputData\"+\n\022CreateTaskResponse\022\025\n\rresou"
+  "rce_meta\030\001 \001(\014\":\n\016GetTaskRequest\022\021\n\ttask"
+  "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"=\n\017Ge"
+  "tTaskResponse\022*\n\010resource\030\001 \001(\0132\030.flytei"
+  "dl.admin.Resource\"\227\001\n\010Resource\022$\n\005state\030"
+  "\001 \001(\0162\025.flyteidl.admin.State\0229\n\022deprecat"
+  "ed_outputs\030\002 \001(\0132\031.flyteidl.core.Literal"
+  "MapB\002\030\001\022*\n\007outputs\030\003 \001(\0132\031.flyteidl.core"
+  ".OutputData\"=\n\021DeleteTaskRequest\022\021\n\ttask"
+  "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022De"
+  "leteTaskResponse*^\n\005State\022\025\n\021RETRYABLE_F"
+  "AILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDI"
+  "NG\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;gith"
+  "ub.com/flyteorg/flyte/flyteidl/gen/pb-go"
+  "/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1426,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1543,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -1503,23 +1512,26 @@ void TaskExecutionMetadata::InternalSwap(TaskExecutionMetadata* other) {
 // ===================================================================
 
 void CreateTaskRequest::InitAsDefaultInstance() {
-  ::flyteidl::admin::_CreateTaskRequest_default_instance_._instance.get_mutable()->inputs_ = const_cast< ::flyteidl::core::LiteralMap*>(
+  ::flyteidl::admin::_CreateTaskRequest_default_instance_._instance.get_mutable()->deprecated_inputs_ = const_cast< ::flyteidl::core::LiteralMap*>(
       ::flyteidl::core::LiteralMap::internal_default_instance());
   ::flyteidl::admin::_CreateTaskRequest_default_instance_._instance.get_mutable()->template__ = const_cast< ::flyteidl::core::TaskTemplate*>(
       ::flyteidl::core::TaskTemplate::internal_default_instance());
   ::flyteidl::admin::_CreateTaskRequest_default_instance_._instance.get_mutable()->task_execution_metadata_ = const_cast< ::flyteidl::admin::TaskExecutionMetadata*>(
       ::flyteidl::admin::TaskExecutionMetadata::internal_default_instance());
+  ::flyteidl::admin::_CreateTaskRequest_default_instance_._instance.get_mutable()->inputs_ = const_cast< ::flyteidl::core::InputData*>(
+      ::flyteidl::core::InputData::internal_default_instance());
 }
 class CreateTaskRequest::HasBitSetters {
  public:
-  static const ::flyteidl::core::LiteralMap& inputs(const CreateTaskRequest* msg);
+  static const ::flyteidl::core::LiteralMap& deprecated_inputs(const CreateTaskRequest* msg);
   static const ::flyteidl::core::TaskTemplate& template_(const CreateTaskRequest* msg);
   static const ::flyteidl::admin::TaskExecutionMetadata& task_execution_metadata(const CreateTaskRequest* msg);
+  static const ::flyteidl::core::InputData& inputs(const CreateTaskRequest* msg);
 };
 
 const ::flyteidl::core::LiteralMap&
-CreateTaskRequest::HasBitSetters::inputs(const CreateTaskRequest* msg) {
-  return *msg->inputs_;
+CreateTaskRequest::HasBitSetters::deprecated_inputs(const CreateTaskRequest* msg) {
+  return *msg->deprecated_inputs_;
 }
 const ::flyteidl::core::TaskTemplate&
 CreateTaskRequest::HasBitSetters::template_(const CreateTaskRequest* msg) {
@@ -1529,11 +1541,15 @@ const ::flyteidl::admin::TaskExecutionMetadata&
 CreateTaskRequest::HasBitSetters::task_execution_metadata(const CreateTaskRequest* msg) {
   return *msg->task_execution_metadata_;
 }
-void CreateTaskRequest::clear_inputs() {
-  if (GetArenaNoVirtual() == nullptr && inputs_ != nullptr) {
-    delete inputs_;
+const ::flyteidl::core::InputData&
+CreateTaskRequest::HasBitSetters::inputs(const CreateTaskRequest* msg) {
+  return *msg->inputs_;
+}
+void CreateTaskRequest::clear_deprecated_inputs() {
+  if (GetArenaNoVirtual() == nullptr && deprecated_inputs_ != nullptr) {
+    delete deprecated_inputs_;
   }
-  inputs_ = nullptr;
+  deprecated_inputs_ = nullptr;
 }
 void CreateTaskRequest::clear_template_() {
   if (GetArenaNoVirtual() == nullptr && template__ != nullptr) {
@@ -1541,11 +1557,18 @@ void CreateTaskRequest::clear_template_() {
   }
   template__ = nullptr;
 }
+void CreateTaskRequest::clear_inputs() {
+  if (GetArenaNoVirtual() == nullptr && inputs_ != nullptr) {
+    delete inputs_;
+  }
+  inputs_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int CreateTaskRequest::kInputsFieldNumber;
+const int CreateTaskRequest::kDeprecatedInputsFieldNumber;
 const int CreateTaskRequest::kTemplateFieldNumber;
 const int CreateTaskRequest::kOutputPrefixFieldNumber;
 const int CreateTaskRequest::kTaskExecutionMetadataFieldNumber;
+const int CreateTaskRequest::kInputsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 CreateTaskRequest::CreateTaskRequest()
@@ -1561,10 +1584,10 @@ CreateTaskRequest::CreateTaskRequest(const CreateTaskRequest& from)
   if (from.output_prefix().size() > 0) {
     output_prefix_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.output_prefix_);
   }
-  if (from.has_inputs()) {
-    inputs_ = new ::flyteidl::core::LiteralMap(*from.inputs_);
+  if (from.has_deprecated_inputs()) {
+    deprecated_inputs_ = new ::flyteidl::core::LiteralMap(*from.deprecated_inputs_);
   } else {
-    inputs_ = nullptr;
+    deprecated_inputs_ = nullptr;
   }
   if (from.has_template_()) {
     template__ = new ::flyteidl::core::TaskTemplate(*from.template__);
@@ -1576,6 +1599,11 @@ CreateTaskRequest::CreateTaskRequest(const CreateTaskRequest& from)
   } else {
     task_execution_metadata_ = nullptr;
   }
+  if (from.has_inputs()) {
+    inputs_ = new ::flyteidl::core::InputData(*from.inputs_);
+  } else {
+    inputs_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.CreateTaskRequest)
 }
 
@@ -1583,9 +1611,9 @@ void CreateTaskRequest::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_CreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto.base);
   output_prefix_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&inputs_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&task_execution_metadata_) -
-      reinterpret_cast<char*>(&inputs_)) + sizeof(task_execution_metadata_));
+  ::memset(&deprecated_inputs_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&inputs_) -
+      reinterpret_cast<char*>(&deprecated_inputs_)) + sizeof(inputs_));
 }
 
 CreateTaskRequest::~CreateTaskRequest() {
@@ -1595,9 +1623,10 @@ CreateTaskRequest::~CreateTaskRequest() {
 
 void CreateTaskRequest::SharedDtor() {
   output_prefix_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete inputs_;
+  if (this != internal_default_instance()) delete deprecated_inputs_;
   if (this != internal_default_instance()) delete template__;
   if (this != internal_default_instance()) delete task_execution_metadata_;
+  if (this != internal_default_instance()) delete inputs_;
 }
 
 void CreateTaskRequest::SetCachedSize(int size) const {
@@ -1616,10 +1645,10 @@ void CreateTaskRequest::Clear() {
   (void) cached_has_bits;
 
   output_prefix_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == nullptr && inputs_ != nullptr) {
-    delete inputs_;
+  if (GetArenaNoVirtual() == nullptr && deprecated_inputs_ != nullptr) {
+    delete deprecated_inputs_;
   }
-  inputs_ = nullptr;
+  deprecated_inputs_ = nullptr;
   if (GetArenaNoVirtual() == nullptr && template__ != nullptr) {
     delete template__;
   }
@@ -1628,6 +1657,10 @@ void CreateTaskRequest::Clear() {
     delete task_execution_metadata_;
   }
   task_execution_metadata_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && inputs_ != nullptr) {
+    delete inputs_;
+  }
+  inputs_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -1644,13 +1677,13 @@ const char* CreateTaskRequest::_InternalParse(const char* begin, const char* end
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.core.LiteralMap inputs = 1;
+      // .flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::core::LiteralMap::_InternalParse;
-        object = msg->mutable_inputs();
+        object = msg->mutable_deprecated_inputs();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -1699,6 +1732,19 @@ const char* CreateTaskRequest::_InternalParse(const char* begin, const char* end
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // .flyteidl.core.InputData inputs = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::InputData::_InternalParse;
+        object = msg->mutable_inputs();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -1733,11 +1779,11 @@ bool CreateTaskRequest::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.core.LiteralMap inputs = 1;
+      // .flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_inputs()));
+               input, mutable_deprecated_inputs()));
         } else {
           goto handle_unusual;
         }
@@ -1781,6 +1827,17 @@ bool CreateTaskRequest::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.InputData inputs = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_inputs()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1808,10 +1865,10 @@ void CreateTaskRequest::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.LiteralMap inputs = 1;
-  if (this->has_inputs()) {
+  // .flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
+  if (this->has_deprecated_inputs()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, HasBitSetters::inputs(this), output);
+      1, HasBitSetters::deprecated_inputs(this), output);
   }
 
   // .flyteidl.core.TaskTemplate template = 2;
@@ -1836,6 +1893,12 @@ void CreateTaskRequest::SerializeWithCachedSizes(
       4, HasBitSetters::task_execution_metadata(this), output);
   }
 
+  // .flyteidl.core.InputData inputs = 5;
+  if (this->has_inputs()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, HasBitSetters::inputs(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1849,11 +1912,11 @@ void CreateTaskRequest::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.LiteralMap inputs = 1;
-  if (this->has_inputs()) {
+  // .flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
+  if (this->has_deprecated_inputs()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, HasBitSetters::inputs(this), target);
+        1, HasBitSetters::deprecated_inputs(this), target);
   }
 
   // .flyteidl.core.TaskTemplate template = 2;
@@ -1879,6 +1942,13 @@ void CreateTaskRequest::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         4, HasBitSetters::task_execution_metadata(this), target);
+  }
+
+  // .flyteidl.core.InputData inputs = 5;
+  if (this->has_inputs()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        5, HasBitSetters::inputs(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1909,11 +1979,11 @@ size_t CreateTaskRequest::ByteSizeLong() const {
         this->output_prefix());
   }
 
-  // .flyteidl.core.LiteralMap inputs = 1;
-  if (this->has_inputs()) {
+  // .flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
+  if (this->has_deprecated_inputs()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *inputs_);
+        *deprecated_inputs_);
   }
 
   // .flyteidl.core.TaskTemplate template = 2;
@@ -1928,6 +1998,13 @@ size_t CreateTaskRequest::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *task_execution_metadata_);
+  }
+
+  // .flyteidl.core.InputData inputs = 5;
+  if (this->has_inputs()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *inputs_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1961,14 +2038,17 @@ void CreateTaskRequest::MergeFrom(const CreateTaskRequest& from) {
 
     output_prefix_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.output_prefix_);
   }
-  if (from.has_inputs()) {
-    mutable_inputs()->::flyteidl::core::LiteralMap::MergeFrom(from.inputs());
+  if (from.has_deprecated_inputs()) {
+    mutable_deprecated_inputs()->::flyteidl::core::LiteralMap::MergeFrom(from.deprecated_inputs());
   }
   if (from.has_template_()) {
     mutable_template_()->::flyteidl::core::TaskTemplate::MergeFrom(from.template_());
   }
   if (from.has_task_execution_metadata()) {
     mutable_task_execution_metadata()->::flyteidl::admin::TaskExecutionMetadata::MergeFrom(from.task_execution_metadata());
+  }
+  if (from.has_inputs()) {
+    mutable_inputs()->::flyteidl::core::InputData::MergeFrom(from.inputs());
   }
 }
 
@@ -1999,9 +2079,10 @@ void CreateTaskRequest::InternalSwap(CreateTaskRequest* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   output_prefix_.Swap(&other->output_prefix_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(inputs_, other->inputs_);
+  swap(deprecated_inputs_, other->deprecated_inputs_);
   swap(template__, other->template__);
   swap(task_execution_metadata_, other->task_execution_metadata_);
+  swap(inputs_, other->inputs_);
 }
 
 ::google::protobuf::Metadata CreateTaskRequest::GetMetadata() const {
@@ -2941,17 +3022,30 @@ void GetTaskResponse::InternalSwap(GetTaskResponse* other) {
 // ===================================================================
 
 void Resource::InitAsDefaultInstance() {
-  ::flyteidl::admin::_Resource_default_instance_._instance.get_mutable()->outputs_ = const_cast< ::flyteidl::core::LiteralMap*>(
+  ::flyteidl::admin::_Resource_default_instance_._instance.get_mutable()->deprecated_outputs_ = const_cast< ::flyteidl::core::LiteralMap*>(
       ::flyteidl::core::LiteralMap::internal_default_instance());
+  ::flyteidl::admin::_Resource_default_instance_._instance.get_mutable()->outputs_ = const_cast< ::flyteidl::core::OutputData*>(
+      ::flyteidl::core::OutputData::internal_default_instance());
 }
 class Resource::HasBitSetters {
  public:
-  static const ::flyteidl::core::LiteralMap& outputs(const Resource* msg);
+  static const ::flyteidl::core::LiteralMap& deprecated_outputs(const Resource* msg);
+  static const ::flyteidl::core::OutputData& outputs(const Resource* msg);
 };
 
 const ::flyteidl::core::LiteralMap&
+Resource::HasBitSetters::deprecated_outputs(const Resource* msg) {
+  return *msg->deprecated_outputs_;
+}
+const ::flyteidl::core::OutputData&
 Resource::HasBitSetters::outputs(const Resource* msg) {
   return *msg->outputs_;
+}
+void Resource::clear_deprecated_outputs() {
+  if (GetArenaNoVirtual() == nullptr && deprecated_outputs_ != nullptr) {
+    delete deprecated_outputs_;
+  }
+  deprecated_outputs_ = nullptr;
 }
 void Resource::clear_outputs() {
   if (GetArenaNoVirtual() == nullptr && outputs_ != nullptr) {
@@ -2961,6 +3055,7 @@ void Resource::clear_outputs() {
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Resource::kStateFieldNumber;
+const int Resource::kDeprecatedOutputsFieldNumber;
 const int Resource::kOutputsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
@@ -2973,8 +3068,13 @@ Resource::Resource(const Resource& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  if (from.has_deprecated_outputs()) {
+    deprecated_outputs_ = new ::flyteidl::core::LiteralMap(*from.deprecated_outputs_);
+  } else {
+    deprecated_outputs_ = nullptr;
+  }
   if (from.has_outputs()) {
-    outputs_ = new ::flyteidl::core::LiteralMap(*from.outputs_);
+    outputs_ = new ::flyteidl::core::OutputData(*from.outputs_);
   } else {
     outputs_ = nullptr;
   }
@@ -2985,9 +3085,9 @@ Resource::Resource(const Resource& from)
 void Resource::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Resource_flyteidl_2fadmin_2fagent_2eproto.base);
-  ::memset(&outputs_, 0, static_cast<size_t>(
+  ::memset(&deprecated_outputs_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&state_) -
-      reinterpret_cast<char*>(&outputs_)) + sizeof(state_));
+      reinterpret_cast<char*>(&deprecated_outputs_)) + sizeof(state_));
 }
 
 Resource::~Resource() {
@@ -2996,6 +3096,7 @@ Resource::~Resource() {
 }
 
 void Resource::SharedDtor() {
+  if (this != internal_default_instance()) delete deprecated_outputs_;
   if (this != internal_default_instance()) delete outputs_;
 }
 
@@ -3014,6 +3115,10 @@ void Resource::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  if (GetArenaNoVirtual() == nullptr && deprecated_outputs_ != nullptr) {
+    delete deprecated_outputs_;
+  }
+  deprecated_outputs_ = nullptr;
   if (GetArenaNoVirtual() == nullptr && outputs_ != nullptr) {
     delete outputs_;
   }
@@ -3043,12 +3148,25 @@ const char* Resource::_InternalParse(const char* begin, const char* end, void* o
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
-      // .flyteidl.core.LiteralMap outputs = 2;
+      // .flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::core::LiteralMap::_InternalParse;
+        object = msg->mutable_deprecated_outputs();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.OutputData outputs = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::OutputData::_InternalParse;
         object = msg->mutable_outputs();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
@@ -3100,9 +3218,20 @@ bool Resource::MergePartialFromCodedStream(
         break;
       }
 
-      // .flyteidl.core.LiteralMap outputs = 2;
+      // .flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_deprecated_outputs()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .flyteidl.core.OutputData outputs = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_outputs()));
         } else {
@@ -3144,10 +3273,16 @@ void Resource::SerializeWithCachedSizes(
       1, this->state(), output);
   }
 
-  // .flyteidl.core.LiteralMap outputs = 2;
+  // .flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];
+  if (this->has_deprecated_outputs()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, HasBitSetters::deprecated_outputs(this), output);
+  }
+
+  // .flyteidl.core.OutputData outputs = 3;
   if (this->has_outputs()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, HasBitSetters::outputs(this), output);
+      3, HasBitSetters::outputs(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3169,11 +3304,18 @@ void Resource::SerializeWithCachedSizes(
       1, this->state(), target);
   }
 
-  // .flyteidl.core.LiteralMap outputs = 2;
+  // .flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];
+  if (this->has_deprecated_outputs()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        2, HasBitSetters::deprecated_outputs(this), target);
+  }
+
+  // .flyteidl.core.OutputData outputs = 3;
   if (this->has_outputs()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, HasBitSetters::outputs(this), target);
+        3, HasBitSetters::outputs(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3197,7 +3339,14 @@ size_t Resource::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .flyteidl.core.LiteralMap outputs = 2;
+  // .flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];
+  if (this->has_deprecated_outputs()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *deprecated_outputs_);
+  }
+
+  // .flyteidl.core.OutputData outputs = 3;
   if (this->has_outputs()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
@@ -3237,8 +3386,11 @@ void Resource::MergeFrom(const Resource& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.has_deprecated_outputs()) {
+    mutable_deprecated_outputs()->::flyteidl::core::LiteralMap::MergeFrom(from.deprecated_outputs());
+  }
   if (from.has_outputs()) {
-    mutable_outputs()->::flyteidl::core::LiteralMap::MergeFrom(from.outputs());
+    mutable_outputs()->::flyteidl::core::OutputData::MergeFrom(from.outputs());
   }
   if (from.state() != 0) {
     set_state(from.state());
@@ -3270,6 +3422,7 @@ void Resource::Swap(Resource* other) {
 void Resource::InternalSwap(Resource* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(deprecated_outputs_, other->deprecated_outputs_);
   swap(outputs_, other->outputs_);
   swap(state_, other->state_);
 }

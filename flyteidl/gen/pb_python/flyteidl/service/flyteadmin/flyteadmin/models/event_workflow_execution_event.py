@@ -18,6 +18,7 @@ import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.models.core_output_data import CoreOutputData  # noqa: F401,E501
 from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase  # noqa: F401,E501
 
@@ -42,7 +43,8 @@ class EventWorkflowExecutionEvent(object):
         'occurred_at': 'datetime',
         'output_uri': 'str',
         'error': 'CoreExecutionError',
-        'output_data': 'CoreLiteralMap'
+        'deprecated_output_data': 'CoreLiteralMap',
+        'output_data': 'CoreOutputData'
     }
 
     attribute_map = {
@@ -52,10 +54,11 @@ class EventWorkflowExecutionEvent(object):
         'occurred_at': 'occurred_at',
         'output_uri': 'output_uri',
         'error': 'error',
+        'deprecated_output_data': 'deprecated_output_data',
         'output_data': 'output_data'
     }
 
-    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None, output_data=None):  # noqa: E501
+    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None, deprecated_output_data=None, output_data=None):  # noqa: E501
         """EventWorkflowExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._execution_id = None
@@ -64,6 +67,7 @@ class EventWorkflowExecutionEvent(object):
         self._occurred_at = None
         self._output_uri = None
         self._error = None
+        self._deprecated_output_data = None
         self._output_data = None
         self.discriminator = None
 
@@ -79,6 +83,8 @@ class EventWorkflowExecutionEvent(object):
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if deprecated_output_data is not None:
+            self.deprecated_output_data = deprecated_output_data
         if output_data is not None:
             self.output_data = output_data
 
@@ -213,13 +219,34 @@ class EventWorkflowExecutionEvent(object):
         self._error = error
 
     @property
+    def deprecated_output_data(self):
+        """Gets the deprecated_output_data of this EventWorkflowExecutionEvent.  # noqa: E501
+
+
+        :return: The deprecated_output_data of this EventWorkflowExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._deprecated_output_data
+
+    @deprecated_output_data.setter
+    def deprecated_output_data(self, deprecated_output_data):
+        """Sets the deprecated_output_data of this EventWorkflowExecutionEvent.
+
+
+        :param deprecated_output_data: The deprecated_output_data of this EventWorkflowExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._deprecated_output_data = deprecated_output_data
+
+    @property
     def output_data(self):
         """Gets the output_data of this EventWorkflowExecutionEvent.  # noqa: E501
 
         Raw output data produced by this workflow execution.  # noqa: E501
 
         :return: The output_data of this EventWorkflowExecutionEvent.  # noqa: E501
-        :rtype: CoreLiteralMap
+        :rtype: CoreOutputData
         """
         return self._output_data
 
@@ -230,7 +257,7 @@ class EventWorkflowExecutionEvent(object):
         Raw output data produced by this workflow execution.  # noqa: E501
 
         :param output_data: The output_data of this EventWorkflowExecutionEvent.  # noqa: E501
-        :type: CoreLiteralMap
+        :type: CoreOutputData
         """
 
         self._output_data = output_data

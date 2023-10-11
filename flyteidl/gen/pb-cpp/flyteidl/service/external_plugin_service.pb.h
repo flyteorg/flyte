@@ -34,7 +34,6 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/tasks.pb.h"
-#include "flyteidl/core/interface.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto
@@ -222,14 +221,14 @@ class TaskCreateRequest final :
   ::std::string* release_output_prefix();
   void set_allocated_output_prefix(::std::string* output_prefix);
 
-  // .flyteidl.core.LiteralMap inputs = 1;
-  bool has_inputs() const;
-  void clear_inputs();
-  static const int kInputsFieldNumber = 1;
-  const ::flyteidl::core::LiteralMap& inputs() const;
-  ::flyteidl::core::LiteralMap* release_inputs();
-  ::flyteidl::core::LiteralMap* mutable_inputs();
-  void set_allocated_inputs(::flyteidl::core::LiteralMap* inputs);
+  // .flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_deprecated_inputs() const;
+  PROTOBUF_DEPRECATED void clear_deprecated_inputs();
+  PROTOBUF_DEPRECATED static const int kDeprecatedInputsFieldNumber = 1;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& deprecated_inputs() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_deprecated_inputs();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_deprecated_inputs();
+  PROTOBUF_DEPRECATED void set_allocated_deprecated_inputs(::flyteidl::core::LiteralMap* deprecated_inputs);
 
   // .flyteidl.core.TaskTemplate template = 2;
   bool has_template_() const;
@@ -240,14 +239,24 @@ class TaskCreateRequest final :
   ::flyteidl::core::TaskTemplate* mutable_template_();
   void set_allocated_template_(::flyteidl::core::TaskTemplate* template_);
 
+  // .flyteidl.core.InputData inputs = 4;
+  bool has_inputs() const;
+  void clear_inputs();
+  static const int kInputsFieldNumber = 4;
+  const ::flyteidl::core::InputData& inputs() const;
+  ::flyteidl::core::InputData* release_inputs();
+  ::flyteidl::core::InputData* mutable_inputs();
+  void set_allocated_inputs(::flyteidl::core::InputData* inputs);
+
   // @@protoc_insertion_point(class_scope:flyteidl.service.TaskCreateRequest)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr output_prefix_;
-  ::flyteidl::core::LiteralMap* inputs_;
+  ::flyteidl::core::LiteralMap* deprecated_inputs_;
   ::flyteidl::core::TaskTemplate* template__;
+  ::flyteidl::core::InputData* inputs_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto;
 };
@@ -603,14 +612,23 @@ class TaskGetResponse final :
 
   // accessors -------------------------------------------------------
 
-  // .flyteidl.core.LiteralMap outputs = 2;
+  // .flyteidl.core.LiteralMap deprecated_outputs = 2;
+  bool has_deprecated_outputs() const;
+  void clear_deprecated_outputs();
+  static const int kDeprecatedOutputsFieldNumber = 2;
+  const ::flyteidl::core::LiteralMap& deprecated_outputs() const;
+  ::flyteidl::core::LiteralMap* release_deprecated_outputs();
+  ::flyteidl::core::LiteralMap* mutable_deprecated_outputs();
+  void set_allocated_deprecated_outputs(::flyteidl::core::LiteralMap* deprecated_outputs);
+
+  // .flyteidl.core.OutputData outputs = 3;
   bool has_outputs() const;
   void clear_outputs();
-  static const int kOutputsFieldNumber = 2;
-  const ::flyteidl::core::LiteralMap& outputs() const;
-  ::flyteidl::core::LiteralMap* release_outputs();
-  ::flyteidl::core::LiteralMap* mutable_outputs();
-  void set_allocated_outputs(::flyteidl::core::LiteralMap* outputs);
+  static const int kOutputsFieldNumber = 3;
+  const ::flyteidl::core::OutputData& outputs() const;
+  ::flyteidl::core::OutputData* release_outputs();
+  ::flyteidl::core::OutputData* mutable_outputs();
+  void set_allocated_outputs(::flyteidl::core::OutputData* outputs);
 
   // .flyteidl.service.State state = 1;
   void clear_state();
@@ -623,7 +641,8 @@ class TaskGetResponse final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::flyteidl::core::LiteralMap* outputs_;
+  ::flyteidl::core::LiteralMap* deprecated_outputs_;
+  ::flyteidl::core::OutputData* outputs_;
   int state_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto;
@@ -879,49 +898,49 @@ class TaskDeleteResponse final :
 #endif  // __GNUC__
 // TaskCreateRequest
 
-// .flyteidl.core.LiteralMap inputs = 1;
-inline bool TaskCreateRequest::has_inputs() const {
-  return this != internal_default_instance() && inputs_ != nullptr;
+// .flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
+inline bool TaskCreateRequest::has_deprecated_inputs() const {
+  return this != internal_default_instance() && deprecated_inputs_ != nullptr;
 }
-inline const ::flyteidl::core::LiteralMap& TaskCreateRequest::inputs() const {
-  const ::flyteidl::core::LiteralMap* p = inputs_;
-  // @@protoc_insertion_point(field_get:flyteidl.service.TaskCreateRequest.inputs)
+inline const ::flyteidl::core::LiteralMap& TaskCreateRequest::deprecated_inputs() const {
+  const ::flyteidl::core::LiteralMap* p = deprecated_inputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.TaskCreateRequest.deprecated_inputs)
   return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
       &::flyteidl::core::_LiteralMap_default_instance_);
 }
-inline ::flyteidl::core::LiteralMap* TaskCreateRequest::release_inputs() {
-  // @@protoc_insertion_point(field_release:flyteidl.service.TaskCreateRequest.inputs)
+inline ::flyteidl::core::LiteralMap* TaskCreateRequest::release_deprecated_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.TaskCreateRequest.deprecated_inputs)
   
-  ::flyteidl::core::LiteralMap* temp = inputs_;
-  inputs_ = nullptr;
+  ::flyteidl::core::LiteralMap* temp = deprecated_inputs_;
+  deprecated_inputs_ = nullptr;
   return temp;
 }
-inline ::flyteidl::core::LiteralMap* TaskCreateRequest::mutable_inputs() {
+inline ::flyteidl::core::LiteralMap* TaskCreateRequest::mutable_deprecated_inputs() {
   
-  if (inputs_ == nullptr) {
+  if (deprecated_inputs_ == nullptr) {
     auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
-    inputs_ = p;
+    deprecated_inputs_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:flyteidl.service.TaskCreateRequest.inputs)
-  return inputs_;
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.TaskCreateRequest.deprecated_inputs)
+  return deprecated_inputs_;
 }
-inline void TaskCreateRequest::set_allocated_inputs(::flyteidl::core::LiteralMap* inputs) {
+inline void TaskCreateRequest::set_allocated_deprecated_inputs(::flyteidl::core::LiteralMap* deprecated_inputs) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(inputs_);
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(deprecated_inputs_);
   }
-  if (inputs) {
+  if (deprecated_inputs) {
     ::google::protobuf::Arena* submessage_arena = nullptr;
     if (message_arena != submessage_arena) {
-      inputs = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, inputs, submessage_arena);
+      deprecated_inputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, deprecated_inputs, submessage_arena);
     }
     
   } else {
     
   }
-  inputs_ = inputs;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.TaskCreateRequest.inputs)
+  deprecated_inputs_ = deprecated_inputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.TaskCreateRequest.deprecated_inputs)
 }
 
 // .flyteidl.core.TaskTemplate template = 2;
@@ -1020,6 +1039,51 @@ inline void TaskCreateRequest::set_allocated_output_prefix(::std::string* output
   }
   output_prefix_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), output_prefix);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.service.TaskCreateRequest.output_prefix)
+}
+
+// .flyteidl.core.InputData inputs = 4;
+inline bool TaskCreateRequest::has_inputs() const {
+  return this != internal_default_instance() && inputs_ != nullptr;
+}
+inline const ::flyteidl::core::InputData& TaskCreateRequest::inputs() const {
+  const ::flyteidl::core::InputData* p = inputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.TaskCreateRequest.inputs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::InputData*>(
+      &::flyteidl::core::_InputData_default_instance_);
+}
+inline ::flyteidl::core::InputData* TaskCreateRequest::release_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.TaskCreateRequest.inputs)
+  
+  ::flyteidl::core::InputData* temp = inputs_;
+  inputs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::InputData* TaskCreateRequest::mutable_inputs() {
+  
+  if (inputs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::InputData>(GetArenaNoVirtual());
+    inputs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.TaskCreateRequest.inputs)
+  return inputs_;
+}
+inline void TaskCreateRequest::set_allocated_inputs(::flyteidl::core::InputData* inputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(inputs_);
+  }
+  if (inputs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      inputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, inputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  inputs_ = inputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.TaskCreateRequest.inputs)
 }
 
 // -------------------------------------------------------------------
@@ -1207,33 +1271,78 @@ inline void TaskGetResponse::set_state(::flyteidl::service::State value) {
   // @@protoc_insertion_point(field_set:flyteidl.service.TaskGetResponse.state)
 }
 
-// .flyteidl.core.LiteralMap outputs = 2;
-inline bool TaskGetResponse::has_outputs() const {
-  return this != internal_default_instance() && outputs_ != nullptr;
+// .flyteidl.core.LiteralMap deprecated_outputs = 2;
+inline bool TaskGetResponse::has_deprecated_outputs() const {
+  return this != internal_default_instance() && deprecated_outputs_ != nullptr;
 }
-inline const ::flyteidl::core::LiteralMap& TaskGetResponse::outputs() const {
-  const ::flyteidl::core::LiteralMap* p = outputs_;
-  // @@protoc_insertion_point(field_get:flyteidl.service.TaskGetResponse.outputs)
+inline const ::flyteidl::core::LiteralMap& TaskGetResponse::deprecated_outputs() const {
+  const ::flyteidl::core::LiteralMap* p = deprecated_outputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.TaskGetResponse.deprecated_outputs)
   return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
       &::flyteidl::core::_LiteralMap_default_instance_);
 }
-inline ::flyteidl::core::LiteralMap* TaskGetResponse::release_outputs() {
+inline ::flyteidl::core::LiteralMap* TaskGetResponse::release_deprecated_outputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.service.TaskGetResponse.deprecated_outputs)
+  
+  ::flyteidl::core::LiteralMap* temp = deprecated_outputs_;
+  deprecated_outputs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LiteralMap* TaskGetResponse::mutable_deprecated_outputs() {
+  
+  if (deprecated_outputs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
+    deprecated_outputs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.service.TaskGetResponse.deprecated_outputs)
+  return deprecated_outputs_;
+}
+inline void TaskGetResponse::set_allocated_deprecated_outputs(::flyteidl::core::LiteralMap* deprecated_outputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(deprecated_outputs_);
+  }
+  if (deprecated_outputs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      deprecated_outputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, deprecated_outputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  deprecated_outputs_ = deprecated_outputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.service.TaskGetResponse.deprecated_outputs)
+}
+
+// .flyteidl.core.OutputData outputs = 3;
+inline bool TaskGetResponse::has_outputs() const {
+  return this != internal_default_instance() && outputs_ != nullptr;
+}
+inline const ::flyteidl::core::OutputData& TaskGetResponse::outputs() const {
+  const ::flyteidl::core::OutputData* p = outputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.service.TaskGetResponse.outputs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::OutputData*>(
+      &::flyteidl::core::_OutputData_default_instance_);
+}
+inline ::flyteidl::core::OutputData* TaskGetResponse::release_outputs() {
   // @@protoc_insertion_point(field_release:flyteidl.service.TaskGetResponse.outputs)
   
-  ::flyteidl::core::LiteralMap* temp = outputs_;
+  ::flyteidl::core::OutputData* temp = outputs_;
   outputs_ = nullptr;
   return temp;
 }
-inline ::flyteidl::core::LiteralMap* TaskGetResponse::mutable_outputs() {
+inline ::flyteidl::core::OutputData* TaskGetResponse::mutable_outputs() {
   
   if (outputs_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
+    auto* p = CreateMaybeMessage<::flyteidl::core::OutputData>(GetArenaNoVirtual());
     outputs_ = p;
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.service.TaskGetResponse.outputs)
   return outputs_;
 }
-inline void TaskGetResponse::set_allocated_outputs(::flyteidl::core::LiteralMap* outputs) {
+inline void TaskGetResponse::set_allocated_outputs(::flyteidl::core::OutputData* outputs) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
     delete reinterpret_cast< ::google::protobuf::MessageLite*>(outputs_);

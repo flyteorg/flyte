@@ -26,13 +26,15 @@ type EventTaskExecutionEvent struct {
 	OccurredAt time.Time `json:"occurred_at,omitempty"`
 	// URI of the input file, it encodes all the information including Cloud source provider. ie., s3://...
 	InputUri string `json:"input_uri,omitempty"`
-	// Raw input data consumed by this task execution.
-	InputData *CoreLiteralMap `json:"input_data,omitempty"`
+	DeprecatedInputData *CoreLiteralMap `json:"deprecated_input_data,omitempty"`
+	// Raw input data consumed by this node execution.
+	InputData *CoreInputData `json:"input_data,omitempty"`
 	// URI to the output of the execution, it will be in a format that encodes all the information including Cloud source provider. ie., s3://...
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
-	// Raw output data produced by this task execution.
-	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
+	DeprecatedOutputData *CoreLiteralMap `json:"deprecated_output_data,omitempty"`
+	// Raw output data produced by this workflow execution.
+	OutputData *CoreOutputData `json:"output_data,omitempty"`
 	// Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.
 	CustomInfo *ProtobufStruct `json:"custom_info,omitempty"`
 	// Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc) that should be recorded regardless of the lack of phase change. The version field should be incremented when metadata changes across the duration of an individual phase.

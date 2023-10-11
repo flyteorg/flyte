@@ -3838,6 +3838,10 @@
         },
         "inputs": {
           "$ref": "#/definitions/coreLiteralMap",
+          "description": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional\nDeprecated: Please use input_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
           "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
         }
       },
@@ -4267,6 +4271,10 @@
         },
         "fixed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
+          "title": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan.\nDeprecated: Please use fixec_input_data instead"
+        },
+        "fixed_input_data": {
+          "$ref": "#/definitions/coreInputData",
           "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan."
         },
         "role": {
@@ -4641,11 +4649,19 @@
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use input_data instead."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use output_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "InputData will only be populated if they are under a configured size threshold."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "OutputData will only be populated if they are under a configured size threshold."
         },
         "dynamic_workflow": {
           "$ref": "#/definitions/flyteidladminDynamicWorkflowNodeMetadata",
@@ -5194,11 +5210,19 @@
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use input_data instead."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use output_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "InputData will only be populated if they are under a configured size threshold."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "OutputData will only be populated if they are under a configured size threshold."
         },
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs",
@@ -5510,11 +5534,19 @@
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use input_data instead."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use output_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "InputData will only be populated if they are under a configured size threshold."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "OutputData will only be populated if they are under a configured size threshold."
         }
       },
       "description": "Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution."
@@ -6148,6 +6180,14 @@
       },
       "description": "Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.\nIf no conditions were satisfied, the else_node or the error will execute."
     },
+    "coreInputData": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap"
+        }
+      }
+    },
     "coreK8sObjectMetadata": {
       "type": "object",
       "properties": {
@@ -6467,6 +6507,14 @@
         }
       },
       "description": "Defines an operand to a comparison expression."
+    },
+    "coreOutputData": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap"
+        }
+      }
     },
     "coreOutputReference": {
       "type": "object",
@@ -7356,8 +7404,12 @@
         "input_uri": {
           "type": "string"
         },
-        "input_data": {
+        "deprecated_input_data": {
           "$ref": "#/definitions/coreLiteralMap",
+          "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
           "description": "Raw input data consumed by this node execution."
         },
         "output_uri": {
@@ -7368,9 +7420,13 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
-        "output_data": {
+        "deprecated_output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output data produced by this node execution."
+          "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "Raw output data produced by this workflow execution."
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -7499,9 +7555,13 @@
           "type": "string",
           "description": "URI of the input file, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
         },
-        "input_data": {
+        "deprecated_input_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw input data consumed by this task execution."
+          "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "Raw input data consumed by this node execution."
         },
         "output_uri": {
           "type": "string",
@@ -7511,9 +7571,13 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
-        "output_data": {
+        "deprecated_output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output data produced by this task execution."
+          "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "Raw output data produced by this workflow execution."
         },
         "custom_info": {
           "$ref": "#/definitions/protobufStruct",
@@ -7583,8 +7647,12 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
-        "output_data": {
+        "deprecated_output_data": {
           "$ref": "#/definitions/coreLiteralMap",
+          "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
           "description": "Raw output data produced by this workflow execution."
         }
       }

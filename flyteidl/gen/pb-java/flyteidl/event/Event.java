@@ -146,9 +146,37 @@ public final class Event {
     /**
      * <pre>
      * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated boolean hasDeprecatedOutputData();
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getDeprecatedOutputData();
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder();
+
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 8;</code>
      */
     boolean hasOutputData();
     /**
@@ -156,17 +184,17 @@ public final class Event {
      * Raw output data produced by this workflow execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+     * <code>.flyteidl.core.OutputData output_data = 8;</code>
      */
-    flyteidl.core.Literals.LiteralMap getOutputData();
+    flyteidl.core.Literals.OutputData getOutputData();
     /**
      * <pre>
      * Raw output data produced by this workflow execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+     * <code>.flyteidl.core.OutputData output_data = 8;</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
+    flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder();
 
     public flyteidl.event.Event.WorkflowExecutionEvent.OutputResultCase getOutputResultCase();
   }
@@ -283,6 +311,20 @@ public final class Event {
               outputResultCase_ = 7;
               break;
             }
+            case 66: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
+              if (outputResultCase_ == 8) {
+                subBuilder = ((flyteidl.core.Literals.OutputData) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.OutputData) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 8;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -321,7 +363,8 @@ public final class Event {
         implements com.google.protobuf.Internal.EnumLite {
       OUTPUT_URI(5),
       ERROR(6),
-      OUTPUT_DATA(7),
+      @java.lang.Deprecated DEPRECATED_OUTPUT_DATA(7),
+      OUTPUT_DATA(8),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -339,7 +382,8 @@ public final class Event {
         switch (value) {
           case 5: return OUTPUT_URI;
           case 6: return ERROR;
-          case 7: return OUTPUT_DATA;
+          case 7: return DEPRECATED_OUTPUT_DATA;
+          case 8: return OUTPUT_DATA;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -574,25 +618,27 @@ public final class Event {
       return flyteidl.core.Execution.ExecutionError.getDefaultInstance();
     }
 
-    public static final int OUTPUT_DATA_FIELD_NUMBER = 7;
+    public static final int DEPRECATED_OUTPUT_DATA_FIELD_NUMBER = 7;
     /**
      * <pre>
      * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
      */
-    public boolean hasOutputData() {
+    @java.lang.Deprecated public boolean hasDeprecatedOutputData() {
       return outputResultCase_ == 7;
     }
     /**
      * <pre>
      * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getOutputData() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputData() {
       if (outputResultCase_ == 7) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
@@ -601,15 +647,54 @@ public final class Event {
     /**
      * <pre>
      * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder() {
       if (outputResultCase_ == 7) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int OUTPUT_DATA_FIELD_NUMBER = 8;
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 8;</code>
+     */
+    public boolean hasOutputData() {
+      return outputResultCase_ == 8;
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 8;</code>
+     */
+    public flyteidl.core.Literals.OutputData getOutputData() {
+      if (outputResultCase_ == 8) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 8;</code>
+     */
+    public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+      if (outputResultCase_ == 8) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -647,6 +732,9 @@ public final class Event {
       if (outputResultCase_ == 7) {
         output.writeMessage(7, (flyteidl.core.Literals.LiteralMap) outputResult_);
       }
+      if (outputResultCase_ == 8) {
+        output.writeMessage(8, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -681,6 +769,10 @@ public final class Event {
       if (outputResultCase_ == 7) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(7, (flyteidl.core.Literals.LiteralMap) outputResult_);
+      }
+      if (outputResultCase_ == 8) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(8, (flyteidl.core.Literals.OutputData) outputResult_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -721,6 +813,10 @@ public final class Event {
               .equals(other.getError())) return false;
           break;
         case 7:
+          if (!getDeprecatedOutputData()
+              .equals(other.getDeprecatedOutputData())) return false;
+          break;
+        case 8:
           if (!getOutputData()
               .equals(other.getOutputData())) return false;
           break;
@@ -760,6 +856,10 @@ public final class Event {
           hash = (53 * hash) + getError().hashCode();
           break;
         case 7:
+          hash = (37 * hash) + DEPRECATED_OUTPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getDeprecatedOutputData().hashCode();
+          break;
+        case 8:
           hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getOutputData().hashCode();
           break;
@@ -966,6 +1066,13 @@ public final class Event {
           }
         }
         if (outputResultCase_ == 7) {
+          if (deprecatedOutputDataBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = deprecatedOutputDataBuilder_.build();
+          }
+        }
+        if (outputResultCase_ == 8) {
           if (outputDataBuilder_ == null) {
             result.outputResult_ = outputResult_;
           } else {
@@ -1043,6 +1150,10 @@ public final class Event {
           }
           case ERROR: {
             mergeError(other.getError());
+            break;
+          }
+          case DEPRECATED_OUTPUT_DATA: {
+            mergeDeprecatedOutputData(other.getDeprecatedOutputData());
             break;
           }
           case OUTPUT_DATA: {
@@ -1824,33 +1935,35 @@ public final class Event {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> deprecatedOutputDataBuilder_;
       /**
        * <pre>
        * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
        */
-      public boolean hasOutputData() {
+      @java.lang.Deprecated public boolean hasDeprecatedOutputData() {
         return outputResultCase_ == 7;
       }
       /**
        * <pre>
        * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getOutputData() {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputData() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 7) {
             return (flyteidl.core.Literals.LiteralMap) outputResult_;
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         } else {
           if (outputResultCase_ == 7) {
-            return outputDataBuilder_.getMessage();
+            return deprecatedOutputDataBuilder_.getMessage();
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         }
@@ -1858,19 +1971,20 @@ public final class Event {
       /**
        * <pre>
        * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
        */
-      public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder setDeprecatedOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           outputResult_ = value;
           onChanged();
         } else {
-          outputDataBuilder_.setMessage(value);
+          deprecatedOutputDataBuilder_.setMessage(value);
         }
         outputResultCase_ = 7;
         return this;
@@ -1878,17 +1992,18 @@ public final class Event {
       /**
        * <pre>
        * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
        */
-      public Builder setOutputData(
+      @java.lang.Deprecated public Builder setDeprecatedOutputData(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (outputDataBuilder_ == null) {
+        if (deprecatedOutputDataBuilder_ == null) {
           outputResult_ = builderForValue.build();
           onChanged();
         } else {
-          outputDataBuilder_.setMessage(builderForValue.build());
+          deprecatedOutputDataBuilder_.setMessage(builderForValue.build());
         }
         outputResultCase_ = 7;
         return this;
@@ -1896,12 +2011,13 @@ public final class Event {
       /**
        * <pre>
        * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
        */
-      public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder mergeDeprecatedOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 7 &&
               outputResult_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
             outputResult_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) outputResult_)
@@ -1912,9 +2028,9 @@ public final class Event {
           onChanged();
         } else {
           if (outputResultCase_ == 7) {
-            outputDataBuilder_.mergeFrom(value);
+            deprecatedOutputDataBuilder_.mergeFrom(value);
           }
-          outputDataBuilder_.setMessage(value);
+          deprecatedOutputDataBuilder_.setMessage(value);
         }
         outputResultCase_ = 7;
         return this;
@@ -1922,12 +2038,13 @@ public final class Event {
       /**
        * <pre>
        * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
        */
-      public Builder clearOutputData() {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder clearDeprecatedOutputData() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 7) {
             outputResultCase_ = 0;
             outputResult_ = null;
@@ -1935,6 +2052,181 @@ public final class Event {
           }
         } else {
           if (outputResultCase_ == 7) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          deprecatedOutputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getDeprecatedOutputDataBuilder() {
+        return getDeprecatedOutputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder() {
+        if ((outputResultCase_ == 7) && (deprecatedOutputDataBuilder_ != null)) {
+          return deprecatedOutputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 7) {
+            return (flyteidl.core.Literals.LiteralMap) outputResult_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getDeprecatedOutputDataFieldBuilder() {
+        if (deprecatedOutputDataBuilder_ == null) {
+          if (!(outputResultCase_ == 7)) {
+            outputResult_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          }
+          deprecatedOutputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  (flyteidl.core.Literals.LiteralMap) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 7;
+        onChanged();;
+        return deprecatedOutputDataBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> outputDataBuilder_;
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
+       */
+      public boolean hasOutputData() {
+        return outputResultCase_ == 8;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
+       */
+      public flyteidl.core.Literals.OutputData getOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 8) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 8) {
+            return outputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
+       */
+      public Builder setOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 8;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
+       */
+      public Builder setOutputData(
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
+        if (outputDataBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 8;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
+       */
+      public Builder mergeOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 8 &&
+              outputResult_ != flyteidl.core.Literals.OutputData.getDefaultInstance()) {
+            outputResult_ = flyteidl.core.Literals.OutputData.newBuilder((flyteidl.core.Literals.OutputData) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 8) {
+            outputDataBuilder_.mergeFrom(value);
+          }
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 8;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
+       */
+      public Builder clearOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 8) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 8) {
             outputResultCase_ = 0;
             outputResult_ = null;
           }
@@ -1947,9 +2239,9 @@ public final class Event {
        * Raw output data produced by this workflow execution.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
+      public flyteidl.core.Literals.OutputData.Builder getOutputDataBuilder() {
         return getOutputDataFieldBuilder().getBuilder();
       }
       /**
@@ -1957,16 +2249,16 @@ public final class Event {
        * Raw output data produced by this workflow execution.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
-        if ((outputResultCase_ == 7) && (outputDataBuilder_ != null)) {
+      public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+        if ((outputResultCase_ == 8) && (outputDataBuilder_ != null)) {
           return outputDataBuilder_.getMessageOrBuilder();
         } else {
-          if (outputResultCase_ == 7) {
-            return (flyteidl.core.Literals.LiteralMap) outputResult_;
+          if (outputResultCase_ == 8) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
           }
-          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
         }
       }
       /**
@@ -1974,23 +2266,23 @@ public final class Event {
        * Raw output data produced by this workflow execution.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 7;</code>
+       * <code>.flyteidl.core.OutputData output_data = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
           getOutputDataFieldBuilder() {
         if (outputDataBuilder_ == null) {
-          if (!(outputResultCase_ == 7)) {
-            outputResult_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          if (!(outputResultCase_ == 8)) {
+            outputResult_ = flyteidl.core.Literals.OutputData.getDefaultInstance();
           }
           outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
-                  (flyteidl.core.Literals.LiteralMap) outputResult_,
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
+                  (flyteidl.core.Literals.OutputData) outputResult_,
                   getParentForChildren(),
                   isClean());
           outputResult_ = null;
         }
-        outputResultCase_ = 7;
+        outputResultCase_ = 8;
         onChanged();;
         return outputDataBuilder_;
       }
@@ -2144,9 +2436,37 @@ public final class Event {
     /**
      * <pre>
      * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated boolean hasDeprecatedInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getDeprecatedInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputDataOrBuilder();
+
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 24;</code>
      */
     boolean hasInputData();
     /**
@@ -2154,17 +2474,17 @@ public final class Event {
      * Raw input data consumed by this node execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     * <code>.flyteidl.core.InputData input_data = 24;</code>
      */
-    flyteidl.core.Literals.LiteralMap getInputData();
+    flyteidl.core.Literals.InputData getInputData();
     /**
      * <pre>
      * Raw input data consumed by this node execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     * <code>.flyteidl.core.InputData input_data = 24;</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder();
+    flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder();
 
     /**
      * <pre>
@@ -2213,28 +2533,56 @@ public final class Event {
 
     /**
      * <pre>
-     * Raw output data produced by this node execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated boolean hasDeprecatedOutputData();
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getDeprecatedOutputData();
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder();
+
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 23;</code>
      */
     boolean hasOutputData();
     /**
      * <pre>
-     * Raw output data produced by this node execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+     * <code>.flyteidl.core.OutputData output_data = 23;</code>
      */
-    flyteidl.core.Literals.LiteralMap getOutputData();
+    flyteidl.core.Literals.OutputData getOutputData();
     /**
      * <pre>
-     * Raw output data produced by this node execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+     * <code>.flyteidl.core.OutputData output_data = 23;</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
+    flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder();
 
     /**
      * <code>.flyteidl.event.WorkflowNodeMetadata workflow_node_metadata = 8;</code>
@@ -2708,6 +3056,34 @@ public final class Event {
               isArray_ = input.readBool();
               break;
             }
+            case 186: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
+              if (outputResultCase_ == 23) {
+                subBuilder = ((flyteidl.core.Literals.OutputData) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.OutputData) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 23;
+              break;
+            }
+            case 194: {
+              flyteidl.core.Literals.InputData.Builder subBuilder = null;
+              if (inputValueCase_ == 24) {
+                subBuilder = ((flyteidl.core.Literals.InputData) inputValue_).toBuilder();
+              }
+              inputValue_ =
+                  input.readMessage(flyteidl.core.Literals.InputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.InputData) inputValue_);
+                inputValue_ = subBuilder.buildPartial();
+              }
+              inputValueCase_ = 24;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2745,7 +3121,8 @@ public final class Event {
     public enum InputValueCase
         implements com.google.protobuf.Internal.EnumLite {
       INPUT_URI(5),
-      INPUT_DATA(20),
+      @java.lang.Deprecated DEPRECATED_INPUT_DATA(20),
+      INPUT_DATA(24),
       INPUTVALUE_NOT_SET(0);
       private final int value;
       private InputValueCase(int value) {
@@ -2762,7 +3139,8 @@ public final class Event {
       public static InputValueCase forNumber(int value) {
         switch (value) {
           case 5: return INPUT_URI;
-          case 20: return INPUT_DATA;
+          case 20: return DEPRECATED_INPUT_DATA;
+          case 24: return INPUT_DATA;
           case 0: return INPUTVALUE_NOT_SET;
           default: return null;
         }
@@ -2784,7 +3162,8 @@ public final class Event {
         implements com.google.protobuf.Internal.EnumLite {
       OUTPUT_URI(6),
       ERROR(7),
-      OUTPUT_DATA(15),
+      @java.lang.Deprecated DEPRECATED_OUTPUT_DATA(15),
+      OUTPUT_DATA(23),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -2802,7 +3181,8 @@ public final class Event {
         switch (value) {
           case 6: return OUTPUT_URI;
           case 7: return ERROR;
-          case 15: return OUTPUT_DATA;
+          case 15: return DEPRECATED_OUTPUT_DATA;
+          case 23: return OUTPUT_DATA;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -3027,25 +3407,27 @@ public final class Event {
       }
     }
 
-    public static final int INPUT_DATA_FIELD_NUMBER = 20;
+    public static final int DEPRECATED_INPUT_DATA_FIELD_NUMBER = 20;
     /**
      * <pre>
      * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
      */
-    public boolean hasInputData() {
+    @java.lang.Deprecated public boolean hasDeprecatedInputData() {
       return inputValueCase_ == 20;
     }
     /**
      * <pre>
      * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getInputData() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedInputData() {
       if (inputValueCase_ == 20) {
          return (flyteidl.core.Literals.LiteralMap) inputValue_;
       }
@@ -3054,15 +3436,54 @@ public final class Event {
     /**
      * <pre>
      * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputDataOrBuilder() {
       if (inputValueCase_ == 20) {
          return (flyteidl.core.Literals.LiteralMap) inputValue_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int INPUT_DATA_FIELD_NUMBER = 24;
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 24;</code>
+     */
+    public boolean hasInputData() {
+      return inputValueCase_ == 24;
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 24;</code>
+     */
+    public flyteidl.core.Literals.InputData getInputData() {
+      if (inputValueCase_ == 24) {
+         return (flyteidl.core.Literals.InputData) inputValue_;
+      }
+      return flyteidl.core.Literals.InputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 24;</code>
+     */
+    public flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder() {
+      if (inputValueCase_ == 24) {
+         return (flyteidl.core.Literals.InputData) inputValue_;
+      }
+      return flyteidl.core.Literals.InputData.getDefaultInstance();
     }
 
     public static final int OUTPUT_URI_FIELD_NUMBER = 6;
@@ -3156,25 +3577,27 @@ public final class Event {
       return flyteidl.core.Execution.ExecutionError.getDefaultInstance();
     }
 
-    public static final int OUTPUT_DATA_FIELD_NUMBER = 15;
+    public static final int DEPRECATED_OUTPUT_DATA_FIELD_NUMBER = 15;
     /**
      * <pre>
-     * Raw output data produced by this node execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
      */
-    public boolean hasOutputData() {
+    @java.lang.Deprecated public boolean hasDeprecatedOutputData() {
       return outputResultCase_ == 15;
     }
     /**
      * <pre>
-     * Raw output data produced by this node execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getOutputData() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputData() {
       if (outputResultCase_ == 15) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
@@ -3182,16 +3605,55 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output data produced by this node execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder() {
       if (outputResultCase_ == 15) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int OUTPUT_DATA_FIELD_NUMBER = 23;
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 23;</code>
+     */
+    public boolean hasOutputData() {
+      return outputResultCase_ == 23;
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 23;</code>
+     */
+    public flyteidl.core.Literals.OutputData getOutputData() {
+      if (outputResultCase_ == 23) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 23;</code>
+     */
+    public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+      if (outputResultCase_ == 23) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
     }
 
     public static final int WORKFLOW_NODE_METADATA_FIELD_NUMBER = 8;
@@ -3654,6 +4116,12 @@ public final class Event {
       if (isArray_ != false) {
         output.writeBool(22, isArray_);
       }
+      if (outputResultCase_ == 23) {
+        output.writeMessage(23, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
+      if (inputValueCase_ == 24) {
+        output.writeMessage(24, (flyteidl.core.Literals.InputData) inputValue_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3744,6 +4212,14 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(22, isArray_);
       }
+      if (outputResultCase_ == 23) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(23, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
+      if (inputValueCase_ == 24) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(24, (flyteidl.core.Literals.InputData) inputValue_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3810,6 +4286,10 @@ public final class Event {
               .equals(other.getInputUri())) return false;
           break;
         case 20:
+          if (!getDeprecatedInputData()
+              .equals(other.getDeprecatedInputData())) return false;
+          break;
+        case 24:
           if (!getInputData()
               .equals(other.getInputData())) return false;
           break;
@@ -3827,6 +4307,10 @@ public final class Event {
               .equals(other.getError())) return false;
           break;
         case 15:
+          if (!getDeprecatedOutputData()
+              .equals(other.getDeprecatedOutputData())) return false;
+          break;
+        case 23:
           if (!getOutputData()
               .equals(other.getOutputData())) return false;
           break;
@@ -3906,6 +4390,10 @@ public final class Event {
           hash = (53 * hash) + getInputUri().hashCode();
           break;
         case 20:
+          hash = (37 * hash) + DEPRECATED_INPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getDeprecatedInputData().hashCode();
+          break;
+        case 24:
           hash = (37 * hash) + INPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getInputData().hashCode();
           break;
@@ -3922,6 +4410,10 @@ public final class Event {
           hash = (53 * hash) + getError().hashCode();
           break;
         case 15:
+          hash = (37 * hash) + DEPRECATED_OUTPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getDeprecatedOutputData().hashCode();
+          break;
+        case 23:
           hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getOutputData().hashCode();
           break;
@@ -4171,6 +4663,13 @@ public final class Event {
           result.inputValue_ = inputValue_;
         }
         if (inputValueCase_ == 20) {
+          if (deprecatedInputDataBuilder_ == null) {
+            result.inputValue_ = inputValue_;
+          } else {
+            result.inputValue_ = deprecatedInputDataBuilder_.build();
+          }
+        }
+        if (inputValueCase_ == 24) {
           if (inputDataBuilder_ == null) {
             result.inputValue_ = inputValue_;
           } else {
@@ -4188,6 +4687,13 @@ public final class Event {
           }
         }
         if (outputResultCase_ == 15) {
+          if (deprecatedOutputDataBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = deprecatedOutputDataBuilder_.build();
+          }
+        }
+        if (outputResultCase_ == 23) {
           if (outputDataBuilder_ == null) {
             result.outputResult_ = outputResult_;
           } else {
@@ -4339,6 +4845,10 @@ public final class Event {
             onChanged();
             break;
           }
+          case DEPRECATED_INPUT_DATA: {
+            mergeDeprecatedInputData(other.getDeprecatedInputData());
+            break;
+          }
           case INPUT_DATA: {
             mergeInputData(other.getInputData());
             break;
@@ -4356,6 +4866,10 @@ public final class Event {
           }
           case ERROR: {
             mergeError(other.getError());
+            break;
+          }
+          case DEPRECATED_OUTPUT_DATA: {
+            mergeDeprecatedOutputData(other.getDeprecatedOutputData());
             break;
           }
           case OUTPUT_DATA: {
@@ -4983,33 +5497,35 @@ public final class Event {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputDataBuilder_;
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> deprecatedInputDataBuilder_;
       /**
        * <pre>
        * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
        */
-      public boolean hasInputData() {
+      @java.lang.Deprecated public boolean hasDeprecatedInputData() {
         return inputValueCase_ == 20;
       }
       /**
        * <pre>
        * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getInputData() {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedInputData() {
+        if (deprecatedInputDataBuilder_ == null) {
           if (inputValueCase_ == 20) {
             return (flyteidl.core.Literals.LiteralMap) inputValue_;
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         } else {
           if (inputValueCase_ == 20) {
-            return inputDataBuilder_.getMessage();
+            return deprecatedInputDataBuilder_.getMessage();
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         }
@@ -5017,19 +5533,20 @@ public final class Event {
       /**
        * <pre>
        * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
        */
-      public Builder setInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder setDeprecatedInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedInputDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           inputValue_ = value;
           onChanged();
         } else {
-          inputDataBuilder_.setMessage(value);
+          deprecatedInputDataBuilder_.setMessage(value);
         }
         inputValueCase_ = 20;
         return this;
@@ -5037,17 +5554,18 @@ public final class Event {
       /**
        * <pre>
        * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
        */
-      public Builder setInputData(
+      @java.lang.Deprecated public Builder setDeprecatedInputData(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (inputDataBuilder_ == null) {
+        if (deprecatedInputDataBuilder_ == null) {
           inputValue_ = builderForValue.build();
           onChanged();
         } else {
-          inputDataBuilder_.setMessage(builderForValue.build());
+          deprecatedInputDataBuilder_.setMessage(builderForValue.build());
         }
         inputValueCase_ = 20;
         return this;
@@ -5055,12 +5573,13 @@ public final class Event {
       /**
        * <pre>
        * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
        */
-      public Builder mergeInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder mergeDeprecatedInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedInputDataBuilder_ == null) {
           if (inputValueCase_ == 20 &&
               inputValue_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
             inputValue_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) inputValue_)
@@ -5071,9 +5590,9 @@ public final class Event {
           onChanged();
         } else {
           if (inputValueCase_ == 20) {
-            inputDataBuilder_.mergeFrom(value);
+            deprecatedInputDataBuilder_.mergeFrom(value);
           }
-          inputDataBuilder_.setMessage(value);
+          deprecatedInputDataBuilder_.setMessage(value);
         }
         inputValueCase_ = 20;
         return this;
@@ -5081,12 +5600,13 @@ public final class Event {
       /**
        * <pre>
        * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
        */
-      public Builder clearInputData() {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder clearDeprecatedInputData() {
+        if (deprecatedInputDataBuilder_ == null) {
           if (inputValueCase_ == 20) {
             inputValueCase_ = 0;
             inputValue_ = null;
@@ -5094,6 +5614,181 @@ public final class Event {
           }
         } else {
           if (inputValueCase_ == 20) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+          }
+          deprecatedInputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getDeprecatedInputDataBuilder() {
+        return getDeprecatedInputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputDataOrBuilder() {
+        if ((inputValueCase_ == 20) && (deprecatedInputDataBuilder_ != null)) {
+          return deprecatedInputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (inputValueCase_ == 20) {
+            return (flyteidl.core.Literals.LiteralMap) inputValue_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getDeprecatedInputDataFieldBuilder() {
+        if (deprecatedInputDataBuilder_ == null) {
+          if (!(inputValueCase_ == 20)) {
+            inputValue_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          }
+          deprecatedInputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  (flyteidl.core.Literals.LiteralMap) inputValue_,
+                  getParentForChildren(),
+                  isClean());
+          inputValue_ = null;
+        }
+        inputValueCase_ = 20;
+        onChanged();;
+        return deprecatedInputDataBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> inputDataBuilder_;
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
+       */
+      public boolean hasInputData() {
+        return inputValueCase_ == 24;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
+       */
+      public flyteidl.core.Literals.InputData getInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 24) {
+            return (flyteidl.core.Literals.InputData) inputValue_;
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        } else {
+          if (inputValueCase_ == 24) {
+            return inputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
+       */
+      public Builder setInputData(flyteidl.core.Literals.InputData value) {
+        if (inputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputValue_ = value;
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 24;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
+       */
+      public Builder setInputData(
+          flyteidl.core.Literals.InputData.Builder builderForValue) {
+        if (inputDataBuilder_ == null) {
+          inputValue_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(builderForValue.build());
+        }
+        inputValueCase_ = 24;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
+       */
+      public Builder mergeInputData(flyteidl.core.Literals.InputData value) {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 24 &&
+              inputValue_ != flyteidl.core.Literals.InputData.getDefaultInstance()) {
+            inputValue_ = flyteidl.core.Literals.InputData.newBuilder((flyteidl.core.Literals.InputData) inputValue_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            inputValue_ = value;
+          }
+          onChanged();
+        } else {
+          if (inputValueCase_ == 24) {
+            inputDataBuilder_.mergeFrom(value);
+          }
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 24;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
+       */
+      public Builder clearInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 24) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+            onChanged();
+          }
+        } else {
+          if (inputValueCase_ == 24) {
             inputValueCase_ = 0;
             inputValue_ = null;
           }
@@ -5106,9 +5801,9 @@ public final class Event {
        * Raw input data consumed by this node execution.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getInputDataBuilder() {
+      public flyteidl.core.Literals.InputData.Builder getInputDataBuilder() {
         return getInputDataFieldBuilder().getBuilder();
       }
       /**
@@ -5116,16 +5811,16 @@ public final class Event {
        * Raw input data consumed by this node execution.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
-        if ((inputValueCase_ == 20) && (inputDataBuilder_ != null)) {
+      public flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder() {
+        if ((inputValueCase_ == 24) && (inputDataBuilder_ != null)) {
           return inputDataBuilder_.getMessageOrBuilder();
         } else {
-          if (inputValueCase_ == 20) {
-            return (flyteidl.core.Literals.LiteralMap) inputValue_;
+          if (inputValueCase_ == 24) {
+            return (flyteidl.core.Literals.InputData) inputValue_;
           }
-          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
         }
       }
       /**
@@ -5133,23 +5828,23 @@ public final class Event {
        * Raw input data consumed by this node execution.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       * <code>.flyteidl.core.InputData input_data = 24;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> 
           getInputDataFieldBuilder() {
         if (inputDataBuilder_ == null) {
-          if (!(inputValueCase_ == 20)) {
-            inputValue_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          if (!(inputValueCase_ == 24)) {
+            inputValue_ = flyteidl.core.Literals.InputData.getDefaultInstance();
           }
           inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
-                  (flyteidl.core.Literals.LiteralMap) inputValue_,
+              flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder>(
+                  (flyteidl.core.Literals.InputData) inputValue_,
                   getParentForChildren(),
                   isClean());
           inputValue_ = null;
         }
-        inputValueCase_ = 20;
+        inputValueCase_ = 24;
         onChanged();;
         return inputDataBuilder_;
       }
@@ -5432,84 +6127,89 @@ public final class Event {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> deprecatedOutputDataBuilder_;
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public boolean hasOutputData() {
+      @java.lang.Deprecated public boolean hasDeprecatedOutputData() {
         return outputResultCase_ == 15;
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getOutputData() {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputData() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 15) {
             return (flyteidl.core.Literals.LiteralMap) outputResult_;
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         } else {
           if (outputResultCase_ == 15) {
-            return outputDataBuilder_.getMessage();
+            return deprecatedOutputDataBuilder_.getMessage();
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         }
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder setDeprecatedOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           outputResult_ = value;
           onChanged();
         } else {
-          outputDataBuilder_.setMessage(value);
+          deprecatedOutputDataBuilder_.setMessage(value);
         }
         outputResultCase_ = 15;
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public Builder setOutputData(
+      @java.lang.Deprecated public Builder setDeprecatedOutputData(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (outputDataBuilder_ == null) {
+        if (deprecatedOutputDataBuilder_ == null) {
           outputResult_ = builderForValue.build();
           onChanged();
         } else {
-          outputDataBuilder_.setMessage(builderForValue.build());
+          deprecatedOutputDataBuilder_.setMessage(builderForValue.build());
         }
         outputResultCase_ = 15;
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder mergeDeprecatedOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 15 &&
               outputResult_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
             outputResult_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) outputResult_)
@@ -5520,22 +6220,23 @@ public final class Event {
           onChanged();
         } else {
           if (outputResultCase_ == 15) {
-            outputDataBuilder_.mergeFrom(value);
+            deprecatedOutputDataBuilder_.mergeFrom(value);
           }
-          outputDataBuilder_.setMessage(value);
+          deprecatedOutputDataBuilder_.setMessage(value);
         }
         outputResultCase_ = 15;
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public Builder clearOutputData() {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder clearDeprecatedOutputData() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 15) {
             outputResultCase_ = 0;
             outputResult_ = null;
@@ -5546,30 +6247,32 @@ public final class Event {
             outputResultCase_ = 0;
             outputResult_ = null;
           }
-          outputDataBuilder_.clear();
+          deprecatedOutputDataBuilder_.clear();
         }
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
-        return getOutputDataFieldBuilder().getBuilder();
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getDeprecatedOutputDataBuilder() {
+        return getDeprecatedOutputDataFieldBuilder().getBuilder();
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
-        if ((outputResultCase_ == 15) && (outputDataBuilder_ != null)) {
-          return outputDataBuilder_.getMessageOrBuilder();
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder() {
+        if ((outputResultCase_ == 15) && (deprecatedOutputDataBuilder_ != null)) {
+          return deprecatedOutputDataBuilder_.getMessageOrBuilder();
         } else {
           if (outputResultCase_ == 15) {
             return (flyteidl.core.Literals.LiteralMap) outputResult_;
@@ -5579,19 +6282,20 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output data produced by this node execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 15;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getOutputDataFieldBuilder() {
-        if (outputDataBuilder_ == null) {
+          getDeprecatedOutputDataFieldBuilder() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (!(outputResultCase_ == 15)) {
             outputResult_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
           }
-          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          deprecatedOutputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
                   (flyteidl.core.Literals.LiteralMap) outputResult_,
                   getParentForChildren(),
@@ -5599,6 +6303,178 @@ public final class Event {
           outputResult_ = null;
         }
         outputResultCase_ = 15;
+        onChanged();;
+        return deprecatedOutputDataBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> outputDataBuilder_;
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public boolean hasOutputData() {
+        return outputResultCase_ == 23;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public flyteidl.core.Literals.OutputData getOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 23) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 23) {
+            return outputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public Builder setOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 23;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public Builder setOutputData(
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
+        if (outputDataBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 23;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public Builder mergeOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 23 &&
+              outputResult_ != flyteidl.core.Literals.OutputData.getDefaultInstance()) {
+            outputResult_ = flyteidl.core.Literals.OutputData.newBuilder((flyteidl.core.Literals.OutputData) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 23) {
+            outputDataBuilder_.mergeFrom(value);
+          }
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 23;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public Builder clearOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 23) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 23) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          outputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public flyteidl.core.Literals.OutputData.Builder getOutputDataBuilder() {
+        return getOutputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+        if ((outputResultCase_ == 23) && (outputDataBuilder_ != null)) {
+          return outputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 23) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 23;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
+          getOutputDataFieldBuilder() {
+        if (outputDataBuilder_ == null) {
+          if (!(outputResultCase_ == 23)) {
+            outputResult_ = flyteidl.core.Literals.OutputData.getDefaultInstance();
+          }
+          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
+                  (flyteidl.core.Literals.OutputData) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 23;
         onChanged();;
         return outputDataBuilder_;
       }
@@ -12233,28 +13109,56 @@ public final class Event {
 
     /**
      * <pre>
-     * Raw input data consumed by this task execution.
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated boolean hasDeprecatedInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getDeprecatedInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputDataOrBuilder();
+
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 23;</code>
      */
     boolean hasInputData();
     /**
      * <pre>
-     * Raw input data consumed by this task execution.
+     * Raw input data consumed by this node execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     * <code>.flyteidl.core.InputData input_data = 23;</code>
      */
-    flyteidl.core.Literals.LiteralMap getInputData();
+    flyteidl.core.Literals.InputData getInputData();
     /**
      * <pre>
-     * Raw input data consumed by this task execution.
+     * Raw input data consumed by this node execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     * <code>.flyteidl.core.InputData input_data = 23;</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder();
+    flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder();
 
     /**
      * <pre>
@@ -12303,28 +13207,56 @@ public final class Event {
 
     /**
      * <pre>
-     * Raw output data produced by this task execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated boolean hasDeprecatedOutputData();
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getDeprecatedOutputData();
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder();
+
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 22;</code>
      */
     boolean hasOutputData();
     /**
      * <pre>
-     * Raw output data produced by this task execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+     * <code>.flyteidl.core.OutputData output_data = 22;</code>
      */
-    flyteidl.core.Literals.LiteralMap getOutputData();
+    flyteidl.core.Literals.OutputData getOutputData();
     /**
      * <pre>
-     * Raw output data produced by this task execution.
+     * Raw output data produced by this workflow execution.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+     * <code>.flyteidl.core.OutputData output_data = 22;</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
+    flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder();
 
     /**
      * <pre>
@@ -12753,12 +13685,40 @@ public final class Event {
               break;
             }
             case 170: {
-              if (!((mutable_bitField0_ & 0x00008000) != 0)) {
+              if (!((mutable_bitField0_ & 0x00020000) != 0)) {
                 reasons_ = new java.util.ArrayList<flyteidl.event.Event.EventReason>();
-                mutable_bitField0_ |= 0x00008000;
+                mutable_bitField0_ |= 0x00020000;
               }
               reasons_.add(
                   input.readMessage(flyteidl.event.Event.EventReason.parser(), extensionRegistry));
+              break;
+            }
+            case 178: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
+              if (outputResultCase_ == 22) {
+                subBuilder = ((flyteidl.core.Literals.OutputData) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.OutputData) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 22;
+              break;
+            }
+            case 186: {
+              flyteidl.core.Literals.InputData.Builder subBuilder = null;
+              if (inputValueCase_ == 23) {
+                subBuilder = ((flyteidl.core.Literals.InputData) inputValue_).toBuilder();
+              }
+              inputValue_ =
+                  input.readMessage(flyteidl.core.Literals.InputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.InputData) inputValue_);
+                inputValue_ = subBuilder.buildPartial();
+              }
+              inputValueCase_ = 23;
               break;
             }
             default: {
@@ -12779,7 +13739,7 @@ public final class Event {
         if (((mutable_bitField0_ & 0x00000020) != 0)) {
           logs_ = java.util.Collections.unmodifiableList(logs_);
         }
-        if (((mutable_bitField0_ & 0x00008000) != 0)) {
+        if (((mutable_bitField0_ & 0x00020000) != 0)) {
           reasons_ = java.util.Collections.unmodifiableList(reasons_);
         }
         this.unknownFields = unknownFields.build();
@@ -12805,7 +13765,8 @@ public final class Event {
     public enum InputValueCase
         implements com.google.protobuf.Internal.EnumLite {
       INPUT_URI(8),
-      INPUT_DATA(19),
+      @java.lang.Deprecated DEPRECATED_INPUT_DATA(19),
+      INPUT_DATA(23),
       INPUTVALUE_NOT_SET(0);
       private final int value;
       private InputValueCase(int value) {
@@ -12822,7 +13783,8 @@ public final class Event {
       public static InputValueCase forNumber(int value) {
         switch (value) {
           case 8: return INPUT_URI;
-          case 19: return INPUT_DATA;
+          case 19: return DEPRECATED_INPUT_DATA;
+          case 23: return INPUT_DATA;
           case 0: return INPUTVALUE_NOT_SET;
           default: return null;
         }
@@ -12844,7 +13806,8 @@ public final class Event {
         implements com.google.protobuf.Internal.EnumLite {
       OUTPUT_URI(9),
       ERROR(10),
-      OUTPUT_DATA(17),
+      @java.lang.Deprecated DEPRECATED_OUTPUT_DATA(17),
+      OUTPUT_DATA(22),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -12862,7 +13825,8 @@ public final class Event {
         switch (value) {
           case 9: return OUTPUT_URI;
           case 10: return ERROR;
-          case 17: return OUTPUT_DATA;
+          case 17: return DEPRECATED_OUTPUT_DATA;
+          case 22: return OUTPUT_DATA;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -13174,25 +14138,27 @@ public final class Event {
       }
     }
 
-    public static final int INPUT_DATA_FIELD_NUMBER = 19;
+    public static final int DEPRECATED_INPUT_DATA_FIELD_NUMBER = 19;
     /**
      * <pre>
-     * Raw input data consumed by this task execution.
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
      */
-    public boolean hasInputData() {
+    @java.lang.Deprecated public boolean hasDeprecatedInputData() {
       return inputValueCase_ == 19;
     }
     /**
      * <pre>
-     * Raw input data consumed by this task execution.
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getInputData() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedInputData() {
       if (inputValueCase_ == 19) {
          return (flyteidl.core.Literals.LiteralMap) inputValue_;
       }
@@ -13200,16 +14166,55 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw input data consumed by this task execution.
+     * Raw input data consumed by this node execution.
+     * Deprecated: please use input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputDataOrBuilder() {
       if (inputValueCase_ == 19) {
          return (flyteidl.core.Literals.LiteralMap) inputValue_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int INPUT_DATA_FIELD_NUMBER = 23;
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 23;</code>
+     */
+    public boolean hasInputData() {
+      return inputValueCase_ == 23;
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 23;</code>
+     */
+    public flyteidl.core.Literals.InputData getInputData() {
+      if (inputValueCase_ == 23) {
+         return (flyteidl.core.Literals.InputData) inputValue_;
+      }
+      return flyteidl.core.Literals.InputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 23;</code>
+     */
+    public flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder() {
+      if (inputValueCase_ == 23) {
+         return (flyteidl.core.Literals.InputData) inputValue_;
+      }
+      return flyteidl.core.Literals.InputData.getDefaultInstance();
     }
 
     public static final int OUTPUT_URI_FIELD_NUMBER = 9;
@@ -13303,25 +14308,27 @@ public final class Event {
       return flyteidl.core.Execution.ExecutionError.getDefaultInstance();
     }
 
-    public static final int OUTPUT_DATA_FIELD_NUMBER = 17;
+    public static final int DEPRECATED_OUTPUT_DATA_FIELD_NUMBER = 17;
     /**
      * <pre>
-     * Raw output data produced by this task execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
      */
-    public boolean hasOutputData() {
+    @java.lang.Deprecated public boolean hasDeprecatedOutputData() {
       return outputResultCase_ == 17;
     }
     /**
      * <pre>
-     * Raw output data produced by this task execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getOutputData() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputData() {
       if (outputResultCase_ == 17) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
@@ -13329,16 +14336,55 @@ public final class Event {
     }
     /**
      * <pre>
-     * Raw output data produced by this task execution.
+     * Raw output data produced by this workflow execution.
+     * Deprecated: please use output_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder() {
       if (outputResultCase_ == 17) {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int OUTPUT_DATA_FIELD_NUMBER = 22;
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 22;</code>
+     */
+    public boolean hasOutputData() {
+      return outputResultCase_ == 22;
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 22;</code>
+     */
+    public flyteidl.core.Literals.OutputData getOutputData() {
+      if (outputResultCase_ == 22) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this workflow execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 22;</code>
+     */
+    public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+      if (outputResultCase_ == 22) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
     }
 
     public static final int CUSTOM_INFO_FIELD_NUMBER = 11;
@@ -13699,6 +14745,12 @@ public final class Event {
       for (int i = 0; i < reasons_.size(); i++) {
         output.writeMessage(21, reasons_.get(i));
       }
+      if (outputResultCase_ == 22) {
+        output.writeMessage(22, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
+      if (inputValueCase_ == 23) {
+        output.writeMessage(23, (flyteidl.core.Literals.InputData) inputValue_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13783,6 +14835,14 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(21, reasons_.get(i));
       }
+      if (outputResultCase_ == 22) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(22, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
+      if (inputValueCase_ == 23) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(23, (flyteidl.core.Literals.InputData) inputValue_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -13852,6 +14912,10 @@ public final class Event {
               .equals(other.getInputUri())) return false;
           break;
         case 19:
+          if (!getDeprecatedInputData()
+              .equals(other.getDeprecatedInputData())) return false;
+          break;
+        case 23:
           if (!getInputData()
               .equals(other.getInputData())) return false;
           break;
@@ -13869,6 +14933,10 @@ public final class Event {
               .equals(other.getError())) return false;
           break;
         case 17:
+          if (!getDeprecatedOutputData()
+              .equals(other.getDeprecatedOutputData())) return false;
+          break;
+        case 22:
           if (!getOutputData()
               .equals(other.getOutputData())) return false;
           break;
@@ -13938,6 +15006,10 @@ public final class Event {
           hash = (53 * hash) + getInputUri().hashCode();
           break;
         case 19:
+          hash = (37 * hash) + DEPRECATED_INPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getDeprecatedInputData().hashCode();
+          break;
+        case 23:
           hash = (37 * hash) + INPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getInputData().hashCode();
           break;
@@ -13954,6 +15026,10 @@ public final class Event {
           hash = (53 * hash) + getError().hashCode();
           break;
         case 17:
+          hash = (37 * hash) + DEPRECATED_OUTPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getDeprecatedOutputData().hashCode();
+          break;
+        case 22:
           hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getOutputData().hashCode();
           break;
@@ -14141,7 +15217,7 @@ public final class Event {
 
         if (reasonsBuilder_ == null) {
           reasons_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00008000);
+          bitField0_ = (bitField0_ & ~0x00020000);
         } else {
           reasonsBuilder_.clear();
         }
@@ -14224,6 +15300,13 @@ public final class Event {
           result.inputValue_ = inputValue_;
         }
         if (inputValueCase_ == 19) {
+          if (deprecatedInputDataBuilder_ == null) {
+            result.inputValue_ = inputValue_;
+          } else {
+            result.inputValue_ = deprecatedInputDataBuilder_.build();
+          }
+        }
+        if (inputValueCase_ == 23) {
           if (inputDataBuilder_ == null) {
             result.inputValue_ = inputValue_;
           } else {
@@ -14241,6 +15324,13 @@ public final class Event {
           }
         }
         if (outputResultCase_ == 17) {
+          if (deprecatedOutputDataBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = deprecatedOutputDataBuilder_.build();
+          }
+        }
+        if (outputResultCase_ == 22) {
           if (outputDataBuilder_ == null) {
             result.outputResult_ = outputResult_;
           } else {
@@ -14255,9 +15345,9 @@ public final class Event {
         result.phaseVersion_ = phaseVersion_;
         result.reason_ = reason_;
         if (reasonsBuilder_ == null) {
-          if (((bitField0_ & 0x00008000) != 0)) {
+          if (((bitField0_ & 0x00020000) != 0)) {
             reasons_ = java.util.Collections.unmodifiableList(reasons_);
-            bitField0_ = (bitField0_ & ~0x00008000);
+            bitField0_ = (bitField0_ & ~0x00020000);
           }
           result.reasons_ = reasons_;
         } else {
@@ -14385,7 +15475,7 @@ public final class Event {
           if (!other.reasons_.isEmpty()) {
             if (reasons_.isEmpty()) {
               reasons_ = other.reasons_;
-              bitField0_ = (bitField0_ & ~0x00008000);
+              bitField0_ = (bitField0_ & ~0x00020000);
             } else {
               ensureReasonsIsMutable();
               reasons_.addAll(other.reasons_);
@@ -14398,7 +15488,7 @@ public final class Event {
               reasonsBuilder_.dispose();
               reasonsBuilder_ = null;
               reasons_ = other.reasons_;
-              bitField0_ = (bitField0_ & ~0x00008000);
+              bitField0_ = (bitField0_ & ~0x00020000);
               reasonsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getReasonsFieldBuilder() : null;
@@ -14427,6 +15517,10 @@ public final class Event {
             onChanged();
             break;
           }
+          case DEPRECATED_INPUT_DATA: {
+            mergeDeprecatedInputData(other.getDeprecatedInputData());
+            break;
+          }
           case INPUT_DATA: {
             mergeInputData(other.getInputData());
             break;
@@ -14444,6 +15538,10 @@ public final class Event {
           }
           case ERROR: {
             mergeError(other.getError());
+            break;
+          }
+          case DEPRECATED_OUTPUT_DATA: {
+            mergeDeprecatedOutputData(other.getDeprecatedOutputData());
             break;
           }
           case OUTPUT_DATA: {
@@ -15610,84 +16708,89 @@ public final class Event {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputDataBuilder_;
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> deprecatedInputDataBuilder_;
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public boolean hasInputData() {
+      @java.lang.Deprecated public boolean hasDeprecatedInputData() {
         return inputValueCase_ == 19;
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getInputData() {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedInputData() {
+        if (deprecatedInputDataBuilder_ == null) {
           if (inputValueCase_ == 19) {
             return (flyteidl.core.Literals.LiteralMap) inputValue_;
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         } else {
           if (inputValueCase_ == 19) {
-            return inputDataBuilder_.getMessage();
+            return deprecatedInputDataBuilder_.getMessage();
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         }
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public Builder setInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder setDeprecatedInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedInputDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           inputValue_ = value;
           onChanged();
         } else {
-          inputDataBuilder_.setMessage(value);
+          deprecatedInputDataBuilder_.setMessage(value);
         }
         inputValueCase_ = 19;
         return this;
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public Builder setInputData(
+      @java.lang.Deprecated public Builder setDeprecatedInputData(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (inputDataBuilder_ == null) {
+        if (deprecatedInputDataBuilder_ == null) {
           inputValue_ = builderForValue.build();
           onChanged();
         } else {
-          inputDataBuilder_.setMessage(builderForValue.build());
+          deprecatedInputDataBuilder_.setMessage(builderForValue.build());
         }
         inputValueCase_ = 19;
         return this;
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public Builder mergeInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder mergeDeprecatedInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedInputDataBuilder_ == null) {
           if (inputValueCase_ == 19 &&
               inputValue_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
             inputValue_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) inputValue_)
@@ -15698,22 +16801,23 @@ public final class Event {
           onChanged();
         } else {
           if (inputValueCase_ == 19) {
-            inputDataBuilder_.mergeFrom(value);
+            deprecatedInputDataBuilder_.mergeFrom(value);
           }
-          inputDataBuilder_.setMessage(value);
+          deprecatedInputDataBuilder_.setMessage(value);
         }
         inputValueCase_ = 19;
         return this;
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public Builder clearInputData() {
-        if (inputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder clearDeprecatedInputData() {
+        if (deprecatedInputDataBuilder_ == null) {
           if (inputValueCase_ == 19) {
             inputValueCase_ = 0;
             inputValue_ = null;
@@ -15724,30 +16828,32 @@ public final class Event {
             inputValueCase_ = 0;
             inputValue_ = null;
           }
-          inputDataBuilder_.clear();
+          deprecatedInputDataBuilder_.clear();
         }
         return this;
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getInputDataBuilder() {
-        return getInputDataFieldBuilder().getBuilder();
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getDeprecatedInputDataBuilder() {
+        return getDeprecatedInputDataFieldBuilder().getBuilder();
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
-        if ((inputValueCase_ == 19) && (inputDataBuilder_ != null)) {
-          return inputDataBuilder_.getMessageOrBuilder();
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputDataOrBuilder() {
+        if ((inputValueCase_ == 19) && (deprecatedInputDataBuilder_ != null)) {
+          return deprecatedInputDataBuilder_.getMessageOrBuilder();
         } else {
           if (inputValueCase_ == 19) {
             return (flyteidl.core.Literals.LiteralMap) inputValue_;
@@ -15757,19 +16863,20 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw input data consumed by this task execution.
+       * Raw input data consumed by this node execution.
+       * Deprecated: please use input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getInputDataFieldBuilder() {
-        if (inputDataBuilder_ == null) {
+          getDeprecatedInputDataFieldBuilder() {
+        if (deprecatedInputDataBuilder_ == null) {
           if (!(inputValueCase_ == 19)) {
             inputValue_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
           }
-          inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          deprecatedInputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
                   (flyteidl.core.Literals.LiteralMap) inputValue_,
                   getParentForChildren(),
@@ -15777,6 +16884,178 @@ public final class Event {
           inputValue_ = null;
         }
         inputValueCase_ = 19;
+        onChanged();;
+        return deprecatedInputDataBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> inputDataBuilder_;
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public boolean hasInputData() {
+        return inputValueCase_ == 23;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public flyteidl.core.Literals.InputData getInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 23) {
+            return (flyteidl.core.Literals.InputData) inputValue_;
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        } else {
+          if (inputValueCase_ == 23) {
+            return inputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public Builder setInputData(flyteidl.core.Literals.InputData value) {
+        if (inputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputValue_ = value;
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 23;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public Builder setInputData(
+          flyteidl.core.Literals.InputData.Builder builderForValue) {
+        if (inputDataBuilder_ == null) {
+          inputValue_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(builderForValue.build());
+        }
+        inputValueCase_ = 23;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public Builder mergeInputData(flyteidl.core.Literals.InputData value) {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 23 &&
+              inputValue_ != flyteidl.core.Literals.InputData.getDefaultInstance()) {
+            inputValue_ = flyteidl.core.Literals.InputData.newBuilder((flyteidl.core.Literals.InputData) inputValue_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            inputValue_ = value;
+          }
+          onChanged();
+        } else {
+          if (inputValueCase_ == 23) {
+            inputDataBuilder_.mergeFrom(value);
+          }
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 23;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public Builder clearInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 23) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+            onChanged();
+          }
+        } else {
+          if (inputValueCase_ == 23) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+          }
+          inputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public flyteidl.core.Literals.InputData.Builder getInputDataBuilder() {
+        return getInputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      public flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder() {
+        if ((inputValueCase_ == 23) && (inputDataBuilder_ != null)) {
+          return inputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (inputValueCase_ == 23) {
+            return (flyteidl.core.Literals.InputData) inputValue_;
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 23;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> 
+          getInputDataFieldBuilder() {
+        if (inputDataBuilder_ == null) {
+          if (!(inputValueCase_ == 23)) {
+            inputValue_ = flyteidl.core.Literals.InputData.getDefaultInstance();
+          }
+          inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder>(
+                  (flyteidl.core.Literals.InputData) inputValue_,
+                  getParentForChildren(),
+                  isClean());
+          inputValue_ = null;
+        }
+        inputValueCase_ = 23;
         onChanged();;
         return inputDataBuilder_;
       }
@@ -16059,84 +17338,89 @@ public final class Event {
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> deprecatedOutputDataBuilder_;
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public boolean hasOutputData() {
+      @java.lang.Deprecated public boolean hasDeprecatedOutputData() {
         return outputResultCase_ == 17;
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getOutputData() {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputData() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 17) {
             return (flyteidl.core.Literals.LiteralMap) outputResult_;
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         } else {
           if (outputResultCase_ == 17) {
-            return outputDataBuilder_.getMessage();
+            return deprecatedOutputDataBuilder_.getMessage();
           }
           return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
         }
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder setDeprecatedOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
           outputResult_ = value;
           onChanged();
         } else {
-          outputDataBuilder_.setMessage(value);
+          deprecatedOutputDataBuilder_.setMessage(value);
         }
         outputResultCase_ = 17;
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public Builder setOutputData(
+      @java.lang.Deprecated public Builder setDeprecatedOutputData(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (outputDataBuilder_ == null) {
+        if (deprecatedOutputDataBuilder_ == null) {
           outputResult_ = builderForValue.build();
           onChanged();
         } else {
-          outputDataBuilder_.setMessage(builderForValue.build());
+          deprecatedOutputDataBuilder_.setMessage(builderForValue.build());
         }
         outputResultCase_ = 17;
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder mergeDeprecatedOutputData(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 17 &&
               outputResult_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
             outputResult_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) outputResult_)
@@ -16147,22 +17431,23 @@ public final class Event {
           onChanged();
         } else {
           if (outputResultCase_ == 17) {
-            outputDataBuilder_.mergeFrom(value);
+            deprecatedOutputDataBuilder_.mergeFrom(value);
           }
-          outputDataBuilder_.setMessage(value);
+          deprecatedOutputDataBuilder_.setMessage(value);
         }
         outputResultCase_ = 17;
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public Builder clearOutputData() {
-        if (outputDataBuilder_ == null) {
+      @java.lang.Deprecated public Builder clearDeprecatedOutputData() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (outputResultCase_ == 17) {
             outputResultCase_ = 0;
             outputResult_ = null;
@@ -16173,30 +17458,32 @@ public final class Event {
             outputResultCase_ = 0;
             outputResult_ = null;
           }
-          outputDataBuilder_.clear();
+          deprecatedOutputDataBuilder_.clear();
         }
         return this;
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
-        return getOutputDataFieldBuilder().getBuilder();
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getDeprecatedOutputDataBuilder() {
+        return getDeprecatedOutputDataFieldBuilder().getBuilder();
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
-        if ((outputResultCase_ == 17) && (outputDataBuilder_ != null)) {
-          return outputDataBuilder_.getMessageOrBuilder();
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputDataOrBuilder() {
+        if ((outputResultCase_ == 17) && (deprecatedOutputDataBuilder_ != null)) {
+          return deprecatedOutputDataBuilder_.getMessageOrBuilder();
         } else {
           if (outputResultCase_ == 17) {
             return (flyteidl.core.Literals.LiteralMap) outputResult_;
@@ -16206,19 +17493,20 @@ public final class Event {
       }
       /**
        * <pre>
-       * Raw output data produced by this task execution.
+       * Raw output data produced by this workflow execution.
+       * Deprecated: please use output_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap output_data = 17;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getOutputDataFieldBuilder() {
-        if (outputDataBuilder_ == null) {
+          getDeprecatedOutputDataFieldBuilder() {
+        if (deprecatedOutputDataBuilder_ == null) {
           if (!(outputResultCase_ == 17)) {
             outputResult_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
           }
-          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          deprecatedOutputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
                   (flyteidl.core.Literals.LiteralMap) outputResult_,
                   getParentForChildren(),
@@ -16226,6 +17514,178 @@ public final class Event {
           outputResult_ = null;
         }
         outputResultCase_ = 17;
+        onChanged();;
+        return deprecatedOutputDataBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> outputDataBuilder_;
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public boolean hasOutputData() {
+        return outputResultCase_ == 22;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public flyteidl.core.Literals.OutputData getOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 22) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 22) {
+            return outputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public Builder setOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 22;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public Builder setOutputData(
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
+        if (outputDataBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 22;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public Builder mergeOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 22 &&
+              outputResult_ != flyteidl.core.Literals.OutputData.getDefaultInstance()) {
+            outputResult_ = flyteidl.core.Literals.OutputData.newBuilder((flyteidl.core.Literals.OutputData) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 22) {
+            outputDataBuilder_.mergeFrom(value);
+          }
+          outputDataBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 22;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public Builder clearOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (outputResultCase_ == 22) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 22) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          outputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public flyteidl.core.Literals.OutputData.Builder getOutputDataBuilder() {
+        return getOutputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+        if ((outputResultCase_ == 22) && (outputDataBuilder_ != null)) {
+          return outputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 22) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this workflow execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 22;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
+          getOutputDataFieldBuilder() {
+        if (outputDataBuilder_ == null) {
+          if (!(outputResultCase_ == 22)) {
+            outputResult_ = flyteidl.core.Literals.OutputData.getDefaultInstance();
+          }
+          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
+                  (flyteidl.core.Literals.OutputData) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 22;
         onChanged();;
         return outputDataBuilder_;
       }
@@ -16524,9 +17984,9 @@ public final class Event {
       private java.util.List<flyteidl.event.Event.EventReason> reasons_ =
         java.util.Collections.emptyList();
       private void ensureReasonsIsMutable() {
-        if (!((bitField0_ & 0x00008000) != 0)) {
+        if (!((bitField0_ & 0x00020000) != 0)) {
           reasons_ = new java.util.ArrayList<flyteidl.event.Event.EventReason>(reasons_);
-          bitField0_ |= 0x00008000;
+          bitField0_ |= 0x00020000;
          }
       }
 
@@ -16720,7 +18180,7 @@ public final class Event {
       public Builder clearReasons() {
         if (reasonsBuilder_ == null) {
           reasons_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00008000);
+          bitField0_ = (bitField0_ & ~0x00020000);
           onChanged();
         } else {
           reasonsBuilder_.clear();
@@ -16825,7 +18285,7 @@ public final class Event {
           reasonsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.event.Event.EventReason, flyteidl.event.Event.EventReason.Builder, flyteidl.event.Event.EventReasonOrBuilder>(
                   reasons_,
-                  ((bitField0_ & 0x00008000) != 0),
+                  ((bitField0_ & 0x00020000) != 0),
                   getParentForChildren(),
                   isClean());
           reasons_ = null;
@@ -21693,96 +23153,104 @@ public final class Event {
       "execution.proto\032\036flyteidl/core/identifie" +
       "r.proto\032\033flyteidl/core/catalog.proto\032\037go" +
       "ogle/protobuf/timestamp.proto\032\034google/pr" +
-      "otobuf/struct.proto\"\340\002\n\026WorkflowExecutio" +
+      "otobuf/struct.proto\"\241\003\n\026WorkflowExecutio" +
       "nEvent\022@\n\014execution_id\030\001 \001(\0132*.flyteidl." +
       "core.WorkflowExecutionIdentifier\022\023\n\013prod" +
       "ucer_id\030\002 \001(\t\0225\n\005phase\030\003 \001(\0162&.flyteidl." +
       "core.WorkflowExecution.Phase\022/\n\013occurred" +
       "_at\030\004 \001(\0132\032.google.protobuf.Timestamp\022\024\n" +
       "\noutput_uri\030\005 \001(\tH\000\022.\n\005error\030\006 \001(\0132\035.fly" +
-      "teidl.core.ExecutionErrorH\000\0220\n\013output_da" +
-      "ta\030\007 \001(\0132\031.flyteidl.core.LiteralMapH\000B\017\n" +
-      "\routput_result\"\241\007\n\022NodeExecutionEvent\0222\n" +
-      "\002id\030\001 \001(\0132&.flyteidl.core.NodeExecutionI" +
-      "dentifier\022\023\n\013producer_id\030\002 \001(\t\0221\n\005phase\030" +
-      "\003 \001(\0162\".flyteidl.core.NodeExecution.Phas" +
-      "e\022/\n\013occurred_at\030\004 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022\023\n\tinput_uri\030\005 \001(\tH\000\022/\n\ninput" +
-      "_data\030\024 \001(\0132\031.flyteidl.core.LiteralMapH\000" +
-      "\022\024\n\noutput_uri\030\006 \001(\tH\001\022.\n\005error\030\007 \001(\0132\035." +
-      "flyteidl.core.ExecutionErrorH\001\0220\n\013output" +
-      "_data\030\017 \001(\0132\031.flyteidl.core.LiteralMapH\001" +
-      "\022F\n\026workflow_node_metadata\030\010 \001(\0132$.flyte" +
-      "idl.event.WorkflowNodeMetadataH\002\022>\n\022task" +
-      "_node_metadata\030\016 \001(\0132 .flyteidl.event.Ta" +
-      "skNodeMetadataH\002\022I\n\024parent_task_metadata" +
-      "\030\t \001(\0132+.flyteidl.event.ParentTaskExecut" +
-      "ionMetadata\022I\n\024parent_node_metadata\030\n \001(" +
-      "\0132+.flyteidl.event.ParentNodeExecutionMe" +
-      "tadata\022\023\n\013retry_group\030\013 \001(\t\022\024\n\014spec_node" +
-      "_id\030\014 \001(\t\022\021\n\tnode_name\030\r \001(\t\022\025\n\revent_ve" +
-      "rsion\030\020 \001(\005\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dyn" +
-      "amic\030\022 \001(\010\022\020\n\010deck_uri\030\023 \001(\t\022/\n\013reported" +
-      "_at\030\025 \001(\0132\032.google.protobuf.Timestamp\022\020\n" +
-      "\010is_array\030\026 \001(\010B\r\n\013input_valueB\017\n\routput" +
-      "_resultB\021\n\017target_metadata\"X\n\024WorkflowNo" +
-      "deMetadata\022@\n\014execution_id\030\001 \001(\0132*.flyte" +
-      "idl.core.WorkflowExecutionIdentifier\"\245\002\n" +
-      "\020TaskNodeMetadata\0227\n\014cache_status\030\001 \001(\0162" +
-      "!.flyteidl.core.CatalogCacheStatus\0223\n\013ca" +
-      "talog_key\030\002 \001(\0132\036.flyteidl.core.CatalogM" +
-      "etadata\022D\n\022reservation_status\030\003 \001(\0162(.fl" +
-      "yteidl.core.CatalogReservation.Status\022\026\n" +
-      "\016checkpoint_uri\030\004 \001(\t\022E\n\020dynamic_workflo" +
-      "w\030\020 \001(\0132+.flyteidl.event.DynamicWorkflow" +
-      "NodeMetadata\"\245\001\n\033DynamicWorkflowNodeMeta" +
-      "data\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
-      "ier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyteid" +
-      "l.core.CompiledWorkflowClosure\022\034\n\024dynami" +
-      "c_job_spec_uri\030\003 \001(\t\"Q\n\033ParentTaskExecut" +
-      "ionMetadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core." +
-      "TaskExecutionIdentifier\".\n\033ParentNodeExe" +
-      "cutionMetadata\022\017\n\007node_id\030\001 \001(\t\"N\n\013Event" +
-      "Reason\022\016\n\006reason\030\001 \001(\t\022/\n\013occurred_at\030\002 " +
-      "\001(\0132\032.google.protobuf.Timestamp\"\271\006\n\022Task" +
-      "ExecutionEvent\022*\n\007task_id\030\001 \001(\0132\031.flytei" +
-      "dl.core.Identifier\022H\n\030parent_node_execut" +
-      "ion_id\030\002 \001(\0132&.flyteidl.core.NodeExecuti" +
-      "onIdentifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005p" +
-      "hase\030\004 \001(\0162\".flyteidl.core.TaskExecution" +
-      ".Phase\022\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(" +
-      "\0132\026.flyteidl.core.TaskLog\022/\n\013occurred_at" +
-      "\030\007 \001(\0132\032.google.protobuf.Timestamp\022\023\n\tin" +
-      "put_uri\030\010 \001(\tH\000\022/\n\ninput_data\030\023 \001(\0132\031.fl" +
-      "yteidl.core.LiteralMapH\000\022\024\n\noutput_uri\030\t" +
-      " \001(\tH\001\022.\n\005error\030\n \001(\0132\035.flyteidl.core.Ex" +
-      "ecutionErrorH\001\0220\n\013output_data\030\021 \001(\0132\031.fl" +
-      "yteidl.core.LiteralMapH\001\022,\n\013custom_info\030" +
-      "\013 \001(\0132\027.google.protobuf.Struct\022\025\n\rphase_" +
-      "version\030\014 \001(\r\022\022\n\006reason\030\r \001(\tB\002\030\001\022,\n\007rea" +
-      "sons\030\025 \003(\0132\033.flyteidl.event.EventReason\022" +
-      "\021\n\ttask_type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132%.f" +
-      "lyteidl.event.TaskExecutionMetadata\022\025\n\re" +
-      "vent_version\030\022 \001(\005\022/\n\013reported_at\030\024 \001(\0132" +
-      "\032.google.protobuf.TimestampB\r\n\013input_val" +
-      "ueB\017\n\routput_result\"\343\001\n\024ExternalResource" +
-      "Info\022\023\n\013external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r" +
-      "\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\"" +
-      ".flyteidl.core.TaskExecution.Phase\0227\n\014ca" +
-      "che_status\030\005 \001(\0162!.flyteidl.core.Catalog" +
-      "CacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.cor" +
-      "e.TaskLog\"?\n\020ResourcePoolInfo\022\030\n\020allocat" +
-      "ion_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025T" +
-      "askExecutionMetadata\022\026\n\016generated_name\030\001" +
-      " \001(\t\022@\n\022external_resources\030\002 \003(\0132$.flyte" +
-      "idl.event.ExternalResourceInfo\022<\n\022resour" +
-      "ce_pool_info\030\003 \003(\0132 .flyteidl.event.Reso" +
-      "urcePoolInfo\022\031\n\021plugin_identifier\030\004 \001(\t\022" +
-      "K\n\016instance_class\030\020 \001(\01623.flyteidl.event" +
-      ".TaskExecutionMetadata.InstanceClass\"/\n\r" +
-      "InstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTI" +
-      "BLE\020\001B=Z;github.com/flyteorg/flyte/flyte" +
-      "idl/gen/pb-go/flyteidl/eventb\006proto3"
+      "teidl.core.ExecutionErrorH\000\022?\n\026deprecate" +
+      "d_output_data\030\007 \001(\0132\031.flyteidl.core.Lite" +
+      "ralMapB\002\030\001H\000\0220\n\013output_data\030\010 \001(\0132\031.flyt" +
+      "eidl.core.OutputDataH\000B\017\n\routput_result\"" +
+      "\241\010\n\022NodeExecutionEvent\0222\n\002id\030\001 \001(\0132&.fly" +
+      "teidl.core.NodeExecutionIdentifier\022\023\n\013pr" +
+      "oducer_id\030\002 \001(\t\0221\n\005phase\030\003 \001(\0162\".flyteid" +
+      "l.core.NodeExecution.Phase\022/\n\013occurred_a" +
+      "t\030\004 \001(\0132\032.google.protobuf.Timestamp\022\023\n\ti" +
+      "nput_uri\030\005 \001(\tH\000\022>\n\025deprecated_input_dat" +
+      "a\030\024 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000" +
+      "\022.\n\ninput_data\030\030 \001(\0132\030.flyteidl.core.Inp" +
+      "utDataH\000\022\024\n\noutput_uri\030\006 \001(\tH\001\022.\n\005error\030" +
+      "\007 \001(\0132\035.flyteidl.core.ExecutionErrorH\001\022?" +
+      "\n\026deprecated_output_data\030\017 \001(\0132\031.flyteid" +
+      "l.core.LiteralMapB\002\030\001H\001\0220\n\013output_data\030\027" +
+      " \001(\0132\031.flyteidl.core.OutputDataH\001\022F\n\026wor" +
+      "kflow_node_metadata\030\010 \001(\0132$.flyteidl.eve" +
+      "nt.WorkflowNodeMetadataH\002\022>\n\022task_node_m" +
+      "etadata\030\016 \001(\0132 .flyteidl.event.TaskNodeM" +
+      "etadataH\002\022I\n\024parent_task_metadata\030\t \001(\0132" +
+      "+.flyteidl.event.ParentTaskExecutionMeta" +
+      "data\022I\n\024parent_node_metadata\030\n \001(\0132+.fly" +
+      "teidl.event.ParentNodeExecutionMetadata\022" +
+      "\023\n\013retry_group\030\013 \001(\t\022\024\n\014spec_node_id\030\014 \001" +
+      "(\t\022\021\n\tnode_name\030\r \001(\t\022\025\n\revent_version\030\020" +
+      " \001(\005\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dynamic\030\022 " +
+      "\001(\010\022\020\n\010deck_uri\030\023 \001(\t\022/\n\013reported_at\030\025 \001" +
+      "(\0132\032.google.protobuf.Timestamp\022\020\n\010is_arr" +
+      "ay\030\026 \001(\010B\r\n\013input_valueB\017\n\routput_result" +
+      "B\021\n\017target_metadata\"X\n\024WorkflowNodeMetad" +
+      "ata\022@\n\014execution_id\030\001 \001(\0132*.flyteidl.cor" +
+      "e.WorkflowExecutionIdentifier\"\245\002\n\020TaskNo" +
+      "deMetadata\0227\n\014cache_status\030\001 \001(\0162!.flyte" +
+      "idl.core.CatalogCacheStatus\0223\n\013catalog_k" +
+      "ey\030\002 \001(\0132\036.flyteidl.core.CatalogMetadata" +
+      "\022D\n\022reservation_status\030\003 \001(\0162(.flyteidl." +
+      "core.CatalogReservation.Status\022\026\n\016checkp" +
+      "oint_uri\030\004 \001(\t\022E\n\020dynamic_workflow\030\020 \001(\013" +
+      "2+.flyteidl.event.DynamicWorkflowNodeMet" +
+      "adata\"\245\001\n\033DynamicWorkflowNodeMetadata\022%\n" +
+      "\002id\030\001 \001(\0132\031.flyteidl.core.Identifier\022A\n\021" +
+      "compiled_workflow\030\002 \001(\0132&.flyteidl.core." +
+      "CompiledWorkflowClosure\022\034\n\024dynamic_job_s" +
+      "pec_uri\030\003 \001(\t\"Q\n\033ParentTaskExecutionMeta" +
+      "data\0222\n\002id\030\001 \001(\0132&.flyteidl.core.TaskExe" +
+      "cutionIdentifier\".\n\033ParentNodeExecutionM" +
+      "etadata\022\017\n\007node_id\030\001 \001(\t\"N\n\013EventReason\022" +
+      "\016\n\006reason\030\001 \001(\t\022/\n\013occurred_at\030\002 \001(\0132\032.g" +
+      "oogle.protobuf.Timestamp\"\271\007\n\022TaskExecuti" +
+      "onEvent\022*\n\007task_id\030\001 \001(\0132\031.flyteidl.core" +
+      ".Identifier\022H\n\030parent_node_execution_id\030" +
+      "\002 \001(\0132&.flyteidl.core.NodeExecutionIdent" +
+      "ifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase\030\004 " +
+      "\001(\0162\".flyteidl.core.TaskExecution.Phase\022" +
+      "\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026.fly" +
+      "teidl.core.TaskLog\022/\n\013occurred_at\030\007 \001(\0132" +
+      "\032.google.protobuf.Timestamp\022\023\n\tinput_uri" +
+      "\030\010 \001(\tH\000\022>\n\025deprecated_input_data\030\023 \001(\0132" +
+      "\031.flyteidl.core.LiteralMapB\002\030\001H\000\022.\n\ninpu" +
+      "t_data\030\027 \001(\0132\030.flyteidl.core.InputDataH\000" +
+      "\022\024\n\noutput_uri\030\t \001(\tH\001\022.\n\005error\030\n \001(\0132\035." +
+      "flyteidl.core.ExecutionErrorH\001\022?\n\026deprec" +
+      "ated_output_data\030\021 \001(\0132\031.flyteidl.core.L" +
+      "iteralMapB\002\030\001H\001\0220\n\013output_data\030\026 \001(\0132\031.f" +
+      "lyteidl.core.OutputDataH\001\022,\n\013custom_info" +
+      "\030\013 \001(\0132\027.google.protobuf.Struct\022\025\n\rphase" +
+      "_version\030\014 \001(\r\022\022\n\006reason\030\r \001(\tB\002\030\001\022,\n\007re" +
+      "asons\030\025 \003(\0132\033.flyteidl.event.EventReason" +
+      "\022\021\n\ttask_type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132%." +
+      "flyteidl.event.TaskExecutionMetadata\022\025\n\r" +
+      "event_version\030\022 \001(\005\022/\n\013reported_at\030\024 \001(\013" +
+      "2\032.google.protobuf.TimestampB\r\n\013input_va" +
+      "lueB\017\n\routput_result\"\343\001\n\024ExternalResourc" +
+      "eInfo\022\023\n\013external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(" +
+      "\r\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162" +
+      "\".flyteidl.core.TaskExecution.Phase\0227\n\014c" +
+      "ache_status\030\005 \001(\0162!.flyteidl.core.Catalo" +
+      "gCacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.co" +
+      "re.TaskLog\"?\n\020ResourcePoolInfo\022\030\n\020alloca" +
+      "tion_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025" +
+      "TaskExecutionMetadata\022\026\n\016generated_name\030" +
+      "\001 \001(\t\022@\n\022external_resources\030\002 \003(\0132$.flyt" +
+      "eidl.event.ExternalResourceInfo\022<\n\022resou" +
+      "rce_pool_info\030\003 \003(\0132 .flyteidl.event.Res" +
+      "ourcePoolInfo\022\031\n\021plugin_identifier\030\004 \001(\t" +
+      "\022K\n\016instance_class\030\020 \001(\01623.flyteidl.even" +
+      "t.TaskExecutionMetadata.InstanceClass\"/\n" +
+      "\rInstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPT" +
+      "IBLE\020\001B=Z;github.com/flyteorg/flyte/flyt" +
+      "eidl/gen/pb-go/flyteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21808,13 +23276,13 @@ public final class Event {
     internal_static_flyteidl_event_WorkflowExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_WorkflowExecutionEvent_descriptor,
-        new java.lang.String[] { "ExecutionId", "ProducerId", "Phase", "OccurredAt", "OutputUri", "Error", "OutputData", "OutputResult", });
+        new java.lang.String[] { "ExecutionId", "ProducerId", "Phase", "OccurredAt", "OutputUri", "Error", "DeprecatedOutputData", "OutputData", "OutputResult", });
     internal_static_flyteidl_event_NodeExecutionEvent_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_event_NodeExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_NodeExecutionEvent_descriptor,
-        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "IsArray", "InputValue", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "DeprecatedInputData", "InputData", "OutputUri", "Error", "DeprecatedOutputData", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "IsArray", "InputValue", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_event_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_event_WorkflowNodeMetadata_fieldAccessorTable = new
@@ -21856,7 +23324,7 @@ public final class Event {
     internal_static_flyteidl_event_TaskExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskExecutionEvent_descriptor,
-        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "Reasons", "TaskType", "Metadata", "EventVersion", "ReportedAt", "InputValue", "OutputResult", });
+        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "DeprecatedInputData", "InputData", "OutputUri", "Error", "DeprecatedOutputData", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "Reasons", "TaskType", "Metadata", "EventVersion", "ReportedAt", "InputValue", "OutputResult", });
     internal_static_flyteidl_event_ExternalResourceInfo_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_event_ExternalResourceInfo_fieldAccessorTable = new

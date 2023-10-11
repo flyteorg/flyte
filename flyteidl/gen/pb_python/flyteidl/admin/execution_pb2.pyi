@@ -24,18 +24,20 @@ EXECUTION_ACTIVE: ExecutionState
 EXECUTION_ARCHIVED: ExecutionState
 
 class ExecutionCreateRequest(_message.Message):
-    __slots__ = ["project", "domain", "name", "spec", "inputs"]
+    __slots__ = ["project", "domain", "name", "spec", "inputs", "input_data"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
+    INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     name: str
     spec: ExecutionSpec
     inputs: _literals_pb2.LiteralMap
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    input_data: _literals_pb2.InputData
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ...) -> None: ...
 
 class ExecutionRelaunchRequest(_message.Message):
     __slots__ = ["id", "name", "overwrite_cache"]
@@ -238,16 +240,20 @@ class WorkflowExecutionGetDataRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ...) -> None: ...
 
 class WorkflowExecutionGetDataResponse(_message.Message):
-    __slots__ = ["outputs", "inputs", "full_inputs", "full_outputs"]
+    __slots__ = ["outputs", "inputs", "full_inputs", "full_outputs", "input_data", "output_data"]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_INPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     outputs: _common_pb2.UrlBlob
     inputs: _common_pb2.UrlBlob
     full_inputs: _literals_pb2.LiteralMap
     full_outputs: _literals_pb2.LiteralMap
-    def __init__(self, outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    input_data: _literals_pb2.InputData
+    output_data: _literals_pb2.OutputData
+    def __init__(self, outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ...) -> None: ...
 
 class ExecutionUpdateRequest(_message.Message):
     __slots__ = ["id", "state"]

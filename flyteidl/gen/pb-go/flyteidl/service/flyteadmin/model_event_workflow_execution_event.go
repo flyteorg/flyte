@@ -22,6 +22,7 @@ type EventWorkflowExecutionEvent struct {
 	// URL to the output of the execution, it encodes all the information including Cloud source provider. ie., s3://...
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
+	DeprecatedOutputData *CoreLiteralMap `json:"deprecated_output_data,omitempty"`
 	// Raw output data produced by this workflow execution.
-	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
+	OutputData *CoreOutputData `json:"output_data,omitempty"`
 }

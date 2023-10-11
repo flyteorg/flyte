@@ -131,10 +131,10 @@ func (m *CreateTaskRequest) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetDeprecatedInputs()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CreateTaskRequestValidationError{
-				field:  "Inputs",
+				field:  "DeprecatedInputs",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -157,6 +157,16 @@ func (m *CreateTaskRequest) Validate() error {
 		if err := v.Validate(); err != nil {
 			return CreateTaskRequestValidationError{
 				field:  "TaskExecutionMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CreateTaskRequestValidationError{
+				field:  "Inputs",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -443,6 +453,16 @@ func (m *Resource) Validate() error {
 	}
 
 	// no validation rules for State
+
+	if v, ok := interface{}(m.GetDeprecatedOutputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ResourceValidationError{
+				field:  "DeprecatedOutputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	if v, ok := interface{}(m.GetOutputs()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {

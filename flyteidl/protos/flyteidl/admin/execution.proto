@@ -37,7 +37,13 @@ message ExecutionCreateRequest {
     // The inputs required to start the execution. All required inputs must be
     // included in this map. If not required and not provided, defaults apply.
     // +optional
-    core.LiteralMap inputs = 5;
+    // Deprecated: Please use input_data instead.
+    core.LiteralMap inputs = 5 [deprecated = true];
+
+    // The inputs required to start the execution. All required inputs must be
+    // included in this map. If not required and not provided, defaults apply.
+    // +optional
+    core.InputData input_data = 6;
 }
 
 // Request to relaunch the referenced execution.
@@ -355,10 +361,18 @@ message WorkflowExecutionGetDataResponse {
     UrlBlob inputs = 2 [deprecated = true];
 
     // Full_inputs will only be populated if they are under a configured size threshold.
-    core.LiteralMap full_inputs = 3;
+    // Deprecated: Please use input_data instead.
+    core.LiteralMap full_inputs                = 3 [deprecated = true];
 
     // Full_outputs will only be populated if they are under a configured size threshold.
-    core.LiteralMap full_outputs = 4;
+    // Deprecated: Please use output_data instead.
+    core.LiteralMap full_outputs               = 4 [deprecated = true];
+
+    // InputData will only be populated if they are under a configured size threshold.
+    core.InputData input_data                  = 5;
+
+    // OutputData will only be populated if they are under a configured size threshold.
+    core.OutputData output_data                = 6;
 }
 
 // The state of the execution is used to control its visibility in the UI/CLI.

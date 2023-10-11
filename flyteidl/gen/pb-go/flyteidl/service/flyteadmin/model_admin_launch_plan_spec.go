@@ -15,8 +15,9 @@ type AdminLaunchPlanSpec struct {
 	EntityMetadata *AdminLaunchPlanMetadata `json:"entity_metadata,omitempty"`
 	// Input values to be passed for the execution. These can be overridden when an execution is created with this launch plan.
 	DefaultInputs *CoreParameterMap `json:"default_inputs,omitempty"`
-	// Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.
 	FixedInputs *CoreLiteralMap `json:"fixed_inputs,omitempty"`
+	// Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.
+	FixedInputData *CoreInputData `json:"fixed_input_data,omitempty"`
 	Role string `json:"role,omitempty"`
 	// Custom labels to be applied to the execution resource.
 	Labels *AdminLabels `json:"labels,omitempty"`

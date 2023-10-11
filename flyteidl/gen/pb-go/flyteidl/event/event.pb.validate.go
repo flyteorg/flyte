@@ -101,6 +101,18 @@ func (m *WorkflowExecutionEvent) Validate() error {
 			}
 		}
 
+	case *WorkflowExecutionEvent_DeprecatedOutputData:
+
+		if v, ok := interface{}(m.GetDeprecatedOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return WorkflowExecutionEventValidationError{
+					field:  "DeprecatedOutputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *WorkflowExecutionEvent_OutputData:
 
 		if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
@@ -257,6 +269,18 @@ func (m *NodeExecutionEvent) Validate() error {
 	case *NodeExecutionEvent_InputUri:
 		// no validation rules for InputUri
 
+	case *NodeExecutionEvent_DeprecatedInputData:
+
+		if v, ok := interface{}(m.GetDeprecatedInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeExecutionEventValidationError{
+					field:  "DeprecatedInputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *NodeExecutionEvent_InputData:
 
 		if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
@@ -282,6 +306,18 @@ func (m *NodeExecutionEvent) Validate() error {
 			if err := v.Validate(); err != nil {
 				return NodeExecutionEventValidationError{
 					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *NodeExecutionEvent_DeprecatedOutputData:
+
+		if v, ok := interface{}(m.GetDeprecatedOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeExecutionEventValidationError{
+					field:  "DeprecatedOutputData",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -989,6 +1025,18 @@ func (m *TaskExecutionEvent) Validate() error {
 	case *TaskExecutionEvent_InputUri:
 		// no validation rules for InputUri
 
+	case *TaskExecutionEvent_DeprecatedInputData:
+
+		if v, ok := interface{}(m.GetDeprecatedInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionEventValidationError{
+					field:  "DeprecatedInputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	case *TaskExecutionEvent_InputData:
 
 		if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
@@ -1014,6 +1062,18 @@ func (m *TaskExecutionEvent) Validate() error {
 			if err := v.Validate(); err != nil {
 				return TaskExecutionEventValidationError{
 					field:  "Error",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *TaskExecutionEvent_DeprecatedOutputData:
+
+		if v, ok := interface{}(m.GetDeprecatedOutputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionEventValidationError{
+					field:  "DeprecatedOutputData",
 					reason: "embedded message failed validation",
 					cause:  err,
 				}

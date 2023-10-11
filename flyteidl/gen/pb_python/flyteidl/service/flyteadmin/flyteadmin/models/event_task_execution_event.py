@@ -18,8 +18,10 @@ import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
+from flyteadmin.models.core_input_data import CoreInputData  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
+from flyteadmin.models.core_output_data import CoreOutputData  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
 from flyteadmin.models.event_event_reason import EventEventReason  # noqa: F401,E501
@@ -49,10 +51,12 @@ class EventTaskExecutionEvent(object):
         'logs': 'list[CoreTaskLog]',
         'occurred_at': 'datetime',
         'input_uri': 'str',
-        'input_data': 'CoreLiteralMap',
+        'deprecated_input_data': 'CoreLiteralMap',
+        'input_data': 'CoreInputData',
         'output_uri': 'str',
         'error': 'CoreExecutionError',
-        'output_data': 'CoreLiteralMap',
+        'deprecated_output_data': 'CoreLiteralMap',
+        'output_data': 'CoreOutputData',
         'custom_info': 'ProtobufStruct',
         'phase_version': 'int',
         'reason': 'str',
@@ -72,9 +76,11 @@ class EventTaskExecutionEvent(object):
         'logs': 'logs',
         'occurred_at': 'occurred_at',
         'input_uri': 'input_uri',
+        'deprecated_input_data': 'deprecated_input_data',
         'input_data': 'input_data',
         'output_uri': 'output_uri',
         'error': 'error',
+        'deprecated_output_data': 'deprecated_output_data',
         'output_data': 'output_data',
         'custom_info': 'custom_info',
         'phase_version': 'phase_version',
@@ -86,7 +92,7 @@ class EventTaskExecutionEvent(object):
         'reported_at': 'reported_at'
     }
 
-    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, reasons=None, task_type=None, metadata=None, event_version=None, reported_at=None):  # noqa: E501
+    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, deprecated_input_data=None, input_data=None, output_uri=None, error=None, deprecated_output_data=None, output_data=None, custom_info=None, phase_version=None, reason=None, reasons=None, task_type=None, metadata=None, event_version=None, reported_at=None):  # noqa: E501
         """EventTaskExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._task_id = None
@@ -97,9 +103,11 @@ class EventTaskExecutionEvent(object):
         self._logs = None
         self._occurred_at = None
         self._input_uri = None
+        self._deprecated_input_data = None
         self._input_data = None
         self._output_uri = None
         self._error = None
+        self._deprecated_output_data = None
         self._output_data = None
         self._custom_info = None
         self._phase_version = None
@@ -127,12 +135,16 @@ class EventTaskExecutionEvent(object):
             self.occurred_at = occurred_at
         if input_uri is not None:
             self.input_uri = input_uri
+        if deprecated_input_data is not None:
+            self.deprecated_input_data = deprecated_input_data
         if input_data is not None:
             self.input_data = input_data
         if output_uri is not None:
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if deprecated_output_data is not None:
+            self.deprecated_output_data = deprecated_output_data
         if output_data is not None:
             self.output_data = output_data
         if custom_info is not None:
@@ -327,13 +339,34 @@ class EventTaskExecutionEvent(object):
         self._input_uri = input_uri
 
     @property
+    def deprecated_input_data(self):
+        """Gets the deprecated_input_data of this EventTaskExecutionEvent.  # noqa: E501
+
+
+        :return: The deprecated_input_data of this EventTaskExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._deprecated_input_data
+
+    @deprecated_input_data.setter
+    def deprecated_input_data(self, deprecated_input_data):
+        """Sets the deprecated_input_data of this EventTaskExecutionEvent.
+
+
+        :param deprecated_input_data: The deprecated_input_data of this EventTaskExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._deprecated_input_data = deprecated_input_data
+
+    @property
     def input_data(self):
         """Gets the input_data of this EventTaskExecutionEvent.  # noqa: E501
 
-        Raw input data consumed by this task execution.  # noqa: E501
+        Raw input data consumed by this node execution.  # noqa: E501
 
         :return: The input_data of this EventTaskExecutionEvent.  # noqa: E501
-        :rtype: CoreLiteralMap
+        :rtype: CoreInputData
         """
         return self._input_data
 
@@ -341,10 +374,10 @@ class EventTaskExecutionEvent(object):
     def input_data(self, input_data):
         """Sets the input_data of this EventTaskExecutionEvent.
 
-        Raw input data consumed by this task execution.  # noqa: E501
+        Raw input data consumed by this node execution.  # noqa: E501
 
         :param input_data: The input_data of this EventTaskExecutionEvent.  # noqa: E501
-        :type: CoreLiteralMap
+        :type: CoreInputData
         """
 
         self._input_data = input_data
@@ -394,13 +427,34 @@ class EventTaskExecutionEvent(object):
         self._error = error
 
     @property
+    def deprecated_output_data(self):
+        """Gets the deprecated_output_data of this EventTaskExecutionEvent.  # noqa: E501
+
+
+        :return: The deprecated_output_data of this EventTaskExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._deprecated_output_data
+
+    @deprecated_output_data.setter
+    def deprecated_output_data(self, deprecated_output_data):
+        """Sets the deprecated_output_data of this EventTaskExecutionEvent.
+
+
+        :param deprecated_output_data: The deprecated_output_data of this EventTaskExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._deprecated_output_data = deprecated_output_data
+
+    @property
     def output_data(self):
         """Gets the output_data of this EventTaskExecutionEvent.  # noqa: E501
 
-        Raw output data produced by this task execution.  # noqa: E501
+        Raw output data produced by this workflow execution.  # noqa: E501
 
         :return: The output_data of this EventTaskExecutionEvent.  # noqa: E501
-        :rtype: CoreLiteralMap
+        :rtype: CoreOutputData
         """
         return self._output_data
 
@@ -408,10 +462,10 @@ class EventTaskExecutionEvent(object):
     def output_data(self, output_data):
         """Sets the output_data of this EventTaskExecutionEvent.
 
-        Raw output data produced by this task execution.  # noqa: E501
+        Raw output data produced by this workflow execution.  # noqa: E501
 
         :param output_data: The output_data of this EventTaskExecutionEvent.  # noqa: E501
-        :type: CoreLiteralMap
+        :type: CoreOutputData
         """
 
         self._output_data = output_data

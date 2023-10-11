@@ -909,14 +909,14 @@ class LaunchPlanSpec final :
   ::flyteidl::core::ParameterMap* mutable_default_inputs();
   void set_allocated_default_inputs(::flyteidl::core::ParameterMap* default_inputs);
 
-  // .flyteidl.core.LiteralMap fixed_inputs = 4;
-  bool has_fixed_inputs() const;
-  void clear_fixed_inputs();
-  static const int kFixedInputsFieldNumber = 4;
-  const ::flyteidl::core::LiteralMap& fixed_inputs() const;
-  ::flyteidl::core::LiteralMap* release_fixed_inputs();
-  ::flyteidl::core::LiteralMap* mutable_fixed_inputs();
-  void set_allocated_fixed_inputs(::flyteidl::core::LiteralMap* fixed_inputs);
+  // .flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_fixed_inputs() const;
+  PROTOBUF_DEPRECATED void clear_fixed_inputs();
+  PROTOBUF_DEPRECATED static const int kFixedInputsFieldNumber = 4;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& fixed_inputs() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_fixed_inputs();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_fixed_inputs();
+  PROTOBUF_DEPRECATED void set_allocated_fixed_inputs(::flyteidl::core::LiteralMap* fixed_inputs);
 
   // .flyteidl.admin.Labels labels = 6;
   bool has_labels() const;
@@ -999,6 +999,15 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::Envs* mutable_envs();
   void set_allocated_envs(::flyteidl::admin::Envs* envs);
 
+  // .flyteidl.core.InputData fixed_input_data = 22;
+  bool has_fixed_input_data() const;
+  void clear_fixed_input_data();
+  static const int kFixedInputDataFieldNumber = 22;
+  const ::flyteidl::core::InputData& fixed_input_data() const;
+  ::flyteidl::core::InputData* release_fixed_input_data();
+  ::flyteidl::core::InputData* mutable_fixed_input_data();
+  void set_allocated_fixed_input_data(::flyteidl::core::InputData* fixed_input_data);
+
   // int32 max_parallelism = 18;
   void clear_max_parallelism();
   static const int kMaxParallelismFieldNumber = 18;
@@ -1030,6 +1039,7 @@ class LaunchPlanSpec final :
   ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
   ::google::protobuf::BoolValue* interruptible_;
   ::flyteidl::admin::Envs* envs_;
+  ::flyteidl::core::InputData* fixed_input_data_;
   ::google::protobuf::int32 max_parallelism_;
   bool overwrite_cache_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -2428,7 +2438,7 @@ inline void LaunchPlanSpec::set_allocated_default_inputs(::flyteidl::core::Param
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.default_inputs)
 }
 
-// .flyteidl.core.LiteralMap fixed_inputs = 4;
+// .flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];
 inline bool LaunchPlanSpec::has_fixed_inputs() const {
   return this != internal_default_instance() && fixed_inputs_ != nullptr;
 }
@@ -2471,6 +2481,51 @@ inline void LaunchPlanSpec::set_allocated_fixed_inputs(::flyteidl::core::Literal
   }
   fixed_inputs_ = fixed_inputs;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.fixed_inputs)
+}
+
+// .flyteidl.core.InputData fixed_input_data = 22;
+inline bool LaunchPlanSpec::has_fixed_input_data() const {
+  return this != internal_default_instance() && fixed_input_data_ != nullptr;
+}
+inline const ::flyteidl::core::InputData& LaunchPlanSpec::fixed_input_data() const {
+  const ::flyteidl::core::InputData* p = fixed_input_data_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanSpec.fixed_input_data)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::InputData*>(
+      &::flyteidl::core::_InputData_default_instance_);
+}
+inline ::flyteidl::core::InputData* LaunchPlanSpec::release_fixed_input_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.LaunchPlanSpec.fixed_input_data)
+  
+  ::flyteidl::core::InputData* temp = fixed_input_data_;
+  fixed_input_data_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::InputData* LaunchPlanSpec::mutable_fixed_input_data() {
+  
+  if (fixed_input_data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::InputData>(GetArenaNoVirtual());
+    fixed_input_data_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.LaunchPlanSpec.fixed_input_data)
+  return fixed_input_data_;
+}
+inline void LaunchPlanSpec::set_allocated_fixed_input_data(::flyteidl::core::InputData* fixed_input_data) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(fixed_input_data_);
+  }
+  if (fixed_input_data) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      fixed_input_data = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, fixed_input_data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  fixed_input_data_ = fixed_input_data;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanSpec.fixed_input_data)
 }
 
 // string role = 5 [deprecated = true];

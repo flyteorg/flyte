@@ -2234,31 +2234,34 @@ public final class Agent {
      * The inputs required to start the execution. All required inputs must be
      * included in this map. If not required and not provided, defaults apply.
      * +optional
+     * Deprecated: Use inputs instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
      */
-    boolean hasInputs();
+    @java.lang.Deprecated boolean hasDeprecatedInputs();
     /**
      * <pre>
      * The inputs required to start the execution. All required inputs must be
      * included in this map. If not required and not provided, defaults apply.
      * +optional
+     * Deprecated: Use inputs instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMap getInputs();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getDeprecatedInputs();
     /**
      * <pre>
      * The inputs required to start the execution. All required inputs must be
      * included in this map. If not required and not provided, defaults apply.
      * +optional
+     * Deprecated: Use inputs instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder();
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputsOrBuilder();
 
     /**
      * <pre>
@@ -2327,6 +2330,37 @@ public final class Agent {
      * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
      */
     flyteidl.admin.Agent.TaskExecutionMetadataOrBuilder getTaskExecutionMetadataOrBuilder();
+
+    /**
+     * <pre>
+     * Inputs are the inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData inputs = 5;</code>
+     */
+    boolean hasInputs();
+    /**
+     * <pre>
+     * Inputs are the inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData inputs = 5;</code>
+     */
+    flyteidl.core.Literals.InputData getInputs();
+    /**
+     * <pre>
+     * Inputs are the inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData inputs = 5;</code>
+     */
+    flyteidl.core.Literals.InputDataOrBuilder getInputsOrBuilder();
   }
   /**
    * <pre>
@@ -2374,13 +2408,13 @@ public final class Agent {
               break;
             case 10: {
               flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
-              if (inputs_ != null) {
-                subBuilder = inputs_.toBuilder();
+              if (deprecatedInputs_ != null) {
+                subBuilder = deprecatedInputs_.toBuilder();
               }
-              inputs_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              deprecatedInputs_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(inputs_);
-                inputs_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(deprecatedInputs_);
+                deprecatedInputs_ = subBuilder.buildPartial();
               }
 
               break;
@@ -2417,6 +2451,19 @@ public final class Agent {
 
               break;
             }
+            case 42: {
+              flyteidl.core.Literals.InputData.Builder subBuilder = null;
+              if (inputs_ != null) {
+                subBuilder = inputs_.toBuilder();
+              }
+              inputs_ = input.readMessage(flyteidl.core.Literals.InputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(inputs_);
+                inputs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2449,43 +2496,46 @@ public final class Agent {
               flyteidl.admin.Agent.CreateTaskRequest.class, flyteidl.admin.Agent.CreateTaskRequest.Builder.class);
     }
 
-    public static final int INPUTS_FIELD_NUMBER = 1;
-    private flyteidl.core.Literals.LiteralMap inputs_;
+    public static final int DEPRECATED_INPUTS_FIELD_NUMBER = 1;
+    private flyteidl.core.Literals.LiteralMap deprecatedInputs_;
     /**
      * <pre>
      * The inputs required to start the execution. All required inputs must be
      * included in this map. If not required and not provided, defaults apply.
      * +optional
+     * Deprecated: Use inputs instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
      */
-    public boolean hasInputs() {
-      return inputs_ != null;
+    @java.lang.Deprecated public boolean hasDeprecatedInputs() {
+      return deprecatedInputs_ != null;
     }
     /**
      * <pre>
      * The inputs required to start the execution. All required inputs must be
      * included in this map. If not required and not provided, defaults apply.
      * +optional
+     * Deprecated: Use inputs instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getInputs() {
-      return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedInputs() {
+      return deprecatedInputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : deprecatedInputs_;
     }
     /**
      * <pre>
      * The inputs required to start the execution. All required inputs must be
      * included in this map. If not required and not provided, defaults apply.
      * +optional
+     * Deprecated: Use inputs instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
-      return getInputs();
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputsOrBuilder() {
+      return getDeprecatedInputs();
     }
 
     public static final int TEMPLATE_FIELD_NUMBER = 2;
@@ -2596,6 +2646,45 @@ public final class Agent {
       return getTaskExecutionMetadata();
     }
 
+    public static final int INPUTS_FIELD_NUMBER = 5;
+    private flyteidl.core.Literals.InputData inputs_;
+    /**
+     * <pre>
+     * Inputs are the inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData inputs = 5;</code>
+     */
+    public boolean hasInputs() {
+      return inputs_ != null;
+    }
+    /**
+     * <pre>
+     * Inputs are the inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData inputs = 5;</code>
+     */
+    public flyteidl.core.Literals.InputData getInputs() {
+      return inputs_ == null ? flyteidl.core.Literals.InputData.getDefaultInstance() : inputs_;
+    }
+    /**
+     * <pre>
+     * Inputs are the inputs required to start the execution. All required inputs must be
+     * included in this map. If not required and not provided, defaults apply.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData inputs = 5;</code>
+     */
+    public flyteidl.core.Literals.InputDataOrBuilder getInputsOrBuilder() {
+      return getInputs();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2610,8 +2699,8 @@ public final class Agent {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (inputs_ != null) {
-        output.writeMessage(1, getInputs());
+      if (deprecatedInputs_ != null) {
+        output.writeMessage(1, getDeprecatedInputs());
       }
       if (template_ != null) {
         output.writeMessage(2, getTemplate());
@@ -2622,6 +2711,9 @@ public final class Agent {
       if (taskExecutionMetadata_ != null) {
         output.writeMessage(4, getTaskExecutionMetadata());
       }
+      if (inputs_ != null) {
+        output.writeMessage(5, getInputs());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2631,9 +2723,9 @@ public final class Agent {
       if (size != -1) return size;
 
       size = 0;
-      if (inputs_ != null) {
+      if (deprecatedInputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getInputs());
+          .computeMessageSize(1, getDeprecatedInputs());
       }
       if (template_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -2645,6 +2737,10 @@ public final class Agent {
       if (taskExecutionMetadata_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getTaskExecutionMetadata());
+      }
+      if (inputs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getInputs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2661,10 +2757,10 @@ public final class Agent {
       }
       flyteidl.admin.Agent.CreateTaskRequest other = (flyteidl.admin.Agent.CreateTaskRequest) obj;
 
-      if (hasInputs() != other.hasInputs()) return false;
-      if (hasInputs()) {
-        if (!getInputs()
-            .equals(other.getInputs())) return false;
+      if (hasDeprecatedInputs() != other.hasDeprecatedInputs()) return false;
+      if (hasDeprecatedInputs()) {
+        if (!getDeprecatedInputs()
+            .equals(other.getDeprecatedInputs())) return false;
       }
       if (hasTemplate() != other.hasTemplate()) return false;
       if (hasTemplate()) {
@@ -2678,6 +2774,11 @@ public final class Agent {
         if (!getTaskExecutionMetadata()
             .equals(other.getTaskExecutionMetadata())) return false;
       }
+      if (hasInputs() != other.hasInputs()) return false;
+      if (hasInputs()) {
+        if (!getInputs()
+            .equals(other.getInputs())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2689,9 +2790,9 @@ public final class Agent {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasInputs()) {
-        hash = (37 * hash) + INPUTS_FIELD_NUMBER;
-        hash = (53 * hash) + getInputs().hashCode();
+      if (hasDeprecatedInputs()) {
+        hash = (37 * hash) + DEPRECATED_INPUTS_FIELD_NUMBER;
+        hash = (53 * hash) + getDeprecatedInputs().hashCode();
       }
       if (hasTemplate()) {
         hash = (37 * hash) + TEMPLATE_FIELD_NUMBER;
@@ -2702,6 +2803,10 @@ public final class Agent {
       if (hasTaskExecutionMetadata()) {
         hash = (37 * hash) + TASK_EXECUTION_METADATA_FIELD_NUMBER;
         hash = (53 * hash) + getTaskExecutionMetadata().hashCode();
+      }
+      if (hasInputs()) {
+        hash = (37 * hash) + INPUTS_FIELD_NUMBER;
+        hash = (53 * hash) + getInputs().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -2840,11 +2945,11 @@ public final class Agent {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (inputsBuilder_ == null) {
-          inputs_ = null;
+        if (deprecatedInputsBuilder_ == null) {
+          deprecatedInputs_ = null;
         } else {
-          inputs_ = null;
-          inputsBuilder_ = null;
+          deprecatedInputs_ = null;
+          deprecatedInputsBuilder_ = null;
         }
         if (templateBuilder_ == null) {
           template_ = null;
@@ -2859,6 +2964,12 @@ public final class Agent {
         } else {
           taskExecutionMetadata_ = null;
           taskExecutionMetadataBuilder_ = null;
+        }
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
         }
         return this;
       }
@@ -2886,10 +2997,10 @@ public final class Agent {
       @java.lang.Override
       public flyteidl.admin.Agent.CreateTaskRequest buildPartial() {
         flyteidl.admin.Agent.CreateTaskRequest result = new flyteidl.admin.Agent.CreateTaskRequest(this);
-        if (inputsBuilder_ == null) {
-          result.inputs_ = inputs_;
+        if (deprecatedInputsBuilder_ == null) {
+          result.deprecatedInputs_ = deprecatedInputs_;
         } else {
-          result.inputs_ = inputsBuilder_.build();
+          result.deprecatedInputs_ = deprecatedInputsBuilder_.build();
         }
         if (templateBuilder_ == null) {
           result.template_ = template_;
@@ -2901,6 +3012,11 @@ public final class Agent {
           result.taskExecutionMetadata_ = taskExecutionMetadata_;
         } else {
           result.taskExecutionMetadata_ = taskExecutionMetadataBuilder_.build();
+        }
+        if (inputsBuilder_ == null) {
+          result.inputs_ = inputs_;
+        } else {
+          result.inputs_ = inputsBuilder_.build();
         }
         onBuilt();
         return result;
@@ -2950,8 +3066,8 @@ public final class Agent {
 
       public Builder mergeFrom(flyteidl.admin.Agent.CreateTaskRequest other) {
         if (other == flyteidl.admin.Agent.CreateTaskRequest.getDefaultInstance()) return this;
-        if (other.hasInputs()) {
-          mergeInputs(other.getInputs());
+        if (other.hasDeprecatedInputs()) {
+          mergeDeprecatedInputs(other.getDeprecatedInputs());
         }
         if (other.hasTemplate()) {
           mergeTemplate(other.getTemplate());
@@ -2962,6 +3078,9 @@ public final class Agent {
         }
         if (other.hasTaskExecutionMetadata()) {
           mergeTaskExecutionMetadata(other.getTaskExecutionMetadata());
+        }
+        if (other.hasInputs()) {
+          mergeInputs(other.getInputs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2992,35 +3111,37 @@ public final class Agent {
         return this;
       }
 
-      private flyteidl.core.Literals.LiteralMap inputs_;
+      private flyteidl.core.Literals.LiteralMap deprecatedInputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputsBuilder_;
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> deprecatedInputsBuilder_;
       /**
        * <pre>
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public boolean hasInputs() {
-        return inputsBuilder_ != null || inputs_ != null;
+      @java.lang.Deprecated public boolean hasDeprecatedInputs() {
+        return deprecatedInputsBuilder_ != null || deprecatedInputs_ != null;
       }
       /**
        * <pre>
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getInputs() {
-        if (inputsBuilder_ == null) {
-          return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedInputs() {
+        if (deprecatedInputsBuilder_ == null) {
+          return deprecatedInputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : deprecatedInputs_;
         } else {
-          return inputsBuilder_.getMessage();
+          return deprecatedInputsBuilder_.getMessage();
         }
       }
       /**
@@ -3028,19 +3149,20 @@ public final class Agent {
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public Builder setInputs(flyteidl.core.Literals.LiteralMap value) {
-        if (inputsBuilder_ == null) {
+      @java.lang.Deprecated public Builder setDeprecatedInputs(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedInputsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          inputs_ = value;
+          deprecatedInputs_ = value;
           onChanged();
         } else {
-          inputsBuilder_.setMessage(value);
+          deprecatedInputsBuilder_.setMessage(value);
         }
 
         return this;
@@ -3050,17 +3172,18 @@ public final class Agent {
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public Builder setInputs(
+      @java.lang.Deprecated public Builder setDeprecatedInputs(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (inputsBuilder_ == null) {
-          inputs_ = builderForValue.build();
+        if (deprecatedInputsBuilder_ == null) {
+          deprecatedInputs_ = builderForValue.build();
           onChanged();
         } else {
-          inputsBuilder_.setMessage(builderForValue.build());
+          deprecatedInputsBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
@@ -3070,21 +3193,22 @@ public final class Agent {
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public Builder mergeInputs(flyteidl.core.Literals.LiteralMap value) {
-        if (inputsBuilder_ == null) {
-          if (inputs_ != null) {
-            inputs_ =
-              flyteidl.core.Literals.LiteralMap.newBuilder(inputs_).mergeFrom(value).buildPartial();
+      @java.lang.Deprecated public Builder mergeDeprecatedInputs(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedInputsBuilder_ == null) {
+          if (deprecatedInputs_ != null) {
+            deprecatedInputs_ =
+              flyteidl.core.Literals.LiteralMap.newBuilder(deprecatedInputs_).mergeFrom(value).buildPartial();
           } else {
-            inputs_ = value;
+            deprecatedInputs_ = value;
           }
           onChanged();
         } else {
-          inputsBuilder_.mergeFrom(value);
+          deprecatedInputsBuilder_.mergeFrom(value);
         }
 
         return this;
@@ -3094,17 +3218,18 @@ public final class Agent {
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public Builder clearInputs() {
-        if (inputsBuilder_ == null) {
-          inputs_ = null;
+      @java.lang.Deprecated public Builder clearDeprecatedInputs() {
+        if (deprecatedInputsBuilder_ == null) {
+          deprecatedInputs_ = null;
           onChanged();
         } else {
-          inputs_ = null;
-          inputsBuilder_ = null;
+          deprecatedInputs_ = null;
+          deprecatedInputsBuilder_ = null;
         }
 
         return this;
@@ -3114,30 +3239,32 @@ public final class Agent {
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getInputsBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getDeprecatedInputsBuilder() {
         
         onChanged();
-        return getInputsFieldBuilder().getBuilder();
+        return getDeprecatedInputsFieldBuilder().getBuilder();
       }
       /**
        * <pre>
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
-        if (inputsBuilder_ != null) {
-          return inputsBuilder_.getMessageOrBuilder();
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedInputsOrBuilder() {
+        if (deprecatedInputsBuilder_ != null) {
+          return deprecatedInputsBuilder_.getMessageOrBuilder();
         } else {
-          return inputs_ == null ?
-              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+          return deprecatedInputs_ == null ?
+              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : deprecatedInputs_;
         }
       }
       /**
@@ -3145,22 +3272,23 @@ public final class Agent {
        * The inputs required to start the execution. All required inputs must be
        * included in this map. If not required and not provided, defaults apply.
        * +optional
+       * Deprecated: Use inputs instead.
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       * <code>.flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getInputsFieldBuilder() {
-        if (inputsBuilder_ == null) {
-          inputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+          getDeprecatedInputsFieldBuilder() {
+        if (deprecatedInputsBuilder_ == null) {
+          deprecatedInputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
               flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
-                  getInputs(),
+                  getDeprecatedInputs(),
                   getParentForChildren(),
                   isClean());
-          inputs_ = null;
+          deprecatedInputs_ = null;
         }
-        return inputsBuilder_;
+        return deprecatedInputsBuilder_;
       }
 
       private flyteidl.core.Tasks.TaskTemplate template_;
@@ -3556,6 +3684,177 @@ public final class Agent {
           taskExecutionMetadata_ = null;
         }
         return taskExecutionMetadataBuilder_;
+      }
+
+      private flyteidl.core.Literals.InputData inputs_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> inputsBuilder_;
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public boolean hasInputs() {
+        return inputsBuilder_ != null || inputs_ != null;
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public flyteidl.core.Literals.InputData getInputs() {
+        if (inputsBuilder_ == null) {
+          return inputs_ == null ? flyteidl.core.Literals.InputData.getDefaultInstance() : inputs_;
+        } else {
+          return inputsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public Builder setInputs(flyteidl.core.Literals.InputData value) {
+        if (inputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputs_ = value;
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public Builder setInputs(
+          flyteidl.core.Literals.InputData.Builder builderForValue) {
+        if (inputsBuilder_ == null) {
+          inputs_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public Builder mergeInputs(flyteidl.core.Literals.InputData value) {
+        if (inputsBuilder_ == null) {
+          if (inputs_ != null) {
+            inputs_ =
+              flyteidl.core.Literals.InputData.newBuilder(inputs_).mergeFrom(value).buildPartial();
+          } else {
+            inputs_ = value;
+          }
+          onChanged();
+        } else {
+          inputsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public Builder clearInputs() {
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+          onChanged();
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public flyteidl.core.Literals.InputData.Builder getInputsBuilder() {
+        
+        onChanged();
+        return getInputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      public flyteidl.core.Literals.InputDataOrBuilder getInputsOrBuilder() {
+        if (inputsBuilder_ != null) {
+          return inputsBuilder_.getMessageOrBuilder();
+        } else {
+          return inputs_ == null ?
+              flyteidl.core.Literals.InputData.getDefaultInstance() : inputs_;
+        }
+      }
+      /**
+       * <pre>
+       * Inputs are the inputs required to start the execution. All required inputs must be
+       * included in this map. If not required and not provided, defaults apply.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData inputs = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> 
+          getInputsFieldBuilder() {
+        if (inputsBuilder_ == null) {
+          inputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder>(
+                  getInputs(),
+                  getParentForChildren(),
+                  isClean());
+          inputs_ = null;
+        }
+        return inputsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -5435,9 +5734,43 @@ public final class Agent {
      * The outputs of the execution. It's typically used by sql task. Agent service will create a
      * Structured dataset pointing to the query result table.
      * +optional
+     * Deprecated: Use outputs instead.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+     * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated boolean hasDeprecatedOutputs();
+    /**
+     * <pre>
+     * The outputs of the execution. It's typically used by sql task. Agent service will create a
+     * Structured dataset pointing to the query result table.
+     * +optional
+     * Deprecated: Use outputs instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getDeprecatedOutputs();
+    /**
+     * <pre>
+     * The outputs of the execution. It's typically used by sql task. Agent service will create a
+     * Structured dataset pointing to the query result table.
+     * +optional
+     * Deprecated: Use outputs instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputsOrBuilder();
+
+    /**
+     * <pre>
+     * The outputs of the execution. It's typically used by sql task. Agent service will create a
+     * Structured dataset pointing to the query result table.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData outputs = 3;</code>
      */
     boolean hasOutputs();
     /**
@@ -5447,9 +5780,9 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+     * <code>.flyteidl.core.OutputData outputs = 3;</code>
      */
-    flyteidl.core.Literals.LiteralMap getOutputs();
+    flyteidl.core.Literals.OutputData getOutputs();
     /**
      * <pre>
      * The outputs of the execution. It's typically used by sql task. Agent service will create a
@@ -5457,9 +5790,9 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+     * <code>.flyteidl.core.OutputData outputs = 3;</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder();
+    flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.admin.Resource}
@@ -5509,10 +5842,23 @@ public final class Agent {
             }
             case 18: {
               flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (deprecatedOutputs_ != null) {
+                subBuilder = deprecatedOutputs_.toBuilder();
+              }
+              deprecatedOutputs_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(deprecatedOutputs_);
+                deprecatedOutputs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 26: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
               if (outputs_ != null) {
                 subBuilder = outputs_.toBuilder();
               }
-              outputs_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              outputs_ = input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
               if (subBuilder != null) {
                 subBuilder.mergeFrom(outputs_);
                 outputs_ = subBuilder.buildPartial();
@@ -5577,8 +5923,50 @@ public final class Agent {
       return result == null ? flyteidl.admin.Agent.State.UNRECOGNIZED : result;
     }
 
-    public static final int OUTPUTS_FIELD_NUMBER = 2;
-    private flyteidl.core.Literals.LiteralMap outputs_;
+    public static final int DEPRECATED_OUTPUTS_FIELD_NUMBER = 2;
+    private flyteidl.core.Literals.LiteralMap deprecatedOutputs_;
+    /**
+     * <pre>
+     * The outputs of the execution. It's typically used by sql task. Agent service will create a
+     * Structured dataset pointing to the query result table.
+     * +optional
+     * Deprecated: Use outputs instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated public boolean hasDeprecatedOutputs() {
+      return deprecatedOutputs_ != null;
+    }
+    /**
+     * <pre>
+     * The outputs of the execution. It's typically used by sql task. Agent service will create a
+     * Structured dataset pointing to the query result table.
+     * +optional
+     * Deprecated: Use outputs instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputs() {
+      return deprecatedOutputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : deprecatedOutputs_;
+    }
+    /**
+     * <pre>
+     * The outputs of the execution. It's typically used by sql task. Agent service will create a
+     * Structured dataset pointing to the query result table.
+     * +optional
+     * Deprecated: Use outputs instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputsOrBuilder() {
+      return getDeprecatedOutputs();
+    }
+
+    public static final int OUTPUTS_FIELD_NUMBER = 3;
+    private flyteidl.core.Literals.OutputData outputs_;
     /**
      * <pre>
      * The outputs of the execution. It's typically used by sql task. Agent service will create a
@@ -5586,7 +5974,7 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+     * <code>.flyteidl.core.OutputData outputs = 3;</code>
      */
     public boolean hasOutputs() {
       return outputs_ != null;
@@ -5598,10 +5986,10 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+     * <code>.flyteidl.core.OutputData outputs = 3;</code>
      */
-    public flyteidl.core.Literals.LiteralMap getOutputs() {
-      return outputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputs_;
+    public flyteidl.core.Literals.OutputData getOutputs() {
+      return outputs_ == null ? flyteidl.core.Literals.OutputData.getDefaultInstance() : outputs_;
     }
     /**
      * <pre>
@@ -5610,9 +5998,9 @@ public final class Agent {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+     * <code>.flyteidl.core.OutputData outputs = 3;</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder() {
+    public flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder() {
       return getOutputs();
     }
 
@@ -5633,8 +6021,11 @@ public final class Agent {
       if (state_ != flyteidl.admin.Agent.State.RETRYABLE_FAILURE.getNumber()) {
         output.writeEnum(1, state_);
       }
+      if (deprecatedOutputs_ != null) {
+        output.writeMessage(2, getDeprecatedOutputs());
+      }
       if (outputs_ != null) {
-        output.writeMessage(2, getOutputs());
+        output.writeMessage(3, getOutputs());
       }
       unknownFields.writeTo(output);
     }
@@ -5649,9 +6040,13 @@ public final class Agent {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, state_);
       }
+      if (deprecatedOutputs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getDeprecatedOutputs());
+      }
       if (outputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getOutputs());
+          .computeMessageSize(3, getOutputs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5669,6 +6064,11 @@ public final class Agent {
       flyteidl.admin.Agent.Resource other = (flyteidl.admin.Agent.Resource) obj;
 
       if (state_ != other.state_) return false;
+      if (hasDeprecatedOutputs() != other.hasDeprecatedOutputs()) return false;
+      if (hasDeprecatedOutputs()) {
+        if (!getDeprecatedOutputs()
+            .equals(other.getDeprecatedOutputs())) return false;
+      }
       if (hasOutputs() != other.hasOutputs()) return false;
       if (hasOutputs()) {
         if (!getOutputs()
@@ -5687,6 +6087,10 @@ public final class Agent {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + STATE_FIELD_NUMBER;
       hash = (53 * hash) + state_;
+      if (hasDeprecatedOutputs()) {
+        hash = (37 * hash) + DEPRECATED_OUTPUTS_FIELD_NUMBER;
+        hash = (53 * hash) + getDeprecatedOutputs().hashCode();
+      }
       if (hasOutputs()) {
         hash = (37 * hash) + OUTPUTS_FIELD_NUMBER;
         hash = (53 * hash) + getOutputs().hashCode();
@@ -5826,6 +6230,12 @@ public final class Agent {
         super.clear();
         state_ = 0;
 
+        if (deprecatedOutputsBuilder_ == null) {
+          deprecatedOutputs_ = null;
+        } else {
+          deprecatedOutputs_ = null;
+          deprecatedOutputsBuilder_ = null;
+        }
         if (outputsBuilder_ == null) {
           outputs_ = null;
         } else {
@@ -5859,6 +6269,11 @@ public final class Agent {
       public flyteidl.admin.Agent.Resource buildPartial() {
         flyteidl.admin.Agent.Resource result = new flyteidl.admin.Agent.Resource(this);
         result.state_ = state_;
+        if (deprecatedOutputsBuilder_ == null) {
+          result.deprecatedOutputs_ = deprecatedOutputs_;
+        } else {
+          result.deprecatedOutputs_ = deprecatedOutputsBuilder_.build();
+        }
         if (outputsBuilder_ == null) {
           result.outputs_ = outputs_;
         } else {
@@ -5914,6 +6329,9 @@ public final class Agent {
         if (other == flyteidl.admin.Agent.Resource.getDefaultInstance()) return this;
         if (other.state_ != 0) {
           setStateValue(other.getStateValue());
+        }
+        if (other.hasDeprecatedOutputs()) {
+          mergeDeprecatedOutputs(other.getDeprecatedOutputs());
         }
         if (other.hasOutputs()) {
           mergeOutputs(other.getOutputs());
@@ -6012,9 +6430,189 @@ public final class Agent {
         return this;
       }
 
-      private flyteidl.core.Literals.LiteralMap outputs_;
+      private flyteidl.core.Literals.LiteralMap deprecatedOutputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputsBuilder_;
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> deprecatedOutputsBuilder_;
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public boolean hasDeprecatedOutputs() {
+        return deprecatedOutputsBuilder_ != null || deprecatedOutputs_ != null;
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getDeprecatedOutputs() {
+        if (deprecatedOutputsBuilder_ == null) {
+          return deprecatedOutputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : deprecatedOutputs_;
+        } else {
+          return deprecatedOutputsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder setDeprecatedOutputs(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          deprecatedOutputs_ = value;
+          onChanged();
+        } else {
+          deprecatedOutputsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder setDeprecatedOutputs(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (deprecatedOutputsBuilder_ == null) {
+          deprecatedOutputs_ = builderForValue.build();
+          onChanged();
+        } else {
+          deprecatedOutputsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder mergeDeprecatedOutputs(flyteidl.core.Literals.LiteralMap value) {
+        if (deprecatedOutputsBuilder_ == null) {
+          if (deprecatedOutputs_ != null) {
+            deprecatedOutputs_ =
+              flyteidl.core.Literals.LiteralMap.newBuilder(deprecatedOutputs_).mergeFrom(value).buildPartial();
+          } else {
+            deprecatedOutputs_ = value;
+          }
+          onChanged();
+        } else {
+          deprecatedOutputsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder clearDeprecatedOutputs() {
+        if (deprecatedOutputsBuilder_ == null) {
+          deprecatedOutputs_ = null;
+          onChanged();
+        } else {
+          deprecatedOutputs_ = null;
+          deprecatedOutputsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getDeprecatedOutputsBuilder() {
+        
+        onChanged();
+        return getDeprecatedOutputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getDeprecatedOutputsOrBuilder() {
+        if (deprecatedOutputsBuilder_ != null) {
+          return deprecatedOutputsBuilder_.getMessageOrBuilder();
+        } else {
+          return deprecatedOutputs_ == null ?
+              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : deprecatedOutputs_;
+        }
+      }
+      /**
+       * <pre>
+       * The outputs of the execution. It's typically used by sql task. Agent service will create a
+       * Structured dataset pointing to the query result table.
+       * +optional
+       * Deprecated: Use outputs instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getDeprecatedOutputsFieldBuilder() {
+        if (deprecatedOutputsBuilder_ == null) {
+          deprecatedOutputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  getDeprecatedOutputs(),
+                  getParentForChildren(),
+                  isClean());
+          deprecatedOutputs_ = null;
+        }
+        return deprecatedOutputsBuilder_;
+      }
+
+      private flyteidl.core.Literals.OutputData outputs_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> outputsBuilder_;
       /**
        * <pre>
        * The outputs of the execution. It's typically used by sql task. Agent service will create a
@@ -6022,7 +6620,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
       public boolean hasOutputs() {
         return outputsBuilder_ != null || outputs_ != null;
@@ -6034,11 +6632,11 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
-      public flyteidl.core.Literals.LiteralMap getOutputs() {
+      public flyteidl.core.Literals.OutputData getOutputs() {
         if (outputsBuilder_ == null) {
-          return outputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputs_;
+          return outputs_ == null ? flyteidl.core.Literals.OutputData.getDefaultInstance() : outputs_;
         } else {
           return outputsBuilder_.getMessage();
         }
@@ -6050,9 +6648,9 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
-      public Builder setOutputs(flyteidl.core.Literals.LiteralMap value) {
+      public Builder setOutputs(flyteidl.core.Literals.OutputData value) {
         if (outputsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -6072,10 +6670,10 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
       public Builder setOutputs(
-          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
         if (outputsBuilder_ == null) {
           outputs_ = builderForValue.build();
           onChanged();
@@ -6092,13 +6690,13 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
-      public Builder mergeOutputs(flyteidl.core.Literals.LiteralMap value) {
+      public Builder mergeOutputs(flyteidl.core.Literals.OutputData value) {
         if (outputsBuilder_ == null) {
           if (outputs_ != null) {
             outputs_ =
-              flyteidl.core.Literals.LiteralMap.newBuilder(outputs_).mergeFrom(value).buildPartial();
+              flyteidl.core.Literals.OutputData.newBuilder(outputs_).mergeFrom(value).buildPartial();
           } else {
             outputs_ = value;
           }
@@ -6116,7 +6714,7 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
       public Builder clearOutputs() {
         if (outputsBuilder_ == null) {
@@ -6136,9 +6734,9 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getOutputsBuilder() {
+      public flyteidl.core.Literals.OutputData.Builder getOutputsBuilder() {
         
         onChanged();
         return getOutputsFieldBuilder().getBuilder();
@@ -6150,14 +6748,14 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder() {
+      public flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder() {
         if (outputsBuilder_ != null) {
           return outputsBuilder_.getMessageOrBuilder();
         } else {
           return outputs_ == null ?
-              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputs_;
+              flyteidl.core.Literals.OutputData.getDefaultInstance() : outputs_;
         }
       }
       /**
@@ -6167,14 +6765,14 @@ public final class Agent {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
+       * <code>.flyteidl.core.OutputData outputs = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
           getOutputsFieldBuilder() {
         if (outputsBuilder_ == null) {
           outputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
                   getOutputs(),
                   getParentForChildren(),
                   isClean());
@@ -7414,25 +8012,28 @@ public final class Agent {
       "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020Anno" +
       "tationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
       ":\0028\001\032;\n\031EnvironmentVariablesEntry\022\013\n\003key" +
-      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTask" +
-      "Request\022)\n\006inputs\030\001 \001(\0132\031.flyteidl.core." +
-      "LiteralMap\022-\n\010template\030\002 \001(\0132\033.flyteidl." +
-      "core.TaskTemplate\022\025\n\routput_prefix\030\003 \001(\t" +
-      "\022F\n\027task_execution_metadata\030\004 \001(\0132%.flyt" +
-      "eidl.admin.TaskExecutionMetadata\"+\n\022Crea" +
-      "teTaskResponse\022\025\n\rresource_meta\030\001 \001(\014\":\n" +
-      "\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre" +
-      "source_meta\030\002 \001(\014\"=\n\017GetTaskResponse\022*\n\010" +
-      "resource\030\001 \001(\0132\030.flyteidl.admin.Resource" +
-      "\"\\\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a" +
-      "dmin.State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.c" +
-      "ore.LiteralMap\"=\n\021DeleteTaskRequest\022\021\n\tt" +
-      "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n" +
-      "\022DeleteTaskResponse*^\n\005State\022\025\n\021RETRYABL" +
-      "E_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PE" +
-      "NDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;g" +
-      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
-      "-go/flyteidl/adminb\006proto3"
+      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\205\002\n\021CreateTask" +
+      "Request\0228\n\021deprecated_inputs\030\001 \001(\0132\031.fly" +
+      "teidl.core.LiteralMapB\002\030\001\022-\n\010template\030\002 " +
+      "\001(\0132\033.flyteidl.core.TaskTemplate\022\025\n\routp" +
+      "ut_prefix\030\003 \001(\t\022F\n\027task_execution_metada" +
+      "ta\030\004 \001(\0132%.flyteidl.admin.TaskExecutionM" +
+      "etadata\022(\n\006inputs\030\005 \001(\0132\030.flyteidl.core." +
+      "InputData\"+\n\022CreateTaskResponse\022\025\n\rresou" +
+      "rce_meta\030\001 \001(\014\":\n\016GetTaskRequest\022\021\n\ttask" +
+      "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"=\n\017Ge" +
+      "tTaskResponse\022*\n\010resource\030\001 \001(\0132\030.flytei" +
+      "dl.admin.Resource\"\227\001\n\010Resource\022$\n\005state\030" +
+      "\001 \001(\0162\025.flyteidl.admin.State\0229\n\022deprecat" +
+      "ed_outputs\030\002 \001(\0132\031.flyteidl.core.Literal" +
+      "MapB\002\030\001\022*\n\007outputs\030\003 \001(\0132\031.flyteidl.core" +
+      ".OutputData\"=\n\021DeleteTaskRequest\022\021\n\ttask" +
+      "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022De" +
+      "leteTaskResponse*^\n\005State\022\025\n\021RETRYABLE_F" +
+      "AILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDI" +
+      "NG\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;gith" +
+      "ub.com/flyteorg/flyte/flyteidl/gen/pb-go" +
+      "/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7479,7 +8080,7 @@ public final class Agent {
     internal_static_flyteidl_admin_CreateTaskRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_CreateTaskRequest_descriptor,
-        new java.lang.String[] { "Inputs", "Template", "OutputPrefix", "TaskExecutionMetadata", });
+        new java.lang.String[] { "DeprecatedInputs", "Template", "OutputPrefix", "TaskExecutionMetadata", "Inputs", });
     internal_static_flyteidl_admin_CreateTaskResponse_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_CreateTaskResponse_fieldAccessorTable = new
@@ -7503,7 +8104,7 @@ public final class Agent {
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Resource_descriptor,
-        new java.lang.String[] { "State", "Outputs", });
+        new java.lang.String[] { "State", "DeprecatedOutputs", "Outputs", });
     internal_static_flyteidl_admin_DeleteTaskRequest_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_DeleteTaskRequest_fieldAccessorTable = new

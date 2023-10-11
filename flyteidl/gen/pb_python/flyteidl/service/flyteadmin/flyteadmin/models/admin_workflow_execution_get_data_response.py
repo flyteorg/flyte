@@ -17,7 +17,9 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_url_blob import AdminUrlBlob  # noqa: F401,E501
+from flyteadmin.models.core_input_data import CoreInputData  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.models.core_output_data import CoreOutputData  # noqa: F401,E501
 
 
 class AdminWorkflowExecutionGetDataResponse(object):
@@ -37,23 +39,29 @@ class AdminWorkflowExecutionGetDataResponse(object):
         'outputs': 'AdminUrlBlob',
         'inputs': 'AdminUrlBlob',
         'full_inputs': 'CoreLiteralMap',
-        'full_outputs': 'CoreLiteralMap'
+        'full_outputs': 'CoreLiteralMap',
+        'input_data': 'CoreInputData',
+        'output_data': 'CoreOutputData'
     }
 
     attribute_map = {
         'outputs': 'outputs',
         'inputs': 'inputs',
         'full_inputs': 'full_inputs',
-        'full_outputs': 'full_outputs'
+        'full_outputs': 'full_outputs',
+        'input_data': 'input_data',
+        'output_data': 'output_data'
     }
 
-    def __init__(self, outputs=None, inputs=None, full_inputs=None, full_outputs=None):  # noqa: E501
+    def __init__(self, outputs=None, inputs=None, full_inputs=None, full_outputs=None, input_data=None, output_data=None):  # noqa: E501
         """AdminWorkflowExecutionGetDataResponse - a model defined in Swagger"""  # noqa: E501
 
         self._outputs = None
         self._inputs = None
         self._full_inputs = None
         self._full_outputs = None
+        self._input_data = None
+        self._output_data = None
         self.discriminator = None
 
         if outputs is not None:
@@ -64,6 +72,10 @@ class AdminWorkflowExecutionGetDataResponse(object):
             self.full_inputs = full_inputs
         if full_outputs is not None:
             self.full_outputs = full_outputs
+        if input_data is not None:
+            self.input_data = input_data
+        if output_data is not None:
+            self.output_data = output_data
 
     @property
     def outputs(self):
@@ -115,7 +127,7 @@ class AdminWorkflowExecutionGetDataResponse(object):
     def full_inputs(self):
         """Gets the full_inputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
 
-        Full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_inputs will only be populated if they are under a configured size threshold. Deprecated: Please use input_data instead.  # noqa: E501
 
         :return: The full_inputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -126,7 +138,7 @@ class AdminWorkflowExecutionGetDataResponse(object):
     def full_inputs(self, full_inputs):
         """Sets the full_inputs of this AdminWorkflowExecutionGetDataResponse.
 
-        Full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_inputs will only be populated if they are under a configured size threshold. Deprecated: Please use input_data instead.  # noqa: E501
 
         :param full_inputs: The full_inputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
         :type: CoreLiteralMap
@@ -138,7 +150,7 @@ class AdminWorkflowExecutionGetDataResponse(object):
     def full_outputs(self):
         """Gets the full_outputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
 
-        Full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_outputs will only be populated if they are under a configured size threshold. Deprecated: Please use output_data instead.  # noqa: E501
 
         :return: The full_outputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -149,13 +161,59 @@ class AdminWorkflowExecutionGetDataResponse(object):
     def full_outputs(self, full_outputs):
         """Sets the full_outputs of this AdminWorkflowExecutionGetDataResponse.
 
-        Full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_outputs will only be populated if they are under a configured size threshold. Deprecated: Please use output_data instead.  # noqa: E501
 
         :param full_outputs: The full_outputs of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
         :type: CoreLiteralMap
         """
 
         self._full_outputs = full_outputs
+
+    @property
+    def input_data(self):
+        """Gets the input_data of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+
+        InputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :return: The input_data of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+        :rtype: CoreInputData
+        """
+        return self._input_data
+
+    @input_data.setter
+    def input_data(self, input_data):
+        """Sets the input_data of this AdminWorkflowExecutionGetDataResponse.
+
+        InputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :param input_data: The input_data of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+        :type: CoreInputData
+        """
+
+        self._input_data = input_data
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+
+        OutputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :return: The output_data of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+        :rtype: CoreOutputData
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this AdminWorkflowExecutionGetDataResponse.
+
+        OutputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :param output_data: The output_data of this AdminWorkflowExecutionGetDataResponse.  # noqa: E501
+        :type: CoreOutputData
+        """
+
+        self._output_data = output_data
 
     def to_dict(self):
         """Returns the model properties as a dict"""

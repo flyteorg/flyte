@@ -17,9 +17,11 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
+from flyteadmin.models.core_input_data import CoreInputData  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase  # noqa: F401,E501
+from flyteadmin.models.core_output_data import CoreOutputData  # noqa: F401,E501
 from flyteadmin.models.event_parent_node_execution_metadata import EventParentNodeExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.event_parent_task_execution_metadata import EventParentTaskExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.flyteidlevent_task_node_metadata import FlyteidleventTaskNodeMetadata  # noqa: F401,E501
@@ -45,10 +47,12 @@ class EventNodeExecutionEvent(object):
         'phase': 'CoreNodeExecutionPhase',
         'occurred_at': 'datetime',
         'input_uri': 'str',
-        'input_data': 'CoreLiteralMap',
+        'deprecated_input_data': 'CoreLiteralMap',
+        'input_data': 'CoreInputData',
         'output_uri': 'str',
         'error': 'CoreExecutionError',
-        'output_data': 'CoreLiteralMap',
+        'deprecated_output_data': 'CoreLiteralMap',
+        'output_data': 'CoreOutputData',
         'workflow_node_metadata': 'FlyteidleventWorkflowNodeMetadata',
         'task_node_metadata': 'FlyteidleventTaskNodeMetadata',
         'parent_task_metadata': 'EventParentTaskExecutionMetadata',
@@ -70,9 +74,11 @@ class EventNodeExecutionEvent(object):
         'phase': 'phase',
         'occurred_at': 'occurred_at',
         'input_uri': 'input_uri',
+        'deprecated_input_data': 'deprecated_input_data',
         'input_data': 'input_data',
         'output_uri': 'output_uri',
         'error': 'error',
+        'deprecated_output_data': 'deprecated_output_data',
         'output_data': 'output_data',
         'workflow_node_metadata': 'workflow_node_metadata',
         'task_node_metadata': 'task_node_metadata',
@@ -89,7 +95,7 @@ class EventNodeExecutionEvent(object):
         'is_array': 'is_array'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None, reported_at=None, is_array=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, deprecated_input_data=None, input_data=None, output_uri=None, error=None, deprecated_output_data=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None, reported_at=None, is_array=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -97,9 +103,11 @@ class EventNodeExecutionEvent(object):
         self._phase = None
         self._occurred_at = None
         self._input_uri = None
+        self._deprecated_input_data = None
         self._input_data = None
         self._output_uri = None
         self._error = None
+        self._deprecated_output_data = None
         self._output_data = None
         self._workflow_node_metadata = None
         self._task_node_metadata = None
@@ -126,12 +134,16 @@ class EventNodeExecutionEvent(object):
             self.occurred_at = occurred_at
         if input_uri is not None:
             self.input_uri = input_uri
+        if deprecated_input_data is not None:
+            self.deprecated_input_data = deprecated_input_data
         if input_data is not None:
             self.input_data = input_data
         if output_uri is not None:
             self.output_uri = output_uri
         if error is not None:
             self.error = error
+        if deprecated_output_data is not None:
+            self.deprecated_output_data = deprecated_output_data
         if output_data is not None:
             self.output_data = output_data
         if workflow_node_metadata is not None:
@@ -269,13 +281,34 @@ class EventNodeExecutionEvent(object):
         self._input_uri = input_uri
 
     @property
+    def deprecated_input_data(self):
+        """Gets the deprecated_input_data of this EventNodeExecutionEvent.  # noqa: E501
+
+
+        :return: The deprecated_input_data of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._deprecated_input_data
+
+    @deprecated_input_data.setter
+    def deprecated_input_data(self, deprecated_input_data):
+        """Sets the deprecated_input_data of this EventNodeExecutionEvent.
+
+
+        :param deprecated_input_data: The deprecated_input_data of this EventNodeExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._deprecated_input_data = deprecated_input_data
+
+    @property
     def input_data(self):
         """Gets the input_data of this EventNodeExecutionEvent.  # noqa: E501
 
         Raw input data consumed by this node execution.  # noqa: E501
 
         :return: The input_data of this EventNodeExecutionEvent.  # noqa: E501
-        :rtype: CoreLiteralMap
+        :rtype: CoreInputData
         """
         return self._input_data
 
@@ -286,7 +319,7 @@ class EventNodeExecutionEvent(object):
         Raw input data consumed by this node execution.  # noqa: E501
 
         :param input_data: The input_data of this EventNodeExecutionEvent.  # noqa: E501
-        :type: CoreLiteralMap
+        :type: CoreInputData
         """
 
         self._input_data = input_data
@@ -336,13 +369,34 @@ class EventNodeExecutionEvent(object):
         self._error = error
 
     @property
+    def deprecated_output_data(self):
+        """Gets the deprecated_output_data of this EventNodeExecutionEvent.  # noqa: E501
+
+
+        :return: The deprecated_output_data of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: CoreLiteralMap
+        """
+        return self._deprecated_output_data
+
+    @deprecated_output_data.setter
+    def deprecated_output_data(self, deprecated_output_data):
+        """Sets the deprecated_output_data of this EventNodeExecutionEvent.
+
+
+        :param deprecated_output_data: The deprecated_output_data of this EventNodeExecutionEvent.  # noqa: E501
+        :type: CoreLiteralMap
+        """
+
+        self._deprecated_output_data = deprecated_output_data
+
+    @property
     def output_data(self):
         """Gets the output_data of this EventNodeExecutionEvent.  # noqa: E501
 
-        Raw output data produced by this node execution.  # noqa: E501
+        Raw output data produced by this workflow execution.  # noqa: E501
 
         :return: The output_data of this EventNodeExecutionEvent.  # noqa: E501
-        :rtype: CoreLiteralMap
+        :rtype: CoreOutputData
         """
         return self._output_data
 
@@ -350,10 +404,10 @@ class EventNodeExecutionEvent(object):
     def output_data(self, output_data):
         """Sets the output_data of this EventNodeExecutionEvent.
 
-        Raw output data produced by this node execution.  # noqa: E501
+        Raw output data produced by this workflow execution.  # noqa: E501
 
         :param output_data: The output_data of this EventNodeExecutionEvent.  # noqa: E501
-        :type: CoreLiteralMap
+        :type: CoreOutputData
         """
 
         self._output_data = output_data

@@ -29,8 +29,10 @@ pub struct CreateTaskRequest {
     /// The inputs required to start the execution. All required inputs must be
     /// included in this map. If not required and not provided, defaults apply.
     /// +optional
+    /// Deprecated: Use inputs instead.
+    #[deprecated]
     #[prost(message, optional, tag="1")]
-    pub inputs: ::core::option::Option<super::core::LiteralMap>,
+    pub deprecated_inputs: ::core::option::Option<super::core::LiteralMap>,
     /// Template of the task that encapsulates all the metadata of the task.
     #[prost(message, optional, tag="2")]
     pub template: ::core::option::Option<super::core::TaskTemplate>,
@@ -40,6 +42,11 @@ pub struct CreateTaskRequest {
     /// subset of runtime task execution metadata.
     #[prost(message, optional, tag="4")]
     pub task_execution_metadata: ::core::option::Option<TaskExecutionMetadata>,
+    /// Inputs are the inputs required to start the execution. All required inputs must be
+    /// included in this map. If not required and not provided, defaults apply.
+    /// +optional
+    #[prost(message, optional, tag="5")]
+    pub inputs: ::core::option::Option<super::core::InputData>,
 }
 /// Represents a create response structure.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -76,8 +83,15 @@ pub struct Resource {
     /// The outputs of the execution. It's typically used by sql task. Agent service will create a
     /// Structured dataset pointing to the query result table.
     /// +optional
+    /// Deprecated: Use outputs instead.
+    #[deprecated]
     #[prost(message, optional, tag="2")]
-    pub outputs: ::core::option::Option<super::core::LiteralMap>,
+    pub deprecated_outputs: ::core::option::Option<super::core::LiteralMap>,
+    /// The outputs of the execution. It's typically used by sql task. Agent service will create a
+    /// Structured dataset pointing to the query result table.
+    /// +optional
+    #[prost(message, optional, tag="3")]
+    pub outputs: ::core::option::Option<super::core::OutputData>,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -802,8 +816,15 @@ pub struct ExecutionCreateRequest {
     /// The inputs required to start the execution. All required inputs must be
     /// included in this map. If not required and not provided, defaults apply.
     /// +optional
+    /// Deprecated: Please use input_data instead.
+    #[deprecated]
     #[prost(message, optional, tag="5")]
     pub inputs: ::core::option::Option<super::core::LiteralMap>,
+    /// The inputs required to start the execution. All required inputs must be
+    /// included in this map. If not required and not provided, defaults apply.
+    /// +optional
+    #[prost(message, optional, tag="6")]
+    pub input_data: ::core::option::Option<super::core::InputData>,
 }
 /// Request to relaunch the referenced execution.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1203,11 +1224,21 @@ pub struct WorkflowExecutionGetDataResponse {
     #[prost(message, optional, tag="2")]
     pub inputs: ::core::option::Option<UrlBlob>,
     /// Full_inputs will only be populated if they are under a configured size threshold.
+    /// Deprecated: Please use input_data instead.
+    #[deprecated]
     #[prost(message, optional, tag="3")]
     pub full_inputs: ::core::option::Option<super::core::LiteralMap>,
     /// Full_outputs will only be populated if they are under a configured size threshold.
+    /// Deprecated: Please use output_data instead.
+    #[deprecated]
     #[prost(message, optional, tag="4")]
     pub full_outputs: ::core::option::Option<super::core::LiteralMap>,
+    /// InputData will only be populated if they are under a configured size threshold.
+    #[prost(message, optional, tag="5")]
+    pub input_data: ::core::option::Option<super::core::InputData>,
+    /// OutputData will only be populated if they are under a configured size threshold.
+    #[prost(message, optional, tag="6")]
+    pub output_data: ::core::option::Option<super::core::OutputData>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1439,8 +1470,14 @@ pub struct LaunchPlanSpec {
     pub default_inputs: ::core::option::Option<super::core::ParameterMap>,
     /// Fixed, non-overridable inputs for the Launch Plan.
     /// These can not be overridden when an execution is created with this launch plan.
+    /// Deprecated: Please use fixec_input_data instead
+    #[deprecated]
     #[prost(message, optional, tag="4")]
     pub fixed_inputs: ::core::option::Option<super::core::LiteralMap>,
+    /// Fixed, non-overridable inputs for the Launch Plan.
+    /// These can not be overridden when an execution is created with this launch plan.
+    #[prost(message, optional, tag="22")]
+    pub fixed_input_data: ::core::option::Option<super::core::InputData>,
     /// String to indicate the role to use to execute the workflow underneath
     #[deprecated]
     #[prost(string, tag="5")]
@@ -2114,11 +2151,21 @@ pub struct NodeExecutionGetDataResponse {
     #[prost(message, optional, tag="2")]
     pub outputs: ::core::option::Option<UrlBlob>,
     /// Full_inputs will only be populated if they are under a configured size threshold.
+    /// Deprecated: Please use input_data instead.
+    #[deprecated]
     #[prost(message, optional, tag="3")]
     pub full_inputs: ::core::option::Option<super::core::LiteralMap>,
-    /// Full_outputs will only be populated if they are under a configured size threshold. 
+    /// Full_outputs will only be populated if they are under a configured size threshold.
+    /// Deprecated: Please use output_data instead.
+    #[deprecated]
     #[prost(message, optional, tag="4")]
     pub full_outputs: ::core::option::Option<super::core::LiteralMap>,
+    /// InputData will only be populated if they are under a configured size threshold.
+    #[prost(message, optional, tag="5")]
+    pub input_data: ::core::option::Option<super::core::InputData>,
+    /// OutputData will only be populated if they are under a configured size threshold.
+    #[prost(message, optional, tag="6")]
+    pub output_data: ::core::option::Option<super::core::OutputData>,
     /// Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
     #[prost(message, optional, tag="16")]
     pub dynamic_workflow: ::core::option::Option<DynamicWorkflowNodeMetadata>,
@@ -2748,11 +2795,21 @@ pub struct TaskExecutionGetDataResponse {
     #[prost(message, optional, tag="2")]
     pub outputs: ::core::option::Option<UrlBlob>,
     /// Full_inputs will only be populated if they are under a configured size threshold.
+    /// Deprecated: Please use input_data instead.
+    #[deprecated]
     #[prost(message, optional, tag="3")]
     pub full_inputs: ::core::option::Option<super::core::LiteralMap>,
     /// Full_outputs will only be populated if they are under a configured size threshold.
+    /// Deprecated: Please use output_data instead.
+    #[deprecated]
     #[prost(message, optional, tag="4")]
     pub full_outputs: ::core::option::Option<super::core::LiteralMap>,
+    /// InputData will only be populated if they are under a configured size threshold.
+    #[prost(message, optional, tag="6")]
+    pub input_data: ::core::option::Option<super::core::InputData>,
+    /// OutputData will only be populated if they are under a configured size threshold.
+    #[prost(message, optional, tag="7")]
+    pub output_data: ::core::option::Option<super::core::OutputData>,
     /// flyte tiny url to fetch a core.LiteralMap of task execution's IO
     /// Deck will be empty for task
     #[prost(message, optional, tag="5")]

@@ -8447,6 +8447,56 @@ public final class Dataproxy {
      */
     flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder();
 
+    /**
+     * <pre>
+     * InputData is returned when the user/url requests the input data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 4;</code>
+     */
+    boolean hasInputData();
+    /**
+     * <pre>
+     * InputData is returned when the user/url requests the input data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 4;</code>
+     */
+    flyteidl.core.Literals.InputData getInputData();
+    /**
+     * <pre>
+     * InputData is returned when the user/url requests the input data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 4;</code>
+     */
+    flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder();
+
+    /**
+     * <pre>
+     * OutputData is returned when the user/url requests the output data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 5;</code>
+     */
+    boolean hasOutputData();
+    /**
+     * <pre>
+     * OutputData is returned when the user/url requests the output data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 5;</code>
+     */
+    flyteidl.core.Literals.OutputData getOutputData();
+    /**
+     * <pre>
+     * OutputData is returned when the user/url requests the output data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 5;</code>
+     */
+    flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder();
+
     public flyteidl.service.Dataproxy.GetDataResponse.DataCase getDataCase();
   }
   /**
@@ -8530,6 +8580,34 @@ public final class Dataproxy {
               dataCase_ = 3;
               break;
             }
+            case 34: {
+              flyteidl.core.Literals.InputData.Builder subBuilder = null;
+              if (dataCase_ == 4) {
+                subBuilder = ((flyteidl.core.Literals.InputData) data_).toBuilder();
+              }
+              data_ =
+                  input.readMessage(flyteidl.core.Literals.InputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.InputData) data_);
+                data_ = subBuilder.buildPartial();
+              }
+              dataCase_ = 4;
+              break;
+            }
+            case 42: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
+              if (dataCase_ == 5) {
+                subBuilder = ((flyteidl.core.Literals.OutputData) data_).toBuilder();
+              }
+              data_ =
+                  input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.OutputData) data_);
+                data_ = subBuilder.buildPartial();
+              }
+              dataCase_ = 5;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -8569,6 +8647,8 @@ public final class Dataproxy {
       LITERAL_MAP(1),
       PRE_SIGNED_URLS(2),
       LITERAL(3),
+      INPUT_DATA(4),
+      OUTPUT_DATA(5),
       DATA_NOT_SET(0);
       private final int value;
       private DataCase(int value) {
@@ -8587,6 +8667,8 @@ public final class Dataproxy {
           case 1: return LITERAL_MAP;
           case 2: return PRE_SIGNED_URLS;
           case 3: return LITERAL;
+          case 4: return INPUT_DATA;
+          case 5: return OUTPUT_DATA;
           case 0: return DATA_NOT_SET;
           default: return null;
         }
@@ -8719,6 +8801,82 @@ public final class Dataproxy {
       return flyteidl.core.Literals.Literal.getDefaultInstance();
     }
 
+    public static final int INPUT_DATA_FIELD_NUMBER = 4;
+    /**
+     * <pre>
+     * InputData is returned when the user/url requests the input data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 4;</code>
+     */
+    public boolean hasInputData() {
+      return dataCase_ == 4;
+    }
+    /**
+     * <pre>
+     * InputData is returned when the user/url requests the input data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 4;</code>
+     */
+    public flyteidl.core.Literals.InputData getInputData() {
+      if (dataCase_ == 4) {
+         return (flyteidl.core.Literals.InputData) data_;
+      }
+      return flyteidl.core.Literals.InputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * InputData is returned when the user/url requests the input data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData input_data = 4;</code>
+     */
+    public flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder() {
+      if (dataCase_ == 4) {
+         return (flyteidl.core.Literals.InputData) data_;
+      }
+      return flyteidl.core.Literals.InputData.getDefaultInstance();
+    }
+
+    public static final int OUTPUT_DATA_FIELD_NUMBER = 5;
+    /**
+     * <pre>
+     * OutputData is returned when the user/url requests the output data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 5;</code>
+     */
+    public boolean hasOutputData() {
+      return dataCase_ == 5;
+    }
+    /**
+     * <pre>
+     * OutputData is returned when the user/url requests the output data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 5;</code>
+     */
+    public flyteidl.core.Literals.OutputData getOutputData() {
+      if (dataCase_ == 5) {
+         return (flyteidl.core.Literals.OutputData) data_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * OutputData is returned when the user/url requests the output data for an execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData output_data = 5;</code>
+     */
+    public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+      if (dataCase_ == 5) {
+         return (flyteidl.core.Literals.OutputData) data_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -8742,6 +8900,12 @@ public final class Dataproxy {
       if (dataCase_ == 3) {
         output.writeMessage(3, (flyteidl.core.Literals.Literal) data_);
       }
+      if (dataCase_ == 4) {
+        output.writeMessage(4, (flyteidl.core.Literals.InputData) data_);
+      }
+      if (dataCase_ == 5) {
+        output.writeMessage(5, (flyteidl.core.Literals.OutputData) data_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -8762,6 +8926,14 @@ public final class Dataproxy {
       if (dataCase_ == 3) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, (flyteidl.core.Literals.Literal) data_);
+      }
+      if (dataCase_ == 4) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, (flyteidl.core.Literals.InputData) data_);
+      }
+      if (dataCase_ == 5) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, (flyteidl.core.Literals.OutputData) data_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -8792,6 +8964,14 @@ public final class Dataproxy {
           if (!getLiteral()
               .equals(other.getLiteral())) return false;
           break;
+        case 4:
+          if (!getInputData()
+              .equals(other.getInputData())) return false;
+          break;
+        case 5:
+          if (!getOutputData()
+              .equals(other.getOutputData())) return false;
+          break;
         case 0:
         default:
       }
@@ -8818,6 +8998,14 @@ public final class Dataproxy {
         case 3:
           hash = (37 * hash) + LITERAL_FIELD_NUMBER;
           hash = (53 * hash) + getLiteral().hashCode();
+          break;
+        case 4:
+          hash = (37 * hash) + INPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getInputData().hashCode();
+          break;
+        case 5:
+          hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getOutputData().hashCode();
           break;
         case 0:
         default:
@@ -9004,6 +9192,20 @@ public final class Dataproxy {
             result.data_ = literalBuilder_.build();
           }
         }
+        if (dataCase_ == 4) {
+          if (inputDataBuilder_ == null) {
+            result.data_ = data_;
+          } else {
+            result.data_ = inputDataBuilder_.build();
+          }
+        }
+        if (dataCase_ == 5) {
+          if (outputDataBuilder_ == null) {
+            result.data_ = data_;
+          } else {
+            result.data_ = outputDataBuilder_.build();
+          }
+        }
         result.dataCase_ = dataCase_;
         onBuilt();
         return result;
@@ -9064,6 +9266,14 @@ public final class Dataproxy {
           }
           case LITERAL: {
             mergeLiteral(other.getLiteral());
+            break;
+          }
+          case INPUT_DATA: {
+            mergeInputData(other.getInputData());
+            break;
+          }
+          case OUTPUT_DATA: {
+            mergeOutputData(other.getOutputData());
             break;
           }
           case DATA_NOT_SET: {
@@ -9638,6 +9848,350 @@ public final class Dataproxy {
         onChanged();;
         return literalBuilder_;
       }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> inputDataBuilder_;
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public boolean hasInputData() {
+        return dataCase_ == 4;
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public flyteidl.core.Literals.InputData getInputData() {
+        if (inputDataBuilder_ == null) {
+          if (dataCase_ == 4) {
+            return (flyteidl.core.Literals.InputData) data_;
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        } else {
+          if (dataCase_ == 4) {
+            return inputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public Builder setInputData(flyteidl.core.Literals.InputData value) {
+        if (inputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(value);
+        }
+        dataCase_ = 4;
+        return this;
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public Builder setInputData(
+          flyteidl.core.Literals.InputData.Builder builderForValue) {
+        if (inputDataBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(builderForValue.build());
+        }
+        dataCase_ = 4;
+        return this;
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public Builder mergeInputData(flyteidl.core.Literals.InputData value) {
+        if (inputDataBuilder_ == null) {
+          if (dataCase_ == 4 &&
+              data_ != flyteidl.core.Literals.InputData.getDefaultInstance()) {
+            data_ = flyteidl.core.Literals.InputData.newBuilder((flyteidl.core.Literals.InputData) data_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            data_ = value;
+          }
+          onChanged();
+        } else {
+          if (dataCase_ == 4) {
+            inputDataBuilder_.mergeFrom(value);
+          }
+          inputDataBuilder_.setMessage(value);
+        }
+        dataCase_ = 4;
+        return this;
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public Builder clearInputData() {
+        if (inputDataBuilder_ == null) {
+          if (dataCase_ == 4) {
+            dataCase_ = 0;
+            data_ = null;
+            onChanged();
+          }
+        } else {
+          if (dataCase_ == 4) {
+            dataCase_ = 0;
+            data_ = null;
+          }
+          inputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public flyteidl.core.Literals.InputData.Builder getInputDataBuilder() {
+        return getInputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      public flyteidl.core.Literals.InputDataOrBuilder getInputDataOrBuilder() {
+        if ((dataCase_ == 4) && (inputDataBuilder_ != null)) {
+          return inputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (dataCase_ == 4) {
+            return (flyteidl.core.Literals.InputData) data_;
+          }
+          return flyteidl.core.Literals.InputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * InputData is returned when the user/url requests the input data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData input_data = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> 
+          getInputDataFieldBuilder() {
+        if (inputDataBuilder_ == null) {
+          if (!(dataCase_ == 4)) {
+            data_ = flyteidl.core.Literals.InputData.getDefaultInstance();
+          }
+          inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder>(
+                  (flyteidl.core.Literals.InputData) data_,
+                  getParentForChildren(),
+                  isClean());
+          data_ = null;
+        }
+        dataCase_ = 4;
+        onChanged();;
+        return inputDataBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> outputDataBuilder_;
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public boolean hasOutputData() {
+        return dataCase_ == 5;
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public flyteidl.core.Literals.OutputData getOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (dataCase_ == 5) {
+            return (flyteidl.core.Literals.OutputData) data_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        } else {
+          if (dataCase_ == 5) {
+            return outputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public Builder setOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(value);
+        }
+        dataCase_ = 5;
+        return this;
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public Builder setOutputData(
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
+        if (outputDataBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          outputDataBuilder_.setMessage(builderForValue.build());
+        }
+        dataCase_ = 5;
+        return this;
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public Builder mergeOutputData(flyteidl.core.Literals.OutputData value) {
+        if (outputDataBuilder_ == null) {
+          if (dataCase_ == 5 &&
+              data_ != flyteidl.core.Literals.OutputData.getDefaultInstance()) {
+            data_ = flyteidl.core.Literals.OutputData.newBuilder((flyteidl.core.Literals.OutputData) data_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            data_ = value;
+          }
+          onChanged();
+        } else {
+          if (dataCase_ == 5) {
+            outputDataBuilder_.mergeFrom(value);
+          }
+          outputDataBuilder_.setMessage(value);
+        }
+        dataCase_ = 5;
+        return this;
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public Builder clearOutputData() {
+        if (outputDataBuilder_ == null) {
+          if (dataCase_ == 5) {
+            dataCase_ = 0;
+            data_ = null;
+            onChanged();
+          }
+        } else {
+          if (dataCase_ == 5) {
+            dataCase_ = 0;
+            data_ = null;
+          }
+          outputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public flyteidl.core.Literals.OutputData.Builder getOutputDataBuilder() {
+        return getOutputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      public flyteidl.core.Literals.OutputDataOrBuilder getOutputDataOrBuilder() {
+        if ((dataCase_ == 5) && (outputDataBuilder_ != null)) {
+          return outputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (dataCase_ == 5) {
+            return (flyteidl.core.Literals.OutputData) data_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * OutputData is returned when the user/url requests the output data for an execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData output_data = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
+          getOutputDataFieldBuilder() {
+        if (outputDataBuilder_ == null) {
+          if (!(dataCase_ == 5)) {
+            data_ = flyteidl.core.Literals.OutputData.getDefaultInstance();
+          }
+          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
+                  (flyteidl.core.Literals.OutputData) data_,
+                  getParentForChildren(),
+                  isClean());
+          data_ = null;
+        }
+        dataCase_ = 5;
+        onChanged();;
+        return outputDataBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -9775,30 +10329,33 @@ public final class Dataproxy {
       "ignedURLs\"S\n\rPreSignedURLs\022\022\n\nsigned_url" +
       "\030\001 \003(\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.prot" +
       "obuf.Timestamp\"#\n\016GetDataRequest\022\021\n\tflyt" +
-      "e_url\030\001 \001(\t\"\262\001\n\017GetDataResponse\0220\n\013liter" +
+      "e_url\030\001 \001(\t\"\224\002\n\017GetDataResponse\0220\n\013liter" +
       "al_map\030\001 \001(\0132\031.flyteidl.core.LiteralMapH" +
       "\000\022:\n\017pre_signed_urls\030\002 \001(\0132\037.flyteidl.se" +
       "rvice.PreSignedURLsH\000\022)\n\007literal\030\003 \001(\0132\026" +
-      ".flyteidl.core.LiteralH\000B\006\n\004data*C\n\014Arti" +
-      "factType\022\033\n\027ARTIFACT_TYPE_UNDEFINED\020\000\022\026\n" +
-      "\022ARTIFACT_TYPE_DECK\020\0012\342\004\n\020DataProxyServi" +
-      "ce\022\240\001\n\024CreateUploadLocation\022-.flyteidl.s" +
-      "ervice.CreateUploadLocationRequest\032..fly" +
-      "teidl.service.CreateUploadLocationRespon" +
-      "se\")\202\323\344\223\002#\"\036/api/v1/dataproxy/artifact_u" +
-      "rn:\001*\022\246\001\n\026CreateDownloadLocation\022/.flyte" +
-      "idl.service.CreateDownloadLocationReques" +
-      "t\0320.flyteidl.service.CreateDownloadLocat" +
-      "ionResponse\")\210\002\001\202\323\344\223\002 \022\036/api/v1/dataprox" +
-      "y/artifact_urn\022\233\001\n\022CreateDownloadLink\022+." +
-      "flyteidl.service.CreateDownloadLinkReque" +
-      "st\032,.flyteidl.service.CreateDownloadLink" +
-      "Response\"*\202\323\344\223\002$\"\037/api/v1/dataproxy/arti" +
-      "fact_link:\001*\022d\n\007GetData\022 .flyteidl.servi" +
-      "ce.GetDataRequest\032!.flyteidl.service.Get" +
-      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB?Z=gi" +
-      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
-      "go/flyteidl/serviceb\006proto3"
+      ".flyteidl.core.LiteralH\000\022.\n\ninput_data\030\004" +
+      " \001(\0132\030.flyteidl.core.InputDataH\000\0220\n\013outp" +
+      "ut_data\030\005 \001(\0132\031.flyteidl.core.OutputData" +
+      "H\000B\006\n\004data*C\n\014ArtifactType\022\033\n\027ARTIFACT_T" +
+      "YPE_UNDEFINED\020\000\022\026\n\022ARTIFACT_TYPE_DECK\020\0012" +
+      "\342\004\n\020DataProxyService\022\240\001\n\024CreateUploadLoc" +
+      "ation\022-.flyteidl.service.CreateUploadLoc" +
+      "ationRequest\032..flyteidl.service.CreateUp" +
+      "loadLocationResponse\")\202\323\344\223\002#\"\036/api/v1/da" +
+      "taproxy/artifact_urn:\001*\022\246\001\n\026CreateDownlo" +
+      "adLocation\022/.flyteidl.service.CreateDown" +
+      "loadLocationRequest\0320.flyteidl.service.C" +
+      "reateDownloadLocationResponse\")\210\002\001\202\323\344\223\002 " +
+      "\022\036/api/v1/dataproxy/artifact_urn\022\233\001\n\022Cre" +
+      "ateDownloadLink\022+.flyteidl.service.Creat" +
+      "eDownloadLinkRequest\032,.flyteidl.service." +
+      "CreateDownloadLinkResponse\"*\202\323\344\223\002$\"\037/api" +
+      "/v1/dataproxy/artifact_link:\001*\022d\n\007GetDat" +
+      "a\022 .flyteidl.service.GetDataRequest\032!.fl" +
+      "yteidl.service.GetDataResponse\"\024\202\323\344\223\002\016\022\014" +
+      "/api/v1/dataB?Z=github.com/flyteorg/flyt" +
+      "e/flyteidl/gen/pb-go/flyteidl/serviceb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -9870,7 +10427,7 @@ public final class Dataproxy {
     internal_static_flyteidl_service_GetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_GetDataResponse_descriptor,
-        new java.lang.String[] { "LiteralMap", "PreSignedUrls", "Literal", "Data", });
+        new java.lang.String[] { "LiteralMap", "PreSignedUrls", "Literal", "InputData", "OutputData", "Data", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);

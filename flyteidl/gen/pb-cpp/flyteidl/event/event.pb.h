@@ -173,7 +173,8 @@ class WorkflowExecutionEvent final :
   enum OutputResultCase {
     kOutputUri = 5,
     kError = 6,
-    kOutputData = 7,
+    kDeprecatedOutputData = 7,
+    kOutputData = 8,
     OUTPUT_RESULT_NOT_SET = 0,
   };
 
@@ -304,14 +305,23 @@ class WorkflowExecutionEvent final :
   ::flyteidl::core::ExecutionError* mutable_error();
   void set_allocated_error(::flyteidl::core::ExecutionError* error);
 
-  // .flyteidl.core.LiteralMap output_data = 7;
+  // .flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_deprecated_output_data() const;
+  PROTOBUF_DEPRECATED void clear_deprecated_output_data();
+  PROTOBUF_DEPRECATED static const int kDeprecatedOutputDataFieldNumber = 7;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& deprecated_output_data() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_deprecated_output_data();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_deprecated_output_data();
+  PROTOBUF_DEPRECATED void set_allocated_deprecated_output_data(::flyteidl::core::LiteralMap* deprecated_output_data);
+
+  // .flyteidl.core.OutputData output_data = 8;
   bool has_output_data() const;
   void clear_output_data();
-  static const int kOutputDataFieldNumber = 7;
-  const ::flyteidl::core::LiteralMap& output_data() const;
-  ::flyteidl::core::LiteralMap* release_output_data();
-  ::flyteidl::core::LiteralMap* mutable_output_data();
-  void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
+  static const int kOutputDataFieldNumber = 8;
+  const ::flyteidl::core::OutputData& output_data() const;
+  ::flyteidl::core::OutputData* release_output_data();
+  ::flyteidl::core::OutputData* mutable_output_data();
+  void set_allocated_output_data(::flyteidl::core::OutputData* output_data);
 
   void clear_output_result();
   OutputResultCase output_result_case() const;
@@ -320,6 +330,7 @@ class WorkflowExecutionEvent final :
   class HasBitSetters;
   void set_has_output_uri();
   void set_has_error();
+  void set_has_deprecated_output_data();
   void set_has_output_data();
 
   inline bool has_output_result() const;
@@ -334,7 +345,8 @@ class WorkflowExecutionEvent final :
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
     ::flyteidl::core::ExecutionError* error_;
-    ::flyteidl::core::LiteralMap* output_data_;
+    ::flyteidl::core::LiteralMap* deprecated_output_data_;
+    ::flyteidl::core::OutputData* output_data_;
   } output_result_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -377,14 +389,16 @@ class NodeExecutionEvent final :
 
   enum InputValueCase {
     kInputUri = 5,
-    kInputData = 20,
+    kDeprecatedInputData = 20,
+    kInputData = 24,
     INPUT_VALUE_NOT_SET = 0,
   };
 
   enum OutputResultCase {
     kOutputUri = 6,
     kError = 7,
-    kOutputData = 15,
+    kDeprecatedOutputData = 15,
+    kOutputData = 23,
     OUTPUT_RESULT_NOT_SET = 0,
   };
 
@@ -619,14 +633,23 @@ class NodeExecutionEvent final :
   ::std::string* release_input_uri();
   void set_allocated_input_uri(::std::string* input_uri);
 
-  // .flyteidl.core.LiteralMap input_data = 20;
+  // .flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_deprecated_input_data() const;
+  PROTOBUF_DEPRECATED void clear_deprecated_input_data();
+  PROTOBUF_DEPRECATED static const int kDeprecatedInputDataFieldNumber = 20;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& deprecated_input_data() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_deprecated_input_data();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_deprecated_input_data();
+  PROTOBUF_DEPRECATED void set_allocated_deprecated_input_data(::flyteidl::core::LiteralMap* deprecated_input_data);
+
+  // .flyteidl.core.InputData input_data = 24;
   bool has_input_data() const;
   void clear_input_data();
-  static const int kInputDataFieldNumber = 20;
-  const ::flyteidl::core::LiteralMap& input_data() const;
-  ::flyteidl::core::LiteralMap* release_input_data();
-  ::flyteidl::core::LiteralMap* mutable_input_data();
-  void set_allocated_input_data(::flyteidl::core::LiteralMap* input_data);
+  static const int kInputDataFieldNumber = 24;
+  const ::flyteidl::core::InputData& input_data() const;
+  ::flyteidl::core::InputData* release_input_data();
+  ::flyteidl::core::InputData* mutable_input_data();
+  void set_allocated_input_data(::flyteidl::core::InputData* input_data);
 
   // string output_uri = 6;
   private:
@@ -654,14 +677,23 @@ class NodeExecutionEvent final :
   ::flyteidl::core::ExecutionError* mutable_error();
   void set_allocated_error(::flyteidl::core::ExecutionError* error);
 
-  // .flyteidl.core.LiteralMap output_data = 15;
+  // .flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_deprecated_output_data() const;
+  PROTOBUF_DEPRECATED void clear_deprecated_output_data();
+  PROTOBUF_DEPRECATED static const int kDeprecatedOutputDataFieldNumber = 15;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& deprecated_output_data() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_deprecated_output_data();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_deprecated_output_data();
+  PROTOBUF_DEPRECATED void set_allocated_deprecated_output_data(::flyteidl::core::LiteralMap* deprecated_output_data);
+
+  // .flyteidl.core.OutputData output_data = 23;
   bool has_output_data() const;
   void clear_output_data();
-  static const int kOutputDataFieldNumber = 15;
-  const ::flyteidl::core::LiteralMap& output_data() const;
-  ::flyteidl::core::LiteralMap* release_output_data();
-  ::flyteidl::core::LiteralMap* mutable_output_data();
-  void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
+  static const int kOutputDataFieldNumber = 23;
+  const ::flyteidl::core::OutputData& output_data() const;
+  ::flyteidl::core::OutputData* release_output_data();
+  ::flyteidl::core::OutputData* mutable_output_data();
+  void set_allocated_output_data(::flyteidl::core::OutputData* output_data);
 
   // .flyteidl.event.WorkflowNodeMetadata workflow_node_metadata = 8;
   bool has_workflow_node_metadata() const;
@@ -691,9 +723,11 @@ class NodeExecutionEvent final :
  private:
   class HasBitSetters;
   void set_has_input_uri();
+  void set_has_deprecated_input_data();
   void set_has_input_data();
   void set_has_output_uri();
   void set_has_error();
+  void set_has_deprecated_output_data();
   void set_has_output_data();
   void set_has_workflow_node_metadata();
   void set_has_task_node_metadata();
@@ -726,13 +760,15 @@ class NodeExecutionEvent final :
   union InputValueUnion {
     InputValueUnion() {}
     ::google::protobuf::internal::ArenaStringPtr input_uri_;
-    ::flyteidl::core::LiteralMap* input_data_;
+    ::flyteidl::core::LiteralMap* deprecated_input_data_;
+    ::flyteidl::core::InputData* input_data_;
   } input_value_;
   union OutputResultUnion {
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
     ::flyteidl::core::ExecutionError* error_;
-    ::flyteidl::core::LiteralMap* output_data_;
+    ::flyteidl::core::LiteralMap* deprecated_output_data_;
+    ::flyteidl::core::OutputData* output_data_;
   } output_result_;
   union TargetMetadataUnion {
     TargetMetadataUnion() {}
@@ -1554,14 +1590,16 @@ class TaskExecutionEvent final :
 
   enum InputValueCase {
     kInputUri = 8,
-    kInputData = 19,
+    kDeprecatedInputData = 19,
+    kInputData = 23,
     INPUT_VALUE_NOT_SET = 0,
   };
 
   enum OutputResultCase {
     kOutputUri = 9,
     kError = 10,
-    kOutputData = 17,
+    kDeprecatedOutputData = 17,
+    kOutputData = 22,
     OUTPUT_RESULT_NOT_SET = 0,
   };
 
@@ -1789,14 +1827,23 @@ class TaskExecutionEvent final :
   ::std::string* release_input_uri();
   void set_allocated_input_uri(::std::string* input_uri);
 
-  // .flyteidl.core.LiteralMap input_data = 19;
+  // .flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_deprecated_input_data() const;
+  PROTOBUF_DEPRECATED void clear_deprecated_input_data();
+  PROTOBUF_DEPRECATED static const int kDeprecatedInputDataFieldNumber = 19;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& deprecated_input_data() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_deprecated_input_data();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_deprecated_input_data();
+  PROTOBUF_DEPRECATED void set_allocated_deprecated_input_data(::flyteidl::core::LiteralMap* deprecated_input_data);
+
+  // .flyteidl.core.InputData input_data = 23;
   bool has_input_data() const;
   void clear_input_data();
-  static const int kInputDataFieldNumber = 19;
-  const ::flyteidl::core::LiteralMap& input_data() const;
-  ::flyteidl::core::LiteralMap* release_input_data();
-  ::flyteidl::core::LiteralMap* mutable_input_data();
-  void set_allocated_input_data(::flyteidl::core::LiteralMap* input_data);
+  static const int kInputDataFieldNumber = 23;
+  const ::flyteidl::core::InputData& input_data() const;
+  ::flyteidl::core::InputData* release_input_data();
+  ::flyteidl::core::InputData* mutable_input_data();
+  void set_allocated_input_data(::flyteidl::core::InputData* input_data);
 
   // string output_uri = 9;
   private:
@@ -1824,14 +1871,23 @@ class TaskExecutionEvent final :
   ::flyteidl::core::ExecutionError* mutable_error();
   void set_allocated_error(::flyteidl::core::ExecutionError* error);
 
-  // .flyteidl.core.LiteralMap output_data = 17;
+  // .flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_deprecated_output_data() const;
+  PROTOBUF_DEPRECATED void clear_deprecated_output_data();
+  PROTOBUF_DEPRECATED static const int kDeprecatedOutputDataFieldNumber = 17;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& deprecated_output_data() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_deprecated_output_data();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_deprecated_output_data();
+  PROTOBUF_DEPRECATED void set_allocated_deprecated_output_data(::flyteidl::core::LiteralMap* deprecated_output_data);
+
+  // .flyteidl.core.OutputData output_data = 22;
   bool has_output_data() const;
   void clear_output_data();
-  static const int kOutputDataFieldNumber = 17;
-  const ::flyteidl::core::LiteralMap& output_data() const;
-  ::flyteidl::core::LiteralMap* release_output_data();
-  ::flyteidl::core::LiteralMap* mutable_output_data();
-  void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
+  static const int kOutputDataFieldNumber = 22;
+  const ::flyteidl::core::OutputData& output_data() const;
+  ::flyteidl::core::OutputData* release_output_data();
+  ::flyteidl::core::OutputData* mutable_output_data();
+  void set_allocated_output_data(::flyteidl::core::OutputData* output_data);
 
   void clear_input_value();
   InputValueCase input_value_case() const;
@@ -1841,9 +1897,11 @@ class TaskExecutionEvent final :
  private:
   class HasBitSetters;
   void set_has_input_uri();
+  void set_has_deprecated_input_data();
   void set_has_input_data();
   void set_has_output_uri();
   void set_has_error();
+  void set_has_deprecated_output_data();
   void set_has_output_data();
 
   inline bool has_input_value() const;
@@ -1871,13 +1929,15 @@ class TaskExecutionEvent final :
   union InputValueUnion {
     InputValueUnion() {}
     ::google::protobuf::internal::ArenaStringPtr input_uri_;
-    ::flyteidl::core::LiteralMap* input_data_;
+    ::flyteidl::core::LiteralMap* deprecated_input_data_;
+    ::flyteidl::core::InputData* input_data_;
   } input_value_;
   union OutputResultUnion {
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
     ::flyteidl::core::ExecutionError* error_;
-    ::flyteidl::core::LiteralMap* output_data_;
+    ::flyteidl::core::LiteralMap* deprecated_output_data_;
+    ::flyteidl::core::OutputData* output_data_;
   } output_result_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[2];
@@ -2670,35 +2730,70 @@ inline ::flyteidl::core::ExecutionError* WorkflowExecutionEvent::mutable_error()
   return output_result_.error_;
 }
 
-// .flyteidl.core.LiteralMap output_data = 7;
+// .flyteidl.core.LiteralMap deprecated_output_data = 7 [deprecated = true];
+inline bool WorkflowExecutionEvent::has_deprecated_output_data() const {
+  return output_result_case() == kDeprecatedOutputData;
+}
+inline void WorkflowExecutionEvent::set_has_deprecated_output_data() {
+  _oneof_case_[0] = kDeprecatedOutputData;
+}
+inline ::flyteidl::core::LiteralMap* WorkflowExecutionEvent::release_deprecated_output_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.WorkflowExecutionEvent.deprecated_output_data)
+  if (has_deprecated_output_data()) {
+    clear_has_output_result();
+      ::flyteidl::core::LiteralMap* temp = output_result_.deprecated_output_data_;
+    output_result_.deprecated_output_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& WorkflowExecutionEvent::deprecated_output_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.WorkflowExecutionEvent.deprecated_output_data)
+  return has_deprecated_output_data()
+      ? *output_result_.deprecated_output_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* WorkflowExecutionEvent::mutable_deprecated_output_data() {
+  if (!has_deprecated_output_data()) {
+    clear_output_result();
+    set_has_deprecated_output_data();
+    output_result_.deprecated_output_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.WorkflowExecutionEvent.deprecated_output_data)
+  return output_result_.deprecated_output_data_;
+}
+
+// .flyteidl.core.OutputData output_data = 8;
 inline bool WorkflowExecutionEvent::has_output_data() const {
   return output_result_case() == kOutputData;
 }
 inline void WorkflowExecutionEvent::set_has_output_data() {
   _oneof_case_[0] = kOutputData;
 }
-inline ::flyteidl::core::LiteralMap* WorkflowExecutionEvent::release_output_data() {
+inline ::flyteidl::core::OutputData* WorkflowExecutionEvent::release_output_data() {
   // @@protoc_insertion_point(field_release:flyteidl.event.WorkflowExecutionEvent.output_data)
   if (has_output_data()) {
     clear_has_output_result();
-      ::flyteidl::core::LiteralMap* temp = output_result_.output_data_;
+      ::flyteidl::core::OutputData* temp = output_result_.output_data_;
     output_result_.output_data_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::flyteidl::core::LiteralMap& WorkflowExecutionEvent::output_data() const {
+inline const ::flyteidl::core::OutputData& WorkflowExecutionEvent::output_data() const {
   // @@protoc_insertion_point(field_get:flyteidl.event.WorkflowExecutionEvent.output_data)
   return has_output_data()
       ? *output_result_.output_data_
-      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+      : *reinterpret_cast< ::flyteidl::core::OutputData*>(&::flyteidl::core::_OutputData_default_instance_);
 }
-inline ::flyteidl::core::LiteralMap* WorkflowExecutionEvent::mutable_output_data() {
+inline ::flyteidl::core::OutputData* WorkflowExecutionEvent::mutable_output_data() {
   if (!has_output_data()) {
     clear_output_result();
     set_has_output_data();
-    output_result_.output_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+    output_result_.output_data_ = CreateMaybeMessage< ::flyteidl::core::OutputData >(
         GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.WorkflowExecutionEvent.output_data)
@@ -2968,35 +3063,70 @@ inline void NodeExecutionEvent::set_allocated_input_uri(::std::string* input_uri
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.NodeExecutionEvent.input_uri)
 }
 
-// .flyteidl.core.LiteralMap input_data = 20;
+// .flyteidl.core.LiteralMap deprecated_input_data = 20 [deprecated = true];
+inline bool NodeExecutionEvent::has_deprecated_input_data() const {
+  return input_value_case() == kDeprecatedInputData;
+}
+inline void NodeExecutionEvent::set_has_deprecated_input_data() {
+  _oneof_case_[0] = kDeprecatedInputData;
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::release_deprecated_input_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.deprecated_input_data)
+  if (has_deprecated_input_data()) {
+    clear_has_input_value();
+      ::flyteidl::core::LiteralMap* temp = input_value_.deprecated_input_data_;
+    input_value_.deprecated_input_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& NodeExecutionEvent::deprecated_input_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.deprecated_input_data)
+  return has_deprecated_input_data()
+      ? *input_value_.deprecated_input_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::mutable_deprecated_input_data() {
+  if (!has_deprecated_input_data()) {
+    clear_input_value();
+    set_has_deprecated_input_data();
+    input_value_.deprecated_input_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.deprecated_input_data)
+  return input_value_.deprecated_input_data_;
+}
+
+// .flyteidl.core.InputData input_data = 24;
 inline bool NodeExecutionEvent::has_input_data() const {
   return input_value_case() == kInputData;
 }
 inline void NodeExecutionEvent::set_has_input_data() {
   _oneof_case_[0] = kInputData;
 }
-inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::release_input_data() {
+inline ::flyteidl::core::InputData* NodeExecutionEvent::release_input_data() {
   // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.input_data)
   if (has_input_data()) {
     clear_has_input_value();
-      ::flyteidl::core::LiteralMap* temp = input_value_.input_data_;
+      ::flyteidl::core::InputData* temp = input_value_.input_data_;
     input_value_.input_data_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::flyteidl::core::LiteralMap& NodeExecutionEvent::input_data() const {
+inline const ::flyteidl::core::InputData& NodeExecutionEvent::input_data() const {
   // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.input_data)
   return has_input_data()
       ? *input_value_.input_data_
-      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+      : *reinterpret_cast< ::flyteidl::core::InputData*>(&::flyteidl::core::_InputData_default_instance_);
 }
-inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::mutable_input_data() {
+inline ::flyteidl::core::InputData* NodeExecutionEvent::mutable_input_data() {
   if (!has_input_data()) {
     clear_input_value();
     set_has_input_data();
-    input_value_.input_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+    input_value_.input_data_ = CreateMaybeMessage< ::flyteidl::core::InputData >(
         GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.input_data)
@@ -3130,35 +3260,70 @@ inline ::flyteidl::core::ExecutionError* NodeExecutionEvent::mutable_error() {
   return output_result_.error_;
 }
 
-// .flyteidl.core.LiteralMap output_data = 15;
+// .flyteidl.core.LiteralMap deprecated_output_data = 15 [deprecated = true];
+inline bool NodeExecutionEvent::has_deprecated_output_data() const {
+  return output_result_case() == kDeprecatedOutputData;
+}
+inline void NodeExecutionEvent::set_has_deprecated_output_data() {
+  _oneof_case_[1] = kDeprecatedOutputData;
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::release_deprecated_output_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.deprecated_output_data)
+  if (has_deprecated_output_data()) {
+    clear_has_output_result();
+      ::flyteidl::core::LiteralMap* temp = output_result_.deprecated_output_data_;
+    output_result_.deprecated_output_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& NodeExecutionEvent::deprecated_output_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.deprecated_output_data)
+  return has_deprecated_output_data()
+      ? *output_result_.deprecated_output_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::mutable_deprecated_output_data() {
+  if (!has_deprecated_output_data()) {
+    clear_output_result();
+    set_has_deprecated_output_data();
+    output_result_.deprecated_output_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.deprecated_output_data)
+  return output_result_.deprecated_output_data_;
+}
+
+// .flyteidl.core.OutputData output_data = 23;
 inline bool NodeExecutionEvent::has_output_data() const {
   return output_result_case() == kOutputData;
 }
 inline void NodeExecutionEvent::set_has_output_data() {
   _oneof_case_[1] = kOutputData;
 }
-inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::release_output_data() {
+inline ::flyteidl::core::OutputData* NodeExecutionEvent::release_output_data() {
   // @@protoc_insertion_point(field_release:flyteidl.event.NodeExecutionEvent.output_data)
   if (has_output_data()) {
     clear_has_output_result();
-      ::flyteidl::core::LiteralMap* temp = output_result_.output_data_;
+      ::flyteidl::core::OutputData* temp = output_result_.output_data_;
     output_result_.output_data_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::flyteidl::core::LiteralMap& NodeExecutionEvent::output_data() const {
+inline const ::flyteidl::core::OutputData& NodeExecutionEvent::output_data() const {
   // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.output_data)
   return has_output_data()
       ? *output_result_.output_data_
-      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+      : *reinterpret_cast< ::flyteidl::core::OutputData*>(&::flyteidl::core::_OutputData_default_instance_);
 }
-inline ::flyteidl::core::LiteralMap* NodeExecutionEvent::mutable_output_data() {
+inline ::flyteidl::core::OutputData* NodeExecutionEvent::mutable_output_data() {
   if (!has_output_data()) {
     clear_output_result();
     set_has_output_data();
-    output_result_.output_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+    output_result_.output_data_ = CreateMaybeMessage< ::flyteidl::core::OutputData >(
         GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.NodeExecutionEvent.output_data)
@@ -4616,35 +4781,70 @@ inline void TaskExecutionEvent::set_allocated_input_uri(::std::string* input_uri
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.TaskExecutionEvent.input_uri)
 }
 
-// .flyteidl.core.LiteralMap input_data = 19;
+// .flyteidl.core.LiteralMap deprecated_input_data = 19 [deprecated = true];
+inline bool TaskExecutionEvent::has_deprecated_input_data() const {
+  return input_value_case() == kDeprecatedInputData;
+}
+inline void TaskExecutionEvent::set_has_deprecated_input_data() {
+  _oneof_case_[0] = kDeprecatedInputData;
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::release_deprecated_input_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.deprecated_input_data)
+  if (has_deprecated_input_data()) {
+    clear_has_input_value();
+      ::flyteidl::core::LiteralMap* temp = input_value_.deprecated_input_data_;
+    input_value_.deprecated_input_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& TaskExecutionEvent::deprecated_input_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.deprecated_input_data)
+  return has_deprecated_input_data()
+      ? *input_value_.deprecated_input_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::mutable_deprecated_input_data() {
+  if (!has_deprecated_input_data()) {
+    clear_input_value();
+    set_has_deprecated_input_data();
+    input_value_.deprecated_input_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.deprecated_input_data)
+  return input_value_.deprecated_input_data_;
+}
+
+// .flyteidl.core.InputData input_data = 23;
 inline bool TaskExecutionEvent::has_input_data() const {
   return input_value_case() == kInputData;
 }
 inline void TaskExecutionEvent::set_has_input_data() {
   _oneof_case_[0] = kInputData;
 }
-inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::release_input_data() {
+inline ::flyteidl::core::InputData* TaskExecutionEvent::release_input_data() {
   // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.input_data)
   if (has_input_data()) {
     clear_has_input_value();
-      ::flyteidl::core::LiteralMap* temp = input_value_.input_data_;
+      ::flyteidl::core::InputData* temp = input_value_.input_data_;
     input_value_.input_data_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::flyteidl::core::LiteralMap& TaskExecutionEvent::input_data() const {
+inline const ::flyteidl::core::InputData& TaskExecutionEvent::input_data() const {
   // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.input_data)
   return has_input_data()
       ? *input_value_.input_data_
-      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+      : *reinterpret_cast< ::flyteidl::core::InputData*>(&::flyteidl::core::_InputData_default_instance_);
 }
-inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::mutable_input_data() {
+inline ::flyteidl::core::InputData* TaskExecutionEvent::mutable_input_data() {
   if (!has_input_data()) {
     clear_input_value();
     set_has_input_data();
-    input_value_.input_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+    input_value_.input_data_ = CreateMaybeMessage< ::flyteidl::core::InputData >(
         GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.input_data)
@@ -4778,35 +4978,70 @@ inline ::flyteidl::core::ExecutionError* TaskExecutionEvent::mutable_error() {
   return output_result_.error_;
 }
 
-// .flyteidl.core.LiteralMap output_data = 17;
+// .flyteidl.core.LiteralMap deprecated_output_data = 17 [deprecated = true];
+inline bool TaskExecutionEvent::has_deprecated_output_data() const {
+  return output_result_case() == kDeprecatedOutputData;
+}
+inline void TaskExecutionEvent::set_has_deprecated_output_data() {
+  _oneof_case_[1] = kDeprecatedOutputData;
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::release_deprecated_output_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.deprecated_output_data)
+  if (has_deprecated_output_data()) {
+    clear_has_output_result();
+      ::flyteidl::core::LiteralMap* temp = output_result_.deprecated_output_data_;
+    output_result_.deprecated_output_data_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::LiteralMap& TaskExecutionEvent::deprecated_output_data() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.deprecated_output_data)
+  return has_deprecated_output_data()
+      ? *output_result_.deprecated_output_data_
+      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::mutable_deprecated_output_data() {
+  if (!has_deprecated_output_data()) {
+    clear_output_result();
+    set_has_deprecated_output_data();
+    output_result_.deprecated_output_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.deprecated_output_data)
+  return output_result_.deprecated_output_data_;
+}
+
+// .flyteidl.core.OutputData output_data = 22;
 inline bool TaskExecutionEvent::has_output_data() const {
   return output_result_case() == kOutputData;
 }
 inline void TaskExecutionEvent::set_has_output_data() {
   _oneof_case_[1] = kOutputData;
 }
-inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::release_output_data() {
+inline ::flyteidl::core::OutputData* TaskExecutionEvent::release_output_data() {
   // @@protoc_insertion_point(field_release:flyteidl.event.TaskExecutionEvent.output_data)
   if (has_output_data()) {
     clear_has_output_result();
-      ::flyteidl::core::LiteralMap* temp = output_result_.output_data_;
+      ::flyteidl::core::OutputData* temp = output_result_.output_data_;
     output_result_.output_data_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::flyteidl::core::LiteralMap& TaskExecutionEvent::output_data() const {
+inline const ::flyteidl::core::OutputData& TaskExecutionEvent::output_data() const {
   // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.output_data)
   return has_output_data()
       ? *output_result_.output_data_
-      : *reinterpret_cast< ::flyteidl::core::LiteralMap*>(&::flyteidl::core::_LiteralMap_default_instance_);
+      : *reinterpret_cast< ::flyteidl::core::OutputData*>(&::flyteidl::core::_OutputData_default_instance_);
 }
-inline ::flyteidl::core::LiteralMap* TaskExecutionEvent::mutable_output_data() {
+inline ::flyteidl::core::OutputData* TaskExecutionEvent::mutable_output_data() {
   if (!has_output_data()) {
     clear_output_result();
     set_has_output_data();
-    output_result_.output_data_ = CreateMaybeMessage< ::flyteidl::core::LiteralMap >(
+    output_result_.output_data_ = CreateMaybeMessage< ::flyteidl::core::OutputData >(
         GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.output_data)

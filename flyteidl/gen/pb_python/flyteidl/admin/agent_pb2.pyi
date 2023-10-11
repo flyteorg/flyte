@@ -61,16 +61,18 @@ class TaskExecutionMetadata(_message.Message):
     def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CreateTaskRequest(_message.Message):
-    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata"]
-    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["deprecated_inputs", "template", "output_prefix", "task_execution_metadata", "inputs"]
+    DEPRECATED_INPUTS_FIELD_NUMBER: _ClassVar[int]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
     TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
-    inputs: _literals_pb2.LiteralMap
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    deprecated_inputs: _literals_pb2.LiteralMap
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
     task_execution_metadata: TaskExecutionMetadata
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
+    inputs: _literals_pb2.InputData
+    def __init__(self, deprecated_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
     __slots__ = ["resource_meta"]
@@ -93,12 +95,14 @@ class GetTaskResponse(_message.Message):
     def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
 
 class Resource(_message.Message):
-    __slots__ = ["state", "outputs"]
+    __slots__ = ["state", "deprecated_outputs", "outputs"]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    DEPRECATED_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     state: State
-    outputs: _literals_pb2.LiteralMap
-    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    deprecated_outputs: _literals_pb2.LiteralMap
+    outputs: _literals_pb2.OutputData
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., deprecated_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]

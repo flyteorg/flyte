@@ -1309,23 +1309,23 @@ class TaskExecutionGetDataResponse final :
   PROTOBUF_DEPRECATED ::flyteidl::admin::UrlBlob* mutable_outputs();
   PROTOBUF_DEPRECATED void set_allocated_outputs(::flyteidl::admin::UrlBlob* outputs);
 
-  // .flyteidl.core.LiteralMap full_inputs = 3;
-  bool has_full_inputs() const;
-  void clear_full_inputs();
-  static const int kFullInputsFieldNumber = 3;
-  const ::flyteidl::core::LiteralMap& full_inputs() const;
-  ::flyteidl::core::LiteralMap* release_full_inputs();
-  ::flyteidl::core::LiteralMap* mutable_full_inputs();
-  void set_allocated_full_inputs(::flyteidl::core::LiteralMap* full_inputs);
+  // .flyteidl.core.LiteralMap full_inputs = 3 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_full_inputs() const;
+  PROTOBUF_DEPRECATED void clear_full_inputs();
+  PROTOBUF_DEPRECATED static const int kFullInputsFieldNumber = 3;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& full_inputs() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_full_inputs();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_full_inputs();
+  PROTOBUF_DEPRECATED void set_allocated_full_inputs(::flyteidl::core::LiteralMap* full_inputs);
 
-  // .flyteidl.core.LiteralMap full_outputs = 4;
-  bool has_full_outputs() const;
-  void clear_full_outputs();
-  static const int kFullOutputsFieldNumber = 4;
-  const ::flyteidl::core::LiteralMap& full_outputs() const;
-  ::flyteidl::core::LiteralMap* release_full_outputs();
-  ::flyteidl::core::LiteralMap* mutable_full_outputs();
-  void set_allocated_full_outputs(::flyteidl::core::LiteralMap* full_outputs);
+  // .flyteidl.core.LiteralMap full_outputs = 4 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_full_outputs() const;
+  PROTOBUF_DEPRECATED void clear_full_outputs();
+  PROTOBUF_DEPRECATED static const int kFullOutputsFieldNumber = 4;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::LiteralMap& full_outputs() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* release_full_outputs();
+  PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_full_outputs();
+  PROTOBUF_DEPRECATED void set_allocated_full_outputs(::flyteidl::core::LiteralMap* full_outputs);
 
   // .flyteidl.admin.FlyteURLs flyte_urls = 5;
   bool has_flyte_urls() const;
@@ -1335,6 +1335,24 @@ class TaskExecutionGetDataResponse final :
   ::flyteidl::admin::FlyteURLs* release_flyte_urls();
   ::flyteidl::admin::FlyteURLs* mutable_flyte_urls();
   void set_allocated_flyte_urls(::flyteidl::admin::FlyteURLs* flyte_urls);
+
+  // .flyteidl.core.InputData input_data = 6;
+  bool has_input_data() const;
+  void clear_input_data();
+  static const int kInputDataFieldNumber = 6;
+  const ::flyteidl::core::InputData& input_data() const;
+  ::flyteidl::core::InputData* release_input_data();
+  ::flyteidl::core::InputData* mutable_input_data();
+  void set_allocated_input_data(::flyteidl::core::InputData* input_data);
+
+  // .flyteidl.core.OutputData output_data = 7;
+  bool has_output_data() const;
+  void clear_output_data();
+  static const int kOutputDataFieldNumber = 7;
+  const ::flyteidl::core::OutputData& output_data() const;
+  ::flyteidl::core::OutputData* release_output_data();
+  ::flyteidl::core::OutputData* mutable_output_data();
+  void set_allocated_output_data(::flyteidl::core::OutputData* output_data);
 
   // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskExecutionGetDataResponse)
  private:
@@ -1346,6 +1364,8 @@ class TaskExecutionGetDataResponse final :
   ::flyteidl::core::LiteralMap* full_inputs_;
   ::flyteidl::core::LiteralMap* full_outputs_;
   ::flyteidl::admin::FlyteURLs* flyte_urls_;
+  ::flyteidl::core::InputData* input_data_;
+  ::flyteidl::core::OutputData* output_data_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto;
 };
@@ -2760,7 +2780,7 @@ inline void TaskExecutionGetDataResponse::set_allocated_outputs(::flyteidl::admi
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.outputs)
 }
 
-// .flyteidl.core.LiteralMap full_inputs = 3;
+// .flyteidl.core.LiteralMap full_inputs = 3 [deprecated = true];
 inline bool TaskExecutionGetDataResponse::has_full_inputs() const {
   return this != internal_default_instance() && full_inputs_ != nullptr;
 }
@@ -2805,7 +2825,7 @@ inline void TaskExecutionGetDataResponse::set_allocated_full_inputs(::flyteidl::
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.full_inputs)
 }
 
-// .flyteidl.core.LiteralMap full_outputs = 4;
+// .flyteidl.core.LiteralMap full_outputs = 4 [deprecated = true];
 inline bool TaskExecutionGetDataResponse::has_full_outputs() const {
   return this != internal_default_instance() && full_outputs_ != nullptr;
 }
@@ -2848,6 +2868,96 @@ inline void TaskExecutionGetDataResponse::set_allocated_full_outputs(::flyteidl:
   }
   full_outputs_ = full_outputs;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.full_outputs)
+}
+
+// .flyteidl.core.InputData input_data = 6;
+inline bool TaskExecutionGetDataResponse::has_input_data() const {
+  return this != internal_default_instance() && input_data_ != nullptr;
+}
+inline const ::flyteidl::core::InputData& TaskExecutionGetDataResponse::input_data() const {
+  const ::flyteidl::core::InputData* p = input_data_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionGetDataResponse.input_data)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::InputData*>(
+      &::flyteidl::core::_InputData_default_instance_);
+}
+inline ::flyteidl::core::InputData* TaskExecutionGetDataResponse::release_input_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskExecutionGetDataResponse.input_data)
+  
+  ::flyteidl::core::InputData* temp = input_data_;
+  input_data_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::InputData* TaskExecutionGetDataResponse::mutable_input_data() {
+  
+  if (input_data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::InputData>(GetArenaNoVirtual());
+    input_data_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionGetDataResponse.input_data)
+  return input_data_;
+}
+inline void TaskExecutionGetDataResponse::set_allocated_input_data(::flyteidl::core::InputData* input_data) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(input_data_);
+  }
+  if (input_data) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      input_data = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, input_data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  input_data_ = input_data;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.input_data)
+}
+
+// .flyteidl.core.OutputData output_data = 7;
+inline bool TaskExecutionGetDataResponse::has_output_data() const {
+  return this != internal_default_instance() && output_data_ != nullptr;
+}
+inline const ::flyteidl::core::OutputData& TaskExecutionGetDataResponse::output_data() const {
+  const ::flyteidl::core::OutputData* p = output_data_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionGetDataResponse.output_data)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::OutputData*>(
+      &::flyteidl::core::_OutputData_default_instance_);
+}
+inline ::flyteidl::core::OutputData* TaskExecutionGetDataResponse::release_output_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskExecutionGetDataResponse.output_data)
+  
+  ::flyteidl::core::OutputData* temp = output_data_;
+  output_data_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::OutputData* TaskExecutionGetDataResponse::mutable_output_data() {
+  
+  if (output_data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::OutputData>(GetArenaNoVirtual());
+    output_data_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionGetDataResponse.output_data)
+  return output_data_;
+}
+inline void TaskExecutionGetDataResponse::set_allocated_output_data(::flyteidl::core::OutputData* output_data) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(output_data_);
+  }
+  if (output_data) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      output_data = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, output_data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  output_data_ = output_data;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.output_data)
 }
 
 // .flyteidl.admin.FlyteURLs flyte_urls = 5;

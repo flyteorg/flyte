@@ -24,6 +24,7 @@ from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_launch_plan_metadata import AdminLaunchPlanMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
+from flyteadmin.models.core_input_data import CoreInputData  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_parameter_map import CoreParameterMap  # noqa: F401,E501
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
@@ -48,6 +49,7 @@ class AdminLaunchPlanSpec(object):
         'entity_metadata': 'AdminLaunchPlanMetadata',
         'default_inputs': 'CoreParameterMap',
         'fixed_inputs': 'CoreLiteralMap',
+        'fixed_input_data': 'CoreInputData',
         'role': 'str',
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
@@ -67,6 +69,7 @@ class AdminLaunchPlanSpec(object):
         'entity_metadata': 'entity_metadata',
         'default_inputs': 'default_inputs',
         'fixed_inputs': 'fixed_inputs',
+        'fixed_input_data': 'fixed_input_data',
         'role': 'role',
         'labels': 'labels',
         'annotations': 'annotations',
@@ -81,13 +84,14 @@ class AdminLaunchPlanSpec(object):
         'envs': 'envs'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None, interruptible=None, overwrite_cache=None, envs=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, fixed_input_data=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None, interruptible=None, overwrite_cache=None, envs=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
         self._entity_metadata = None
         self._default_inputs = None
         self._fixed_inputs = None
+        self._fixed_input_data = None
         self._role = None
         self._labels = None
         self._annotations = None
@@ -110,6 +114,8 @@ class AdminLaunchPlanSpec(object):
             self.default_inputs = default_inputs
         if fixed_inputs is not None:
             self.fixed_inputs = fixed_inputs
+        if fixed_input_data is not None:
+            self.fixed_input_data = fixed_input_data
         if role is not None:
             self.role = role
         if labels is not None:
@@ -204,7 +210,6 @@ class AdminLaunchPlanSpec(object):
     def fixed_inputs(self):
         """Gets the fixed_inputs of this AdminLaunchPlanSpec.  # noqa: E501
 
-        Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.  # noqa: E501
 
         :return: The fixed_inputs of this AdminLaunchPlanSpec.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -215,13 +220,35 @@ class AdminLaunchPlanSpec(object):
     def fixed_inputs(self, fixed_inputs):
         """Sets the fixed_inputs of this AdminLaunchPlanSpec.
 
-        Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.  # noqa: E501
 
         :param fixed_inputs: The fixed_inputs of this AdminLaunchPlanSpec.  # noqa: E501
         :type: CoreLiteralMap
         """
 
         self._fixed_inputs = fixed_inputs
+
+    @property
+    def fixed_input_data(self):
+        """Gets the fixed_input_data of this AdminLaunchPlanSpec.  # noqa: E501
+
+        Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.  # noqa: E501
+
+        :return: The fixed_input_data of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: CoreInputData
+        """
+        return self._fixed_input_data
+
+    @fixed_input_data.setter
+    def fixed_input_data(self, fixed_input_data):
+        """Sets the fixed_input_data of this AdminLaunchPlanSpec.
+
+        Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.  # noqa: E501
+
+        :param fixed_input_data: The fixed_input_data of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: CoreInputData
+        """
+
+        self._fixed_input_data = fixed_input_data
 
     @property
     def role(self):

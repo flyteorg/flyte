@@ -18,7 +18,9 @@ import six
 
 from flyteadmin.models.admin_flyte_ur_ls import AdminFlyteURLs  # noqa: F401,E501
 from flyteadmin.models.admin_url_blob import AdminUrlBlob  # noqa: F401,E501
+from flyteadmin.models.core_input_data import CoreInputData  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.models.core_output_data import CoreOutputData  # noqa: F401,E501
 from flyteadmin.models.flyteidladmin_dynamic_workflow_node_metadata import FlyteidladminDynamicWorkflowNodeMetadata  # noqa: F401,E501
 
 
@@ -40,6 +42,8 @@ class AdminNodeExecutionGetDataResponse(object):
         'outputs': 'AdminUrlBlob',
         'full_inputs': 'CoreLiteralMap',
         'full_outputs': 'CoreLiteralMap',
+        'input_data': 'CoreInputData',
+        'output_data': 'CoreOutputData',
         'dynamic_workflow': 'FlyteidladminDynamicWorkflowNodeMetadata',
         'flyte_urls': 'AdminFlyteURLs'
     }
@@ -49,17 +53,21 @@ class AdminNodeExecutionGetDataResponse(object):
         'outputs': 'outputs',
         'full_inputs': 'full_inputs',
         'full_outputs': 'full_outputs',
+        'input_data': 'input_data',
+        'output_data': 'output_data',
         'dynamic_workflow': 'dynamic_workflow',
         'flyte_urls': 'flyte_urls'
     }
 
-    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None, dynamic_workflow=None, flyte_urls=None):  # noqa: E501
+    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None, input_data=None, output_data=None, dynamic_workflow=None, flyte_urls=None):  # noqa: E501
         """AdminNodeExecutionGetDataResponse - a model defined in Swagger"""  # noqa: E501
 
         self._inputs = None
         self._outputs = None
         self._full_inputs = None
         self._full_outputs = None
+        self._input_data = None
+        self._output_data = None
         self._dynamic_workflow = None
         self._flyte_urls = None
         self.discriminator = None
@@ -72,6 +80,10 @@ class AdminNodeExecutionGetDataResponse(object):
             self.full_inputs = full_inputs
         if full_outputs is not None:
             self.full_outputs = full_outputs
+        if input_data is not None:
+            self.input_data = input_data
+        if output_data is not None:
+            self.output_data = output_data
         if dynamic_workflow is not None:
             self.dynamic_workflow = dynamic_workflow
         if flyte_urls is not None:
@@ -127,7 +139,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_inputs(self):
         """Gets the full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
 
-        Full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_inputs will only be populated if they are under a configured size threshold. Deprecated: Please use input_data instead.  # noqa: E501
 
         :return: The full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -138,7 +150,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_inputs(self, full_inputs):
         """Sets the full_inputs of this AdminNodeExecutionGetDataResponse.
 
-        Full_inputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_inputs will only be populated if they are under a configured size threshold. Deprecated: Please use input_data instead.  # noqa: E501
 
         :param full_inputs: The full_inputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :type: CoreLiteralMap
@@ -150,7 +162,7 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_outputs(self):
         """Gets the full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
 
-        Full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_outputs will only be populated if they are under a configured size threshold. Deprecated: Please use output_data instead.  # noqa: E501
 
         :return: The full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -161,13 +173,59 @@ class AdminNodeExecutionGetDataResponse(object):
     def full_outputs(self, full_outputs):
         """Sets the full_outputs of this AdminNodeExecutionGetDataResponse.
 
-        Full_outputs will only be populated if they are under a configured size threshold.  # noqa: E501
+        Full_outputs will only be populated if they are under a configured size threshold. Deprecated: Please use output_data instead.  # noqa: E501
 
         :param full_outputs: The full_outputs of this AdminNodeExecutionGetDataResponse.  # noqa: E501
         :type: CoreLiteralMap
         """
 
         self._full_outputs = full_outputs
+
+    @property
+    def input_data(self):
+        """Gets the input_data of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+
+        InputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :return: The input_data of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :rtype: CoreInputData
+        """
+        return self._input_data
+
+    @input_data.setter
+    def input_data(self, input_data):
+        """Sets the input_data of this AdminNodeExecutionGetDataResponse.
+
+        InputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :param input_data: The input_data of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :type: CoreInputData
+        """
+
+        self._input_data = input_data
+
+    @property
+    def output_data(self):
+        """Gets the output_data of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+
+        OutputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :return: The output_data of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :rtype: CoreOutputData
+        """
+        return self._output_data
+
+    @output_data.setter
+    def output_data(self, output_data):
+        """Sets the output_data of this AdminNodeExecutionGetDataResponse.
+
+        OutputData will only be populated if they are under a configured size threshold.  # noqa: E501
+
+        :param output_data: The output_data of this AdminNodeExecutionGetDataResponse.  # noqa: E501
+        :type: CoreOutputData
+        """
+
+        self._output_data = output_data
 
     @property
     def dynamic_workflow(self):

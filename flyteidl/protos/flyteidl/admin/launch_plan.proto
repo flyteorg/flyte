@@ -90,7 +90,11 @@ message LaunchPlanSpec {
 
     // Fixed, non-overridable inputs for the Launch Plan.
     // These can not be overridden when an execution is created with this launch plan.
-    core.LiteralMap fixed_inputs = 4;
+    // Deprecated: Please use fixec_input_data instead
+    core.LiteralMap fixed_inputs = 4 [deprecated = true];
+    // Fixed, non-overridable inputs for the Launch Plan.
+    // These can not be overridden when an execution is created with this launch plan.
+    core.InputData fixed_input_data = 22;
 
     // String to indicate the role to use to execute the workflow underneath
     string role = 5 [deprecated = true];

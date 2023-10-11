@@ -1184,6 +1184,154 @@ var _ interface {
 	ErrorName() string
 } = LiteralMapValidationError{}
 
+// Validate checks the field values on InputData with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *InputData) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetInputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return InputDataValidationError{
+				field:  "Inputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// InputDataValidationError is the validation error returned by
+// InputData.Validate if the designated constraints aren't met.
+type InputDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InputDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InputDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InputDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InputDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InputDataValidationError) ErrorName() string { return "InputDataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InputDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInputData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InputDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InputDataValidationError{}
+
+// Validate checks the field values on OutputData with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *OutputData) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetOutputs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return OutputDataValidationError{
+				field:  "Outputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// OutputDataValidationError is the validation error returned by
+// OutputData.Validate if the designated constraints aren't met.
+type OutputDataValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e OutputDataValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e OutputDataValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e OutputDataValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e OutputDataValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e OutputDataValidationError) ErrorName() string { return "OutputDataValidationError" }
+
+// Error satisfies the builtin error interface
+func (e OutputDataValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sOutputData.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = OutputDataValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = OutputDataValidationError{}
+
 // Validate checks the field values on BindingDataCollection with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

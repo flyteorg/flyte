@@ -12304,6 +12304,1218 @@ public final class Literals {
 
   }
 
+  public interface InputDataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.InputData)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     */
+    boolean hasInputs();
+    /**
+     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     */
+    flyteidl.core.Literals.LiteralMap getInputs();
+    /**
+     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     */
+    flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder();
+  }
+  /**
+   * Protobuf type {@code flyteidl.core.InputData}
+   */
+  public  static final class InputData extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.InputData)
+      InputDataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use InputData.newBuilder() to construct.
+    private InputData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private InputData() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private InputData(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (inputs_ != null) {
+                subBuilder = inputs_.toBuilder();
+              }
+              inputs_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(inputs_);
+                inputs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Literals.internal_static_flyteidl_core_InputData_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Literals.internal_static_flyteidl_core_InputData_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Literals.InputData.class, flyteidl.core.Literals.InputData.Builder.class);
+    }
+
+    public static final int INPUTS_FIELD_NUMBER = 1;
+    private flyteidl.core.Literals.LiteralMap inputs_;
+    /**
+     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     */
+    public boolean hasInputs() {
+      return inputs_ != null;
+    }
+    /**
+     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     */
+    public flyteidl.core.Literals.LiteralMap getInputs() {
+      return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+    }
+    /**
+     * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+     */
+    public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
+      return getInputs();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (inputs_ != null) {
+        output.writeMessage(1, getInputs());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (inputs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getInputs());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Literals.InputData)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Literals.InputData other = (flyteidl.core.Literals.InputData) obj;
+
+      if (hasInputs() != other.hasInputs()) return false;
+      if (hasInputs()) {
+        if (!getInputs()
+            .equals(other.getInputs())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasInputs()) {
+        hash = (37 * hash) + INPUTS_FIELD_NUMBER;
+        hash = (53 * hash) + getInputs().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Literals.InputData parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.InputData parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Literals.InputData parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Literals.InputData parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Literals.InputData prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.core.InputData}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.InputData)
+        flyteidl.core.Literals.InputDataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Literals.internal_static_flyteidl_core_InputData_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Literals.internal_static_flyteidl_core_InputData_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Literals.InputData.class, flyteidl.core.Literals.InputData.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Literals.InputData.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Literals.internal_static_flyteidl_core_InputData_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Literals.InputData getDefaultInstanceForType() {
+        return flyteidl.core.Literals.InputData.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Literals.InputData build() {
+        flyteidl.core.Literals.InputData result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Literals.InputData buildPartial() {
+        flyteidl.core.Literals.InputData result = new flyteidl.core.Literals.InputData(this);
+        if (inputsBuilder_ == null) {
+          result.inputs_ = inputs_;
+        } else {
+          result.inputs_ = inputsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Literals.InputData) {
+          return mergeFrom((flyteidl.core.Literals.InputData)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Literals.InputData other) {
+        if (other == flyteidl.core.Literals.InputData.getDefaultInstance()) return this;
+        if (other.hasInputs()) {
+          mergeInputs(other.getInputs());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Literals.InputData parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Literals.InputData) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.Literals.LiteralMap inputs_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputsBuilder_;
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public boolean hasInputs() {
+        return inputsBuilder_ != null || inputs_ != null;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap getInputs() {
+        if (inputsBuilder_ == null) {
+          return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+        } else {
+          return inputsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public Builder setInputs(flyteidl.core.Literals.LiteralMap value) {
+        if (inputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputs_ = value;
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public Builder setInputs(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (inputsBuilder_ == null) {
+          inputs_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public Builder mergeInputs(flyteidl.core.Literals.LiteralMap value) {
+        if (inputsBuilder_ == null) {
+          if (inputs_ != null) {
+            inputs_ =
+              flyteidl.core.Literals.LiteralMap.newBuilder(inputs_).mergeFrom(value).buildPartial();
+          } else {
+            inputs_ = value;
+          }
+          onChanged();
+        } else {
+          inputsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public Builder clearInputs() {
+        if (inputsBuilder_ == null) {
+          inputs_ = null;
+          onChanged();
+        } else {
+          inputs_ = null;
+          inputsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap.Builder getInputsBuilder() {
+        
+        onChanged();
+        return getInputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
+        if (inputsBuilder_ != null) {
+          return inputsBuilder_.getMessageOrBuilder();
+        } else {
+          return inputs_ == null ?
+              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
+        }
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getInputsFieldBuilder() {
+        if (inputsBuilder_ == null) {
+          inputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  getInputs(),
+                  getParentForChildren(),
+                  isClean());
+          inputs_ = null;
+        }
+        return inputsBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.InputData)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.InputData)
+    private static final flyteidl.core.Literals.InputData DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Literals.InputData();
+    }
+
+    public static flyteidl.core.Literals.InputData getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<InputData>
+        PARSER = new com.google.protobuf.AbstractParser<InputData>() {
+      @java.lang.Override
+      public InputData parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new InputData(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<InputData> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<InputData> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Literals.InputData getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface OutputDataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.OutputData)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+     */
+    boolean hasOutputs();
+    /**
+     * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+     */
+    flyteidl.core.Literals.LiteralMap getOutputs();
+    /**
+     * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+     */
+    flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder();
+  }
+  /**
+   * Protobuf type {@code flyteidl.core.OutputData}
+   */
+  public  static final class OutputData extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.OutputData)
+      OutputDataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use OutputData.newBuilder() to construct.
+    private OutputData(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private OutputData() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private OutputData(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (outputs_ != null) {
+                subBuilder = outputs_.toBuilder();
+              }
+              outputs_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(outputs_);
+                outputs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Literals.internal_static_flyteidl_core_OutputData_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Literals.internal_static_flyteidl_core_OutputData_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Literals.OutputData.class, flyteidl.core.Literals.OutputData.Builder.class);
+    }
+
+    public static final int OUTPUTS_FIELD_NUMBER = 1;
+    private flyteidl.core.Literals.LiteralMap outputs_;
+    /**
+     * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+     */
+    public boolean hasOutputs() {
+      return outputs_ != null;
+    }
+    /**
+     * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+     */
+    public flyteidl.core.Literals.LiteralMap getOutputs() {
+      return outputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputs_;
+    }
+    /**
+     * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+     */
+    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder() {
+      return getOutputs();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (outputs_ != null) {
+        output.writeMessage(1, getOutputs());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (outputs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getOutputs());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Literals.OutputData)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Literals.OutputData other = (flyteidl.core.Literals.OutputData) obj;
+
+      if (hasOutputs() != other.hasOutputs()) return false;
+      if (hasOutputs()) {
+        if (!getOutputs()
+            .equals(other.getOutputs())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasOutputs()) {
+        hash = (37 * hash) + OUTPUTS_FIELD_NUMBER;
+        hash = (53 * hash) + getOutputs().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.OutputData parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Literals.OutputData parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Literals.OutputData parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Literals.OutputData prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.core.OutputData}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.OutputData)
+        flyteidl.core.Literals.OutputDataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Literals.internal_static_flyteidl_core_OutputData_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Literals.internal_static_flyteidl_core_OutputData_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Literals.OutputData.class, flyteidl.core.Literals.OutputData.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Literals.OutputData.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (outputsBuilder_ == null) {
+          outputs_ = null;
+        } else {
+          outputs_ = null;
+          outputsBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Literals.internal_static_flyteidl_core_OutputData_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Literals.OutputData getDefaultInstanceForType() {
+        return flyteidl.core.Literals.OutputData.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Literals.OutputData build() {
+        flyteidl.core.Literals.OutputData result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Literals.OutputData buildPartial() {
+        flyteidl.core.Literals.OutputData result = new flyteidl.core.Literals.OutputData(this);
+        if (outputsBuilder_ == null) {
+          result.outputs_ = outputs_;
+        } else {
+          result.outputs_ = outputsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Literals.OutputData) {
+          return mergeFrom((flyteidl.core.Literals.OutputData)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Literals.OutputData other) {
+        if (other == flyteidl.core.Literals.OutputData.getDefaultInstance()) return this;
+        if (other.hasOutputs()) {
+          mergeOutputs(other.getOutputs());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Literals.OutputData parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Literals.OutputData) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.Literals.LiteralMap outputs_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputsBuilder_;
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public boolean hasOutputs() {
+        return outputsBuilder_ != null || outputs_ != null;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap getOutputs() {
+        if (outputsBuilder_ == null) {
+          return outputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputs_;
+        } else {
+          return outputsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public Builder setOutputs(flyteidl.core.Literals.LiteralMap value) {
+        if (outputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputs_ = value;
+          onChanged();
+        } else {
+          outputsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public Builder setOutputs(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (outputsBuilder_ == null) {
+          outputs_ = builderForValue.build();
+          onChanged();
+        } else {
+          outputsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public Builder mergeOutputs(flyteidl.core.Literals.LiteralMap value) {
+        if (outputsBuilder_ == null) {
+          if (outputs_ != null) {
+            outputs_ =
+              flyteidl.core.Literals.LiteralMap.newBuilder(outputs_).mergeFrom(value).buildPartial();
+          } else {
+            outputs_ = value;
+          }
+          onChanged();
+        } else {
+          outputsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public Builder clearOutputs() {
+        if (outputsBuilder_ == null) {
+          outputs_ = null;
+          onChanged();
+        } else {
+          outputs_ = null;
+          outputsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap.Builder getOutputsBuilder() {
+        
+        onChanged();
+        return getOutputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder() {
+        if (outputsBuilder_ != null) {
+          return outputsBuilder_.getMessageOrBuilder();
+        } else {
+          return outputs_ == null ?
+              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputs_;
+        }
+      }
+      /**
+       * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getOutputsFieldBuilder() {
+        if (outputsBuilder_ == null) {
+          outputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  getOutputs(),
+                  getParentForChildren(),
+                  isClean());
+          outputs_ = null;
+        }
+        return outputsBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.OutputData)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.OutputData)
+    private static final flyteidl.core.Literals.OutputData DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Literals.OutputData();
+    }
+
+    public static flyteidl.core.Literals.OutputData getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<OutputData>
+        PARSER = new com.google.protobuf.AbstractParser<OutputData>() {
+      @java.lang.Override
+      public OutputData parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new OutputData(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<OutputData> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<OutputData> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Literals.OutputData getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface BindingDataCollectionOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.BindingDataCollection)
       com.google.protobuf.MessageOrBuilder {
@@ -18424,6 +19636,16 @@ public final class Literals {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_LiteralMap_LiteralsEntry_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_InputData_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_InputData_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_OutputData_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_OutputData_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_BindingDataCollection_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -18514,26 +19736,29 @@ public final class Literals {
       "erals\030\001 \003(\0132\'.flyteidl.core.LiteralMap.L" +
       "iteralsEntry\032G\n\rLiteralsEntry\022\013\n\003key\030\001 \001" +
       "(\t\022%\n\005value\030\002 \001(\0132\026.flyteidl.core.Litera" +
-      "l:\0028\001\"E\n\025BindingDataCollection\022,\n\010bindin" +
-      "gs\030\001 \003(\0132\032.flyteidl.core.BindingData\"\234\001\n" +
-      "\016BindingDataMap\022=\n\010bindings\030\001 \003(\0132+.flyt" +
-      "eidl.core.BindingDataMap.BindingsEntry\032K" +
-      "\n\rBindingsEntry\022\013\n\003key\030\001 \001(\t\022)\n\005value\030\002 " +
-      "\001(\0132\032.flyteidl.core.BindingData:\0028\001\";\n\tU" +
-      "nionInfo\022.\n\ntargetType\030\001 \001(\0132\032.flyteidl." +
-      "core.LiteralType\"\205\002\n\013BindingData\022\'\n\006scal" +
-      "ar\030\001 \001(\0132\025.flyteidl.core.ScalarH\000\022:\n\ncol" +
-      "lection\030\002 \001(\0132$.flyteidl.core.BindingDat" +
-      "aCollectionH\000\0221\n\007promise\030\003 \001(\0132\036.flyteid" +
-      "l.core.OutputReferenceH\000\022,\n\003map\030\004 \001(\0132\035." +
-      "flyteidl.core.BindingDataMapH\000\022\'\n\005union\030" +
-      "\005 \001(\0132\030.flyteidl.core.UnionInfoB\007\n\005value" +
-      "\"C\n\007Binding\022\013\n\003var\030\001 \001(\t\022+\n\007binding\030\002 \001(" +
-      "\0132\032.flyteidl.core.BindingData\"*\n\014KeyValu" +
-      "ePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\" \n\rRet" +
-      "ryStrategy\022\017\n\007retries\030\005 \001(\rB<Z:github.co" +
-      "m/flyteorg/flyte/flyteidl/gen/pb-go/flyt" +
-      "eidl/coreb\006proto3"
+      "l:\0028\001\"6\n\tInputData\022)\n\006inputs\030\001 \001(\0132\031.fly" +
+      "teidl.core.LiteralMap\"8\n\nOutputData\022*\n\007o" +
+      "utputs\030\001 \001(\0132\031.flyteidl.core.LiteralMap\"" +
+      "E\n\025BindingDataCollection\022,\n\010bindings\030\001 \003" +
+      "(\0132\032.flyteidl.core.BindingData\"\234\001\n\016Bindi" +
+      "ngDataMap\022=\n\010bindings\030\001 \003(\0132+.flyteidl.c" +
+      "ore.BindingDataMap.BindingsEntry\032K\n\rBind" +
+      "ingsEntry\022\013\n\003key\030\001 \001(\t\022)\n\005value\030\002 \001(\0132\032." +
+      "flyteidl.core.BindingData:\0028\001\";\n\tUnionIn" +
+      "fo\022.\n\ntargetType\030\001 \001(\0132\032.flyteidl.core.L" +
+      "iteralType\"\205\002\n\013BindingData\022\'\n\006scalar\030\001 \001" +
+      "(\0132\025.flyteidl.core.ScalarH\000\022:\n\ncollectio" +
+      "n\030\002 \001(\0132$.flyteidl.core.BindingDataColle" +
+      "ctionH\000\0221\n\007promise\030\003 \001(\0132\036.flyteidl.core" +
+      ".OutputReferenceH\000\022,\n\003map\030\004 \001(\0132\035.flytei" +
+      "dl.core.BindingDataMapH\000\022\'\n\005union\030\005 \001(\0132" +
+      "\030.flyteidl.core.UnionInfoB\007\n\005value\"C\n\007Bi" +
+      "nding\022\013\n\003var\030\001 \001(\t\022+\n\007binding\030\002 \001(\0132\032.fl" +
+      "yteidl.core.BindingData\"*\n\014KeyValuePair\022" +
+      "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\" \n\rRetryStra" +
+      "tegy\022\017\n\007retries\030\005 \001(\rB<Z:github.com/flyt" +
+      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/c" +
+      "oreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18635,14 +19860,26 @@ public final class Literals {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_LiteralMap_LiteralsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_flyteidl_core_BindingDataCollection_descriptor =
+    internal_static_flyteidl_core_InputData_descriptor =
       getDescriptor().getMessageTypes().get(13);
+    internal_static_flyteidl_core_InputData_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_InputData_descriptor,
+        new java.lang.String[] { "Inputs", });
+    internal_static_flyteidl_core_OutputData_descriptor =
+      getDescriptor().getMessageTypes().get(14);
+    internal_static_flyteidl_core_OutputData_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_OutputData_descriptor,
+        new java.lang.String[] { "Outputs", });
+    internal_static_flyteidl_core_BindingDataCollection_descriptor =
+      getDescriptor().getMessageTypes().get(15);
     internal_static_flyteidl_core_BindingDataCollection_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_BindingDataCollection_descriptor,
         new java.lang.String[] { "Bindings", });
     internal_static_flyteidl_core_BindingDataMap_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_flyteidl_core_BindingDataMap_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_BindingDataMap_descriptor,
@@ -18654,31 +19891,31 @@ public final class Literals {
         internal_static_flyteidl_core_BindingDataMap_BindingsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_UnionInfo_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_flyteidl_core_UnionInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_UnionInfo_descriptor,
         new java.lang.String[] { "TargetType", });
     internal_static_flyteidl_core_BindingData_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_flyteidl_core_BindingData_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_BindingData_descriptor,
         new java.lang.String[] { "Scalar", "Collection", "Promise", "Map", "Union", "Value", });
     internal_static_flyteidl_core_Binding_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_flyteidl_core_Binding_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Binding_descriptor,
         new java.lang.String[] { "Var", "Binding", });
     internal_static_flyteidl_core_KeyValuePair_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_flyteidl_core_KeyValuePair_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_KeyValuePair_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_RetryStrategy_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_flyteidl_core_RetryStrategy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_RetryStrategy_descriptor,

@@ -511,6 +511,18 @@ pub struct LiteralMap {
     #[prost(map="string, message", tag="1")]
     pub literals: ::std::collections::HashMap<::prost::alloc::string::String, Literal>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InputData {
+    #[prost(message, optional, tag="1")]
+    pub inputs: ::core::option::Option<LiteralMap>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct OutputData {
+    #[prost(message, optional, tag="1")]
+    pub outputs: ::core::option::Option<LiteralMap>,
+}
 /// A collection of BindingData items.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

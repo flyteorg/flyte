@@ -1110,6 +1110,26 @@ func (m *NodeExecutionGetDataResponse) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NodeExecutionGetDataResponseValidationError{
+				field:  "InputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NodeExecutionGetDataResponseValidationError{
+				field:  "OutputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if v, ok := interface{}(m.GetDynamicWorkflow()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return NodeExecutionGetDataResponseValidationError{

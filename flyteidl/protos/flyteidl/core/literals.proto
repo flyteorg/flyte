@@ -120,6 +120,14 @@ message LiteralMap {
     map<string, Literal> literals = 1;
 }
 
+message InputData {
+    LiteralMap inputs = 1;
+}
+
+message OutputData {
+    LiteralMap outputs = 1;
+}
+
 // A collection of BindingData items.
 message BindingDataCollection {
     repeated BindingData bindings = 1;

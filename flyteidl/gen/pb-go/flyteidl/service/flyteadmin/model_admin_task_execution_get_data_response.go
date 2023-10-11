@@ -15,9 +15,13 @@ type AdminTaskExecutionGetDataResponse struct {
 	Inputs *AdminUrlBlob `json:"inputs,omitempty"`
 	// Signed url to fetch a core.LiteralMap of task execution outputs. Deprecated: Please use full_outputs instead.
 	Outputs *AdminUrlBlob `json:"outputs,omitempty"`
-	// Full_inputs will only be populated if they are under a configured size threshold.
+	// Full_inputs will only be populated if they are under a configured size threshold. Deprecated: Please use input_data instead.
 	FullInputs *CoreLiteralMap `json:"full_inputs,omitempty"`
-	// Full_outputs will only be populated if they are under a configured size threshold.
+	// Full_outputs will only be populated if they are under a configured size threshold. Deprecated: Please use output_data instead.
 	FullOutputs *CoreLiteralMap `json:"full_outputs,omitempty"`
+	// InputData will only be populated if they are under a configured size threshold.
+	InputData *CoreInputData `json:"input_data,omitempty"`
+	// OutputData will only be populated if they are under a configured size threshold.
+	OutputData *CoreOutputData `json:"output_data,omitempty"`
 	FlyteUrls *AdminFlyteUrLs `json:"flyte_urls,omitempty"`
 }

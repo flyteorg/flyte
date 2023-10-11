@@ -74,6 +74,16 @@ func (m *ExecutionCreateRequest) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionCreateRequestValidationError{
+				field:  "InputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -1730,6 +1740,26 @@ func (m *WorkflowExecutionGetDataResponse) Validate() error {
 		if err := v.Validate(); err != nil {
 			return WorkflowExecutionGetDataResponseValidationError{
 				field:  "FullOutputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowExecutionGetDataResponseValidationError{
+				field:  "InputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowExecutionGetDataResponseValidationError{
+				field:  "OutputData",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

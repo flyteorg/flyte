@@ -14,7 +14,7 @@ pub struct WorkflowExecutionEvent {
     /// by the executor of the workflow.
     #[prost(message, optional, tag="4")]
     pub occurred_at: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(oneof="workflow_execution_event::OutputResult", tags="5, 6, 7")]
+    #[prost(oneof="workflow_execution_event::OutputResult", tags="5, 6, 7, 8")]
     pub output_result: ::core::option::Option<workflow_execution_event::OutputResult>,
 }
 /// Nested message and enum types in `WorkflowExecutionEvent`.
@@ -30,8 +30,12 @@ pub mod workflow_execution_event {
         #[prost(message, tag="6")]
         Error(super::super::core::ExecutionError),
         /// Raw output data produced by this workflow execution.
+        /// Deprecated: please use output_data instead
         #[prost(message, tag="7")]
-        OutputData(super::super::core::LiteralMap),
+        DeprecatedOutputData(super::super::core::LiteralMap),
+        /// Raw output data produced by this workflow execution.
+        #[prost(message, tag="8")]
+        OutputData(super::super::core::OutputData),
     }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -86,9 +90,9 @@ pub struct NodeExecutionEvent {
     /// Indicates if this node is an ArrayNode.
     #[prost(bool, tag="22")]
     pub is_array: bool,
-    #[prost(oneof="node_execution_event::InputValue", tags="5, 20")]
+    #[prost(oneof="node_execution_event::InputValue", tags="5, 20, 24")]
     pub input_value: ::core::option::Option<node_execution_event::InputValue>,
-    #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15")]
+    #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15, 23")]
     pub output_result: ::core::option::Option<node_execution_event::OutputResult>,
     /// Additional metadata to do with this event's node target based
     /// on the node type
@@ -103,8 +107,12 @@ pub mod node_execution_event {
         #[prost(string, tag="5")]
         InputUri(::prost::alloc::string::String),
         /// Raw input data consumed by this node execution.
+        /// Deprecated: please use input_data instead
         #[prost(message, tag="20")]
-        InputData(super::super::core::LiteralMap),
+        DeprecatedInputData(super::super::core::LiteralMap),
+        /// Raw input data consumed by this node execution.
+        #[prost(message, tag="24")]
+        InputData(super::super::core::InputData),
     }
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -116,9 +124,13 @@ pub mod node_execution_event {
         /// Error information for the execution
         #[prost(message, tag="7")]
         Error(super::super::core::ExecutionError),
-        /// Raw output data produced by this node execution.
+        /// Raw output data produced by this workflow execution.
+        /// Deprecated: please use output_data instead
         #[prost(message, tag="15")]
-        OutputData(super::super::core::LiteralMap),
+        DeprecatedOutputData(super::super::core::LiteralMap),
+        /// Raw output data produced by this workflow execution.
+        #[prost(message, tag="23")]
+        OutputData(super::super::core::OutputData),
     }
     /// Additional metadata to do with this event's node target based
     /// on the node type
@@ -260,9 +272,9 @@ pub struct TaskExecutionEvent {
     /// facilitates a more accurate portrayal of the evaluation time-series. 
     #[prost(message, optional, tag="20")]
     pub reported_at: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(oneof="task_execution_event::InputValue", tags="8, 19")]
+    #[prost(oneof="task_execution_event::InputValue", tags="8, 19, 23")]
     pub input_value: ::core::option::Option<task_execution_event::InputValue>,
-    #[prost(oneof="task_execution_event::OutputResult", tags="9, 10, 17")]
+    #[prost(oneof="task_execution_event::OutputResult", tags="9, 10, 17, 22")]
     pub output_result: ::core::option::Option<task_execution_event::OutputResult>,
 }
 /// Nested message and enum types in `TaskExecutionEvent`.
@@ -274,9 +286,13 @@ pub mod task_execution_event {
         /// including Cloud source provider. ie., s3://...
         #[prost(string, tag="8")]
         InputUri(::prost::alloc::string::String),
-        /// Raw input data consumed by this task execution.
+        /// Raw input data consumed by this node execution.
+        /// Deprecated: please use input_data instead
         #[prost(message, tag="19")]
-        InputData(super::super::core::LiteralMap),
+        DeprecatedInputData(super::super::core::LiteralMap),
+        /// Raw input data consumed by this node execution.
+        #[prost(message, tag="23")]
+        InputData(super::super::core::InputData),
     }
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
@@ -288,9 +304,13 @@ pub mod task_execution_event {
         /// Error information for the execution
         #[prost(message, tag="10")]
         Error(super::super::core::ExecutionError),
-        /// Raw output data produced by this task execution.
+        /// Raw output data produced by this workflow execution.
+        /// Deprecated: please use output_data instead
         #[prost(message, tag="17")]
-        OutputData(super::super::core::LiteralMap),
+        DeprecatedOutputData(super::super::core::LiteralMap),
+        /// Raw output data produced by this workflow execution.
+        #[prost(message, tag="22")]
+        OutputData(super::super::core::OutputData),
     }
 }
 /// This message contains metadata about external resources produced or used by a specific task execution.

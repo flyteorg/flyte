@@ -4491,29 +4491,60 @@ public final class LaunchPlanOuterClass {
      * <pre>
      * Fixed, non-overridable inputs for the Launch Plan.
      * These can not be overridden when an execution is created with this launch plan.
+     * Deprecated: Please use fixec_input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
      */
-    boolean hasFixedInputs();
+    @java.lang.Deprecated boolean hasFixedInputs();
+    /**
+     * <pre>
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overridden when an execution is created with this launch plan.
+     * Deprecated: Please use fixec_input_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMap getFixedInputs();
+    /**
+     * <pre>
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overridden when an execution is created with this launch plan.
+     * Deprecated: Please use fixec_input_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated flyteidl.core.Literals.LiteralMapOrBuilder getFixedInputsOrBuilder();
+
     /**
      * <pre>
      * Fixed, non-overridable inputs for the Launch Plan.
      * These can not be overridden when an execution is created with this launch plan.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+     * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
      */
-    flyteidl.core.Literals.LiteralMap getFixedInputs();
+    boolean hasFixedInputData();
     /**
      * <pre>
      * Fixed, non-overridable inputs for the Launch Plan.
      * These can not be overridden when an execution is created with this launch plan.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+     * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
      */
-    flyteidl.core.Literals.LiteralMapOrBuilder getFixedInputsOrBuilder();
+    flyteidl.core.Literals.InputData getFixedInputData();
+    /**
+     * <pre>
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overridden when an execution is created with this launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+     */
+    flyteidl.core.Literals.InputDataOrBuilder getFixedInputDataOrBuilder();
 
     /**
      * <pre>
@@ -5006,6 +5037,19 @@ public final class LaunchPlanOuterClass {
 
               break;
             }
+            case 178: {
+              flyteidl.core.Literals.InputData.Builder subBuilder = null;
+              if (fixedInputData_ != null) {
+                subBuilder = fixedInputData_.toBuilder();
+              }
+              fixedInputData_ = input.readMessage(flyteidl.core.Literals.InputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(fixedInputData_);
+                fixedInputData_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -5146,23 +5190,51 @@ public final class LaunchPlanOuterClass {
      * <pre>
      * Fixed, non-overridable inputs for the Launch Plan.
      * These can not be overridden when an execution is created with this launch plan.
+     * Deprecated: Please use fixec_input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
      */
-    public boolean hasFixedInputs() {
+    @java.lang.Deprecated public boolean hasFixedInputs() {
       return fixedInputs_ != null;
     }
     /**
      * <pre>
      * Fixed, non-overridable inputs for the Launch Plan.
      * These can not be overridden when an execution is created with this launch plan.
+     * Deprecated: Please use fixec_input_data instead
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.LiteralMap getFixedInputs() {
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getFixedInputs() {
       return fixedInputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : fixedInputs_;
+    }
+    /**
+     * <pre>
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overridden when an execution is created with this launch plan.
+     * Deprecated: Please use fixec_input_data instead
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
+     */
+    @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getFixedInputsOrBuilder() {
+      return getFixedInputs();
+    }
+
+    public static final int FIXED_INPUT_DATA_FIELD_NUMBER = 22;
+    private flyteidl.core.Literals.InputData fixedInputData_;
+    /**
+     * <pre>
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overridden when an execution is created with this launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+     */
+    public boolean hasFixedInputData() {
+      return fixedInputData_ != null;
     }
     /**
      * <pre>
@@ -5170,10 +5242,21 @@ public final class LaunchPlanOuterClass {
      * These can not be overridden when an execution is created with this launch plan.
      * </pre>
      *
-     * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+     * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
      */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getFixedInputsOrBuilder() {
-      return getFixedInputs();
+    public flyteidl.core.Literals.InputData getFixedInputData() {
+      return fixedInputData_ == null ? flyteidl.core.Literals.InputData.getDefaultInstance() : fixedInputData_;
+    }
+    /**
+     * <pre>
+     * Fixed, non-overridable inputs for the Launch Plan.
+     * These can not be overridden when an execution is created with this launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+     */
+    public flyteidl.core.Literals.InputDataOrBuilder getFixedInputDataOrBuilder() {
+      return getFixedInputData();
     }
 
     public static final int ROLE_FIELD_NUMBER = 5;
@@ -5604,6 +5687,9 @@ public final class LaunchPlanOuterClass {
       if (envs_ != null) {
         output.writeMessage(21, getEnvs());
       }
+      if (fixedInputData_ != null) {
+        output.writeMessage(22, getFixedInputData());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5676,6 +5762,10 @@ public final class LaunchPlanOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(21, getEnvs());
       }
+      if (fixedInputData_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(22, getFixedInputData());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5710,6 +5800,11 @@ public final class LaunchPlanOuterClass {
       if (hasFixedInputs()) {
         if (!getFixedInputs()
             .equals(other.getFixedInputs())) return false;
+      }
+      if (hasFixedInputData() != other.hasFixedInputData()) return false;
+      if (hasFixedInputData()) {
+        if (!getFixedInputData()
+            .equals(other.getFixedInputData())) return false;
       }
       if (!getRole()
           .equals(other.getRole())) return false;
@@ -5788,6 +5883,10 @@ public final class LaunchPlanOuterClass {
       if (hasFixedInputs()) {
         hash = (37 * hash) + FIXED_INPUTS_FIELD_NUMBER;
         hash = (53 * hash) + getFixedInputs().hashCode();
+      }
+      if (hasFixedInputData()) {
+        hash = (37 * hash) + FIXED_INPUT_DATA_FIELD_NUMBER;
+        hash = (53 * hash) + getFixedInputData().hashCode();
       }
       hash = (37 * hash) + ROLE_FIELD_NUMBER;
       hash = (53 * hash) + getRole().hashCode();
@@ -5993,6 +6092,12 @@ public final class LaunchPlanOuterClass {
           fixedInputs_ = null;
           fixedInputsBuilder_ = null;
         }
+        if (fixedInputDataBuilder_ == null) {
+          fixedInputData_ = null;
+        } else {
+          fixedInputData_ = null;
+          fixedInputDataBuilder_ = null;
+        }
         role_ = "";
 
         if (labelsBuilder_ == null) {
@@ -6098,6 +6203,11 @@ public final class LaunchPlanOuterClass {
           result.fixedInputs_ = fixedInputs_;
         } else {
           result.fixedInputs_ = fixedInputsBuilder_.build();
+        }
+        if (fixedInputDataBuilder_ == null) {
+          result.fixedInputData_ = fixedInputData_;
+        } else {
+          result.fixedInputData_ = fixedInputDataBuilder_.build();
         }
         result.role_ = role_;
         if (labelsBuilder_ == null) {
@@ -6206,6 +6316,9 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasFixedInputs()) {
           mergeFixedInputs(other.getFixedInputs());
+        }
+        if (other.hasFixedInputData()) {
+          mergeFixedInputData(other.getFixedInputData());
         }
         if (!other.getRole().isEmpty()) {
           role_ = other.role_;
@@ -6748,22 +6861,24 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public boolean hasFixedInputs() {
+      @java.lang.Deprecated public boolean hasFixedInputs() {
         return fixedInputsBuilder_ != null || fixedInputs_ != null;
       }
       /**
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap getFixedInputs() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap getFixedInputs() {
         if (fixedInputsBuilder_ == null) {
           return fixedInputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : fixedInputs_;
         } else {
@@ -6774,11 +6889,12 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public Builder setFixedInputs(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder setFixedInputs(flyteidl.core.Literals.LiteralMap value) {
         if (fixedInputsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -6795,11 +6911,12 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public Builder setFixedInputs(
+      @java.lang.Deprecated public Builder setFixedInputs(
           flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
         if (fixedInputsBuilder_ == null) {
           fixedInputs_ = builderForValue.build();
@@ -6814,11 +6931,12 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public Builder mergeFixedInputs(flyteidl.core.Literals.LiteralMap value) {
+      @java.lang.Deprecated public Builder mergeFixedInputs(flyteidl.core.Literals.LiteralMap value) {
         if (fixedInputsBuilder_ == null) {
           if (fixedInputs_ != null) {
             fixedInputs_ =
@@ -6837,11 +6955,12 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public Builder clearFixedInputs() {
+      @java.lang.Deprecated public Builder clearFixedInputs() {
         if (fixedInputsBuilder_ == null) {
           fixedInputs_ = null;
           onChanged();
@@ -6856,11 +6975,12 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMap.Builder getFixedInputsBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMap.Builder getFixedInputsBuilder() {
         
         onChanged();
         return getFixedInputsFieldBuilder().getBuilder();
@@ -6869,11 +6989,12 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getFixedInputsOrBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.LiteralMapOrBuilder getFixedInputsOrBuilder() {
         if (fixedInputsBuilder_ != null) {
           return fixedInputsBuilder_.getMessageOrBuilder();
         } else {
@@ -6885,9 +7006,10 @@ public final class LaunchPlanOuterClass {
        * <pre>
        * Fixed, non-overridable inputs for the Launch Plan.
        * These can not be overridden when an execution is created with this launch plan.
+       * Deprecated: Please use fixec_input_data instead
        * </pre>
        *
-       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4;</code>
+       * <code>.flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
@@ -6901,6 +7023,168 @@ public final class LaunchPlanOuterClass {
           fixedInputs_ = null;
         }
         return fixedInputsBuilder_;
+      }
+
+      private flyteidl.core.Literals.InputData fixedInputData_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> fixedInputDataBuilder_;
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public boolean hasFixedInputData() {
+        return fixedInputDataBuilder_ != null || fixedInputData_ != null;
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public flyteidl.core.Literals.InputData getFixedInputData() {
+        if (fixedInputDataBuilder_ == null) {
+          return fixedInputData_ == null ? flyteidl.core.Literals.InputData.getDefaultInstance() : fixedInputData_;
+        } else {
+          return fixedInputDataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public Builder setFixedInputData(flyteidl.core.Literals.InputData value) {
+        if (fixedInputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          fixedInputData_ = value;
+          onChanged();
+        } else {
+          fixedInputDataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public Builder setFixedInputData(
+          flyteidl.core.Literals.InputData.Builder builderForValue) {
+        if (fixedInputDataBuilder_ == null) {
+          fixedInputData_ = builderForValue.build();
+          onChanged();
+        } else {
+          fixedInputDataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public Builder mergeFixedInputData(flyteidl.core.Literals.InputData value) {
+        if (fixedInputDataBuilder_ == null) {
+          if (fixedInputData_ != null) {
+            fixedInputData_ =
+              flyteidl.core.Literals.InputData.newBuilder(fixedInputData_).mergeFrom(value).buildPartial();
+          } else {
+            fixedInputData_ = value;
+          }
+          onChanged();
+        } else {
+          fixedInputDataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public Builder clearFixedInputData() {
+        if (fixedInputDataBuilder_ == null) {
+          fixedInputData_ = null;
+          onChanged();
+        } else {
+          fixedInputData_ = null;
+          fixedInputDataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public flyteidl.core.Literals.InputData.Builder getFixedInputDataBuilder() {
+        
+        onChanged();
+        return getFixedInputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      public flyteidl.core.Literals.InputDataOrBuilder getFixedInputDataOrBuilder() {
+        if (fixedInputDataBuilder_ != null) {
+          return fixedInputDataBuilder_.getMessageOrBuilder();
+        } else {
+          return fixedInputData_ == null ?
+              flyteidl.core.Literals.InputData.getDefaultInstance() : fixedInputData_;
+        }
+      }
+      /**
+       * <pre>
+       * Fixed, non-overridable inputs for the Launch Plan.
+       * These can not be overridden when an execution is created with this launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.InputData fixed_input_data = 22;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder> 
+          getFixedInputDataFieldBuilder() {
+        if (fixedInputDataBuilder_ == null) {
+          fixedInputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.InputData, flyteidl.core.Literals.InputData.Builder, flyteidl.core.Literals.InputDataOrBuilder>(
+                  getFixedInputData(),
+                  getParentForChildren(),
+                  isClean());
+          fixedInputData_ = null;
+        }
+        return fixedInputDataBuilder_;
       }
 
       private java.lang.Object role_ = "";
@@ -14576,47 +14860,49 @@ public final class LaunchPlanOuterClass {
       "0\n\014launch_plans\030\001 \003(\0132\032.flyteidl.admin.L" +
       "aunchPlan\022\r\n\005token\030\002 \001(\t\"J\n\004Auth\022\032\n\022assu" +
       "mable_iam_role\030\001 \001(\t\022\"\n\032kubernetes_servi" +
-      "ce_account\030\002 \001(\t:\002\030\001\"\355\005\n\016LaunchPlanSpec\022" +
+      "ce_account\030\002 \001(\t:\002\030\001\"\245\006\n\016LaunchPlanSpec\022" +
       ".\n\013workflow_id\030\001 \001(\0132\031.flyteidl.core.Ide" +
       "ntifier\022;\n\017entity_metadata\030\002 \001(\0132\".flyte" +
       "idl.admin.LaunchPlanMetadata\0223\n\016default_" +
       "inputs\030\003 \001(\0132\033.flyteidl.core.ParameterMa" +
-      "p\022/\n\014fixed_inputs\030\004 \001(\0132\031.flyteidl.core." +
-      "LiteralMap\022\020\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006" +
-      " \001(\0132\026.flyteidl.admin.Labels\0220\n\013annotati" +
-      "ons\030\007 \001(\0132\033.flyteidl.admin.Annotations\022&" +
-      "\n\004auth\030\010 \001(\0132\024.flyteidl.admin.AuthB\002\030\001\022/" +
-      "\n\tauth_role\030\t \001(\0132\030.flyteidl.admin.AuthR" +
-      "oleB\002\030\001\0228\n\020security_context\030\n \001(\0132\036.flyt" +
-      "eidl.core.SecurityContext\022;\n\022quality_of_" +
-      "service\030\020 \001(\0132\037.flyteidl.core.QualityOfS" +
-      "ervice\022C\n\026raw_output_data_config\030\021 \001(\0132#" +
-      ".flyteidl.admin.RawOutputDataConfig\022\027\n\017m" +
-      "ax_parallelism\030\022 \001(\005\0221\n\rinterruptible\030\023 " +
-      "\001(\0132\032.google.protobuf.BoolValue\022\027\n\017overw" +
-      "rite_cache\030\024 \001(\010\022\"\n\004envs\030\025 \001(\0132\024.flyteid" +
-      "l.admin.Envs\"\217\002\n\021LaunchPlanClosure\022.\n\005st" +
-      "ate\030\001 \001(\0162\037.flyteidl.admin.LaunchPlanSta" +
-      "te\0224\n\017expected_inputs\030\002 \001(\0132\033.flyteidl.c" +
-      "ore.ParameterMap\0224\n\020expected_outputs\030\003 \001" +
-      "(\0132\032.flyteidl.core.VariableMap\022.\n\ncreate" +
-      "d_at\030\004 \001(\0132\032.google.protobuf.Timestamp\022." +
-      "\n\nupdated_at\030\005 \001(\0132\032.google.protobuf.Tim" +
-      "estamp\"u\n\022LaunchPlanMetadata\022*\n\010schedule" +
-      "\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\rnoti" +
-      "fications\030\002 \003(\0132\034.flyteidl.admin.Notific" +
-      "ation\"p\n\027LaunchPlanUpdateRequest\022%\n\002id\030\001" +
-      " \001(\0132\031.flyteidl.core.Identifier\022.\n\005state" +
-      "\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanState\"" +
-      "\032\n\030LaunchPlanUpdateResponse\"L\n\027ActiveLau" +
-      "nchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.ad" +
-      "min.NamedEntityIdentifier\"\203\001\n\033ActiveLaun" +
-      "chPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006do" +
-      "main\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t" +
-      "\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort*" +
-      "+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTI" +
-      "VE\020\001B=Z;github.com/flyteorg/flyte/flytei" +
-      "dl/gen/pb-go/flyteidl/adminb\006proto3"
+      "p\0223\n\014fixed_inputs\030\004 \001(\0132\031.flyteidl.core." +
+      "LiteralMapB\002\030\001\0222\n\020fixed_input_data\030\026 \001(\013" +
+      "2\030.flyteidl.core.InputData\022\020\n\004role\030\005 \001(\t" +
+      "B\002\030\001\022&\n\006labels\030\006 \001(\0132\026.flyteidl.admin.La" +
+      "bels\0220\n\013annotations\030\007 \001(\0132\033.flyteidl.adm" +
+      "in.Annotations\022&\n\004auth\030\010 \001(\0132\024.flyteidl." +
+      "admin.AuthB\002\030\001\022/\n\tauth_role\030\t \001(\0132\030.flyt" +
+      "eidl.admin.AuthRoleB\002\030\001\0228\n\020security_cont" +
+      "ext\030\n \001(\0132\036.flyteidl.core.SecurityContex" +
+      "t\022;\n\022quality_of_service\030\020 \001(\0132\037.flyteidl" +
+      ".core.QualityOfService\022C\n\026raw_output_dat" +
+      "a_config\030\021 \001(\0132#.flyteidl.admin.RawOutpu" +
+      "tDataConfig\022\027\n\017max_parallelism\030\022 \001(\005\0221\n\r" +
+      "interruptible\030\023 \001(\0132\032.google.protobuf.Bo" +
+      "olValue\022\027\n\017overwrite_cache\030\024 \001(\010\022\"\n\004envs" +
+      "\030\025 \001(\0132\024.flyteidl.admin.Envs\"\217\002\n\021LaunchP" +
+      "lanClosure\022.\n\005state\030\001 \001(\0162\037.flyteidl.adm" +
+      "in.LaunchPlanState\0224\n\017expected_inputs\030\002 " +
+      "\001(\0132\033.flyteidl.core.ParameterMap\0224\n\020expe" +
+      "cted_outputs\030\003 \001(\0132\032.flyteidl.core.Varia" +
+      "bleMap\022.\n\ncreated_at\030\004 \001(\0132\032.google.prot" +
+      "obuf.Timestamp\022.\n\nupdated_at\030\005 \001(\0132\032.goo" +
+      "gle.protobuf.Timestamp\"u\n\022LaunchPlanMeta" +
+      "data\022*\n\010schedule\030\001 \001(\0132\030.flyteidl.admin." +
+      "Schedule\0223\n\rnotifications\030\002 \003(\0132\034.flytei" +
+      "dl.admin.Notification\"p\n\027LaunchPlanUpdat" +
+      "eRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Ide" +
+      "ntifier\022.\n\005state\030\002 \001(\0162\037.flyteidl.admin." +
+      "LaunchPlanState\"\032\n\030LaunchPlanUpdateRespo" +
+      "nse\"L\n\027ActiveLaunchPlanRequest\0221\n\002id\030\001 \001" +
+      "(\0132%.flyteidl.admin.NamedEntityIdentifie" +
+      "r\"\203\001\n\033ActiveLaunchPlanListRequest\022\017\n\007pro" +
+      "ject\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(" +
+      "\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyt" +
+      "eidl.admin.Sort*+\n\017LaunchPlanState\022\014\n\010IN" +
+      "ACTIVE\020\000\022\n\n\006ACTIVE\020\001B=Z;github.com/flyte" +
+      "org/flyte/flyteidl/gen/pb-go/flyteidl/ad" +
+      "minb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14674,7 +14960,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", "OverwriteCache", "Envs", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "FixedInputData", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", "OverwriteCache", "Envs", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new

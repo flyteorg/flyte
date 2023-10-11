@@ -224,10 +224,18 @@ message NodeExecutionGetDataResponse {
     UrlBlob outputs                            = 2  [deprecated = true];
 
     // Full_inputs will only be populated if they are under a configured size threshold.
-    core.LiteralMap full_inputs                = 3;
+    // Deprecated: Please use input_data instead.
+    core.LiteralMap full_inputs                = 3 [deprecated = true];
 
-    // Full_outputs will only be populated if they are under a configured size threshold. 
-    core.LiteralMap full_outputs               = 4;
+    // Full_outputs will only be populated if they are under a configured size threshold.
+    // Deprecated: Please use output_data instead.
+    core.LiteralMap full_outputs               = 4 [deprecated = true];
+
+    // InputData will only be populated if they are under a configured size threshold.
+    core.InputData input_data                  = 5;
+
+    // OutputData will only be populated if they are under a configured size threshold.
+    core.OutputData output_data                = 6;
 
     // Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
     DynamicWorkflowNodeMetadata dynamic_workflow = 16;

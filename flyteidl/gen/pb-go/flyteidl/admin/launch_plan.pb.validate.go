@@ -482,6 +482,16 @@ func (m *LaunchPlanSpec) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetFixedInputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LaunchPlanSpecValidationError{
+				field:  "FixedInputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	// no validation rules for Role
 
 	if v, ok := interface{}(m.GetLabels()).(interface{ Validate() error }); ok {

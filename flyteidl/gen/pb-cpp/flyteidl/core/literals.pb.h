@@ -48,7 +48,7 @@ struct TableStruct_flyteidl_2fcore_2fliterals_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[22]
+  static const ::google::protobuf::internal::ParseTable schema[24]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -81,6 +81,9 @@ extern BlobDefaultTypeInternal _Blob_default_instance_;
 class BlobMetadata;
 class BlobMetadataDefaultTypeInternal;
 extern BlobMetadataDefaultTypeInternal _BlobMetadata_default_instance_;
+class InputData;
+class InputDataDefaultTypeInternal;
+extern InputDataDefaultTypeInternal _InputData_default_instance_;
 class KeyValuePair;
 class KeyValuePairDefaultTypeInternal;
 extern KeyValuePairDefaultTypeInternal _KeyValuePair_default_instance_;
@@ -96,6 +99,9 @@ extern LiteralMapDefaultTypeInternal _LiteralMap_default_instance_;
 class LiteralMap_LiteralsEntry_DoNotUse;
 class LiteralMap_LiteralsEntry_DoNotUseDefaultTypeInternal;
 extern LiteralMap_LiteralsEntry_DoNotUseDefaultTypeInternal _LiteralMap_LiteralsEntry_DoNotUse_default_instance_;
+class OutputData;
+class OutputDataDefaultTypeInternal;
+extern OutputDataDefaultTypeInternal _OutputData_default_instance_;
 class Primitive;
 class PrimitiveDefaultTypeInternal;
 extern PrimitiveDefaultTypeInternal _Primitive_default_instance_;
@@ -135,11 +141,13 @@ template<> ::flyteidl::core::BindingDataMap* Arena::CreateMaybeMessage<::flyteid
 template<> ::flyteidl::core::BindingDataMap_BindingsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::BindingDataMap_BindingsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::Blob* Arena::CreateMaybeMessage<::flyteidl::core::Blob>(Arena*);
 template<> ::flyteidl::core::BlobMetadata* Arena::CreateMaybeMessage<::flyteidl::core::BlobMetadata>(Arena*);
+template<> ::flyteidl::core::InputData* Arena::CreateMaybeMessage<::flyteidl::core::InputData>(Arena*);
 template<> ::flyteidl::core::KeyValuePair* Arena::CreateMaybeMessage<::flyteidl::core::KeyValuePair>(Arena*);
 template<> ::flyteidl::core::Literal* Arena::CreateMaybeMessage<::flyteidl::core::Literal>(Arena*);
 template<> ::flyteidl::core::LiteralCollection* Arena::CreateMaybeMessage<::flyteidl::core::LiteralCollection>(Arena*);
 template<> ::flyteidl::core::LiteralMap* Arena::CreateMaybeMessage<::flyteidl::core::LiteralMap>(Arena*);
 template<> ::flyteidl::core::LiteralMap_LiteralsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::LiteralMap_LiteralsEntry_DoNotUse>(Arena*);
+template<> ::flyteidl::core::OutputData* Arena::CreateMaybeMessage<::flyteidl::core::OutputData>(Arena*);
 template<> ::flyteidl::core::Primitive* Arena::CreateMaybeMessage<::flyteidl::core::Primitive>(Arena*);
 template<> ::flyteidl::core::RetryStrategy* Arena::CreateMaybeMessage<::flyteidl::core::RetryStrategy>(Arena*);
 template<> ::flyteidl::core::Scalar* Arena::CreateMaybeMessage<::flyteidl::core::Scalar>(Arena*);
@@ -2000,6 +2008,236 @@ class LiteralMap final :
 };
 // -------------------------------------------------------------------
 
+class InputData final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.InputData) */ {
+ public:
+  InputData();
+  virtual ~InputData();
+
+  InputData(const InputData& from);
+
+  inline InputData& operator=(const InputData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  InputData(InputData&& from) noexcept
+    : InputData() {
+    *this = ::std::move(from);
+  }
+
+  inline InputData& operator=(InputData&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const InputData& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const InputData* internal_default_instance() {
+    return reinterpret_cast<const InputData*>(
+               &_InputData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    14;
+
+  void Swap(InputData* other);
+  friend void swap(InputData& a, InputData& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline InputData* New() const final {
+    return CreateMaybeMessage<InputData>(nullptr);
+  }
+
+  InputData* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<InputData>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const InputData& from);
+  void MergeFrom(const InputData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(InputData* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.LiteralMap inputs = 1;
+  bool has_inputs() const;
+  void clear_inputs();
+  static const int kInputsFieldNumber = 1;
+  const ::flyteidl::core::LiteralMap& inputs() const;
+  ::flyteidl::core::LiteralMap* release_inputs();
+  ::flyteidl::core::LiteralMap* mutable_inputs();
+  void set_allocated_inputs(::flyteidl::core::LiteralMap* inputs);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.InputData)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::LiteralMap* inputs_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fliterals_2eproto;
+};
+// -------------------------------------------------------------------
+
+class OutputData final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.OutputData) */ {
+ public:
+  OutputData();
+  virtual ~OutputData();
+
+  OutputData(const OutputData& from);
+
+  inline OutputData& operator=(const OutputData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  OutputData(OutputData&& from) noexcept
+    : OutputData() {
+    *this = ::std::move(from);
+  }
+
+  inline OutputData& operator=(OutputData&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const OutputData& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const OutputData* internal_default_instance() {
+    return reinterpret_cast<const OutputData*>(
+               &_OutputData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    15;
+
+  void Swap(OutputData* other);
+  friend void swap(OutputData& a, OutputData& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline OutputData* New() const final {
+    return CreateMaybeMessage<OutputData>(nullptr);
+  }
+
+  OutputData* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<OutputData>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const OutputData& from);
+  void MergeFrom(const OutputData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(OutputData* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.LiteralMap outputs = 1;
+  bool has_outputs() const;
+  void clear_outputs();
+  static const int kOutputsFieldNumber = 1;
+  const ::flyteidl::core::LiteralMap& outputs() const;
+  ::flyteidl::core::LiteralMap* release_outputs();
+  ::flyteidl::core::LiteralMap* mutable_outputs();
+  void set_allocated_outputs(::flyteidl::core::LiteralMap* outputs);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.OutputData)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::LiteralMap* outputs_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fliterals_2eproto;
+};
+// -------------------------------------------------------------------
+
 class BindingDataCollection final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.BindingDataCollection) */ {
  public:
@@ -2038,7 +2276,7 @@ class BindingDataCollection final :
                &_BindingDataCollection_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    16;
 
   void Swap(BindingDataCollection* other);
   friend void swap(BindingDataCollection& a, BindingDataCollection& b) {
@@ -2180,7 +2418,7 @@ class BindingDataMap final :
                &_BindingDataMap_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    18;
 
   void Swap(BindingDataMap* other);
   friend void swap(BindingDataMap& a, BindingDataMap& b) {
@@ -2301,7 +2539,7 @@ class UnionInfo final :
                &_UnionInfo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    19;
 
   void Swap(UnionInfo* other);
   friend void swap(UnionInfo& a, UnionInfo& b) {
@@ -2424,7 +2662,7 @@ class BindingData final :
                &_BindingData_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    20;
 
   void Swap(BindingData* other);
   friend void swap(BindingData& a, BindingData& b) {
@@ -2593,7 +2831,7 @@ class Binding final :
                &_Binding_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    21;
 
   void Swap(Binding* other);
   friend void swap(Binding& a, Binding& b) {
@@ -2723,7 +2961,7 @@ class KeyValuePair final :
                &_KeyValuePair_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    22;
 
   void Swap(KeyValuePair* other);
   friend void swap(KeyValuePair& a, KeyValuePair& b) {
@@ -2858,7 +3096,7 @@ class RetryStrategy final :
                &_RetryStrategy_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    23;
 
   void Swap(RetryStrategy* other);
   friend void swap(RetryStrategy& a, RetryStrategy& b) {
@@ -4448,6 +4686,116 @@ LiteralMap::mutable_literals() {
 
 // -------------------------------------------------------------------
 
+// InputData
+
+// .flyteidl.core.LiteralMap inputs = 1;
+inline bool InputData::has_inputs() const {
+  return this != internal_default_instance() && inputs_ != nullptr;
+}
+inline void InputData::clear_inputs() {
+  if (GetArenaNoVirtual() == nullptr && inputs_ != nullptr) {
+    delete inputs_;
+  }
+  inputs_ = nullptr;
+}
+inline const ::flyteidl::core::LiteralMap& InputData::inputs() const {
+  const ::flyteidl::core::LiteralMap* p = inputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.InputData.inputs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
+      &::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* InputData::release_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.InputData.inputs)
+  
+  ::flyteidl::core::LiteralMap* temp = inputs_;
+  inputs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LiteralMap* InputData::mutable_inputs() {
+  
+  if (inputs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
+    inputs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.InputData.inputs)
+  return inputs_;
+}
+inline void InputData::set_allocated_inputs(::flyteidl::core::LiteralMap* inputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete inputs_;
+  }
+  if (inputs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      inputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, inputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  inputs_ = inputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.InputData.inputs)
+}
+
+// -------------------------------------------------------------------
+
+// OutputData
+
+// .flyteidl.core.LiteralMap outputs = 1;
+inline bool OutputData::has_outputs() const {
+  return this != internal_default_instance() && outputs_ != nullptr;
+}
+inline void OutputData::clear_outputs() {
+  if (GetArenaNoVirtual() == nullptr && outputs_ != nullptr) {
+    delete outputs_;
+  }
+  outputs_ = nullptr;
+}
+inline const ::flyteidl::core::LiteralMap& OutputData::outputs() const {
+  const ::flyteidl::core::LiteralMap* p = outputs_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.OutputData.outputs)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LiteralMap*>(
+      &::flyteidl::core::_LiteralMap_default_instance_);
+}
+inline ::flyteidl::core::LiteralMap* OutputData::release_outputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.OutputData.outputs)
+  
+  ::flyteidl::core::LiteralMap* temp = outputs_;
+  outputs_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LiteralMap* OutputData::mutable_outputs() {
+  
+  if (outputs_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LiteralMap>(GetArenaNoVirtual());
+    outputs_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.OutputData.outputs)
+  return outputs_;
+}
+inline void OutputData::set_allocated_outputs(::flyteidl::core::LiteralMap* outputs) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete outputs_;
+  }
+  if (outputs) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      outputs = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, outputs, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  outputs_ = outputs;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.OutputData.outputs)
+}
+
+// -------------------------------------------------------------------
+
 // BindingDataCollection
 
 // repeated .flyteidl.core.BindingData bindings = 1;
@@ -5014,6 +5362,10 @@ inline void RetryStrategy::set_retries(::google::protobuf::uint32 value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
