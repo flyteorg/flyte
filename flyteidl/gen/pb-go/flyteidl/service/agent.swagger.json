@@ -373,6 +373,34 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreExtendedResources": {
+      "type": "object",
+      "properties": {
+        "gpu_accelerator": {
+          "$ref": "#/definitions/coreGPUAccelerator",
+          "description": "GPU accelerator to select for task. Contains information about device type, and\nfor multi-instance GPUs, the partition size to use."
+        }
+      },
+      "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
+    },
+    "coreGPUAccelerator": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "type": "string",
+          "description": "This can be any arbitrary string, and should be informed by the labels or taints\nassociated with the nodes in question. Default cloud provider labels typically\nuse the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc."
+        },
+        "unpartitioned": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "partition_size": {
+          "type": "string",
+          "description": "Like `device`, this can be any arbitrary string, and should be informed by\nthe labels or taints associated with the nodes in question. Default cloud\nprovider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc."
+        }
+      },
+      "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
+    },
     "coreIOStrategy": {
       "type": "object",
       "properties": {
@@ -1039,6 +1067,10 @@
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
+        },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Encapsulates all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
         },
         "config": {
           "type": "object",

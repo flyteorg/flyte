@@ -1886,6 +1886,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides resources */
             resources?: (flyteidl.core.IResources|null);
+
+            /** TaskNodeOverrides extendedResources */
+            extendedResources?: (flyteidl.core.IExtendedResources|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -1899,6 +1902,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides resources. */
             public resources?: (flyteidl.core.IResources|null);
+
+            /** TaskNodeOverrides extendedResources. */
+            public extendedResources?: (flyteidl.core.IExtendedResources|null);
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -5255,6 +5261,125 @@ export namespace flyteidl {
             }
         }
 
+        /** Properties of a GPUAccelerator. */
+        interface IGPUAccelerator {
+
+            /** GPUAccelerator device */
+            device?: (string|null);
+
+            /** GPUAccelerator unpartitioned */
+            unpartitioned?: (boolean|null);
+
+            /** GPUAccelerator partitionSize */
+            partitionSize?: (string|null);
+        }
+
+        /** Represents a GPUAccelerator. */
+        class GPUAccelerator implements IGPUAccelerator {
+
+            /**
+             * Constructs a new GPUAccelerator.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IGPUAccelerator);
+
+            /** GPUAccelerator device. */
+            public device: string;
+
+            /** GPUAccelerator unpartitioned. */
+            public unpartitioned: boolean;
+
+            /** GPUAccelerator partitionSize. */
+            public partitionSize: string;
+
+            /** GPUAccelerator partitionSizeValue. */
+            public partitionSizeValue?: ("unpartitioned"|"partitionSize");
+
+            /**
+             * Creates a new GPUAccelerator instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GPUAccelerator instance
+             */
+            public static create(properties?: flyteidl.core.IGPUAccelerator): flyteidl.core.GPUAccelerator;
+
+            /**
+             * Encodes the specified GPUAccelerator message. Does not implicitly {@link flyteidl.core.GPUAccelerator.verify|verify} messages.
+             * @param message GPUAccelerator message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IGPUAccelerator, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GPUAccelerator message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GPUAccelerator
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.GPUAccelerator;
+
+            /**
+             * Verifies a GPUAccelerator message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExtendedResources. */
+        interface IExtendedResources {
+
+            /** ExtendedResources gpuAccelerator */
+            gpuAccelerator?: (flyteidl.core.IGPUAccelerator|null);
+        }
+
+        /** Represents an ExtendedResources. */
+        class ExtendedResources implements IExtendedResources {
+
+            /**
+             * Constructs a new ExtendedResources.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IExtendedResources);
+
+            /** ExtendedResources gpuAccelerator. */
+            public gpuAccelerator?: (flyteidl.core.IGPUAccelerator|null);
+
+            /**
+             * Creates a new ExtendedResources instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExtendedResources instance
+             */
+            public static create(properties?: flyteidl.core.IExtendedResources): flyteidl.core.ExtendedResources;
+
+            /**
+             * Encodes the specified ExtendedResources message. Does not implicitly {@link flyteidl.core.ExtendedResources.verify|verify} messages.
+             * @param message ExtendedResources message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IExtendedResources, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExtendedResources message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExtendedResources
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ExtendedResources;
+
+            /**
+             * Verifies an ExtendedResources message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a RuntimeMetadata. */
         interface IRuntimeMetadata {
 
@@ -5476,6 +5601,9 @@ export namespace flyteidl {
             /** TaskTemplate securityContext */
             securityContext?: (flyteidl.core.ISecurityContext|null);
 
+            /** TaskTemplate extendedResources */
+            extendedResources?: (flyteidl.core.IExtendedResources|null);
+
             /** TaskTemplate config */
             config?: ({ [k: string]: string }|null);
         }
@@ -5518,6 +5646,9 @@ export namespace flyteidl {
 
             /** TaskTemplate securityContext. */
             public securityContext?: (flyteidl.core.ISecurityContext|null);
+
+            /** TaskTemplate extendedResources. */
+            public extendedResources?: (flyteidl.core.IExtendedResources|null);
 
             /** TaskTemplate config. */
             public config: { [k: string]: string };

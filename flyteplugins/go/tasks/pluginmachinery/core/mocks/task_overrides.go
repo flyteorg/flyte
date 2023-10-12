@@ -3,7 +3,9 @@
 package mocks
 
 import (
+	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
+
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -40,6 +42,40 @@ func (_m *TaskOverrides) GetConfig() *v1.ConfigMap {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*v1.ConfigMap)
+		}
+	}
+
+	return r0
+}
+
+type TaskOverrides_GetExtendedResources struct {
+	*mock.Call
+}
+
+func (_m TaskOverrides_GetExtendedResources) Return(_a0 *flyteidlcore.ExtendedResources) *TaskOverrides_GetExtendedResources {
+	return &TaskOverrides_GetExtendedResources{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskOverrides) OnGetExtendedResources() *TaskOverrides_GetExtendedResources {
+	c_call := _m.On("GetExtendedResources")
+	return &TaskOverrides_GetExtendedResources{Call: c_call}
+}
+
+func (_m *TaskOverrides) OnGetExtendedResourcesMatch(matchers ...interface{}) *TaskOverrides_GetExtendedResources {
+	c_call := _m.On("GetExtendedResources", matchers...)
+	return &TaskOverrides_GetExtendedResources{Call: c_call}
+}
+
+// GetExtendedResources provides a mock function with given fields:
+func (_m *TaskOverrides) GetExtendedResources() *flyteidlcore.ExtendedResources {
+	ret := _m.Called()
+
+	var r0 *flyteidlcore.ExtendedResources
+	if rf, ok := ret.Get(0).(func() *flyteidlcore.ExtendedResources); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*flyteidlcore.ExtendedResources)
 		}
 	}
 
