@@ -14,6 +14,8 @@ pub struct WorkflowExecutionEvent {
     /// by the executor of the workflow.
     #[prost(message, optional, tag="4")]
     pub occurred_at: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(int32, tag="9")]
+    pub event_version: i32,
     #[prost(oneof="workflow_execution_event::OutputResult", tags="5, 6, 7, 8")]
     pub output_result: ::core::option::Option<workflow_execution_event::OutputResult>,
 }

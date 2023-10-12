@@ -9375,6 +9375,34 @@ public final class ExecutionOuterClass {
 
     /**
      * <pre>
+     * Raw output data produced by this execution.
+     * DEPRECATED. Use GetExecutionData to fetch output data instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+     */
+    boolean hasFullOutputs();
+    /**
+     * <pre>
+     * Raw output data produced by this execution.
+     * DEPRECATED. Use GetExecutionData to fetch output data instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+     */
+    flyteidl.core.Literals.OutputData getFullOutputs();
+    /**
+     * <pre>
+     * Raw output data produced by this execution.
+     * DEPRECATED. Use GetExecutionData to fetch output data instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+     */
+    flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder();
+
+    /**
+     * <pre>
      * Inputs computed and passed for execution.
      * computed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan
      * </pre>
@@ -9769,9 +9797,9 @@ public final class ExecutionOuterClass {
               break;
             }
             case 74: {
-              if (!((mutable_bitField0_ & 0x00000800) != 0)) {
+              if (!((mutable_bitField0_ & 0x00001000) != 0)) {
                 notifications_ = new java.util.ArrayList<flyteidl.admin.Common.Notification>();
-                mutable_bitField0_ |= 0x00000800;
+                mutable_bitField0_ |= 0x00001000;
               }
               notifications_.add(
                   input.readMessage(flyteidl.admin.Common.Notification.parser(), extensionRegistry));
@@ -9837,6 +9865,20 @@ public final class ExecutionOuterClass {
 
               break;
             }
+            case 122: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
+              if (outputResultCase_ == 15) {
+                subBuilder = ((flyteidl.core.Literals.OutputData) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.OutputData) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 15;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -9852,7 +9894,7 @@ public final class ExecutionOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000800) != 0)) {
+        if (((mutable_bitField0_ & 0x00001000) != 0)) {
           notifications_ = java.util.Collections.unmodifiableList(notifications_);
         }
         this.unknownFields = unknownFields.build();
@@ -9882,6 +9924,7 @@ public final class ExecutionOuterClass {
       @java.lang.Deprecated ABORT_CAUSE(10),
       ABORT_METADATA(12),
       @java.lang.Deprecated OUTPUT_DATA(13),
+      FULL_OUTPUTS(15),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -9902,6 +9945,7 @@ public final class ExecutionOuterClass {
           case 10: return ABORT_CAUSE;
           case 12: return ABORT_METADATA;
           case 13: return OUTPUT_DATA;
+          case 15: return FULL_OUTPUTS;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -10124,6 +10168,47 @@ public final class ExecutionOuterClass {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int FULL_OUTPUTS_FIELD_NUMBER = 15;
+    /**
+     * <pre>
+     * Raw output data produced by this execution.
+     * DEPRECATED. Use GetExecutionData to fetch output data instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+     */
+    public boolean hasFullOutputs() {
+      return outputResultCase_ == 15;
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this execution.
+     * DEPRECATED. Use GetExecutionData to fetch output data instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+     */
+    public flyteidl.core.Literals.OutputData getFullOutputs() {
+      if (outputResultCase_ == 15) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this execution.
+     * DEPRECATED. Use GetExecutionData to fetch output data instead.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+     */
+    public flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder() {
+      if (outputResultCase_ == 15) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
     }
 
     public static final int COMPUTED_INPUTS_FIELD_NUMBER = 3;
@@ -10506,6 +10591,9 @@ public final class ExecutionOuterClass {
       if (stateChangeDetails_ != null) {
         output.writeMessage(14, getStateChangeDetails());
       }
+      if (outputResultCase_ == 15) {
+        output.writeMessage(15, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10569,6 +10657,10 @@ public final class ExecutionOuterClass {
       if (stateChangeDetails_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(14, getStateChangeDetails());
+      }
+      if (outputResultCase_ == 15) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(15, (flyteidl.core.Literals.OutputData) outputResult_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -10645,6 +10737,10 @@ public final class ExecutionOuterClass {
           if (!getOutputData()
               .equals(other.getOutputData())) return false;
           break;
+        case 15:
+          if (!getFullOutputs()
+              .equals(other.getFullOutputs())) return false;
+          break;
         case 0:
         default:
       }
@@ -10713,6 +10809,10 @@ public final class ExecutionOuterClass {
         case 13:
           hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getOutputData().hashCode();
+          break;
+        case 15:
+          hash = (37 * hash) + FULL_OUTPUTS_FIELD_NUMBER;
+          hash = (53 * hash) + getFullOutputs().hashCode();
           break;
         case 0:
         default:
@@ -10889,7 +10989,7 @@ public final class ExecutionOuterClass {
         }
         if (notificationsBuilder_ == null) {
           notifications_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000800);
+          bitField0_ = (bitField0_ & ~0x00001000);
         } else {
           notificationsBuilder_.clear();
         }
@@ -10966,6 +11066,13 @@ public final class ExecutionOuterClass {
             result.outputResult_ = outputDataBuilder_.build();
           }
         }
+        if (outputResultCase_ == 15) {
+          if (fullOutputsBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = fullOutputsBuilder_.build();
+          }
+        }
         if (computedInputsBuilder_ == null) {
           result.computedInputs_ = computedInputs_;
         } else {
@@ -10993,9 +11100,9 @@ public final class ExecutionOuterClass {
           result.updatedAt_ = updatedAtBuilder_.build();
         }
         if (notificationsBuilder_ == null) {
-          if (((bitField0_ & 0x00000800) != 0)) {
+          if (((bitField0_ & 0x00001000) != 0)) {
             notifications_ = java.util.Collections.unmodifiableList(notifications_);
-            bitField0_ = (bitField0_ & ~0x00000800);
+            bitField0_ = (bitField0_ & ~0x00001000);
           }
           result.notifications_ = notifications_;
         } else {
@@ -11083,7 +11190,7 @@ public final class ExecutionOuterClass {
           if (!other.notifications_.isEmpty()) {
             if (notifications_.isEmpty()) {
               notifications_ = other.notifications_;
-              bitField0_ = (bitField0_ & ~0x00000800);
+              bitField0_ = (bitField0_ & ~0x00001000);
             } else {
               ensureNotificationsIsMutable();
               notifications_.addAll(other.notifications_);
@@ -11096,7 +11203,7 @@ public final class ExecutionOuterClass {
               notificationsBuilder_.dispose();
               notificationsBuilder_ = null;
               notifications_ = other.notifications_;
-              bitField0_ = (bitField0_ & ~0x00000800);
+              bitField0_ = (bitField0_ & ~0x00001000);
               notificationsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getNotificationsFieldBuilder() : null;
@@ -11132,6 +11239,10 @@ public final class ExecutionOuterClass {
           }
           case OUTPUT_DATA: {
             mergeOutputData(other.getOutputData());
+            break;
+          }
+          case FULL_OUTPUTS: {
+            mergeFullOutputs(other.getFullOutputs());
             break;
           }
           case OUTPUTRESULT_NOT_SET: {
@@ -11989,6 +12100,187 @@ public final class ExecutionOuterClass {
         return outputDataBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> fullOutputsBuilder_;
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public boolean hasFullOutputs() {
+        return outputResultCase_ == 15;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public flyteidl.core.Literals.OutputData getFullOutputs() {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 15) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 15) {
+            return fullOutputsBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public Builder setFullOutputs(flyteidl.core.Literals.OutputData value) {
+        if (fullOutputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          fullOutputsBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 15;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public Builder setFullOutputs(
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
+        if (fullOutputsBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          fullOutputsBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 15;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public Builder mergeFullOutputs(flyteidl.core.Literals.OutputData value) {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 15 &&
+              outputResult_ != flyteidl.core.Literals.OutputData.getDefaultInstance()) {
+            outputResult_ = flyteidl.core.Literals.OutputData.newBuilder((flyteidl.core.Literals.OutputData) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 15) {
+            fullOutputsBuilder_.mergeFrom(value);
+          }
+          fullOutputsBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 15;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public Builder clearFullOutputs() {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 15) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 15) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          fullOutputsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public flyteidl.core.Literals.OutputData.Builder getFullOutputsBuilder() {
+        return getFullOutputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      public flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder() {
+        if ((outputResultCase_ == 15) && (fullOutputsBuilder_ != null)) {
+          return fullOutputsBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 15) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this execution.
+       * DEPRECATED. Use GetExecutionData to fetch output data instead.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 15;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
+          getFullOutputsFieldBuilder() {
+        if (fullOutputsBuilder_ == null) {
+          if (!(outputResultCase_ == 15)) {
+            outputResult_ = flyteidl.core.Literals.OutputData.getDefaultInstance();
+          }
+          fullOutputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
+                  (flyteidl.core.Literals.OutputData) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 15;
+        onChanged();;
+        return fullOutputsBuilder_;
+      }
+
       private flyteidl.core.Literals.LiteralMap computedInputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> computedInputsBuilder_;
@@ -12831,9 +13123,9 @@ public final class ExecutionOuterClass {
       private java.util.List<flyteidl.admin.Common.Notification> notifications_ =
         java.util.Collections.emptyList();
       private void ensureNotificationsIsMutable() {
-        if (!((bitField0_ & 0x00000800) != 0)) {
+        if (!((bitField0_ & 0x00001000) != 0)) {
           notifications_ = new java.util.ArrayList<flyteidl.admin.Common.Notification>(notifications_);
-          bitField0_ |= 0x00000800;
+          bitField0_ |= 0x00001000;
          }
       }
 
@@ -13049,7 +13341,7 @@ public final class ExecutionOuterClass {
       public Builder clearNotifications() {
         if (notificationsBuilder_ == null) {
           notifications_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000800);
+          bitField0_ = (bitField0_ & ~0x00001000);
           onChanged();
         } else {
           notificationsBuilder_.clear();
@@ -13168,7 +13460,7 @@ public final class ExecutionOuterClass {
           notificationsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.admin.Common.Notification, flyteidl.admin.Common.Notification.Builder, flyteidl.admin.Common.NotificationOrBuilder>(
                   notifications_,
-                  ((bitField0_ & 0x00000800) != 0),
+                  ((bitField0_ & 0x00001000) != 0),
                   getParentForChildren(),
                   isClean());
           notifications_ = null;
@@ -29306,91 +29598,92 @@ public final class ExecutionOuterClass {
       "teralMapBlob\022/\n\006values\030\001 \001(\0132\031.flyteidl." +
       "core.LiteralMapB\002\030\001H\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004" +
       "data\"1\n\rAbortMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n\t" +
-      "principal\030\002 \001(\t\"\360\005\n\020ExecutionClosure\0225\n\007" +
+      "principal\030\002 \001(\t\"\243\006\n\020ExecutionClosure\0225\n\007" +
       "outputs\030\001 \001(\0132\036.flyteidl.admin.LiteralMa" +
       "pBlobB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.flyteidl.co" +
       "re.ExecutionErrorH\000\022\031\n\013abort_cause\030\n \001(\t" +
       "B\002\030\001H\000\0227\n\016abort_metadata\030\014 \001(\0132\035.flyteid" +
       "l.admin.AbortMetadataH\000\0224\n\013output_data\030\r" +
-      " \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\0226\n" +
-      "\017computed_inputs\030\003 \001(\0132\031.flyteidl.core.L" +
-      "iteralMapB\002\030\001\0225\n\005phase\030\004 \001(\0162&.flyteidl." +
-      "core.WorkflowExecution.Phase\022.\n\nstarted_" +
-      "at\030\005 \001(\0132\032.google.protobuf.Timestamp\022+\n\010" +
-      "duration\030\006 \001(\0132\031.google.protobuf.Duratio" +
-      "n\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf." +
-      "Timestamp\022.\n\nupdated_at\030\010 \001(\0132\032.google.p" +
-      "rotobuf.Timestamp\0223\n\rnotifications\030\t \003(\013" +
-      "2\034.flyteidl.admin.Notification\022.\n\013workfl" +
-      "ow_id\030\013 \001(\0132\031.flyteidl.core.Identifier\022I" +
-      "\n\024state_change_details\030\016 \001(\0132+.flyteidl." +
-      "admin.ExecutionStateChangeDetailsB\017\n\rout" +
-      "put_result\">\n\016SystemMetadata\022\031\n\021executio" +
-      "n_cluster\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\332\003\n\021E" +
-      "xecutionMetadata\022=\n\004mode\030\001 \001(\0162/.flyteid" +
-      "l.admin.ExecutionMetadata.ExecutionMode\022" +
-      "\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014s" +
-      "cheduled_at\030\004 \001(\0132\032.google.protobuf.Time" +
-      "stamp\022E\n\025parent_node_execution\030\005 \001(\0132&.f" +
-      "lyteidl.core.NodeExecutionIdentifier\022G\n\023" +
-      "reference_execution\030\020 \001(\0132*.flyteidl.cor" +
-      "e.WorkflowExecutionIdentifier\0227\n\017system_" +
-      "metadata\030\021 \001(\0132\036.flyteidl.admin.SystemMe" +
-      "tadata\"g\n\rExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tS" +
-      "CHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016" +
-      "CHILD_WORKFLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020Notif" +
-      "icationList\0223\n\rnotifications\030\001 \003(\0132\034.fly" +
-      "teidl.admin.Notification\"\262\006\n\rExecutionSp" +
-      "ec\022.\n\013launch_plan\030\001 \001(\0132\031.flyteidl.core." +
-      "Identifier\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.co" +
-      "re.LiteralMapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.fl" +
-      "yteidl.admin.ExecutionMetadata\0229\n\rnotifi" +
-      "cations\030\005 \001(\0132 .flyteidl.admin.Notificat" +
-      "ionListH\000\022\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006labe" +
-      "ls\030\007 \001(\0132\026.flyteidl.admin.Labels\0220\n\013anno" +
-      "tations\030\010 \001(\0132\033.flyteidl.admin.Annotatio" +
-      "ns\0228\n\020security_context\030\n \001(\0132\036.flyteidl." +
-      "core.SecurityContext\022/\n\tauth_role\030\020 \001(\0132" +
-      "\030.flyteidl.admin.AuthRoleB\002\030\001\022;\n\022quality" +
-      "_of_service\030\021 \001(\0132\037.flyteidl.core.Qualit" +
-      "yOfService\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026r" +
-      "aw_output_data_config\030\023 \001(\0132#.flyteidl.a" +
-      "dmin.RawOutputDataConfig\022=\n\022cluster_assi" +
-      "gnment\030\024 \001(\0132!.flyteidl.admin.ClusterAss" +
-      "ignment\0221\n\rinterruptible\030\025 \001(\0132\032.google." +
-      "protobuf.BoolValue\022\027\n\017overwrite_cache\030\026 " +
-      "\001(\010\022\"\n\004envs\030\027 \001(\0132\024.flyteidl.admin.Envs\022" +
-      "\014\n\004tags\030\030 \003(\tB\030\n\026notification_overridesJ" +
-      "\004\010\004\020\005\"b\n\031ExecutionTerminateRequest\0226\n\002id" +
-      "\030\001 \001(\0132*.flyteidl.core.WorkflowExecution" +
-      "Identifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTe" +
-      "rminateResponse\"Y\n\037WorkflowExecutionGetD" +
-      "ataRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.W" +
-      "orkflowExecutionIdentifier\"\304\002\n WorkflowE" +
-      "xecutionGetDataResponse\022,\n\007outputs\030\001 \001(\013" +
-      "2\027.flyteidl.admin.UrlBlobB\002\030\001\022+\n\006inputs\030" +
-      "\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\0222\n\013fu" +
-      "ll_inputs\030\003 \001(\0132\031.flyteidl.core.LiteralM" +
-      "apB\002\030\001\0223\n\014full_outputs\030\004 \001(\0132\031.flyteidl." +
-      "core.LiteralMapB\002\030\001\022,\n\ninput_data\030\005 \001(\0132" +
-      "\030.flyteidl.core.InputData\022.\n\013output_data" +
-      "\030\006 \001(\0132\031.flyteidl.core.OutputData\"\177\n\026Exe" +
-      "cutionUpdateRequest\0226\n\002id\030\001 \001(\0132*.flytei" +
-      "dl.core.WorkflowExecutionIdentifier\022-\n\005s" +
-      "tate\030\002 \001(\0162\036.flyteidl.admin.ExecutionSta" +
-      "te\"\220\001\n\033ExecutionStateChangeDetails\022-\n\005st" +
-      "ate\030\001 \001(\0162\036.flyteidl.admin.ExecutionStat" +
-      "e\022/\n\013occurred_at\030\002 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027Executi" +
-      "onUpdateResponse\"k\n\"WorkflowExecutionGet" +
-      "MetricsRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.co" +
-      "re.WorkflowExecutionIdentifier\022\r\n\005depth\030" +
-      "\002 \001(\005\"H\n#WorkflowExecutionGetMetricsResp" +
-      "onse\022!\n\004span\030\001 \001(\0132\023.flyteidl.core.Span*" +
-      ">\n\016ExecutionState\022\024\n\020EXECUTION_ACTIVE\020\000\022" +
-      "\026\n\022EXECUTION_ARCHIVED\020\001B=Z;github.com/fl" +
-      "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +
-      "/adminb\006proto3"
+      " \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\0221\n" +
+      "\014full_outputs\030\017 \001(\0132\031.flyteidl.core.Outp" +
+      "utDataH\000\0226\n\017computed_inputs\030\003 \001(\0132\031.flyt" +
+      "eidl.core.LiteralMapB\002\030\001\0225\n\005phase\030\004 \001(\0162" +
+      "&.flyteidl.core.WorkflowExecution.Phase\022" +
+      ".\n\nstarted_at\030\005 \001(\0132\032.google.protobuf.Ti" +
+      "mestamp\022+\n\010duration\030\006 \001(\0132\031.google.proto" +
+      "buf.Duration\022.\n\ncreated_at\030\007 \001(\0132\032.googl" +
+      "e.protobuf.Timestamp\022.\n\nupdated_at\030\010 \001(\013" +
+      "2\032.google.protobuf.Timestamp\0223\n\rnotifica" +
+      "tions\030\t \003(\0132\034.flyteidl.admin.Notificatio" +
+      "n\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl.core.I" +
+      "dentifier\022I\n\024state_change_details\030\016 \001(\0132" +
+      "+.flyteidl.admin.ExecutionStateChangeDet" +
+      "ailsB\017\n\routput_result\">\n\016SystemMetadata\022" +
+      "\031\n\021execution_cluster\030\001 \001(\t\022\021\n\tnamespace\030" +
+      "\002 \001(\t\"\332\003\n\021ExecutionMetadata\022=\n\004mode\030\001 \001(" +
+      "\0162/.flyteidl.admin.ExecutionMetadata.Exe" +
+      "cutionMode\022\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting" +
+      "\030\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132\032.google.pr" +
+      "otobuf.Timestamp\022E\n\025parent_node_executio" +
+      "n\030\005 \001(\0132&.flyteidl.core.NodeExecutionIde" +
+      "ntifier\022G\n\023reference_execution\030\020 \001(\0132*.f" +
+      "lyteidl.core.WorkflowExecutionIdentifier" +
+      "\0227\n\017system_metadata\030\021 \001(\0132\036.flyteidl.adm" +
+      "in.SystemMetadata\"g\n\rExecutionMode\022\n\n\006MA" +
+      "NUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010REL" +
+      "AUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\022\r\n\tRECOVERED" +
+      "\020\005\"G\n\020NotificationList\0223\n\rnotifications\030" +
+      "\001 \003(\0132\034.flyteidl.admin.Notification\"\262\006\n\r" +
+      "ExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.fly" +
+      "teidl.core.Identifier\022-\n\006inputs\030\002 \001(\0132\031." +
+      "flyteidl.core.LiteralMapB\002\030\001\0223\n\010metadata" +
+      "\030\003 \001(\0132!.flyteidl.admin.ExecutionMetadat" +
+      "a\0229\n\rnotifications\030\005 \001(\0132 .flyteidl.admi" +
+      "n.NotificationListH\000\022\025\n\013disable_all\030\006 \001(" +
+      "\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.Lab" +
+      "els\0220\n\013annotations\030\010 \001(\0132\033.flyteidl.admi" +
+      "n.Annotations\0228\n\020security_context\030\n \001(\0132" +
+      "\036.flyteidl.core.SecurityContext\022/\n\tauth_" +
+      "role\030\020 \001(\0132\030.flyteidl.admin.AuthRoleB\002\030\001" +
+      "\022;\n\022quality_of_service\030\021 \001(\0132\037.flyteidl." +
+      "core.QualityOfService\022\027\n\017max_parallelism" +
+      "\030\022 \001(\005\022C\n\026raw_output_data_config\030\023 \001(\0132#" +
+      ".flyteidl.admin.RawOutputDataConfig\022=\n\022c" +
+      "luster_assignment\030\024 \001(\0132!.flyteidl.admin" +
+      ".ClusterAssignment\0221\n\rinterruptible\030\025 \001(" +
+      "\0132\032.google.protobuf.BoolValue\022\027\n\017overwri" +
+      "te_cache\030\026 \001(\010\022\"\n\004envs\030\027 \001(\0132\024.flyteidl." +
+      "admin.Envs\022\014\n\004tags\030\030 \003(\tB\030\n\026notification" +
+      "_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateRe" +
+      "quest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workfl" +
+      "owExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032" +
+      "ExecutionTerminateResponse\"Y\n\037WorkflowEx" +
+      "ecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.flyt" +
+      "eidl.core.WorkflowExecutionIdentifier\"\304\002" +
+      "\n WorkflowExecutionGetDataResponse\022,\n\007ou" +
+      "tputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001" +
+      "\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlo" +
+      "bB\002\030\001\0222\n\013full_inputs\030\003 \001(\0132\031.flyteidl.co" +
+      "re.LiteralMapB\002\030\001\0223\n\014full_outputs\030\004 \001(\0132" +
+      "\031.flyteidl.core.LiteralMapB\002\030\001\022,\n\ninput_" +
+      "data\030\005 \001(\0132\030.flyteidl.core.InputData\022.\n\013" +
+      "output_data\030\006 \001(\0132\031.flyteidl.core.Output" +
+      "Data\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030\001 \001" +
+      "(\0132*.flyteidl.core.WorkflowExecutionIden" +
+      "tifier\022-\n\005state\030\002 \001(\0162\036.flyteidl.admin.E" +
+      "xecutionState\"\220\001\n\033ExecutionStateChangeDe" +
+      "tails\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin.Ex" +
+      "ecutionState\022/\n\013occurred_at\030\002 \001(\0132\032.goog" +
+      "le.protobuf.Timestamp\022\021\n\tprincipal\030\003 \001(\t" +
+      "\"\031\n\027ExecutionUpdateResponse\"k\n\"WorkflowE" +
+      "xecutionGetMetricsRequest\0226\n\002id\030\001 \001(\0132*." +
+      "flyteidl.core.WorkflowExecutionIdentifie" +
+      "r\022\r\n\005depth\030\002 \001(\005\"H\n#WorkflowExecutionGet" +
+      "MetricsResponse\022!\n\004span\030\001 \001(\0132\023.flyteidl" +
+      ".core.Span*>\n\016ExecutionState\022\024\n\020EXECUTIO" +
+      "N_ACTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B=Z;gi" +
+      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
+      "go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -29473,7 +29766,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionClosure_descriptor,
-        new java.lang.String[] { "Outputs", "Error", "AbortCause", "AbortMetadata", "OutputData", "ComputedInputs", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "Notifications", "WorkflowId", "StateChangeDetails", "OutputResult", });
+        new java.lang.String[] { "Outputs", "Error", "AbortCause", "AbortMetadata", "OutputData", "FullOutputs", "ComputedInputs", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "Notifications", "WorkflowId", "StateChangeDetails", "OutputResult", });
     internal_static_flyteidl_admin_SystemMetadata_descriptor =
       getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_admin_SystemMetadata_fieldAccessorTable = new

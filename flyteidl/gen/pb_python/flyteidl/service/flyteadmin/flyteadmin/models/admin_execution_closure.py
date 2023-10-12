@@ -23,6 +23,7 @@ from flyteadmin.models.admin_notification import AdminNotification  # noqa: F401
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.models.core_output_data import CoreOutputData  # noqa: F401,E501
 from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase  # noqa: F401,E501
 
 
@@ -45,6 +46,7 @@ class AdminExecutionClosure(object):
         'abort_cause': 'str',
         'abort_metadata': 'AdminAbortMetadata',
         'output_data': 'CoreLiteralMap',
+        'full_outputs': 'CoreOutputData',
         'computed_inputs': 'CoreLiteralMap',
         'phase': 'CoreWorkflowExecutionPhase',
         'started_at': 'datetime',
@@ -62,6 +64,7 @@ class AdminExecutionClosure(object):
         'abort_cause': 'abort_cause',
         'abort_metadata': 'abort_metadata',
         'output_data': 'output_data',
+        'full_outputs': 'full_outputs',
         'computed_inputs': 'computed_inputs',
         'phase': 'phase',
         'started_at': 'started_at',
@@ -73,7 +76,7 @@ class AdminExecutionClosure(object):
         'state_change_details': 'state_change_details'
     }
 
-    def __init__(self, outputs=None, error=None, abort_cause=None, abort_metadata=None, output_data=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None, state_change_details=None):  # noqa: E501
+    def __init__(self, outputs=None, error=None, abort_cause=None, abort_metadata=None, output_data=None, full_outputs=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None, state_change_details=None):  # noqa: E501
         """AdminExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._outputs = None
@@ -81,6 +84,7 @@ class AdminExecutionClosure(object):
         self._abort_cause = None
         self._abort_metadata = None
         self._output_data = None
+        self._full_outputs = None
         self._computed_inputs = None
         self._phase = None
         self._started_at = None
@@ -102,6 +106,8 @@ class AdminExecutionClosure(object):
             self.abort_metadata = abort_metadata
         if output_data is not None:
             self.output_data = output_data
+        if full_outputs is not None:
+            self.full_outputs = full_outputs
         if computed_inputs is not None:
             self.computed_inputs = computed_inputs
         if phase is not None:
@@ -235,6 +241,29 @@ class AdminExecutionClosure(object):
         """
 
         self._output_data = output_data
+
+    @property
+    def full_outputs(self):
+        """Gets the full_outputs of this AdminExecutionClosure.  # noqa: E501
+
+        Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.  # noqa: E501
+
+        :return: The full_outputs of this AdminExecutionClosure.  # noqa: E501
+        :rtype: CoreOutputData
+        """
+        return self._full_outputs
+
+    @full_outputs.setter
+    def full_outputs(self, full_outputs):
+        """Sets the full_outputs of this AdminExecutionClosure.
+
+        Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.  # noqa: E501
+
+        :param full_outputs: The full_outputs of this AdminExecutionClosure.  # noqa: E501
+        :type: CoreOutputData
+        """
+
+        self._full_outputs = full_outputs
 
     @property
     def computed_inputs(self):

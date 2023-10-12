@@ -977,7 +977,7 @@ pub struct ExecutionClosure {
     pub state_change_details: ::core::option::Option<ExecutionStateChangeDetails>,
     /// A result produced by a terminated execution.
     /// A pending (non-terminal) execution will not have any output result.
-    #[prost(oneof="execution_closure::OutputResult", tags="1, 2, 10, 12, 13")]
+    #[prost(oneof="execution_closure::OutputResult", tags="1, 2, 10, 12, 13, 15")]
     pub output_result: ::core::option::Option<execution_closure::OutputResult>,
 }
 /// Nested message and enum types in `ExecutionClosure`.
@@ -1004,6 +1004,10 @@ pub mod execution_closure {
         /// DEPRECATED. Use GetExecutionData to fetch output data instead.
         #[prost(message, tag="13")]
         OutputData(super::super::core::LiteralMap),
+        /// Raw output data produced by this execution.
+        /// DEPRECATED. Use GetExecutionData to fetch output data instead.
+        #[prost(message, tag="15")]
+        FullOutputs(super::super::core::OutputData),
     }
 }
 /// Represents system, rather than user-facing, metadata about an execution.
@@ -2057,7 +2061,7 @@ pub struct NodeExecutionClosure {
     #[prost(string, tag="12")]
     pub dynamic_job_spec_uri: ::prost::alloc::string::String,
     /// Only a node in a terminal state will have a non-empty output_result.
-    #[prost(oneof="node_execution_closure::OutputResult", tags="1, 2, 10")]
+    #[prost(oneof="node_execution_closure::OutputResult", tags="1, 2, 10, 13")]
     pub output_result: ::core::option::Option<node_execution_closure::OutputResult>,
     /// Store metadata for what the node launched.
     /// for ex: if this is a workflow node, we store information for the launched workflow.
@@ -2081,6 +2085,9 @@ pub mod node_execution_closure {
         /// DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
         #[prost(message, tag="10")]
         OutputData(super::super::core::LiteralMap),
+        /// Raw output data produced by this node execution.
+        #[prost(message, tag="13")]
+        FullOutputs(super::super::core::OutputData),
     }
     /// Store metadata for what the node launched.
     /// for ex: if this is a workflow node, we store information for the launched workflow.
@@ -2741,7 +2748,7 @@ pub struct TaskExecutionClosure {
     /// as previously done, is much more valuable in visualizing and understanding historical evaluations.
     #[prost(message, repeated, tag="18")]
     pub reasons: ::prost::alloc::vec::Vec<Reason>,
-    #[prost(oneof="task_execution_closure::OutputResult", tags="1, 2, 12")]
+    #[prost(oneof="task_execution_closure::OutputResult", tags="1, 2, 12, 19")]
     pub output_result: ::core::option::Option<task_execution_closure::OutputResult>,
 }
 /// Nested message and enum types in `TaskExecutionClosure`.
@@ -2760,6 +2767,9 @@ pub mod task_execution_closure {
         /// DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
         #[prost(message, tag="12")]
         OutputData(super::super::core::LiteralMap),
+        /// Raw output data produced by this task execution.
+        #[prost(message, tag="19")]
+        FullOutputs(super::super::core::OutputData),
     }
 }
 /// Reason is a single message annotated with a timestamp to indicate the instant the reason occurred.

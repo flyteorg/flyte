@@ -694,6 +694,7 @@ class TaskExecutionClosure final :
     kOutputUri = 1,
     kError = 2,
     kOutputData = 12,
+    kFullOutputs = 19,
     OUTPUT_RESULT_NOT_SET = 0,
   };
 
@@ -913,6 +914,15 @@ class TaskExecutionClosure final :
   PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_output_data();
   PROTOBUF_DEPRECATED void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
 
+  // .flyteidl.core.OutputData full_outputs = 19;
+  bool has_full_outputs() const;
+  void clear_full_outputs();
+  static const int kFullOutputsFieldNumber = 19;
+  const ::flyteidl::core::OutputData& full_outputs() const;
+  ::flyteidl::core::OutputData* release_full_outputs();
+  ::flyteidl::core::OutputData* mutable_full_outputs();
+  void set_allocated_full_outputs(::flyteidl::core::OutputData* full_outputs);
+
   void clear_output_result();
   OutputResultCase output_result_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskExecutionClosure)
@@ -921,6 +931,7 @@ class TaskExecutionClosure final :
   void set_has_output_uri();
   void set_has_error();
   void set_has_output_data();
+  void set_has_full_outputs();
 
   inline bool has_output_result() const;
   inline void clear_has_output_result();
@@ -943,6 +954,7 @@ class TaskExecutionClosure final :
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
     ::flyteidl::core::ExecutionError* error_;
     ::flyteidl::core::LiteralMap* output_data_;
+    ::flyteidl::core::OutputData* full_outputs_;
   } output_result_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -2057,6 +2069,41 @@ inline ::flyteidl::core::LiteralMap* TaskExecutionClosure::mutable_output_data()
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionClosure.output_data)
   return output_result_.output_data_;
+}
+
+// .flyteidl.core.OutputData full_outputs = 19;
+inline bool TaskExecutionClosure::has_full_outputs() const {
+  return output_result_case() == kFullOutputs;
+}
+inline void TaskExecutionClosure::set_has_full_outputs() {
+  _oneof_case_[0] = kFullOutputs;
+}
+inline ::flyteidl::core::OutputData* TaskExecutionClosure::release_full_outputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskExecutionClosure.full_outputs)
+  if (has_full_outputs()) {
+    clear_has_output_result();
+      ::flyteidl::core::OutputData* temp = output_result_.full_outputs_;
+    output_result_.full_outputs_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::OutputData& TaskExecutionClosure::full_outputs() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionClosure.full_outputs)
+  return has_full_outputs()
+      ? *output_result_.full_outputs_
+      : *reinterpret_cast< ::flyteidl::core::OutputData*>(&::flyteidl::core::_OutputData_default_instance_);
+}
+inline ::flyteidl::core::OutputData* TaskExecutionClosure::mutable_full_outputs() {
+  if (!has_full_outputs()) {
+    clear_output_result();
+    set_has_full_outputs();
+    output_result_.full_outputs_ = CreateMaybeMessage< ::flyteidl::core::OutputData >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionClosure.full_outputs)
+  return output_result_.full_outputs_;
 }
 
 // .flyteidl.core.TaskExecution.Phase phase = 3;

@@ -50,6 +50,10 @@ func (t TestProtoDataStore) ReadProtobuf(ctx context.Context, reference storage.
 	return t.ReadProtobufCb(ctx, reference, msg)
 }
 
+func (t TestProtoDataStore) ReadProtobufAny(ctx context.Context, reference storage.DataReference, msg ...proto.Message) (int, error) {
+	return 0, t.ReadProtobufCb(ctx, reference, msg[0])
+}
+
 func (t TestProtoDataStore) WriteProtobuf(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
 	return t.WriteProtobufCb(ctx, reference, opts, msg)
 }

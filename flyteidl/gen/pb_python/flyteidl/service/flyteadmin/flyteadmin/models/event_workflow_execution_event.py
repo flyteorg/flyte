@@ -44,7 +44,8 @@ class EventWorkflowExecutionEvent(object):
         'output_uri': 'str',
         'error': 'CoreExecutionError',
         'deprecated_output_data': 'CoreLiteralMap',
-        'output_data': 'CoreOutputData'
+        'output_data': 'CoreOutputData',
+        'event_version': 'int'
     }
 
     attribute_map = {
@@ -55,10 +56,11 @@ class EventWorkflowExecutionEvent(object):
         'output_uri': 'output_uri',
         'error': 'error',
         'deprecated_output_data': 'deprecated_output_data',
-        'output_data': 'output_data'
+        'output_data': 'output_data',
+        'event_version': 'event_version'
     }
 
-    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None, deprecated_output_data=None, output_data=None):  # noqa: E501
+    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None, deprecated_output_data=None, output_data=None, event_version=None):  # noqa: E501
         """EventWorkflowExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._execution_id = None
@@ -69,6 +71,7 @@ class EventWorkflowExecutionEvent(object):
         self._error = None
         self._deprecated_output_data = None
         self._output_data = None
+        self._event_version = None
         self.discriminator = None
 
         if execution_id is not None:
@@ -87,6 +90,8 @@ class EventWorkflowExecutionEvent(object):
             self.deprecated_output_data = deprecated_output_data
         if output_data is not None:
             self.output_data = output_data
+        if event_version is not None:
+            self.event_version = event_version
 
     @property
     def execution_id(self):
@@ -261,6 +266,27 @@ class EventWorkflowExecutionEvent(object):
         """
 
         self._output_data = output_data
+
+    @property
+    def event_version(self):
+        """Gets the event_version of this EventWorkflowExecutionEvent.  # noqa: E501
+
+
+        :return: The event_version of this EventWorkflowExecutionEvent.  # noqa: E501
+        :rtype: int
+        """
+        return self._event_version
+
+    @event_version.setter
+    def event_version(self, event_version):
+        """Sets the event_version of this EventWorkflowExecutionEvent.
+
+
+        :param event_version: The event_version of this EventWorkflowExecutionEvent.  # noqa: E501
+        :type: int
+        """
+
+        self._event_version = event_version
 
     def to_dict(self):
         """Returns the model properties as a dict"""

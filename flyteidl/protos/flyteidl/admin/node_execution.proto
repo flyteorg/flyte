@@ -144,6 +144,9 @@ message NodeExecutionClosure {
         // Raw output data produced by this node execution.
         // DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
         core.LiteralMap output_data        = 10 [deprecated = true];
+
+        // Raw output data produced by this node execution.
+        core.OutputData full_outputs       = 13;
     }
 
     // The last recorded phase for this node execution.

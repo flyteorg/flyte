@@ -25,4 +25,5 @@ type EventWorkflowExecutionEvent struct {
 	DeprecatedOutputData *CoreLiteralMap `json:"deprecated_output_data,omitempty"`
 	// Raw output data produced by this workflow execution.
 	OutputData *CoreOutputData `json:"output_data,omitempty"`
+	EventVersion int32 `json:"event_version,omitempty"`
 }

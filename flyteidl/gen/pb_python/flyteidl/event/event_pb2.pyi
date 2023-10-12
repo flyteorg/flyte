@@ -14,7 +14,7 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class WorkflowExecutionEvent(_message.Message):
-    __slots__ = ["execution_id", "producer_id", "phase", "occurred_at", "output_uri", "error", "deprecated_output_data", "output_data"]
+    __slots__ = ["execution_id", "producer_id", "phase", "occurred_at", "output_uri", "error", "deprecated_output_data", "output_data", "event_version"]
     EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
     PRODUCER_ID_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
@@ -23,6 +23,7 @@ class WorkflowExecutionEvent(_message.Message):
     ERROR_FIELD_NUMBER: _ClassVar[int]
     DEPRECATED_OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    EVENT_VERSION_FIELD_NUMBER: _ClassVar[int]
     execution_id: _identifier_pb2.WorkflowExecutionIdentifier
     producer_id: str
     phase: _execution_pb2.WorkflowExecution.Phase
@@ -31,7 +32,8 @@ class WorkflowExecutionEvent(_message.Message):
     error: _execution_pb2.ExecutionError
     deprecated_output_data: _literals_pb2.LiteralMap
     output_data: _literals_pb2.OutputData
-    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., deprecated_output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ...) -> None: ...
+    event_version: int
+    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., producer_id: _Optional[str] = ..., phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., occurred_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., deprecated_output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., event_version: _Optional[int] = ...) -> None: ...
 
 class NodeExecutionEvent(_message.Message):
     __slots__ = ["id", "producer_id", "phase", "occurred_at", "input_uri", "deprecated_input_data", "input_data", "output_uri", "error", "deprecated_output_data", "output_data", "workflow_node_metadata", "task_node_metadata", "parent_task_metadata", "parent_node_metadata", "retry_group", "spec_node_id", "node_name", "event_version", "is_parent", "is_dynamic", "deck_uri", "reported_at", "is_array"]

@@ -20,6 +20,8 @@ type AdminNodeExecutionClosure struct {
 	Error_ *CoreExecutionError `json:"error,omitempty"`
 	// Raw output data produced by this node execution. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
+	// Raw output data produced by this node execution.
+	FullOutputs *CoreOutputData `json:"full_outputs,omitempty"`
 	// The last recorded phase for this node execution.
 	Phase *CoreNodeExecutionPhase `json:"phase,omitempty"`
 	// Time at which the node execution began running.

@@ -86,6 +86,9 @@ message TaskExecutionClosure {
         // Raw output data produced by this task execution.
         // DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
         core.LiteralMap output_data        = 12 [deprecated = true];
+
+        // Raw output data produced by this task execution.
+        core.OutputData full_outputs = 19;
     }
 
     // The last recorded phase for this task execution.

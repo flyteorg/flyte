@@ -222,15 +222,38 @@ func UpdateExecutionModelState(
 				},
 			},
 		}
-	} else if request.Event.GetOutputData() != nil {
+	} else if outputData := request.Event.GetOutputData(); outputData != nil {
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
-			executionClosure.OutputResult = &admin.ExecutionClosure_OutputData{
-				OutputData: request.Event.GetOutputData(),
+			executionClosure.OutputResult = &admin.ExecutionClosure_FullOutputs{
+				FullOutputs: outputData,
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+			uri, err := common.OffloadData(ctx, storageClient, outputData,
+				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
+			if err != nil {
+				return err
+			}
+			executionClosure.OutputResult = &admin.ExecutionClosure_Outputs{
+				Outputs: &admin.LiteralMapBlob{
+					Data: &admin.LiteralMapBlob_Uri{
+						Uri: uri.String(),
+					},
+				},
+			}
+		}
+	} else if request.Event.GetDeprecatedOutputData() != nil {
+		switch inlineEventDataPolicy {
+		case interfaces.InlineEventDataPolicyStoreInline:
+			executionClosure.OutputResult = &admin.ExecutionClosure_FullOutputs{
+				FullOutputs: &core.OutputData{
+					Outputs: request.Event.GetDeprecatedOutputData(),
+				},
+			}
+		default:
+			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
+			uri, err := common.OffloadData(ctx, storageClient, &core.OutputData{Outputs: request.Event.GetDeprecatedOutputData()},
 				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
 			if err != nil {
 				return err

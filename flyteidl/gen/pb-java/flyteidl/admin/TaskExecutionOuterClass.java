@@ -4377,6 +4377,31 @@ public final class TaskExecutionOuterClass {
 
     /**
      * <pre>
+     * Raw output data produced by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+     */
+    boolean hasFullOutputs();
+    /**
+     * <pre>
+     * Raw output data produced by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+     */
+    flyteidl.core.Literals.OutputData getFullOutputs();
+    /**
+     * <pre>
+     * Raw output data produced by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+     */
+    flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder();
+
+    /**
+     * <pre>
      * The last recorded phase for this task execution.
      * </pre>
      *
@@ -4760,9 +4785,9 @@ public final class TaskExecutionOuterClass {
               break;
             }
             case 34: {
-              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
+              if (!((mutable_bitField0_ & 0x00000020) != 0)) {
                 logs_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>();
-                mutable_bitField0_ |= 0x00000010;
+                mutable_bitField0_ |= 0x00000020;
               }
               logs_.add(
                   input.readMessage(flyteidl.core.Execution.TaskLog.parser(), extensionRegistry));
@@ -4878,12 +4903,26 @@ public final class TaskExecutionOuterClass {
               break;
             }
             case 146: {
-              if (!((mutable_bitField0_ & 0x00004000) != 0)) {
+              if (!((mutable_bitField0_ & 0x00008000) != 0)) {
                 reasons_ = new java.util.ArrayList<flyteidl.admin.TaskExecutionOuterClass.Reason>();
-                mutable_bitField0_ |= 0x00004000;
+                mutable_bitField0_ |= 0x00008000;
               }
               reasons_.add(
                   input.readMessage(flyteidl.admin.TaskExecutionOuterClass.Reason.parser(), extensionRegistry));
+              break;
+            }
+            case 154: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
+              if (outputResultCase_ == 19) {
+                subBuilder = ((flyteidl.core.Literals.OutputData) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.OutputData) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 19;
               break;
             }
             default: {
@@ -4901,10 +4940,10 @@ public final class TaskExecutionOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000010) != 0)) {
+        if (((mutable_bitField0_ & 0x00000020) != 0)) {
           logs_ = java.util.Collections.unmodifiableList(logs_);
         }
-        if (((mutable_bitField0_ & 0x00004000) != 0)) {
+        if (((mutable_bitField0_ & 0x00008000) != 0)) {
           reasons_ = java.util.Collections.unmodifiableList(reasons_);
         }
         this.unknownFields = unknownFields.build();
@@ -4932,6 +4971,7 @@ public final class TaskExecutionOuterClass {
       @java.lang.Deprecated OUTPUT_URI(1),
       ERROR(2),
       @java.lang.Deprecated OUTPUT_DATA(12),
+      FULL_OUTPUTS(19),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -4950,6 +4990,7 @@ public final class TaskExecutionOuterClass {
           case 1: return OUTPUT_URI;
           case 2: return ERROR;
           case 12: return OUTPUT_DATA;
+          case 19: return FULL_OUTPUTS;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -5095,6 +5136,44 @@ public final class TaskExecutionOuterClass {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int FULL_OUTPUTS_FIELD_NUMBER = 19;
+    /**
+     * <pre>
+     * Raw output data produced by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+     */
+    public boolean hasFullOutputs() {
+      return outputResultCase_ == 19;
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+     */
+    public flyteidl.core.Literals.OutputData getFullOutputs() {
+      if (outputResultCase_ == 19) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+     */
+    public flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder() {
+      if (outputResultCase_ == 19) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
     }
 
     public static final int PHASE_FIELD_NUMBER = 3;
@@ -5594,6 +5673,9 @@ public final class TaskExecutionOuterClass {
       for (int i = 0; i < reasons_.size(); i++) {
         output.writeMessage(18, reasons_.get(i));
       }
+      if (outputResultCase_ == 19) {
+        output.writeMessage(19, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5659,6 +5741,10 @@ public final class TaskExecutionOuterClass {
       for (int i = 0; i < reasons_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(18, reasons_.get(i));
+      }
+      if (outputResultCase_ == 19) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, (flyteidl.core.Literals.OutputData) outputResult_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5730,6 +5816,10 @@ public final class TaskExecutionOuterClass {
           if (!getOutputData()
               .equals(other.getOutputData())) return false;
           break;
+        case 19:
+          if (!getFullOutputs()
+              .equals(other.getFullOutputs())) return false;
+          break;
         case 0:
         default:
       }
@@ -5796,6 +5886,10 @@ public final class TaskExecutionOuterClass {
         case 12:
           hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getOutputData().hashCode();
+          break;
+        case 19:
+          hash = (37 * hash) + FULL_OUTPUTS_FIELD_NUMBER;
+          hash = (53 * hash) + getFullOutputs().hashCode();
           break;
         case 0:
         default:
@@ -5943,7 +6037,7 @@ public final class TaskExecutionOuterClass {
 
         if (logsBuilder_ == null) {
           logs_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
         } else {
           logsBuilder_.clear();
         }
@@ -5991,7 +6085,7 @@ public final class TaskExecutionOuterClass {
 
         if (reasonsBuilder_ == null) {
           reasons_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00004000);
+          bitField0_ = (bitField0_ & ~0x00008000);
         } else {
           reasonsBuilder_.clear();
         }
@@ -6042,11 +6136,18 @@ public final class TaskExecutionOuterClass {
             result.outputResult_ = outputDataBuilder_.build();
           }
         }
+        if (outputResultCase_ == 19) {
+          if (fullOutputsBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = fullOutputsBuilder_.build();
+          }
+        }
         result.phase_ = phase_;
         if (logsBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) != 0)) {
+          if (((bitField0_ & 0x00000020) != 0)) {
             logs_ = java.util.Collections.unmodifiableList(logs_);
-            bitField0_ = (bitField0_ & ~0x00000010);
+            bitField0_ = (bitField0_ & ~0x00000020);
           }
           result.logs_ = logs_;
         } else {
@@ -6086,9 +6187,9 @@ public final class TaskExecutionOuterClass {
         }
         result.eventVersion_ = eventVersion_;
         if (reasonsBuilder_ == null) {
-          if (((bitField0_ & 0x00004000) != 0)) {
+          if (((bitField0_ & 0x00008000) != 0)) {
             reasons_ = java.util.Collections.unmodifiableList(reasons_);
-            bitField0_ = (bitField0_ & ~0x00004000);
+            bitField0_ = (bitField0_ & ~0x00008000);
           }
           result.reasons_ = reasons_;
         } else {
@@ -6151,7 +6252,7 @@ public final class TaskExecutionOuterClass {
           if (!other.logs_.isEmpty()) {
             if (logs_.isEmpty()) {
               logs_ = other.logs_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
             } else {
               ensureLogsIsMutable();
               logs_.addAll(other.logs_);
@@ -6164,7 +6265,7 @@ public final class TaskExecutionOuterClass {
               logsBuilder_.dispose();
               logsBuilder_ = null;
               logs_ = other.logs_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000020);
               logsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getLogsFieldBuilder() : null;
@@ -6206,7 +6307,7 @@ public final class TaskExecutionOuterClass {
           if (!other.reasons_.isEmpty()) {
             if (reasons_.isEmpty()) {
               reasons_ = other.reasons_;
-              bitField0_ = (bitField0_ & ~0x00004000);
+              bitField0_ = (bitField0_ & ~0x00008000);
             } else {
               ensureReasonsIsMutable();
               reasons_.addAll(other.reasons_);
@@ -6219,7 +6320,7 @@ public final class TaskExecutionOuterClass {
               reasonsBuilder_.dispose();
               reasonsBuilder_ = null;
               reasons_ = other.reasons_;
-              bitField0_ = (bitField0_ & ~0x00004000);
+              bitField0_ = (bitField0_ & ~0x00008000);
               reasonsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getReasonsFieldBuilder() : null;
@@ -6241,6 +6342,10 @@ public final class TaskExecutionOuterClass {
           }
           case OUTPUT_DATA: {
             mergeOutputData(other.getOutputData());
+            break;
+          }
+          case FULL_OUTPUTS: {
+            mergeFullOutputs(other.getFullOutputs());
             break;
           }
           case OUTPUTRESULT_NOT_SET: {
@@ -6750,6 +6855,178 @@ public final class TaskExecutionOuterClass {
         return outputDataBuilder_;
       }
 
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> fullOutputsBuilder_;
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public boolean hasFullOutputs() {
+        return outputResultCase_ == 19;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public flyteidl.core.Literals.OutputData getFullOutputs() {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 19) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 19) {
+            return fullOutputsBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public Builder setFullOutputs(flyteidl.core.Literals.OutputData value) {
+        if (fullOutputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          fullOutputsBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 19;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public Builder setFullOutputs(
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
+        if (fullOutputsBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          fullOutputsBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 19;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public Builder mergeFullOutputs(flyteidl.core.Literals.OutputData value) {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 19 &&
+              outputResult_ != flyteidl.core.Literals.OutputData.getDefaultInstance()) {
+            outputResult_ = flyteidl.core.Literals.OutputData.newBuilder((flyteidl.core.Literals.OutputData) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 19) {
+            fullOutputsBuilder_.mergeFrom(value);
+          }
+          fullOutputsBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 19;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public Builder clearFullOutputs() {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 19) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 19) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          fullOutputsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public flyteidl.core.Literals.OutputData.Builder getFullOutputsBuilder() {
+        return getFullOutputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      public flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder() {
+        if ((outputResultCase_ == 19) && (fullOutputsBuilder_ != null)) {
+          return fullOutputsBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 19) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 19;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
+          getFullOutputsFieldBuilder() {
+        if (fullOutputsBuilder_ == null) {
+          if (!(outputResultCase_ == 19)) {
+            outputResult_ = flyteidl.core.Literals.OutputData.getDefaultInstance();
+          }
+          fullOutputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
+                  (flyteidl.core.Literals.OutputData) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 19;
+        onChanged();;
+        return fullOutputsBuilder_;
+      }
+
       private int phase_ = 0;
       /**
        * <pre>
@@ -6818,9 +7095,9 @@ public final class TaskExecutionOuterClass {
       private java.util.List<flyteidl.core.Execution.TaskLog> logs_ =
         java.util.Collections.emptyList();
       private void ensureLogsIsMutable() {
-        if (!((bitField0_ & 0x00000010) != 0)) {
+        if (!((bitField0_ & 0x00000020) != 0)) {
           logs_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>(logs_);
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000020;
          }
       }
 
@@ -7014,7 +7291,7 @@ public final class TaskExecutionOuterClass {
       public Builder clearLogs() {
         if (logsBuilder_ == null) {
           logs_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000020);
           onChanged();
         } else {
           logsBuilder_.clear();
@@ -7119,7 +7396,7 @@ public final class TaskExecutionOuterClass {
           logsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder>(
                   logs_,
-                  ((bitField0_ & 0x00000010) != 0),
+                  ((bitField0_ & 0x00000020) != 0),
                   getParentForChildren(),
                   isClean());
           logs_ = null;
@@ -8273,9 +8550,9 @@ public final class TaskExecutionOuterClass {
       private java.util.List<flyteidl.admin.TaskExecutionOuterClass.Reason> reasons_ =
         java.util.Collections.emptyList();
       private void ensureReasonsIsMutable() {
-        if (!((bitField0_ & 0x00004000) != 0)) {
+        if (!((bitField0_ & 0x00008000) != 0)) {
           reasons_ = new java.util.ArrayList<flyteidl.admin.TaskExecutionOuterClass.Reason>(reasons_);
-          bitField0_ |= 0x00004000;
+          bitField0_ |= 0x00008000;
          }
       }
 
@@ -8480,7 +8757,7 @@ public final class TaskExecutionOuterClass {
       public Builder clearReasons() {
         if (reasonsBuilder_ == null) {
           reasons_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00004000);
+          bitField0_ = (bitField0_ & ~0x00008000);
           onChanged();
         } else {
           reasonsBuilder_.clear();
@@ -8592,7 +8869,7 @@ public final class TaskExecutionOuterClass {
           reasonsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.admin.TaskExecutionOuterClass.Reason, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder, flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder>(
                   reasons_,
-                  ((bitField0_ & 0x00004000) != 0),
+                  ((bitField0_ & 0x00008000) != 0),
                   getParentForChildren(),
                   isClean());
           reasons_ = null;
@@ -12532,38 +12809,39 @@ public final class TaskExecutionOuterClass {
       "in.TaskExecutionClosure\022\021\n\tis_parent\030\004 \001" +
       "(\010\"Z\n\021TaskExecutionList\0226\n\017task_executio" +
       "ns\030\001 \003(\0132\035.flyteidl.admin.TaskExecution\022" +
-      "\r\n\005token\030\002 \001(\t\"\207\005\n\024TaskExecutionClosure\022" +
+      "\r\n\005token\030\002 \001(\t\"\272\005\n\024TaskExecutionClosure\022" +
       "\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\013" +
       "2\035.flyteidl.core.ExecutionErrorH\000\0224\n\013out" +
       "put_data\030\014 \001(\0132\031.flyteidl.core.LiteralMa" +
-      "pB\002\030\001H\000\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.T" +
-      "askExecution.Phase\022$\n\004logs\030\004 \003(\0132\026.flyte" +
-      "idl.core.TaskLog\022.\n\nstarted_at\030\005 \001(\0132\032.g" +
-      "oogle.protobuf.Timestamp\022+\n\010duration\030\006 \001" +
-      "(\0132\031.google.protobuf.Duration\022.\n\ncreated" +
-      "_at\030\007 \001(\0132\032.google.protobuf.Timestamp\022.\n" +
-      "\nupdated_at\030\010 \001(\0132\032.google.protobuf.Time" +
-      "stamp\022,\n\013custom_info\030\t \001(\0132\027.google.prot" +
-      "obuf.Struct\022\016\n\006reason\030\n \001(\t\022\021\n\ttask_type" +
-      "\030\013 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl.even" +
-      "t.TaskExecutionMetadata\022\025\n\revent_version" +
-      "\030\021 \001(\005\022\'\n\007reasons\030\022 \003(\0132\026.flyteidl.admin" +
-      ".ReasonB\017\n\routput_result\"J\n\006Reason\022/\n\013oc" +
-      "curred_at\030\001 \001(\0132\032.google.protobuf.Timest" +
-      "amp\022\017\n\007message\030\002 \001(\t\"Q\n\033TaskExecutionGet" +
-      "DataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.core." +
-      "TaskExecutionIdentifier\"\357\002\n\034TaskExecutio" +
-      "nGetDataResponse\022+\n\006inputs\030\001 \001(\0132\027.flyte" +
-      "idl.admin.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027" +
-      ".flyteidl.admin.UrlBlobB\002\030\001\0222\n\013full_inpu" +
-      "ts\030\003 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001\022" +
-      "3\n\014full_outputs\030\004 \001(\0132\031.flyteidl.core.Li" +
-      "teralMapB\002\030\001\022,\n\ninput_data\030\006 \001(\0132\030.flyte" +
-      "idl.core.InputData\022.\n\013output_data\030\007 \001(\0132" +
-      "\031.flyteidl.core.OutputData\022-\n\nflyte_urls" +
-      "\030\005 \001(\0132\031.flyteidl.admin.FlyteURLsB=Z;git" +
-      "hub.com/flyteorg/flyte/flyteidl/gen/pb-g" +
-      "o/flyteidl/adminb\006proto3"
+      "pB\002\030\001H\000\0221\n\014full_outputs\030\023 \001(\0132\031.flyteidl" +
+      ".core.OutputDataH\000\0221\n\005phase\030\003 \001(\0162\".flyt" +
+      "eidl.core.TaskExecution.Phase\022$\n\004logs\030\004 " +
+      "\003(\0132\026.flyteidl.core.TaskLog\022.\n\nstarted_a" +
+      "t\030\005 \001(\0132\032.google.protobuf.Timestamp\022+\n\010d" +
+      "uration\030\006 \001(\0132\031.google.protobuf.Duration" +
+      "\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf.T" +
+      "imestamp\022.\n\nupdated_at\030\010 \001(\0132\032.google.pr" +
+      "otobuf.Timestamp\022,\n\013custom_info\030\t \001(\0132\027." +
+      "google.protobuf.Struct\022\016\n\006reason\030\n \001(\t\022\021" +
+      "\n\ttask_type\030\013 \001(\t\0227\n\010metadata\030\020 \001(\0132%.fl" +
+      "yteidl.event.TaskExecutionMetadata\022\025\n\rev" +
+      "ent_version\030\021 \001(\005\022\'\n\007reasons\030\022 \003(\0132\026.fly" +
+      "teidl.admin.ReasonB\017\n\routput_result\"J\n\006R" +
+      "eason\022/\n\013occurred_at\030\001 \001(\0132\032.google.prot" +
+      "obuf.Timestamp\022\017\n\007message\030\002 \001(\t\"Q\n\033TaskE" +
+      "xecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.fly" +
+      "teidl.core.TaskExecutionIdentifier\"\357\002\n\034T" +
+      "askExecutionGetDataResponse\022+\n\006inputs\030\001 " +
+      "\001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007outp" +
+      "uts\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\0222" +
+      "\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Lite" +
+      "ralMapB\002\030\001\0223\n\014full_outputs\030\004 \001(\0132\031.flyte" +
+      "idl.core.LiteralMapB\002\030\001\022,\n\ninput_data\030\006 " +
+      "\001(\0132\030.flyteidl.core.InputData\022.\n\013output_" +
+      "data\030\007 \001(\0132\031.flyteidl.core.OutputData\022-\n" +
+      "\nflyte_urls\030\005 \001(\0132\031.flyteidl.admin.Flyte" +
+      "URLsB=Z;github.com/flyteorg/flyte/flytei" +
+      "dl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12614,7 +12892,7 @@ public final class TaskExecutionOuterClass {
     internal_static_flyteidl_admin_TaskExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskExecutionClosure_descriptor,
-        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "Reason", "TaskType", "Metadata", "EventVersion", "Reasons", "OutputResult", });
+        new java.lang.String[] { "OutputUri", "Error", "OutputData", "FullOutputs", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "Reason", "TaskType", "Metadata", "EventVersion", "Reasons", "OutputResult", });
     internal_static_flyteidl_admin_Reason_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_Reason_fieldAccessorTable = new

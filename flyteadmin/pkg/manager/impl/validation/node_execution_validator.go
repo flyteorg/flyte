@@ -50,6 +50,14 @@ func ValidateNodeExecutionEventRequest(request *admin.NodeExecutionEventRequest,
 			return err
 		}
 	}
+
+	outputData := request.Event.GetOutputData()
+	if outputData == nil {
+		outputData = &core.OutputData{
+			Outputs: request.Event.GetDeprecatedOutputData(),
+		}
+	}
+
 	if err := ValidateOutputData(request.Event.GetOutputData(), maxOutputSizeInBytes); err != nil {
 		return err
 	}

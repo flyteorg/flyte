@@ -1046,6 +1046,7 @@ class NodeExecutionClosure final :
     kOutputUri = 1,
     kError = 2,
     kOutputData = 10,
+    kFullOutputs = 13,
     OUTPUT_RESULT_NOT_SET = 0,
   };
 
@@ -1223,6 +1224,15 @@ class NodeExecutionClosure final :
   PROTOBUF_DEPRECATED ::flyteidl::core::LiteralMap* mutable_output_data();
   PROTOBUF_DEPRECATED void set_allocated_output_data(::flyteidl::core::LiteralMap* output_data);
 
+  // .flyteidl.core.OutputData full_outputs = 13;
+  bool has_full_outputs() const;
+  void clear_full_outputs();
+  static const int kFullOutputsFieldNumber = 13;
+  const ::flyteidl::core::OutputData& full_outputs() const;
+  ::flyteidl::core::OutputData* release_full_outputs();
+  ::flyteidl::core::OutputData* mutable_full_outputs();
+  void set_allocated_full_outputs(::flyteidl::core::OutputData* full_outputs);
+
   // .flyteidl.admin.WorkflowNodeMetadata workflow_node_metadata = 8;
   bool has_workflow_node_metadata() const;
   void clear_workflow_node_metadata();
@@ -1251,6 +1261,7 @@ class NodeExecutionClosure final :
   void set_has_output_uri();
   void set_has_error();
   void set_has_output_data();
+  void set_has_full_outputs();
   void set_has_workflow_node_metadata();
   void set_has_task_node_metadata();
 
@@ -1273,6 +1284,7 @@ class NodeExecutionClosure final :
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
     ::flyteidl::core::ExecutionError* error_;
     ::flyteidl::core::LiteralMap* output_data_;
+    ::flyteidl::core::OutputData* full_outputs_;
   } output_result_;
   union TargetMetadataUnion {
     TargetMetadataUnion() {}
@@ -3120,6 +3132,41 @@ inline ::flyteidl::core::LiteralMap* NodeExecutionClosure::mutable_output_data()
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionClosure.output_data)
   return output_result_.output_data_;
+}
+
+// .flyteidl.core.OutputData full_outputs = 13;
+inline bool NodeExecutionClosure::has_full_outputs() const {
+  return output_result_case() == kFullOutputs;
+}
+inline void NodeExecutionClosure::set_has_full_outputs() {
+  _oneof_case_[0] = kFullOutputs;
+}
+inline ::flyteidl::core::OutputData* NodeExecutionClosure::release_full_outputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionClosure.full_outputs)
+  if (has_full_outputs()) {
+    clear_has_output_result();
+      ::flyteidl::core::OutputData* temp = output_result_.full_outputs_;
+    output_result_.full_outputs_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::OutputData& NodeExecutionClosure::full_outputs() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionClosure.full_outputs)
+  return has_full_outputs()
+      ? *output_result_.full_outputs_
+      : *reinterpret_cast< ::flyteidl::core::OutputData*>(&::flyteidl::core::_OutputData_default_instance_);
+}
+inline ::flyteidl::core::OutputData* NodeExecutionClosure::mutable_full_outputs() {
+  if (!has_full_outputs()) {
+    clear_output_result();
+    set_has_full_outputs();
+    output_result_.full_outputs_ = CreateMaybeMessage< ::flyteidl::core::OutputData >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionClosure.full_outputs)
+  return output_result_.full_outputs_;
 }
 
 // .flyteidl.core.NodeExecution.Phase phase = 3;

@@ -16356,6 +16356,7 @@
                  * @property {flyteidl.core.IExecutionError|null} [error] WorkflowExecutionEvent error
                  * @property {flyteidl.core.ILiteralMap|null} [deprecatedOutputData] WorkflowExecutionEvent deprecatedOutputData
                  * @property {flyteidl.core.IOutputData|null} [outputData] WorkflowExecutionEvent outputData
+                 * @property {number|null} [eventVersion] WorkflowExecutionEvent eventVersion
                  */
     
                 /**
@@ -16437,6 +16438,14 @@
                  */
                 WorkflowExecutionEvent.prototype.outputData = null;
     
+                /**
+                 * WorkflowExecutionEvent eventVersion.
+                 * @member {number} eventVersion
+                 * @memberof flyteidl.event.WorkflowExecutionEvent
+                 * @instance
+                 */
+                WorkflowExecutionEvent.prototype.eventVersion = 0;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -16491,6 +16500,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.deprecatedOutputData, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.outputData != null && message.hasOwnProperty("outputData"))
                         $root.flyteidl.core.OutputData.encode(message.outputData, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                        writer.uint32(/* id 9, wireType 0 =*/72).int32(message.eventVersion);
                     return writer;
                 };
     
@@ -16535,6 +16546,9 @@
                             break;
                         case 8:
                             message.outputData = $root.flyteidl.core.OutputData.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.eventVersion = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -16620,6 +16634,9 @@
                                 return "outputData." + error;
                         }
                     }
+                    if (message.eventVersion != null && message.hasOwnProperty("eventVersion"))
+                        if (!$util.isInteger(message.eventVersion))
+                            return "eventVersion: integer expected";
                     return null;
                 };
     
@@ -27104,6 +27121,7 @@
                  * @property {string|null} [abortCause] ExecutionClosure abortCause
                  * @property {flyteidl.admin.IAbortMetadata|null} [abortMetadata] ExecutionClosure abortMetadata
                  * @property {flyteidl.core.ILiteralMap|null} [outputData] ExecutionClosure outputData
+                 * @property {flyteidl.core.IOutputData|null} [fullOutputs] ExecutionClosure fullOutputs
                  * @property {flyteidl.core.ILiteralMap|null} [computedInputs] ExecutionClosure computedInputs
                  * @property {flyteidl.core.WorkflowExecution.Phase|null} [phase] ExecutionClosure phase
                  * @property {google.protobuf.ITimestamp|null} [startedAt] ExecutionClosure startedAt
@@ -27170,6 +27188,14 @@
                  * @instance
                  */
                 ExecutionClosure.prototype.outputData = null;
+    
+                /**
+                 * ExecutionClosure fullOutputs.
+                 * @member {flyteidl.core.IOutputData|null|undefined} fullOutputs
+                 * @memberof flyteidl.admin.ExecutionClosure
+                 * @instance
+                 */
+                ExecutionClosure.prototype.fullOutputs = null;
     
                 /**
                  * ExecutionClosure computedInputs.
@@ -27248,12 +27274,12 @@
     
                 /**
                  * ExecutionClosure outputResult.
-                 * @member {"outputs"|"error"|"abortCause"|"abortMetadata"|"outputData"|undefined} outputResult
+                 * @member {"outputs"|"error"|"abortCause"|"abortMetadata"|"outputData"|"fullOutputs"|undefined} outputResult
                  * @memberof flyteidl.admin.ExecutionClosure
                  * @instance
                  */
                 Object.defineProperty(ExecutionClosure.prototype, "outputResult", {
-                    get: $util.oneOfGetter($oneOfFields = ["outputs", "error", "abortCause", "abortMetadata", "outputData"]),
+                    get: $util.oneOfGetter($oneOfFields = ["outputs", "error", "abortCause", "abortMetadata", "outputData", "fullOutputs"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -27310,6 +27336,8 @@
                         $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 13, wireType 2 =*/106).fork()).ldelim();
                     if (message.stateChangeDetails != null && message.hasOwnProperty("stateChangeDetails"))
                         $root.flyteidl.admin.ExecutionStateChangeDetails.encode(message.stateChangeDetails, writer.uint32(/* id 14, wireType 2 =*/114).fork()).ldelim();
+                    if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
+                        $root.flyteidl.core.OutputData.encode(message.fullOutputs, writer.uint32(/* id 15, wireType 2 =*/122).fork()).ldelim();
                     return writer;
                 };
     
@@ -27345,6 +27373,9 @@
                             break;
                         case 13:
                             message.outputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 15:
+                            message.fullOutputs = $root.flyteidl.core.OutputData.decode(reader, reader.uint32());
                             break;
                         case 3:
                             message.computedInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
@@ -27438,6 +27469,16 @@
                             var error = $root.flyteidl.core.LiteralMap.verify(message.outputData);
                             if (error)
                                 return "outputData." + error;
+                        }
+                    }
+                    if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs")) {
+                        if (properties.outputResult === 1)
+                            return "outputResult: multiple values";
+                        properties.outputResult = 1;
+                        {
+                            var error = $root.flyteidl.core.OutputData.verify(message.fullOutputs);
+                            if (error)
+                                return "fullOutputs." + error;
                         }
                     }
                     if (message.computedInputs != null && message.hasOwnProperty("computedInputs")) {
@@ -34915,6 +34956,7 @@
                  * @property {string|null} [outputUri] NodeExecutionClosure outputUri
                  * @property {flyteidl.core.IExecutionError|null} [error] NodeExecutionClosure error
                  * @property {flyteidl.core.ILiteralMap|null} [outputData] NodeExecutionClosure outputData
+                 * @property {flyteidl.core.IOutputData|null} [fullOutputs] NodeExecutionClosure fullOutputs
                  * @property {flyteidl.core.NodeExecution.Phase|null} [phase] NodeExecutionClosure phase
                  * @property {google.protobuf.ITimestamp|null} [startedAt] NodeExecutionClosure startedAt
                  * @property {google.protobuf.IDuration|null} [duration] NodeExecutionClosure duration
@@ -34964,6 +35006,14 @@
                  * @instance
                  */
                 NodeExecutionClosure.prototype.outputData = null;
+    
+                /**
+                 * NodeExecutionClosure fullOutputs.
+                 * @member {flyteidl.core.IOutputData|null|undefined} fullOutputs
+                 * @memberof flyteidl.admin.NodeExecutionClosure
+                 * @instance
+                 */
+                NodeExecutionClosure.prototype.fullOutputs = null;
     
                 /**
                  * NodeExecutionClosure phase.
@@ -35042,12 +35092,12 @@
     
                 /**
                  * NodeExecutionClosure outputResult.
-                 * @member {"outputUri"|"error"|"outputData"|undefined} outputResult
+                 * @member {"outputUri"|"error"|"outputData"|"fullOutputs"|undefined} outputResult
                  * @memberof flyteidl.admin.NodeExecutionClosure
                  * @instance
                  */
                 Object.defineProperty(NodeExecutionClosure.prototype, "outputResult", {
-                    get: $util.oneOfGetter($oneOfFields = ["outputUri", "error", "outputData"]),
+                    get: $util.oneOfGetter($oneOfFields = ["outputUri", "error", "outputData", "fullOutputs"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -35110,6 +35160,8 @@
                         writer.uint32(/* id 11, wireType 2 =*/90).string(message.deckUri);
                     if (message.dynamicJobSpecUri != null && message.hasOwnProperty("dynamicJobSpecUri"))
                         writer.uint32(/* id 12, wireType 2 =*/98).string(message.dynamicJobSpecUri);
+                    if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
+                        $root.flyteidl.core.OutputData.encode(message.fullOutputs, writer.uint32(/* id 13, wireType 2 =*/106).fork()).ldelim();
                     return writer;
                 };
     
@@ -35139,6 +35191,9 @@
                             break;
                         case 10:
                             message.outputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 13:
+                            message.fullOutputs = $root.flyteidl.core.OutputData.decode(reader, reader.uint32());
                             break;
                         case 3:
                             message.phase = reader.int32();
@@ -35210,6 +35265,16 @@
                             var error = $root.flyteidl.core.LiteralMap.verify(message.outputData);
                             if (error)
                                 return "outputData." + error;
+                        }
+                    }
+                    if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs")) {
+                        if (properties.outputResult === 1)
+                            return "outputResult: multiple values";
+                        properties.outputResult = 1;
+                        {
+                            var error = $root.flyteidl.core.OutputData.verify(message.fullOutputs);
+                            if (error)
+                                return "fullOutputs." + error;
                         }
                     }
                     if (message.phase != null && message.hasOwnProperty("phase"))
@@ -41056,6 +41121,7 @@
                  * @property {string|null} [outputUri] TaskExecutionClosure outputUri
                  * @property {flyteidl.core.IExecutionError|null} [error] TaskExecutionClosure error
                  * @property {flyteidl.core.ILiteralMap|null} [outputData] TaskExecutionClosure outputData
+                 * @property {flyteidl.core.IOutputData|null} [fullOutputs] TaskExecutionClosure fullOutputs
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] TaskExecutionClosure phase
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] TaskExecutionClosure logs
                  * @property {google.protobuf.ITimestamp|null} [startedAt] TaskExecutionClosure startedAt
@@ -41110,6 +41176,14 @@
                  * @instance
                  */
                 TaskExecutionClosure.prototype.outputData = null;
+    
+                /**
+                 * TaskExecutionClosure fullOutputs.
+                 * @member {flyteidl.core.IOutputData|null|undefined} fullOutputs
+                 * @memberof flyteidl.admin.TaskExecutionClosure
+                 * @instance
+                 */
+                TaskExecutionClosure.prototype.fullOutputs = null;
     
                 /**
                  * TaskExecutionClosure phase.
@@ -41212,12 +41286,12 @@
     
                 /**
                  * TaskExecutionClosure outputResult.
-                 * @member {"outputUri"|"error"|"outputData"|undefined} outputResult
+                 * @member {"outputUri"|"error"|"outputData"|"fullOutputs"|undefined} outputResult
                  * @memberof flyteidl.admin.TaskExecutionClosure
                  * @instance
                  */
                 Object.defineProperty(TaskExecutionClosure.prototype, "outputResult", {
-                    get: $util.oneOfGetter($oneOfFields = ["outputUri", "error", "outputData"]),
+                    get: $util.oneOfGetter($oneOfFields = ["outputUri", "error", "outputData", "fullOutputs"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -41277,6 +41351,8 @@
                     if (message.reasons != null && message.reasons.length)
                         for (var i = 0; i < message.reasons.length; ++i)
                             $root.flyteidl.admin.Reason.encode(message.reasons[i], writer.uint32(/* id 18, wireType 2 =*/146).fork()).ldelim();
+                    if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
+                        $root.flyteidl.core.OutputData.encode(message.fullOutputs, writer.uint32(/* id 19, wireType 2 =*/154).fork()).ldelim();
                     return writer;
                 };
     
@@ -41306,6 +41382,9 @@
                             break;
                         case 12:
                             message.outputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 19:
+                            message.fullOutputs = $root.flyteidl.core.OutputData.decode(reader, reader.uint32());
                             break;
                         case 3:
                             message.phase = reader.int32();
@@ -41390,6 +41469,16 @@
                             var error = $root.flyteidl.core.LiteralMap.verify(message.outputData);
                             if (error)
                                 return "outputData." + error;
+                        }
+                    }
+                    if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs")) {
+                        if (properties.outputResult === 1)
+                            return "outputResult: multiple values";
+                        properties.outputResult = 1;
+                        {
+                            var error = $root.flyteidl.core.OutputData.verify(message.fullOutputs);
+                            if (error)
+                                return "fullOutputs." + error;
                         }
                     }
                     if (message.phase != null && message.hasOwnProperty("phase"))

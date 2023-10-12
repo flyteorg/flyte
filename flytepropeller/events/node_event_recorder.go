@@ -11,7 +11,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -50,14 +49,30 @@ func (r *nodeEventRecorder) RecordNodeEvent(ctx context.Context, ev *event.NodeE
 	var origEvent = ev
 	var rawOutputPolicy = eventConfig.RawOutputPolicy
 	if rawOutputPolicy == config.RawOutputPolicyInline && len(ev.GetOutputUri()) > 0 {
-		outputs := &core.LiteralMap{}
-		err := r.store.ReadProtobuf(ctx, storage.DataReference(ev.GetOutputUri()), outputs)
+		outputLit := &core.LiteralMap{}
+		outputs := &core.OutputData{}
+		i, err := r.store.ReadProtobufAny(ctx, storage.DataReference(ev.GetOutputUri()), outputs, outputLit)
 		if err != nil {
 			// Fall back to forwarding along outputs by reference when we can't fetch them.
 			logger.Warnf(ctx, "failed to fetch outputs by ref [%s] to send inline with err: %v", ev.GetOutputUri(), err)
 			rawOutputPolicy = config.RawOutputPolicyReference
+		} else if ev.GetEventVersion() < 3 {
+			// Set literal maps
+			if i == 0 {
+				outputLit = outputs.Outputs
+			}
+
+			ev.OutputResult = &event.NodeExecutionEvent_DeprecatedOutputData{
+				DeprecatedOutputData: outputLit,
+			}
 		} else {
-			origEvent = proto.Clone(ev).(*event.NodeExecutionEvent)
+			// Use OutputData
+			if i == 1 {
+				outputs = &core.OutputData{
+					Outputs: outputLit,
+				}
+			}
+
 			ev.OutputResult = &event.NodeExecutionEvent_OutputData{
 				OutputData: outputs,
 			}

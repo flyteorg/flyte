@@ -945,6 +945,18 @@ func (m *ExecutionClosure) Validate() error {
 			}
 		}
 
+	case *ExecutionClosure_FullOutputs:
+
+		if v, ok := interface{}(m.GetFullOutputs()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ExecutionClosureValidationError{
+					field:  "FullOutputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

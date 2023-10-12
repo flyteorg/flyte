@@ -21,6 +21,8 @@ type AdminTaskExecutionClosure struct {
 	Error_ *CoreExecutionError `json:"error,omitempty"`
 	// Raw output data produced by this task execution. DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
+	// Raw output data produced by this task execution.
+	FullOutputs *CoreOutputData `json:"full_outputs,omitempty"`
 	// The last recorded phase for this task execution.
 	Phase *CoreTaskExecutionPhase `json:"phase,omitempty"`
 	// Detailed log information output by the task execution.

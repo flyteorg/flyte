@@ -31,12 +31,12 @@ type DefaultProtobufStore struct {
 	metrics *protoMetrics
 }
 
-func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataReference, msg proto.Message) error {
+func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference DataReference, msg ...proto.Message) (int, error) {
 	rc, err := s.ReadRaw(ctx, reference)
 	if err != nil && !IsFailedWriteToCache(err) {
 		logger.Errorf(ctx, "Failed to read from the raw store [%s] Error: %v", reference, err)
 		s.metrics.ReadFailureUnrelatedToCache.Inc()
-		return errs.Wrap(err, fmt.Sprintf("path:%v", reference))
+		return -1, errs.Wrap(err, fmt.Sprintf("path:%v", reference))
 	}
 
 	defer func() {
@@ -48,18 +48,29 @@ func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataRe
 
 	docContents, err := ioutils.ReadAll(rc, s.metrics.FetchLatency.Start())
 	if err != nil {
-		return errs.Wrap(err, fmt.Sprintf("readAll: %v", reference))
+		return -1, errs.Wrap(err, fmt.Sprintf("readAll: %v", reference))
 	}
 
-	t := s.metrics.UnmarshalTime.Start()
-	err = proto.Unmarshal(docContents, msg)
-	t.Stop()
-	if err != nil {
-		s.metrics.UnmarshalFailure.Inc()
-		return errs.Wrap(err, fmt.Sprintf("unmarshall: %v", reference))
+	var lastErr error
+	for i, m := range msg {
+		t := s.metrics.UnmarshalTime.Start()
+		err = proto.Unmarshal(docContents, m)
+		t.Stop()
+		if err != nil {
+			s.metrics.UnmarshalFailure.Inc()
+			lastErr = errs.Wrap(err, fmt.Sprintf("unmarshall: %v", reference))
+			continue
+		}
+
+		return i, nil
 	}
 
-	return nil
+	return -1, lastErr
+}
+
+func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataReference, msg proto.Message) error {
+	_, err := s.ReadProtobufAny(ctx, reference, msg)
+	return err
 }
 
 func (s DefaultProtobufStore) WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error {

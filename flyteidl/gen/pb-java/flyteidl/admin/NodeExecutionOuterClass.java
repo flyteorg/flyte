@@ -7160,6 +7160,31 @@ public final class NodeExecutionOuterClass {
 
     /**
      * <pre>
+     * Raw output data produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+     */
+    boolean hasFullOutputs();
+    /**
+     * <pre>
+     * Raw output data produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+     */
+    flyteidl.core.Literals.OutputData getFullOutputs();
+    /**
+     * <pre>
+     * Raw output data produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+     */
+    flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder();
+
+    /**
+     * <pre>
      * The last recorded phase for this node execution.
      * </pre>
      *
@@ -7523,6 +7548,20 @@ public final class NodeExecutionOuterClass {
               dynamicJobSpecUri_ = s;
               break;
             }
+            case 106: {
+              flyteidl.core.Literals.OutputData.Builder subBuilder = null;
+              if (outputResultCase_ == 13) {
+                subBuilder = ((flyteidl.core.Literals.OutputData) outputResult_).toBuilder();
+              }
+              outputResult_ =
+                  input.readMessage(flyteidl.core.Literals.OutputData.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.OutputData) outputResult_);
+                outputResult_ = subBuilder.buildPartial();
+              }
+              outputResultCase_ = 13;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -7562,6 +7601,7 @@ public final class NodeExecutionOuterClass {
       @java.lang.Deprecated OUTPUT_URI(1),
       ERROR(2),
       @java.lang.Deprecated OUTPUT_DATA(10),
+      FULL_OUTPUTS(13),
       OUTPUTRESULT_NOT_SET(0);
       private final int value;
       private OutputResultCase(int value) {
@@ -7580,6 +7620,7 @@ public final class NodeExecutionOuterClass {
           case 1: return OUTPUT_URI;
           case 2: return ERROR;
           case 10: return OUTPUT_DATA;
+          case 13: return FULL_OUTPUTS;
           case 0: return OUTPUTRESULT_NOT_SET;
           default: return null;
         }
@@ -7763,6 +7804,44 @@ public final class NodeExecutionOuterClass {
          return (flyteidl.core.Literals.LiteralMap) outputResult_;
       }
       return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int FULL_OUTPUTS_FIELD_NUMBER = 13;
+    /**
+     * <pre>
+     * Raw output data produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+     */
+    public boolean hasFullOutputs() {
+      return outputResultCase_ == 13;
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+     */
+    public flyteidl.core.Literals.OutputData getFullOutputs() {
+      if (outputResultCase_ == 13) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw output data produced by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+     */
+    public flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder() {
+      if (outputResultCase_ == 13) {
+         return (flyteidl.core.Literals.OutputData) outputResult_;
+      }
+      return flyteidl.core.Literals.OutputData.getDefaultInstance();
     }
 
     public static final int PHASE_FIELD_NUMBER = 3;
@@ -8112,6 +8191,9 @@ public final class NodeExecutionOuterClass {
       if (!getDynamicJobSpecUriBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 12, dynamicJobSpecUri_);
       }
+      if (outputResultCase_ == 13) {
+        output.writeMessage(13, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -8166,6 +8248,10 @@ public final class NodeExecutionOuterClass {
       if (!getDynamicJobSpecUriBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(12, dynamicJobSpecUri_);
       }
+      if (outputResultCase_ == 13) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(13, (flyteidl.core.Literals.OutputData) outputResult_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -8219,6 +8305,10 @@ public final class NodeExecutionOuterClass {
         case 10:
           if (!getOutputData()
               .equals(other.getOutputData())) return false;
+          break;
+        case 13:
+          if (!getFullOutputs()
+              .equals(other.getFullOutputs())) return false;
           break;
         case 0:
         default:
@@ -8281,6 +8371,10 @@ public final class NodeExecutionOuterClass {
         case 10:
           hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
           hash = (53 * hash) + getOutputData().hashCode();
+          break;
+        case 13:
+          hash = (37 * hash) + FULL_OUTPUTS_FIELD_NUMBER;
+          hash = (53 * hash) + getFullOutputs().hashCode();
           break;
         case 0:
         default:
@@ -8511,6 +8605,13 @@ public final class NodeExecutionOuterClass {
             result.outputResult_ = outputDataBuilder_.build();
           }
         }
+        if (outputResultCase_ == 13) {
+          if (fullOutputsBuilder_ == null) {
+            result.outputResult_ = outputResult_;
+          } else {
+            result.outputResult_ = fullOutputsBuilder_.build();
+          }
+        }
         result.phase_ = phase_;
         if (startedAtBuilder_ == null) {
           result.startedAt_ = startedAt_;
@@ -8634,6 +8735,10 @@ public final class NodeExecutionOuterClass {
           }
           case OUTPUT_DATA: {
             mergeOutputData(other.getOutputData());
+            break;
+          }
+          case FULL_OUTPUTS: {
+            mergeFullOutputs(other.getFullOutputs());
             break;
           }
           case OUTPUTRESULT_NOT_SET: {
@@ -9168,6 +9273,178 @@ public final class NodeExecutionOuterClass {
         outputResultCase_ = 10;
         onChanged();;
         return outputDataBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> fullOutputsBuilder_;
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public boolean hasFullOutputs() {
+        return outputResultCase_ == 13;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public flyteidl.core.Literals.OutputData getFullOutputs() {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 13) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        } else {
+          if (outputResultCase_ == 13) {
+            return fullOutputsBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public Builder setFullOutputs(flyteidl.core.Literals.OutputData value) {
+        if (fullOutputsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          outputResult_ = value;
+          onChanged();
+        } else {
+          fullOutputsBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 13;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public Builder setFullOutputs(
+          flyteidl.core.Literals.OutputData.Builder builderForValue) {
+        if (fullOutputsBuilder_ == null) {
+          outputResult_ = builderForValue.build();
+          onChanged();
+        } else {
+          fullOutputsBuilder_.setMessage(builderForValue.build());
+        }
+        outputResultCase_ = 13;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public Builder mergeFullOutputs(flyteidl.core.Literals.OutputData value) {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 13 &&
+              outputResult_ != flyteidl.core.Literals.OutputData.getDefaultInstance()) {
+            outputResult_ = flyteidl.core.Literals.OutputData.newBuilder((flyteidl.core.Literals.OutputData) outputResult_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            outputResult_ = value;
+          }
+          onChanged();
+        } else {
+          if (outputResultCase_ == 13) {
+            fullOutputsBuilder_.mergeFrom(value);
+          }
+          fullOutputsBuilder_.setMessage(value);
+        }
+        outputResultCase_ = 13;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public Builder clearFullOutputs() {
+        if (fullOutputsBuilder_ == null) {
+          if (outputResultCase_ == 13) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+            onChanged();
+          }
+        } else {
+          if (outputResultCase_ == 13) {
+            outputResultCase_ = 0;
+            outputResult_ = null;
+          }
+          fullOutputsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public flyteidl.core.Literals.OutputData.Builder getFullOutputsBuilder() {
+        return getFullOutputsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      public flyteidl.core.Literals.OutputDataOrBuilder getFullOutputsOrBuilder() {
+        if ((outputResultCase_ == 13) && (fullOutputsBuilder_ != null)) {
+          return fullOutputsBuilder_.getMessageOrBuilder();
+        } else {
+          if (outputResultCase_ == 13) {
+            return (flyteidl.core.Literals.OutputData) outputResult_;
+          }
+          return flyteidl.core.Literals.OutputData.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw output data produced by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.OutputData full_outputs = 13;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
+          getFullOutputsFieldBuilder() {
+        if (fullOutputsBuilder_ == null) {
+          if (!(outputResultCase_ == 13)) {
+            outputResult_ = flyteidl.core.Literals.OutputData.getDefaultInstance();
+          }
+          fullOutputsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder>(
+                  (flyteidl.core.Literals.OutputData) outputResult_,
+                  getParentForChildren(),
+                  isClean());
+          outputResult_ = null;
+        }
+        outputResultCase_ = 13;
+        onChanged();;
+        return fullOutputsBuilder_;
       }
 
       private int phase_ = 0;
@@ -16347,47 +16624,48 @@ public final class NodeExecutionOuterClass {
       "\nis_dynamic\030\004 \001(\010\022\020\n\010is_array\030\005 \001(\010\"Z\n\021N" +
       "odeExecutionList\0226\n\017node_executions\030\001 \003(" +
       "\0132\035.flyteidl.admin.NodeExecution\022\r\n\005toke" +
-      "n\030\002 \001(\t\"\342\004\n\024NodeExecutionClosure\022\030\n\noutp" +
+      "n\030\002 \001(\t\"\225\005\n\024NodeExecutionClosure\022\030\n\noutp" +
       "ut_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.flyt" +
       "eidl.core.ExecutionErrorH\000\0224\n\013output_dat" +
       "a\030\n \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000" +
-      "\0221\n\005phase\030\003 \001(\0162\".flyteidl.core.NodeExec" +
-      "ution.Phase\022.\n\nstarted_at\030\004 \001(\0132\032.google" +
-      ".protobuf.Timestamp\022+\n\010duration\030\005 \001(\0132\031." +
-      "google.protobuf.Duration\022.\n\ncreated_at\030\006" +
-      " \001(\0132\032.google.protobuf.Timestamp\022.\n\nupda" +
-      "ted_at\030\007 \001(\0132\032.google.protobuf.Timestamp" +
-      "\022F\n\026workflow_node_metadata\030\010 \001(\0132$.flyte" +
-      "idl.admin.WorkflowNodeMetadataH\001\022>\n\022task" +
-      "_node_metadata\030\t \001(\0132 .flyteidl.admin.Ta" +
-      "skNodeMetadataH\001\022\020\n\010deck_uri\030\013 \001(\t\022\034\n\024dy" +
-      "namic_job_spec_uri\030\014 \001(\tB\017\n\routput_resul" +
-      "tB\021\n\017target_metadata\"W\n\024WorkflowNodeMeta" +
-      "data\022?\n\013executionId\030\001 \001(\0132*.flyteidl.cor" +
-      "e.WorkflowExecutionIdentifier\"\230\001\n\020TaskNo" +
-      "deMetadata\0227\n\014cache_status\030\001 \001(\0162!.flyte" +
-      "idl.core.CatalogCacheStatus\0223\n\013catalog_k" +
-      "ey\030\002 \001(\0132\036.flyteidl.core.CatalogMetadata" +
-      "\022\026\n\016checkpoint_uri\030\004 \001(\t\"\245\001\n\033DynamicWork" +
-      "flowNodeMetadata\022%\n\002id\030\001 \001(\0132\031.flyteidl." +
-      "core.Identifier\022A\n\021compiled_workflow\030\002 \001" +
-      "(\0132&.flyteidl.core.CompiledWorkflowClosu" +
-      "re\022\034\n\024dynamic_job_spec_uri\030\003 \001(\t\"Q\n\033Node" +
-      "ExecutionGetDataRequest\0222\n\002id\030\001 \001(\0132&.fl" +
-      "yteidl.core.NodeExecutionIdentifier\"\266\003\n\034" +
-      "NodeExecutionGetDataResponse\022+\n\006inputs\030\001" +
-      " \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022,\n\007out" +
-      "puts\030\002 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022" +
-      "2\n\013full_inputs\030\003 \001(\0132\031.flyteidl.core.Lit" +
-      "eralMapB\002\030\001\0223\n\014full_outputs\030\004 \001(\0132\031.flyt" +
-      "eidl.core.LiteralMapB\002\030\001\022,\n\ninput_data\030\005" +
-      " \001(\0132\030.flyteidl.core.InputData\022.\n\013output" +
-      "_data\030\006 \001(\0132\031.flyteidl.core.OutputData\022E" +
-      "\n\020dynamic_workflow\030\020 \001(\0132+.flyteidl.admi" +
-      "n.DynamicWorkflowNodeMetadata\022-\n\nflyte_u" +
-      "rls\030\021 \001(\0132\031.flyteidl.admin.FlyteURLsB=Z;" +
-      "github.com/flyteorg/flyte/flyteidl/gen/p" +
-      "b-go/flyteidl/adminb\006proto3"
+      "\0221\n\014full_outputs\030\r \001(\0132\031.flyteidl.core.O" +
+      "utputDataH\000\0221\n\005phase\030\003 \001(\0162\".flyteidl.co" +
+      "re.NodeExecution.Phase\022.\n\nstarted_at\030\004 \001" +
+      "(\0132\032.google.protobuf.Timestamp\022+\n\010durati" +
+      "on\030\005 \001(\0132\031.google.protobuf.Duration\022.\n\nc" +
+      "reated_at\030\006 \001(\0132\032.google.protobuf.Timest" +
+      "amp\022.\n\nupdated_at\030\007 \001(\0132\032.google.protobu" +
+      "f.Timestamp\022F\n\026workflow_node_metadata\030\010 " +
+      "\001(\0132$.flyteidl.admin.WorkflowNodeMetadat" +
+      "aH\001\022>\n\022task_node_metadata\030\t \001(\0132 .flytei" +
+      "dl.admin.TaskNodeMetadataH\001\022\020\n\010deck_uri\030" +
+      "\013 \001(\t\022\034\n\024dynamic_job_spec_uri\030\014 \001(\tB\017\n\ro" +
+      "utput_resultB\021\n\017target_metadata\"W\n\024Workf" +
+      "lowNodeMetadata\022?\n\013executionId\030\001 \001(\0132*.f" +
+      "lyteidl.core.WorkflowExecutionIdentifier" +
+      "\"\230\001\n\020TaskNodeMetadata\0227\n\014cache_status\030\001 " +
+      "\001(\0162!.flyteidl.core.CatalogCacheStatus\0223" +
+      "\n\013catalog_key\030\002 \001(\0132\036.flyteidl.core.Cata" +
+      "logMetadata\022\026\n\016checkpoint_uri\030\004 \001(\t\"\245\001\n\033" +
+      "DynamicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132" +
+      "\031.flyteidl.core.Identifier\022A\n\021compiled_w" +
+      "orkflow\030\002 \001(\0132&.flyteidl.core.CompiledWo" +
+      "rkflowClosure\022\034\n\024dynamic_job_spec_uri\030\003 " +
+      "\001(\t\"Q\n\033NodeExecutionGetDataRequest\0222\n\002id" +
+      "\030\001 \001(\0132&.flyteidl.core.NodeExecutionIden" +
+      "tifier\"\266\003\n\034NodeExecutionGetDataResponse\022" +
+      "+\n\006inputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlob" +
+      "B\002\030\001\022,\n\007outputs\030\002 \001(\0132\027.flyteidl.admin.U" +
+      "rlBlobB\002\030\001\0222\n\013full_inputs\030\003 \001(\0132\031.flytei" +
+      "dl.core.LiteralMapB\002\030\001\0223\n\014full_outputs\030\004" +
+      " \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001\022,\n\ni" +
+      "nput_data\030\005 \001(\0132\030.flyteidl.core.InputDat" +
+      "a\022.\n\013output_data\030\006 \001(\0132\031.flyteidl.core.O" +
+      "utputData\022E\n\020dynamic_workflow\030\020 \001(\0132+.fl" +
+      "yteidl.admin.DynamicWorkflowNodeMetadata" +
+      "\022-\n\nflyte_urls\030\021 \001(\0132\031.flyteidl.admin.Fl" +
+      "yteURLsB=Z;github.com/flyteorg/flyte/fly" +
+      "teidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16450,7 +16728,7 @@ public final class NodeExecutionOuterClass {
     internal_static_flyteidl_admin_NodeExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_NodeExecutionClosure_descriptor,
-        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "WorkflowNodeMetadata", "TaskNodeMetadata", "DeckUri", "DynamicJobSpecUri", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "OutputUri", "Error", "OutputData", "FullOutputs", "Phase", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "WorkflowNodeMetadata", "TaskNodeMetadata", "DeckUri", "DynamicJobSpecUri", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_admin_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_WorkflowNodeMetadata_fieldAccessorTable = new

@@ -24,6 +24,8 @@ type AdminExecutionClosure struct {
 	AbortMetadata *AdminAbortMetadata `json:"abort_metadata,omitempty"`
 	// Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
+	// Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.
+	FullOutputs *CoreOutputData `json:"full_outputs,omitempty"`
 	ComputedInputs *CoreLiteralMap `json:"computed_inputs,omitempty"`
 	// Most recent recorded phase for the execution.
 	Phase *CoreWorkflowExecutionPhase `json:"phase,omitempty"`

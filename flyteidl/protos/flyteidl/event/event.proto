@@ -40,6 +40,8 @@ message WorkflowExecutionEvent {
         // Raw output data produced by this workflow execution.
         core.OutputData output_data = 8;
     }
+
+    int32 event_version = 9;
 }
 
 message NodeExecutionEvent {

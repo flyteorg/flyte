@@ -84,6 +84,8 @@ func (m *WorkflowExecutionEvent) Validate() error {
 		}
 	}
 
+	// no validation rules for EventVersion
+
 	switch m.OutputResult.(type) {
 
 	case *WorkflowExecutionEvent_OutputUri:

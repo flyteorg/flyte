@@ -9,19 +9,21 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/golang/protobuf/proto"
 	errrs "github.com/pkg/errors"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/codes"
 )
 
-func OffloadLiteralMap(ctx context.Context, storageClient *storage.DataStore, literalMap *core.LiteralMap, nestedKeys ...string) (storage.DataReference, error) {
-	return OffloadLiteralMapWithRetryDelayAndAttempts(ctx, storageClient, literalMap, async.RetryDelay, 5, nestedKeys...)
+func OffloadData(ctx context.Context, storageClient *storage.DataStore, msg proto.Message, nestedKeys ...string) (storage.DataReference, error) {
+	return OffloadDataWithRetryDelayAndAttempts(ctx, storageClient, msg, async.RetryDelay, 5, nestedKeys...)
 }
 
-func OffloadLiteralMapWithRetryDelayAndAttempts(ctx context.Context, storageClient *storage.DataStore, literalMap *core.LiteralMap, retryDelay time.Duration, attempts int, nestedKeys ...string) (storage.DataReference, error) {
-	if literalMap == nil {
-		literalMap = &core.LiteralMap{}
+func OffloadDataWithRetryDelayAndAttempts(ctx context.Context, storageClient *storage.DataStore, msg proto.Message, retryDelay time.Duration, attempts int, nestedKeys ...string) (storage.DataReference, error) {
+	if msg == nil {
+		msg = &core.OutputData{}
 	}
+
 	nestedKeyReference := []string{
 		shared.Metadata,
 	}
@@ -32,7 +34,7 @@ func OffloadLiteralMapWithRetryDelayAndAttempts(ctx context.Context, storageClie
 	}
 
 	err = async.RetryOnSpecificErrors(attempts, retryDelay, func() error {
-		err = storageClient.WriteProtobuf(ctx, uri, storage.Options{}, literalMap)
+		err = storageClient.WriteProtobuf(ctx, uri, storage.Options{}, msg)
 		return err
 	}, isRetryableError)
 

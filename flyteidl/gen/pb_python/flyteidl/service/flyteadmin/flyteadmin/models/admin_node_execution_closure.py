@@ -19,6 +19,7 @@ import six
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase  # noqa: F401,E501
+from flyteadmin.models.core_output_data import CoreOutputData  # noqa: F401,E501
 from flyteadmin.models.flyteidladmin_task_node_metadata import FlyteidladminTaskNodeMetadata  # noqa: F401,E501
 from flyteadmin.models.flyteidladmin_workflow_node_metadata import FlyteidladminWorkflowNodeMetadata  # noqa: F401,E501
 
@@ -40,6 +41,7 @@ class AdminNodeExecutionClosure(object):
         'output_uri': 'str',
         'error': 'CoreExecutionError',
         'output_data': 'CoreLiteralMap',
+        'full_outputs': 'CoreOutputData',
         'phase': 'CoreNodeExecutionPhase',
         'started_at': 'datetime',
         'duration': 'str',
@@ -55,6 +57,7 @@ class AdminNodeExecutionClosure(object):
         'output_uri': 'output_uri',
         'error': 'error',
         'output_data': 'output_data',
+        'full_outputs': 'full_outputs',
         'phase': 'phase',
         'started_at': 'started_at',
         'duration': 'duration',
@@ -66,12 +69,13 @@ class AdminNodeExecutionClosure(object):
         'dynamic_job_spec_uri': 'dynamic_job_spec_uri'
     }
 
-    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None, deck_uri=None, dynamic_job_spec_uri=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, full_outputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None, deck_uri=None, dynamic_job_spec_uri=None):  # noqa: E501
         """AdminNodeExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._output_uri = None
         self._error = None
         self._output_data = None
+        self._full_outputs = None
         self._phase = None
         self._started_at = None
         self._duration = None
@@ -89,6 +93,8 @@ class AdminNodeExecutionClosure(object):
             self.error = error
         if output_data is not None:
             self.output_data = output_data
+        if full_outputs is not None:
+            self.full_outputs = full_outputs
         if phase is not None:
             self.phase = phase
         if started_at is not None:
@@ -174,6 +180,29 @@ class AdminNodeExecutionClosure(object):
         """
 
         self._output_data = output_data
+
+    @property
+    def full_outputs(self):
+        """Gets the full_outputs of this AdminNodeExecutionClosure.  # noqa: E501
+
+        Raw output data produced by this node execution.  # noqa: E501
+
+        :return: The full_outputs of this AdminNodeExecutionClosure.  # noqa: E501
+        :rtype: CoreOutputData
+        """
+        return self._full_outputs
+
+    @full_outputs.setter
+    def full_outputs(self, full_outputs):
+        """Sets the full_outputs of this AdminNodeExecutionClosure.
+
+        Raw output data produced by this node execution.  # noqa: E501
+
+        :param full_outputs: The full_outputs of this AdminNodeExecutionClosure.  # noqa: E501
+        :type: CoreOutputData
+        """
+
+        self._full_outputs = full_outputs
 
     @property
     def phase(self):

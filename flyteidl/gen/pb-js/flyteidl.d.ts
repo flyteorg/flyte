@@ -6816,6 +6816,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionEvent outputData */
             outputData?: (flyteidl.core.IOutputData|null);
+
+            /** WorkflowExecutionEvent eventVersion */
+            eventVersion?: (number|null);
         }
 
         /** Represents a WorkflowExecutionEvent. */
@@ -6850,6 +6853,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionEvent outputData. */
             public outputData?: (flyteidl.core.IOutputData|null);
+
+            /** WorkflowExecutionEvent eventVersion. */
+            public eventVersion: number;
 
             /** WorkflowExecutionEvent outputResult. */
             public outputResult?: ("outputUri"|"error"|"deprecatedOutputData"|"outputData");
@@ -11266,6 +11272,9 @@ export namespace flyteidl {
             /** ExecutionClosure outputData */
             outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** ExecutionClosure fullOutputs */
+            fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** ExecutionClosure computedInputs */
             computedInputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -11318,6 +11327,9 @@ export namespace flyteidl {
             /** ExecutionClosure outputData. */
             public outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** ExecutionClosure fullOutputs. */
+            public fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** ExecutionClosure computedInputs. */
             public computedInputs?: (flyteidl.core.ILiteralMap|null);
 
@@ -11346,7 +11358,7 @@ export namespace flyteidl {
             public stateChangeDetails?: (flyteidl.admin.IExecutionStateChangeDetails|null);
 
             /** ExecutionClosure outputResult. */
-            public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata"|"outputData");
+            public outputResult?: ("outputs"|"error"|"abortCause"|"abortMetadata"|"outputData"|"fullOutputs");
 
             /**
              * Creates a new ExecutionClosure instance using the specified properties.
@@ -14489,6 +14501,9 @@ export namespace flyteidl {
             /** NodeExecutionClosure outputData */
             outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** NodeExecutionClosure fullOutputs */
+            fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** NodeExecutionClosure phase */
             phase?: (flyteidl.core.NodeExecution.Phase|null);
 
@@ -14535,6 +14550,9 @@ export namespace flyteidl {
             /** NodeExecutionClosure outputData. */
             public outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** NodeExecutionClosure fullOutputs. */
+            public fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** NodeExecutionClosure phase. */
             public phase: flyteidl.core.NodeExecution.Phase;
 
@@ -14563,7 +14581,7 @@ export namespace flyteidl {
             public dynamicJobSpecUri: string;
 
             /** NodeExecutionClosure outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
+            public outputResult?: ("outputUri"|"error"|"outputData"|"fullOutputs");
 
             /** NodeExecutionClosure targetMetadata. */
             public targetMetadata?: ("workflowNodeMetadata"|"taskNodeMetadata");
@@ -17147,6 +17165,9 @@ export namespace flyteidl {
             /** TaskExecutionClosure outputData */
             outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** TaskExecutionClosure fullOutputs */
+            fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** TaskExecutionClosure phase */
             phase?: (flyteidl.core.TaskExecution.Phase|null);
 
@@ -17202,6 +17223,9 @@ export namespace flyteidl {
             /** TaskExecutionClosure outputData. */
             public outputData?: (flyteidl.core.ILiteralMap|null);
 
+            /** TaskExecutionClosure fullOutputs. */
+            public fullOutputs?: (flyteidl.core.IOutputData|null);
+
             /** TaskExecutionClosure phase. */
             public phase: flyteidl.core.TaskExecution.Phase;
 
@@ -17239,7 +17263,7 @@ export namespace flyteidl {
             public reasons: flyteidl.admin.IReason[];
 
             /** TaskExecutionClosure outputResult. */
-            public outputResult?: ("outputUri"|"error"|"outputData");
+            public outputResult?: ("outputUri"|"error"|"outputData"|"fullOutputs");
 
             /**
              * Creates a new TaskExecutionClosure instance using the specified properties.

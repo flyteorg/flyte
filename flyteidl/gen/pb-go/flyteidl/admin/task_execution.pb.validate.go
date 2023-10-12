@@ -518,6 +518,18 @@ func (m *TaskExecutionClosure) Validate() error {
 			}
 		}
 
+	case *TaskExecutionClosure_FullOutputs:
+
+		if v, ok := interface{}(m.GetFullOutputs()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionClosureValidationError{
+					field:  "FullOutputs",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

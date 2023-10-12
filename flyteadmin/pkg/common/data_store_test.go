@@ -42,7 +42,7 @@ func TestOffloadLiteralMap(t *testing.T) {
 		return nil
 	}
 
-	uri, err := OffloadLiteralMap(context.TODO(), mockStorage, literalMap, "nested", "key")
+	uri, err := OffloadData(context.TODO(), mockStorage, literalMap, "nested", "key")
 	assert.NoError(t, err)
 	assert.Equal(t, "s3://bucket/metadata/nested/key", uri.String())
 }
@@ -53,7 +53,7 @@ func TestOffloadLiteralMap_ConstructReferenceError(t *testing.T) {
 		ctx context.Context, reference storage.DataReference, nestedKeys ...string) (storage.DataReference, error) {
 		return "foo", errors.NewFlyteAdminError(codes.Internal, "foo")
 	}
-	_, err := OffloadLiteralMap(context.TODO(), mockStorage, literalMap, "nested", "key")
+	_, err := OffloadData(context.TODO(), mockStorage, literalMap, "nested", "key")
 	assert.Equal(t, err.(errors.FlyteAdminError).Code(), codes.Internal)
 }
 
@@ -63,7 +63,7 @@ func TestOffloadLiteralMap_StorageFailure(t *testing.T) {
 		assert.Equal(t, reference.String(), "s3://bucket/metadata/nested/key")
 		return errors.NewFlyteAdminError(codes.Internal, "foo")
 	}
-	_, err := OffloadLiteralMap(context.TODO(), mockStorage, literalMap, "nested", "key")
+	_, err := OffloadData(context.TODO(), mockStorage, literalMap, "nested", "key")
 	assert.Equal(t, err.(errors.FlyteAdminError).Code(), codes.Internal)
 }
 
@@ -76,7 +76,7 @@ func TestOffloadLiteralMap_RetryOn409(t *testing.T) {
 		return errs.Wrapf(&googleapi.Error{Code: 409}, "Failed to write data [%vb] to path [%v].", 10, "size")
 	}
 	expectedRetries := 2
-	_, err := OffloadLiteralMapWithRetryDelayAndAttempts(context.TODO(), mockStorage, literalMap, time.Millisecond, expectedRetries, "nested", "key")
+	_, err := OffloadDataWithRetryDelayAndAttempts(context.TODO(), mockStorage, literalMap, time.Millisecond, expectedRetries, "nested", "key")
 	assert.EqualValues(t, retries, expectedRetries+1)
 	assert.Equal(t, err.(errors.FlyteAdminError).Code(), codes.Internal)
 }

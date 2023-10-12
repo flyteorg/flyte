@@ -158,6 +158,10 @@ message ExecutionClosure {
         // Raw output data produced by this execution.
         // DEPRECATED. Use GetExecutionData to fetch output data instead.
         core.LiteralMap output_data = 13 [deprecated = true];
+
+        // Raw output data produced by this execution.
+        // DEPRECATED. Use GetExecutionData to fetch output data instead.
+        core.OutputData full_outputs = 15;
     }
 
     // Inputs computed and passed for execution.

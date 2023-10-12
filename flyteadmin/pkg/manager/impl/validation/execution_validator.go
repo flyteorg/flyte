@@ -145,7 +145,15 @@ func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequ
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"Workflow event handler request event doesn't have an execution id - %v", request.Event)
 	}
-	if err := ValidateOutputData(request.Event.GetOutputData(), maxOutputSizeInBytes); err != nil {
+
+	outputData := request.Event.GetOutputData()
+	if outputData == nil {
+		outputData = &core.OutputData{
+			Outputs: request.Event.GetDeprecatedOutputData(),
+		}
+	}
+
+	if err := ValidateOutputData(outputData, maxOutputSizeInBytes); err != nil {
 		return err
 	}
 	return nil

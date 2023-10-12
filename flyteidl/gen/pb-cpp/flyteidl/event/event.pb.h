@@ -279,6 +279,12 @@ class WorkflowExecutionEvent final :
   ::flyteidl::core::WorkflowExecution_Phase phase() const;
   void set_phase(::flyteidl::core::WorkflowExecution_Phase value);
 
+  // int32 event_version = 9;
+  void clear_event_version();
+  static const int kEventVersionFieldNumber = 9;
+  ::google::protobuf::int32 event_version() const;
+  void set_event_version(::google::protobuf::int32 value);
+
   // string output_uri = 5;
   private:
   bool has_output_uri() const;
@@ -341,6 +347,7 @@ class WorkflowExecutionEvent final :
   ::flyteidl::core::WorkflowExecutionIdentifier* execution_id_;
   ::google::protobuf::Timestamp* occurred_at_;
   int phase_;
+  ::google::protobuf::int32 event_version_;
   union OutputResultUnion {
     OutputResultUnion() {}
     ::google::protobuf::internal::ArenaStringPtr output_uri_;
@@ -2798,6 +2805,20 @@ inline ::flyteidl::core::OutputData* WorkflowExecutionEvent::mutable_output_data
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.event.WorkflowExecutionEvent.output_data)
   return output_result_.output_data_;
+}
+
+// int32 event_version = 9;
+inline void WorkflowExecutionEvent::clear_event_version() {
+  event_version_ = 0;
+}
+inline ::google::protobuf::int32 WorkflowExecutionEvent::event_version() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.WorkflowExecutionEvent.event_version)
+  return event_version_;
+}
+inline void WorkflowExecutionEvent::set_event_version(::google::protobuf::int32 value) {
+  
+  event_version_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.WorkflowExecutionEvent.event_version)
 }
 
 inline bool WorkflowExecutionEvent::has_output_result() const {
