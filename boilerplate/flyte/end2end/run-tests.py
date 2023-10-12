@@ -263,7 +263,12 @@ def run(
 @click.argument("flytesnacks_release_tag")
 @click.argument("priorities")
 @click.argument("config_file")
-@click.argument("cluster_pool_name")
+@click.argument(
+    "cluster_pool_name",
+    required=False,
+    type=str,
+    default=None,
+)
 def cli(
     flytesnacks_release_tag,
     priorities,
