@@ -152,13 +152,17 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
+	logger.Info(ctx, "Get databricks job status", "runID", exec.RunID)
+	logger.Info(ctx, "Get databricks job token", "token", exec.Token)
 	req, err := buildRequest(get, nil, p.cfg.databricksEndpoint,
 		p.cfg.DatabricksInstance, exec.Token, exec.RunID, false)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to build databricks job request [%v]", err)
 		return nil, err
 	}
+	logger.Info(ctx, "Get databricks job request", "req", req)
 	resp, err := p.client.Do(req)
+	logger.Info(ctx, "Get databricks job response", "resp", resp)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get databricks job status [%v]", resp)
 		return nil, err
