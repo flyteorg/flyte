@@ -3,8 +3,8 @@ package flyteidl.artifact;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact";
 
-
 import "google/protobuf/any.proto";
+import "google/api/annotations.proto";
 
 import "flyteidl/admin/launch_plan.proto";
 import "flyteidl/core/literals.proto";
@@ -87,11 +87,15 @@ message ListArtifactNamesResponse {
   repeated core.ArtifactKey artifact_keys = 1;
 }
 
-message ListArtifactsRequest {
+message SearchArtifactsRequest {
   core.ArtifactKey artifact_key = 1;
+
+  string filters = 2;
+  string token = 3;
+  int32 limit = 4;
 }
 
-message ListArtifactsResponse {
+message SearchArtifactsResponse {
   repeated Artifact artifacts = 1;
 }
 
@@ -147,13 +151,27 @@ message RegisterConsumerRequest {
 message RegisterResponse {}
 
 service ArtifactRegistry {
-  rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {}
+  rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {
 
-  rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {}
+  }
 
-//  rpc ListArtifactNames (ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {}
-//
-//  rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse) {}
+  rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {
+    option (google.api.http) = {
+      get: "/data/v1/artifacts"
+      additional_bindings {get: "/data/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
+      additional_bindings {get: "/data/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
+      additional_bindings {get: "/data/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
+    };
+
+
+  }
+
+  rpc SearchArtifacts (SearchArtifactsRequest) returns (SearchArtifactsResponse) {
+    option (google.api.http) = {
+      get: "/data/v1/query/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
+      additional_bindings {get: "/data/v1/query/{artifact_key.project}/{artifact_key.domain}"}
+    };
+  }
 
   rpc CreateTrigger (CreateTriggerRequest) returns (CreateTriggerResponse) {}
 

@@ -53159,24 +53159,27 @@
                 return ListArtifactNamesResponse;
             })();
     
-            artifact.ListArtifactsRequest = (function() {
+            artifact.SearchArtifactsRequest = (function() {
     
                 /**
-                 * Properties of a ListArtifactsRequest.
+                 * Properties of a SearchArtifactsRequest.
                  * @memberof flyteidl.artifact
-                 * @interface IListArtifactsRequest
-                 * @property {flyteidl.core.IArtifactKey|null} [artifactKey] ListArtifactsRequest artifactKey
+                 * @interface ISearchArtifactsRequest
+                 * @property {flyteidl.core.IArtifactKey|null} [artifactKey] SearchArtifactsRequest artifactKey
+                 * @property {string|null} [filters] SearchArtifactsRequest filters
+                 * @property {string|null} [token] SearchArtifactsRequest token
+                 * @property {number|null} [limit] SearchArtifactsRequest limit
                  */
     
                 /**
-                 * Constructs a new ListArtifactsRequest.
+                 * Constructs a new SearchArtifactsRequest.
                  * @memberof flyteidl.artifact
-                 * @classdesc Represents a ListArtifactsRequest.
-                 * @implements IListArtifactsRequest
+                 * @classdesc Represents a SearchArtifactsRequest.
+                 * @implements ISearchArtifactsRequest
                  * @constructor
-                 * @param {flyteidl.artifact.IListArtifactsRequest=} [properties] Properties to set
+                 * @param {flyteidl.artifact.ISearchArtifactsRequest=} [properties] Properties to set
                  */
-                function ListArtifactsRequest(properties) {
+                function SearchArtifactsRequest(properties) {
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -53184,62 +53187,101 @@
                 }
     
                 /**
-                 * ListArtifactsRequest artifactKey.
+                 * SearchArtifactsRequest artifactKey.
                  * @member {flyteidl.core.IArtifactKey|null|undefined} artifactKey
-                 * @memberof flyteidl.artifact.ListArtifactsRequest
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
                  * @instance
                  */
-                ListArtifactsRequest.prototype.artifactKey = null;
+                SearchArtifactsRequest.prototype.artifactKey = null;
     
                 /**
-                 * Creates a new ListArtifactsRequest instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.artifact.ListArtifactsRequest
-                 * @static
-                 * @param {flyteidl.artifact.IListArtifactsRequest=} [properties] Properties to set
-                 * @returns {flyteidl.artifact.ListArtifactsRequest} ListArtifactsRequest instance
+                 * SearchArtifactsRequest filters.
+                 * @member {string} filters
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
+                 * @instance
                  */
-                ListArtifactsRequest.create = function create(properties) {
-                    return new ListArtifactsRequest(properties);
+                SearchArtifactsRequest.prototype.filters = "";
+    
+                /**
+                 * SearchArtifactsRequest token.
+                 * @member {string} token
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
+                 * @instance
+                 */
+                SearchArtifactsRequest.prototype.token = "";
+    
+                /**
+                 * SearchArtifactsRequest limit.
+                 * @member {number} limit
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
+                 * @instance
+                 */
+                SearchArtifactsRequest.prototype.limit = 0;
+    
+                /**
+                 * Creates a new SearchArtifactsRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
+                 * @static
+                 * @param {flyteidl.artifact.ISearchArtifactsRequest=} [properties] Properties to set
+                 * @returns {flyteidl.artifact.SearchArtifactsRequest} SearchArtifactsRequest instance
+                 */
+                SearchArtifactsRequest.create = function create(properties) {
+                    return new SearchArtifactsRequest(properties);
                 };
     
                 /**
-                 * Encodes the specified ListArtifactsRequest message. Does not implicitly {@link flyteidl.artifact.ListArtifactsRequest.verify|verify} messages.
+                 * Encodes the specified SearchArtifactsRequest message. Does not implicitly {@link flyteidl.artifact.SearchArtifactsRequest.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.artifact.ListArtifactsRequest
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
                  * @static
-                 * @param {flyteidl.artifact.IListArtifactsRequest} message ListArtifactsRequest message or plain object to encode
+                 * @param {flyteidl.artifact.ISearchArtifactsRequest} message SearchArtifactsRequest message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                ListArtifactsRequest.encode = function encode(message, writer) {
+                SearchArtifactsRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.artifactKey != null && message.hasOwnProperty("artifactKey"))
                         $root.flyteidl.core.ArtifactKey.encode(message.artifactKey, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.filters != null && message.hasOwnProperty("filters"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.filters);
+                    if (message.token != null && message.hasOwnProperty("token"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.token);
+                    if (message.limit != null && message.hasOwnProperty("limit"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).int32(message.limit);
                     return writer;
                 };
     
                 /**
-                 * Decodes a ListArtifactsRequest message from the specified reader or buffer.
+                 * Decodes a SearchArtifactsRequest message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.artifact.ListArtifactsRequest
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.artifact.ListArtifactsRequest} ListArtifactsRequest
+                 * @returns {flyteidl.artifact.SearchArtifactsRequest} SearchArtifactsRequest
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                ListArtifactsRequest.decode = function decode(reader, length) {
+                SearchArtifactsRequest.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.artifact.ListArtifactsRequest();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.artifact.SearchArtifactsRequest();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
                             message.artifactKey = $root.flyteidl.core.ArtifactKey.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.filters = reader.string();
+                            break;
+                        case 3:
+                            message.token = reader.string();
+                            break;
+                        case 4:
+                            message.limit = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -53250,14 +53292,14 @@
                 };
     
                 /**
-                 * Verifies a ListArtifactsRequest message.
+                 * Verifies a SearchArtifactsRequest message.
                  * @function verify
-                 * @memberof flyteidl.artifact.ListArtifactsRequest
+                 * @memberof flyteidl.artifact.SearchArtifactsRequest
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                ListArtifactsRequest.verify = function verify(message) {
+                SearchArtifactsRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.artifactKey != null && message.hasOwnProperty("artifactKey")) {
@@ -53265,30 +53307,39 @@
                         if (error)
                             return "artifactKey." + error;
                     }
+                    if (message.filters != null && message.hasOwnProperty("filters"))
+                        if (!$util.isString(message.filters))
+                            return "filters: string expected";
+                    if (message.token != null && message.hasOwnProperty("token"))
+                        if (!$util.isString(message.token))
+                            return "token: string expected";
+                    if (message.limit != null && message.hasOwnProperty("limit"))
+                        if (!$util.isInteger(message.limit))
+                            return "limit: integer expected";
                     return null;
                 };
     
-                return ListArtifactsRequest;
+                return SearchArtifactsRequest;
             })();
     
-            artifact.ListArtifactsResponse = (function() {
+            artifact.SearchArtifactsResponse = (function() {
     
                 /**
-                 * Properties of a ListArtifactsResponse.
+                 * Properties of a SearchArtifactsResponse.
                  * @memberof flyteidl.artifact
-                 * @interface IListArtifactsResponse
-                 * @property {Array.<flyteidl.artifact.IArtifact>|null} [artifacts] ListArtifactsResponse artifacts
+                 * @interface ISearchArtifactsResponse
+                 * @property {Array.<flyteidl.artifact.IArtifact>|null} [artifacts] SearchArtifactsResponse artifacts
                  */
     
                 /**
-                 * Constructs a new ListArtifactsResponse.
+                 * Constructs a new SearchArtifactsResponse.
                  * @memberof flyteidl.artifact
-                 * @classdesc Represents a ListArtifactsResponse.
-                 * @implements IListArtifactsResponse
+                 * @classdesc Represents a SearchArtifactsResponse.
+                 * @implements ISearchArtifactsResponse
                  * @constructor
-                 * @param {flyteidl.artifact.IListArtifactsResponse=} [properties] Properties to set
+                 * @param {flyteidl.artifact.ISearchArtifactsResponse=} [properties] Properties to set
                  */
-                function ListArtifactsResponse(properties) {
+                function SearchArtifactsResponse(properties) {
                     this.artifacts = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -53297,35 +53348,35 @@
                 }
     
                 /**
-                 * ListArtifactsResponse artifacts.
+                 * SearchArtifactsResponse artifacts.
                  * @member {Array.<flyteidl.artifact.IArtifact>} artifacts
-                 * @memberof flyteidl.artifact.ListArtifactsResponse
+                 * @memberof flyteidl.artifact.SearchArtifactsResponse
                  * @instance
                  */
-                ListArtifactsResponse.prototype.artifacts = $util.emptyArray;
+                SearchArtifactsResponse.prototype.artifacts = $util.emptyArray;
     
                 /**
-                 * Creates a new ListArtifactsResponse instance using the specified properties.
+                 * Creates a new SearchArtifactsResponse instance using the specified properties.
                  * @function create
-                 * @memberof flyteidl.artifact.ListArtifactsResponse
+                 * @memberof flyteidl.artifact.SearchArtifactsResponse
                  * @static
-                 * @param {flyteidl.artifact.IListArtifactsResponse=} [properties] Properties to set
-                 * @returns {flyteidl.artifact.ListArtifactsResponse} ListArtifactsResponse instance
+                 * @param {flyteidl.artifact.ISearchArtifactsResponse=} [properties] Properties to set
+                 * @returns {flyteidl.artifact.SearchArtifactsResponse} SearchArtifactsResponse instance
                  */
-                ListArtifactsResponse.create = function create(properties) {
-                    return new ListArtifactsResponse(properties);
+                SearchArtifactsResponse.create = function create(properties) {
+                    return new SearchArtifactsResponse(properties);
                 };
     
                 /**
-                 * Encodes the specified ListArtifactsResponse message. Does not implicitly {@link flyteidl.artifact.ListArtifactsResponse.verify|verify} messages.
+                 * Encodes the specified SearchArtifactsResponse message. Does not implicitly {@link flyteidl.artifact.SearchArtifactsResponse.verify|verify} messages.
                  * @function encode
-                 * @memberof flyteidl.artifact.ListArtifactsResponse
+                 * @memberof flyteidl.artifact.SearchArtifactsResponse
                  * @static
-                 * @param {flyteidl.artifact.IListArtifactsResponse} message ListArtifactsResponse message or plain object to encode
+                 * @param {flyteidl.artifact.ISearchArtifactsResponse} message SearchArtifactsResponse message or plain object to encode
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                ListArtifactsResponse.encode = function encode(message, writer) {
+                SearchArtifactsResponse.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
                     if (message.artifacts != null && message.artifacts.length)
@@ -53335,20 +53386,20 @@
                 };
     
                 /**
-                 * Decodes a ListArtifactsResponse message from the specified reader or buffer.
+                 * Decodes a SearchArtifactsResponse message from the specified reader or buffer.
                  * @function decode
-                 * @memberof flyteidl.artifact.ListArtifactsResponse
+                 * @memberof flyteidl.artifact.SearchArtifactsResponse
                  * @static
                  * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
                  * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.artifact.ListArtifactsResponse} ListArtifactsResponse
+                 * @returns {flyteidl.artifact.SearchArtifactsResponse} SearchArtifactsResponse
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                ListArtifactsResponse.decode = function decode(reader, length) {
+                SearchArtifactsResponse.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.artifact.ListArtifactsResponse();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.artifact.SearchArtifactsResponse();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -53366,14 +53417,14 @@
                 };
     
                 /**
-                 * Verifies a ListArtifactsResponse message.
+                 * Verifies a SearchArtifactsResponse message.
                  * @function verify
-                 * @memberof flyteidl.artifact.ListArtifactsResponse
+                 * @memberof flyteidl.artifact.SearchArtifactsResponse
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                ListArtifactsResponse.verify = function verify(message) {
+                SearchArtifactsResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.artifacts != null && message.hasOwnProperty("artifacts")) {
@@ -53388,7 +53439,7 @@
                     return null;
                 };
     
-                return ListArtifactsResponse;
+                return SearchArtifactsResponse;
             })();
     
             artifact.AddTagRequest = (function() {
@@ -54730,6 +54781,39 @@
                  * @instance
                  * @param {flyteidl.artifact.IGetArtifactRequest} request GetArtifactRequest message or plain object
                  * @returns {Promise<flyteidl.artifact.GetArtifactResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.artifact.ArtifactRegistry#searchArtifacts}.
+                 * @memberof flyteidl.artifact.ArtifactRegistry
+                 * @typedef SearchArtifactsCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.artifact.SearchArtifactsResponse} [response] SearchArtifactsResponse
+                 */
+    
+                /**
+                 * Calls SearchArtifacts.
+                 * @function searchArtifacts
+                 * @memberof flyteidl.artifact.ArtifactRegistry
+                 * @instance
+                 * @param {flyteidl.artifact.ISearchArtifactsRequest} request SearchArtifactsRequest message or plain object
+                 * @param {flyteidl.artifact.ArtifactRegistry.SearchArtifactsCallback} callback Node-style callback called with the error, if any, and SearchArtifactsResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(ArtifactRegistry.prototype.searchArtifacts = function searchArtifacts(request, callback) {
+                    return this.rpcCall(searchArtifacts, $root.flyteidl.artifact.SearchArtifactsRequest, $root.flyteidl.artifact.SearchArtifactsResponse, request, callback);
+                }, "name", { value: "SearchArtifacts" });
+    
+                /**
+                 * Calls SearchArtifacts.
+                 * @function searchArtifacts
+                 * @memberof flyteidl.artifact.ArtifactRegistry
+                 * @instance
+                 * @param {flyteidl.artifact.ISearchArtifactsRequest} request SearchArtifactsRequest message or plain object
+                 * @returns {Promise<flyteidl.artifact.SearchArtifactsResponse>} Promise
                  * @variation 2
                  */
     

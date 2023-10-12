@@ -91,13 +91,19 @@ pub struct ListArtifactNamesResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListArtifactsRequest {
+pub struct SearchArtifactsRequest {
     #[prost(message, optional, tag="1")]
     pub artifact_key: ::core::option::Option<super::core::ArtifactKey>,
+    #[prost(string, tag="2")]
+    pub filters: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub token: ::prost::alloc::string::String,
+    #[prost(int32, tag="4")]
+    pub limit: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListArtifactsResponse {
+pub struct SearchArtifactsResponse {
     #[prost(message, repeated, tag="1")]
     pub artifacts: ::prost::alloc::vec::Vec<Artifact>,
 }

@@ -1,4 +1,5 @@
 from google.protobuf import any_pb2 as _any_pb2
+from google.api import annotations_pb2 as _annotations_pb2
 from flyteidl.admin import launch_plan_pb2 as _launch_plan_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import types_pb2 as _types_pb2
@@ -99,13 +100,19 @@ class ListArtifactNamesResponse(_message.Message):
     artifact_keys: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactKey]
     def __init__(self, artifact_keys: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]]] = ...) -> None: ...
 
-class ListArtifactsRequest(_message.Message):
-    __slots__ = ["artifact_key"]
+class SearchArtifactsRequest(_message.Message):
+    __slots__ = ["artifact_key", "filters", "token", "limit"]
     ARTIFACT_KEY_FIELD_NUMBER: _ClassVar[int]
+    FILTERS_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
     artifact_key: _artifact_id_pb2.ArtifactKey
-    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ...) -> None: ...
+    filters: str
+    token: str
+    limit: int
+    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., filters: _Optional[str] = ..., token: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
 
-class ListArtifactsResponse(_message.Message):
+class SearchArtifactsResponse(_message.Message):
     __slots__ = ["artifacts"]
     ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
     artifacts: _containers.RepeatedCompositeFieldContainer[Artifact]

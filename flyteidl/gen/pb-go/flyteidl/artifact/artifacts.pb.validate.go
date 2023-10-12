@@ -722,17 +722,17 @@ var _ interface {
 	ErrorName() string
 } = ListArtifactNamesResponseValidationError{}
 
-// Validate checks the field values on ListArtifactsRequest with the rules
+// Validate checks the field values on SearchArtifactsRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *ListArtifactsRequest) Validate() error {
+func (m *SearchArtifactsRequest) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if v, ok := interface{}(m.GetArtifactKey()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
-			return ListArtifactsRequestValidationError{
+			return SearchArtifactsRequestValidationError{
 				field:  "ArtifactKey",
 				reason: "embedded message failed validation",
 				cause:  err,
@@ -740,12 +740,18 @@ func (m *ListArtifactsRequest) Validate() error {
 		}
 	}
 
+	// no validation rules for Filters
+
+	// no validation rules for Token
+
+	// no validation rules for Limit
+
 	return nil
 }
 
-// ListArtifactsRequestValidationError is the validation error returned by
-// ListArtifactsRequest.Validate if the designated constraints aren't met.
-type ListArtifactsRequestValidationError struct {
+// SearchArtifactsRequestValidationError is the validation error returned by
+// SearchArtifactsRequest.Validate if the designated constraints aren't met.
+type SearchArtifactsRequestValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -753,24 +759,24 @@ type ListArtifactsRequestValidationError struct {
 }
 
 // Field function returns field value.
-func (e ListArtifactsRequestValidationError) Field() string { return e.field }
+func (e SearchArtifactsRequestValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ListArtifactsRequestValidationError) Reason() string { return e.reason }
+func (e SearchArtifactsRequestValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ListArtifactsRequestValidationError) Cause() error { return e.cause }
+func (e SearchArtifactsRequestValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ListArtifactsRequestValidationError) Key() bool { return e.key }
+func (e SearchArtifactsRequestValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ListArtifactsRequestValidationError) ErrorName() string {
-	return "ListArtifactsRequestValidationError"
+func (e SearchArtifactsRequestValidationError) ErrorName() string {
+	return "SearchArtifactsRequestValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ListArtifactsRequestValidationError) Error() string {
+func (e SearchArtifactsRequestValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -782,14 +788,14 @@ func (e ListArtifactsRequestValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sListArtifactsRequest.%s: %s%s",
+		"invalid %sSearchArtifactsRequest.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ListArtifactsRequestValidationError{}
+var _ error = SearchArtifactsRequestValidationError{}
 
 var _ interface {
 	Field() string
@@ -797,12 +803,12 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ListArtifactsRequestValidationError{}
+} = SearchArtifactsRequestValidationError{}
 
-// Validate checks the field values on ListArtifactsResponse with the rules
+// Validate checks the field values on SearchArtifactsResponse with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
-func (m *ListArtifactsResponse) Validate() error {
+func (m *SearchArtifactsResponse) Validate() error {
 	if m == nil {
 		return nil
 	}
@@ -812,7 +818,7 @@ func (m *ListArtifactsResponse) Validate() error {
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
-				return ListArtifactsResponseValidationError{
+				return SearchArtifactsResponseValidationError{
 					field:  fmt.Sprintf("Artifacts[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
@@ -825,9 +831,9 @@ func (m *ListArtifactsResponse) Validate() error {
 	return nil
 }
 
-// ListArtifactsResponseValidationError is the validation error returned by
-// ListArtifactsResponse.Validate if the designated constraints aren't met.
-type ListArtifactsResponseValidationError struct {
+// SearchArtifactsResponseValidationError is the validation error returned by
+// SearchArtifactsResponse.Validate if the designated constraints aren't met.
+type SearchArtifactsResponseValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -835,24 +841,24 @@ type ListArtifactsResponseValidationError struct {
 }
 
 // Field function returns field value.
-func (e ListArtifactsResponseValidationError) Field() string { return e.field }
+func (e SearchArtifactsResponseValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e ListArtifactsResponseValidationError) Reason() string { return e.reason }
+func (e SearchArtifactsResponseValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e ListArtifactsResponseValidationError) Cause() error { return e.cause }
+func (e SearchArtifactsResponseValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e ListArtifactsResponseValidationError) Key() bool { return e.key }
+func (e SearchArtifactsResponseValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e ListArtifactsResponseValidationError) ErrorName() string {
-	return "ListArtifactsResponseValidationError"
+func (e SearchArtifactsResponseValidationError) ErrorName() string {
+	return "SearchArtifactsResponseValidationError"
 }
 
 // Error satisfies the builtin error interface
-func (e ListArtifactsResponseValidationError) Error() string {
+func (e SearchArtifactsResponseValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -864,14 +870,14 @@ func (e ListArtifactsResponseValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sListArtifactsResponse.%s: %s%s",
+		"invalid %sSearchArtifactsResponse.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = ListArtifactsResponseValidationError{}
+var _ error = SearchArtifactsResponseValidationError{}
 
 var _ interface {
 	Field() string
@@ -879,7 +885,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = ListArtifactsResponseValidationError{}
+} = SearchArtifactsResponseValidationError{}
 
 // Validate checks the field values on AddTagRequest with the rules defined in
 // the proto definition for this message. If any rules are violated, an error

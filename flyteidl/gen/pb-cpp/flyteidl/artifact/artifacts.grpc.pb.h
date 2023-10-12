@@ -62,10 +62,13 @@ class ArtifactRegistry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::GetArtifactResponse>> PrepareAsyncGetArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::GetArtifactResponse>>(PrepareAsyncGetArtifactRaw(context, request, cq));
     }
-    //  rpc ListArtifactNames (ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {}
-    //
-    //  rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse) {}
-    //
+    virtual ::grpc::Status SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::flyteidl::artifact::SearchArtifactsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>> AsyncSearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>>(AsyncSearchArtifactsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>> PrepareAsyncSearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>>(PrepareAsyncSearchArtifactsRaw(context, request, cq));
+    }
     virtual ::grpc::Status CreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::flyteidl::artifact::CreateTriggerResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CreateTriggerResponse>> AsyncCreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CreateTriggerResponse>>(AsyncCreateTriggerRaw(context, request, cq));
@@ -112,10 +115,10 @@ class ArtifactRegistry final {
       virtual void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::GetArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest* request, ::flyteidl::artifact::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      //  rpc ListArtifactNames (ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {}
-      //
-      //  rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse) {}
-      //
+      virtual void SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SearchArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void SearchArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void CreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest* request, ::flyteidl::artifact::CreateTriggerResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateTrigger(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::CreateTriggerResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void CreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest* request, ::flyteidl::artifact::CreateTriggerResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -143,6 +146,8 @@ class ArtifactRegistry final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CreateArtifactResponse>* PrepareAsyncCreateArtifactRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateArtifactRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::GetArtifactResponse>* AsyncGetArtifactRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::GetArtifactResponse>* PrepareAsyncGetArtifactRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>* AsyncSearchArtifactsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>* PrepareAsyncSearchArtifactsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CreateTriggerResponse>* AsyncCreateTriggerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CreateTriggerResponse>* PrepareAsyncCreateTriggerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::DeleteTriggerResponse>* AsyncDeleteTriggerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::DeleteTriggerRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -170,6 +175,13 @@ class ArtifactRegistry final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::GetArtifactResponse>> PrepareAsyncGetArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::GetArtifactResponse>>(PrepareAsyncGetArtifactRaw(context, request, cq));
+    }
+    ::grpc::Status SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::flyteidl::artifact::SearchArtifactsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>> AsyncSearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>>(AsyncSearchArtifactsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>> PrepareAsyncSearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>>(PrepareAsyncSearchArtifactsRaw(context, request, cq));
     }
     ::grpc::Status CreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::flyteidl::artifact::CreateTriggerResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CreateTriggerResponse>> AsyncCreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::grpc::CompletionQueue* cq) {
@@ -217,6 +229,10 @@ class ArtifactRegistry final {
       void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::GetArtifactResponse* response, std::function<void(::grpc::Status)>) override;
       void GetArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest* request, ::flyteidl::artifact::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) override;
+      void SearchArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) override;
+      void SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void SearchArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void CreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest* request, ::flyteidl::artifact::CreateTriggerResponse* response, std::function<void(::grpc::Status)>) override;
       void CreateTrigger(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::CreateTriggerResponse* response, std::function<void(::grpc::Status)>) override;
       void CreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest* request, ::flyteidl::artifact::CreateTriggerResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
@@ -252,6 +268,8 @@ class ArtifactRegistry final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CreateArtifactResponse>* PrepareAsyncCreateArtifactRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateArtifactRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::GetArtifactResponse>* AsyncGetArtifactRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::GetArtifactResponse>* PrepareAsyncGetArtifactRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* AsyncSearchArtifactsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* PrepareAsyncSearchArtifactsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CreateTriggerResponse>* AsyncCreateTriggerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CreateTriggerResponse>* PrepareAsyncCreateTriggerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::DeleteTriggerResponse>* AsyncDeleteTriggerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::DeleteTriggerRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -264,6 +282,7 @@ class ArtifactRegistry final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_CreateArtifact_;
     const ::grpc::internal::RpcMethod rpcmethod_GetArtifact_;
+    const ::grpc::internal::RpcMethod rpcmethod_SearchArtifacts_;
     const ::grpc::internal::RpcMethod rpcmethod_CreateTrigger_;
     const ::grpc::internal::RpcMethod rpcmethod_DeleteTrigger_;
     const ::grpc::internal::RpcMethod rpcmethod_AddTag_;
@@ -278,10 +297,7 @@ class ArtifactRegistry final {
     virtual ~Service();
     virtual ::grpc::Status CreateArtifact(::grpc::ServerContext* context, const ::flyteidl::artifact::CreateArtifactRequest* request, ::flyteidl::artifact::CreateArtifactResponse* response);
     virtual ::grpc::Status GetArtifact(::grpc::ServerContext* context, const ::flyteidl::artifact::GetArtifactRequest* request, ::flyteidl::artifact::GetArtifactResponse* response);
-    //  rpc ListArtifactNames (ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {}
-    //
-    //  rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse) {}
-    //
+    virtual ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response);
     virtual ::grpc::Status CreateTrigger(::grpc::ServerContext* context, const ::flyteidl::artifact::CreateTriggerRequest* request, ::flyteidl::artifact::CreateTriggerResponse* response);
     virtual ::grpc::Status DeleteTrigger(::grpc::ServerContext* context, const ::flyteidl::artifact::DeleteTriggerRequest* request, ::flyteidl::artifact::DeleteTriggerResponse* response);
     virtual ::grpc::Status AddTag(::grpc::ServerContext* context, const ::flyteidl::artifact::AddTagRequest* request, ::flyteidl::artifact::AddTagResponse* response);
@@ -329,12 +345,32 @@ class ArtifactRegistry final {
     }
   };
   template <class BaseClass>
+  class WithAsyncMethod_SearchArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_SearchArtifacts() {
+      ::grpc::Service::MarkMethodAsync(2);
+    }
+    ~WithAsyncMethod_SearchArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestSearchArtifacts(::grpc::ServerContext* context, ::flyteidl::artifact::SearchArtifactsRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::SearchArtifactsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithAsyncMethod_CreateTrigger : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_CreateTrigger() {
-      ::grpc::Service::MarkMethodAsync(2);
+      ::grpc::Service::MarkMethodAsync(3);
     }
     ~WithAsyncMethod_CreateTrigger() override {
       BaseClassMustBeDerivedFromService(this);
@@ -345,7 +381,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestCreateTrigger(::grpc::ServerContext* context, ::flyteidl::artifact::CreateTriggerRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::CreateTriggerResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -354,7 +390,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_DeleteTrigger() {
-      ::grpc::Service::MarkMethodAsync(3);
+      ::grpc::Service::MarkMethodAsync(4);
     }
     ~WithAsyncMethod_DeleteTrigger() override {
       BaseClassMustBeDerivedFromService(this);
@@ -365,7 +401,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestDeleteTrigger(::grpc::ServerContext* context, ::flyteidl::artifact::DeleteTriggerRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::DeleteTriggerResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -374,7 +410,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_AddTag() {
-      ::grpc::Service::MarkMethodAsync(4);
+      ::grpc::Service::MarkMethodAsync(5);
     }
     ~WithAsyncMethod_AddTag() override {
       BaseClassMustBeDerivedFromService(this);
@@ -385,7 +421,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestAddTag(::grpc::ServerContext* context, ::flyteidl::artifact::AddTagRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::AddTagResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -394,7 +430,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_RegisterProducer() {
-      ::grpc::Service::MarkMethodAsync(5);
+      ::grpc::Service::MarkMethodAsync(6);
     }
     ~WithAsyncMethod_RegisterProducer() override {
       BaseClassMustBeDerivedFromService(this);
@@ -405,7 +441,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRegisterProducer(::grpc::ServerContext* context, ::flyteidl::artifact::RegisterProducerRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::RegisterResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -414,7 +450,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_RegisterConsumer() {
-      ::grpc::Service::MarkMethodAsync(6);
+      ::grpc::Service::MarkMethodAsync(7);
     }
     ~WithAsyncMethod_RegisterConsumer() override {
       BaseClassMustBeDerivedFromService(this);
@@ -425,10 +461,10 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRegisterConsumer(::grpc::ServerContext* context, ::flyteidl::artifact::RegisterConsumerRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::RegisterResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_CreateTrigger<WithAsyncMethod_DeleteTrigger<WithAsyncMethod_AddTag<WithAsyncMethod_RegisterProducer<WithAsyncMethod_RegisterConsumer<Service > > > > > > > AsyncService;
+  typedef WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_SearchArtifacts<WithAsyncMethod_CreateTrigger<WithAsyncMethod_DeleteTrigger<WithAsyncMethod_AddTag<WithAsyncMethod_RegisterProducer<WithAsyncMethod_RegisterConsumer<Service > > > > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateArtifact : public BaseClass {
    private:
@@ -492,12 +528,43 @@ class ArtifactRegistry final {
     virtual void GetArtifact(::grpc::ServerContext* context, const ::flyteidl::artifact::GetArtifactRequest* request, ::flyteidl::artifact::GetArtifactResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithCallbackMethod_SearchArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_SearchArtifacts() {
+      ::grpc::Service::experimental().MarkMethodCallback(2,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::SearchArtifactsRequest, ::flyteidl::artifact::SearchArtifactsResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::artifact::SearchArtifactsRequest* request,
+                 ::flyteidl::artifact::SearchArtifactsResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->SearchArtifacts(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_SearchArtifacts(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::SearchArtifactsRequest, ::flyteidl::artifact::SearchArtifactsResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::SearchArtifactsRequest, ::flyteidl::artifact::SearchArtifactsResponse>*>(
+          ::grpc::Service::experimental().GetHandler(2))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_SearchArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateTrigger : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_CreateTrigger() {
-      ::grpc::Service::experimental().MarkMethodCallback(2,
+      ::grpc::Service::experimental().MarkMethodCallback(3,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::CreateTriggerRequest, ::flyteidl::artifact::CreateTriggerResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::artifact::CreateTriggerRequest* request,
@@ -509,7 +576,7 @@ class ArtifactRegistry final {
     void SetMessageAllocatorFor_CreateTrigger(
         ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::CreateTriggerRequest, ::flyteidl::artifact::CreateTriggerResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::CreateTriggerRequest, ::flyteidl::artifact::CreateTriggerResponse>*>(
-          ::grpc::Service::experimental().GetHandler(2))
+          ::grpc::Service::experimental().GetHandler(3))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_CreateTrigger() override {
@@ -528,7 +595,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_DeleteTrigger() {
-      ::grpc::Service::experimental().MarkMethodCallback(3,
+      ::grpc::Service::experimental().MarkMethodCallback(4,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::DeleteTriggerRequest, ::flyteidl::artifact::DeleteTriggerResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::artifact::DeleteTriggerRequest* request,
@@ -540,7 +607,7 @@ class ArtifactRegistry final {
     void SetMessageAllocatorFor_DeleteTrigger(
         ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::DeleteTriggerRequest, ::flyteidl::artifact::DeleteTriggerResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::DeleteTriggerRequest, ::flyteidl::artifact::DeleteTriggerResponse>*>(
-          ::grpc::Service::experimental().GetHandler(3))
+          ::grpc::Service::experimental().GetHandler(4))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_DeleteTrigger() override {
@@ -559,7 +626,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_AddTag() {
-      ::grpc::Service::experimental().MarkMethodCallback(4,
+      ::grpc::Service::experimental().MarkMethodCallback(5,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::AddTagRequest, ::flyteidl::artifact::AddTagResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::artifact::AddTagRequest* request,
@@ -571,7 +638,7 @@ class ArtifactRegistry final {
     void SetMessageAllocatorFor_AddTag(
         ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::AddTagRequest, ::flyteidl::artifact::AddTagResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::AddTagRequest, ::flyteidl::artifact::AddTagResponse>*>(
-          ::grpc::Service::experimental().GetHandler(4))
+          ::grpc::Service::experimental().GetHandler(5))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_AddTag() override {
@@ -590,7 +657,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_RegisterProducer() {
-      ::grpc::Service::experimental().MarkMethodCallback(5,
+      ::grpc::Service::experimental().MarkMethodCallback(6,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::RegisterProducerRequest, ::flyteidl::artifact::RegisterResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::artifact::RegisterProducerRequest* request,
@@ -602,7 +669,7 @@ class ArtifactRegistry final {
     void SetMessageAllocatorFor_RegisterProducer(
         ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::RegisterProducerRequest, ::flyteidl::artifact::RegisterResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::RegisterProducerRequest, ::flyteidl::artifact::RegisterResponse>*>(
-          ::grpc::Service::experimental().GetHandler(5))
+          ::grpc::Service::experimental().GetHandler(6))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_RegisterProducer() override {
@@ -621,7 +688,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_RegisterConsumer() {
-      ::grpc::Service::experimental().MarkMethodCallback(6,
+      ::grpc::Service::experimental().MarkMethodCallback(7,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::RegisterConsumerRequest, ::flyteidl::artifact::RegisterResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::artifact::RegisterConsumerRequest* request,
@@ -633,7 +700,7 @@ class ArtifactRegistry final {
     void SetMessageAllocatorFor_RegisterConsumer(
         ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::RegisterConsumerRequest, ::flyteidl::artifact::RegisterResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::RegisterConsumerRequest, ::flyteidl::artifact::RegisterResponse>*>(
-          ::grpc::Service::experimental().GetHandler(6))
+          ::grpc::Service::experimental().GetHandler(7))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_RegisterConsumer() override {
@@ -646,7 +713,7 @@ class ArtifactRegistry final {
     }
     virtual void RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_CreateTrigger<ExperimentalWithCallbackMethod_DeleteTrigger<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_RegisterProducer<ExperimentalWithCallbackMethod_RegisterConsumer<Service > > > > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_SearchArtifacts<ExperimentalWithCallbackMethod_CreateTrigger<ExperimentalWithCallbackMethod_DeleteTrigger<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_RegisterProducer<ExperimentalWithCallbackMethod_RegisterConsumer<Service > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateArtifact : public BaseClass {
    private:
@@ -682,12 +749,29 @@ class ArtifactRegistry final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_SearchArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_SearchArtifacts() {
+      ::grpc::Service::MarkMethodGeneric(2);
+    }
+    ~WithGenericMethod_SearchArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_CreateTrigger : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_CreateTrigger() {
-      ::grpc::Service::MarkMethodGeneric(2);
+      ::grpc::Service::MarkMethodGeneric(3);
     }
     ~WithGenericMethod_CreateTrigger() override {
       BaseClassMustBeDerivedFromService(this);
@@ -704,7 +788,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_DeleteTrigger() {
-      ::grpc::Service::MarkMethodGeneric(3);
+      ::grpc::Service::MarkMethodGeneric(4);
     }
     ~WithGenericMethod_DeleteTrigger() override {
       BaseClassMustBeDerivedFromService(this);
@@ -721,7 +805,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_AddTag() {
-      ::grpc::Service::MarkMethodGeneric(4);
+      ::grpc::Service::MarkMethodGeneric(5);
     }
     ~WithGenericMethod_AddTag() override {
       BaseClassMustBeDerivedFromService(this);
@@ -738,7 +822,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_RegisterProducer() {
-      ::grpc::Service::MarkMethodGeneric(5);
+      ::grpc::Service::MarkMethodGeneric(6);
     }
     ~WithGenericMethod_RegisterProducer() override {
       BaseClassMustBeDerivedFromService(this);
@@ -755,7 +839,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_RegisterConsumer() {
-      ::grpc::Service::MarkMethodGeneric(6);
+      ::grpc::Service::MarkMethodGeneric(7);
     }
     ~WithGenericMethod_RegisterConsumer() override {
       BaseClassMustBeDerivedFromService(this);
@@ -807,12 +891,32 @@ class ArtifactRegistry final {
     }
   };
   template <class BaseClass>
+  class WithRawMethod_SearchArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_SearchArtifacts() {
+      ::grpc::Service::MarkMethodRaw(2);
+    }
+    ~WithRawMethod_SearchArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestSearchArtifacts(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
   class WithRawMethod_CreateTrigger : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_CreateTrigger() {
-      ::grpc::Service::MarkMethodRaw(2);
+      ::grpc::Service::MarkMethodRaw(3);
     }
     ~WithRawMethod_CreateTrigger() override {
       BaseClassMustBeDerivedFromService(this);
@@ -823,7 +927,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestCreateTrigger(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -832,7 +936,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_DeleteTrigger() {
-      ::grpc::Service::MarkMethodRaw(3);
+      ::grpc::Service::MarkMethodRaw(4);
     }
     ~WithRawMethod_DeleteTrigger() override {
       BaseClassMustBeDerivedFromService(this);
@@ -843,7 +947,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestDeleteTrigger(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -852,7 +956,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_AddTag() {
-      ::grpc::Service::MarkMethodRaw(4);
+      ::grpc::Service::MarkMethodRaw(5);
     }
     ~WithRawMethod_AddTag() override {
       BaseClassMustBeDerivedFromService(this);
@@ -863,7 +967,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestAddTag(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -872,7 +976,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_RegisterProducer() {
-      ::grpc::Service::MarkMethodRaw(5);
+      ::grpc::Service::MarkMethodRaw(6);
     }
     ~WithRawMethod_RegisterProducer() override {
       BaseClassMustBeDerivedFromService(this);
@@ -883,7 +987,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRegisterProducer(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -892,7 +996,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_RegisterConsumer() {
-      ::grpc::Service::MarkMethodRaw(6);
+      ::grpc::Service::MarkMethodRaw(7);
     }
     ~WithRawMethod_RegisterConsumer() override {
       BaseClassMustBeDerivedFromService(this);
@@ -903,7 +1007,7 @@ class ArtifactRegistry final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRegisterConsumer(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -957,12 +1061,37 @@ class ArtifactRegistry final {
     virtual void GetArtifact(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_SearchArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_SearchArtifacts() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(2,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->SearchArtifacts(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_SearchArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void SearchArtifacts(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_CreateTrigger : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_CreateTrigger() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(2,
+      ::grpc::Service::experimental().MarkMethodRawCallback(3,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -987,7 +1116,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_DeleteTrigger() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(3,
+      ::grpc::Service::experimental().MarkMethodRawCallback(4,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -1012,7 +1141,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_AddTag() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(4,
+      ::grpc::Service::experimental().MarkMethodRawCallback(5,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -1037,7 +1166,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_RegisterProducer() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(5,
+      ::grpc::Service::experimental().MarkMethodRawCallback(6,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -1062,7 +1191,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_RegisterConsumer() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(6,
+      ::grpc::Service::experimental().MarkMethodRawCallback(7,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -1122,12 +1251,32 @@ class ArtifactRegistry final {
     virtual ::grpc::Status StreamedGetArtifact(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::GetArtifactRequest,::flyteidl::artifact::GetArtifactResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_SearchArtifacts : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_SearchArtifacts() {
+      ::grpc::Service::MarkMethodStreamed(2,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::SearchArtifactsRequest, ::flyteidl::artifact::SearchArtifactsResponse>(std::bind(&WithStreamedUnaryMethod_SearchArtifacts<BaseClass>::StreamedSearchArtifacts, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_SearchArtifacts() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedSearchArtifacts(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::SearchArtifactsRequest,::flyteidl::artifact::SearchArtifactsResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_CreateTrigger : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_CreateTrigger() {
-      ::grpc::Service::MarkMethodStreamed(2,
+      ::grpc::Service::MarkMethodStreamed(3,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::CreateTriggerRequest, ::flyteidl::artifact::CreateTriggerResponse>(std::bind(&WithStreamedUnaryMethod_CreateTrigger<BaseClass>::StreamedCreateTrigger, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_CreateTrigger() override {
@@ -1147,7 +1296,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_DeleteTrigger() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(4,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::DeleteTriggerRequest, ::flyteidl::artifact::DeleteTriggerResponse>(std::bind(&WithStreamedUnaryMethod_DeleteTrigger<BaseClass>::StreamedDeleteTrigger, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_DeleteTrigger() override {
@@ -1167,7 +1316,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_AddTag() {
-      ::grpc::Service::MarkMethodStreamed(4,
+      ::grpc::Service::MarkMethodStreamed(5,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::AddTagRequest, ::flyteidl::artifact::AddTagResponse>(std::bind(&WithStreamedUnaryMethod_AddTag<BaseClass>::StreamedAddTag, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_AddTag() override {
@@ -1187,7 +1336,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_RegisterProducer() {
-      ::grpc::Service::MarkMethodStreamed(5,
+      ::grpc::Service::MarkMethodStreamed(6,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::RegisterProducerRequest, ::flyteidl::artifact::RegisterResponse>(std::bind(&WithStreamedUnaryMethod_RegisterProducer<BaseClass>::StreamedRegisterProducer, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_RegisterProducer() override {
@@ -1207,7 +1356,7 @@ class ArtifactRegistry final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_RegisterConsumer() {
-      ::grpc::Service::MarkMethodStreamed(6,
+      ::grpc::Service::MarkMethodStreamed(7,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::RegisterConsumerRequest, ::flyteidl::artifact::RegisterResponse>(std::bind(&WithStreamedUnaryMethod_RegisterConsumer<BaseClass>::StreamedRegisterConsumer, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_RegisterConsumer() override {
@@ -1221,9 +1370,9 @@ class ArtifactRegistry final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedRegisterConsumer(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::RegisterConsumerRequest,::flyteidl::artifact::RegisterResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > > StreamedService;
 };
 
 }  // namespace artifact

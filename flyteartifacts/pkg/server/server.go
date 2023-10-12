@@ -1,15 +1,12 @@
 package server
 
 import (
-	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
+	"context"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-	"net"
-
-	"context"
 
 	_ "net/http/pprof" // Required to serve application.
 )
@@ -23,33 +20,37 @@ func NewArtifactService() *ArtifactService {
 }
 
 func HttpRegistrationHook(ctx context.Context, gwmux *runtime.ServeMux, grpcAddress string, grpcConnectionOpts []grpc.DialOption, _ promutils.Scope) error {
-	//err := executionsvc.RegisterExecutionServiceHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
+	err := artifact.RegisterArtifactRegistryHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
 	if err != nil {
 		return errors.Wrap(err, "error registering execution service")
 	}
 	return nil
 }
 
-func Serve(ctx context.Context, opts ...grpc.ServerOption) error {
-	var serverOpts []grpc.ServerOption
+func GrpcRegistrationHook(ctx context.Context, server *grpc.Server, scope promutils.Scope) error {
+	serviceImpl := NewArtifactService()
+	artifact.RegisterArtifactRegistryServer(server, serviceImpl)
 
-	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
-
-	serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(3000000))
-	serverOpts = append(serverOpts, opts...)
-	grpcServer := grpc.NewServer(serverOpts...)
-	server := NewArtifactService()
-
-	artifact.RegisterArtifactRegistryServer(grpcServer, server)
-
-	lis, err := net.Listen("tcp", "localhost:50051")
-	if err != nil {
-		return err
-	}
-	err = grpcServer.Serve(lis)
-
-	return err
+	return nil
 }
+
+//func Serve(ctx context.Context, opts ...grpc.ServerOption) error {
+//	var serverOpts []grpc.ServerOption
+//
+//	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
+//
+//	serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(3000000))
+//	serverOpts = append(serverOpts, opts...)
+//	grpcServer := grpc.NewServer(serverOpts...)
+//
+//	lis, err := net.Listen("tcp", "localhost:50051")
+//	if err != nil {
+//		return err
+//	}
+//	err = grpcServer.Serve(lis)
+//
+//	return err
+//}
 
 func (a *ArtifactService) CreateArtifact(ctx context.Context, request *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
 	return &artifact.CreateArtifactResponse{}, nil
@@ -77,4 +78,8 @@ func (a *ArtifactService) RegisterProducer(ctx context.Context, request *artifac
 
 func (a *ArtifactService) RegisterConsumer(ctx context.Context, request *artifact.RegisterConsumerRequest) (*artifact.RegisterResponse, error) {
 	return &artifact.RegisterResponse{}, nil
+}
+
+func (a *ArtifactService) SearchArtifacts(ctx context.Context, request *artifact.SearchArtifactsRequest) (*artifact.SearchArtifactsResponse, error) {
+	return &artifact.SearchArtifactsResponse{}, nil
 }
