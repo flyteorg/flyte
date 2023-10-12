@@ -48,9 +48,7 @@ func (fc *fakeConn) ParseServiceConfig(_ string) *serviceconfig.ParseResult {
 	return nil
 }
 
-func (fc *fakeConn) NewAddress(_ []resolver.Address) {
-	return
-}
+func (fc *fakeConn) NewAddress(_ []resolver.Address) {}
 
 func (*fakeConn) NewServiceConfig(serviceConfig string) {
 	fmt.Printf("serviceConfig: %s\n", serviceConfig)
@@ -67,8 +65,8 @@ func TestBuilder(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Make sure watch is started before we create the endpoint
-	time.Sleep(3 * time.Second)
+	// Make sure watcher is started before we create the endpoint
+	time.Sleep(5 * time.Second)
 
 	_, err = k8sClient.CoreV1().Endpoints("flyte").Create(context.Background(), &v1.Endpoints{
 		ObjectMeta: metav1.ObjectMeta{
@@ -92,10 +90,7 @@ func TestBuilder(t *testing.T) {
 		},
 	}, metav1.CreateOptions{})
 	assert.NilError(t, err)
-	ctx := context.Background()
-	e, err := k8sClient.CoreV1().Endpoints("flyte").Get(ctx, "flyteagent", metav1.GetOptions{})
-	assert.NilError(t, err)
-	assert.Equal(t, e.Subsets[0].Addresses[0].IP, "10.0.0.1")
+	assert.Equal(t, len(fc.found), 1)
 	assert.Equal(t, fc.found[0], "10.0.0.1:8000")
 
 	<-fc.cmp
