@@ -5,11 +5,12 @@ package controller
 import (
 	"context"
 	"fmt"
-	resolver2 "github.com/flyteorg/flyte/flytepropeller/pkg/resolver"
-	"google.golang.org/grpc/resolver"
 	"os"
 	"runtime/pprof"
 	"time"
+
+	resolver2 "github.com/flyteorg/flyte/flytepropeller/pkg/resolver"
+	"google.golang.org/grpc/resolver"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"

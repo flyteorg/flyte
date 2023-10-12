@@ -3,17 +3,17 @@ package resolver
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"log"
+	"net/url"
+	"testing"
+	"time"
+
 	"google.golang.org/grpc/resolver"
 	"google.golang.org/grpc/serviceconfig"
 	"gotest.tools/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	testclient "k8s.io/client-go/kubernetes/fake"
-	"log"
-	"net/url"
-	"testing"
-	"time"
 )
 
 func parseTarget(target string) resolver.Target {
@@ -27,17 +27,16 @@ func parseTarget(target string) resolver.Target {
 	}
 }
 
-func newTestBuilder() resolver.Builder {
-	client := testclient.NewSimpleClientset()
-	return NewBuilder(client, KubernetesSchema)
-}
-
 type fakeConn struct {
 	cmp   chan struct{}
 	found []string
 }
 
-func (fc *fakeConn) UpdateState(resolver.State) error {
+func (fc *fakeConn) UpdateState(state resolver.State) error {
+	for _, a := range state.Addresses {
+		fc.found = append(fc.found, a.Addr)
+	}
+	fc.cmp <- struct{}{}
 	return nil
 }
 
@@ -46,20 +45,11 @@ func (fc *fakeConn) ReportError(e error) {
 }
 
 func (fc *fakeConn) ParseServiceConfig(_ string) *serviceconfig.ParseResult {
-	return &serviceconfig.ParseResult{
-		Config: nil,
-		Err:    fmt.Errorf("no implementation for ParseServiceConfig"),
-	}
+	return nil
 }
 
-func (fc *fakeConn) NewAddress(addresses []resolver.Address) {
-	logger.Info(context.Background(), "NewAddress called")
-	for i, a := range addresses {
-		fc.found = append(fc.found, a.Addr)
-		fmt.Printf("%d, address: %s\n", i, a.Addr)
-		fmt.Printf("%d, servername: %s\n", i, a.ServerName)
-	}
-	fc.cmp <- struct{}{}
+func (fc *fakeConn) NewAddress(_ []resolver.Address) {
+	return
 }
 
 func (*fakeConn) NewServiceConfig(serviceConfig string) {
@@ -67,7 +57,8 @@ func (*fakeConn) NewServiceConfig(serviceConfig string) {
 }
 
 func TestBuilder(t *testing.T) {
-	builder := newTestBuilder()
+	k8sClient := testclient.NewSimpleClientset()
+	builder := NewBuilder(k8sClient, KubernetesSchema)
 	fc := &fakeConn{
 		cmp: make(chan struct{}),
 	}
@@ -75,7 +66,10 @@ func TestBuilder(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	k8sClient := testclient.NewSimpleClientset()
+
+	// Make sure watch is started before we create the endpoint
+	time.Sleep(3 * time.Second)
+
 	_, err = k8sClient.CoreV1().Endpoints("flyte").Create(context.Background(), &v1.Endpoints{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "flyteagent",
@@ -88,21 +82,55 @@ func TestBuilder(t *testing.T) {
 						IP: "10.0.0.1",
 					},
 				},
+				Ports: []v1.EndpointPort{
+					{
+						Name: "grpc",
+						Port: 8000,
+					},
+				},
 			},
 		},
 	}, metav1.CreateOptions{})
 	assert.NilError(t, err)
-	time.Sleep(1 * time.Second)
-	e, err := k8sClient.CoreV1().Endpoints("flyte").Get(context.Background(), "flyteagent", metav1.GetOptions{})
+	ctx := context.Background()
+	e, err := k8sClient.CoreV1().Endpoints("flyte").Get(ctx, "flyteagent", metav1.GetOptions{})
 	assert.NilError(t, err)
 	assert.Equal(t, e.Subsets[0].Addresses[0].IP, "10.0.0.1")
-	// fmt.Printf(e.String())
+	assert.Equal(t, fc.found[0], "10.0.0.1:8000")
+
 	<-fc.cmp
 	k8sResolver.Close()
-	if len(fc.found) == 0 {
-		t.Fatal("could not found endpoints")
-	}
 	close(fc.cmp)
+}
+
+func TestWatcher(t *testing.T) {
+	k8sClient := testclient.NewSimpleClientset()
+	go func() {
+		for i := 0; i < 10; i++ {
+			_, err := k8sClient.CoreV1().Endpoints("flyte").Create(context.Background(), &v1.Endpoints{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "flyteagent",
+					Namespace: "flyte",
+				},
+				Subsets: []v1.EndpointSubset{
+					{
+						Addresses: []v1.EndpointAddress{
+							{
+								IP: "10.0.0.1",
+							},
+						},
+						Ports: []v1.EndpointPort{
+							{
+								Name: "grpc",
+								Port: 8000,
+							},
+						},
+					},
+				},
+			}, metav1.CreateOptions{})
+			assert.NilError(t, err)
+		}
+	}()
 }
 
 func TestParseResolverTargets(t *testing.T) {

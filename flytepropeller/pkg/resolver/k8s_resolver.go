@@ -3,6 +3,10 @@ package resolver
 import (
 	"context"
 	"fmt"
+	"net"
+	"strings"
+	"sync"
+
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/resolver"
@@ -10,9 +14,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
-	"net"
-	"strings"
-	"sync"
 )
 
 const (
@@ -23,6 +24,10 @@ type targetInfo struct {
 	serviceName      string
 	serviceNamespace string
 	port             string
+}
+
+func (t targetInfo) String() string {
+	return fmt.Sprintf("kubernetes:///%s.%s:%s", t.serviceNamespace, t.serviceName, t.port)
 }
 
 // NewBuilder creates a kubeBuilder which is used by grpc resolver.
@@ -46,10 +51,6 @@ func splitServicePortNamespace(hpn string) (service, port, namespace string) {
 		service, port = service[:colon], service[colon+1:]
 	}
 
-	// we want to split into the service name, namespace, and whatever else is left
-	// this will support fully qualified service names, e.g. {service-name}.<namespace>.svc.<cluster-domain-name>.
-	// Note that since we look up the endpoints by service name and namespace, we don't care about the
-	// cluster-domain-name, only that we can parse out the service name and namespace properly.
 	parts := strings.SplitN(service, ".", 3)
 	if len(parts) >= 2 {
 		service, namespace = parts[0], parts[1]
@@ -150,7 +151,7 @@ func (k *kResolver) resolve(e *v1.Endpoints) {
 func (k *kResolver) run() {
 	k.wg.Add(1)
 	defer k.wg.Done()
-	logger.Infof(k.ctx, "Starting k8s resolver for %s", k.target.serviceName)
+	logger.Infof(k.ctx, "Starting k8s resolver for target: %s", k.target)
 	watcher, err := k.k8sClient.CoreV1().Endpoints(k.target.serviceNamespace).Watch(k.ctx, metav1.ListOptions{FieldSelector: "metadata.name=" + k.target.serviceName})
 	if err != nil {
 		grpclog.Errorf("k8s resolver: failed to create watcher: %v", err)
@@ -158,13 +159,10 @@ func (k *kResolver) run() {
 	}
 
 	for {
-		logger.Infof(k.ctx, "for loop")
 		select {
 		case <-k.ctx.Done():
-			logger.Infof(k.ctx, "done")
 			return
 		case event, ok := <-watcher.ResultChan():
-			logger.Infof(k.ctx, "Event: %v\n", event)
 			if !ok {
 				logger.Debugf(k.ctx, "k8s resolver: watcher closed")
 				return
