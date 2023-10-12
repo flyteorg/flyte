@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/single-binary.yml
+      - boilerplate/**
       - charts/flyte-binary/**
       - charts/flyte-sandbox/**
       - cmd/**
