@@ -53,6 +53,7 @@ func (cfg UpdateConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.BoolVar(&UConfig.Archive, fmt.Sprintf("%v%v", prefix, "archive"), UConfig.Archive, "disable the launch plan schedule (if it has an active schedule associated with it).")
 	cmdFlags.BoolVar(&UConfig.Activate, fmt.Sprintf("%v%v", prefix, "activate"), UConfig.Activate, "activate launchplan.")
 	cmdFlags.BoolVar(&UConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), UConfig.DryRun, "execute command without making any modifications.")
+	cmdFlags.BoolVar(&UConfig.Force, fmt.Sprintf("%v%v", prefix, "force"), UConfig.Force, "do not ask for an acknowledgement during updates.")
 	cmdFlags.StringVar(&UConfig.Version, fmt.Sprintf("%v%v", prefix, "version"), UConfig.Version, "version of the launchplan to be fetched.")
 	return cmdFlags
 }

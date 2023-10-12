@@ -155,4 +155,18 @@ func TestNamedEntityConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_force", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("force", testValue)
+			if vBool, err := cmdFlags.GetBool("force"); err == nil {
+				testDecodeJson_NamedEntityConfig(t, fmt.Sprintf("%v", vBool), &actual.Force)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

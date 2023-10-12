@@ -52,7 +52,8 @@ func TestFetchWorkflowAttributesError(t *testing.T) {
 		adminClient.OnGetWorkflowAttributesMatch(mock.Anything, mock.Anything).Return(wResp, nil)
 		_, err := adminFetcherExt.FetchWorkflowAttributes(ctx, "dummyProject", "domainValue", "workflowName", admin.MatchableResource_TASK_RESOURCE)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("attribute doesn't exist"), err)
+		assert.True(t, IsNotFoundError(err))
+		assert.EqualError(t, err, "attribute not found")
 	})
 }
 
@@ -76,7 +77,8 @@ func TestFetchProjectDomainAttributesError(t *testing.T) {
 		adminClient.OnGetProjectDomainAttributesMatch(mock.Anything, mock.Anything).Return(pResp, nil)
 		_, err := adminFetcherExt.FetchProjectDomainAttributes(ctx, "dummyProject", "domainValue", admin.MatchableResource_TASK_RESOURCE)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("attribute doesn't exist"), err)
+		assert.True(t, IsNotFoundError(err))
+		assert.EqualError(t, err, "attribute not found")
 	})
 }
 
@@ -93,6 +95,7 @@ func TestFetchProjectAttributesError(t *testing.T) {
 		adminClient.OnGetProjectAttributesMatch(mock.Anything, mock.Anything).Return(pResp, nil)
 		_, err := adminFetcherExt.FetchProjectAttributes(ctx, "dummyProject", admin.MatchableResource_TASK_RESOURCE)
 		assert.NotNil(t, err)
-		assert.Equal(t, fmt.Errorf("attribute doesn't exist"), err)
+		assert.True(t, IsNotFoundError(err))
+		assert.EqualError(t, err, "attribute not found")
 	})
 }

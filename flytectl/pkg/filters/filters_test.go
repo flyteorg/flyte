@@ -71,3 +71,14 @@ func TestParseFailed(t *testing.T) {
 		assert.Equal(t, "", op)
 	}
 }
+
+func TestEscapeValue(t *testing.T) {
+	assert.Equal(t, "", EscapeValue(""))
+	assert.Equal(t, "abc", EscapeValue("abc"))
+	assert.Equal(t, `\\`, EscapeValue(`\`))
+	assert.Equal(t, `\\\\`, EscapeValue(`\\`))
+	assert.Equal(t, `\,`, EscapeValue(`,`))
+	assert.Equal(t, `\,\,`, EscapeValue(`,,`))
+	assert.Equal(t, `\=`, EscapeValue(`=`))
+	assert.Equal(t, `\=\=`, EscapeValue(`==`))
+}

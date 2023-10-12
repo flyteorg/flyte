@@ -3,14 +3,15 @@ package update
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/launchplan"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytestdlib/logger"
 )
 
 const (
@@ -41,37 +42,67 @@ func updateLPFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandCont
 	if len(version) == 0 {
 		return fmt.Errorf(clierrors.ErrLPVersionNotPassed)
 	}
-	activateLP := launchplan.UConfig.Activate
-	archiveLP := launchplan.UConfig.Archive
-	if activateLP == archiveLP && archiveLP {
+
+	activate := launchplan.UConfig.Activate
+	archive := launchplan.UConfig.Archive
+	if activate == archive && archive {
 		return fmt.Errorf(clierrors.ErrInvalidStateUpdate)
 	}
 
-	var lpState admin.LaunchPlanState
-	if activateLP {
-		lpState = admin.LaunchPlanState_ACTIVE
-	} else if archiveLP {
-		lpState = admin.LaunchPlanState_INACTIVE
+	var newState admin.LaunchPlanState
+	if activate {
+		newState = admin.LaunchPlanState_ACTIVE
+	} else if archive {
+		newState = admin.LaunchPlanState_INACTIVE
 	}
 
-	if launchplan.UConfig.DryRun {
-		logger.Debugf(ctx, "skipping CreateExecution request (DryRun)")
-	} else {
-		_, err := cmdCtx.AdminClient().UpdateLaunchPlan(ctx, &admin.LaunchPlanUpdateRequest{
-			Id: &core.Identifier{
-				Project: project,
-				Domain:  domain,
-				Name:    name,
-				Version: version,
-			},
-			State: lpState,
-		})
-		if err != nil {
-			fmt.Printf(clierrors.ErrFailedLPUpdate, name, err)
-			return err
-		}
+	id := &core.Identifier{
+		Project:      project,
+		Domain:       domain,
+		Name:         name,
+		Version:      version,
+		ResourceType: core.ResourceType_LAUNCH_PLAN,
 	}
-	fmt.Printf("updated launchplan successfully on %v", name)
+
+	launchPlan, err := cmdCtx.AdminClient().GetLaunchPlan(ctx, &admin.ObjectGetRequest{Id: id})
+	if err != nil {
+		return fmt.Errorf("update launch plan %s: could not fetch launch plan: %w", name, err)
+	}
+	oldState := launchPlan.GetClosure().GetState()
+
+	type LaunchPlan struct {
+		State admin.LaunchPlanState `json:"state"`
+	}
+	patch, err := DiffAsYaml(diffPathBefore, diffPathAfter, LaunchPlan{oldState}, LaunchPlan{newState})
+	if err != nil {
+		panic(err)
+	}
+
+	if patch == "" {
+		fmt.Printf("No changes detected. Skipping the update.\n")
+		return nil
+	}
+
+	fmt.Printf("The following changes are to be applied.\n%s\n", patch)
+
+	if launchplan.UConfig.DryRun {
+		fmt.Printf("skipping LaunchPlanUpdate request (DryRun)")
+		return nil
+	}
+
+	if !launchplan.UConfig.Force && !cmdUtil.AskForConfirmation("Continue?", os.Stdin) {
+		return fmt.Errorf("update aborted by user")
+	}
+
+	_, err = cmdCtx.AdminClient().UpdateLaunchPlan(ctx, &admin.LaunchPlanUpdateRequest{
+		Id:    id,
+		State: newState,
+	})
+	if err != nil {
+		return fmt.Errorf(clierrors.ErrFailedLPUpdate, name, err)
+	}
+
+	fmt.Printf("updated launch plan successfully on %s", name)
 
 	return nil
 }

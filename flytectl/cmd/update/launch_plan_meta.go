@@ -42,8 +42,7 @@ func getUpdateLPMetaFunc(namedEntityConfig *NamedEntityConfig) func(ctx context.
 		name := args[0]
 		err := namedEntityConfig.UpdateNamedEntity(ctx, name, project, domain, core.ResourceType_LAUNCH_PLAN, cmdCtx)
 		if err != nil {
-			fmt.Printf(clierrors.ErrFailedLPUpdate, name, err)
-			return err
+			return fmt.Errorf(clierrors.ErrFailedLPUpdate, name, err)
 		}
 		fmt.Printf("updated metadata successfully on %v", name)
 		return nil

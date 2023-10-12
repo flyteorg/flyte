@@ -65,6 +65,16 @@ func (i InvalidEscapeSequence) Error() string {
 	return fmt.Sprintf("invalid field selector: invalid escape sequence: %s", i.sequence)
 }
 
+// EscapeValue escapes strings to be used as values in filter queries.
+func EscapeValue(s string) string {
+	replacer := strings.NewReplacer(
+		`\`, `\\`,
+		`,`, `\,`,
+		`=`, `\=`,
+	)
+	return replacer.Replace(s)
+}
+
 // UnescapeValue unescapes a fieldSelector value and returns the original literal value.
 // May return the original string if it contains no escaped or special characters.
 func UnescapeValue(s string) (string, error) {

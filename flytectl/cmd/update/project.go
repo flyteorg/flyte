@@ -3,12 +3,14 @@ package update
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flytestdlib/logger"
+	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 const (
@@ -30,7 +32,7 @@ Incorrect usage when passing both archive and activate:
 
 ::
 
- flytectl update project -p flytesnacks --archiveProject --activate
+ flytectl update project -p flytesnacks --archive --activate
 
 Incorrect usage when passing unknown-project:
 
@@ -42,7 +44,7 @@ project ID is required flag
 
 ::
 
- flytectl update project unknown-project --archiveProject
+ flytectl update project unknown-project --archive
 
 Update projects.(project/projects can be used interchangeably in these commands)
 
@@ -83,24 +85,70 @@ Usage
 )
 
 func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	projectSpec, err := project.DefaultProjectConfig.GetProjectSpec(config.GetConfig())
+	edits, err := project.DefaultProjectConfig.GetProjectSpec(config.GetConfig())
 	if err != nil {
 		return err
 	}
 
-	if projectSpec.Id == "" {
+	if edits.Id == "" {
 		return fmt.Errorf(clierrors.ErrProjectNotPassed)
 	}
 
-	if project.DefaultProjectConfig.DryRun {
-		logger.Infof(ctx, "skipping UpdateProject request (dryRun)")
-	} else {
-		_, err := cmdCtx.AdminClient().UpdateProject(ctx, projectSpec)
-		if err != nil {
-			fmt.Printf(clierrors.ErrFailedProjectUpdate, projectSpec.Id, err)
-			return err
-		}
+	currentProject, err := cmdCtx.AdminFetcherExt().GetProjectByID(ctx, edits.Id)
+	if err != nil {
+		return fmt.Errorf("update project %s: could not fetch project: %w", edits.Id, err)
 	}
-	fmt.Printf("Project %v updated\n", projectSpec.Id)
+
+	// We do not compare currentProject against edits directly, because edits does not
+	// have a complete set of project's fields - it will only contain fields that
+	// the update command allows updating. (For example, it won't have Domains field
+	// initialized.)
+	currentProjectWithEdits := copyProjectWithEdits(currentProject, edits)
+	patch, err := DiffAsYaml(diffPathBefore, diffPathAfter, currentProject, currentProjectWithEdits)
+	if err != nil {
+		panic(err)
+	}
+	if patch == "" {
+		fmt.Printf("No changes detected. Skipping the update.\n")
+		return nil
+	}
+
+	fmt.Printf("The following changes are to be applied.\n%s\n", patch)
+
+	if project.DefaultProjectConfig.DryRun {
+		fmt.Printf("skipping UpdateProject request (dryRun)\n")
+		return nil
+	}
+
+	if !project.DefaultProjectConfig.Force && !cmdUtil.AskForConfirmation("Continue?", os.Stdin) {
+		return fmt.Errorf("update aborted by user")
+	}
+
+	_, err = cmdCtx.AdminClient().UpdateProject(ctx, edits)
+	if err != nil {
+		return fmt.Errorf(clierrors.ErrFailedProjectUpdate, edits.Id, err)
+	}
+
+	fmt.Printf("project %s updated\n", edits.Id)
 	return nil
+}
+
+// Makes a shallow copy of target and applies certain properties from edited to it.
+// The properties applied are only the ones supported by update command: state, name,
+// description, labels, etc.
+func copyProjectWithEdits(target *admin.Project, edited *admin.Project) *admin.Project {
+	copy := *target
+
+	copy.State = edited.State
+	if edited.Name != "" {
+		copy.Name = edited.Name
+	}
+	if edited.Description != "" {
+		copy.Description = edited.Description
+	}
+	if len(edited.GetLabels().GetValues()) != 0 {
+		copy.Labels = edited.Labels
+	}
+
+	return &copy
 }

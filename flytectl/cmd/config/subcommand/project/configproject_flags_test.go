@@ -169,6 +169,20 @@ func TestConfigProject_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_force", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("force", testValue)
+			if vBool, err := cmdFlags.GetBool("force"); err == nil {
+				testDecodeJson_ConfigProject(t, fmt.Sprintf("%v", vBool), &actual.Force)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_name", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

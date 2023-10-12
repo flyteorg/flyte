@@ -53,5 +53,6 @@ func (cfg UpdateConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.BoolVar(&UConfig.Archive, fmt.Sprintf("%v%v", prefix, "archive"), UConfig.Archive, "archive execution.")
 	cmdFlags.BoolVar(&UConfig.Activate, fmt.Sprintf("%v%v", prefix, "activate"), UConfig.Activate, "activate execution.")
 	cmdFlags.BoolVar(&UConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), UConfig.DryRun, "execute command without making any modifications.")
+	cmdFlags.BoolVar(&UConfig.Force, fmt.Sprintf("%v%v", prefix, "force"), UConfig.Force, "do not ask for an acknowledgement during updates.")
 	return cmdFlags
 }

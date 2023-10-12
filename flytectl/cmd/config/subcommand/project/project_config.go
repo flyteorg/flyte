@@ -33,6 +33,7 @@ type ConfigProject struct {
 	ArchiveProject  bool              `json:"archiveProject" pflag:",(Deprecated) Archives the project specified as argument. Only used in update"`
 	Activate        bool              `json:"activate" pflag:",Activates the project specified as argument. Only used in update"`
 	Archive         bool              `json:"archive" pflag:",Archives the project specified as argument. Only used in update"`
+	Force           bool              `json:"force" pflag:",Skips asking for an acknowledgement during an update operation. Only used in update"`
 	Name            string            `json:"name" pflag:",name for the project specified as argument."`
 	DryRun          bool              `json:"dryRun" pflag:",execute command without making any modifications."`
 	Description     string            `json:"description" pflag:",description for the project specified as argument."`

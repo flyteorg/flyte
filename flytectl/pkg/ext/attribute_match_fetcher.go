@@ -2,57 +2,65 @@ package ext
 
 import (
 	"context"
-	"fmt"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func (a *AdminFetcherExtClient) FetchWorkflowAttributes(ctx context.Context, project, domain, name string,
 	rsType admin.MatchableResource) (*admin.WorkflowAttributesGetResponse, error) {
-	workflowAttr, err := a.AdminServiceClient().GetWorkflowAttributes(ctx, &admin.WorkflowAttributesGetRequest{
+	response, err := a.AdminServiceClient().GetWorkflowAttributes(ctx, &admin.WorkflowAttributesGetRequest{
 		Project:      project,
 		Domain:       domain,
 		Workflow:     name,
 		ResourceType: rsType,
 	})
-	if err != nil {
+	if err != nil && status.Code(err) != codes.NotFound {
 		return nil, err
 	}
-	if workflowAttr.GetAttributes() == nil || workflowAttr.GetAttributes().GetMatchingAttributes() == nil {
-		return nil, fmt.Errorf("attribute doesn't exist")
+	if status.Code(err) == codes.NotFound ||
+		response.GetAttributes() == nil ||
+		response.GetAttributes().GetMatchingAttributes() == nil {
+		return nil, NewNotFoundError("attribute")
 	}
-	return workflowAttr, nil
+	return response, nil
 }
 
 func (a *AdminFetcherExtClient) FetchProjectDomainAttributes(ctx context.Context, project, domain string,
 	rsType admin.MatchableResource) (*admin.ProjectDomainAttributesGetResponse, error) {
-	projectDomainAttr, err := a.AdminServiceClient().GetProjectDomainAttributes(ctx,
+	response, err := a.AdminServiceClient().GetProjectDomainAttributes(ctx,
 		&admin.ProjectDomainAttributesGetRequest{
 			Project:      project,
 			Domain:       domain,
 			ResourceType: rsType,
 		})
-	if err != nil {
+	if err != nil && status.Code(err) != codes.NotFound {
 		return nil, err
 	}
-	if projectDomainAttr.GetAttributes() == nil || projectDomainAttr.GetAttributes().GetMatchingAttributes() == nil {
-		return nil, fmt.Errorf("attribute doesn't exist")
+	if status.Code(err) == codes.NotFound ||
+		response.GetAttributes() == nil ||
+		response.GetAttributes().GetMatchingAttributes() == nil {
+		return nil, NewNotFoundError("attribute")
 	}
-	return projectDomainAttr, nil
+	return response, nil
 }
 
 func (a *AdminFetcherExtClient) FetchProjectAttributes(ctx context.Context, project string,
 	rsType admin.MatchableResource) (*admin.ProjectAttributesGetResponse, error) {
-	projectDomainAttr, err := a.AdminServiceClient().GetProjectAttributes(ctx,
+	response, err := a.AdminServiceClient().GetProjectAttributes(ctx,
 		&admin.ProjectAttributesGetRequest{
 			Project:      project,
 			ResourceType: rsType,
 		})
-	if err != nil {
+	if err != nil && status.Code(err) != codes.NotFound {
 		return nil, err
 	}
-	if projectDomainAttr.GetAttributes() == nil || projectDomainAttr.GetAttributes().GetMatchingAttributes() == nil {
-		return nil, fmt.Errorf("attribute doesn't exist")
+	if status.Code(err) == codes.NotFound ||
+		response.GetAttributes() == nil ||
+		response.GetAttributes().GetMatchingAttributes() == nil {
+		return nil, NewNotFoundError("attribute")
 	}
-	return projectDomainAttr, nil
+	return response, nil
 }

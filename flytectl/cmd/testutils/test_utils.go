@@ -6,20 +6,19 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"regexp"
 	"strings"
 	"testing"
-
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-
-	"github.com/flyteorg/flyteidl/clients/go/admin"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flytectl/cmd/config"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	extMocks "github.com/flyteorg/flytectl/pkg/ext/mocks"
+	"github.com/flyteorg/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
 )
 
 const projectValue = "dummyProject"
@@ -110,6 +109,34 @@ func (s *TestStruct) TearDownAndVerify(t *testing.T, expectedLog string) {
 	}
 
 	assert.Equal(t, sanitizeString(expectedLog), sanitizeString(buf.String()))
+}
+
+func (s *TestStruct) TearDownAndVerifyContains(t *testing.T, expectedLog string) {
+	if err := s.Writer.Close(); err != nil {
+		panic(fmt.Errorf("could not close test context writer: %w", err))
+	}
+
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, s.Reader); err != nil {
+		panic(fmt.Errorf("could not read from test context reader: %w", err))
+	}
+
+	assert.Contains(t, sanitizeString(buf.String()), sanitizeString(expectedLog))
+}
+
+// RandomName returns a string composed of random lowercase English letters of specified length.
+func RandomName(length int) string {
+	if length < 0 {
+		panic("length should be a non-negative number")
+	}
+
+	var b strings.Builder
+	for i := 0; i < length; i++ {
+		c := rune('a' + rand.Intn('z'-'a')) // #nosec G404 - we use this function for testing only, do not need a cryptographically secure random number generator
+		b.WriteRune(c)
+	}
+
+	return b.String()
 }
 
 func sanitizeString(str string) string {

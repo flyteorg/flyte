@@ -7,6 +7,7 @@ import (
 	sconfig "github.com/flyteorg/flytectl/cmd/config/subcommand"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/executionclusterlabel"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
+	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 const (
@@ -64,9 +65,9 @@ func updateExecutionClusterLabelFunc(ctx context.Context, args []string, cmdCtx 
 	domain := executionClusterLabelFileConfig.Domain
 	workflowName := executionClusterLabelFileConfig.Workflow
 
-	// Updates the admin matchable attribute from executionClusterLabelFileConfig
-	if err := DecorateAndUpdateMatchableAttr(ctx, project, domain, workflowName, cmdCtx.AdminUpdaterExt(),
-		executionClusterLabelFileConfig, updateConfig.DryRun); err != nil {
+	if err := DecorateAndUpdateMatchableAttr(ctx, cmdCtx, project, domain, workflowName,
+		admin.MatchableResource_EXECUTION_CLUSTER_LABEL, executionClusterLabelFileConfig,
+		updateConfig.DryRun, updateConfig.Force); err != nil {
 		return err
 	}
 	return nil
