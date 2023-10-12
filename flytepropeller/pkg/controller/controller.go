@@ -315,7 +315,7 @@ func getAdminClient(ctx context.Context) (client service.AdminServiceClient, sig
 
 	credentialsFuture := admin.NewPerRPCCredentialsFuture()
 	opts := []grpc.DialOption{
-		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, nil, credentialsFuture)),
+		grpc.WithChainUnaryInterceptor(admin.NewAuthInterceptor(cfg, nil, credentialsFuture, nil)),
 		grpc.WithPerRPCCredentials(credentialsFuture),
 	}
 

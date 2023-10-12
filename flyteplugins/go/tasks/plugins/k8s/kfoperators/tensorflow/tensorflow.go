@@ -80,6 +80,11 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			PodSpec:       podSpec.DeepCopy(),
 			RestartPolicy: commonOp.RestartPolicyNever,
 		},
+		kubeflowv1.TFJobReplicaTypeEval: {
+			ReplicaNum:    int32(0),
+			PodSpec:       podSpec.DeepCopy(),
+			RestartPolicy: commonOp.RestartPolicyNever,
+		},
 	}
 	runPolicy := commonOp.RunPolicy{}
 
@@ -94,6 +99,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 		replicaSpecMap[kubeflowv1.TFJobReplicaTypeChief].ReplicaNum = tensorflowTaskExtraArgs.GetChiefReplicas()
 		replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker].ReplicaNum = tensorflowTaskExtraArgs.GetWorkers()
 		replicaSpecMap[kubeflowv1.TFJobReplicaTypePS].ReplicaNum = tensorflowTaskExtraArgs.GetPsReplicas()
+		replicaSpecMap[kubeflowv1.TFJobReplicaTypeEval].ReplicaNum = tensorflowTaskExtraArgs.GetEvaluatorReplicas()
 
 	} else if taskTemplate.TaskTypeVersion == 1 {
 		kfTensorflowTaskExtraArgs := kfplugins.DistributedTensorflowTrainingTask{}
@@ -149,6 +155,22 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			}
 			replicaSpecMap[kubeflowv1.TFJobReplicaTypePS].RestartPolicy = common.ParseRestartPolicy(psReplicaSpec.GetRestartPolicy())
 			replicaSpecMap[kubeflowv1.TFJobReplicaTypePS].ReplicaNum = psReplicaSpec.GetReplicas()
+		}
+
+		evaluatorReplicaSpec := kfTensorflowTaskExtraArgs.GetEvaluatorReplicas()
+		if evaluatorReplicaSpec != nil {
+			err := common.OverrideContainerSpec(
+				replicaSpecMap[kubeflowv1.TFJobReplicaTypeEval].PodSpec,
+				kubeflowv1.TFJobDefaultContainerName,
+				evaluatorReplicaSpec.GetImage(),
+				evaluatorReplicaSpec.GetResources(),
+				nil,
+			)
+			if err != nil {
+				return nil, err
+			}
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypeEval].RestartPolicy = common.ParseRestartPolicy(evaluatorReplicaSpec.GetRestartPolicy())
+			replicaSpecMap[kubeflowv1.TFJobReplicaTypeEval].ReplicaNum = evaluatorReplicaSpec.GetReplicas()
 		}
 
 		if kfTensorflowTaskExtraArgs.GetRunPolicy() != nil {
@@ -207,9 +229,10 @@ func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginC
 	workersCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas
 	psReplicasCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas
 	chiefCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas
+	evaluatorReplicasCount := app.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeEval].Replicas
 
 	taskLogs, err := common.GetLogs(pluginContext, common.TensorflowTaskType, app.ObjectMeta, false,
-		*workersCount, *psReplicasCount, *chiefCount)
+		*workersCount, *psReplicasCount, *chiefCount, *evaluatorReplicasCount)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
