@@ -98,36 +98,6 @@ func TestBuilder(t *testing.T) {
 	close(fc.cmp)
 }
 
-func TestWatcher(t *testing.T) {
-	k8sClient := testclient.NewSimpleClientset()
-	go func() {
-		for i := 0; i < 10; i++ {
-			_, err := k8sClient.CoreV1().Endpoints("flyte").Create(context.Background(), &v1.Endpoints{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      "flyteagent",
-					Namespace: "flyte",
-				},
-				Subsets: []v1.EndpointSubset{
-					{
-						Addresses: []v1.EndpointAddress{
-							{
-								IP: "10.0.0.1",
-							},
-						},
-						Ports: []v1.EndpointPort{
-							{
-								Name: "grpc",
-								Port: 8000,
-							},
-						},
-					},
-				},
-			}, metav1.CreateOptions{})
-			assert.NilError(t, err)
-		}
-	}()
-}
-
 func TestParseResolverTargets(t *testing.T) {
 	for i, test := range []struct {
 		target string

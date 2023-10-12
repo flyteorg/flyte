@@ -5,7 +5,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	resolver2 "github.com/flyteorg/flyte/flytestdlib/resolver"
 	"os"
 	"runtime/pprof"
 	"time"
@@ -43,6 +42,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	resolver2 "github.com/flyteorg/flyte/flytestdlib/resolver"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
