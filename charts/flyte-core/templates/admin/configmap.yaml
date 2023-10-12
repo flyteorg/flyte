@@ -37,7 +37,7 @@ data:
 {{- with .Values.configmap.namespace_config }}
   namespace_config.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
-  {{- with .Values.configmap.clusterpool_config }}
+{{- with .Values.configmap.clusterpool_config }}
   clusterpool_config.yaml: | {{ toYaml . | nindent 4 }}
 {{- end }}
   storage.yaml: | {{ tpl (include "storage" .) $ | nindent 4 }}
