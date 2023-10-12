@@ -304,24 +304,25 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 			w.workqueue.Forget(batch)
 			w.workqueue.Done(batch)
 
-			t := w.metrics.SyncLatency.Start()
 			newBatch := make(Batch, 0, len(*batch.(*Batch)))
 			for _, b := range *batch.(*Batch) {
 				itemID := b.GetID()
 				item, ok := w.lruMap.Get(itemID)
 				if !ok {
 					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
-					t.Stop()
 					continue
 				}
 				if item.(Item).IsTerminal() {
 					logger.Debugf(ctx, "item with id [%v] is terminal", itemID)
-					t.Stop()
 					continue
 				}
 				newBatch = append(newBatch, b)
 			}
+			if len(newBatch) == 0 {
+				continue
+			}
 
+			t := w.metrics.SyncLatency.Start()
 			updatedBatch, err := w.syncCb(ctx, newBatch)
 
 			if err != nil {
