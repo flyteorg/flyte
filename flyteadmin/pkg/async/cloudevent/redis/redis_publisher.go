@@ -3,9 +3,9 @@ package redis
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/golang/protobuf/proto"
 	redisAPI "github.com/redis/go-redis/v9"
 )

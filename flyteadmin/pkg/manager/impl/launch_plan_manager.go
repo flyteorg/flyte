@@ -3,7 +3,7 @@ package impl
 import (
 	"bytes"
 	"context"
-	"github.com/flyteorg/flyteadmin/pkg/artifacts"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"strconv"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"

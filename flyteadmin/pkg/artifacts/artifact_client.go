@@ -4,8 +4,8 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/artifact"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )

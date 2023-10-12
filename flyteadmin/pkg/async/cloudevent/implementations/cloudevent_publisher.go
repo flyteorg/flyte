@@ -35,7 +35,7 @@ import (
 )
 
 const (
-	cloudEventSource     = "https://github.com/flyteorg/flyteadmin"
+	cloudEventSource     = "https://github.com/flyteorg/flyte/flyteadmin"
 	cloudEventTypePrefix = "com.flyte.resource"
 	jsonSchemaURLKey     = "jsonschemaurl"
 	jsonSchemaURL        = "https://github.com/flyteorg/flyteidl/blob/v0.24.14/jsonschema/workflow_execution.json"

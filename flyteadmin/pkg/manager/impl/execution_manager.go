@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"regexp"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/benbjohnson/clock"
@@ -734,24 +732,20 @@ func (m *ExecutionManager) ExtractArtifactKeys(input *core.Literal) []string {
 	return artifactKeys
 }
 
-var re = regexp.MustCompile(`.*({{\s*\.?inputs\.([a-zA-Z0-9_]+)\s*}}).*`)
-var reExecutionMetadata = regexp.MustCompile(`.*({{\s*\.execution\.([a-zA-Z0-9_]+)\s*}}).*`)
+// getStringFromInput should be called when a tag or partition value is a binding to an input. the input is looked up
+// from the input map and the binding, and an error is returned if the input key is not in the map.
+func (m *ExecutionManager) getStringFromInput(ctx context.Context, inputBinding core.InputBindingData, inputs map[string]*core.Literal) (string, error) {
 
-// templateInputString uses regex to take a string that looks like "{{ .inputs.var1 }}" and replace it with the
-// string value of var1
-func (m *ExecutionManager) templateInputString(ctx context.Context, input string, inputs map[string]*core.Literal, metadata *admin.ExecutionMetadata) (string, error) {
-
-	matches := re.FindStringSubmatch(input)
-	if len(matches) == 3 {
-		val, ok := inputs[matches[2]]
-		if !ok {
-			return input, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "input var [%s] not found", matches[2])
-		}
-		if val.GetScalar() == nil || val.GetScalar().GetPrimitive() == nil {
-			return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input value [%+v]", val)
+	inputName := inputBinding.GetVar()
+	if inputName == "" {
+		return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "input binding var is empty")
+	}
+	if inputVal, ok := inputs[inputName]; ok {
+		if inputVal.GetScalar() == nil || inputVal.GetScalar().GetPrimitive() == nil {
+			return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input value [%+v]", inputVal)
 		}
 		var strVal = ""
-		p := val.GetScalar().GetPrimitive()
+		p := inputVal.GetScalar().GetPrimitive()
 		switch p.GetValue().(type) {
 		case *core.Primitive_Integer:
 			strVal = fmt.Sprintf("%s", p.GetStringValue())
@@ -761,47 +755,33 @@ func (m *ExecutionManager) templateInputString(ctx context.Context, input string
 		case *core.Primitive_StringValue:
 			strVal = fmt.Sprintf("%s", p.GetStringValue())
 		case *core.Primitive_FloatValue:
-			strVal = fmt.Sprintf("%s", p.GetFloatValue())
+			strVal = fmt.Sprintf("%.2f", p.GetFloatValue())
 		case *core.Primitive_Boolean:
-			strVal = fmt.Sprintf("%s", p.GetBoolean())
+			strVal = fmt.Sprintf("%t", p.GetBoolean())
 		default:
 			strVal = fmt.Sprintf("%s", p.GetValue())
 		}
 
-		logger.Debugf(ctx, "String templating returning [%s] for [%s]", strVal, input)
-		x := strings.Replace(input, matches[1], strVal, -1)
-		return x, nil
-	} else {
-		logger.Debugf(ctx, "No input matches found for input string [%s]", input)
+		logger.Debugf(ctx, "String templating returning [%s] for [%+v]", strVal, inputVal)
+		return strVal, nil
 	}
-
-	// TODO: This whole block/regex is just demo code and should be removed until there is user demand.
-	matches = reExecutionMetadata.FindStringSubmatch(input)
-	if len(matches) == 3 {
-		metadataKey := matches[2]
-		if metadataKey == "kickoff_time" {
-			// timestamp formatting datetime is harder in the current proto library we're using.
-			// manually convert
-			var customFormattedTime string
-			if metadata != nil && metadata.ScheduledAt != nil {
-				t := time.Unix(metadata.ScheduledAt.GetSeconds(), 0)
-				customFormattedTime = fmt.Sprintf("%d-%02d-%02d", t.Year(), int(t.Month()), t.Day())
-			} else {
-				customFormattedTime = "2023-09-58"
-			}
-			x := strings.Replace(input, matches[1], customFormattedTime, -1)
-			return x, nil
-		} else {
-			logger.Warningf(ctx, "unknown execution templating key found [%s], leaving unchanged [%s]", metadataKey, input)
-		}
-	}
-
-	// By default just return the original string
-	return input, nil
+	return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "input binding var [%s] not found", inputName)
 }
 
-func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.ArtifactQuery, inputs map[string]*core.Literal, metadata *admin.ExecutionMetadata) (core.ArtifactQuery, error) {
+func (m *ExecutionManager) getLabelValue(ctx context.Context, l *core.LabelValue, inputs map[string]*core.Literal) (string, error) {
+	if l == nil {
+		return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "label value is nil")
+	}
+	if l.GetInputBinding() != nil {
+		return m.getStringFromInput(ctx, *l.GetInputBinding(), inputs)
+	}
+	if l.GetStaticValue() != "" {
+		return l.GetStaticValue(), nil
+	}
+	return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "label value is empty")
+}
 
+func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.ArtifactQuery, inputs map[string]*core.Literal) (core.ArtifactQuery, error) {
 	if query.GetUri() != "" {
 		// If a query string, then just pass it through, nothing to fill in.
 		return query, nil
@@ -822,8 +802,7 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 		} else {
 			domain = ak.GetDomain()
 		}
-
-		newValue, err := m.templateInputString(ctx, t.GetValue(), inputs, metadata)
+		strValue, err := m.getLabelValue(ctx, t.GetValue(), inputs)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to template input string [%s] [%v]", t.GetValue(), err)
 			return query, err
@@ -837,10 +816,15 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 						Domain:  domain,
 						Name:    ak.GetName(),
 					},
-					Value: newValue,
+					Value: &core.LabelValue{
+						Value: &core.LabelValue_StaticValue{
+							StaticValue: strValue,
+						},
+					},
 				},
 			},
 		}, nil
+
 	} else if query.GetArtifactId() != nil {
 		artifactID := query.GetArtifactId()
 		ak := artifactID.GetArtifactKey()
@@ -859,17 +843,17 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 			domain = ak.GetDomain()
 		}
 
-		var partitions map[string]*core.PartitionValue
+		var partitions map[string]*core.LabelValue
 
 		if artifactID.GetPartitions() != nil && artifactID.GetPartitions().GetValue() != nil {
-			partitions = make(map[string]*core.PartitionValue, len(artifactID.GetPartitions().Value))
+			partitions = make(map[string]*core.LabelValue, len(artifactID.GetPartitions().Value))
 			for k, v := range artifactID.GetPartitions().GetValue() {
-				newValue, err := m.templateInputString(ctx, v.StaticValue, inputs, metadata)
+				newValue, err := m.getLabelValue(ctx, v, inputs)
 				if err != nil {
-					logger.Errorf(ctx, "Failed to template input string [%s] [%v]", v, err)
+					logger.Errorf(ctx, "Failed to resolve partition input string [%s] [%+v] [%v]", k, v, err)
 					return query, err
 				}
-				partitions[k] = &core.PartitionValue{StaticValue: newValue}
+				partitions[k] = &core.LabelValue{Value: &core.LabelValue_StaticValue{StaticValue: newValue}}
 			}
 		}
 		return core.ArtifactQuery{
@@ -893,7 +877,7 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 }
 
 // ResolveParameterMapArtifacts will go through the parameter map, and resolve any artifact queries.
-func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, inputsForQueryTemplating map[string]*core.Literal, metadata *admin.ExecutionMetadata) (*core.ParameterMap, map[string]*core.ArtifactID, error) {
+func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, inputsForQueryTemplating map[string]*core.Literal) (*core.ParameterMap, map[string]*core.ArtifactID, error) {
 
 	// only top level replace for now. Need to make this recursive
 	var artifactIDs = make(map[string]*core.ArtifactID)
@@ -918,7 +902,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 			if m.artifactRegistry.GetClient() == nil {
 				return nil, nil, errors.NewFlyteAdminErrorf(codes.Internal, "artifact client is not initialized, can't resolve queries")
 			}
-			filledInQuery, err := m.fillInTemplateArgs(ctx, *v.GetArtifactQuery(), inputsForQueryTemplating, metadata)
+			filledInQuery, err := m.fillInTemplateArgs(ctx, *v.GetArtifactQuery(), inputsForQueryTemplating)
 			if err != nil {
 				logger.Errorf(ctx, "Failed to fill in template args for [%s] [%v]", k, err)
 				return nil, nil, err
@@ -1027,7 +1011,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Also send in the inputsForQueryTemplating for two reasons, so we don't run queries for things we don't need to
 	// and so we can fill in template args.
 	// ArtifactIDs are also returned for lineage purposes.
-	resolvedExpectedInputs, usedArtifactIDs, err := m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating, request.Spec.Metadata)
+	resolvedExpectedInputs, usedArtifactIDs, err := m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating)
 	if err != nil {
 		logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
 		return nil, nil, err
