@@ -41,12 +41,12 @@ func TestCreateInitCommand(t *testing.T) {
 	assert.Equal(t, initCmdShort, cmdNouns[2].Short)
 	assert.Equal(t, "validate", cmdNouns[3].Use)
 	assert.Equal(t, "Validates the loaded config.", cmdNouns[3].Short)
-
 }
 
 func TestSetupConfigFunc(t *testing.T) {
 	var yes = strings.NewReader("Yes")
 	var no = strings.NewReader("No")
+	var empty = strings.NewReader("")
 	mockOutStream := new(io.Writer)
 	ctx := context.Background()
 	_ = os.Remove(configutil.FlytectlConfig)
@@ -59,8 +59,13 @@ func TestSetupConfigFunc(t *testing.T) {
 	initConfig.DefaultConfig.Host = ""
 	assert.Nil(t, err)
 
+	initConfig.DefaultConfig.Force = false
 	assert.Nil(t, initFlytectlConfig(yes))
 	assert.Nil(t, initFlytectlConfig(no))
+
+	initConfig.DefaultConfig.Force = true
+	assert.Nil(t, initFlytectlConfig(empty))
+
 	initConfig.DefaultConfig.Host = "flyte.org"
 	assert.Nil(t, initFlytectlConfig(no))
 	initConfig.DefaultConfig.Host = "localhost:30081"
@@ -85,4 +90,12 @@ func TestValidateEndpointName(t *testing.T) {
 	assert.Equal(t, true, validateEndpointName("112.11.1.1:8080"))
 	assert.Equal(t, false, validateEndpointName("112.11.1.1:8080/console"))
 	assert.Equal(t, false, validateEndpointName("flyte"))
+}
+
+func TestForceFlagInCreateConfigCommand(t *testing.T) {
+	cmd := CreateConfigCommand()
+	assert.False(t, initConfig.DefaultConfig.Force)
+	err := cmd.Flags().Parse([]string{"--force"})
+	assert.Nil(t, err)
+	assert.True(t, initConfig.DefaultConfig.Force)
 }

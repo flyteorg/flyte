@@ -53,5 +53,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&DefaultConfig.Console, fmt.Sprintf("%v%v", prefix, "console"), DefaultConfig.Console, "Endpoint of console,  if different than flyte admin")
 	cmdFlags.StringVar(&DefaultConfig.Host, fmt.Sprintf("%v%v", prefix, "host"), DefaultConfig.Host, "Endpoint of flyte admin")
 	cmdFlags.BoolVar(&DefaultConfig.Insecure, fmt.Sprintf("%v%v", prefix, "insecure"), DefaultConfig.Insecure, "Enable insecure mode")
+	cmdFlags.BoolVar(&DefaultConfig.Force, fmt.Sprintf("%v%v", prefix, "force"), DefaultConfig.Force, "Force to overwrite the default config file without confirmation")
 	return cmdFlags
 }
