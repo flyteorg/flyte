@@ -6,7 +6,7 @@ set -ex
 # TODO(monorepo): This only works if we have at least one component tag per release.
 #                 In other words, if we have two consecutive releases the latest tag in the second release is going to point to an invalid
 #                 tag (because there will not be images tagged with the previous release tag).
-LATEST_TAG=$(git tag | sed 's#[^/]*/##' | sort | tail -n 1)
+LATEST_TAG=$(git tag | sed 's#[^/]*/##' | sort --version-sort | tail -n1)
 FLYTEKIT_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytekit/releases/latest" | jq -r .tag_name | sed 's/^v//')
 FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
 
