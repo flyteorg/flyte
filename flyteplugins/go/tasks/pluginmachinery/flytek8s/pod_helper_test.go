@@ -626,12 +626,6 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 					Operator: v1.TolerationOpEqual,
 					Effect:   v1.TaintEffectNoSchedule,
 				},
-				{
-					Key:      "gpu-partition-size",
-					Value:    GpuPartitionSizeNotSet,
-					Operator: v1.TolerationOpEqual,
-					Effect:   v1.TaintEffectNoSchedule,
-				},
 			},
 			podSpec.Tolerations,
 		)

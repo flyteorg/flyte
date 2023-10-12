@@ -33,8 +33,6 @@ const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
 
-const GpuPartitionSizeNotSet = "NotSet"
-
 // AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
 // objects to an existing v1.Affinity object. If there are no existing required
 // node selectors, the new v1.NodeSelectorRequirement will be added as-is.
@@ -195,13 +193,6 @@ func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelera
 		}
 		if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
 			partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
-		} else {
-			partitionSizeTol = &v1.Toleration{
-				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
-				Value:    GpuPartitionSizeNotSet,
-				Operator: v1.TolerationOpEqual,
-				Effect:   v1.TaintEffectNoSchedule,
-			}
 		}
 	case *core.GPUAccelerator_PartitionSize:
 		partitionSizeNsr = &v1.NodeSelectorRequirement{
