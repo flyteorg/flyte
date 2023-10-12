@@ -56,11 +56,11 @@ func (*fakeConn) NewServiceConfig(serviceConfig string) {
 
 func TestBuilder(t *testing.T) {
 	k8sClient := testclient.NewSimpleClientset()
-	builder := NewBuilder(k8sClient, KubernetesSchema)
+	builder := NewBuilder(k8sClient, "test")
 	fc := &fakeConn{
 		cmp: make(chan struct{}),
 	}
-	k8sResolver, err := builder.Build(parseTarget("kubernetes://flyteagent.flyte.svc.cluster.local:8000"), fc, resolver.BuildOptions{})
+	k8sResolver, err := builder.Build(parseTarget("test://flyteagent.flyte.svc.cluster.local:8000"), fc, resolver.BuildOptions{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -89,13 +89,13 @@ func TestBuilder(t *testing.T) {
 			},
 		},
 	}, metav1.CreateOptions{})
+
+	<-fc.cmp
 	assert.NilError(t, err)
 	assert.Equal(t, len(fc.found), 1)
 	assert.Equal(t, fc.found[0], "10.0.0.1:8000")
 
-	<-fc.cmp
 	k8sResolver.Close()
-	close(fc.cmp)
 }
 
 func TestParseResolverTargets(t *testing.T) {
