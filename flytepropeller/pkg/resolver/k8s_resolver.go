@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	KubernetesSchema = "k8s"
+	KubernetesSchema = "kubernetes"
 )
 
 type targetInfo struct {
@@ -26,7 +26,7 @@ type targetInfo struct {
 }
 
 // NewBuilder creates a kubeBuilder which is used by grpc resolver.
-func NewBuilder(client *kubernetes.Clientset, schema string) resolver.Builder {
+func NewBuilder(client kubernetes.Interface, schema string) resolver.Builder {
 	return &kubeBuilder{
 		k8sClient: client,
 		schema:    schema,
@@ -34,7 +34,7 @@ func NewBuilder(client *kubernetes.Clientset, schema string) resolver.Builder {
 }
 
 type kubeBuilder struct {
-	k8sClient *kubernetes.Clientset
+	k8sClient kubernetes.Interface
 	schema    string
 }
 
@@ -83,7 +83,7 @@ func parseResolverTarget(target resolver.Target) (targetInfo, error) {
 	}, nil
 }
 
-// Build creates a new resolver for the given target, e.g. k8s:///flyteagent:flyte:8000.
+// Build creates a new resolver for the given target, e.g. kubernetes:///flyteagent:flyte:8000.
 func (b *kubeBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
 	ti, err := parseResolverTarget(target)
 	if err != nil {
@@ -113,15 +113,13 @@ type kResolver struct {
 	ctx       context.Context
 	cancel    context.CancelFunc
 	cc        resolver.ClientConn
-	k8sClient *kubernetes.Clientset
+	k8sClient kubernetes.Interface
 	// wg is used to enforce Close() to return after the watcher() goroutine has finished.
 	wg sync.WaitGroup
 }
 
 // ResolveNow is a no-op at this point.
-func (k *kResolver) ResolveNow(resolver.ResolveNowOptions) {
-	logger.Infof(k.ctx, "k8s resolver: resolveNow")
-}
+func (k *kResolver) ResolveNow(resolver.ResolveNowOptions) {}
 
 // Close closes the resolver.
 func (k *kResolver) Close() {
@@ -143,8 +141,6 @@ func (k *kResolver) resolve(e *v1.Endpoints) {
 			})
 		}
 	}
-	logger.Infof(k.ctx, "k8s resolver: resolved %d addresses", len(newAddrs))
-	logger.Infof(k.ctx, "k8s resolver: resolved addresses: %v", newAddrs)
 	err := k.cc.UpdateState(resolver.State{Addresses: newAddrs})
 	if err != nil {
 		grpclog.Errorf("k8s resolver: failed  : %v", err)
@@ -162,20 +158,20 @@ func (k *kResolver) run() {
 	}
 
 	for {
+		logger.Infof(k.ctx, "for loop")
 		select {
 		case <-k.ctx.Done():
-			logger.Infof(k.ctx, "k8s resolver: context done")
+			logger.Infof(k.ctx, "done")
 			return
 		case event, ok := <-watcher.ResultChan():
+			logger.Infof(k.ctx, "Event: %v\n", event)
 			if !ok {
-				logger.Infof(k.ctx, "k8s resolver: watcher closed")
+				logger.Debugf(k.ctx, "k8s resolver: watcher closed")
 				return
 			}
-			logger.Infof(k.ctx, "k8s resolver: received event.type: %v", event.Type)
 			if event.Object == nil {
 				continue
 			}
-			logger.Infof(k.ctx, "k8s resolver2: received event: %v", event.Object.(*v1.Endpoints))
 			k.resolve(event.Object.(*v1.Endpoints))
 		}
 	}

@@ -234,11 +234,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 			return pluginsCore.PhaseInfoFailure(string(rune(statusCode)), message, taskInfo), nil
 		}
 		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
-	case http.StatusBadRequest:
-		fallthrough
-	case http.StatusInternalServerError:
-		fallthrough
-	case http.StatusUnauthorized:
+	case http.StatusBadRequest, http.StatusUnauthorized, http.StatusForbidden, http.StatusInternalServerError, http.StatusTooManyRequests:
 		return pluginsCore.PhaseInfoFailure(string(rune(statusCode)), message, taskInfo), nil
 	}
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", statusCode)
