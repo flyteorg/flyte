@@ -370,6 +370,8 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 
 	overrides := &mocks.TaskOverrides{}
 	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
+	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
+	overrides.On("GetExtendedResources").Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)

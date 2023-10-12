@@ -53,7 +53,9 @@ var (
 		ImagePullBackoffGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
 		},
-		GpuResourceName: ResourceNvidiaGPU,
+		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
+		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
+		GpuResourceName:           ResourceNvidiaGPU,
 		DefaultPodTemplateResync: config2.Duration{
 			Duration: 30 * time.Second,
 		},
@@ -139,6 +141,18 @@ type K8sPluginConfig struct {
 	// error persists past this grace period, it will be inferred to be a permanent
 	// one, and the corresponding task marked as failed
 	ImagePullBackoffGracePeriod config2.Duration `json:"image-pull-backoff-grace-period" pflag:"-,Time to wait for transient ImagePullBackoff errors to be resolved."`
+
+	// The node label that specifies the attached GPU device.
+	GpuDeviceNodeLabel string `json:"gpu-device-node-label" pflag:"-,The node label that specifies the attached GPU device."`
+
+	// The node label that specifies the attached GPU partition size.
+	GpuPartitionSizeNodeLabel string `json:"gpu-partition-size-node-label" pflag:"-,The node label that specifies the attached GPU partition size."`
+
+	// Override for node selector requirement added to pods intended for unpartitioned GPU nodes.
+	GpuUnpartitionedNodeSelectorRequirement *v1.NodeSelectorRequirement `json:"gpu-unpartitioned-node-selector-requirement" pflag:"-,Override for node selector requirement added to pods intended for unpartitioned GPU nodes."`
+
+	// Toleration added to pods intended for unpartitioned GPU nodes.
+	GpuUnpartitionedToleration *v1.Toleration `json:"gpu-unpartitioned-toleration" pflag:"-,Toleration added to pods intended for unpartitioned GPU nodes."`
 
 	// The name of the GPU resource to use when the task resource requests GPUs.
 	GpuResourceName v1.ResourceName `json:"gpu-resource-name" pflag:"-,The name of the GPU resource to use when the task resource requests GPUs."`
