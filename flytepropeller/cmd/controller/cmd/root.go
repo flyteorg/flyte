@@ -113,7 +113,7 @@ func logAndExit(err error) {
 }
 
 func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
-	// set up signals, so we handle the first shutdown signal gracefully
+	// set up signals so we handle the first shutdown signal gracefully
 	ctx := signals.SetupSignalHandler(baseCtx)
 
 	// set metric keys
