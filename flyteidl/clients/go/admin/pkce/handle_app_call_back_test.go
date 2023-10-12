@@ -25,7 +25,7 @@ func HandleAppCallBackSetup(t *testing.T, state string) (tokenChannel chan *oaut
 	errorChannel = make(chan error, 1)
 	tokenChannel = make(chan *oauth2.Token)
 	testAuthConfig = &oauth.Config{Config: &oauth2.Config{}, DeviceEndpoint: "dummyDeviceEndpoint"}
-	callBackFn = getAuthServerCallbackHandler(testAuthConfig, "", tokenChannel, errorChannel, state, &http.Client{})
+	callBackFn = getAuthServerCallbackHandler(testAuthConfig, "", tokenChannel, errorChannel, state)
 	assert.NotNil(t, callBackFn)
 	req = &http.Request{
 		Method: http.MethodGet,
