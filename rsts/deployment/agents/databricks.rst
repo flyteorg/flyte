@@ -268,16 +268,17 @@ You have to set the Databricks token to the Flyte configuration.
 
 1. Install flyteagent pod using helm
   
-    .. code-block:: bash
+    .. code-block::
       
       cd flyte/charts/flyteagent
+    
+    .. code-block::
 
       helm install flyteagent . -n flyte
-  
 
 2. Get the base64 value of your Databricks token.
 
-    .. code-block:: bash
+    .. code-block::
   
       echo -n "<DATABRICKS_TOKEN>" | base64
 
@@ -320,13 +321,13 @@ Upgrade the deployment
 
       .. group-tab:: Demo cluster
 
-        .. code-block:: bash
+        .. code-block::
 
           kubectl rollout restart deployment flyte-sandbox -n flyte
 
       .. group-tab:: Helm chart
 
-        .. code-block:: bash
+        .. code-block::
 
           helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
 
