@@ -432,6 +432,15 @@ func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*
 	return podSpec, objectMeta, primaryContainerName, nil
 }
 
+func GetContainer(podSpec *v1.PodSpec, name string) (*v1.Container, error) {
+	for _, container := range podSpec.Containers {
+		if container.Name == name {
+			return &container, nil
+		}
+	}
+	return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification, container [%s] not defined", name)
+}
+
 // getBasePodTemplate attempts to retrieve the PodTemplate to use as the base for k8s Pod configuration. This value can
 // come from one of the following:
 // (1) PodTemplate name in the TaskMetadata: This name is then looked up in the PodTemplateStore.

@@ -71,11 +71,12 @@ var (
 	jobNamespace = "tensorflow-namespace"
 )
 
-func dummyTensorFlowCustomObj(workers int32, psReplicas int32, chiefReplicas int32) *plugins.DistributedTensorflowTrainingTask {
+func dummyTensorFlowCustomObj(workers int32, psReplicas int32, chiefReplicas int32, evaluatorReplicas int32) *plugins.DistributedTensorflowTrainingTask {
 	return &plugins.DistributedTensorflowTrainingTask{
-		Workers:       workers,
-		PsReplicas:    psReplicas,
-		ChiefReplicas: chiefReplicas,
+		Workers:           workers,
+		PsReplicas:        psReplicas,
+		ChiefReplicas:     chiefReplicas,
+		EvaluatorReplicas: evaluatorReplicas,
 	}
 }
 
@@ -177,7 +178,7 @@ func dummyTensorFlowTaskContext(taskTemplate *core.TaskTemplate, resources *core
 }
 
 func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorResourceHandler,
-	workers int32, psReplicas int32, chiefReplicas int32, conditionType commonOp.JobConditionType) *kubeflowv1.TFJob {
+	workers int32, psReplicas int32, chiefReplicas int32, evaluatorReplicas int32, conditionType commonOp.JobConditionType) *kubeflowv1.TFJob {
 	var jobConditions []commonOp.JobCondition
 
 	now := time.Now()
@@ -276,7 +277,7 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 		}
 	}
 
-	tfObj := dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas)
+	tfObj := dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas)
 	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
 	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
 	if err != nil {
@@ -302,7 +303,7 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 func TestBuildResourceTensorFlow(t *testing.T) {
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 
-	tfObj := dummyTensorFlowCustomObj(100, 50, 1)
+	tfObj := dummyTensorFlowCustomObj(100, 50, 1, 1)
 	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
 
 	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
@@ -314,6 +315,7 @@ func TestBuildResourceTensorFlow(t *testing.T) {
 	assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas)
 	assert.Equal(t, int32(50), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas)
 	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas)
+	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeEval].Replicas)
 
 	// verify TaskExecutionMetadata labels and annotations are copied to the TensorFlowJob
 	for k, v := range dummyAnnotations {
@@ -444,7 +446,7 @@ func TestBuildResourceTensorFlowExtendedResources(t *testing.T) {
 		},
 	}
 
-	v0TaskTemplate := dummyTensorFlowTaskTemplate("v0", dummyTensorFlowCustomObj(100, 50, 1))
+	v0TaskTemplate := dummyTensorFlowTaskTemplate("v0", dummyTensorFlowCustomObj(100, 50, 1, 1))
 	v1TaskTemplate := dummyTensorFlowTaskTemplate("v1", &kfplugins.DistributedTensorflowTrainingTask{
 		ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
 			Replicas: 1,
@@ -454,6 +456,9 @@ func TestBuildResourceTensorFlowExtendedResources(t *testing.T) {
 		},
 		PsReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
 			Replicas: 50,
+		},
+		EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+			Replicas: 1,
 		},
 	})
 	v1TaskTemplate.TaskTypeVersion = 1
@@ -500,10 +505,10 @@ func TestGetTaskPhase(t *testing.T) {
 	ctx := context.TODO()
 
 	dummyTensorFlowJobResourceCreator := func(conditionType commonOp.JobConditionType) *kubeflowv1.TFJob {
-		return dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, conditionType)
+		return dummyTensorFlowJobResource(tensorflowResourceHandler, 2, 1, 1, 1, conditionType)
 	}
 
-	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1)), resourceRequirements, nil)
+	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(2, 1, 1, 1)), resourceRequirements, nil)
 	taskPhase, err := tensorflowResourceHandler.GetTaskPhase(ctx, taskCtx, dummyTensorFlowJobResourceCreator(commonOp.JobCreated))
 	assert.NoError(t, err)
 	assert.Equal(t, pluginsCore.PhaseQueued, taskPhase.Phase())
@@ -544,18 +549,20 @@ func TestGetLogs(t *testing.T) {
 	workers := int32(2)
 	psReplicas := int32(1)
 	chiefReplicas := int32(1)
+	evaluatorReplicas := int32(1)
 
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
-	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, commonOp.JobRunning)
-	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas)), resourceRequirements, nil)
+	tensorFlowJob := dummyTensorFlowJobResource(tensorflowResourceHandler, workers, psReplicas, chiefReplicas, evaluatorReplicas, commonOp.JobRunning)
+	taskCtx := dummyTensorFlowTaskContext(dummyTensorFlowTaskTemplate("", dummyTensorFlowCustomObj(workers, psReplicas, chiefReplicas, evaluatorReplicas)), resourceRequirements, nil)
 	jobLogs, err := common.GetLogs(taskCtx, common.TensorflowTaskType, tensorFlowJob.ObjectMeta, false,
-		workers, psReplicas, chiefReplicas)
+		workers, psReplicas, chiefReplicas, evaluatorReplicas)
 	assert.NoError(t, err)
-	assert.Equal(t, 4, len(jobLogs))
+	assert.Equal(t, 5, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[0].Uri)
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-1/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[1].Uri)
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-psReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[2].Uri)
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-chiefReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[3].Uri)
+	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-evaluatorReplica-0/pod?namespace=tensorflow-namespace", jobNamespace, jobName), jobLogs[4].Uri)
 }
 
 func TestGetProperties(t *testing.T) {
@@ -566,26 +573,31 @@ func TestGetProperties(t *testing.T) {
 
 func TestReplicaCounts(t *testing.T) {
 	for _, test := range []struct {
-		name               string
-		chiefReplicaCount  int32
-		psReplicaCount     int32
-		workerReplicaCount int32
-		expectError        bool
-		contains           []commonOp.ReplicaType
-		notContains        []commonOp.ReplicaType
+		name                  string
+		chiefReplicaCount     int32
+		psReplicaCount        int32
+		workerReplicaCount    int32
+		evaluatorReplicaCount int32
+		expectError           bool
+		contains              []commonOp.ReplicaType
+		notContains           []commonOp.ReplicaType
 	}{
-		{"NoWorkers", 1, 1, 0, true, nil, nil},
-		{"SingleChief", 1, 0, 1, false,
+		{"NoWorkers", 1, 1, 0, 1, true, nil, nil},
+		{"SingleChief", 1, 0, 1, 0, false,
 			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeWorker},
-			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS}},
-		{"SinglePS", 0, 1, 1, false,
+			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeEval}},
+		{"SinglePS", 0, 1, 1, 0, false,
 			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeWorker},
-			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief}},
+			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeEval}},
+		{"AllContains", 1, 1, 1, 1, false,
+			[]commonOp.ReplicaType{kubeflowv1.TFJobReplicaTypePS, kubeflowv1.TFJobReplicaTypeWorker, kubeflowv1.TFJobReplicaTypeChief, kubeflowv1.TFJobReplicaTypeEval},
+			nil,
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 
-			tfObj := dummyTensorFlowCustomObj(test.workerReplicaCount, test.psReplicaCount, test.chiefReplicaCount)
+			tfObj := dummyTensorFlowCustomObj(test.workerReplicaCount, test.psReplicaCount, test.chiefReplicaCount, test.evaluatorReplicaCount)
 			taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
 
 			resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
@@ -653,6 +665,21 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 				},
 			},
 		},
+		EvaluatorReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+			Replicas: 1,
+			Image:    testImage,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
+				},
+			},
+			RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
+		},
 		RunPolicy: &kfplugins.RunPolicy{
 			CleanPodPolicy:        kfplugins.CleanPodPolicy_CLEANPOD_POLICY_ALL,
 			ActiveDeadlineSeconds: int32(100),
@@ -688,6 +715,16 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 				corev1.ResourceCPU: resource.MustParse("500m"),
 			},
 		},
+		kubeflowv1.TFJobReplicaTypeEval: {
+			Requests: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("250m"),
+				corev1.ResourceMemory: resource.MustParse("1Gi"),
+			},
+			Limits: corev1.ResourceList{
+				corev1.ResourceCPU:    resource.MustParse("500m"),
+				corev1.ResourceMemory: resource.MustParse("2Gi"),
+			},
+		},
 	}
 
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
@@ -704,6 +741,7 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 	assert.Equal(t, int32(100), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Replicas)
 	assert.Equal(t, int32(50), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypePS].Replicas)
 	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Replicas)
+	assert.Equal(t, int32(1), *tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeEval].Replicas)
 
 	for replicaType, replicaSpec := range tensorflowJob.Spec.TFReplicaSpecs {
 		var hasContainerWithDefaultTensorFlowName = false
