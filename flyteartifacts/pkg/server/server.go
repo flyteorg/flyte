@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -13,10 +15,20 @@ import (
 
 type ArtifactService struct {
 	artifact.UnimplementedArtifactRegistryServer
+	ArtifactProvider ArtifactHandler
+	TriggerProvider  TriggerHandler
+	TagProvider      TagHandler
+	LineageProvider  LineageHandler
+	Metrics          ServiceMetrics
 }
 
-func NewArtifactService() *ArtifactService {
-	return &ArtifactService{}
+func NewArtifactService(scope promutils.Scope) *ArtifactService {
+	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
+	fmt.Println(cfg)
+
+	return &ArtifactService{
+		Metrics: InitMetrics(scope),
+	}
 }
 
 func HttpRegistrationHook(ctx context.Context, gwmux *runtime.ServeMux, grpcAddress string, grpcConnectionOpts []grpc.DialOption, _ promutils.Scope) error {
@@ -28,29 +40,11 @@ func HttpRegistrationHook(ctx context.Context, gwmux *runtime.ServeMux, grpcAddr
 }
 
 func GrpcRegistrationHook(ctx context.Context, server *grpc.Server, scope promutils.Scope) error {
-	serviceImpl := NewArtifactService()
+	serviceImpl := NewArtifactService(scope)
 	artifact.RegisterArtifactRegistryServer(server, serviceImpl)
 
 	return nil
 }
-
-//func Serve(ctx context.Context, opts ...grpc.ServerOption) error {
-//	var serverOpts []grpc.ServerOption
-//
-//	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
-//
-//	serverOpts = append(serverOpts, grpc.MaxRecvMsgSize(3000000))
-//	serverOpts = append(serverOpts, opts...)
-//	grpcServer := grpc.NewServer(serverOpts...)
-//
-//	lis, err := net.Listen("tcp", "localhost:50051")
-//	if err != nil {
-//		return err
-//	}
-//	err = grpcServer.Serve(lis)
-//
-//	return err
-//}
 
 func (a *ArtifactService) CreateArtifact(ctx context.Context, request *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
 	return &artifact.CreateArtifactResponse{}, nil

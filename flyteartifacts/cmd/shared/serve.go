@@ -38,6 +38,7 @@ func newGRPCServer(ctx context.Context, serviceName string, serverCfg *sharedCfg
 	grpcHook GrpcRegistrationHook, opts ...grpc.ServerOption) (*grpc.Server, error) {
 
 	scope := promutils.NewScope(serverCfg.Metrics.MetricsScope)
+	scope = scope.NewSubScope(serviceName)
 
 	var grpcUnaryInterceptors = make([]grpc.UnaryServerInterceptor, 0)
 	var streamServerInterceptors = make([]grpc.StreamServerInterceptor, 0)
@@ -202,7 +203,6 @@ func newHTTPServer(_ sharedCfg.ServerSecurityOptions) (*http.ServeMux, *runtime.
 	gwmux := runtime.NewServeMux(gwmuxOptions...)
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		//ctx := GetOrGenerateRequestIDForRequest(r)
 		ctx := r.Context()
 		logger.Debugf(ctx, "Running identity interceptor for http endpoint [%s]", r.URL.String())
 

@@ -22,17 +22,8 @@ var (
 	configAccessor = viper.NewAccessor(config.Options{})
 )
 
-//var XXRootCmd = &cobra.Command{
-//	Use:   "artifacts",
-//	Short: "Fill in later",
-//	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-//		return initConfig(cmd.Flags())
-//	},
-//}
-
 // NewRootCmd represents the base command when called without any subcommands
 func NewRootCmd(rootUse string, grpcHook GrpcRegistrationHook, httpHook HttpRegistrationHook) *cobra.Command {
-
 	rootCmd := &cobra.Command{
 		Use:   rootUse,
 		Short: "Short description",
