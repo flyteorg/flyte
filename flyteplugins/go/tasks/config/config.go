@@ -12,19 +12,15 @@ var (
 	rootSection = config.MustRegisterSection(configSectionKey, &Config{})
 )
 
-// Config is the top level plugins config.
+// Top level plugins config.
 type Config struct {
 }
 
-// GetConfig retrieves the current config value or default.
+// Retrieves the current config value or default.
 func GetConfig() *Config {
 	return rootSection.GetConfig().(*Config)
 }
 
 func MustRegisterSubSection(subSectionKey string, section config.Config) config.Section {
 	return rootSection.MustRegisterSection(subSectionKey, section)
-}
-
-func MustRegisterSubSectionWithUpdates(subSectionKey string, section config.Config, sectionUpdatedFn config.SectionUpdated) config.Section {
-	return rootSection.MustRegisterSectionWithUpdates(subSectionKey, section, sectionUpdatedFn)
 }

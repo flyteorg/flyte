@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
@@ -27,12 +28,11 @@ import (
 )
 
 const (
-	rayTaskType                     = "ray"
-	KindRayJob                      = "RayJob"
-	IncludeDashboard                = "include-dashboard"
-	NodeIPAddress                   = "node-ip-address"
-	DashboardHost                   = "dashboard-host"
-	DisableUsageStatsStartParameter = "disable-usage-stats"
+	rayTaskType      = "ray"
+	KindRayJob       = "RayJob"
+	IncludeDashboard = "include-dashboard"
+	NodeIPAddress    = "node-ip-address"
+	DashboardHost    = "dashboard-host"
 )
 
 type rayJobResourceHandler struct {
@@ -58,6 +58,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
@@ -76,36 +77,26 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to get primary container from the pod: [%v]", err.Error())
 	}
 
-	cfg := GetConfig()
 	headReplicas := int32(1)
 	headNodeRayStartParams := make(map[string]string)
 	if rayJob.RayCluster.HeadGroupSpec != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
 		headNodeRayStartParams = rayJob.RayCluster.HeadGroupSpec.RayStartParams
-	} else if headNode := cfg.Defaults.HeadNode; len(headNode.StartParameters) > 0 {
-		headNodeRayStartParams = headNode.StartParameters
 	}
-
 	if _, exist := headNodeRayStartParams[IncludeDashboard]; !exist {
 		headNodeRayStartParams[IncludeDashboard] = strconv.FormatBool(GetConfig().IncludeDashboard)
 	}
-
 	if _, exist := headNodeRayStartParams[NodeIPAddress]; !exist {
-		headNodeRayStartParams[NodeIPAddress] = cfg.Defaults.HeadNode.IPAddress
+		headNodeRayStartParams[NodeIPAddress] = GetConfig().NodeIPAddress
 	}
-
 	if _, exist := headNodeRayStartParams[DashboardHost]; !exist {
-		headNodeRayStartParams[DashboardHost] = cfg.DashboardHost
-	}
-
-	if _, exists := headNodeRayStartParams[DisableUsageStatsStartParameter]; !exists && !cfg.EnableUsageStats {
-		headNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
+		headNodeRayStartParams[DashboardHost] = GetConfig().DashboardHost
 	}
 
 	enableIngress := true
 	rayClusterSpec := rayv1alpha1.RayClusterSpec{
 		HeadGroupSpec: rayv1alpha1.HeadGroupSpec{
 			Template:       buildHeadPodTemplate(&container, podSpec, objectMeta, taskCtx),
-			ServiceType:    v1.ServiceType(cfg.ServiceType),
+			ServiceType:    v1.ServiceType(GetConfig().ServiceType),
 			Replicas:       &headReplicas,
 			EnableIngress:  &enableIngress,
 			RayStartParams: headNodeRayStartParams,
@@ -121,7 +112,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		if spec.MinReplicas != 0 {
 			minReplicas = spec.MinReplicas
 		}
-
 		if spec.MaxReplicas != 0 {
 			maxReplicas = spec.MaxReplicas
 		}
@@ -129,16 +119,9 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
 			workerNodeRayStartParams = spec.RayStartParams
-		} else if workerNode := cfg.Defaults.WorkerNode; len(workerNode.StartParameters) > 0 {
-			workerNodeRayStartParams = workerNode.StartParameters
 		}
-
 		if _, exist := workerNodeRayStartParams[NodeIPAddress]; !exist {
-			workerNodeRayStartParams[NodeIPAddress] = cfg.Defaults.WorkerNode.IPAddress
-		}
-
-		if _, exists := workerNodeRayStartParams[DisableUsageStatsStartParameter]; !exists && !cfg.EnableUsageStats {
-			workerNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
+			workerNodeRayStartParams[NodeIPAddress] = GetConfig().NodeIPAddress
 		}
 
 		workerNodeSpec := rayv1alpha1.WorkerGroupSpec{
@@ -163,8 +146,8 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	jobSpec := rayv1alpha1.RayJobSpec{
 		RayClusterSpec:           rayClusterSpec,
 		Entrypoint:               strings.Join(container.Args, " "),
-		ShutdownAfterJobFinishes: cfg.ShutdownAfterJobFinishes,
-		TTLSecondsAfterFinished:  &cfg.TTLSecondsAfterFinished,
+		ShutdownAfterJobFinishes: GetConfig().ShutdownAfterJobFinishes,
+		TTLSecondsAfterFinished:  &GetConfig().TTLSecondsAfterFinished,
 		RuntimeEnv:               rayJob.RuntimeEnv,
 	}
 
@@ -365,10 +348,12 @@ func (rayJobResourceHandler) BuildIdentityResource(ctx context.Context, taskCtx 
 	}, nil
 }
 
-func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginContext, rayJob *rayv1alpha1.RayJob) (*pluginsCore.TaskInfo, error) {
-	logPlugin, err := logs.InitializeLogPlugins(&logConfig)
+func getEventInfoForRayJob() (*pluginsCore.TaskInfo, error) {
+	taskLogs := make([]*core.TaskLog, 0, 3)
+	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
+
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize log plugins. Error: %w", err)
+		return nil, err
 	}
 
 	if logPlugin == nil {
@@ -378,31 +363,22 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	// TODO: Retrieve the name of head pod from rayJob.status, and add it to task logs
 	// RayJob CRD does not include the name of the worker or head pod for now
 
-	taskID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	logOutput, err := logPlugin.GetTaskLogs(tasklog.Input{
-		Namespace:               rayJob.Namespace,
-		TaskExecutionIdentifier: &taskID,
-	})
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to generate task logs. Error: %w", err)
-	}
+	// TODO: Add ray Dashboard URI to task logs
 
 	return &pluginsCore.TaskInfo{
-		Logs: logOutput.TaskLogs,
+		Logs: taskLogs,
 	}, nil
 }
 
-func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
+func (rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	rayJob := resource.(*rayv1alpha1.RayJob)
-	info, err := getEventInfoForRayJob(GetConfig().Logs, pluginContext, rayJob)
+	info, err := getEventInfoForRayJob()
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
-
 	switch rayJob.Status.JobStatus {
 	case rayv1alpha1.JobStatusPending:
-		return pluginsCore.PhaseInfoInitializing(rayJob.Status.StartTime.Time, pluginsCore.DefaultPhaseVersion, "job is pending", info), nil
+		return pluginsCore.PhaseInfoNotReady(time.Now(), pluginsCore.DefaultPhaseVersion, "job is pending"), nil
 	case rayv1alpha1.JobStatusFailed:
 		reason := fmt.Sprintf("Failed to create Ray job: %s", rayJob.Name)
 		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
@@ -411,8 +387,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	case rayv1alpha1.JobStatusRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 	}
-
-	return pluginsCore.PhaseInfoQueued(rayJob.CreationTimestamp.Time, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
 }
 
 func init() {
