@@ -153,7 +153,7 @@ func NewAdminConnection(ctx context.Context, cfg *Config, proxyCredentialsFuture
 
 	opts = append(opts, GetAdditionalAdminClientConfigOptions(cfg)...)
 
-	if cfg.ProxyCommand != nil {
+	if len(cfg.ProxyCommand) > 0 {
 		opts = append(opts, grpc.WithChainUnaryInterceptor(NewProxyAuthInterceptor(cfg, proxyCredentialsFuture)))
 		opts = append(opts, grpc.WithPerRPCCredentials(proxyCredentialsFuture))
 	}
