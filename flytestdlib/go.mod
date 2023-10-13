@@ -12,6 +12,7 @@ require (
 	github.com/flyteorg/stow v0.3.7
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/ghodss/yaml v1.0.0
+	github.com/go-gormigrate/gormigrate/v2 v2.1.1
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.3
 	github.com/hashicorp/golang-lru v0.5.4
@@ -30,7 +31,8 @@ require (
 	google.golang.org/grpc v1.56.1
 	google.golang.org/protobuf v1.30.0
 	gorm.io/driver/postgres v1.5.3
-	gorm.io/gorm v1.25.2-0.20230530020048-26663ab9bf55
+	gorm.io/driver/sqlite v1.5.4
+	gorm.io/gorm v1.25.4
 	k8s.io/api v0.20.2
 	k8s.io/apimachinery v0.20.2
 	k8s.io/client-go v0.0.0-20210217172142-7279fc64d847
@@ -81,6 +83,7 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
+	github.com/mattn/go-sqlite3 v1.14.17 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect

@@ -39,7 +39,7 @@ func resolvePassword(ctx context.Context, passwordVal, passwordPath string) stri
 }
 
 // Produces the DSN (data source name) for opening a postgres db connection.
-func getPostgresDsn(ctx context.Context, pgConfig database.PostgresConfig) string {
+func getPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
 	password := resolvePassword(ctx, pgConfig.Password, pgConfig.PasswordPath)
 	if len(password) == 0 {
 		// The password-less case is included for development environments.
@@ -52,15 +52,16 @@ func getPostgresDsn(ctx context.Context, pgConfig database.PostgresConfig) strin
 
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
 func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
+	fmt.Printf("CreatePostgresDbIfNotExist=================================s: %v\n", pgConfig)
 	dialector := postgres.Open(getPostgresDsn(ctx, pgConfig))
 	gormDb, err := gorm.Open(dialector, gormConfig)
 	if err == nil {
 		return gormDb, nil
 	}
-
 	if !isPgErrorWithCode(err, pqInvalidDBCode) {
 		return nil, err
 	}
+	fmt.Println("=============================...........===")
 
 	logger.Warningf(ctx, "Database [%v] does not exist", pgConfig.DbName)
 
@@ -68,6 +69,9 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	// initialize the user-specified database.
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
+	x := getPostgresDsn(ctx, defaultDbPgConfig)
+	fmt.Println(x)
+	fmt.Println("==============================^^===")
 	defaultDBDialector := postgres.Open(getPostgresDsn(ctx, defaultDbPgConfig))
 	gormDb, err = gorm.Open(defaultDBDialector, gormConfig)
 	if err != nil {
@@ -93,6 +97,8 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 
 func isPgErrorWithCode(err error, code string) bool {
 	pgErr := &pgconn.PgError{}
+	xx := errors.As(err, &pgErr)
+	fmt.Println(xx)
 	if !errors.As(err, &pgErr) {
 		// err chain does not contain a pgconn.PgError
 		return false

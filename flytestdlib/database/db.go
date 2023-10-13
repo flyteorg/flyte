@@ -4,12 +4,10 @@ import (
 	"context"
 	"fmt"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
-
-const pqInvalidDBCode = "3D000"
-const pqDbAlreadyExistsCode = "42P04"
 
 // GetDB uses the dbConfig to create gorm DB object. If the db doesn't exist for the dbConfig then a new one is created
 // using the default db for the provider. eg : postgres has default dbName as postgres
@@ -19,7 +17,7 @@ func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 		panic("Cannot initialize database repository from empty db config")
 	}
 	gormConfig := &gorm.Config{
-		Logger:                                   database.GetGormLogger(ctx, logConfig),
+		Logger:                                   GetGormLogger(ctx, logConfig),
 		DisableForeignKeyConstraintWhenMigrating: !dbConfig.EnableForeignKeyConstraintWhenMigrating,
 	}
 
@@ -64,7 +62,7 @@ func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 	return gormDb, setupDbConnectionPool(ctx, gormDb, dbConfig)
 }
 
-func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *database.DbConfig) error {
+func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *DbConfig) error {
 	genericDb, err := gormDb.DB()
 	if err != nil {
 		return err
@@ -74,4 +72,64 @@ func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *datab
 	genericDb.SetMaxOpenConns(dbConfig.MaxOpenConnections)
 	logger.Infof(ctx, "Set connection pool values to [%+v]", genericDb.Stats())
 	return nil
+}
+
+func withDB(ctx context.Context, do func(db *gorm.DB) error) error {
+	databaseConfig := GetConfig()
+	logConfig := logger.GetConfig()
+
+	db, err := GetDB(ctx, databaseConfig, logConfig)
+	if err != nil {
+		logger.Fatal(ctx, err)
+	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		logger.Fatal(ctx, err)
+	}
+
+	defer func(deferCtx context.Context) {
+		if err = sqlDB.Close(); err != nil {
+			logger.Fatal(deferCtx, err)
+		}
+	}(ctx)
+
+	if err = sqlDB.Ping(); err != nil {
+		return err
+	}
+
+	return do(db)
+}
+
+// Migrate runs all configured migrations
+func Migrate(ctx context.Context, migrations []*gormigrate.Migration) error {
+	if migrations == nil || len(migrations) == 0 {
+		logger.Infof(ctx, "No migrations to run")
+		return nil
+	}
+	return withDB(ctx, func(db *gorm.DB) error {
+		m := gormigrate.New(db, gormigrate.DefaultOptions, migrations)
+		if err := m.Migrate(); err != nil {
+			return fmt.Errorf("database migration failed: %v", err)
+		}
+		logger.Infof(ctx, "Migration ran successfully")
+		return nil
+	})
+}
+
+// Rollback rolls back the last migration
+func Rollback(ctx context.Context, migrations []*gormigrate.Migration) error {
+	if migrations == nil || len(migrations) == 0 {
+		logger.Infof(ctx, "No migrations to rollback")
+		return nil
+	}
+	return withDB(ctx, func(db *gorm.DB) error {
+		m := gormigrate.New(db, gormigrate.DefaultOptions, migrations)
+		err := m.RollbackLast()
+		if err != nil {
+			return fmt.Errorf("could not rollback latest migration: %v", err)
+		}
+		logger.Infof(ctx, "Rolled back one migration successfully")
+		return nil
+	})
 }

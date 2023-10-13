@@ -13,8 +13,8 @@ func main() {
 	ctx := context.Background()
 	logger.Infof(ctx, "Beginning Flyte Artifacts Service")
 	rootCmd := sharedCmd.NewRootCmd("artifacts", server.GrpcRegistrationHook, server.HttpRegistrationHook)
-
-	rootCmd.AddCommand(sharedCmd.NewMigrateCmd(migrations))
+	migs := server.GetMigrations(ctx)
+	rootCmd.AddCommand(sharedCmd.NewMigrateCmd(migs))
 	err := rootCmd.ExecuteContext(ctx)
 	if err != nil {
 		panic(err)

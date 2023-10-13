@@ -1,2 +1,5 @@
 artifactsServer:
   myTestValue: "test from file"
+database:
+  postgres:
+    dbname: artifacts

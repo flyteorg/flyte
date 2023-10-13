@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
@@ -15,11 +16,9 @@ import (
 
 type ArtifactService struct {
 	artifact.UnimplementedArtifactRegistryServer
-	ArtifactProvider ArtifactHandler
-	TriggerProvider  TriggerHandler
-	TagProvider      TagHandler
-	LineageProvider  LineageHandler
-	Metrics          ServiceMetrics
+	StorageProvider StorageInterface
+	Metrics         ServiceMetrics
+	Service         CoreService
 }
 
 func NewArtifactService(scope promutils.Scope) *ArtifactService {
@@ -28,6 +27,7 @@ func NewArtifactService(scope promutils.Scope) *ArtifactService {
 
 	return &ArtifactService{
 		Metrics: InitMetrics(scope),
+		Service: CoreService{},
 	}
 }
 
@@ -46,34 +46,7 @@ func GrpcRegistrationHook(ctx context.Context, server *grpc.Server, scope promut
 	return nil
 }
 
-func (a *ArtifactService) CreateArtifact(ctx context.Context, request *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
-	return &artifact.CreateArtifactResponse{}, nil
-}
-
-func (a *ArtifactService) GetArtifact(ctx context.Context, request *artifact.GetArtifactRequest) (*artifact.GetArtifactResponse, error) {
-	return &artifact.GetArtifactResponse{}, nil
-}
-
-func (a *ArtifactService) CreateTrigger(ctx context.Context, request *artifact.CreateTriggerRequest) (*artifact.CreateTriggerResponse, error) {
-	return &artifact.CreateTriggerResponse{}, nil
-}
-
-func (a *ArtifactService) DeleteTrigger(ctx context.Context, request *artifact.DeleteTriggerRequest) (*artifact.DeleteTriggerResponse, error) {
-	return &artifact.DeleteTriggerResponse{}, nil
-}
-
-func (a *ArtifactService) AddTag(ctx context.Context, request *artifact.AddTagRequest) (*artifact.AddTagResponse, error) {
-	return &artifact.AddTagResponse{}, nil
-}
-
-func (a *ArtifactService) RegisterProducer(ctx context.Context, request *artifact.RegisterProducerRequest) (*artifact.RegisterResponse, error) {
-	return &artifact.RegisterResponse{}, nil
-}
-
-func (a *ArtifactService) RegisterConsumer(ctx context.Context, request *artifact.RegisterConsumerRequest) (*artifact.RegisterResponse, error) {
-	return &artifact.RegisterResponse{}, nil
-}
-
-func (a *ArtifactService) SearchArtifacts(ctx context.Context, request *artifact.SearchArtifactsRequest) (*artifact.SearchArtifactsResponse, error) {
-	return &artifact.SearchArtifactsResponse{}, nil
+// GetMigrations should be hidden behind the storage interface in the future.
+func GetMigrations(ctx context.Context) []*gormigrate.Migration {
+	return Migrations
 }
