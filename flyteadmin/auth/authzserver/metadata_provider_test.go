@@ -10,10 +10,11 @@ import (
 
 	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
@@ -111,3 +112,19 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 		assert.Equal(t, "https://dev-14186422.okta.com", resp.Issuer)
 	})
 }
+
+//func TestSendAndRetryHttpRequest(t *testing.T) {
+//	cm := ClientMock{}
+//	response, err := sendAndRetryHttpRequest(&cm, "url")
+//}
+//
+//type ClientMock struct {
+//}
+//
+//func (c *ClientMock) Do(req *http.Request) (*http.Response, error) {
+//	return &http.Response{}, errors.New("fail")
+//}
+//
+//type HttpClient interface {
+//	Do(req *http.Request) (*http.Response, error)
+//}
