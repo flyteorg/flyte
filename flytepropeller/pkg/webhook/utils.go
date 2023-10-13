@@ -5,13 +5,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/uuid"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 )
 
 func hasEnvVar(envVars []corev1.EnvVar, envVarKey string) bool {

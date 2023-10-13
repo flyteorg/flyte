@@ -5,28 +5,23 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/imdario/mergo"
+	"github.com/prometheus/client_golang/prometheus"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/leaderelection"
+
 	managerConfig "github.com/flyteorg/flyte/flytepropeller/manager/config"
 	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy"
 	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	leader "github.com/flyteorg/flyte/flytepropeller/pkg/leaderelection"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
 	stderrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/imdario/mergo"
-
-	"github.com/prometheus/client_golang/prometheus"
-
-	v1 "k8s.io/api/core/v1"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/util/wait"
-
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/leaderelection"
 )
 
 const (

@@ -3,28 +3,24 @@ package cmd
 import (
 	"context"
 
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	"github.com/spf13/cobra"
-
-	"golang.org/x/sync/errgroup"
-
-	"k8s.io/client-go/rest"
-
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 var webhookCmd = &cobra.Command{

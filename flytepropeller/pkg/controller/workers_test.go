@@ -5,10 +5,10 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var testLocalScope2 = promutils.NewScope("worker_pool")
