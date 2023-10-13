@@ -144,7 +144,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err,
 			"Unable to fetch statementHandle from http response")
 	}
-	runID := fmt.Sprintf("%v", data["run_id"])
+	runID := fmt.Sprintf("%.0f", data["run_id"])
 
 	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
 		ResourceWrapper{StatusCode: resp.StatusCode}, nil
