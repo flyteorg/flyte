@@ -7,10 +7,9 @@ import (
 	"net/url"
 	"time"
 
+	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 )
 
 const prestoConfigSectionKey = "presto"
