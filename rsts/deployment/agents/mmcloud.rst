@@ -57,15 +57,15 @@ Enable the MMCloud agent by adding the following config to the relevant YAML fil
 .. code-block:: yaml
 
   tasks:
-    task-agents:
-      enabled-agents:
+    task-plugins:
+      enabled-plugins:
         - agent-service
       default-for-task-types:
         - mmcloud_task: agent-service
 
 .. code-block:: yaml
 
-  agents:
+  plugins:
     agent-service:
       agents:
         mmcloud-agent:

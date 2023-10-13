@@ -268,19 +268,19 @@ You have to set the Databricks token to the Flyte configuration.
 
 1. Install flyteagent pod using helm
   
-    .. code-block::
-      
-      cd flyte/charts/flyteagent
-    
-    .. code-block::
+.. code-block::
+  
+  cd flyte/charts/flyteagent
 
-      helm install flyteagent . -n flyte
+.. code-block::
+
+  helm install flyteagent . -n flyte
 
 2. Get the base64 value of your Databricks token.
 
-    .. code-block::
-  
-      echo -n "<DATABRICKS_TOKEN>" | base64
+.. code-block::
+
+  echo -n "<DATABRICKS_TOKEN>" | base64
 
 3. Edit the flyteagent secret
   
