@@ -2,14 +2,26 @@ package authzserver
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
+
+	errrs "github.com/pkg/errors"
+	"google.golang.org/api/googleapi"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+)
+
+var (
+	retryAttempts = 5
+	retryDelay    = 1 * time.Second
 )
 
 type OAuth2MetadataProvider struct {
@@ -72,7 +84,7 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 			httpClient.Transport = transport
 		}
 
-		response, err := httpClient.Get(externalMetadataURL.String())
+		response, err := sendAndRetryHttpRequest(httpClient, externalMetadataURL.String())
 		if err != nil {
 			return nil, err
 		}
@@ -106,4 +118,27 @@ func NewService(config *authConfig.Config) OAuth2MetadataProvider {
 	return OAuth2MetadataProvider{
 		cfg: config,
 	}
+}
+
+func sendAndRetryHttpRequest(client *http.Client, url string) (*http.Response, error) {
+	var response *http.Response
+	var err error
+	err = async.RetryOnSpecificErrors(retryAttempts, retryDelay, func() error {
+		response, err = client.Get(url)
+		return err
+	}, isTransientError)
+
+	if err != nil {
+		e, _ := errrs.Cause(err).(*googleapi.Error)
+		return nil, errors.New(fmt.Sprintf("Failed to get oauth metadata after %v attempts. Error code: %v Err: %v", retryAttempts, e.Code, e.Error()))
+	}
+
+	return response, nil
+}
+
+func isTransientError(err error) bool {
+	if e, ok := errrs.Cause(err).(*googleapi.Error); ok && e.Code >= 500 && e.Code <= 599 {
+		return true
+	}
+	return false
 }
