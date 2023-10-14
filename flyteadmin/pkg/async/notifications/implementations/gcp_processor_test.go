@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var (

@@ -3,10 +3,11 @@ package runtime
 import (
 	"fmt"
 
+	"github.com/golang/protobuf/ptypes"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/golang/protobuf/ptypes"
 )
 
 const qualityOfServiceKey = "qualityOfService"
