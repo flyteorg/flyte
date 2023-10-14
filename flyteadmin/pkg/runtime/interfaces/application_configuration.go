@@ -97,8 +97,6 @@ type ApplicationConfig struct {
 
 	// Environment variables to be set for the execution.
 	Envs map[string]string `json:"envs,omitempty"`
-
-	EnableGrpcHistograms bool `json:"enableGrpcHistograms" pflag:",Enable grpc histograms"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {

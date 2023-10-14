@@ -2,14 +2,19 @@ package entrypoints
 
 import (
 	"context"
-	runtimeConfig "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
+
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
-	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/spf13/cobra"
+
 	_ "net/http/pprof" // Required to serve application.
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/spf13/cobra"
+
+	runtimeConfig "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 )
 
 var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
@@ -30,9 +35,6 @@ var serveCmd = &cobra.Command{
 			}
 		}()
 		server.SetMetricKeys(cfg.ApplicationConfiguration().GetTopLevelConfig())
-		if cfg.ApplicationConfiguration().GetTopLevelConfig().EnableGrpcHistograms {
-			grpcPrometheus.EnableHandlingTimeHistogram()
-		}
 
 		return server.Serve(ctx, pluginRegistryStore.Load(), nil)
 	},

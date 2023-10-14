@@ -505,4 +505,18 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_enableGrpcHistograms", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("enableGrpcHistograms", testValue)
+			if vBool, err := cmdFlags.GetBool("enableGrpcHistograms"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.EnableGrpcHistograms)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
