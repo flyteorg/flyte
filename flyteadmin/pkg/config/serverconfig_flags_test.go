@@ -323,6 +323,20 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_grpc.enableGrpcHistograms", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("grpc.enableGrpcHistograms", testValue)
+			if vBool, err := cmdFlags.GetBool("grpc.enableGrpcHistograms"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.GrpcConfig.EnableGrpcHistograms)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_thirdPartyConfig.flyteClient.clientId", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -499,20 +513,6 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("kubeClientConfig.timeout", testValue)
 			if vString, err := cmdFlags.GetString("kubeClientConfig.timeout"); err == nil {
 				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vString), &actual.KubeClientConfig.Timeout)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_enableGrpcHistograms", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("enableGrpcHistograms", testValue)
-			if vBool, err := cmdFlags.GetBool("enableGrpcHistograms"); err == nil {
-				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.EnableGrpcHistograms)
 
 			} else {
 				assert.FailNow(t, err.Error())

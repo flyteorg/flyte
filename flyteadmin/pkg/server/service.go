@@ -80,7 +80,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
 		RequestIDInterceptor, auth.BlanketAuthorization, auth.ExecutionUserIdentifierInterceptor))
 
-	if cfg.EnableGrpcHistograms {
+	if cfg.GrpcConfig.EnableGrpcHistograms {
 		grpcprometheus.EnableHandlingTimeHistogram()
 	}
 
