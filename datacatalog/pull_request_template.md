@@ -1,6 +1,5 @@
 ## _Read then delete this section_
 
-
 _- Make sure to use a concise title for the pull-request._
 
 _- Use #patch, #minor or #major in the pull-request title to bump the corresponding version. Otherwise, the patch version

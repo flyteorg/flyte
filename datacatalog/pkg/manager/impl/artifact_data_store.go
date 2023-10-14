@@ -3,12 +3,13 @@ package impl
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"google.golang.org/grpc/codes"
 )
 
 const artifactDataFile = "data.pb"
