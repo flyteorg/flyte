@@ -8,9 +8,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/flyteorg/flyte/flytestdlib/atomic"
-
 	"github.com/spf13/pflag"
+
+	"github.com/flyteorg/flyte/flytestdlib/atomic"
 )
 
 type Section interface {
