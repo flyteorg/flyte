@@ -6552,6 +6552,80 @@ public final class Types {
      */
     com.google.protobuf.ByteString
         getTagBytes();
+
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+    int getDataclassTypeCount();
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+    boolean containsDataclassType(
+        java.lang.String key);
+    /**
+     * Use {@link #getDataclassTypeMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType>
+    getDataclassType();
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+    java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType>
+    getDataclassTypeMap();
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+
+    flyteidl.core.Types.LiteralType getDataclassTypeOrDefault(
+        java.lang.String key,
+        flyteidl.core.Types.LiteralType defaultValue);
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+
+    flyteidl.core.Types.LiteralType getDataclassTypeOrThrow(
+        java.lang.String key);
   }
   /**
    * <pre>
@@ -6605,6 +6679,19 @@ public final class Types {
               tag_ = s;
               break;
             }
+            case 18: {
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+                dataclassType_ = com.google.protobuf.MapField.newMapField(
+                    DataclassTypeDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000002;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, flyteidl.core.Types.LiteralType>
+              dataclassType__ = input.readMessage(
+                  DataclassTypeDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              dataclassType_.getMutableMap().put(
+                  dataclassType__.getKey(), dataclassType__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -6629,6 +6716,18 @@ public final class Types {
       return flyteidl.core.Types.internal_static_flyteidl_core_TypeStructure_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 2:
+          return internalGetDataclassType();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -6637,6 +6736,7 @@ public final class Types {
               flyteidl.core.Types.TypeStructure.class, flyteidl.core.Types.TypeStructure.Builder.class);
     }
 
+    private int bitField0_;
     public static final int TAG_FIELD_NUMBER = 1;
     private volatile java.lang.Object tag_;
     /**
@@ -6679,6 +6779,114 @@ public final class Types {
       }
     }
 
+    public static final int DATACLASS_TYPE_FIELD_NUMBER = 2;
+    private static final class DataclassTypeDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, flyteidl.core.Types.LiteralType> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, flyteidl.core.Types.LiteralType>newDefaultInstance(
+                  flyteidl.core.Types.internal_static_flyteidl_core_TypeStructure_DataclassTypeEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.MESSAGE,
+                  flyteidl.core.Types.LiteralType.getDefaultInstance());
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, flyteidl.core.Types.LiteralType> dataclassType_;
+    private com.google.protobuf.MapField<java.lang.String, flyteidl.core.Types.LiteralType>
+    internalGetDataclassType() {
+      if (dataclassType_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            DataclassTypeDefaultEntryHolder.defaultEntry);
+      }
+      return dataclassType_;
+    }
+
+    public int getDataclassTypeCount() {
+      return internalGetDataclassType().getMap().size();
+    }
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+
+    public boolean containsDataclassType(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetDataclassType().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getDataclassTypeMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> getDataclassType() {
+      return getDataclassTypeMap();
+    }
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+
+    public java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> getDataclassTypeMap() {
+      return internalGetDataclassType().getMap();
+    }
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+
+    public flyteidl.core.Types.LiteralType getDataclassTypeOrDefault(
+        java.lang.String key,
+        flyteidl.core.Types.LiteralType defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> map =
+          internalGetDataclassType().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * dataclass_type only exists for dataclasses.
+     * This is used to resolve the type of the fields of dataclass
+     * The key is the field name, and the value is the literal type of the field
+     * e.g. For dataclass Foo, with fields a, and a is a string
+     * Foo.a will be resolved as a literal type of string from dataclass_type
+     * </pre>
+     *
+     * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+     */
+
+    public flyteidl.core.Types.LiteralType getDataclassTypeOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> map =
+          internalGetDataclassType().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6696,6 +6904,12 @@ public final class Types {
       if (!getTagBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, tag_);
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetDataclassType(),
+          DataclassTypeDefaultEntryHolder.defaultEntry,
+          2);
       unknownFields.writeTo(output);
     }
 
@@ -6707,6 +6921,16 @@ public final class Types {
       size = 0;
       if (!getTagBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, tag_);
+      }
+      for (java.util.Map.Entry<java.lang.String, flyteidl.core.Types.LiteralType> entry
+           : internalGetDataclassType().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, flyteidl.core.Types.LiteralType>
+        dataclassType__ = DataclassTypeDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(2, dataclassType__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6725,6 +6949,8 @@ public final class Types {
 
       if (!getTag()
           .equals(other.getTag())) return false;
+      if (!internalGetDataclassType().equals(
+          other.internalGetDataclassType())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6738,6 +6964,10 @@ public final class Types {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + TAG_FIELD_NUMBER;
       hash = (53 * hash) + getTag().hashCode();
+      if (!internalGetDataclassType().getMap().isEmpty()) {
+        hash = (37 * hash) + DATACLASS_TYPE_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetDataclassType().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6851,6 +7081,28 @@ public final class Types {
         return flyteidl.core.Types.internal_static_flyteidl_core_TypeStructure_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 2:
+            return internalGetDataclassType();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 2:
+            return internalGetMutableDataclassType();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -6879,6 +7131,7 @@ public final class Types {
         super.clear();
         tag_ = "";
 
+        internalGetMutableDataclassType().clear();
         return this;
       }
 
@@ -6905,7 +7158,12 @@ public final class Types {
       @java.lang.Override
       public flyteidl.core.Types.TypeStructure buildPartial() {
         flyteidl.core.Types.TypeStructure result = new flyteidl.core.Types.TypeStructure(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.tag_ = tag_;
+        result.dataclassType_ = internalGetDataclassType();
+        result.dataclassType_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -6958,6 +7216,8 @@ public final class Types {
           tag_ = other.tag_;
           onChanged();
         }
+        internalGetMutableDataclassType().mergeFrom(
+            other.internalGetDataclassType());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -6986,6 +7246,7 @@ public final class Types {
         }
         return this;
       }
+      private int bitField0_;
 
       private java.lang.Object tag_ = "";
       /**
@@ -7073,6 +7334,185 @@ public final class Types {
         
         tag_ = value;
         onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, flyteidl.core.Types.LiteralType> dataclassType_;
+      private com.google.protobuf.MapField<java.lang.String, flyteidl.core.Types.LiteralType>
+      internalGetDataclassType() {
+        if (dataclassType_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              DataclassTypeDefaultEntryHolder.defaultEntry);
+        }
+        return dataclassType_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, flyteidl.core.Types.LiteralType>
+      internalGetMutableDataclassType() {
+        onChanged();;
+        if (dataclassType_ == null) {
+          dataclassType_ = com.google.protobuf.MapField.newMapField(
+              DataclassTypeDefaultEntryHolder.defaultEntry);
+        }
+        if (!dataclassType_.isMutable()) {
+          dataclassType_ = dataclassType_.copy();
+        }
+        return dataclassType_;
+      }
+
+      public int getDataclassTypeCount() {
+        return internalGetDataclassType().getMap().size();
+      }
+      /**
+       * <pre>
+       * dataclass_type only exists for dataclasses.
+       * This is used to resolve the type of the fields of dataclass
+       * The key is the field name, and the value is the literal type of the field
+       * e.g. For dataclass Foo, with fields a, and a is a string
+       * Foo.a will be resolved as a literal type of string from dataclass_type
+       * </pre>
+       *
+       * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+       */
+
+      public boolean containsDataclassType(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetDataclassType().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getDataclassTypeMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> getDataclassType() {
+        return getDataclassTypeMap();
+      }
+      /**
+       * <pre>
+       * dataclass_type only exists for dataclasses.
+       * This is used to resolve the type of the fields of dataclass
+       * The key is the field name, and the value is the literal type of the field
+       * e.g. For dataclass Foo, with fields a, and a is a string
+       * Foo.a will be resolved as a literal type of string from dataclass_type
+       * </pre>
+       *
+       * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+       */
+
+      public java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> getDataclassTypeMap() {
+        return internalGetDataclassType().getMap();
+      }
+      /**
+       * <pre>
+       * dataclass_type only exists for dataclasses.
+       * This is used to resolve the type of the fields of dataclass
+       * The key is the field name, and the value is the literal type of the field
+       * e.g. For dataclass Foo, with fields a, and a is a string
+       * Foo.a will be resolved as a literal type of string from dataclass_type
+       * </pre>
+       *
+       * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+       */
+
+      public flyteidl.core.Types.LiteralType getDataclassTypeOrDefault(
+          java.lang.String key,
+          flyteidl.core.Types.LiteralType defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> map =
+            internalGetDataclassType().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * dataclass_type only exists for dataclasses.
+       * This is used to resolve the type of the fields of dataclass
+       * The key is the field name, and the value is the literal type of the field
+       * e.g. For dataclass Foo, with fields a, and a is a string
+       * Foo.a will be resolved as a literal type of string from dataclass_type
+       * </pre>
+       *
+       * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+       */
+
+      public flyteidl.core.Types.LiteralType getDataclassTypeOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> map =
+            internalGetDataclassType().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearDataclassType() {
+        internalGetMutableDataclassType().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * dataclass_type only exists for dataclasses.
+       * This is used to resolve the type of the fields of dataclass
+       * The key is the field name, and the value is the literal type of the field
+       * e.g. For dataclass Foo, with fields a, and a is a string
+       * Foo.a will be resolved as a literal type of string from dataclass_type
+       * </pre>
+       *
+       * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+       */
+
+      public Builder removeDataclassType(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableDataclassType().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType>
+      getMutableDataclassType() {
+        return internalGetMutableDataclassType().getMutableMap();
+      }
+      /**
+       * <pre>
+       * dataclass_type only exists for dataclasses.
+       * This is used to resolve the type of the fields of dataclass
+       * The key is the field name, and the value is the literal type of the field
+       * e.g. For dataclass Foo, with fields a, and a is a string
+       * Foo.a will be resolved as a literal type of string from dataclass_type
+       * </pre>
+       *
+       * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+       */
+      public Builder putDataclassType(
+          java.lang.String key,
+          flyteidl.core.Types.LiteralType value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableDataclassType().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * dataclass_type only exists for dataclasses.
+       * This is used to resolve the type of the fields of dataclass
+       * The key is the field name, and the value is the literal type of the field
+       * e.g. For dataclass Foo, with fields a, and a is a string
+       * Foo.a will be resolved as a literal type of string from dataclass_type
+       * </pre>
+       *
+       * <code>map&lt;string, .flyteidl.core.LiteralType&gt; dataclass_type = 2;</code>
+       */
+
+      public Builder putAllDataclassType(
+          java.util.Map<java.lang.String, flyteidl.core.Types.LiteralType> values) {
+        internalGetMutableDataclassType().getMutableMap()
+            .putAll(values);
         return this;
       }
       @java.lang.Override
@@ -13841,6 +14281,11 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_TypeStructure_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_TypeStructure_DataclassTypeEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_TypeStructure_DataclassTypeEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_TypeAnnotation_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -13894,35 +14339,39 @@ public final class Types {
       "imensionality\"/\n\022BlobDimensionality\022\n\n\006S" +
       "INGLE\020\000\022\r\n\tMULTIPART\020\001\"\032\n\010EnumType\022\016\n\006va" +
       "lues\030\001 \003(\t\"9\n\tUnionType\022,\n\010variants\030\001 \003(" +
-      "\0132\032.flyteidl.core.LiteralType\"\034\n\rTypeStr" +
-      "ucture\022\013\n\003tag\030\001 \001(\t\">\n\016TypeAnnotation\022,\n" +
-      "\013annotations\030\001 \001(\0132\027.google.protobuf.Str" +
-      "uct\"\273\004\n\013LiteralType\022+\n\006simple\030\001 \001(\0162\031.fl" +
-      "yteidl.core.SimpleTypeH\000\022+\n\006schema\030\002 \001(\013" +
-      "2\031.flyteidl.core.SchemaTypeH\000\0225\n\017collect" +
-      "ion_type\030\003 \001(\0132\032.flyteidl.core.LiteralTy" +
-      "peH\000\0224\n\016map_value_type\030\004 \001(\0132\032.flyteidl." +
-      "core.LiteralTypeH\000\022\'\n\004blob\030\005 \001(\0132\027.flyte" +
-      "idl.core.BlobTypeH\000\022,\n\tenum_type\030\007 \001(\0132\027" +
-      ".flyteidl.core.EnumTypeH\000\022G\n\027structured_" +
-      "dataset_type\030\010 \001(\0132$.flyteidl.core.Struc" +
-      "turedDatasetTypeH\000\022.\n\nunion_type\030\n \001(\0132\030" +
-      ".flyteidl.core.UnionTypeH\000\022)\n\010metadata\030\006" +
-      " \001(\0132\027.google.protobuf.Struct\0221\n\nannotat" +
-      "ion\030\t \001(\0132\035.flyteidl.core.TypeAnnotation" +
-      "\022/\n\tstructure\030\013 \001(\0132\034.flyteidl.core.Type" +
-      "StructureB\006\n\004type\"c\n\017OutputReference\022\017\n\007" +
-      "node_id\030\001 \001(\t\022\013\n\003var\030\002 \001(\t\0222\n\tattr_path\030" +
-      "\003 \003(\0132\037.flyteidl.core.PromiseAttribute\"H" +
-      "\n\020PromiseAttribute\022\026\n\014string_value\030\001 \001(\t" +
-      "H\000\022\023\n\tint_value\030\002 \001(\005H\000B\007\n\005value\"0\n\005Erro" +
-      "r\022\026\n\016failed_node_id\030\001 \001(\t\022\017\n\007message\030\002 \001" +
-      "(\t*\206\001\n\nSimpleType\022\010\n\004NONE\020\000\022\013\n\007INTEGER\020\001" +
-      "\022\t\n\005FLOAT\020\002\022\n\n\006STRING\020\003\022\013\n\007BOOLEAN\020\004\022\014\n\010" +
-      "DATETIME\020\005\022\014\n\010DURATION\020\006\022\n\n\006BINARY\020\007\022\t\n\005" +
-      "ERROR\020\010\022\n\n\006STRUCT\020\tB<Z:github.com/flyteo" +
-      "rg/flyte/flyteidl/gen/pb-go/flyteidl/cor" +
-      "eb\006proto3"
+      "\0132\032.flyteidl.core.LiteralType\"\267\001\n\rTypeSt" +
+      "ructure\022\013\n\003tag\030\001 \001(\t\022G\n\016dataclass_type\030\002" +
+      " \003(\0132/.flyteidl.core.TypeStructure.Datac" +
+      "lassTypeEntry\032P\n\022DataclassTypeEntry\022\013\n\003k" +
+      "ey\030\001 \001(\t\022)\n\005value\030\002 \001(\0132\032.flyteidl.core." +
+      "LiteralType:\0028\001\">\n\016TypeAnnotation\022,\n\013ann" +
+      "otations\030\001 \001(\0132\027.google.protobuf.Struct\"" +
+      "\273\004\n\013LiteralType\022+\n\006simple\030\001 \001(\0162\031.flytei" +
+      "dl.core.SimpleTypeH\000\022+\n\006schema\030\002 \001(\0132\031.f" +
+      "lyteidl.core.SchemaTypeH\000\0225\n\017collection_" +
+      "type\030\003 \001(\0132\032.flyteidl.core.LiteralTypeH\000" +
+      "\0224\n\016map_value_type\030\004 \001(\0132\032.flyteidl.core" +
+      ".LiteralTypeH\000\022\'\n\004blob\030\005 \001(\0132\027.flyteidl." +
+      "core.BlobTypeH\000\022,\n\tenum_type\030\007 \001(\0132\027.fly" +
+      "teidl.core.EnumTypeH\000\022G\n\027structured_data" +
+      "set_type\030\010 \001(\0132$.flyteidl.core.Structure" +
+      "dDatasetTypeH\000\022.\n\nunion_type\030\n \001(\0132\030.fly" +
+      "teidl.core.UnionTypeH\000\022)\n\010metadata\030\006 \001(\013" +
+      "2\027.google.protobuf.Struct\0221\n\nannotation\030" +
+      "\t \001(\0132\035.flyteidl.core.TypeAnnotation\022/\n\t" +
+      "structure\030\013 \001(\0132\034.flyteidl.core.TypeStru" +
+      "ctureB\006\n\004type\"c\n\017OutputReference\022\017\n\007node" +
+      "_id\030\001 \001(\t\022\013\n\003var\030\002 \001(\t\0222\n\tattr_path\030\003 \003(" +
+      "\0132\037.flyteidl.core.PromiseAttribute\"H\n\020Pr" +
+      "omiseAttribute\022\026\n\014string_value\030\001 \001(\tH\000\022\023" +
+      "\n\tint_value\030\002 \001(\005H\000B\007\n\005value\"0\n\005Error\022\026\n" +
+      "\016failed_node_id\030\001 \001(\t\022\017\n\007message\030\002 \001(\t*\206" +
+      "\001\n\nSimpleType\022\010\n\004NONE\020\000\022\013\n\007INTEGER\020\001\022\t\n\005" +
+      "FLOAT\020\002\022\n\n\006STRING\020\003\022\013\n\007BOOLEAN\020\004\022\014\n\010DATE" +
+      "TIME\020\005\022\014\n\010DURATION\020\006\022\n\n\006BINARY\020\007\022\t\n\005ERRO" +
+      "R\020\010\022\n\n\006STRUCT\020\tB<Z:github.com/flyteorg/f" +
+      "lyte/flyteidl/gen/pb-go/flyteidl/coreb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -13984,7 +14433,13 @@ public final class Types {
     internal_static_flyteidl_core_TypeStructure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TypeStructure_descriptor,
-        new java.lang.String[] { "Tag", });
+        new java.lang.String[] { "Tag", "DataclassType", });
+    internal_static_flyteidl_core_TypeStructure_DataclassTypeEntry_descriptor =
+      internal_static_flyteidl_core_TypeStructure_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_core_TypeStructure_DataclassTypeEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_TypeStructure_DataclassTypeEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_TypeAnnotation_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_core_TypeAnnotation_fieldAccessorTable = new
