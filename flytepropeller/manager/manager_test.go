@@ -269,7 +269,7 @@ func TestRun(t *testing.T) {
 				errChan <- err
 			}()
 
-			time.Sleep(1 * time.Second)
+			time.Sleep(10 * time.Millisecond)
 			cancel()
 
 			err := <-errChan
@@ -299,7 +299,7 @@ func Test_Run(t *testing.T) {
 		errChan <- err
 	}()
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(10 * time.Millisecond)
 	cancel()
 
 	err := <-errChan
