@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -61,17 +61,12 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	if !isPgErrorWithCode(err, pqInvalidDBCode) {
 		return nil, err
 	}
-	fmt.Println("=============================...........===")
-
 	logger.Warningf(ctx, "Database [%v] does not exist", pgConfig.DbName)
 
 	// Every postgres installation includes a 'postgres' database by default. We connect to that now in order to
 	// initialize the user-specified database.
 	defaultDbPgConfig := pgConfig
 	defaultDbPgConfig.DbName = defaultDB
-	x := getPostgresDsn(ctx, defaultDbPgConfig)
-	fmt.Println(x)
-	fmt.Println("==============================^^===")
 	defaultDBDialector := postgres.Open(getPostgresDsn(ctx, defaultDbPgConfig))
 	gormDb, err = gorm.Open(defaultDBDialector, gormConfig)
 	if err != nil {
@@ -96,9 +91,9 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 }
 
 func isPgErrorWithCode(err error, code string) bool {
+	// Make sure the pgconn you're using is "github.com/jackc/pgx/v5/pgconn"
+	// See https://github.com/go-gorm/gorm/issues/4135
 	pgErr := &pgconn.PgError{}
-	xx := errors.As(err, &pgErr)
-	fmt.Println(xx)
 	if !errors.As(err, &pgErr) {
 		// err chain does not contain a pgconn.PgError
 		return false

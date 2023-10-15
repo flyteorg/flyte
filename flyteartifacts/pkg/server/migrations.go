@@ -21,7 +21,7 @@ var Migrations = []*gormigrate.Migration{
 				gorm.Model
 				ArtifactsKey
 				Version    string          `gorm:"type:varchar(255);index:idx_artifact_version"`
-				Partitions postgres.Hstore `gorm:"index:idx_artifact_partitions"`
+				Partitions postgres.Hstore `gorm:"type:hstore;index:idx_artifact_partitions"`
 
 				LiteralType  []byte `gorm:"not null"`
 				LiteralValue []byte `gorm:"not null"`

@@ -14,7 +14,8 @@ func main() {
 	logger.Infof(ctx, "Beginning Flyte Artifacts Service")
 	rootCmd := sharedCmd.NewRootCmd("artifacts", server.GrpcRegistrationHook, server.HttpRegistrationHook)
 	migs := server.GetMigrations(ctx)
-	rootCmd.AddCommand(sharedCmd.NewMigrateCmd(migs))
+	initializationSql := "create extension if not exists hstore;"
+	rootCmd.AddCommand(sharedCmd.NewMigrateCmd(migs, initializationSql))
 	err := rootCmd.ExecuteContext(ctx)
 	if err != nil {
 		panic(err)

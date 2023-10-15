@@ -8,12 +8,12 @@ import (
 )
 
 // NewMigrateCmd represents the migrate command
-func NewMigrateCmd(migs []*gormigrate.Migration) *cobra.Command {
+func NewMigrateCmd(migs []*gormigrate.Migration, initializationSql string) *cobra.Command {
 	return &cobra.Command{
 		Use:   "migrate",
 		Short: "This command will run all the migrations for the database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return database.Migrate(context.Background(), migs)
+			return database.Migrate(context.Background(), migs, initializationSql)
 		},
 	}
 }
