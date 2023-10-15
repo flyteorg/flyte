@@ -200,10 +200,10 @@ func createTaskInfo(queryID string, cfg awsSdk.Config) *core.TaskInfo {
 	}
 }
 
-func NewPlugin(_ context.Context, cfg *Config, awsConfig *aws.Config, metricScope promutils.Scope) (Plugin, webapi.SyncPlugin, error) {
+func NewPlugin(_ context.Context, cfg *Config, awsConfig *aws.Config, metricScope promutils.Scope) (webapi.AsyncPlugin, error) {
 	sdkCfg, err := awsConfig.GetSdkConfig()
 	if err != nil {
-		return Plugin{}, nil, err
+		return Plugin{}, err
 	}
 
 	return Plugin{
@@ -211,14 +211,14 @@ func NewPlugin(_ context.Context, cfg *Config, awsConfig *aws.Config, metricScop
 		client:      athena.NewFromConfig(sdkCfg),
 		cfg:         cfg,
 		awsConfig:   sdkCfg,
-	}, nil, nil
+	}, nil
 }
 
 func init() {
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(webapi.PluginEntry{
 		ID:                 "athena",
 		SupportedTaskTypes: []core.TaskType{"hive", "presto"},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
 			return NewPlugin(ctx, GetConfig(), aws.GetConfig(), iCtx.MetricsScope())
 		},
 	})

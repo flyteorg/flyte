@@ -33,8 +33,7 @@ const (
 
 type CorePlugin struct {
 	id             string
-	p              webapi.AsyncPlugin
-	sp             webapi.SyncPlugin
+	p              webapi.Plugin
 	cache          cache.AutoRefresh
 	tokenAllocator tokenAllocator
 	metrics        Metrics
@@ -72,7 +71,7 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
 	if taskTemplate.GetMetadata().GetRuntime().GetFlavor() == syncPlugin {
-		phaseInfo, err := c.sp.Do(ctx, tCtx)
+		phaseInfo, err := c.p.Do(ctx, tCtx)
 		if err != nil {
 			return core.UnknownTransition, err
 		}
@@ -176,7 +175,7 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 		RegisteredTaskTypes: pluginEntry.SupportedTaskTypes,
 		LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (
 			core.Plugin, error) {
-			p, sp, err := pluginEntry.PluginLoader(ctx, iCtx)
+			p, err := pluginEntry.PluginLoader(ctx, iCtx)
 			if err != nil {
 				return nil, err
 			}
@@ -216,7 +215,6 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 			return CorePlugin{
 				id:             pluginEntry.ID,
 				p:              p,
-				sp:             sp,
 				cache:          resourceCache,
 				metrics:        newMetrics(iCtx.MetricsScope()),
 				tokenAllocator: newTokenAllocator(c),

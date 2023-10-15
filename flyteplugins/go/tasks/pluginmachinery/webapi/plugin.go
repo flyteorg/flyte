@@ -100,8 +100,7 @@ type ResourceMeta = interface{}
 type Resource = interface{}
 
 type Plugin interface {
-	AsyncPlugin
-	SyncPlugin
+	GetConfig() PluginConfig
 }
 
 // AsyncPlugin defines the interface for plugins that call Async Web APIs.
