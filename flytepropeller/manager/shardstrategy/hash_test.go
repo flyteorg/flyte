@@ -23,3 +23,17 @@ func TestComputeKeyRange(t *testing.T) {
 		assert.Equal(t, keyspaceSize, keysCovered)
 	}
 }
+
+func TestHashHashCode(t *testing.T) {
+	strategy1 := &HashShardStrategy{
+		ShardCount: 3,
+	}
+	strategy2 := &HashShardStrategy{
+		ShardCount: 3,
+	}
+	hashcode1, err := strategy1.HashCode()
+	assert.NoError(t, err)
+	hashcode2, err := strategy2.HashCode()
+	assert.NoError(t, err)
+	assert.Equal(t, hashcode1, hashcode2)
+}

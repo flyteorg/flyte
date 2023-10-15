@@ -3,9 +3,16 @@ package manager
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"testing"
+	"time"
 
+	managerConfig "github.com/flyteorg/flyte/flytepropeller/manager/config"
+	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	leader "github.com/flyteorg/flyte/flytepropeller/pkg/leaderelection"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"k8s.io/client-go/tools/leaderelection"
 
 	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy"
 	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy/mocks"
@@ -194,6 +201,151 @@ func TestGetPodNames(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.podCount, len(manager.getPodNames()))
+		})
+	}
+}
+
+func createPropellerConfig(enableLeaderElection bool) *propellerConfig.Config {
+	return &propellerConfig.Config{
+		LeaderElection: propellerConfig.LeaderElectionConfig{
+			Enabled:       enableLeaderElection,
+			LeaseDuration: config.Duration{Duration: time.Second * 15},
+			RenewDeadline: config.Duration{Duration: time.Second * 10},
+			RetryPeriod:   config.Duration{Duration: time.Second * 2},
+		},
+	}
+}
+
+func TestRun(t *testing.T) {
+	t.Parallel()
+	// setup for leaderElector
+	setup := func() *leaderelection.LeaderElector {
+		kubeClient := fake.NewSimpleClientset(podTemplate)
+		propellerCfg := createPropellerConfig(true)
+		lock, _ := leader.NewResourceLock(kubeClient.CoreV1(), kubeClient.CoordinationV1(), nil, propellerCfg.LeaderElection)
+		leConfig := leaderelection.LeaderElectionConfig{
+			Lock:          lock,
+			LeaseDuration: time.Second * 15,
+			RenewDeadline: time.Second * 10,
+			RetryPeriod:   time.Second * 2,
+			Callbacks: leaderelection.LeaderCallbacks{
+				OnStartedLeading: func(ctx context.Context) {},
+				OnStoppedLeading: func() {},
+				OnNewLeader:      func(identity string) {},
+			},
+		}
+		leaderElector, _ := leaderelection.NewLeaderElector(leConfig)
+		return leaderElector
+	}
+
+	tests := []struct {
+		name          string
+		leaderElector *leaderelection.LeaderElector
+	}{
+		{"withLeaderElection", setup()},
+		{"withoutLeaderElection", nil},
+	}
+
+	metrics := newManagerMetrics(promutils.NewScope(fmt.Sprintf("create_%s", "Run")))
+	kubeClient := fake.NewSimpleClientset(podTemplate)
+	shardStrategy := createShardStrategy(2)
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithCancel(context.TODO())
+			defer cancel()
+
+			manager := Manager{
+				leaderElector:  tt.leaderElector,
+				kubeClient:     kubeClient,
+				metrics:        metrics,
+				podApplication: "flytepropeller",
+				shardStrategy:  shardStrategy,
+			}
+
+			errChan := make(chan error, 1)
+			go func() {
+				err := manager.Run(ctx)
+				errChan <- err
+			}()
+
+			time.Sleep(1 * time.Second)
+			cancel()
+
+			err := <-errChan
+			assert.NoError(t, err)
+		})
+	}
+}
+
+func Test_Run(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
+	scope := promutils.NewScope(fmt.Sprintf("create_%s", "run"))
+	kubeClient := fake.NewSimpleClientset(podTemplate)
+	shardStrategy := createShardStrategy(2)
+
+	manager := Manager{
+		kubeClient:     kubeClient,
+		metrics:        newManagerMetrics(scope),
+		podApplication: "flytepropeller",
+		shardStrategy:  shardStrategy,
+	}
+
+	errChan := make(chan error, 1)
+
+	go func() {
+		err := manager.run(ctx)
+		errChan <- err
+	}()
+
+	time.Sleep(1 * time.Second)
+	cancel()
+
+	err := <-errChan
+	assert.NoError(t, err)
+}
+
+func TestNewManager(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name                 string
+		propellerConfig      *propellerConfig.Config
+		leaderElectionEnable bool
+	}{
+		{"enableLeaderElection", createPropellerConfig(true), true},
+		{"withoutLeaderElection", createPropellerConfig(false), false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx := context.TODO()
+			managerCfg := managerConfig.DefaultConfig
+			podNamespace := "flyte"
+			ownerReference := make([]metav1.OwnerReference, 0)
+			kubeClient := fake.NewSimpleClientset(podTemplate)
+			scope := promutils.NewScope(fmt.Sprintf("create_%s", tt.name))
+			shardStrategy, _ := shardstrategy.NewShardStrategy(ctx, managerCfg.ShardConfig)
+
+			manager, err := New(ctx, tt.propellerConfig, managerCfg, podNamespace, ownerReference, kubeClient, scope)
+
+			expectedManager := &Manager{
+				kubeClient:               kubeClient,
+				leaderElector:            manager.leaderElector,
+				metrics:                  manager.metrics,
+				ownerReferences:          ownerReference,
+				podApplication:           managerCfg.PodApplication,
+				podNamespace:             podNamespace,
+				podTemplateContainerName: managerCfg.PodTemplateContainerName,
+				podTemplateName:          managerCfg.PodTemplateName,
+				podTemplateNamespace:     managerCfg.PodTemplateNamespace,
+				scanInterval:             managerCfg.ScanInterval.Duration,
+				shardStrategy:            shardStrategy,
+			}
+
+			assert.NoError(t, err)
+			assert.True(t, reflect.DeepEqual(expectedManager, manager))
+			assert.Equal(t, scope, manager.metrics.Scope)
+			assert.Equal(t, tt.leaderElectionEnable, manager.leaderElector != nil)
 		})
 	}
 }
