@@ -124,6 +124,26 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 						sourceType = cType
 					}
 				}
+				var exist bool
+				var tmpType *flyte.LiteralType
+
+				// If the variable has an attribute path. Extract the type of the last attribute.
+				for _, attr := range val.Promise.AttrPath {
+					if sourceType.GetCollectionType() != nil {
+						sourceType = sourceType.GetCollectionType()
+					} else if sourceType.GetMapValueType() != nil {
+						sourceType = sourceType.GetMapValueType()
+					} else if sourceType.GetStructure() != nil && sourceType.GetStructure().GetDataclassType() != nil {
+
+						tmpType, exist = sourceType.GetStructure().GetDataclassType()[attr.GetStringValue()]
+
+						if !exist {
+							errs.Collect(errors.NewFieldNotFoundErr(nodeID, val.Promise.Var, sourceType.String(), attr.GetStringValue()))
+							return nil, nil, !errs.HasErrors()
+						}
+						sourceType = tmpType
+					}
+				}
 
 				if !validateParamTypes || AreTypesCastable(sourceType, expectedType) {
 					val.Promise.NodeId = upNode.GetId()
