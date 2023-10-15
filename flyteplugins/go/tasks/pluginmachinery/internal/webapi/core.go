@@ -71,7 +71,7 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
 	if taskTemplate.GetMetadata().GetRuntime().GetFlavor() == syncPlugin {
-		phaseInfo, err := c.p.Do(ctx, tCtx)
+		phaseInfo, err := c.p.(webapi.SyncPlugin).Do(ctx, tCtx)
 		if err != nil {
 			return core.UnknownTransition, err
 		}
@@ -85,17 +85,18 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	var nextState *State
 	var phaseInfo core.PhaseInfo
+	plugin := c.p.(webapi.AsyncPlugin)
 	switch incomingState.Phase {
 	case PhaseNotStarted:
 		if len(c.p.GetConfig().ResourceQuotas) > 0 {
-			nextState, phaseInfo, err = c.tokenAllocator.allocateToken(ctx, c.p, tCtx, &incomingState, c.metrics)
+			nextState, phaseInfo, err = c.tokenAllocator.allocateToken(ctx, plugin, tCtx, &incomingState, c.metrics)
 		} else {
-			nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
+			nextState, phaseInfo, err = launch(ctx, plugin, tCtx, c.cache, &incomingState)
 		}
 	case PhaseAllocationTokenAcquired:
-		nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
+		nextState, phaseInfo, err = launch(ctx, plugin, tCtx, c.cache, &incomingState)
 	case PhaseResourcesCreated:
-		nextState, phaseInfo, err = monitor(ctx, tCtx, c.p, c.cache, &incomingState)
+		nextState, phaseInfo, err = monitor(ctx, tCtx, plugin, c.cache, &incomingState)
 	}
 
 	if err != nil {
@@ -117,7 +118,7 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 
 	logger.Infof(ctx, "Attempting to abort resource [%v].", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID())
 
-	err = c.p.Delete(ctx, newPluginContext(incomingState.ResourceMeta, nil, "Aborted", tCtx))
+	err = c.p.(webapi.AsyncPlugin).Delete(ctx, newPluginContext(incomingState.ResourceMeta, nil, "Aborted", tCtx))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to abort some resources [%v]. Error: %v",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
@@ -135,7 +136,7 @@ func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext
 
 	logger.Infof(ctx, "Attempting to finalize resource [%v].",
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
-	return c.tokenAllocator.releaseToken(ctx, c.p, tCtx, c.metrics)
+	return c.tokenAllocator.releaseToken(ctx, c.p.(webapi.AsyncPlugin), tCtx, c.metrics)
 }
 
 func validateRangeInt(fieldName string, min, max, provided int) error {
@@ -200,7 +201,7 @@ func createRemotePlugin(pluginEntry webapi.PluginEntry, c clock.Clock) core.Plug
 				}
 			}
 
-			resourceCache, err := NewResourceCache(ctx, pluginEntry.ID, p, p.GetConfig().Caching,
+			resourceCache, err := NewResourceCache(ctx, pluginEntry.ID, p.(webapi.AsyncPlugin), p.GetConfig().Caching,
 				iCtx.MetricsScope().NewSubScope("cache"))
 
 			if err != nil {
