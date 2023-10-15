@@ -200,7 +200,7 @@ func createTaskInfo(queryID string, cfg awsSdk.Config) *core.TaskInfo {
 	}
 }
 
-func NewPlugin(_ context.Context, cfg *Config, awsConfig *aws.Config, metricScope promutils.Scope) (webapi.AsyncPlugin, error) {
+func NewPlugin(_ context.Context, cfg *Config, awsConfig *aws.Config, metricScope promutils.Scope) (Plugin, error) {
 	sdkCfg, err := awsConfig.GetSdkConfig()
 	if err != nil {
 		return Plugin{}, err
