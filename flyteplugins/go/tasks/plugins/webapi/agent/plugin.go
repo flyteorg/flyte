@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
+	"time"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -39,6 +40,7 @@ type Plugin struct {
 type ResourceWrapper struct {
 	State   admin.State
 	Outputs *flyteIdl.LiteralMap
+	Message string
 }
 
 type ResourceMetaWrapper struct {
@@ -59,72 +61,57 @@ func (p Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionCo
 	return "default", p.cfg.ResourceConstraints, nil
 }
 
-func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (latest webapi.Resource, err error) {
+type pluginContext struct {
+	webapi.TaskExecutionContext
+	resource webapi.Resource
+}
+
+func (p pluginContext) Resource() webapi.Resource {
+	return p.resource
+}
+
+func (p pluginContext) ResourceMeta() webapi.ResourceMeta {
+	return nil
+}
+
+func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (phase core.PhaseInfo, err error) {
 	// write the resource here
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
-		return nil, err
+		return core.PhaseInfoUndefined, err
 	}
 
 	inputs, err := taskCtx.InputReader().Get(ctx)
 	if err != nil {
-		return nil, err
-	}
-
-	if taskTemplate.GetContainer() != nil {
-		templateParameters := template.Parameters{
-			TaskExecMetadata: taskCtx.TaskExecutionMetadata(),
-			Inputs:           taskCtx.InputReader(),
-			OutputPath:       taskCtx.OutputWriter(),
-			Task:             taskCtx.TaskReader(),
-		}
-		modifiedArgs, err := template.Render(ctx, taskTemplate.GetContainer().Args, templateParameters)
-		if err != nil {
-			return nil, err
-		}
-		taskTemplate.GetContainer().Args = modifiedArgs
+		return core.PhaseInfoUndefined, err
 	}
 
 	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find agent agent with error: %v", err)
+		return core.PhaseInfoUndefined, fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
 
 	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
+		return core.PhaseInfoUndefined, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
 
 	finalCtx, cancel := getFinalContext(ctx, "DoTask", agent)
-
 	defer cancel()
 
 	res, err := client.DoTask(finalCtx, &admin.DoTaskRequest{Inputs: inputs, Template: taskTemplate})
 	if err != nil {
-		return nil, err
+		return core.PhaseInfoUndefined, err
 	}
-	// TODO: Check if state is not succeeded, then return error
+
 	resource := ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
+		Message: res.Resource.Message,
 	}
 
-	// Write the output
-	if taskTemplate.Interface == nil || taskTemplate.Interface.Outputs == nil || taskTemplate.Interface.Outputs.Variables == nil {
-		logger.Debugf(ctx, "The task declares no outputs. Skipping writing the outputs.")
-		return resource, nil
-	}
+	return p.Status(ctx, pluginContext{TaskExecutionContext: taskCtx, resource: resource})
 
-	var opReader io.OutputReader
-	if resource.Outputs != nil {
-		logger.Debugf(ctx, "Agent returned an output.")
-		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
-	}
-
-	return ResourceWrapper{
-		State:   res.Resource.State,
-		Outputs: res.Resource.Outputs,
-	}, taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
@@ -209,6 +196,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	return ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
+		Message: res.Resource.Message,
 	}, nil
 }
 
@@ -239,6 +227,8 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	taskInfo := &core.TaskInfo{}
 
 	switch resource.State {
+	case admin.State_PENDING:
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
@@ -370,18 +360,13 @@ func newAgentPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
 			return &Plugin{
-					metricScope:     iCtx.MetricsScope(),
-					cfg:             GetConfig(),
-					getClient:       getClientFunc,
-					connectionCache: make(map[*Agent]*grpc.ClientConn),
-				}, &Plugin{
-					metricScope:     iCtx.MetricsScope(),
-					cfg:             GetConfig(),
-					getClient:       getClientFunc,
-					connectionCache: make(map[*Agent]*grpc.ClientConn),
-				}, nil
+				metricScope:     iCtx.MetricsScope(),
+				cfg:             GetConfig(),
+				getClient:       getClientFunc,
+				connectionCache: make(map[*Agent]*grpc.ClientConn),
+			}, nil
 		},
 	}
 }

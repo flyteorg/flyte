@@ -13,4 +13,6 @@ package flyteadmin
 type CoreTaskNodeOverrides struct {
 	// A customizable interface to convey resources requested for a task container.
 	Resources *CoreResources `json:"resources,omitempty"`
+	// Overrides for all non-standard resources, not captured by v1.ResourceRequirements, to allocate to a task.
+	ExtendedResources *CoreExtendedResources `json:"extended_resources,omitempty"`
 }

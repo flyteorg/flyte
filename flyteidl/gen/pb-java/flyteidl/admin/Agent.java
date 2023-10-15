@@ -5460,6 +5460,24 @@ public final class Agent {
      * <code>.flyteidl.core.LiteralMap outputs = 2;</code>
      */
     flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder();
+
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    java.lang.String getMessage();
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
   }
   /**
    * Protobuf type {@code flyteidl.admin.Resource}
@@ -5475,6 +5493,7 @@ public final class Agent {
     }
     private Resource() {
       state_ = 0;
+      message_ = "";
     }
 
     @java.lang.Override
@@ -5518,6 +5537,12 @@ public final class Agent {
                 outputs_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              message_ = s;
               break;
             }
             default: {
@@ -5616,6 +5641,48 @@ public final class Agent {
       return getOutputs();
     }
 
+    public static final int MESSAGE_FIELD_NUMBER = 3;
+    private volatile java.lang.Object message_;
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A descriptive message for the current state. e.g. waiting for cluster.
+     * </pre>
+     *
+     * <code>string message = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5636,6 +5703,9 @@ public final class Agent {
       if (outputs_ != null) {
         output.writeMessage(2, getOutputs());
       }
+      if (!getMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, message_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5652,6 +5722,9 @@ public final class Agent {
       if (outputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getOutputs());
+      }
+      if (!getMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, message_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5674,6 +5747,8 @@ public final class Agent {
         if (!getOutputs()
             .equals(other.getOutputs())) return false;
       }
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5691,6 +5766,8 @@ public final class Agent {
         hash = (37 * hash) + OUTPUTS_FIELD_NUMBER;
         hash = (53 * hash) + getOutputs().hashCode();
       }
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5832,6 +5909,8 @@ public final class Agent {
           outputs_ = null;
           outputsBuilder_ = null;
         }
+        message_ = "";
+
         return this;
       }
 
@@ -5864,6 +5943,7 @@ public final class Agent {
         } else {
           result.outputs_ = outputsBuilder_.build();
         }
+        result.message_ = message_;
         onBuilt();
         return result;
       }
@@ -5917,6 +5997,10 @@ public final class Agent {
         }
         if (other.hasOutputs()) {
           mergeOutputs(other.getOutputs());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -6181,6 +6265,95 @@ public final class Agent {
           outputs_ = null;
         }
         return outputsBuilder_;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A descriptive message for the current state. e.g. waiting for cluster.
+       * </pre>
+       *
+       * <code>string message = 3;</code>
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8998,19 +9171,20 @@ public final class Agent {
       "\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre" +
       "source_meta\030\002 \001(\014\"=\n\017GetTaskResponse\022*\n\010" +
       "resource\030\001 \001(\0132\030.flyteidl.admin.Resource" +
-      "\"\\\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a" +
+      "\"m\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a" +
       "dmin.State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.c" +
-      "ore.LiteralMap\"=\n\021DeleteTaskRequest\022\021\n\tt" +
-      "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n" +
-      "\022DeleteTaskResponse\"i\n\rDoTaskRequest\022)\n\006" +
-      "inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMap\022" +
-      "-\n\010template\030\002 \001(\0132\033.flyteidl.core.TaskTe" +
-      "mplate\"<\n\016DoTaskResponse\022*\n\010resource\030\001 \001" +
-      "(\0132\030.flyteidl.admin.Resource*^\n\005State\022\025\n" +
-      "\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILUR" +
-      "E\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEED" +
-      "ED\020\004B=Z;github.com/flyteorg/flyte/flytei" +
-      "dl/gen/pb-go/flyteidl/adminb\006proto3"
+      "ore.LiteralMap\022\017\n\007message\030\003 \001(\t\"=\n\021Delet" +
+      "eTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresou" +
+      "rce_meta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"i\n\r" +
+      "DoTaskRequest\022)\n\006inputs\030\001 \001(\0132\031.flyteidl" +
+      ".core.LiteralMap\022-\n\010template\030\002 \001(\0132\033.fly" +
+      "teidl.core.TaskTemplate\"<\n\016DoTaskRespons" +
+      "e\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Res" +
+      "ource*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n" +
+      "\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUN" +
+      "NING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyt" +
+      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/a" +
+      "dminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -9081,7 +9255,7 @@ public final class Agent {
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Resource_descriptor,
-        new java.lang.String[] { "State", "Outputs", });
+        new java.lang.String[] { "State", "Outputs", "Message", });
     internal_static_flyteidl_admin_DeleteTaskRequest_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_DeleteTaskRequest_fieldAccessorTable = new

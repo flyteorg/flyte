@@ -454,6 +454,8 @@ func (m *Resource) Validate() error {
 		}
 	}
 
+	// no validation rules for Message
+
 	return nil
 }
 

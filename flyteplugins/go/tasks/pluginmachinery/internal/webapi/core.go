@@ -28,6 +28,7 @@ const (
 	maxBurst           = 10000
 	minQPS             = 1
 	maxQPS             = 100000
+	syncPlugin         = "sync_plugin"
 )
 
 type CorePlugin struct {
@@ -66,20 +67,16 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
-func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	_, err := c.sp.Do(ctx, tCtx)
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
-	return core.DoTransition(core.PhaseInfoSuccess(&core.TaskInfo{})), nil
-}
-
 func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
 
-	if taskTemplate.Type == "dispatcher" {
-		return c.syncHandle(ctx, tCtx)
+	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
+	if taskTemplate.GetMetadata().GetRuntime().GetFlavor() == syncPlugin {
+		phaseInfo, err := c.sp.Do(ctx, tCtx)
+		if err != nil {
+			return core.UnknownTransition, err
+		}
+		return core.DoTransition(phaseInfo), nil
 	}
 
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())

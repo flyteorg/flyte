@@ -23,7 +23,7 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::proto
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<4> scc_info_TaskExecutionMetadata_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_TaskExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
 namespace flyteidl {
 namespace admin {
 class TaskExecutionMetadata_LabelsEntry_DoNotUseDefaultTypeInternal {
@@ -365,6 +365,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, state_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, outputs_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, message_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::DeleteTaskRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -401,10 +402,10 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 53, -1, sizeof(::flyteidl::admin::GetTaskRequest)},
   { 60, -1, sizeof(::flyteidl::admin::GetTaskResponse)},
   { 66, -1, sizeof(::flyteidl::admin::Resource)},
-  { 73, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
-  { 80, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
-  { 85, -1, sizeof(::flyteidl::admin::DoTaskRequest)},
-  { 92, -1, sizeof(::flyteidl::admin::DoTaskResponse)},
+  { 74, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
+  { 81, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
+  { 86, -1, sizeof(::flyteidl::admin::DoTaskRequest)},
+  { 93, -1, sizeof(::flyteidl::admin::DoTaskResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -457,24 +458,25 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre"
   "source_meta\030\002 \001(\014\"=\n\017GetTaskResponse\022*\n\010"
   "resource\030\001 \001(\0132\030.flyteidl.admin.Resource"
-  "\"\\\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a"
+  "\"m\n\010Resource\022$\n\005state\030\001 \001(\0162\025.flyteidl.a"
   "dmin.State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.c"
-  "ore.LiteralMap\"=\n\021DeleteTaskRequest\022\021\n\tt"
-  "ask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n"
-  "\022DeleteTaskResponse\"i\n\rDoTaskRequest\022)\n\006"
-  "inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMap\022"
-  "-\n\010template\030\002 \001(\0132\033.flyteidl.core.TaskTe"
-  "mplate\"<\n\016DoTaskResponse\022*\n\010resource\030\001 \001"
-  "(\0132\030.flyteidl.admin.Resource*^\n\005State\022\025\n"
-  "\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILUR"
-  "E\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEED"
-  "ED\020\004B=Z;github.com/flyteorg/flyte/flytei"
-  "dl/gen/pb-go/flyteidl/adminb\006proto3"
+  "ore.LiteralMap\022\017\n\007message\030\003 \001(\t\"=\n\021Delet"
+  "eTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresou"
+  "rce_meta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"i\n\r"
+  "DoTaskRequest\022)\n\006inputs\030\001 \001(\0132\031.flyteidl"
+  ".core.LiteralMap\022-\n\010template\030\002 \001(\0132\033.fly"
+  "teidl.core.TaskTemplate\"<\n\016DoTaskRespons"
+  "e\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Res"
+  "ource*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n"
+  "\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUN"
+  "NING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyt"
+  "eorg/flyte/flyteidl/gen/pb-go/flyteidl/a"
+  "dminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1595,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1612,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -3024,6 +3026,7 @@ void Resource::clear_outputs() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Resource::kStateFieldNumber;
 const int Resource::kOutputsFieldNumber;
+const int Resource::kMessageFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Resource::Resource()
@@ -3035,6 +3038,10 @@ Resource::Resource(const Resource& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.message().size() > 0) {
+    message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
+  }
   if (from.has_outputs()) {
     outputs_ = new ::flyteidl::core::LiteralMap(*from.outputs_);
   } else {
@@ -3047,6 +3054,7 @@ Resource::Resource(const Resource& from)
 void Resource::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Resource_flyteidl_2fadmin_2fagent_2eproto.base);
+  message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&outputs_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&state_) -
       reinterpret_cast<char*>(&outputs_)) + sizeof(state_));
@@ -3058,6 +3066,7 @@ Resource::~Resource() {
 }
 
 void Resource::SharedDtor() {
+  message_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete outputs_;
 }
 
@@ -3076,6 +3085,7 @@ void Resource::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && outputs_ != nullptr) {
     delete outputs_;
   }
@@ -3118,6 +3128,22 @@ const char* Resource::_InternalParse(const char* begin, const char* end, void* o
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
+      // string message = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Resource.message");
+        object = msg->mutable_message();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -3133,6 +3159,10 @@ const char* Resource::_InternalParse(const char* begin, const char* end, void* o
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -3167,6 +3197,21 @@ bool Resource::MergePartialFromCodedStream(
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_outputs()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // string message = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_message()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->message().data(), static_cast<int>(this->message().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.Resource.message"));
         } else {
           goto handle_unusual;
         }
@@ -3212,6 +3257,16 @@ void Resource::SerializeWithCachedSizes(
       2, HasBitSetters::outputs(this), output);
   }
 
+  // string message = 3;
+  if (this->message().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->message().data(), static_cast<int>(this->message().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Resource.message");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->message(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -3238,6 +3293,17 @@ void Resource::SerializeWithCachedSizes(
         2, HasBitSetters::outputs(this), target);
   }
 
+  // string message = 3;
+  if (this->message().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->message().data(), static_cast<int>(this->message().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Resource.message");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->message(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -3258,6 +3324,13 @@ size_t Resource::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string message = 3;
+  if (this->message().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->message());
+  }
 
   // .flyteidl.core.LiteralMap outputs = 2;
   if (this->has_outputs()) {
@@ -3299,6 +3372,10 @@ void Resource::MergeFrom(const Resource& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.message().size() > 0) {
+
+    message_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.message_);
+  }
   if (from.has_outputs()) {
     mutable_outputs()->::flyteidl::core::LiteralMap::MergeFrom(from.outputs());
   }
@@ -3332,6 +3409,8 @@ void Resource::Swap(Resource* other) {
 void Resource::InternalSwap(Resource* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  message_.Swap(&other->message_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(outputs_, other->outputs_);
   swap(state_, other->state_);
 }

@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -122,6 +123,7 @@ type autoRefresh struct {
 	syncPeriod      time.Duration
 	workqueue       workqueue.RateLimitingInterface
 	parallelizm     int
+	lock            sync.RWMutex
 }
 
 func getEvictionFunction(counter prometheus.Counter) func(key interface{}, value interface{}) {
@@ -173,6 +175,25 @@ func (w *autoRefresh) Start(ctx context.Context) error {
 	return nil
 }
 
+// Update updates the item only if it exists in the cache, return true if we updated the item.
+func (w *autoRefresh) Update(id ItemID, item Item) (ok bool) {
+	w.lock.Lock()
+	defer w.lock.Unlock()
+	ok = w.lruMap.Contains(id)
+	if ok {
+		w.lruMap.Add(id, item)
+	}
+	return ok
+}
+
+// Delete deletes the item from the cache if it exists.
+func (w *autoRefresh) Delete(key interface{}) {
+	w.lock.Lock()
+	defer w.lock.Unlock()
+	w.toDelete.Remove(key)
+	w.lruMap.Remove(key)
+}
+
 func (w *autoRefresh) Get(id ItemID) (Item, error) {
 	if val, ok := w.lruMap.Get(id); ok {
 		w.metrics.CacheHit.Inc()
@@ -212,8 +233,7 @@ func (w *autoRefresh) enqueueBatches(ctx context.Context) error {
 	snapshot := make([]ItemWrapper, 0, len(keys))
 	for _, k := range keys {
 		if w.toDelete.Contains(k) {
-			w.lruMap.Remove(k)
-			w.toDelete.Remove(k)
+			w.Delete(k)
 			continue
 		}
 		// If not ok, it means evicted between the item was evicted between getting the keys and this update loop
@@ -273,18 +293,37 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 		case <-ctx.Done():
 			return nil
 		default:
-			item, shutdown := w.workqueue.Get()
+			batch, shutdown := w.workqueue.Get()
 			if shutdown {
+				logger.Debugf(ctx, "Shutting down worker")
 				return nil
 			}
 
-			t := w.metrics.SyncLatency.Start()
-			updatedBatch, err := w.syncCb(ctx, *item.(*Batch))
-
 			// Since we create batches every time we sync, we will just remove the item from the queue here
 			// regardless of whether it succeeded the sync or not.
-			w.workqueue.Forget(item)
-			w.workqueue.Done(item)
+			w.workqueue.Forget(batch)
+			w.workqueue.Done(batch)
+
+			newBatch := make(Batch, 0, len(*batch.(*Batch)))
+			for _, b := range *batch.(*Batch) {
+				itemID := b.GetID()
+				item, ok := w.lruMap.Get(itemID)
+				if !ok {
+					logger.Debugf(ctx, "item with id [%v] not found in cache", itemID)
+					continue
+				}
+				if item.(Item).IsTerminal() {
+					logger.Debugf(ctx, "item with id [%v] is terminal", itemID)
+					continue
+				}
+				newBatch = append(newBatch, b)
+			}
+			if len(newBatch) == 0 {
+				continue
+			}
+
+			t := w.metrics.SyncLatency.Start()
+			updatedBatch, err := w.syncCb(ctx, newBatch)
 
 			if err != nil {
 				w.metrics.SyncErrors.Inc()
@@ -295,14 +334,13 @@ func (w *autoRefresh) sync(ctx context.Context) (err error) {
 
 			for _, item := range updatedBatch {
 				if item.Action == Update {
-					// Add adds the item if it has been evicted or updates an existing one.
-					w.lruMap.Add(item.ID, item.Item)
+					// Updates an existing item.
+					w.Update(item.ID, item.Item)
 				}
 			}
 
 			w.toDelete.Range(func(key interface{}) bool {
-				w.lruMap.Remove(key)
-				w.toDelete.Remove(key)
+				w.Delete(key)
 				return true
 			})
 

@@ -22,7 +22,7 @@ import (
 
 // A Lazy loading function, that will load the plugin. Plugins should be initialized in this method. It is guaranteed
 // that the plugin loader will be called before any Handle/Abort/Finalize functions are invoked
-type PluginLoader func(ctx context.Context, iCtx PluginSetupContext) (AsyncPlugin, SyncPlugin, error)
+type PluginLoader func(ctx context.Context, iCtx PluginSetupContext) (Plugin, error)
 
 // PluginEntry is a structure that is used to indicate to the system a K8s plugin
 type PluginEntry struct {
@@ -99,6 +99,11 @@ type StatusContext interface {
 type ResourceMeta = interface{}
 type Resource = interface{}
 
+type Plugin interface {
+	AsyncPlugin
+	SyncPlugin
+}
+
 // AsyncPlugin defines the interface for plugins that call Async Web APIs.
 type AsyncPlugin interface {
 	// GetConfig gets the loaded plugin config. This will be used to control the interactions with the remote service.
@@ -150,5 +155,5 @@ type SyncPlugin interface {
 	GetConfig() PluginConfig
 
 	// Do performs the action associated with this plugin.
-	Do(ctx context.Context, tCtx TaskExecutionContext) (latest Resource, err error)
+	Do(ctx context.Context, tCtx TaskExecutionContext) (phase pluginsCore.PhaseInfo, err error)
 }

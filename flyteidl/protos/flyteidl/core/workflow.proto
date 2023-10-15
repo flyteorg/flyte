@@ -279,4 +279,8 @@ message WorkflowTemplate {
 message TaskNodeOverrides {
     // A customizable interface to convey resources requested for a task container. 
     Resources resources = 1;
+
+    // Overrides for all non-standard resources, not captured by
+    // v1.ResourceRequirements, to allocate to a task.
+    ExtendedResources extended_resources = 2;
 }
