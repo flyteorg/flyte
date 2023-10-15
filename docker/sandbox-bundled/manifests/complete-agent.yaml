@@ -816,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: R2JRWFVRYThnRFVLbHpuSA==
+  haSharedSecret: Wk9VRzZ1a1BjNDk3MHlteQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -874,6 +874,9 @@ type: Opaque
 ---
 apiVersion: v1
 data:
+  FLYTE_AWS_ACCESS_KEY_ID: minio
+  FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+  FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
   username: User
 kind: Secret
 metadata:
@@ -1409,7 +1412,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0ee1553aec7c03152a0a44e7b1a82985795774412a779f7b607a57e59f42c8ef
+        checksum/secret: 4683cf4a765862d5c9e0d509cfbcc2cc90991ddf90bf6a23ef9d81d1fd3f4687
       labels:
         app: docker-registry
         release: flyte-sandbox

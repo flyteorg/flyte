@@ -26,28 +26,44 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         name: flyteagent
-        volumeMounts: {{- include "agentSecret.volumeMount" . | nindent 8 }}
         ports:
         - containerPort: {{ .Values.ports.containerPort }}
           name: {{ .Values.ports.name }}
         resources: {{- toYaml .Values.resources | nindent 10 }}
+        env:
+        - name: FLYTE_AWS_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "flyteagent.name" . }}
+              key: FLYTE_AWS_ENDPOINT
+        - name: FLYTE_AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "flyteagent.name" . }}
+              key: FLYTE_AWS_ACCESS_KEY_ID
+        - name: FLYTE_AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "flyteagent.name" . }}
+              key: FLYTE_AWS_SECRET_ACCESS_KEY
+        volumeMounts: {{- include "agentSecret.volumeMount" . | nindent 10 }}
         {{- with .Values.additionalVolumeMounts -}}
-        {{ tpl (toYaml .) $ | nindent 8 }}
+        {{ tpl (toYaml .) $ | nindent 10 }}
         {{- end }}
       {{- with .Values.additionalContainers -}}
-      {{- tpl (toYaml .) $ | nindent 6}}
+      {{- tpl (toYaml .) $ | nindent 8}}
       {{- end }}
       serviceAccountName: {{ template "flyteagent.name" . }}
-      volumes: {{- include "agentSecret.volume" . | nindent 6 }}
+      volumes: {{- include "agentSecret.volume" . | nindent 8 }}
       {{- with .Values.additionalVolumes -}}
-      {{ tpl (toYaml .) $ | nindent 6 }}
+      {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
-      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 10 }}
       {{- end }}
       {{- with .Values.affinity }}
-      affinity: {{ tpl (toYaml .) $ | nindent 8 }}
+      affinity: {{ tpl (toYaml .) $ | nindent 10 }}
       {{- end }}
       {{- with .Values.tolerations }}
-      tolerations: {{ tpl (toYaml .) $ | nindent 8 }}
+      tolerations: {{ tpl (toYaml .) $ | nindent 10 }}
       {{- end }}
