@@ -805,7 +805,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: d1l6eWRCOXBJcFhiNEo5QQ==
+  haSharedSecret: Z2JmOWxNNnpXN0RNU01oMg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1366,7 +1366,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 2f5b6d46fd3276b5b25c8a537298beb6943b13b0b21900db8b2da23e166f0593
+        checksum/secret: 57a7056ad885316655ca974bb2a8fc28874a43fbfbe92ca71dd609c12e32f122
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1814,3 +1814,12 @@ spec:
   updateStrategy:
     rollingUpdate: {}
     type: RollingUpdate
+---
+apiVersion: helm.cattle.io/v1
+kind: HelmChart
+metadata:
+  name: nvidia-device-plugin
+  namespace: kube-system
+spec:
+  chart: nvidia-device-plugin
+  repo: https://nvidia.github.io/k8s-device-plugin
