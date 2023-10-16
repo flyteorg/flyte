@@ -47,9 +47,10 @@ type DataProxyUploadConfig struct {
 }
 
 type GrpcConfig struct {
-	Port                int  `json:"port" pflag:",On which grpc port to serve admin"`
-	ServerReflection    bool `json:"serverReflection" pflag:",Enable GRPC Server Reflection"`
-	MaxMessageSizeBytes int  `json:"maxMessageSizeBytes" pflag:",The max size in bytes for incoming gRPC messages"`
+	Port                 int  `json:"port" pflag:",On which grpc port to serve admin"`
+	ServerReflection     bool `json:"serverReflection" pflag:",Enable GRPC Server Reflection"`
+	MaxMessageSizeBytes  int  `json:"maxMessageSizeBytes" pflag:",The max size in bytes for incoming gRPC messages"`
+	EnableGrpcHistograms bool `json:"enableGrpcHistograms" pflag:",Enable grpc histograms"`
 }
 
 // KubeClientConfig contains the configuration used by flyteadmin to configure its internal Kubernetes Client.

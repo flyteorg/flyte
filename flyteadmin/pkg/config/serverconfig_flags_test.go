@@ -323,6 +323,20 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_grpc.enableGrpcHistograms", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("grpc.enableGrpcHistograms", testValue)
+			if vBool, err := cmdFlags.GetBool("grpc.enableGrpcHistograms"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.GrpcConfig.EnableGrpcHistograms)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_thirdPartyConfig.flyteClient.clientId", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
