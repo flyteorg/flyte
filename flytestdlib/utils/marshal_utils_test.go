@@ -3,15 +3,14 @@ package utils
 import (
 	"testing"
 
-	"k8s.io/apimachinery/pkg/util/json"
-
 	"github.com/go-test/deep"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyte/flytestdlib/utils/prototest"
 	"github.com/golang/protobuf/proto"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/json"
+
+	"github.com/flyteorg/flyte/flytestdlib/utils/prototest"
 )
 
 type SimpleType struct {

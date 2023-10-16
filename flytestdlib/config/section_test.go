@@ -10,13 +10,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ghodss/yaml"
+	"github.com/spf13/pflag"
+	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/rand"
 
 	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
-	"github.com/ghodss/yaml"
-	"github.com/spf13/pflag"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // Make sure existing config file(s) parse correctly before overriding them with this flag!
