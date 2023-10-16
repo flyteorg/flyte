@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
@@ -400,19 +401,29 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	switch rayJob.Status.JobStatus {
-	case rayv1alpha1.JobStatusPending:
-		return pluginsCore.PhaseInfoInitializing(rayJob.Status.StartTime.Time, pluginsCore.DefaultPhaseVersion, "job is pending", info), nil
-	case rayv1alpha1.JobStatusFailed:
-		reason := fmt.Sprintf("Failed to create Ray job: %s", rayJob.Name)
+	// Kuberay creates a Ray cluster first, and then submits a Ray job to the cluster
+	switch rayJob.Status.JobDeploymentStatus {
+	case rayv1alpha1.JobDeploymentStatusInitializing:
+		return pluginsCore.PhaseInfoInitializing(time.Now(), pluginsCore.DefaultPhaseVersion, "cluster is creating", info), nil
+	case rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, rayv1alpha1.JobDeploymentStatusFailedJobDeploy:
+		reason := fmt.Sprintf("Failed to create Ray cluster %s with error: %s", rayJob.Name, rayJob.Status.Message)
 		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
-	case rayv1alpha1.JobStatusSucceeded:
-		return pluginsCore.PhaseInfoSuccess(info), nil
-	case rayv1alpha1.JobStatusRunning:
+	case rayv1alpha1.JobDeploymentStatusWaitForDashboard, rayv1alpha1.JobDeploymentStatusRunning:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 	}
 
-	return pluginsCore.PhaseInfoQueued(rayJob.CreationTimestamp.Time, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+	switch rayJob.Status.JobStatus {
+	case rayv1alpha1.JobStatusFailed:
+		reason := fmt.Sprintf("Failed to create Ray job %s with error: %s", rayJob.Name, rayJob.Status.Message)
+		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
+	case rayv1alpha1.JobStatusSucceeded:
+		return pluginsCore.PhaseInfoSuccess(info), nil
+	case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusRunning:
+		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+	}
+
+	// return pluginsCore.PhaseInfoQueued(rayJob.CreationTimestamp.Time, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+	return pluginsCore.PhaseInfoUndefined, nil
 }
 
 func init() {
