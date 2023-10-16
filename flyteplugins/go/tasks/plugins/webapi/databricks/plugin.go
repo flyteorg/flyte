@@ -228,7 +228,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case http.StatusAccepted:
 		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
 	case http.StatusOK:
-		if lifeCycleState == "TERMINATED" {
+		if lifeCycleState == "TERMINATED" || lifeCycleState == "SKIPPED" || lifeCycleState == "INTERNAL_ERROR" {
 			if resultState == "SUCCESS" {
 				if err := writeOutput(ctx, taskCtx); err != nil {
 					pluginsCore.PhaseInfoFailure(string(rune(statusCode)), "failed to write output", taskInfo)
