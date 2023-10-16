@@ -81,6 +81,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		RequestIDInterceptor, auth.BlanketAuthorization, auth.ExecutionUserIdentifierInterceptor))
 
 	if cfg.GrpcConfig.EnableGrpcHistograms {
+		logger.Debugf(ctx, "enabling grpc histogram metrics")
 		grpcprometheus.EnableHandlingTimeHistogram()
 	}
 
