@@ -6,10 +6,11 @@ import (
 	"os"
 	"path"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/fsnotify/fsnotify"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func FileExists(filePath string) (bool, error) {
