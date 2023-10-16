@@ -36,9 +36,10 @@ package config
 import (
 	"time"
 
+	"k8s.io/apimachinery/pkg/types"
+
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -113,6 +114,7 @@ var (
 		},
 		ClusterID:              "propeller",
 		CreateFlyteWorkflowCRD: false,
+		ArrayNodeEventVersion:  0,
 	}
 )
 
@@ -152,6 +154,7 @@ type Config struct {
 	ExcludeDomainLabel       []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
 	ClusterID                string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
 	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
+	ArrayNodeEventVersion    int                  `json:"array-node-event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.

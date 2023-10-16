@@ -4693,6 +4693,11 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.\nThis is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true."
+        },
+        "is_array": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean flag indicating if the node is an array node. This is intended to uniquely identify\narray nodes from other nodes which can have is_parent_node as true."
         }
       },
       "title": "Represents additional attributes related to a Node Execution"
@@ -6026,6 +6031,34 @@
       },
       "description": "Represents the error message from the execution."
     },
+    "coreExtendedResources": {
+      "type": "object",
+      "properties": {
+        "gpu_accelerator": {
+          "$ref": "#/definitions/coreGPUAccelerator",
+          "description": "GPU accelerator to select for task. Contains information about device type, and\nfor multi-instance GPUs, the partition size to use."
+        }
+      },
+      "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
+    },
+    "coreGPUAccelerator": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "type": "string",
+          "description": "This can be any arbitrary string, and should be informed by the labels or taints\nassociated with the nodes in question. Default cloud provider labels typically\nuse the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc."
+        },
+        "unpartitioned": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "partition_size": {
+          "type": "string",
+          "description": "Like `device`, this can be any arbitrary string, and should be informed by\nthe labels or taints associated with the nodes in question. Default cloud\nprovider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc."
+        }
+      },
+      "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
+    },
     "coreGateNode": {
       "type": "object",
       "properties": {
@@ -7009,6 +7042,10 @@
         "resources": {
           "$ref": "#/definitions/coreResources",
           "description": "A customizable interface to convey resources requested for a task container."
+        },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Overrides for all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
         }
       },
       "description": "Optional task node overrides that will be applied at task execution time."
@@ -7053,6 +7090,10 @@
         "security_context": {
           "$ref": "#/definitions/coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
+        },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Encapsulates all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
         },
         "config": {
           "type": "object",
@@ -7415,6 +7456,11 @@
           "type": "string",
           "format": "date-time",
           "description": "This timestamp represents the instant when the event was reported by the executing framework. For example,\nwhen first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when\nliteral inputs are initially copied. The event however will not be sent until after the copy completes.\nExtracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series."
+        },
+        "is_array": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Indicates if this node is an ArrayNode."
         }
       }
     },

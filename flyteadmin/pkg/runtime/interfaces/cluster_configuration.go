@@ -3,9 +3,9 @@ package interfaces
 import (
 	"io/ioutil"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
-
 	"github.com/pkg/errors"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 )
 
 // Holds details about a cluster used for workflow execution.

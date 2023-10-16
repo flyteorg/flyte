@@ -1,13 +1,11 @@
 package task
 
 import (
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"k8s.io/apimachinery/pkg/types"
+
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type setupContext struct {

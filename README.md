@@ -31,8 +31,8 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
     <img src="https://img.shields.io/badge/openssf%20best%20practices-passing-green?style=for-the-badge" alt="OpenSSF Best Practices" /></a>
   <a href="https://artifacthub.io/packages/search?repo=flyte">
     <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" /></a>
-  <a href="https://twitter.com/flyteorg">
-    <img src="https://img.shields.io/badge/Twitter-Follow-blue?style=for-the-badge&logo=twitter" alt="Flyte Twitter" /></a>
+  <a href="https://twitter.com/flyteorg"> 
+    <img src="https://img.shields.io/badge/X-000000.svg?style=for-the-badge&logo=X&logoColor=white" height=30px/></a>
   <a href="https://slack.flyte.org">
     <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack" /></a>
 </p>

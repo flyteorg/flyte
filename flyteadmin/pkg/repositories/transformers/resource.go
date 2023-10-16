@@ -3,14 +3,14 @@ package transformers
 import (
 	"context"
 
-	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"google.golang.org/grpc/codes"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func WorkflowAttributesToResourceModel(attributes admin.WorkflowAttributes, resource admin.MatchableResource) (models.Resource, error) {

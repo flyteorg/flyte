@@ -62,16 +62,18 @@ class NodeExecution(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., input_uri: _Optional[str] = ..., closure: _Optional[_Union[NodeExecutionClosure, _Mapping]] = ..., metadata: _Optional[_Union[NodeExecutionMetaData, _Mapping]] = ...) -> None: ...
 
 class NodeExecutionMetaData(_message.Message):
-    __slots__ = ["retry_group", "is_parent_node", "spec_node_id", "is_dynamic"]
+    __slots__ = ["retry_group", "is_parent_node", "spec_node_id", "is_dynamic", "is_array"]
     RETRY_GROUP_FIELD_NUMBER: _ClassVar[int]
     IS_PARENT_NODE_FIELD_NUMBER: _ClassVar[int]
     SPEC_NODE_ID_FIELD_NUMBER: _ClassVar[int]
     IS_DYNAMIC_FIELD_NUMBER: _ClassVar[int]
+    IS_ARRAY_FIELD_NUMBER: _ClassVar[int]
     retry_group: str
     is_parent_node: bool
     spec_node_id: str
     is_dynamic: bool
-    def __init__(self, retry_group: _Optional[str] = ..., is_parent_node: bool = ..., spec_node_id: _Optional[str] = ..., is_dynamic: bool = ...) -> None: ...
+    is_array: bool
+    def __init__(self, retry_group: _Optional[str] = ..., is_parent_node: bool = ..., spec_node_id: _Optional[str] = ..., is_dynamic: bool = ..., is_array: bool = ...) -> None: ...
 
 class NodeExecutionList(_message.Message):
     __slots__ = ["node_executions", "token"]

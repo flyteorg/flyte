@@ -3,13 +3,13 @@ package runtime
 import (
 	"context"
 	"os"
+	"path/filepath"
 	"testing"
 
-	"path/filepath"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/stretchr/testify/assert"
 )
 
 func initTestClusterResourceConfig() error {

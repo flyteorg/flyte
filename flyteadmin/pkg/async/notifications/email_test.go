@@ -2,16 +2,16 @@ package notifications
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
-	"strings"
+	"github.com/gogo/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/gogo/protobuf/proto"
-	"github.com/stretchr/testify/assert"
 )
 
 const executionProjectValue = "proj"

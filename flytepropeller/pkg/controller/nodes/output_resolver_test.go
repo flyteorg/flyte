@@ -3,9 +3,10 @@ package nodes
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateAliasMap(t *testing.T) {

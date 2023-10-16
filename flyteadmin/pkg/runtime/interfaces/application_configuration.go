@@ -1,13 +1,13 @@
 package interfaces
 
 import (
+	"github.com/golang/protobuf/ptypes/wrappers"
+	"golang.org/x/time/rate"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/database"
-	"github.com/golang/protobuf/ptypes/wrappers"
-
-	"golang.org/x/time/rate"
 )
 
 // DbConfig is used to for initiating the database connection with the store that holds registered

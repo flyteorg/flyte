@@ -7,11 +7,10 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
 	"github.com/coocood/freecache"
 	"github.com/prometheus/client_golang/prometheus"
 
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"

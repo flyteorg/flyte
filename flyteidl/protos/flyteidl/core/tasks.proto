@@ -43,6 +43,31 @@ message Resources {
     repeated ResourceEntry limits = 2;
 }
 
+// Metadata associated with the GPU accelerator to allocate to a task. Contains
+// information about device type, and for multi-instance GPUs, the partition size to
+// use.
+message GPUAccelerator {
+    // This can be any arbitrary string, and should be informed by the labels or taints
+    // associated with the nodes in question. Default cloud provider labels typically
+    // use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+    string device = 1;
+    oneof partition_size_value {
+        bool unpartitioned = 2;
+        // Like `device`, this can be any arbitrary string, and should be informed by
+        // the labels or taints associated with the nodes in question. Default cloud
+        // provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+        string partition_size = 3;
+    }
+}
+
+// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
+// allocate to a task.
+message ExtendedResources {
+    // GPU accelerator to select for task. Contains information about device type, and
+    // for multi-instance GPUs, the partition size to use.
+    GPUAccelerator gpu_accelerator = 1;
+}
+
 // Runtime information. This is loosely defined to allow for extensibility.
 message RuntimeMetadata {
     enum RuntimeType {
@@ -143,6 +168,10 @@ message TaskTemplate {
 
     // security_context encapsulates security attributes requested to run this task.
     SecurityContext security_context = 8;
+
+    // Encapsulates all non-standard resources, not captured by
+    // v1.ResourceRequirements, to allocate to a task.
+    ExtendedResources extended_resources = 9;
 
     // Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
     // to use as required.
