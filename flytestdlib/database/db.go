@@ -13,6 +13,7 @@ import (
 // using the default db for the provider. eg : postgres has default dbName as postgres
 func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 	*gorm.DB, error) {
+
 	if dbConfig == nil {
 		panic("Cannot initialize database repository from empty db config")
 	}

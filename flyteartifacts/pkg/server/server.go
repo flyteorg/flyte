@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/db"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/go-gormigrate/gormigrate/v2"
@@ -48,5 +49,5 @@ func GrpcRegistrationHook(ctx context.Context, server *grpc.Server, scope promut
 
 // GetMigrations should be hidden behind the storage interface in the future.
 func GetMigrations(ctx context.Context) []*gormigrate.Migration {
-	return Migrations
+	return db.Migrations
 }

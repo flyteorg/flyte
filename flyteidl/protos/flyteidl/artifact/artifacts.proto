@@ -54,7 +54,7 @@ message ArtifactSpec {
   string principal = 7;
 
   string short_description = 8;
-  string long_description = 9;
+  string long_description = 9;  // todo let's remove this for now
 
   // Additional user metadata
   google.protobuf.Any user_metadata = 10;

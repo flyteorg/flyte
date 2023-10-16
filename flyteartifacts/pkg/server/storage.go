@@ -1,17 +1,12 @@
 package server
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/database"
+	"context"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 )
 
-type RDSStorage struct {
-	config database.DbConfig
-}
+type StorageInterface interface {
+	CreateArtifact(context.Context, *models.Artifact) (models.Artifact, error)
 
-func NewStorage() StorageInterface {
-	dbCfg := database.GetConfig()
-
-	return &RDSStorage{
-		config: *dbCfg,
-	}
+	GetArtifact(ctx context.Context) (models.Artifact, error)
 }
