@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	rayv1alpha1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1alpha1"
 	v1 "k8s.io/api/core/v1"
@@ -396,6 +397,10 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	info, err := getEventInfoForRayJob(GetConfig().Logs, pluginContext, rayJob)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	if len(rayJob.Status.JobDeploymentStatus) == 0 {
+		return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
 	}
 
 	// Kuberay creates a Ray cluster first, and then submits a Ray job to the cluster
