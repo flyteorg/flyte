@@ -2,18 +2,16 @@ package repositories
 
 import (
 	"context"
-
-	"gorm.io/driver/sqlite"
-
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytestdlib/database"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/config"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"gorm.io/gorm"
 )
 
 type DBHandle struct {
