@@ -8,9 +8,7 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
-
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 

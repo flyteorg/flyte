@@ -7,12 +7,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 )
 
 func Test_newJSONWebKeySet(t *testing.T) {
