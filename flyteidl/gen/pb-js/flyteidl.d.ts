@@ -7297,6 +7297,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution workflowId */
+            workflowId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventWorkflowExecution. */
@@ -7331,6 +7334,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution workflowId. */
+            public workflowId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -7443,6 +7449,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventTaskExecution workflowId */
+            workflowId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventTaskExecution. */
@@ -7477,6 +7486,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventTaskExecution workflowId. */
+            public workflowId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventTaskExecution instance using the specified properties.

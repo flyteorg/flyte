@@ -17581,6 +17581,7 @@
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventWorkflowExecution artifactIds
                  * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventWorkflowExecution parentNodeExecution
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventWorkflowExecution referenceExecution
+                 * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventWorkflowExecution workflowId
                  */
     
                 /**
@@ -17664,6 +17665,14 @@
                 CloudEventWorkflowExecution.prototype.referenceExecution = null;
     
                 /**
+                 * CloudEventWorkflowExecution workflowId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} workflowId
+                 * @memberof flyteidl.event.CloudEventWorkflowExecution
+                 * @instance
+                 */
+                CloudEventWorkflowExecution.prototype.workflowId = null;
+    
+                /**
                  * Creates a new CloudEventWorkflowExecution instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.CloudEventWorkflowExecution
@@ -17704,6 +17713,8 @@
                         $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
+                        $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -17750,6 +17761,9 @@
                             break;
                         case 8:
                             message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.workflowId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17813,6 +17827,11 @@
                         var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.referenceExecution);
                         if (error)
                             return "referenceExecution." + error;
+                    }
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.workflowId);
+                        if (error)
+                            return "workflowId." + error;
                     }
                     return null;
                 };
@@ -17946,6 +17965,7 @@
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventTaskExecution artifactIds
                  * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventTaskExecution parentNodeExecution
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventTaskExecution referenceExecution
+                 * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventTaskExecution workflowId
                  */
     
                 /**
@@ -18029,6 +18049,14 @@
                 CloudEventTaskExecution.prototype.referenceExecution = null;
     
                 /**
+                 * CloudEventTaskExecution workflowId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} workflowId
+                 * @memberof flyteidl.event.CloudEventTaskExecution
+                 * @instance
+                 */
+                CloudEventTaskExecution.prototype.workflowId = null;
+    
+                /**
                  * Creates a new CloudEventTaskExecution instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.CloudEventTaskExecution
@@ -18069,6 +18097,8 @@
                         $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
+                        $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -18115,6 +18145,9 @@
                             break;
                         case 8:
                             message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.workflowId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18178,6 +18211,11 @@
                         var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.referenceExecution);
                         if (error)
                             return "referenceExecution." + error;
+                    }
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.workflowId);
+                        if (error)
+                            return "workflowId." + error;
                     }
                     return null;
                 };

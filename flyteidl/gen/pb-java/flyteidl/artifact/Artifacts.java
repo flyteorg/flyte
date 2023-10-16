@@ -2649,10 +2649,18 @@ public final class Artifacts {
         getShortDescriptionBytes();
 
     /**
+     * <pre>
+     * todo let's remove this for now
+     * </pre>
+     *
      * <code>string long_description = 9;</code>
      */
     java.lang.String getLongDescription();
     /**
+     * <pre>
+     * todo let's remove this for now
+     * </pre>
+     *
      * <code>string long_description = 9;</code>
      */
     com.google.protobuf.ByteString
@@ -3062,6 +3070,10 @@ public final class Artifacts {
     public static final int LONG_DESCRIPTION_FIELD_NUMBER = 9;
     private volatile java.lang.Object longDescription_;
     /**
+     * <pre>
+     * todo let's remove this for now
+     * </pre>
+     *
      * <code>string long_description = 9;</code>
      */
     public java.lang.String getLongDescription() {
@@ -3077,6 +3089,10 @@ public final class Artifacts {
       }
     }
     /**
+     * <pre>
+     * todo let's remove this for now
+     * </pre>
+     *
      * <code>string long_description = 9;</code>
      */
     public com.google.protobuf.ByteString
@@ -4417,6 +4433,10 @@ public final class Artifacts {
 
       private java.lang.Object longDescription_ = "";
       /**
+       * <pre>
+       * todo let's remove this for now
+       * </pre>
+       *
        * <code>string long_description = 9;</code>
        */
       public java.lang.String getLongDescription() {
@@ -4432,6 +4452,10 @@ public final class Artifacts {
         }
       }
       /**
+       * <pre>
+       * todo let's remove this for now
+       * </pre>
+       *
        * <code>string long_description = 9;</code>
        */
       public com.google.protobuf.ByteString
@@ -4448,6 +4472,10 @@ public final class Artifacts {
         }
       }
       /**
+       * <pre>
+       * todo let's remove this for now
+       * </pre>
+       *
        * <code>string long_description = 9;</code>
        */
       public Builder setLongDescription(
@@ -4461,6 +4489,10 @@ public final class Artifacts {
         return this;
       }
       /**
+       * <pre>
+       * todo let's remove this for now
+       * </pre>
+       *
        * <code>string long_description = 9;</code>
        */
       public Builder clearLongDescription() {
@@ -4470,6 +4502,10 @@ public final class Artifacts {
         return this;
       }
       /**
+       * <pre>
+       * todo let's remove this for now
+       * </pre>
+       *
        * <code>string long_description = 9;</code>
        */
       public Builder setLongDescriptionBytes(

@@ -46,6 +46,7 @@ pub struct ArtifactSpec {
     pub principal: ::prost::alloc::string::String,
     #[prost(string, tag="8")]
     pub short_description: ::prost::alloc::string::String,
+    /// todo let's remove this for now
     #[prost(string, tag="9")]
     pub long_description: ::prost::alloc::string::String,
     /// Additional user metadata
