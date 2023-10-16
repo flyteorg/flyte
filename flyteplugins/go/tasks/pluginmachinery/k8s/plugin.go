@@ -5,11 +5,9 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 //go:generate mockery -all -case=underscore

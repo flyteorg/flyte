@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-
 	"time"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"

@@ -5,18 +5,14 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
+	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/client-go/util/workqueue"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	lru "github.com/hashicorp/golang-lru"
-
-	"k8s.io/client-go/util/workqueue"
 )
 
 //go:generate mockery -all -case=underscore

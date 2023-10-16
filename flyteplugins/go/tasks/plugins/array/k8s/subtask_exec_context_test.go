@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	podPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/pod"
-
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSubTaskExecutionContext(t *testing.T) {

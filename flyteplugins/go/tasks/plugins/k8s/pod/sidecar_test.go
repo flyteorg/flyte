@@ -9,8 +9,16 @@ import (
 	"path"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	errors2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -18,18 +26,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
-	structpb "github.com/golang/protobuf/ptypes/struct"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"

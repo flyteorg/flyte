@@ -8,37 +8,27 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/rand"
-
 	"github.com/go-test/deep"
-
-	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"k8s.io/apimachinery/pkg/types"
-
-	"k8s.io/apimachinery/pkg/api/resource"
-
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
-
 	v1 "k8s.io/api/core/v1"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/stretchr/testify/mock"
-
-	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/api/resource"
+	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/rand"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func createSampleContainerTask() *idlCore.Container {
