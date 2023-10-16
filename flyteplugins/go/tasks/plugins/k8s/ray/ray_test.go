@@ -423,19 +423,26 @@ func TestGetTaskPhase(t *testing.T) {
 
 	testCases := []struct {
 		rayJobPhase       rayv1alpha1.JobStatus
+		rayClusterPhase   rayv1alpha1.JobDeploymentStatus
 		expectedCorePhase pluginsCore.Phase
 	}{
-		{"", pluginsCore.PhaseQueued},
-		{rayv1alpha1.JobStatusPending, pluginsCore.PhaseInitializing},
-		{rayv1alpha1.JobStatusRunning, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusSucceeded, pluginsCore.PhaseSuccess},
-		{rayv1alpha1.JobStatusFailed, pluginsCore.PhasePermanentFailure},
+		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseUndefined},
+		{rayv1alpha1.JobStatusRunning, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
+		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess},
 	}
 
 	for _, tc := range testCases {
 		t.Run("TestGetTaskPhase_"+string(tc.rayJobPhase), func(t *testing.T) {
 			rayObject := &rayv1alpha1.RayJob{}
 			rayObject.Status.JobStatus = tc.rayJobPhase
+			rayObject.Status.JobDeploymentStatus = tc.rayClusterPhase
 			startTime := metav1.NewTime(time.Now())
 			rayObject.Status.StartTime = &startTime
 			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
