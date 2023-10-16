@@ -6,19 +6,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coreos/go-oidc"
+	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
+	"golang.org/x/oauth2"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
-
-	"github.com/coreos/go-oidc"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"golang.org/x/oauth2"
 )
 
 const (

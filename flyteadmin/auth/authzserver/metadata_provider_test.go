@@ -8,13 +8,12 @@ import (
 	"strings"
 	"testing"
 
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 var oauthMetadataFailureErrorMessage = "Failed to get oauth metadata"

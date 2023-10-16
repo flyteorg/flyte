@@ -5,14 +5,12 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func TestGetOrCreateSignal(t *testing.T) {

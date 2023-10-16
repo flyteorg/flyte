@@ -3,10 +3,8 @@ package authzserver
 import (
 	"testing"
 
-	"github.com/ory/fosite/storage"
-
 	"github.com/ory/fosite/compose"
-
+	"github.com/ory/fosite/storage"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"

@@ -3,13 +3,12 @@ package auth
 import (
 	"context"
 	"net/http"
-
 	"testing"
 
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-	"github.com/stretchr/testify/assert"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func TestGetPublicURL(t *testing.T) {
