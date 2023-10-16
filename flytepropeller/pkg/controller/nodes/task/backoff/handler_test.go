@@ -8,17 +8,16 @@ import (
 	"testing"
 	"time"
 
-	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
-
 	"github.com/stretchr/testify/assert"
-
-	taskErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	v1 "k8s.io/api/core/v1"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/clock"
+
+	taskErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
+	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 )
 
 func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
