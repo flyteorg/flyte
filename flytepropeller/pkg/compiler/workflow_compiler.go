@@ -34,14 +34,14 @@ package compiler
 import (
 	"strings"
 
+	// #noSA1019
+	"github.com/golang/protobuf/proto"
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	v "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-
-	// #noSA1019
-	"github.com/golang/protobuf/proto"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 // Updates workflows and tasks references to reflect the needed ones for this workflow (ignoring subworkflows)

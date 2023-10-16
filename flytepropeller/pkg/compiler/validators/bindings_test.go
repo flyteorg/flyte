@@ -3,15 +3,14 @@ package validators
 import (
 	"testing"
 
-	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
 	compilerErrors "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 // LiteralToBinding converts a literal to a non-promise binding data.
