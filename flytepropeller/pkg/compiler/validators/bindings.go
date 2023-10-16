@@ -3,12 +3,12 @@ package validators
 import (
 	"reflect"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"k8s.io/apimachinery/pkg/util/sets"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
 )
 
 func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, binding *flyte.BindingData,
