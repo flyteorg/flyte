@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 type MemoryMetadata struct {

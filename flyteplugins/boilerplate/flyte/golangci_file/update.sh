@@ -5,5 +5,10 @@
 # 
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
-goimports -w $(find . -type f -name '*.go' -not -path "./vendor/*" -not -path "./pkg/client/*" -not -path "./boilerplate/*")
-gci write -s standard -s default -s "prefix(github.com/flyteorg)" --custom-order --skip-generated .
+set -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+# Clone the .golangci file
+echo "     - copying ${DIR}/.golangci to the root directory."
+cp ${DIR}/.golangci.yml ${DIR}/../../../.golangci.yml
