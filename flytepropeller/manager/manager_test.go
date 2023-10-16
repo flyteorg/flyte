@@ -326,12 +326,12 @@ func TestNewManager(t *testing.T) {
 			scope := promutils.NewScope(fmt.Sprintf("create_%s", tt.name))
 			shardStrategy, _ := shardstrategy.NewShardStrategy(ctx, managerCfg.ShardConfig)
 
-			manager, err := New(ctx, tt.propellerConfig, managerCfg, podNamespace, ownerReference, kubeClient, scope)
+			actualManager, err := New(ctx, tt.propellerConfig, managerCfg, podNamespace, ownerReference, kubeClient, scope)
 
 			expectedManager := &Manager{
 				kubeClient:               kubeClient,
-				leaderElector:            manager.leaderElector,
-				metrics:                  manager.metrics,
+				leaderElector:            actualManager.leaderElector,
+				metrics:                  actualManager.metrics,
 				ownerReferences:          ownerReference,
 				podApplication:           managerCfg.PodApplication,
 				podNamespace:             podNamespace,
@@ -343,9 +343,9 @@ func TestNewManager(t *testing.T) {
 			}
 
 			assert.NoError(t, err)
-			assert.True(t, reflect.DeepEqual(expectedManager, manager))
-			assert.Equal(t, scope, manager.metrics.Scope)
-			assert.Equal(t, tt.leaderElectionEnable, manager.leaderElector != nil)
+			assert.True(t, reflect.DeepEqual(expectedManager, actualManager))
+			assert.Equal(t, scope, actualManager.metrics.Scope)
+			assert.Equal(t, tt.leaderElectionEnable, actualManager.leaderElector != nil)
 		})
 	}
 }

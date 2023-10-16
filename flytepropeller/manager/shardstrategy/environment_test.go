@@ -7,7 +7,7 @@ import (
 )
 
 func TestEnvironmentHashCode(t *testing.T) {
-	strategy1 := &EnvironmentShardStrategy{
+	expectedStrategy := &EnvironmentShardStrategy{
 		EnvType: Project,
 		PerShardIDs: [][]string{
 			{"flytesnacks"},
@@ -15,7 +15,7 @@ func TestEnvironmentHashCode(t *testing.T) {
 			{"*"},
 		},
 	}
-	strategy2 := &EnvironmentShardStrategy{
+	actualStrategy := &EnvironmentShardStrategy{
 		EnvType: Project,
 		PerShardIDs: [][]string{
 			{"flytesnacks"},
@@ -23,9 +23,9 @@ func TestEnvironmentHashCode(t *testing.T) {
 			{"*"},
 		},
 	}
-	hashcode1, err := strategy1.HashCode()
+	expectedHashcode, err := expectedStrategy.HashCode()
 	assert.NoError(t, err)
-	hashcode2, err := strategy2.HashCode()
+	actualHashcode, err := actualStrategy.HashCode()
 	assert.NoError(t, err)
-	assert.Equal(t, hashcode1, hashcode2)
+	assert.Equal(t, expectedHashcode, actualHashcode)
 }

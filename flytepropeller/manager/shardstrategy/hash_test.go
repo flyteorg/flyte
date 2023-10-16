@@ -25,15 +25,15 @@ func TestComputeKeyRange(t *testing.T) {
 }
 
 func TestHashHashCode(t *testing.T) {
-	strategy1 := &HashShardStrategy{
+	expectedStrategy := &HashShardStrategy{
 		ShardCount: 3,
 	}
-	strategy2 := &HashShardStrategy{
+	actualStrategy := &HashShardStrategy{
 		ShardCount: 3,
 	}
-	hashcode1, err := strategy1.HashCode()
+	expectedHashcode, err := expectedStrategy.HashCode()
 	assert.NoError(t, err)
-	hashcode2, err := strategy2.HashCode()
+	actualHashcode, err := actualStrategy.HashCode()
 	assert.NoError(t, err)
-	assert.Equal(t, hashcode1, hashcode2)
+	assert.Equal(t, expectedHashcode, actualHashcode)
 }

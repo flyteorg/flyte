@@ -281,23 +281,23 @@ func TestNewShardStrategyErrorConfig(t *testing.T) {
 }
 
 func TestComputeHashCode(t *testing.T) {
-	data1 := struct {
+	expectedData := struct {
 		Field1 string
 		Field2 int
 	}{
 		Field1: "flytesnacks",
 		Field2: 42,
 	}
-	data2 := struct {
+	actualData := struct {
 		Field1 string
 		Field2 int
 	}{
 		Field1: "flytesnacks",
 		Field2: 42,
 	}
-	hashcode1, err := computeHashCode(data1)
+	expectedHashcode, err := computeHashCode(expectedData)
 	assert.NoError(t, err)
-	hashcode2, err := computeHashCode(data2)
+	actualHashcode, err := computeHashCode(actualData)
 	assert.NoError(t, err)
-	assert.Equal(t, hashcode1, hashcode2)
+	assert.Equal(t, expectedHashcode, actualHashcode)
 }
