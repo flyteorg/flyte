@@ -17,9 +17,8 @@ limitations under the License.
 package promutils
 
 import (
-	"k8s.io/client-go/util/workqueue"
-
 	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/client-go/util/workqueue"
 )
 
 // Package prometheus sets the workqueue DefaultMetricsFactory to produce

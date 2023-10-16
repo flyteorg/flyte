@@ -6,18 +6,15 @@ import (
 	"sync"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-
-	"k8s.io/client-go/util/workqueue"
-
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/util/workqueue"
+
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type ItemID = string

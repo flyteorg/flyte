@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	_ "net/http/pprof" // #nosec G108 Import for pprof server
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/version"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	// #nosec G108
-	_ "net/http/pprof" // Import for pprof server
 )
 
 const (
