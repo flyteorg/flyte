@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/manager/impl/validators"
@@ -16,7 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"google.golang.org/grpc/codes"
 )
 
 type datasetMetrics struct {
