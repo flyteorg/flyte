@@ -5,16 +5,59 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc"
-
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
+
+func TestDo(t *testing.T) {
+	tCtx := getTaskContext(t)
+	taskReader := new(mocks.TaskReader)
+
+	template := flyteIdlCore.TaskTemplate{
+		Type: "api_task",
+		Metadata: &flyteIdlCore.TaskMetadata{
+			Runtime: &flyteIdlCore.RuntimeMetadata{
+				Flavor: "sync_plugin",
+			},
+		},
+	}
+
+	taskReader.On("Read", mock.Anything).Return(&template, nil)
+
+	tCtx.OnTaskReader().Return(taskReader)
+
+	agentPlugin := newMockAgentPlugin()
+	pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
+	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("do_test"))
+	assert.NoError(t, err)
+
+	// Call the Do function by Flavor
+	inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	basePrefix := storage.DataReference("fake://bucket/prefix/")
+	inputReader := &ioMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return(basePrefix)
+	inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
+	tCtx.OnInputReader().Return(inputReader)
+
+	phase, err := plugin.Handle(context.TODO(), tCtx)
+
+	assert.Nil(t, err)
+	assert.Equal(t, pluginsCore.PhaseSuccess, phase.Info().Phase())
+}
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
@@ -100,6 +143,10 @@ func TestPlugin(t *testing.T) {
 		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.NotEqual(t, context.TODO(), ctx)
 	})
+
+	// t.Run("test Do Function", func(t *testing.T) {
+	// 	taskContext := new(webapiPlugin.StatusContext)
+	// })
 
 	t.Run("test PENDING Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)

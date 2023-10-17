@@ -68,6 +68,9 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 
 func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return core.UnknownTransition, err
+	}
 
 	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
 	if taskTemplate.GetMetadata().GetRuntime().GetFlavor() == syncPlugin {

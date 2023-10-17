@@ -82,7 +82,7 @@ func TestCreateRemotePlugin(t *testing.T) {
 	CreateRemotePlugin(webapi.PluginEntry{
 		ID:                 "MyTestPlugin",
 		SupportedTaskTypes: []core.TaskType{"test-task"},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
 			return newPluginWithProperties(webapi.PluginConfig{
 				Caching: webapi.CachingConfig{
 					Size: 10,

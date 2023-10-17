@@ -89,7 +89,6 @@ message DeleteTaskRequest {
 message DeleteTaskResponse {
 }
 
-
 // A message used to do a task
 message DoTaskRequest {
   // The inputs required to start the execution. All required inputs must be

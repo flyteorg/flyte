@@ -63,6 +63,14 @@ func (m *MockClient) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _
 	return &admin.DeleteTaskResponse{}, nil
 }
 
+func (m *MockClient) DoTask(_ context.Context, _ *admin.DoTaskRequest, _ ...grpc.CallOption) (*admin.DoTaskResponse, error) {
+	return &admin.DoTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
+		Literals: map[string]*flyteIdlCore.Literal{
+			"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+		},
+	}}}, nil
+}
+
 func mockGetClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 	return &MockClient{}, nil
 }
@@ -125,7 +133,7 @@ func TestEndToEnd(t *testing.T) {
 
 	t.Run("failed to create a job", func(t *testing.T) {
 		agentPlugin := newMockAgentPlugin()
-		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
 			return &MockPlugin{
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
@@ -259,8 +267,8 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 func newMockAgentPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
-		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job"},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job", "api_task"},
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
 			return &MockPlugin{
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
