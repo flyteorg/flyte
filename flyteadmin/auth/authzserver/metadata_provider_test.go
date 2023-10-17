@@ -16,6 +16,8 @@ import (
 	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
+var oauthMetadataFailureErrorMessage = "Failed to get oauth metadata"
+
 func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
 	provider := NewService(&authConfig.Config{
 		AppAuth: authConfig.OAuth2Options{
@@ -110,4 +112,30 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "https://dev-14186422.okta.com", resp.Issuer)
 	})
+}
+
+func TestSendAndRetryHttpRequest(t *testing.T) {
+	hf := func(w http.ResponseWriter, r *http.Request) {
+		switch strings.TrimSpace(r.URL.Path) {
+		case "/":
+			mockExternalMetadataEndpointTransientFailure(w, r)
+		default:
+			http.NotFoundHandler().ServeHTTP(w, r)
+		}
+
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(hf))
+	defer server.Close()
+	http.DefaultClient = server.Client()
+
+	resp, err := sendAndRetryHttpRequest(server.Client(), server.URL, 5, 0)
+	assert.Error(t, err)
+	assert.Equal(t, oauthMetadataFailureErrorMessage, err.Error())
+	assert.NotNil(t, resp)
+	assert.Equal(t, 500, resp.StatusCode)
+}
+
+func mockExternalMetadataEndpointTransientFailure(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(500)
 }
