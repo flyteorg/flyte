@@ -35,7 +35,6 @@ spec:
           {{- with .Values.additionalEnvs }}
           {{- toYaml . | nindent 10 }}
           {{- end }}
-
         {{- with .Values.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}

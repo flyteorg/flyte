@@ -94,9 +94,9 @@ spec:
             ephemeral-storage: 200Mi
             memory: 200Mi
         env:
-          FLYTE_AWS_ACCESS_KEY_ID: minio
-          FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
-          FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+          - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+          - FLYTE_AWS_ACCESS_KEY_ID: minio
+          - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
       serviceAccountName: flyteagent
       volumes:
       - name: flyteagent
