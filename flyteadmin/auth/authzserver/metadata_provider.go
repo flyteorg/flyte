@@ -10,11 +10,12 @@ import (
 	"strings"
 	"time"
 
-	errrs "github.com/pkg/errors"
-	"google.golang.org/api/googleapi"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 
@@ -22,8 +23,8 @@ import (
 )
 
 var (
-	retryAttempts = 5
-	retryDelay    = 1 * time.Second
+	defaultRetryAttempts = 5
+	defaultRetryDelay    = 1 * time.Second
 )
 
 type OAuth2MetadataProvider struct {
@@ -86,8 +87,13 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 			httpClient.Transport = transport
 		}
 
-		response, err := sendAndRetryHttpRequest(httpClient, externalMetadataURL.String())
+		response, err := sendAndRetryHttpRequest(httpClient, externalMetadataURL.String(), defaultRetryAttempts, defaultRetryDelay)
 		if err != nil {
+			if response != nil {
+				logger.Errorf(ctx, "Failed to get oauth metadata. Error code: %v. Err: %v", response.StatusCode, err)
+				return nil, flyteErrors.NewFlyteAdminError(codes.Code(response.StatusCode), "Failed to get oauth metadata.")
+			}
+			logger.Errorf(ctx, "Failed to get oauth metadata. Err: %v", response.StatusCode, err)
 			return nil, err
 		}
 
@@ -122,24 +128,27 @@ func NewService(config *authConfig.Config) OAuth2MetadataProvider {
 	}
 }
 
-func sendAndRetryHttpRequest(client *http.Client, url string) (*http.Response, error) {
+func sendAndRetryHttpRequest(client *http.Client, url string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
 	var response *http.Response
 	var err error
-	err = async.RetryOnSpecificErrors(retryAttempts, retryDelay, func() error {
+	err = async.RetryOnSpecificErrorCodes(retryAttempts, retryDelay, func() (*http.Response, error) {
 		response, err = client.Get(url)
-		return err
-	}, isTransientError)
+		return response, err
+	}, isTransientErrorCode)
 
 	if err != nil {
-		e, _ := errrs.Cause(err).(*googleapi.Error)
-		return nil, errors.New(fmt.Sprintf("Failed to get oauth metadata after %v attempts. Error code: %v Err: %v", retryAttempts, e.Code, e.Error()))
+		return nil, err
+	}
+
+	if response.StatusCode != http.StatusOK {
+		return response, errors.New(fmt.Sprint("Failed to get oauth metadata"))
 	}
 
 	return response, nil
 }
 
-func isTransientError(err error) bool {
-	if e, ok := errrs.Cause(err).(*googleapi.Error); ok && e.Code >= 500 && e.Code <= 599 {
+func isTransientErrorCode(resp *http.Response) bool {
+	if resp.StatusCode >= 500 && resp.StatusCode <= 599 {
 		return true
 	}
 	return false

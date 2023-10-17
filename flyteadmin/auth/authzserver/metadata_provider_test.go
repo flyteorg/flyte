@@ -17,6 +17,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
+var oauthMetadataFailureErrorMessage = "Failed to get oauth metadata"
+
 func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
 	provider := NewService(&authConfig.Config{
 		AppAuth: authConfig.OAuth2Options{
@@ -113,18 +115,28 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 	})
 }
 
-//func TestSendAndRetryHttpRequest(t *testing.T) {
-//	cm := ClientMock{}
-//	response, err := sendAndRetryHttpRequest(&cm, "url")
-//}
-//
-//type ClientMock struct {
-//}
-//
-//func (c *ClientMock) Do(req *http.Request) (*http.Response, error) {
-//	return &http.Response{}, errors.New("fail")
-//}
-//
-//type HttpClient interface {
-//	Do(req *http.Request) (*http.Response, error)
-//}
+func TestSendAndRetryHttpRequest(t *testing.T) {
+	hf := func(w http.ResponseWriter, r *http.Request) {
+		switch strings.TrimSpace(r.URL.Path) {
+		case "/":
+			mockExternalMetadataEndpointTransientFailure(w, r)
+		default:
+			http.NotFoundHandler().ServeHTTP(w, r)
+		}
+
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(hf))
+	defer server.Close()
+	http.DefaultClient = server.Client()
+
+	resp, err := sendAndRetryHttpRequest(server.Client(), server.URL, 5, 0)
+	assert.Error(t, err)
+	assert.Equal(t, oauthMetadataFailureErrorMessage, err.Error())
+	assert.NotNil(t, resp)
+	assert.Equal(t, 500, resp.StatusCode)
+}
+
+func mockExternalMetadataEndpointTransientFailure(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(500)
+}
