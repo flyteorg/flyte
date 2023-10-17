@@ -229,6 +229,10 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 		sandboxEnv = append(sandboxEnv, "FLYTE_DEV=True")
 	}
 
+	if sandboxConfig.DisableAgent {
+		sandboxEnv = append(sandboxEnv, "DISABLE_AGENT=True")
+	}
+
 	ID, err := docker.StartContainer(ctx, cli, volumes, exposedPorts, portBindings, docker.FlyteSandboxClusterName,
 		sandboxImage, sandboxEnv, sandboxConfig.DryRun)
 
@@ -393,6 +397,7 @@ func StartDemoCluster(ctx context.Context, args []string, sandboxConfig *sandbox
 		return err
 	}
 	// K3s will automatically write the file specified by this var, which is mounted from user's local state dir.
+
 	sandboxConfig.Env = append(sandboxConfig.Env, k3sKubeConfigEnvVar)
 	err = StartCluster(ctx, args, sandboxConfig, demoImageName, sandboxImagePrefix, exposedPorts, portBindings, util.DemoConsolePort)
 	if err != nil {

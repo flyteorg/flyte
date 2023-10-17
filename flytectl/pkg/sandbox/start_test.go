@@ -106,6 +106,8 @@ func TestStartFunc(t *testing.T) {
 		RegistryAuth: "",
 		Platform:     "",
 	}
+	config.Dev = true
+	config.DisableAgent = true
 	assert.Nil(t, util.SetupFlyteDir())
 	assert.Nil(t, os.MkdirAll(f.FilePathJoin(f.UserHomeDir(), ".flyte", "state"), os.ModePerm))
 	assert.Nil(t, ioutil.WriteFile(docker.Kubeconfig, []byte(content), os.ModePerm))
