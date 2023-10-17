@@ -6,15 +6,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/ghodss/yaml"
+	"github.com/ory/fosite"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-
-	"github.com/ghodss/yaml"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/ory/fosite"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func TestHashFlyteClientSecret(t *testing.T) {

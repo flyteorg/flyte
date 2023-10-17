@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/config"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 //go:generate enumer --type=SecretManagerType --trimprefix=SecretManagerType -json -yaml

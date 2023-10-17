@@ -8,15 +8,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/atomic"
-
+	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/util/workqueue"
 
+	"github.com/flyteorg/flyte/flytestdlib/atomic"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
-
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/stretchr/testify/assert"
 )
 
 const fakeCacheItemValueLimit = 10

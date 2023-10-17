@@ -4,15 +4,13 @@ import (
 	"context"
 
 	errors2 "github.com/pkg/errors"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/spf13/cobra"
+	_ "gorm.io/driver/postgres" // Required to import database driver.
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/spf13/cobra"
-	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var parentClusterResourceCmd = &cobra.Command{

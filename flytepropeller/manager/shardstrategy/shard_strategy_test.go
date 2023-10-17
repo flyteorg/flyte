@@ -8,7 +8,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 
 	"github.com/stretchr/testify/assert"
-
 	v1 "k8s.io/api/core/v1"
 )
 
