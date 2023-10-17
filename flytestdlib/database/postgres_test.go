@@ -3,12 +3,13 @@ package database
 import (
 	"context"
 	"errors"
-	"github.com/jackc/pgconn"
-	"github.com/stretchr/testify/assert"
 	"io/ioutil"
 	"net"
 	"os"
 	"testing"
+
+	"github.com/jackc/pgconn"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestResolvePassword(t *testing.T) {

@@ -5,6 +5,7 @@ on:
     paths:
       - 'datacatalog/**'
       - 'flyteadmin/**'
+      - 'flyteartifacts/**'
       - 'flytecopilot/**'
       - 'flyteplugins/**'
       - 'flytepropeller/**'
@@ -15,6 +16,7 @@ on:
     paths:
       - 'datacatalog/**'
       - 'flyteadmin/**'
+      - 'flyteartifacts/**'
       - 'flytecopilot/**'
       - 'flyteidl/**'
       - 'flyteplugins/**'
@@ -80,6 +82,7 @@ jobs:
         component:
           - datacatalog
           - flyteadmin
+          - flyteartifacts
           - flytecopilot
           - flytepropeller
     name: Docker Build Images
@@ -162,6 +165,7 @@ jobs:
         component:
           - datacatalog
           - flyteadmin
+          - flyteartifacts
           - flytecopilot
           - flytepropeller
           - flytescheduler

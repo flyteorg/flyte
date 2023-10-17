@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/driver/sqlite"
@@ -103,13 +104,13 @@ func withDB(ctx context.Context, do func(db *gorm.DB) error) error {
 }
 
 // Migrate runs all configured migrations
-func Migrate(ctx context.Context, migrations []*gormigrate.Migration, initializationSql string) error {
-	if migrations == nil || len(migrations) == 0 {
+func Migrate(ctx context.Context, migrations []*gormigrate.Migration, initializationSQL string) error {
+	if len(migrations) == 0 {
 		logger.Infof(ctx, "No migrations to run")
 		return nil
 	}
 	return withDB(ctx, func(db *gorm.DB) error {
-		tx := db.Exec(initializationSql)
+		tx := db.Exec(initializationSQL)
 		if tx.Error != nil {
 			return tx.Error
 		}
@@ -125,7 +126,7 @@ func Migrate(ctx context.Context, migrations []*gormigrate.Migration, initializa
 
 // Rollback rolls back the last migration
 func Rollback(ctx context.Context, migrations []*gormigrate.Migration) error {
-	if migrations == nil || len(migrations) == 0 {
+	if len(migrations) == 0 {
 		logger.Infof(ctx, "No migrations to rollback")
 		return nil
 	}
