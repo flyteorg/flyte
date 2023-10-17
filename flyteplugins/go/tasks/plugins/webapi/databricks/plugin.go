@@ -141,7 +141,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err,
 			"Unable to fetch statementHandle from http response")
 	}
-	runID := fmt.Sprintf("%v", data["run_id"])
+	runID := fmt.Sprintf("%.0f", data["run_id"])
 
 	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
 		ResourceWrapper{StatusCode: resp.StatusCode}, nil
@@ -156,6 +156,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 	resp, err := p.client.Do(req)
+	logger.Debugf(ctx, "Get databricks job response", "resp", resp)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get databricks job status [%v]", resp)
 		return nil, err
@@ -221,7 +222,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case http.StatusAccepted:
 		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
 	case http.StatusOK:
-		if lifeCycleState == "TERMINATED" {
+		if lifeCycleState == "TERMINATED" || lifeCycleState == "SKIPPED" || lifeCycleState == "INTERNAL_ERROR" {
 			if resultState == "SUCCESS" {
 				if err := writeOutput(ctx, taskCtx); err != nil {
 					pluginsCore.PhaseInfoFailure(string(rune(statusCode)), "failed to write output", taskInfo)
