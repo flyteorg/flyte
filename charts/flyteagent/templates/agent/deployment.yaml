@@ -32,12 +32,9 @@ spec:
           name: {{ .Values.ports.name }}
         resources: {{- toYaml .Values.resources | nindent 10 }}
         env:
-        - name: FLYTE_AWS_ENDPOINT
-          value: http://flyte-sandbox-minio.flyte:9000
-        - name: FLYTE_AWS_ACCESS_KEY_ID
-          value: minio
-        - name: FLYTE_AWS_SECRET_ACCESS_KEY
-          value: miniostorage
+          {{- with .Values.additionalEnvs }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
 
         {{- with .Values.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}

@@ -816,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ajd1UVlZZ2QyUUxaNXR4Zg==
+  haSharedSecret: amN4SVhXb3Zmc3doNmw2Qw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1409,7 +1409,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 5cf3faf4eed585ffebe715ccf3dc0ef080458a5f77bae5a88b3ec484a94dda79
+        checksum/secret: 349f7af6f1eb97cb0e23b0440cc72a803bf2b3b05f32d8647c7129c6e6bac1e7
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1739,12 +1739,9 @@ spec:
         - pyflyte
         - serve
         env:
-        - name: FLYTE_AWS_ENDPOINT
-          value: http://flyte-sandbox-minio.flyte:9000
-        - name: FLYTE_AWS_ACCESS_KEY_ID
-          value: minio
-        - name: FLYTE_AWS_ACCESS_KEY_ID
-          value: miniostorage
+          FLYTE_AWS_ACCESS_KEY_ID: minio
+          FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+          FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
         image: ghcr.io/flyteorg/flyteagent:1.9.1
         imagePullPolicy: IfNotPresent
         name: flyteagent
