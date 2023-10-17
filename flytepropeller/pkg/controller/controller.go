@@ -554,7 +554,7 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 		return errors.Wrapf(err, "error building Kubernetes Clientset")
 	}
 
-	resolver.Register(resolver2.NewBuilder(kubeClient, resolver2.KubernetesSchema))
+	resolver.Register(resolver2.NewBuilder(kubeClient, resolver2.K8sSchema))
 
 	flyteworkflowClient, err := clientset.NewForConfig(kubecfg)
 	if err != nil {

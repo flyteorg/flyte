@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	KubernetesSchema = "kubernetes"
+	K8sSchema = "k8s"
 )
 
 type targetInfo struct {
