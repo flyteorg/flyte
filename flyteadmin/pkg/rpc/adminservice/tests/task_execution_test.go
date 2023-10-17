@@ -5,6 +5,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -12,10 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/golang/protobuf/proto"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/golang/protobuf/ptypes"
 )
 
 func TestTaskExecution(t *testing.T) {

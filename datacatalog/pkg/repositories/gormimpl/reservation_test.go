@@ -6,19 +6,17 @@ import (
 	"testing"
 	"time"
 
+	mocket "github.com/Selvatico/go-mocket"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
-
 	apiErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
-	"google.golang.org/grpc/codes"
-
-	mocket "github.com/Selvatico/go-mocket"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreate(t *testing.T) {

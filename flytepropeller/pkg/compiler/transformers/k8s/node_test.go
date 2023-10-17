@@ -4,17 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-
-	"github.com/stretchr/testify/assert"
-
-	"google.golang.org/protobuf/types/known/durationpb"
-
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func createNodeWithTask() *core.Node {

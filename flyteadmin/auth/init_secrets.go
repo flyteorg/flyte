@@ -12,11 +12,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/spf13/cobra"
+
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (

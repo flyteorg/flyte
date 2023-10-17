@@ -6,12 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func TestIsPhaseTerminal(t *testing.T) {

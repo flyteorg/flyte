@@ -3,11 +3,10 @@ package handler
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func AsPointer[T any](val T) *T {

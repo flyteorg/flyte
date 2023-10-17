@@ -4,8 +4,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"k8s.io/apimachinery/pkg/util/validation"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 )
 
 var dns1123InvalidRegex = regexp.MustCompile("[^-.a-z0-9]")

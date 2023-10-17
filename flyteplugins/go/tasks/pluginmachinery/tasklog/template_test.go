@@ -3,12 +3,12 @@ package tasklog
 import (
 	"reflect"
 	"regexp"
-
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/go-test/deep"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestTemplateLog(t *testing.T) {

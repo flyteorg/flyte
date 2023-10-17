@@ -3,13 +3,12 @@ package validators
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestValidateBranchNode(t *testing.T) {

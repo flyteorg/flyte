@@ -5,10 +5,10 @@ import (
 	"testing"
 	"time"
 
-	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/stretchr/testify/assert"
+
+	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func TestNewWorkQueue(t *testing.T) {

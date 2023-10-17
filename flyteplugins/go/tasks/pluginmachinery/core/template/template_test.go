@@ -7,13 +7,12 @@ import (
 	"testing"
 	"time"
 
-	pluginsCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginsCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type dummyInputReader struct {

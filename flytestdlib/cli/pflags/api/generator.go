@@ -7,11 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
+	"github.com/ernesto-jimenez/gogen/gogenutil"
 	"golang.org/x/tools/go/packages"
 
-	"github.com/ernesto-jimenez/gogen/gogenutil"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 

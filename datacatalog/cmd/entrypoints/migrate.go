@@ -1,11 +1,11 @@
 package entrypoints
 
 import (
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
-
 	"context"
 
 	"github.com/spf13/cobra"
+
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 )
 
 var parentMigrateCmd = &cobra.Command{
