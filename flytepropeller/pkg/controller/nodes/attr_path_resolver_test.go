@@ -31,16 +31,6 @@ func NewStructFromMap(m map[string]interface{}) *structpb.Struct {
 }
 
 func TestResolveAttrPathIn(t *testing.T) {
-	// - map {"foo": "bar"}
-	// - collection ["foo", "bar"]
-	// - struct1 {"foo": "bar"}
-	// - struct2 {"foo": ["bar1", "bar2"]}
-	// - nested list struct {"foo": [["bar1", "bar2"]]}
-	// - map+collection+struct {"foo": [{"bar": "car"}]}
-	// - exception key error with map
-	// - exception out of range with collection
-	// - exception key error with struct
-	// - exception out of range with struct
 
 	args := []struct {
 		literal  *core.Literal
@@ -48,6 +38,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 		expected *core.Literal
 		hasError bool
 	}{
+		// - map {"foo": "bar"}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Map{
@@ -68,6 +59,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: NewScalarLiteral("bar"),
 			hasError: false,
 		},
+		// - collection ["foo", "bar"]
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Collection{
@@ -89,6 +81,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: NewScalarLiteral("bar"),
 			hasError: false,
 		},
+		// - struct1 {"foo": "bar"}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -109,6 +102,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: NewScalarLiteral("bar"),
 			hasError: false,
 		},
+		// - struct2 {"foo": ["bar1", "bar2"]}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -138,6 +132,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: NewScalarLiteral("bar2"),
 			hasError: false,
 		},
+		// - nested list struct {"foo": [["bar1", "bar2"]]}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -179,6 +174,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			},
 			hasError: false,
 		},
+		// - map+collection+struct {"foo": [{"bar": "car"}]}
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Map{
@@ -225,6 +221,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: NewScalarLiteral("car"),
 			hasError: false,
 		},
+		// - exception key error with map
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Map{
@@ -245,6 +242,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: &core.Literal{},
 			hasError: true,
 		},
+		// - exception out of range with collection
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Collection{
@@ -266,6 +264,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: &core.Literal{},
 			hasError: true,
 		},
+		// - exception key error with struct
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{
@@ -286,6 +285,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 			expected: &core.Literal{},
 			hasError: true,
 		},
+		// - exception out of range with struct
 		{
 			literal: &core.Literal{
 				Value: &core.Literal_Scalar{

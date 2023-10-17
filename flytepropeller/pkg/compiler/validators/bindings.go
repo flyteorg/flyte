@@ -124,11 +124,12 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 						sourceType = cType
 					}
 				}
-				var exist bool
-				var tmpType *flyte.LiteralType
 
 				// If the variable has an attribute path. Extract the type of the last attribute.
 				for _, attr := range val.Promise.AttrPath {
+					var tmpType *flyte.LiteralType
+					var exist bool
+
 					if sourceType.GetCollectionType() != nil {
 						sourceType = sourceType.GetCollectionType()
 					} else if sourceType.GetMapValueType() != nil {
@@ -138,6 +139,7 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 						tmpType, exist = sourceType.GetStructure().GetDataclassType()[attr.GetStringValue()]
 
 						if !exist {
+							// the error should output the sourceType instead of tmpType because tmpType is nil
 							errs.Collect(errors.NewFieldNotFoundErr(nodeID, val.Promise.Var, sourceType.String(), attr.GetStringValue()))
 							return nil, nil, !errs.HasErrors()
 						}
