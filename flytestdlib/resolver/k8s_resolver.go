@@ -28,18 +28,20 @@ type targetInfo struct {
 }
 
 func (t targetInfo) String() string {
-	return fmt.Sprintf("kubernetes:///%s.%s:%s", t.serviceNamespace, t.serviceName, t.port)
+	return fmt.Sprintf("%s:///%s.%s:%s", K8sSchema, t.serviceNamespace, t.serviceName, t.port)
 }
 
 // NewBuilder creates a kubeBuilder which is used by grpc resolver.
-func NewBuilder(client kubernetes.Interface, schema string) resolver.Builder {
+func NewBuilder(ctx context.Context, client kubernetes.Interface, schema string) resolver.Builder {
 	return &kubeBuilder{
+		ctx:       ctx,
 		k8sClient: client,
 		schema:    schema,
 	}
 }
 
 type kubeBuilder struct {
+	ctx       context.Context
 	k8sClient kubernetes.Interface
 	schema    string
 }
@@ -63,14 +65,14 @@ func splitServicePortNamespace(hpn string) (service, port, namespace string) {
 func parseResolverTarget(target resolver.Target) (targetInfo, error) {
 	var service, port, namespace string
 	if target.URL.Host == "" {
-		// kubernetes:///service.namespace:port
+		// k8s:///service.namespace:port
 		service, port, namespace = splitServicePortNamespace(target.Endpoint())
 	} else if target.URL.Port() == "" && target.Endpoint() != "" {
-		// kubernetes://namespace/service:port
+		// k8s://namespace/service:port
 		service, port, _ = splitServicePortNamespace(target.Endpoint())
 		namespace = target.URL.Hostname()
 	} else {
-		// kubernetes://service.namespace:port
+		// k8s://service.namespace:port
 		service, port, namespace = splitServicePortNamespace(target.URL.Host)
 	}
 
@@ -92,7 +94,7 @@ func (b *kubeBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts
 		return nil, err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(b.ctx)
 	r := &kResolver{
 		target:    ti,
 		ctx:       ctx,
