@@ -1,16 +1,15 @@
 package nodes
 
 import (
-	"context"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // resolveAttrPathInPromise resolves the literal with attribute path
 // If the promise is chained with attributes (e.g. promise.a["b"][0]), then we need to resolve the promise
-func resolveAttrPathInPromise(ctx context.Context, nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
+func resolveAttrPathInPromise(nodeID string, literal *core.Literal, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 	var currVal *core.Literal = literal
 	var tmpVal *core.Literal
 	var err error
@@ -21,7 +20,7 @@ func resolveAttrPathInPromise(ctx context.Context, nodeID string, literal *core.
 		switch currVal.GetValue().(type) {
 		case *core.Literal_Map:
 			tmpVal, exist = currVal.GetMap().GetLiterals()[attr.GetStringValue()]
-			if exist == false {
+			if !exist {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal.GetMap().GetLiterals())
 			}
 			currVal = tmpVal
@@ -42,7 +41,7 @@ func resolveAttrPathInPromise(ctx context.Context, nodeID string, literal *core.
 	if currVal.GetScalar() != nil && currVal.GetScalar().GetGeneric() != nil {
 		st := currVal.GetScalar().GetGeneric()
 		// start from index "count"
-		currVal, err = resolveAttrPathInPbStruct(ctx, nodeID, st, bindAttrPath[count:])
+		currVal, err = resolveAttrPathInPbStruct(nodeID, st, bindAttrPath[count:])
 		if err != nil {
 			return nil, err
 		}
@@ -52,7 +51,7 @@ func resolveAttrPathInPromise(ctx context.Context, nodeID string, literal *core.
 }
 
 // resolveAttrPathInPbStruct resolves the protobuf struct (e.g. dataclass) with attribute path
-func resolveAttrPathInPbStruct(ctx context.Context, nodeID string, st *structpb.Struct, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
+func resolveAttrPathInPbStruct(nodeID string, st *structpb.Struct, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
 
 	var currVal interface{}
 	var tmpVal interface{}
@@ -62,37 +61,37 @@ func resolveAttrPathInPbStruct(ctx context.Context, nodeID string, st *structpb.
 
 	// Turn the current value to a map so it can be resolved more easily
 	for _, attr := range bindAttrPath {
-		switch currVal.(type) {
+		switch resolvedVal := currVal.(type) {
 		// map
 		case map[string]interface{}:
-			tmpVal, exist = currVal.(map[string]interface{})[attr.GetStringValue()]
-			if exist == false {
+			tmpVal, exist = resolvedVal[attr.GetStringValue()]
+			if !exist {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "key [%v] does not exist in literal %v", attr.GetStringValue(), currVal)
 			}
 			currVal = tmpVal
 		// list
 		case []interface{}:
-			if int(attr.GetIntValue()) >= len(currVal.([]interface{})) {
+			if int(attr.GetIntValue()) >= len(resolvedVal) {
 				return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "index [%v] is out of range of %v", attr.GetIntValue(), currVal)
 			}
-			currVal = currVal.([]interface{})[attr.GetIntValue()]
+			currVal = resolvedVal[attr.GetIntValue()]
 		}
 	}
 
 	// After resolve, convert the interface to literal
-	literal, err := convertInterfaceToLiteral(ctx, nodeID, currVal)
+	literal, err := convertInterfaceToLiteral(nodeID, currVal)
 
 	return literal, err
 }
 
 // convertInterfaceToLiteral converts the protobuf struct (e.g. dataclass) to literal
-func convertInterfaceToLiteral(ctx context.Context, nodeID string, obj interface{}) (*core.Literal, error) {
+func convertInterfaceToLiteral(nodeID string, obj interface{}) (*core.Literal, error) {
 
 	literal := &core.Literal{}
 
-	switch obj.(type) {
+	switch obj := obj.(type) {
 	case map[string]interface{}:
-		newSt, err := structpb.NewStruct(obj.(map[string]interface{}))
+		newSt, err := structpb.NewStruct(obj)
 		if err != nil {
 			return nil, err
 		}
@@ -105,9 +104,9 @@ func convertInterfaceToLiteral(ctx context.Context, nodeID string, obj interface
 		}
 	case []interface{}:
 		literals := []*core.Literal{}
-		for _, v := range obj.([]interface{}) {
+		for _, v := range obj {
 			// recursively convert the interface to literal
-			literal, err := convertInterfaceToLiteral(ctx, nodeID, v)
+			literal, err := convertInterfaceToLiteral(nodeID, v)
 			if err != nil {
 				return nil, err
 			}
@@ -119,7 +118,7 @@ func convertInterfaceToLiteral(ctx context.Context, nodeID string, obj interface
 			},
 		}
 	case interface{}:
-		scalar, err := convertInterfaceToLiteralScalar(ctx, nodeID, obj)
+		scalar, err := convertInterfaceToLiteralScalar(nodeID, obj)
 		if err != nil {
 			return nil, err
 		}
@@ -130,18 +129,18 @@ func convertInterfaceToLiteral(ctx context.Context, nodeID string, obj interface
 }
 
 // convertInterfaceToLiteralScalar converts the a single value to a literal scalar
-func convertInterfaceToLiteralScalar(ctx context.Context, nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
+func convertInterfaceToLiteralScalar(nodeID string, obj interface{}) (*core.Literal_Scalar, error) {
 	value := &core.Primitive{}
 
-	switch obj.(type) {
+	switch obj := obj.(type) {
 	case string:
-		value.Value = &core.Primitive_StringValue{StringValue: obj.(string)}
+		value.Value = &core.Primitive_StringValue{StringValue: obj}
 	case int:
-		value.Value = &core.Primitive_Integer{Integer: int64(obj.(int))}
+		value.Value = &core.Primitive_Integer{Integer: int64(obj)}
 	case float64:
-		value.Value = &core.Primitive_FloatValue{FloatValue: obj.(float64)}
+		value.Value = &core.Primitive_FloatValue{FloatValue: obj}
 	case bool:
-		value.Value = &core.Primitive_Boolean{Boolean: obj.(bool)}
+		value.Value = &core.Primitive_Boolean{Boolean: obj}
 	default:
 		return nil, errors.Errorf(errors.PromiseAttributeResolveError, nodeID, "Failed to resolve interface to literal scalar")
 	}

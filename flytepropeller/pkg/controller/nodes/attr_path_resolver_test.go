@@ -3,10 +3,11 @@ package nodes
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/types/known/structpb"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 )
 
 func NewScalarLiteral(value string) *core.Literal {
@@ -318,7 +319,7 @@ func TestResolveAttrPathIn(t *testing.T) {
 	}
 
 	for i, arg := range args {
-		resolved, err := resolveAttrPathInPromise(nil, "", arg.literal, arg.path)
+		resolved, err := resolveAttrPathInPromise("", arg.literal, arg.path)
 		if arg.hasError {
 			assert.Error(t, err, i)
 			assert.ErrorContains(t, err, errors.PromiseAttributeResolveError, i)

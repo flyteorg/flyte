@@ -349,10 +349,10 @@ func TestValidateBindings(t *testing.T) {
 							NodeId: "n2",
 							AttrPath: []*core.PromiseAttribute{
 								{
-									Value: &core.PromiseAttribute_StringValue{"x"},
+									Value: &core.PromiseAttribute_StringValue{StringValue: "x"},
 								},
 								{
-									Value: &core.PromiseAttribute_IntValue{0},
+									Value: &core.PromiseAttribute_IntValue{IntValue: 0},
 								},
 							},
 						},
@@ -425,10 +425,10 @@ func TestValidateBindings(t *testing.T) {
 							NodeId: "n2",
 							AttrPath: []*core.PromiseAttribute{
 								{
-									Value: &core.PromiseAttribute_StringValue{"x"},
+									Value: &core.PromiseAttribute_StringValue{StringValue: "x"},
 								},
 								{
-									Value: &core.PromiseAttribute_IntValue{0},
+									Value: &core.PromiseAttribute_IntValue{IntValue: 0},
 								},
 							},
 						},
