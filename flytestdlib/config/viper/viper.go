@@ -10,23 +10,18 @@ import (
 	"strings"
 	"sync"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
+	"github.com/fsnotify/fsnotify"
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
-
-	stdLibErrs "github.com/flyteorg/flyte/flytestdlib/errors"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	viperLib "github.com/spf13/viper"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/files"
+	stdLibErrs "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/fsnotify/fsnotify"
-	"github.com/mitchellh/mapstructure"
-
-	"github.com/spf13/pflag"
-	viperLib "github.com/spf13/viper"
 )
 
 const (

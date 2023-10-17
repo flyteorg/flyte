@@ -5,25 +5,24 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
+
+	rayv1alpha1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1alpha1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-
+	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	rayv1alpha1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1alpha1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes/scheme"
-
-	v1 "k8s.io/api/core/v1"
-
-	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -400,19 +399,35 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
-	switch rayJob.Status.JobStatus {
-	case rayv1alpha1.JobStatusPending:
-		return pluginsCore.PhaseInfoInitializing(rayJob.Status.StartTime.Time, pluginsCore.DefaultPhaseVersion, "job is pending", info), nil
-	case rayv1alpha1.JobStatusFailed:
-		reason := fmt.Sprintf("Failed to create Ray job: %s", rayJob.Name)
-		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
-	case rayv1alpha1.JobStatusSucceeded:
-		return pluginsCore.PhaseInfoSuccess(info), nil
-	case rayv1alpha1.JobStatusRunning:
-		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+	if len(rayJob.Status.JobDeploymentStatus) == 0 {
+		return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
 	}
 
-	return pluginsCore.PhaseInfoQueued(rayJob.CreationTimestamp.Time, pluginsCore.DefaultPhaseVersion, "JobCreated"), nil
+	// Kuberay creates a Ray cluster first, and then submits a Ray job to the cluster
+	switch rayJob.Status.JobDeploymentStatus {
+	case rayv1alpha1.JobDeploymentStatusInitializing:
+		return pluginsCore.PhaseInfoInitializing(rayJob.CreationTimestamp.Time, pluginsCore.DefaultPhaseVersion, "cluster is creating", info), nil
+	case rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster:
+		reason := fmt.Sprintf("Failed to create Ray cluster %s with error: %s", rayJob.Name, rayJob.Status.Message)
+		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
+	case rayv1alpha1.JobDeploymentStatusFailedJobDeploy:
+		reason := fmt.Sprintf("Failed to submit Ray job %s with error: %s", rayJob.Name, rayJob.Status.Message)
+		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
+	case rayv1alpha1.JobDeploymentStatusWaitForDashboard:
+		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+	case rayv1alpha1.JobDeploymentStatusRunning, rayv1alpha1.JobDeploymentStatusComplete:
+		switch rayJob.Status.JobStatus {
+		case rayv1alpha1.JobStatusFailed:
+			reason := fmt.Sprintf("Failed to run Ray job %s with error: %s", rayJob.Name, rayJob.Status.Message)
+			return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
+		case rayv1alpha1.JobStatusSucceeded:
+			return pluginsCore.PhaseInfoSuccess(info), nil
+		case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusRunning:
+			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+		}
+	}
+
+	return pluginsCore.PhaseInfoUndefined, nil
 }
 
 func init() {

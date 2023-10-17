@@ -6,9 +6,9 @@ import (
 	"encoding/gob"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
 )
 
 // A test to demonstrate how to unmarshal a serialized state from a workflow CRD.

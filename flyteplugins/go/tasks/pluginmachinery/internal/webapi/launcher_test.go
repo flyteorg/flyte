@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_launch(t *testing.T) {

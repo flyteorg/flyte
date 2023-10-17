@@ -14,14 +14,14 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/jackc/pgconn"
+	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
+	"gorm.io/gorm"
+
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/prometheus/client_golang/prometheus"
-
-	"github.com/jackc/pgconn"
-	"google.golang.org/grpc/codes"
-	"gorm.io/gorm"
 )
 
 // Postgres error codes
