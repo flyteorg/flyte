@@ -7,13 +7,14 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/resolver"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
