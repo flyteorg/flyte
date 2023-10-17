@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/manager/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
+
+	"github.com/flyteorg/flyte/flytepropeller/manager/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 var (

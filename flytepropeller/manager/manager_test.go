@@ -7,21 +7,20 @@ import (
 	"testing"
 	"time"
 
-	managerConfig "github.com/flyteorg/flyte/flytepropeller/manager/config"
-	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	leader "github.com/flyteorg/flyte/flytepropeller/pkg/leaderelection"
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"k8s.io/client-go/tools/leaderelection"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
+	"k8s.io/client-go/tools/leaderelection"
 
+	managerConfig "github.com/flyteorg/flyte/flytepropeller/manager/config"
 	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy"
 	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy/mocks"
+	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	leader "github.com/flyteorg/flyte/flytepropeller/pkg/leaderelection"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
