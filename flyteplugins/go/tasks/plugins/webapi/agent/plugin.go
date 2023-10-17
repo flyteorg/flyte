@@ -110,7 +110,6 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (ph
 	}
 
 	return p.Status(ctx, pluginContext{TaskExecutionContext: taskCtx, resource: resource})
-
 }
 
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,

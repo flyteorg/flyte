@@ -111,7 +111,7 @@ func init() {
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(webapi.PluginEntry{
 		ID:                 "service-a",
 		SupportedTaskTypes: []core.TaskType{"my-task"},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
 			return NewPlugin(ctx, GetConfig(), iCtx.MetricsScope())
 		},
 		IsDefault:           false,

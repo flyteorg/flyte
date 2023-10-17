@@ -10,7 +10,6 @@ import (
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
@@ -24,7 +23,7 @@ import (
 
 func TestDo(t *testing.T) {
 	tCtx := getTaskContext(t)
-	taskReader := new(mocks.TaskReader)
+	taskReader := new(pluginCoreMocks.TaskReader)
 
 	template := flyteIdlCore.TaskTemplate{
 		Type: "api_task",
@@ -143,10 +142,6 @@ func TestPlugin(t *testing.T) {
 		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.NotEqual(t, context.TODO(), ctx)
 	})
-
-	// t.Run("test Do Function", func(t *testing.T) {
-	// 	taskContext := new(webapiPlugin.StatusContext)
-	// })
 
 	t.Run("test PENDING Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
