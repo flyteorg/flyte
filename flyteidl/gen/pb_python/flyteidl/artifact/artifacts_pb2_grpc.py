@@ -54,6 +54,11 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.FromString,
                 )
+        self.HandleCloudEvent = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/HandleCloudEvent',
+                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.CloudEventRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.CloudEventResponse.FromString,
+                )
 
 
 class ArtifactRegistryServicer(object):
@@ -107,6 +112,12 @@ class ArtifactRegistryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def HandleCloudEvent(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ArtifactRegistryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -149,6 +160,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.RegisterConsumer,
                     request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.FromString,
                     response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.SerializeToString,
+            ),
+            'HandleCloudEvent': grpc.unary_unary_rpc_method_handler(
+                    servicer.HandleCloudEvent,
+                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.CloudEventRequest.FromString,
+                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.CloudEventResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -293,5 +309,22 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/RegisterConsumer',
             flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.SerializeToString,
             flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def HandleCloudEvent(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/HandleCloudEvent',
+            flyteidl_dot_artifact_dot_artifacts__pb2.CloudEventRequest.SerializeToString,
+            flyteidl_dot_artifact_dot_artifacts__pb2.CloudEventResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

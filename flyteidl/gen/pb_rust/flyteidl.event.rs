@@ -408,6 +408,9 @@ pub struct CloudEventWorkflowExecution {
     pub parent_node_execution: ::core::option::Option<super::core::NodeExecutionIdentifier>,
     #[prost(message, optional, tag="8")]
     pub reference_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    /// gatepr: Add the workflow id where this originated from
+    #[prost(message, optional, tag="9")]
+    pub workflow_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -438,6 +441,11 @@ pub struct CloudEventTaskExecution {
     pub parent_node_execution: ::core::option::Option<super::core::NodeExecutionIdentifier>,
     #[prost(message, optional, tag="8")]
     pub reference_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    /// gatepr: Add the workflow id where this originated from
+    /// The originating Task ID is in the TaskExecutionEvent but the
+    /// workflow ID is not.
+    #[prost(message, optional, tag="9")]
+    pub workflow_id: ::core::option::Option<super::core::Identifier>,
 }
 /// This event is to be sent by Admin after it creates an execution.
 #[allow(clippy::derive_partial_eq_without_eq)]

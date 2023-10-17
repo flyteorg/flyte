@@ -265,8 +265,6 @@ func (m *ArtifactSpec) Validate() error {
 
 	// no validation rules for ShortDescription
 
-	// no validation rules for LongDescription
-
 	if v, ok := interface{}(m.GetUserMetadata()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ArtifactSpecValidationError{
@@ -1717,3 +1715,177 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RegisterResponseValidationError{}
+
+// Validate checks the field values on CloudEventRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *CloudEventRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	switch m.Event.(type) {
+
+	case *CloudEventRequest_WorkflowExecutionEvent:
+
+		if v, ok := interface{}(m.GetWorkflowExecutionEvent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CloudEventRequestValidationError{
+					field:  "WorkflowExecutionEvent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *CloudEventRequest_TaskExecutionEvent:
+
+		if v, ok := interface{}(m.GetTaskExecutionEvent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CloudEventRequestValidationError{
+					field:  "TaskExecutionEvent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *CloudEventRequest_NodeExecutionEvent:
+
+		if v, ok := interface{}(m.GetNodeExecutionEvent()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CloudEventRequestValidationError{
+					field:  "NodeExecutionEvent",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// CloudEventRequestValidationError is the validation error returned by
+// CloudEventRequest.Validate if the designated constraints aren't met.
+type CloudEventRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CloudEventRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CloudEventRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CloudEventRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CloudEventRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CloudEventRequestValidationError) ErrorName() string {
+	return "CloudEventRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CloudEventRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCloudEventRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CloudEventRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CloudEventRequestValidationError{}
+
+// Validate checks the field values on CloudEventResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CloudEventResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// CloudEventResponseValidationError is the validation error returned by
+// CloudEventResponse.Validate if the designated constraints aren't met.
+type CloudEventResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CloudEventResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CloudEventResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CloudEventResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CloudEventResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CloudEventResponseValidationError) ErrorName() string {
+	return "CloudEventResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CloudEventResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCloudEventResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CloudEventResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CloudEventResponseValidationError{}

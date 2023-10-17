@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type CoreService struct {
@@ -58,4 +59,16 @@ func (c *CoreService) RegisterConsumer(ctx context.Context, request *artifact.Re
 
 func (c *CoreService) SearchArtifacts(ctx context.Context, request *artifact.SearchArtifactsRequest) (*artifact.SearchArtifactsResponse, error) {
 	return &artifact.SearchArtifactsResponse{}, nil
+}
+
+// HandleCloudEvent is the stand-in for simple open-source handling of the event stream, rather than using
+// a real
+func (c *CoreService) HandleCloudEvent(ctx context.Context, request *artifact.CloudEventRequest) (*artifact.CloudEventResponse, error) {
+	return &artifact.CloudEventResponse{}, nil
+}
+
+func NewCoreService(storage StorageInterface, _ promutils.Scope) CoreService {
+	return CoreService{
+		Storage: storage,
+	}
 }

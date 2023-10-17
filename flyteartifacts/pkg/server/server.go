@@ -22,13 +22,16 @@ type ArtifactService struct {
 	Service         CoreService
 }
 
-func NewArtifactService(scope promutils.Scope) *ArtifactService {
+func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactService {
 	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
 	fmt.Println(cfg)
 
+	storage := db.NewStorage(ctx, scope.NewSubScope("storage:rds"))
+	coreService := NewCoreService(storage, scope.NewSubScope("server"))
+
 	return &ArtifactService{
 		Metrics: InitMetrics(scope),
-		Service: CoreService{},
+		Service: coreService,
 	}
 }
 
@@ -41,7 +44,7 @@ func HttpRegistrationHook(ctx context.Context, gwmux *runtime.ServeMux, grpcAddr
 }
 
 func GrpcRegistrationHook(ctx context.Context, server *grpc.Server, scope promutils.Scope) error {
-	serviceImpl := NewArtifactService(scope)
+	serviceImpl := NewArtifactService(ctx, scope)
 	artifact.RegisterArtifactRegistryServer(server, serviceImpl)
 
 	return nil

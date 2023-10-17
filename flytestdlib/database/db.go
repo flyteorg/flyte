@@ -19,7 +19,7 @@ func GetDB(ctx context.Context, dbConfig *DbConfig, logConfig *logger.Config) (
 	}
 	gormConfig := &gorm.Config{
 		Logger:                                   GetGormLogger(ctx, logConfig),
-		DisableForeignKeyConstraintWhenMigrating: !dbConfig.EnableForeignKeyConstraintWhenMigrating,
+		DisableForeignKeyConstraintWhenMigrating: false,
 	}
 
 	var gormDb *gorm.DB

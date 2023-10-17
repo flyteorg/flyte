@@ -147,6 +147,31 @@ public final class Cloudevents {
      * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 8;</code>
      */
     flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getReferenceExecutionOrBuilder();
+
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    boolean hasWorkflowId();
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId();
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder();
   }
   /**
    * <pre>
@@ -289,6 +314,19 @@ public final class Cloudevents {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(referenceExecution_);
                 referenceExecution_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 74: {
+              flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
+              if (workflowId_ != null) {
+                subBuilder = workflowId_.toBuilder();
+              }
+              workflowId_ = input.readMessage(flyteidl.core.IdentifierOuterClass.Identifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(workflowId_);
+                workflowId_ = subBuilder.buildPartial();
               }
 
               break;
@@ -526,6 +564,39 @@ public final class Cloudevents {
       return getReferenceExecution();
     }
 
+    public static final int WORKFLOW_ID_FIELD_NUMBER = 9;
+    private flyteidl.core.IdentifierOuterClass.Identifier workflowId_;
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    public boolean hasWorkflowId() {
+      return workflowId_ != null;
+    }
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId() {
+      return workflowId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
+    }
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder() {
+      return getWorkflowId();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -563,6 +634,9 @@ public final class Cloudevents {
       }
       if (referenceExecution_ != null) {
         output.writeMessage(8, getReferenceExecution());
+      }
+      if (workflowId_ != null) {
+        output.writeMessage(9, getWorkflowId());
       }
       unknownFields.writeTo(output);
     }
@@ -604,6 +678,10 @@ public final class Cloudevents {
       if (referenceExecution_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, getReferenceExecution());
+      }
+      if (workflowId_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, getWorkflowId());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -657,6 +735,11 @@ public final class Cloudevents {
         if (!getReferenceExecution()
             .equals(other.getReferenceExecution())) return false;
       }
+      if (hasWorkflowId() != other.hasWorkflowId()) return false;
+      if (hasWorkflowId()) {
+        if (!getWorkflowId()
+            .equals(other.getWorkflowId())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -699,6 +782,10 @@ public final class Cloudevents {
       if (hasReferenceExecution()) {
         hash = (37 * hash) + REFERENCE_EXECUTION_FIELD_NUMBER;
         hash = (53 * hash) + getReferenceExecution().hashCode();
+      }
+      if (hasWorkflowId()) {
+        hash = (37 * hash) + WORKFLOW_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getWorkflowId().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -887,6 +974,12 @@ public final class Cloudevents {
           referenceExecution_ = null;
           referenceExecutionBuilder_ = null;
         }
+        if (workflowIdBuilder_ == null) {
+          workflowId_ = null;
+        } else {
+          workflowId_ = null;
+          workflowIdBuilder_ = null;
+        }
         return this;
       }
 
@@ -958,6 +1051,11 @@ public final class Cloudevents {
           result.referenceExecution_ = referenceExecution_;
         } else {
           result.referenceExecution_ = referenceExecutionBuilder_.build();
+        }
+        if (workflowIdBuilder_ == null) {
+          result.workflowId_ = workflowId_;
+        } else {
+          result.workflowId_ = workflowIdBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -1054,6 +1152,9 @@ public final class Cloudevents {
         }
         if (other.hasReferenceExecution()) {
           mergeReferenceExecution(other.getReferenceExecution());
+        }
+        if (other.hasWorkflowId()) {
+          mergeWorkflowId(other.getWorkflowId());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2188,6 +2289,159 @@ public final class Cloudevents {
         }
         return referenceExecutionBuilder_;
       }
+
+      private flyteidl.core.IdentifierOuterClass.Identifier workflowId_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> workflowIdBuilder_;
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public boolean hasWorkflowId() {
+        return workflowIdBuilder_ != null || workflowId_ != null;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId() {
+        if (workflowIdBuilder_ == null) {
+          return workflowId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
+        } else {
+          return workflowIdBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder setWorkflowId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (workflowIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          workflowId_ = value;
+          onChanged();
+        } else {
+          workflowIdBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder setWorkflowId(
+          flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
+        if (workflowIdBuilder_ == null) {
+          workflowId_ = builderForValue.build();
+          onChanged();
+        } else {
+          workflowIdBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder mergeWorkflowId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (workflowIdBuilder_ == null) {
+          if (workflowId_ != null) {
+            workflowId_ =
+              flyteidl.core.IdentifierOuterClass.Identifier.newBuilder(workflowId_).mergeFrom(value).buildPartial();
+          } else {
+            workflowId_ = value;
+          }
+          onChanged();
+        } else {
+          workflowIdBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder clearWorkflowId() {
+        if (workflowIdBuilder_ == null) {
+          workflowId_ = null;
+          onChanged();
+        } else {
+          workflowId_ = null;
+          workflowIdBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier.Builder getWorkflowIdBuilder() {
+        
+        onChanged();
+        return getWorkflowIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder() {
+        if (workflowIdBuilder_ != null) {
+          return workflowIdBuilder_.getMessageOrBuilder();
+        } else {
+          return workflowId_ == null ?
+              flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
+        }
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
+          getWorkflowIdFieldBuilder() {
+        if (workflowIdBuilder_ == null) {
+          workflowIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder>(
+                  getWorkflowId(),
+                  getParentForChildren(),
+                  isClean());
+          workflowId_ = null;
+        }
+        return workflowIdBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -3004,6 +3258,37 @@ public final class Cloudevents {
      * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 8;</code>
      */
     flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getReferenceExecutionOrBuilder();
+
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * The originating Task ID is in the TaskExecutionEvent but the
+     * workflow ID is not.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    boolean hasWorkflowId();
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * The originating Task ID is in the TaskExecutionEvent but the
+     * workflow ID is not.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId();
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * The originating Task ID is in the TaskExecutionEvent but the
+     * workflow ID is not.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.event.CloudEventTaskExecution}
@@ -3141,6 +3426,19 @@ public final class Cloudevents {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(referenceExecution_);
                 referenceExecution_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 74: {
+              flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
+              if (workflowId_ != null) {
+                subBuilder = workflowId_.toBuilder();
+              }
+              workflowId_ = input.readMessage(flyteidl.core.IdentifierOuterClass.Identifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(workflowId_);
+                workflowId_ = subBuilder.buildPartial();
               }
 
               break;
@@ -3402,6 +3700,45 @@ public final class Cloudevents {
       return getReferenceExecution();
     }
 
+    public static final int WORKFLOW_ID_FIELD_NUMBER = 9;
+    private flyteidl.core.IdentifierOuterClass.Identifier workflowId_;
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * The originating Task ID is in the TaskExecutionEvent but the
+     * workflow ID is not.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    public boolean hasWorkflowId() {
+      return workflowId_ != null;
+    }
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * The originating Task ID is in the TaskExecutionEvent but the
+     * workflow ID is not.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId() {
+      return workflowId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
+    }
+    /**
+     * <pre>
+     * gatepr: Add the workflow id where this originated from
+     * The originating Task ID is in the TaskExecutionEvent but the
+     * workflow ID is not.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder() {
+      return getWorkflowId();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3439,6 +3776,9 @@ public final class Cloudevents {
       }
       if (referenceExecution_ != null) {
         output.writeMessage(8, getReferenceExecution());
+      }
+      if (workflowId_ != null) {
+        output.writeMessage(9, getWorkflowId());
       }
       unknownFields.writeTo(output);
     }
@@ -3480,6 +3820,10 @@ public final class Cloudevents {
       if (referenceExecution_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, getReferenceExecution());
+      }
+      if (workflowId_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, getWorkflowId());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3533,6 +3877,11 @@ public final class Cloudevents {
         if (!getReferenceExecution()
             .equals(other.getReferenceExecution())) return false;
       }
+      if (hasWorkflowId() != other.hasWorkflowId()) return false;
+      if (hasWorkflowId()) {
+        if (!getWorkflowId()
+            .equals(other.getWorkflowId())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3575,6 +3924,10 @@ public final class Cloudevents {
       if (hasReferenceExecution()) {
         hash = (37 * hash) + REFERENCE_EXECUTION_FIELD_NUMBER;
         hash = (53 * hash) + getReferenceExecution().hashCode();
+      }
+      if (hasWorkflowId()) {
+        hash = (37 * hash) + WORKFLOW_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getWorkflowId().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -3758,6 +4111,12 @@ public final class Cloudevents {
           referenceExecution_ = null;
           referenceExecutionBuilder_ = null;
         }
+        if (workflowIdBuilder_ == null) {
+          workflowId_ = null;
+        } else {
+          workflowId_ = null;
+          workflowIdBuilder_ = null;
+        }
         return this;
       }
 
@@ -3829,6 +4188,11 @@ public final class Cloudevents {
           result.referenceExecution_ = referenceExecution_;
         } else {
           result.referenceExecution_ = referenceExecutionBuilder_.build();
+        }
+        if (workflowIdBuilder_ == null) {
+          result.workflowId_ = workflowId_;
+        } else {
+          result.workflowId_ = workflowIdBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -3925,6 +4289,9 @@ public final class Cloudevents {
         }
         if (other.hasReferenceExecution()) {
           mergeReferenceExecution(other.getReferenceExecution());
+        }
+        if (other.hasWorkflowId()) {
+          mergeWorkflowId(other.getWorkflowId());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -5130,6 +5497,177 @@ public final class Cloudevents {
           referenceExecution_ = null;
         }
         return referenceExecutionBuilder_;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.Identifier workflowId_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> workflowIdBuilder_;
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public boolean hasWorkflowId() {
+        return workflowIdBuilder_ != null || workflowId_ != null;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId() {
+        if (workflowIdBuilder_ == null) {
+          return workflowId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
+        } else {
+          return workflowIdBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder setWorkflowId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (workflowIdBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          workflowId_ = value;
+          onChanged();
+        } else {
+          workflowIdBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder setWorkflowId(
+          flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
+        if (workflowIdBuilder_ == null) {
+          workflowId_ = builderForValue.build();
+          onChanged();
+        } else {
+          workflowIdBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder mergeWorkflowId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (workflowIdBuilder_ == null) {
+          if (workflowId_ != null) {
+            workflowId_ =
+              flyteidl.core.IdentifierOuterClass.Identifier.newBuilder(workflowId_).mergeFrom(value).buildPartial();
+          } else {
+            workflowId_ = value;
+          }
+          onChanged();
+        } else {
+          workflowIdBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public Builder clearWorkflowId() {
+        if (workflowIdBuilder_ == null) {
+          workflowId_ = null;
+          onChanged();
+        } else {
+          workflowId_ = null;
+          workflowIdBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier.Builder getWorkflowIdBuilder() {
+        
+        onChanged();
+        return getWorkflowIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder() {
+        if (workflowIdBuilder_ != null) {
+          return workflowIdBuilder_.getMessageOrBuilder();
+        } else {
+          return workflowId_ == null ?
+              flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
+        }
+      }
+      /**
+       * <pre>
+       * gatepr: Add the workflow id where this originated from
+       * The originating Task ID is in the TaskExecutionEvent but the
+       * workflow ID is not.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier workflow_id = 9;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
+          getWorkflowIdFieldBuilder() {
+        if (workflowIdBuilder_ == null) {
+          workflowIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder>(
+                  getWorkflowId(),
+                  getParentForChildren(),
+                  isClean());
+          workflowId_ = null;
+        }
+        return workflowIdBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -7081,7 +7619,7 @@ public final class Cloudevents {
       "flyteidl/core/literals.proto\032\035flyteidl/c" +
       "ore/interface.proto\032\037flyteidl/core/artif" +
       "act_id.proto\032\036flyteidl/core/identifier.p" +
-      "roto\032\037google/protobuf/timestamp.proto\"\343\003" +
+      "roto\032\037google/protobuf/timestamp.proto\"\223\004" +
       "\n\033CloudEventWorkflowExecution\0229\n\traw_eve" +
       "nt\030\001 \001(\0132&.flyteidl.event.WorkflowExecut" +
       "ionEvent\022.\n\013output_data\030\002 \001(\0132\031.flyteidl" +
@@ -7094,29 +7632,31 @@ public final class Cloudevents {
       "tion\030\007 \001(\0132&.flyteidl.core.NodeExecution" +
       "Identifier\022G\n\023reference_execution\030\010 \001(\0132" +
       "*.flyteidl.core.WorkflowExecutionIdentif" +
-      "ier\"P\n\027CloudEventNodeExecution\0225\n\traw_ev" +
-      "ent\030\001 \001(\0132\".flyteidl.event.NodeExecution" +
-      "Event\"\333\003\n\027CloudEventTaskExecution\0225\n\traw" +
-      "_event\030\001 \001(\0132\".flyteidl.event.TaskExecut" +
-      "ionEvent\022.\n\013output_data\030\002 \001(\0132\031.flyteidl" +
-      ".core.LiteralMap\0227\n\020output_interface\030\003 \001" +
-      "(\0132\035.flyteidl.core.TypedInterface\022-\n\ninp" +
-      "ut_data\030\004 \001(\0132\031.flyteidl.core.LiteralMap" +
-      "\0220\n\014scheduled_at\030\005 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022/\n\014artifact_ids\030\006 \003(\0132\031.flyte" +
-      "idl.core.ArtifactID\022E\n\025parent_node_execu" +
-      "tion\030\007 \001(\0132&.flyteidl.core.NodeExecution" +
-      "Identifier\022G\n\023reference_execution\030\010 \001(\0132" +
-      "*.flyteidl.core.WorkflowExecutionIdentif" +
-      "ier\"\207\002\n\030CloudEventExecutionStart\022@\n\014exec" +
-      "ution_id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
-      "xecutionIdentifier\0221\n\016launch_plan_id\030\002 \001" +
-      "(\0132\031.flyteidl.core.Identifier\022.\n\013workflo" +
-      "w_id\030\003 \001(\0132\031.flyteidl.core.Identifier\022/\n" +
-      "\014artifact_ids\030\004 \003(\0132\031.flyteidl.core.Arti" +
-      "factID\022\025\n\rartifact_keys\030\005 \003(\tB=Z;github." +
-      "com/flyteorg/flyte/flyteidl/gen/pb-go/fl" +
-      "yteidl/eventb\006proto3"
+      "ier\022.\n\013workflow_id\030\t \001(\0132\031.flyteidl.core" +
+      ".Identifier\"P\n\027CloudEventNodeExecution\0225" +
+      "\n\traw_event\030\001 \001(\0132\".flyteidl.event.NodeE" +
+      "xecutionEvent\"\213\004\n\027CloudEventTaskExecutio" +
+      "n\0225\n\traw_event\030\001 \001(\0132\".flyteidl.event.Ta" +
+      "skExecutionEvent\022.\n\013output_data\030\002 \001(\0132\031." +
+      "flyteidl.core.LiteralMap\0227\n\020output_inter" +
+      "face\030\003 \001(\0132\035.flyteidl.core.TypedInterfac" +
+      "e\022-\n\ninput_data\030\004 \001(\0132\031.flyteidl.core.Li" +
+      "teralMap\0220\n\014scheduled_at\030\005 \001(\0132\032.google." +
+      "protobuf.Timestamp\022/\n\014artifact_ids\030\006 \003(\013" +
+      "2\031.flyteidl.core.ArtifactID\022E\n\025parent_no" +
+      "de_execution\030\007 \001(\0132&.flyteidl.core.NodeE" +
+      "xecutionIdentifier\022G\n\023reference_executio" +
+      "n\030\010 \001(\0132*.flyteidl.core.WorkflowExecutio" +
+      "nIdentifier\022.\n\013workflow_id\030\t \001(\0132\031.flyte" +
+      "idl.core.Identifier\"\207\002\n\030CloudEventExecut" +
+      "ionStart\022@\n\014execution_id\030\001 \001(\0132*.flyteid" +
+      "l.core.WorkflowExecutionIdentifier\0221\n\016la" +
+      "unch_plan_id\030\002 \001(\0132\031.flyteidl.core.Ident" +
+      "ifier\022.\n\013workflow_id\030\003 \001(\0132\031.flyteidl.co" +
+      "re.Identifier\022/\n\014artifact_ids\030\004 \003(\0132\031.fl" +
+      "yteidl.core.ArtifactID\022\025\n\rartifact_keys\030" +
+      "\005 \003(\tB=Z;github.com/flyteorg/flyte/flyte" +
+      "idl/gen/pb-go/flyteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7141,7 +7681,7 @@ public final class Cloudevents {
     internal_static_flyteidl_event_CloudEventWorkflowExecution_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventWorkflowExecution_descriptor,
-        new java.lang.String[] { "RawEvent", "OutputData", "OutputInterface", "InputData", "ScheduledAt", "ArtifactIds", "ParentNodeExecution", "ReferenceExecution", });
+        new java.lang.String[] { "RawEvent", "OutputData", "OutputInterface", "InputData", "ScheduledAt", "ArtifactIds", "ParentNodeExecution", "ReferenceExecution", "WorkflowId", });
     internal_static_flyteidl_event_CloudEventNodeExecution_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_event_CloudEventNodeExecution_fieldAccessorTable = new
@@ -7153,7 +7693,7 @@ public final class Cloudevents {
     internal_static_flyteidl_event_CloudEventTaskExecution_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventTaskExecution_descriptor,
-        new java.lang.String[] { "RawEvent", "OutputData", "OutputInterface", "InputData", "ScheduledAt", "ArtifactIds", "ParentNodeExecution", "ReferenceExecution", });
+        new java.lang.String[] { "RawEvent", "OutputData", "OutputInterface", "InputData", "ScheduledAt", "ArtifactIds", "ParentNodeExecution", "ReferenceExecution", "WorkflowId", });
     internal_static_flyteidl_event_CloudEventExecutionStart_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_event_CloudEventExecutionStart_fieldAccessorTable = new

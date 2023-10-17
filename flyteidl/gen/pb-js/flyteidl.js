@@ -17581,6 +17581,7 @@
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventWorkflowExecution artifactIds
                  * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventWorkflowExecution parentNodeExecution
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventWorkflowExecution referenceExecution
+                 * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventWorkflowExecution workflowId
                  */
     
                 /**
@@ -17664,6 +17665,14 @@
                 CloudEventWorkflowExecution.prototype.referenceExecution = null;
     
                 /**
+                 * CloudEventWorkflowExecution workflowId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} workflowId
+                 * @memberof flyteidl.event.CloudEventWorkflowExecution
+                 * @instance
+                 */
+                CloudEventWorkflowExecution.prototype.workflowId = null;
+    
+                /**
                  * Creates a new CloudEventWorkflowExecution instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.CloudEventWorkflowExecution
@@ -17704,6 +17713,8 @@
                         $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
+                        $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -17750,6 +17761,9 @@
                             break;
                         case 8:
                             message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.workflowId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17813,6 +17827,11 @@
                         var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.referenceExecution);
                         if (error)
                             return "referenceExecution." + error;
+                    }
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.workflowId);
+                        if (error)
+                            return "workflowId." + error;
                     }
                     return null;
                 };
@@ -17946,6 +17965,7 @@
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventTaskExecution artifactIds
                  * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventTaskExecution parentNodeExecution
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventTaskExecution referenceExecution
+                 * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventTaskExecution workflowId
                  */
     
                 /**
@@ -18029,6 +18049,14 @@
                 CloudEventTaskExecution.prototype.referenceExecution = null;
     
                 /**
+                 * CloudEventTaskExecution workflowId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} workflowId
+                 * @memberof flyteidl.event.CloudEventTaskExecution
+                 * @instance
+                 */
+                CloudEventTaskExecution.prototype.workflowId = null;
+    
+                /**
                  * Creates a new CloudEventTaskExecution instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.CloudEventTaskExecution
@@ -18069,6 +18097,8 @@
                         $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
+                        $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -18115,6 +18145,9 @@
                             break;
                         case 8:
                             message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.workflowId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18178,6 +18211,11 @@
                         var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.referenceExecution);
                         if (error)
                             return "referenceExecution." + error;
+                    }
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.workflowId);
+                        if (error)
+                            return "workflowId." + error;
                     }
                     return null;
                 };
@@ -52315,7 +52353,6 @@
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [execution] ArtifactSpec execution
                  * @property {string|null} [principal] ArtifactSpec principal
                  * @property {string|null} [shortDescription] ArtifactSpec shortDescription
-                 * @property {string|null} [longDescription] ArtifactSpec longDescription
                  * @property {google.protobuf.IAny|null} [userMetadata] ArtifactSpec userMetadata
                  * @property {string|null} [metadataType] ArtifactSpec metadataType
                  */
@@ -52384,14 +52421,6 @@
                 ArtifactSpec.prototype.shortDescription = "";
     
                 /**
-                 * ArtifactSpec longDescription.
-                 * @member {string} longDescription
-                 * @memberof flyteidl.artifact.ArtifactSpec
-                 * @instance
-                 */
-                ArtifactSpec.prototype.longDescription = "";
-    
-                /**
                  * ArtifactSpec userMetadata.
                  * @member {google.protobuf.IAny|null|undefined} userMetadata
                  * @memberof flyteidl.artifact.ArtifactSpec
@@ -52443,8 +52472,6 @@
                         writer.uint32(/* id 7, wireType 2 =*/58).string(message.principal);
                     if (message.shortDescription != null && message.hasOwnProperty("shortDescription"))
                         writer.uint32(/* id 8, wireType 2 =*/66).string(message.shortDescription);
-                    if (message.longDescription != null && message.hasOwnProperty("longDescription"))
-                        writer.uint32(/* id 9, wireType 2 =*/74).string(message.longDescription);
                     if (message.userMetadata != null && message.hasOwnProperty("userMetadata"))
                         $root.google.protobuf.Any.encode(message.userMetadata, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     if (message.metadataType != null && message.hasOwnProperty("metadataType"))
@@ -52487,9 +52514,6 @@
                             break;
                         case 8:
                             message.shortDescription = reader.string();
-                            break;
-                        case 9:
-                            message.longDescription = reader.string();
                             break;
                         case 10:
                             message.userMetadata = $root.google.protobuf.Any.decode(reader, reader.uint32());
@@ -52542,9 +52566,6 @@
                     if (message.shortDescription != null && message.hasOwnProperty("shortDescription"))
                         if (!$util.isString(message.shortDescription))
                             return "shortDescription: string expected";
-                    if (message.longDescription != null && message.hasOwnProperty("longDescription"))
-                        if (!$util.isString(message.longDescription))
-                            return "longDescription: string expected";
                     if (message.userMetadata != null && message.hasOwnProperty("userMetadata")) {
                         var error = $root.google.protobuf.Any.verify(message.userMetadata);
                         if (error)
@@ -54686,6 +54707,277 @@
                 return RegisterResponse;
             })();
     
+            artifact.CloudEventRequest = (function() {
+    
+                /**
+                 * Properties of a CloudEventRequest.
+                 * @memberof flyteidl.artifact
+                 * @interface ICloudEventRequest
+                 * @property {flyteidl.event.ICloudEventWorkflowExecution|null} [workflowExecutionEvent] CloudEventRequest workflowExecutionEvent
+                 * @property {flyteidl.event.ICloudEventTaskExecution|null} [taskExecutionEvent] CloudEventRequest taskExecutionEvent
+                 * @property {flyteidl.event.ICloudEventNodeExecution|null} [nodeExecutionEvent] CloudEventRequest nodeExecutionEvent
+                 */
+    
+                /**
+                 * Constructs a new CloudEventRequest.
+                 * @memberof flyteidl.artifact
+                 * @classdesc Represents a CloudEventRequest.
+                 * @implements ICloudEventRequest
+                 * @constructor
+                 * @param {flyteidl.artifact.ICloudEventRequest=} [properties] Properties to set
+                 */
+                function CloudEventRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * CloudEventRequest workflowExecutionEvent.
+                 * @member {flyteidl.event.ICloudEventWorkflowExecution|null|undefined} workflowExecutionEvent
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @instance
+                 */
+                CloudEventRequest.prototype.workflowExecutionEvent = null;
+    
+                /**
+                 * CloudEventRequest taskExecutionEvent.
+                 * @member {flyteidl.event.ICloudEventTaskExecution|null|undefined} taskExecutionEvent
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @instance
+                 */
+                CloudEventRequest.prototype.taskExecutionEvent = null;
+    
+                /**
+                 * CloudEventRequest nodeExecutionEvent.
+                 * @member {flyteidl.event.ICloudEventNodeExecution|null|undefined} nodeExecutionEvent
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @instance
+                 */
+                CloudEventRequest.prototype.nodeExecutionEvent = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * CloudEventRequest event.
+                 * @member {"workflowExecutionEvent"|"taskExecutionEvent"|"nodeExecutionEvent"|undefined} event
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @instance
+                 */
+                Object.defineProperty(CloudEventRequest.prototype, "event", {
+                    get: $util.oneOfGetter($oneOfFields = ["workflowExecutionEvent", "taskExecutionEvent", "nodeExecutionEvent"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new CloudEventRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @static
+                 * @param {flyteidl.artifact.ICloudEventRequest=} [properties] Properties to set
+                 * @returns {flyteidl.artifact.CloudEventRequest} CloudEventRequest instance
+                 */
+                CloudEventRequest.create = function create(properties) {
+                    return new CloudEventRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified CloudEventRequest message. Does not implicitly {@link flyteidl.artifact.CloudEventRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @static
+                 * @param {flyteidl.artifact.ICloudEventRequest} message CloudEventRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                CloudEventRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.workflowExecutionEvent != null && message.hasOwnProperty("workflowExecutionEvent"))
+                        $root.flyteidl.event.CloudEventWorkflowExecution.encode(message.workflowExecutionEvent, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.taskExecutionEvent != null && message.hasOwnProperty("taskExecutionEvent"))
+                        $root.flyteidl.event.CloudEventTaskExecution.encode(message.taskExecutionEvent, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.nodeExecutionEvent != null && message.hasOwnProperty("nodeExecutionEvent"))
+                        $root.flyteidl.event.CloudEventNodeExecution.encode(message.nodeExecutionEvent, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a CloudEventRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.artifact.CloudEventRequest} CloudEventRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                CloudEventRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.artifact.CloudEventRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.workflowExecutionEvent = $root.flyteidl.event.CloudEventWorkflowExecution.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.taskExecutionEvent = $root.flyteidl.event.CloudEventTaskExecution.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.nodeExecutionEvent = $root.flyteidl.event.CloudEventNodeExecution.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a CloudEventRequest message.
+                 * @function verify
+                 * @memberof flyteidl.artifact.CloudEventRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                CloudEventRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.workflowExecutionEvent != null && message.hasOwnProperty("workflowExecutionEvent")) {
+                        properties.event = 1;
+                        {
+                            var error = $root.flyteidl.event.CloudEventWorkflowExecution.verify(message.workflowExecutionEvent);
+                            if (error)
+                                return "workflowExecutionEvent." + error;
+                        }
+                    }
+                    if (message.taskExecutionEvent != null && message.hasOwnProperty("taskExecutionEvent")) {
+                        if (properties.event === 1)
+                            return "event: multiple values";
+                        properties.event = 1;
+                        {
+                            var error = $root.flyteidl.event.CloudEventTaskExecution.verify(message.taskExecutionEvent);
+                            if (error)
+                                return "taskExecutionEvent." + error;
+                        }
+                    }
+                    if (message.nodeExecutionEvent != null && message.hasOwnProperty("nodeExecutionEvent")) {
+                        if (properties.event === 1)
+                            return "event: multiple values";
+                        properties.event = 1;
+                        {
+                            var error = $root.flyteidl.event.CloudEventNodeExecution.verify(message.nodeExecutionEvent);
+                            if (error)
+                                return "nodeExecutionEvent." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return CloudEventRequest;
+            })();
+    
+            artifact.CloudEventResponse = (function() {
+    
+                /**
+                 * Properties of a CloudEventResponse.
+                 * @memberof flyteidl.artifact
+                 * @interface ICloudEventResponse
+                 */
+    
+                /**
+                 * Constructs a new CloudEventResponse.
+                 * @memberof flyteidl.artifact
+                 * @classdesc Represents a CloudEventResponse.
+                 * @implements ICloudEventResponse
+                 * @constructor
+                 * @param {flyteidl.artifact.ICloudEventResponse=} [properties] Properties to set
+                 */
+                function CloudEventResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Creates a new CloudEventResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.artifact.CloudEventResponse
+                 * @static
+                 * @param {flyteidl.artifact.ICloudEventResponse=} [properties] Properties to set
+                 * @returns {flyteidl.artifact.CloudEventResponse} CloudEventResponse instance
+                 */
+                CloudEventResponse.create = function create(properties) {
+                    return new CloudEventResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified CloudEventResponse message. Does not implicitly {@link flyteidl.artifact.CloudEventResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.artifact.CloudEventResponse
+                 * @static
+                 * @param {flyteidl.artifact.ICloudEventResponse} message CloudEventResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                CloudEventResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a CloudEventResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.artifact.CloudEventResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.artifact.CloudEventResponse} CloudEventResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                CloudEventResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.artifact.CloudEventResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a CloudEventResponse message.
+                 * @function verify
+                 * @memberof flyteidl.artifact.CloudEventResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                CloudEventResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    return null;
+                };
+    
+                return CloudEventResponse;
+            })();
+    
             artifact.ArtifactRegistry = (function() {
     
                 /**
@@ -54979,6 +55271,39 @@
                  * @instance
                  * @param {flyteidl.artifact.IRegisterConsumerRequest} request RegisterConsumerRequest message or plain object
                  * @returns {Promise<flyteidl.artifact.RegisterResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.artifact.ArtifactRegistry#handleCloudEvent}.
+                 * @memberof flyteidl.artifact.ArtifactRegistry
+                 * @typedef HandleCloudEventCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.artifact.CloudEventResponse} [response] CloudEventResponse
+                 */
+    
+                /**
+                 * Calls HandleCloudEvent.
+                 * @function handleCloudEvent
+                 * @memberof flyteidl.artifact.ArtifactRegistry
+                 * @instance
+                 * @param {flyteidl.artifact.ICloudEventRequest} request CloudEventRequest message or plain object
+                 * @param {flyteidl.artifact.ArtifactRegistry.HandleCloudEventCallback} callback Node-style callback called with the error, if any, and CloudEventResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(ArtifactRegistry.prototype.handleCloudEvent = function handleCloudEvent(request, callback) {
+                    return this.rpcCall(handleCloudEvent, $root.flyteidl.artifact.CloudEventRequest, $root.flyteidl.artifact.CloudEventResponse, request, callback);
+                }, "name", { value: "HandleCloudEvent" });
+    
+                /**
+                 * Calls HandleCloudEvent.
+                 * @function handleCloudEvent
+                 * @memberof flyteidl.artifact.ArtifactRegistry
+                 * @instance
+                 * @param {flyteidl.artifact.ICloudEventRequest} request CloudEventRequest message or plain object
+                 * @returns {Promise<flyteidl.artifact.CloudEventResponse>} Promise
                  * @variation 2
                  */
     

@@ -12,6 +12,7 @@ import "flyteidl/core/types.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/interface.proto";
+import "flyteidl/event/cloudevents.proto";
 
 
 message Artifact {
@@ -54,7 +55,6 @@ message ArtifactSpec {
   string principal = 7;
 
   string short_description = 8;
-  string long_description = 9;  // todo let's remove this for now
 
   // Additional user metadata
   google.protobuf.Any user_metadata = 10;
@@ -150,6 +150,16 @@ message RegisterConsumerRequest {
 
 message RegisterResponse {}
 
+message CloudEventRequest {
+  oneof event {
+    event.CloudEventWorkflowExecution workflow_execution_event = 1;
+    event.CloudEventTaskExecution task_execution_event = 2;
+    event.CloudEventNodeExecution node_execution_event = 3;
+  }
+}
+
+message CloudEventResponse {}
+
 service ArtifactRegistry {
   rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {
 
@@ -182,4 +192,6 @@ service ArtifactRegistry {
   rpc RegisterProducer(RegisterProducerRequest) returns (RegisterResponse) {}
 
   rpc RegisterConsumer(RegisterConsumerRequest) returns (RegisterResponse) {}
+
+  rpc HandleCloudEvent(CloudEventRequest) returns (CloudEventResponse) {}
 }

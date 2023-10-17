@@ -46,8 +46,6 @@ pub struct ArtifactSpec {
     pub principal: ::prost::alloc::string::String,
     #[prost(string, tag="8")]
     pub short_description: ::prost::alloc::string::String,
-    #[prost(string, tag="9")]
-    pub long_description: ::prost::alloc::string::String,
     /// Additional user metadata
     #[prost(message, optional, tag="10")]
     pub user_metadata: ::core::option::Option<::prost_types::Any>,
@@ -179,5 +177,28 @@ pub struct RegisterConsumerRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct RegisterResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventRequest {
+    #[prost(oneof="cloud_event_request::Event", tags="1, 2, 3")]
+    pub event: ::core::option::Option<cloud_event_request::Event>,
+}
+/// Nested message and enum types in `CloudEventRequest`.
+pub mod cloud_event_request {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Event {
+        #[prost(message, tag="1")]
+        WorkflowExecutionEvent(super::super::event::CloudEventWorkflowExecution),
+        #[prost(message, tag="2")]
+        TaskExecutionEvent(super::super::event::CloudEventTaskExecution),
+        #[prost(message, tag="3")]
+        NodeExecutionEvent(super::super::event::CloudEventNodeExecution),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventResponse {
 }
 // @@protoc_insertion_point(module)

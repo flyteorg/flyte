@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+// CreateArtifactModelFrom is used for converting from an incoming request to a model
 func CreateArtifactModelFrom(key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (models.Artifact, error) {
 
 	if key == nil || spec == nil {

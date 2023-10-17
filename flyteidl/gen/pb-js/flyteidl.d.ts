@@ -7297,6 +7297,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution workflowId */
+            workflowId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventWorkflowExecution. */
@@ -7331,6 +7334,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution workflowId. */
+            public workflowId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -7443,6 +7449,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventTaskExecution workflowId */
+            workflowId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventTaskExecution. */
@@ -7477,6 +7486,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventTaskExecution workflowId. */
+            public workflowId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -22426,9 +22438,6 @@ export namespace flyteidl {
             /** ArtifactSpec shortDescription */
             shortDescription?: (string|null);
 
-            /** ArtifactSpec longDescription */
-            longDescription?: (string|null);
-
             /** ArtifactSpec userMetadata */
             userMetadata?: (google.protobuf.IAny|null);
 
@@ -22462,9 +22471,6 @@ export namespace flyteidl {
 
             /** ArtifactSpec shortDescription. */
             public shortDescription: string;
-
-            /** ArtifactSpec longDescription. */
-            public longDescription: string;
 
             /** ArtifactSpec userMetadata. */
             public userMetadata?: (google.protobuf.IAny|null);
@@ -23471,6 +23477,119 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a CloudEventRequest. */
+        interface ICloudEventRequest {
+
+            /** CloudEventRequest workflowExecutionEvent */
+            workflowExecutionEvent?: (flyteidl.event.ICloudEventWorkflowExecution|null);
+
+            /** CloudEventRequest taskExecutionEvent */
+            taskExecutionEvent?: (flyteidl.event.ICloudEventTaskExecution|null);
+
+            /** CloudEventRequest nodeExecutionEvent */
+            nodeExecutionEvent?: (flyteidl.event.ICloudEventNodeExecution|null);
+        }
+
+        /** Represents a CloudEventRequest. */
+        class CloudEventRequest implements ICloudEventRequest {
+
+            /**
+             * Constructs a new CloudEventRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.artifact.ICloudEventRequest);
+
+            /** CloudEventRequest workflowExecutionEvent. */
+            public workflowExecutionEvent?: (flyteidl.event.ICloudEventWorkflowExecution|null);
+
+            /** CloudEventRequest taskExecutionEvent. */
+            public taskExecutionEvent?: (flyteidl.event.ICloudEventTaskExecution|null);
+
+            /** CloudEventRequest nodeExecutionEvent. */
+            public nodeExecutionEvent?: (flyteidl.event.ICloudEventNodeExecution|null);
+
+            /** CloudEventRequest event. */
+            public event?: ("workflowExecutionEvent"|"taskExecutionEvent"|"nodeExecutionEvent");
+
+            /**
+             * Creates a new CloudEventRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventRequest instance
+             */
+            public static create(properties?: flyteidl.artifact.ICloudEventRequest): flyteidl.artifact.CloudEventRequest;
+
+            /**
+             * Encodes the specified CloudEventRequest message. Does not implicitly {@link flyteidl.artifact.CloudEventRequest.verify|verify} messages.
+             * @param message CloudEventRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.artifact.ICloudEventRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.CloudEventRequest;
+
+            /**
+             * Verifies a CloudEventRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CloudEventResponse. */
+        interface ICloudEventResponse {
+        }
+
+        /** Represents a CloudEventResponse. */
+        class CloudEventResponse implements ICloudEventResponse {
+
+            /**
+             * Constructs a new CloudEventResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.artifact.ICloudEventResponse);
+
+            /**
+             * Creates a new CloudEventResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventResponse instance
+             */
+            public static create(properties?: flyteidl.artifact.ICloudEventResponse): flyteidl.artifact.CloudEventResponse;
+
+            /**
+             * Encodes the specified CloudEventResponse message. Does not implicitly {@link flyteidl.artifact.CloudEventResponse.verify|verify} messages.
+             * @param message CloudEventResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.artifact.ICloudEventResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.CloudEventResponse;
+
+            /**
+             * Verifies a CloudEventResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Represents an ArtifactRegistry */
         class ArtifactRegistry extends $protobuf.rpc.Service {
 
@@ -23602,6 +23721,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public registerConsumer(request: flyteidl.artifact.IRegisterConsumerRequest): Promise<flyteidl.artifact.RegisterResponse>;
+
+            /**
+             * Calls HandleCloudEvent.
+             * @param request CloudEventRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and CloudEventResponse
+             */
+            public handleCloudEvent(request: flyteidl.artifact.ICloudEventRequest, callback: flyteidl.artifact.ArtifactRegistry.HandleCloudEventCallback): void;
+
+            /**
+             * Calls HandleCloudEvent.
+             * @param request CloudEventRequest message or plain object
+             * @returns Promise
+             */
+            public handleCloudEvent(request: flyteidl.artifact.ICloudEventRequest): Promise<flyteidl.artifact.CloudEventResponse>;
         }
 
         namespace ArtifactRegistry {
@@ -23661,6 +23794,13 @@ export namespace flyteidl {
              * @param [response] RegisterResponse
              */
             type RegisterConsumerCallback = (error: (Error|null), response?: flyteidl.artifact.RegisterResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.artifact.ArtifactRegistry#handleCloudEvent}.
+             * @param error Error, if any
+             * @param [response] CloudEventResponse
+             */
+            type HandleCloudEventCallback = (error: (Error|null), response?: flyteidl.artifact.CloudEventResponse) => void;
         }
     }
 }
