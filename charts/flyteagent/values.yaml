@@ -70,9 +70,6 @@ additionalEnvs:
     value: minio
   - name: FLYTE_AWS_SECRET_ACCESS_KEY
     value: miniostorage
-  # - FLYTE_AWS_ENDPOINT: "http://flyte-sandbox-minio.flyte:9000"
-  # - FLYTE_AWS_ACCESS_KEY_ID: "minio"
-  # - FLYTE_AWS_SECRET_ACCESS_KEY: "miniostorage"
 additionalVolumes: []
 # -- Appends additional volume mounts to the main container's spec. May include template values.
 additionalVolumeMounts: []
