@@ -7298,8 +7298,8 @@ export namespace flyteidl {
             /** CloudEventWorkflowExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
 
-            /** CloudEventWorkflowExecution workflowId */
-            workflowId?: (flyteidl.core.IIdentifier|null);
+            /** CloudEventWorkflowExecution launchPlanId */
+            launchPlanId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventWorkflowExecution. */
@@ -7335,8 +7335,8 @@ export namespace flyteidl {
             /** CloudEventWorkflowExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
 
-            /** CloudEventWorkflowExecution workflowId. */
-            public workflowId?: (flyteidl.core.IIdentifier|null);
+            /** CloudEventWorkflowExecution launchPlanId. */
+            public launchPlanId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -7450,8 +7450,8 @@ export namespace flyteidl {
             /** CloudEventTaskExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
 
-            /** CloudEventTaskExecution workflowId */
-            workflowId?: (flyteidl.core.IIdentifier|null);
+            /** CloudEventTaskExecution launchPlanId */
+            launchPlanId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventTaskExecution. */
@@ -7487,8 +7487,8 @@ export namespace flyteidl {
             /** CloudEventTaskExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
 
-            /** CloudEventTaskExecution workflowId. */
-            public workflowId?: (flyteidl.core.IIdentifier|null);
+            /** CloudEventTaskExecution launchPlanId. */
+            public launchPlanId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -23721,20 +23721,6 @@ export namespace flyteidl {
              * @returns Promise
              */
             public registerConsumer(request: flyteidl.artifact.IRegisterConsumerRequest): Promise<flyteidl.artifact.RegisterResponse>;
-
-            /**
-             * Calls HandleCloudEvent.
-             * @param request CloudEventRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and CloudEventResponse
-             */
-            public handleCloudEvent(request: flyteidl.artifact.ICloudEventRequest, callback: flyteidl.artifact.ArtifactRegistry.HandleCloudEventCallback): void;
-
-            /**
-             * Calls HandleCloudEvent.
-             * @param request CloudEventRequest message or plain object
-             * @returns Promise
-             */
-            public handleCloudEvent(request: flyteidl.artifact.ICloudEventRequest): Promise<flyteidl.artifact.CloudEventResponse>;
         }
 
         namespace ArtifactRegistry {
@@ -23794,13 +23780,6 @@ export namespace flyteidl {
              * @param [response] RegisterResponse
              */
             type RegisterConsumerCallback = (error: (Error|null), response?: flyteidl.artifact.RegisterResponse) => void;
-
-            /**
-             * Callback as used by {@link flyteidl.artifact.ArtifactRegistry#handleCloudEvent}.
-             * @param error Error, if any
-             * @param [response] CloudEventResponse
-             */
-            type HandleCloudEventCallback = (error: (Error|null), response?: flyteidl.artifact.CloudEventResponse) => void;
         }
     }
 }

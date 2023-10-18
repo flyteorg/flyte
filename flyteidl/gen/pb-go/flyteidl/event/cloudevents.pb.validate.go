@@ -129,10 +129,10 @@ func (m *CloudEventWorkflowExecution) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetWorkflowId()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CloudEventWorkflowExecutionValidationError{
-				field:  "WorkflowId",
+				field:  "LaunchPlanId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
@@ -369,10 +369,10 @@ func (m *CloudEventTaskExecution) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetWorkflowId()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CloudEventTaskExecutionValidationError{
-				field:  "WorkflowId",
+				field:  "LaunchPlanId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -59,6 +59,10 @@ func startClusterResourceController(ctx context.Context) error {
 	return nil
 }
 
+func startArtifact(ctx context.Context, cfg Artifacts) error {
+	return nil
+}
+
 func startAdmin(ctx context.Context, cfg Admin) error {
 	logger.Infof(ctx, "Running Database Migrations...")
 	if err := adminServer.Migrate(ctx); err != nil {
@@ -187,6 +191,16 @@ var startCmd = &cobra.Command{
 				if err != nil {
 					logger.Panicf(childCtx, "Failed to start Admin, err: %v", err)
 					return err
+				}
+				return nil
+			})
+		}
+
+		if !cfg.Artifact.Disabled {
+			g.Go(func() error {
+				err := startArtifact(childCtx, cfg.Artifact)
+				if err != nil {
+					logger.Panicf(childCtx, "Failed to start Artifacts server, err: %v", err)
 				}
 				return nil
 			})

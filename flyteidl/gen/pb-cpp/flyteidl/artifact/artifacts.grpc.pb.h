@@ -104,13 +104,6 @@ class ArtifactRegistry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>> PrepareAsyncRegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>>(PrepareAsyncRegisterConsumerRaw(context, request, cq));
     }
-    virtual ::grpc::Status HandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::flyteidl::artifact::CloudEventResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CloudEventResponse>> AsyncHandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CloudEventResponse>>(AsyncHandleCloudEventRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CloudEventResponse>> PrepareAsyncHandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CloudEventResponse>>(PrepareAsyncHandleCloudEventRaw(context, request, cq));
-    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -146,10 +139,6 @@ class ArtifactRegistry final {
       virtual void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void RegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void HandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void HandleCloudEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::CloudEventResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void HandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void HandleCloudEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::CloudEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
@@ -169,8 +158,6 @@ class ArtifactRegistry final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterProducerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterProducerRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>* AsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CloudEventResponse>* AsyncHandleCloudEventRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::CloudEventResponse>* PrepareAsyncHandleCloudEventRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -231,13 +218,6 @@ class ArtifactRegistry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>> PrepareAsyncRegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>>(PrepareAsyncRegisterConsumerRaw(context, request, cq));
     }
-    ::grpc::Status HandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::flyteidl::artifact::CloudEventResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CloudEventResponse>> AsyncHandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CloudEventResponse>>(AsyncHandleCloudEventRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CloudEventResponse>> PrepareAsyncHandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CloudEventResponse>>(PrepareAsyncHandleCloudEventRaw(context, request, cq));
-    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -273,10 +253,6 @@ class ArtifactRegistry final {
       void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, std::function<void(::grpc::Status)>) override;
       void RegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void HandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response, std::function<void(::grpc::Status)>) override;
-      void HandleCloudEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::CloudEventResponse* response, std::function<void(::grpc::Status)>) override;
-      void HandleCloudEvent(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void HandleCloudEvent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::CloudEventResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -304,8 +280,6 @@ class ArtifactRegistry final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterProducerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterProducerRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>* AsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CloudEventResponse>* AsyncHandleCloudEventRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::CloudEventResponse>* PrepareAsyncHandleCloudEventRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::CloudEventRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_CreateArtifact_;
     const ::grpc::internal::RpcMethod rpcmethod_GetArtifact_;
     const ::grpc::internal::RpcMethod rpcmethod_SearchArtifacts_;
@@ -314,7 +288,6 @@ class ArtifactRegistry final {
     const ::grpc::internal::RpcMethod rpcmethod_AddTag_;
     const ::grpc::internal::RpcMethod rpcmethod_RegisterProducer_;
     const ::grpc::internal::RpcMethod rpcmethod_RegisterConsumer_;
-    const ::grpc::internal::RpcMethod rpcmethod_HandleCloudEvent_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -330,7 +303,6 @@ class ArtifactRegistry final {
     virtual ::grpc::Status AddTag(::grpc::ServerContext* context, const ::flyteidl::artifact::AddTagRequest* request, ::flyteidl::artifact::AddTagResponse* response);
     virtual ::grpc::Status RegisterProducer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterProducerRequest* request, ::flyteidl::artifact::RegisterResponse* response);
     virtual ::grpc::Status RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response);
-    virtual ::grpc::Status HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_CreateArtifact : public BaseClass {
@@ -492,27 +464,7 @@ class ArtifactRegistry final {
       ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  template <class BaseClass>
-  class WithAsyncMethod_HandleCloudEvent : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithAsyncMethod_HandleCloudEvent() {
-      ::grpc::Service::MarkMethodAsync(8);
-    }
-    ~WithAsyncMethod_HandleCloudEvent() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestHandleCloudEvent(::grpc::ServerContext* context, ::flyteidl::artifact::CloudEventRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::CloudEventResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  typedef WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_SearchArtifacts<WithAsyncMethod_CreateTrigger<WithAsyncMethod_DeleteTrigger<WithAsyncMethod_AddTag<WithAsyncMethod_RegisterProducer<WithAsyncMethod_RegisterConsumer<WithAsyncMethod_HandleCloudEvent<Service > > > > > > > > > AsyncService;
+  typedef WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_SearchArtifacts<WithAsyncMethod_CreateTrigger<WithAsyncMethod_DeleteTrigger<WithAsyncMethod_AddTag<WithAsyncMethod_RegisterProducer<WithAsyncMethod_RegisterConsumer<Service > > > > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateArtifact : public BaseClass {
    private:
@@ -761,38 +713,7 @@ class ArtifactRegistry final {
     }
     virtual void RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  template <class BaseClass>
-  class ExperimentalWithCallbackMethod_HandleCloudEvent : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithCallbackMethod_HandleCloudEvent() {
-      ::grpc::Service::experimental().MarkMethodCallback(8,
-        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::CloudEventRequest, ::flyteidl::artifact::CloudEventResponse>(
-          [this](::grpc::ServerContext* context,
-                 const ::flyteidl::artifact::CloudEventRequest* request,
-                 ::flyteidl::artifact::CloudEventResponse* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->HandleCloudEvent(context, request, response, controller);
-                 }));
-    }
-    void SetMessageAllocatorFor_HandleCloudEvent(
-        ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::CloudEventRequest, ::flyteidl::artifact::CloudEventResponse>* allocator) {
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::CloudEventRequest, ::flyteidl::artifact::CloudEventResponse>*>(
-          ::grpc::Service::experimental().GetHandler(8))
-              ->SetMessageAllocator(allocator);
-    }
-    ~ExperimentalWithCallbackMethod_HandleCloudEvent() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  typedef ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_SearchArtifacts<ExperimentalWithCallbackMethod_CreateTrigger<ExperimentalWithCallbackMethod_DeleteTrigger<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_RegisterProducer<ExperimentalWithCallbackMethod_RegisterConsumer<ExperimentalWithCallbackMethod_HandleCloudEvent<Service > > > > > > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_SearchArtifacts<ExperimentalWithCallbackMethod_CreateTrigger<ExperimentalWithCallbackMethod_DeleteTrigger<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_RegisterProducer<ExperimentalWithCallbackMethod_RegisterConsumer<Service > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateArtifact : public BaseClass {
    private:
@@ -925,23 +846,6 @@ class ArtifactRegistry final {
     }
     // disable synchronous version of this method
     ::grpc::Status RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
-  class WithGenericMethod_HandleCloudEvent : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithGenericMethod_HandleCloudEvent() {
-      ::grpc::Service::MarkMethodGeneric(8);
-    }
-    ~WithGenericMethod_HandleCloudEvent() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1104,26 +1008,6 @@ class ArtifactRegistry final {
     }
     void RequestRegisterConsumer(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
-  class WithRawMethod_HandleCloudEvent : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithRawMethod_HandleCloudEvent() {
-      ::grpc::Service::MarkMethodRaw(8);
-    }
-    ~WithRawMethod_HandleCloudEvent() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestHandleCloudEvent(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1327,31 +1211,6 @@ class ArtifactRegistry final {
     virtual void RegisterConsumer(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_HandleCloudEvent : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithRawCallbackMethod_HandleCloudEvent() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(8,
-        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-          [this](::grpc::ServerContext* context,
-                 const ::grpc::ByteBuffer* request,
-                 ::grpc::ByteBuffer* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->HandleCloudEvent(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithRawCallbackMethod_HandleCloudEvent() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void HandleCloudEvent(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
   class WithStreamedUnaryMethod_CreateArtifact : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
@@ -1511,29 +1370,9 @@ class ArtifactRegistry final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedRegisterConsumer(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::RegisterConsumerRequest,::flyteidl::artifact::RegisterResponse>* server_unary_streamer) = 0;
   };
-  template <class BaseClass>
-  class WithStreamedUnaryMethod_HandleCloudEvent : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_HandleCloudEvent() {
-      ::grpc::Service::MarkMethodStreamed(8,
-        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::CloudEventRequest, ::flyteidl::artifact::CloudEventResponse>(std::bind(&WithStreamedUnaryMethod_HandleCloudEvent<BaseClass>::StreamedHandleCloudEvent, this, std::placeholders::_1, std::placeholders::_2)));
-    }
-    ~WithStreamedUnaryMethod_HandleCloudEvent() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status HandleCloudEvent(::grpc::ServerContext* context, const ::flyteidl::artifact::CloudEventRequest* request, ::flyteidl::artifact::CloudEventResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedHandleCloudEvent(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::CloudEventRequest,::flyteidl::artifact::CloudEventResponse>* server_unary_streamer) = 0;
-  };
-  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<WithStreamedUnaryMethod_HandleCloudEvent<Service > > > > > > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<WithStreamedUnaryMethod_HandleCloudEvent<Service > > > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > > StreamedService;
 };
 
 }  // namespace artifact

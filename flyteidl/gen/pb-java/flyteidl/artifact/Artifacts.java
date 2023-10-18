@@ -18440,7 +18440,7 @@ public final class Artifacts {
       "oudEventTaskExecutionH\000\022G\n\024node_executio" +
       "n_event\030\003 \001(\0132\'.flyteidl.event.CloudEven" +
       "tNodeExecutionH\000B\007\n\005event\"\024\n\022CloudEventR" +
-      "esponse2\236\014\n\020ArtifactRegistry\022g\n\016CreateAr" +
+      "esponse2\273\013\n\020ArtifactRegistry\022g\n\016CreateAr" +
       "tifact\022(.flyteidl.artifact.CreateArtifac" +
       "tRequest\032).flyteidl.artifact.CreateArtif" +
       "actResponse\"\000\022\315\004\n\013GetArtifact\022%.flyteidl" +
@@ -18476,12 +18476,9 @@ public final class Artifacts {
       "ProducerRequest\032#.flyteidl.artifact.Regi" +
       "sterResponse\"\000\022e\n\020RegisterConsumer\022*.fly" +
       "teidl.artifact.RegisterConsumerRequest\032#" +
-      ".flyteidl.artifact.RegisterResponse\"\000\022a\n" +
-      "\020HandleCloudEvent\022$.flyteidl.artifact.Cl" +
-      "oudEventRequest\032%.flyteidl.artifact.Clou" +
-      "dEventResponse\"\000B@Z>github.com/flyteorg/" +
-      "flyte/flyteidl/gen/pb-go/flyteidl/artifa" +
-      "ctb\006proto3"
+      ".flyteidl.artifact.RegisterResponse\"\000B@Z" +
+      ">github.com/flyteorg/flyte/flyteidl/gen/" +
+      "pb-go/flyteidl/artifactb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
