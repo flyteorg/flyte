@@ -115,25 +115,31 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 }
 
 func TestSendAndRetryHttpRequest(t *testing.T) {
+	numRetries := 0
 	hf := func(w http.ResponseWriter, r *http.Request) {
 		switch strings.TrimSpace(r.URL.Path) {
 		case "/":
 			mockExternalMetadataEndpointTransientFailure(w, r)
+			numRetries++
 		default:
 			http.NotFoundHandler().ServeHTTP(w, r)
 		}
-
 	}
 
 	server := httptest.NewServer(http.HandlerFunc(hf))
 	defer server.Close()
 	http.DefaultClient = server.Client()
+	retryAttempts := 5
 
-	resp, err := sendAndRetryHttpRequest(server.Client(), server.URL, 5, 0)
+	resp, err := sendAndRetryHttpRequest(server.Client(), server.URL, retryAttempts, 0 /* for testing */)
 	assert.Error(t, err)
 	assert.Equal(t, oauthMetadataFailureErrorMessage, err.Error())
 	assert.NotNil(t, resp)
 	assert.Equal(t, 500, resp.StatusCode)
+
+	// Will always be 1 more than expected because of needing to run on 0 if
+	// specifying no retries in config so we will send the request at least 1 time
+	assert.Equal(t, retryAttempts+1, numRetries)
 }
 
 func mockExternalMetadataEndpointTransientFailure(w http.ResponseWriter, r *http.Request) {
