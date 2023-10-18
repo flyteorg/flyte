@@ -13,12 +13,11 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
+	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 )
 
 type OAuth2MetadataProvider struct {
