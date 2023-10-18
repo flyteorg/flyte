@@ -391,7 +391,11 @@ that integrates all Flyte components into a single binary.
 
    # Step3: Edit the config file: ./flyte-single-binary-local.yaml.
    # Replace occurrences of $HOME with the actual path of your home directory.
-   sed -i "s|\$HOME|${HOME}|g" ./flyte-single-binary-local.yaml
+   sedi=(-i)
+   case "$(uname)" in
+     Darwin*) sedi=(-i "")
+   esac
+   sed "${sedi[@]}" -e "s|\$HOME|${HOME}|g" flyte-single-binary-local.yaml
 
    # Step 4: Prepare a namespace template for the cluster resource controller.
    # The configuration file "flyte-single-binary-local.yaml" has an entry named cluster_resources.templatePath.
