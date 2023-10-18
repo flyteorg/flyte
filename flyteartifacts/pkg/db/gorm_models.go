@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/jackc/pgx/v5/pgtype"
 	"gorm.io/gorm"
 )
 
@@ -16,9 +16,9 @@ type Artifact struct {
 	gorm.Model
 	// gatepr: this doesn't actually create a foreign key...
 	ArtifactKeyID uint
-	ArtifactKey   ArtifactKey      `gorm:"foreignKey:ArtifactKeyID;references:ID"`
-	Version       string           `gorm:"not null;type:varchar(255);index:idx_artifact_version"`
-	Partitions    *postgres.Hstore `gorm:"type:hstore;index:idx_artifact_partitions"`
+	ArtifactKey   ArtifactKey   `gorm:"foreignKey:ArtifactKeyID;references:ID"`
+	Version       string        `gorm:"not null;type:varchar(255);index:idx_artifact_version"`
+	Partitions    pgtype.Hstore `gorm:"type:hstore;index:idx_artifact_partitions"`
 
 	LiteralType  []byte `gorm:"not null"`
 	LiteralValue []byte `gorm:"not null"`

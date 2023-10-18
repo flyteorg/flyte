@@ -3,13 +3,14 @@ package db
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
-	"github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
-	"testing"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
@@ -17,7 +18,8 @@ import (
 func TestWriteOne(t *testing.T) {
 	ctx := context.Background()
 	configAccessor := viper.NewAccessor(config.Options{
-		SearchPaths: []string{"/Users/ytong/go/src/github.com/flyteorg/flyte/flyteartifacts/sandbox.yaml"},
+		// TODO: find an idiomatic way to point to this file
+		SearchPaths: []string{"/Users/eduardo/repos/flyte/flyteartifacts/sandbox.yaml"},
 		StrictMode:  false,
 	})
 	err := configAccessor.UpdateConfig(ctx)
@@ -28,7 +30,10 @@ func TestWriteOne(t *testing.T) {
 
 	one := uint32(1)
 	pval1 := "51"
-	p := postgres.Hstore{"area": &pval1}
+	p := pgtype.Hstore{
+		"area": &pval1,
+	}
+	//p := postgres.Hstore{"area": &pval1}
 
 	lt := &core.LiteralType{
 		Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
@@ -56,8 +61,8 @@ func TestWriteOne(t *testing.T) {
 			Domain:  "unit",
 			Name:    "testname 2",
 		},
-		Version:       "abc123/1/n0/8",
-		Partitions:    &p,
+		Version:       "abc123/1/n0/7",
+		Partitions:    p,
 		LiteralType:   ltBytes,
 		LiteralValue:  litBytes,
 		ExecutionName: "ddd",
