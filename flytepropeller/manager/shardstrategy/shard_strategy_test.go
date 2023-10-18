@@ -1,10 +1,14 @@
 package shardstrategy
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
+
+	"github.com/flyteorg/flyte/flytepropeller/manager/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 var (
@@ -157,4 +161,142 @@ func TestUpdatePodSpecInvalidPodSpec(t *testing.T) {
 			assert.Error(t, err)
 		})
 	}
+}
+
+var (
+	hashShardConfig = config.ShardConfig{
+		Type:       config.ShardTypeHash,
+		ShardCount: 3,
+	}
+	projectShardConfig = config.ShardConfig{
+		Type: config.ShardTypeProject,
+		PerShardMappings: []config.PerShardMappingsConfig{
+			{IDs: []string{"flytesnacks"}},
+			{IDs: []string{"flytefoo", "flytebar"}},
+		},
+	}
+	projectShardWildcardConfig = config.ShardConfig{
+		Type: config.ShardTypeProject,
+		PerShardMappings: []config.PerShardMappingsConfig{
+			{IDs: []string{"flytesnacks"}},
+			{IDs: []string{"flytefoo", "flytebar"}},
+			{IDs: []string{"*"}},
+		},
+	}
+	domainShardConfig = config.ShardConfig{
+		Type: config.ShardTypeDomain,
+		PerShardMappings: []config.PerShardMappingsConfig{
+			{IDs: []string{"production"}},
+			{IDs: []string{"foo", "bar"}},
+		},
+	}
+	domainShardWildcardConfig = config.ShardConfig{
+		Type: config.ShardTypeDomain,
+		PerShardMappings: []config.PerShardMappingsConfig{
+			{IDs: []string{"production"}},
+			{IDs: []string{"foo", "bar"}},
+			{IDs: []string{"*"}},
+		},
+	}
+)
+
+func TestNewShardStrategy(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name          string
+		ShardStrategy ShardStrategy
+		shardConfig   config.ShardConfig
+	}{
+		{"hash", hashShardStrategy, hashShardConfig},
+		{"project", projectShardStrategy, projectShardConfig},
+		{"project_wildcard", projectShardStrategyWildcard, projectShardWildcardConfig},
+		{"domain", domainShardStrategy, domainShardConfig},
+		{"domain_wildcard", domainShardStrategyWildcard, domainShardWildcardConfig},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			strategy, err := NewShardStrategy(context.TODO(), tt.shardConfig)
+			assert.NoError(t, err)
+			assert.Equal(t, tt.ShardStrategy, strategy)
+		})
+	}
+}
+
+var (
+	errorHashShardConfig1 = config.ShardConfig{
+		Type:       config.ShardTypeHash,
+		ShardCount: 0,
+	}
+	errorHashShardConfig2 = config.ShardConfig{
+		Type:       config.ShardTypeHash,
+		ShardCount: v1alpha1.ShardKeyspaceSize + 1,
+	}
+	errorProjectShardConfig = config.ShardConfig{
+		Type: config.ShardTypeProject,
+		PerShardMappings: []config.PerShardMappingsConfig{
+			{IDs: []string{}},
+		},
+	}
+	errorProjectShardWildcardConfig = config.ShardConfig{
+		Type: config.ShardTypeProject,
+		PerShardMappings: []config.PerShardMappingsConfig{
+			{IDs: []string{"flytesnacks", "*"}},
+		},
+	}
+	errorDomainShardWildcardConfig = config.ShardConfig{
+		Type: config.ShardTypeDomain,
+		PerShardMappings: []config.PerShardMappingsConfig{
+			{IDs: []string{"production"}},
+			{IDs: []string{"*"}},
+			{IDs: []string{"*"}},
+		},
+	}
+	errorShardType = config.ShardConfig{
+		Type: -1,
+	}
+)
+
+func TestNewShardStrategyErrorConfig(t *testing.T) {
+	t.Parallel()
+	tests := []struct {
+		name        string
+		shardConfig config.ShardConfig
+	}{
+		{"hash_shard_cnt_zero", errorHashShardConfig1},
+		{"hash_shard_cnt_larger_than_keyspace", errorHashShardConfig2},
+		{"project_with_zero_config_ids", errorProjectShardConfig},
+		{"project_wildcard_with_other_ids", errorProjectShardWildcardConfig},
+		{"domain_multi_wildcard_ids", errorDomainShardWildcardConfig},
+		{"error_shard_type", errorShardType},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := NewShardStrategy(context.TODO(), tt.shardConfig)
+			assert.Error(t, err)
+		})
+	}
+}
+
+func TestComputeHashCode(t *testing.T) {
+	expectedData := struct {
+		Field1 string
+		Field2 int
+	}{
+		Field1: "flytesnacks",
+		Field2: 42,
+	}
+	actualData := struct {
+		Field1 string
+		Field2 int
+	}{
+		Field1: "flytesnacks",
+		Field2: 42,
+	}
+	expectedHashcode, err := computeHashCode(expectedData)
+	assert.NoError(t, err)
+	actualHashcode, err := computeHashCode(actualData)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedHashcode, actualHashcode)
 }
