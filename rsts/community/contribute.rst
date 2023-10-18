@@ -453,7 +453,7 @@ The following instructions provide guidance on how to build single binary with y
    pip install flytekit && export PATH=$PATH:/home/ubuntu/.local/bin
 
    # Step2: Run a hello world example
-   pyflyte run --remote https://github.com/flyteorg/flytesnacks/blob/master/examples/basics/basics/hello_world.py  hello_world_wf
+   pyflyte run --remote https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py  hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
    # You can go to the [flytesnacks repository](https://github.com/flyteorg/flytesnacks) to see more useful examples.
 
@@ -512,7 +512,7 @@ If not, we can start backends with a single command.
    make setup
    pip install -e .
    
-   # If you are also developing the plugins, consider the followings:
+   # If you are also developing the plugins, consider the following:
 
    # Installing Specific Plugins:
    # If you wish to only use few plugins, you can install them individually.
@@ -535,7 +535,7 @@ If not, we can start backends with a single command.
    make test
 
    # Step3: Run a hello world sample to test locally
-   pyflyte run https://github.com/flyteorg/flytesnacks/blob/master/examples/basics/basics/hello_world.py hello_world_wf
+   pyflyte run https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py hello_world_wf
    # Running hello_world_wf() hello world
 
 **3. Run workflow in sandbox.**
@@ -578,7 +578,7 @@ the Flyte cluster, and finally submit the workflow.
 
    # Step4: Submit a hello world workflow to the Flyte cluster
    cd flytesnacks
-   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote https://github.com/flyteorg/flytesnacks/blob/master/examples/basics/basics/hello_world.py hello_world_wf
+   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote https://raw.githubusercontent.com/flyteorg/flytesnacks/master/examples/basics/basics/hello_world.py hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
 
 How to setup dev environment for flyteconsole?
