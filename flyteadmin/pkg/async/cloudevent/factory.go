@@ -113,8 +113,9 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 		return implementations.NewNoopPublish()
 	}
 
-	if !cloudEventsConfig.TransformToCloudEvents {
+	if cloudEventsConfig.CloudEventVersion == runtimeInterfaces.CloudEventVersionv2 {
+		return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, urlData, remoteDataConfig)
+	} else {
 		return cloudEventImplementations.NewCloudEventsPublisher(sender, scope, cloudEventsConfig.EventsPublisherConfig.EventTypes)
 	}
-	return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, urlData, remoteDataConfig)
 }

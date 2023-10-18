@@ -80,7 +80,7 @@ database:
 #    options: "sslmode=disable"
 cloudEvents:
   enable: true
-  transformToCloudEvents: true
+  cloudEventVersion: v2
   type: redis
   redis:
     addr: "localhost:30004"

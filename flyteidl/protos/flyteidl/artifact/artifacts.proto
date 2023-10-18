@@ -192,6 +192,4 @@ service ArtifactRegistry {
   rpc RegisterProducer(RegisterProducerRequest) returns (RegisterResponse) {}
 
   rpc RegisterConsumer(RegisterConsumerRequest) returns (RegisterResponse) {}
-
-  rpc HandleCloudEvent(CloudEventRequest) returns (CloudEventResponse) {}
 }

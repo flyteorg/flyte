@@ -3,7 +3,7 @@
 ############
 Cloud Events
 ############
-
+# gatepr: this doc needs to be updated
 .. tags:: Infrastructure, AWS, GCP, Advanced
 
 Progress of Flyte workflow and task execution is delimited by a series of
@@ -98,6 +98,8 @@ The same flag is used for Helm as for Admin itself.
 Usage
 *****
 
+Version 1
+=========
 The events are emitted in cloud Event format, and the data in the cloud event
 will be base64 encoded binary representation of the following IDL messages:
 
@@ -112,7 +114,7 @@ Note that these message wrap the underlying event messages
 :std:doc:`found here <flyteidl:protos/docs/event/event>`.
 
 CloudEvent Spec
-===============
+---------------
 
 .. code:: json
 
@@ -128,3 +130,30 @@ CloudEvent Spec
 
 .. note::
    The message format may eventually change to an enriched and distinct message type in future releases.
+
+Version 2
+=========
+These events are also in the cloud event spec, but there will be considerably more information in the event that users may find useful. Keep in mind however that turning on these events will induce a heavier load on the database as information is queried.
+
+The event types may be found in the following IDL messages (Python example given):
+
+* ``flyteidl.event.cloudevents_pb2.CloudEventWorkflowExecution``
+* ``flyteidl.event.cloudevents_pb2.CloudEventTaskExecution``
+* ``flyteidl.event.cloudevents_pb2.CloudEventNodeExecution``
+* ``flyteidl.event.cloudevents_pb2.CloudEventExecutionStart``
+
+CloudEvent Spec
+---------------
+The specification for these v2 events is similar, except that the jsonschemaurl will be blank for now. We are working on making these auto-generated from the IDL.
+
+.. code:: json
+
+    {
+        "specversion" : "1.0",
+        "type" : "com.flyte.resource.cloudevents.WorkflowExecution",
+        "source" : "https://github.com/flyteorg/flyteadmin",
+        "id" : "D234-1234-1234",
+        "time" : "2018-04-05T17:31:00Z",
+        "jsonschemaurl": "",
+        "data" : (bytes of the underlying event)
+    }

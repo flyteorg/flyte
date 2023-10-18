@@ -197,15 +197,10 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		// GetInputs actually fetches the data, even though this is an output
 		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig, c.storageClient, rawEvent.GetOutputUri())
 		if err != nil {
-			// TODO: metric this
+			// gatepr: metric this
 			logger.Warningf(ctx, "Error fetching output literal map %v", rawEvent)
 			return nil, err
 		}
-	}
-
-	if outputs == nil {
-		// todo: remove after testing
-		logger.Debugf(ctx, "Output data was nil for %v", rawEvent)
 	}
 
 	return &event.CloudEventWorkflowExecution{
@@ -217,6 +212,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		ArtifactIds:         spec.GetMetadata().GetArtifactIds(),
 		ParentNodeExecution: spec.GetMetadata().GetParentNodeExecution(),
 		ReferenceExecution:  spec.GetMetadata().GetReferenceExecution(),
+		LaunchPlanId:        spec.LaunchPlan,
 	}, nil
 }
 
@@ -312,6 +308,7 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 		ArtifactIds:         spec.GetMetadata().GetArtifactIds(),
 		ParentNodeExecution: spec.GetMetadata().GetParentNodeExecution(),
 		ReferenceExecution:  spec.GetMetadata().GetReferenceExecution(),
+		LaunchPlanId:        spec.LaunchPlan,
 	}, nil
 }
 
@@ -403,7 +400,8 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 	cloudEvt.SetSource(eventSource)
 	cloudEvt.SetID(eventID)
 	cloudEvt.SetTime(eventTime)
-	cloudEvt.SetExtension(jsonSchemaURLKey, jsonSchemaURL)
+	// TODO: Fill this in after we can get auto-generation in buf.
+	cloudEvt.SetExtension(jsonSchemaURLKey, "")
 
 	if err := cloudEvt.SetData(cloudevents.ApplicationJSON, buf.Bytes()); err != nil {
 		c.systemMetrics.PublishError.Inc()

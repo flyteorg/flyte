@@ -27,7 +27,7 @@ func TestWriteOne(t *testing.T) {
 	rds := NewStorage(ctx, scope)
 
 	one := uint32(1)
-	pval1 := "f51f"
+	pval1 := "51"
 	p := postgres.Hstore{"area": &pval1}
 
 	lt := &core.LiteralType{
@@ -54,9 +54,9 @@ func TestWriteOne(t *testing.T) {
 		ArtifactKey: ArtifactKey{
 			Project: "demotst",
 			Domain:  "unit",
-			Name:    "testname 1",
+			Name:    "testname 2",
 		},
-		Version:       "abc123/1/n0/7",
+		Version:       "abc123/1/n0/8",
 		Partitions:    &p,
 		LiteralType:   ltBytes,
 		LiteralValue:  litBytes,

@@ -29,8 +29,10 @@ message CloudEventWorkflowExecution {
   core.NodeExecutionIdentifier parent_node_execution = 7;
   core.WorkflowExecutionIdentifier reference_execution = 8;
 
-  // gatepr: Add the workflow id where this originated from
-  core.Identifier workflow_id = 9;
+  // The ID of the LP that generated the execution that generated the Artifact.
+  // Here for provenance information.
+  // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+  core.Identifier launch_plan_id = 9;
 }
 
 
@@ -56,10 +58,10 @@ message CloudEventTaskExecution {
   core.NodeExecutionIdentifier parent_node_execution = 7;
   core.WorkflowExecutionIdentifier reference_execution = 8;
 
-  // gatepr: Add the workflow id where this originated from
-  // The originating Task ID is in the TaskExecutionEvent but the
-  // workflow ID is not.
-  core.Identifier workflow_id = 9;
+  // The ID of the LP that generated the execution that generated the Artifact.
+  // Here for provenance information.
+  // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+  core.Identifier launch_plan_id = 9;
 }
 
 // This event is to be sent by Admin after it creates an execution.

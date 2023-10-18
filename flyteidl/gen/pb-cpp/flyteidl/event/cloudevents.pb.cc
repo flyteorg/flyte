@@ -147,7 +147,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fevent_2fcloudevents_2epr
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventWorkflowExecution, artifact_ids_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventWorkflowExecution, parent_node_execution_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventWorkflowExecution, reference_execution_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventWorkflowExecution, workflow_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventWorkflowExecution, launch_plan_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventNodeExecution, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -167,7 +167,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fevent_2fcloudevents_2epr
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventTaskExecution, artifact_ids_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventTaskExecution, parent_node_execution_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventTaskExecution, reference_execution_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventTaskExecution, workflow_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventTaskExecution, launch_plan_id_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::event::CloudEventExecutionStart, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -205,7 +205,7 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fcloudevents_2eproto[] =
   "flyteidl/core/literals.proto\032\035flyteidl/c"
   "ore/interface.proto\032\037flyteidl/core/artif"
   "act_id.proto\032\036flyteidl/core/identifier.p"
-  "roto\032\037google/protobuf/timestamp.proto\"\223\004"
+  "roto\032\037google/protobuf/timestamp.proto\"\226\004"
   "\n\033CloudEventWorkflowExecution\0229\n\traw_eve"
   "nt\030\001 \001(\0132&.flyteidl.event.WorkflowExecut"
   "ionEvent\022.\n\013output_data\030\002 \001(\0132\031.flyteidl"
@@ -218,36 +218,37 @@ const char descriptor_table_protodef_flyteidl_2fevent_2fcloudevents_2eproto[] =
   "tion\030\007 \001(\0132&.flyteidl.core.NodeExecution"
   "Identifier\022G\n\023reference_execution\030\010 \001(\0132"
   "*.flyteidl.core.WorkflowExecutionIdentif"
-  "ier\022.\n\013workflow_id\030\t \001(\0132\031.flyteidl.core"
-  ".Identifier\"P\n\027CloudEventNodeExecution\0225"
-  "\n\traw_event\030\001 \001(\0132\".flyteidl.event.NodeE"
-  "xecutionEvent\"\213\004\n\027CloudEventTaskExecutio"
-  "n\0225\n\traw_event\030\001 \001(\0132\".flyteidl.event.Ta"
-  "skExecutionEvent\022.\n\013output_data\030\002 \001(\0132\031."
-  "flyteidl.core.LiteralMap\0227\n\020output_inter"
-  "face\030\003 \001(\0132\035.flyteidl.core.TypedInterfac"
-  "e\022-\n\ninput_data\030\004 \001(\0132\031.flyteidl.core.Li"
-  "teralMap\0220\n\014scheduled_at\030\005 \001(\0132\032.google."
-  "protobuf.Timestamp\022/\n\014artifact_ids\030\006 \003(\013"
-  "2\031.flyteidl.core.ArtifactID\022E\n\025parent_no"
-  "de_execution\030\007 \001(\0132&.flyteidl.core.NodeE"
-  "xecutionIdentifier\022G\n\023reference_executio"
-  "n\030\010 \001(\0132*.flyteidl.core.WorkflowExecutio"
-  "nIdentifier\022.\n\013workflow_id\030\t \001(\0132\031.flyte"
-  "idl.core.Identifier\"\207\002\n\030CloudEventExecut"
-  "ionStart\022@\n\014execution_id\030\001 \001(\0132*.flyteid"
-  "l.core.WorkflowExecutionIdentifier\0221\n\016la"
-  "unch_plan_id\030\002 \001(\0132\031.flyteidl.core.Ident"
-  "ifier\022.\n\013workflow_id\030\003 \001(\0132\031.flyteidl.co"
-  "re.Identifier\022/\n\014artifact_ids\030\004 \003(\0132\031.fl"
-  "yteidl.core.ArtifactID\022\025\n\rartifact_keys\030"
-  "\005 \003(\tB=Z;github.com/flyteorg/flyte/flyte"
-  "idl/gen/pb-go/flyteidl/eventb\006proto3"
+  "ier\0221\n\016launch_plan_id\030\t \001(\0132\031.flyteidl.c"
+  "ore.Identifier\"P\n\027CloudEventNodeExecutio"
+  "n\0225\n\traw_event\030\001 \001(\0132\".flyteidl.event.No"
+  "deExecutionEvent\"\216\004\n\027CloudEventTaskExecu"
+  "tion\0225\n\traw_event\030\001 \001(\0132\".flyteidl.event"
+  ".TaskExecutionEvent\022.\n\013output_data\030\002 \001(\013"
+  "2\031.flyteidl.core.LiteralMap\0227\n\020output_in"
+  "terface\030\003 \001(\0132\035.flyteidl.core.TypedInter"
+  "face\022-\n\ninput_data\030\004 \001(\0132\031.flyteidl.core"
+  ".LiteralMap\0220\n\014scheduled_at\030\005 \001(\0132\032.goog"
+  "le.protobuf.Timestamp\022/\n\014artifact_ids\030\006 "
+  "\003(\0132\031.flyteidl.core.ArtifactID\022E\n\025parent"
+  "_node_execution\030\007 \001(\0132&.flyteidl.core.No"
+  "deExecutionIdentifier\022G\n\023reference_execu"
+  "tion\030\010 \001(\0132*.flyteidl.core.WorkflowExecu"
+  "tionIdentifier\0221\n\016launch_plan_id\030\t \001(\0132\031"
+  ".flyteidl.core.Identifier\"\207\002\n\030CloudEvent"
+  "ExecutionStart\022@\n\014execution_id\030\001 \001(\0132*.f"
+  "lyteidl.core.WorkflowExecutionIdentifier"
+  "\0221\n\016launch_plan_id\030\002 \001(\0132\031.flyteidl.core"
+  ".Identifier\022.\n\013workflow_id\030\003 \001(\0132\031.flyte"
+  "idl.core.Identifier\022/\n\014artifact_ids\030\004 \003("
+  "\0132\031.flyteidl.core.ArtifactID\022\025\n\rartifact"
+  "_keys\030\005 \003(\tB=Z;github.com/flyteorg/flyte"
+  "/flyteidl/gen/pb-go/flyteidl/eventb\006prot"
+  "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fevent_2fcloudevents_2eproto = {
   false, InitDefaults_flyteidl_2fevent_2fcloudevents_2eproto, 
   descriptor_table_protodef_flyteidl_2fevent_2fcloudevents_2eproto,
-  "flyteidl/event/cloudevents.proto", &assign_descriptors_table_flyteidl_2fevent_2fcloudevents_2eproto, 1716,
+  "flyteidl/event/cloudevents.proto", &assign_descriptors_table_flyteidl_2fevent_2fcloudevents_2eproto, 1722,
 };
 
 void AddDescriptors_flyteidl_2fevent_2fcloudevents_2eproto() {
@@ -285,7 +286,7 @@ void CloudEventWorkflowExecution::InitAsDefaultInstance() {
       ::flyteidl::core::NodeExecutionIdentifier::internal_default_instance());
   ::flyteidl::event::_CloudEventWorkflowExecution_default_instance_._instance.get_mutable()->reference_execution_ = const_cast< ::flyteidl::core::WorkflowExecutionIdentifier*>(
       ::flyteidl::core::WorkflowExecutionIdentifier::internal_default_instance());
-  ::flyteidl::event::_CloudEventWorkflowExecution_default_instance_._instance.get_mutable()->workflow_id_ = const_cast< ::flyteidl::core::Identifier*>(
+  ::flyteidl::event::_CloudEventWorkflowExecution_default_instance_._instance.get_mutable()->launch_plan_id_ = const_cast< ::flyteidl::core::Identifier*>(
       ::flyteidl::core::Identifier::internal_default_instance());
 }
 class CloudEventWorkflowExecution::HasBitSetters {
@@ -297,7 +298,7 @@ class CloudEventWorkflowExecution::HasBitSetters {
   static const ::google::protobuf::Timestamp& scheduled_at(const CloudEventWorkflowExecution* msg);
   static const ::flyteidl::core::NodeExecutionIdentifier& parent_node_execution(const CloudEventWorkflowExecution* msg);
   static const ::flyteidl::core::WorkflowExecutionIdentifier& reference_execution(const CloudEventWorkflowExecution* msg);
-  static const ::flyteidl::core::Identifier& workflow_id(const CloudEventWorkflowExecution* msg);
+  static const ::flyteidl::core::Identifier& launch_plan_id(const CloudEventWorkflowExecution* msg);
 };
 
 const ::flyteidl::event::WorkflowExecutionEvent&
@@ -329,8 +330,8 @@ CloudEventWorkflowExecution::HasBitSetters::reference_execution(const CloudEvent
   return *msg->reference_execution_;
 }
 const ::flyteidl::core::Identifier&
-CloudEventWorkflowExecution::HasBitSetters::workflow_id(const CloudEventWorkflowExecution* msg) {
-  return *msg->workflow_id_;
+CloudEventWorkflowExecution::HasBitSetters::launch_plan_id(const CloudEventWorkflowExecution* msg) {
+  return *msg->launch_plan_id_;
 }
 void CloudEventWorkflowExecution::clear_raw_event() {
   if (GetArenaNoVirtual() == nullptr && raw_event_ != nullptr) {
@@ -377,11 +378,11 @@ void CloudEventWorkflowExecution::clear_reference_execution() {
   }
   reference_execution_ = nullptr;
 }
-void CloudEventWorkflowExecution::clear_workflow_id() {
-  if (GetArenaNoVirtual() == nullptr && workflow_id_ != nullptr) {
-    delete workflow_id_;
+void CloudEventWorkflowExecution::clear_launch_plan_id() {
+  if (GetArenaNoVirtual() == nullptr && launch_plan_id_ != nullptr) {
+    delete launch_plan_id_;
   }
-  workflow_id_ = nullptr;
+  launch_plan_id_ = nullptr;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int CloudEventWorkflowExecution::kRawEventFieldNumber;
@@ -392,7 +393,7 @@ const int CloudEventWorkflowExecution::kScheduledAtFieldNumber;
 const int CloudEventWorkflowExecution::kArtifactIdsFieldNumber;
 const int CloudEventWorkflowExecution::kParentNodeExecutionFieldNumber;
 const int CloudEventWorkflowExecution::kReferenceExecutionFieldNumber;
-const int CloudEventWorkflowExecution::kWorkflowIdFieldNumber;
+const int CloudEventWorkflowExecution::kLaunchPlanIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 CloudEventWorkflowExecution::CloudEventWorkflowExecution()
@@ -440,10 +441,10 @@ CloudEventWorkflowExecution::CloudEventWorkflowExecution(const CloudEventWorkflo
   } else {
     reference_execution_ = nullptr;
   }
-  if (from.has_workflow_id()) {
-    workflow_id_ = new ::flyteidl::core::Identifier(*from.workflow_id_);
+  if (from.has_launch_plan_id()) {
+    launch_plan_id_ = new ::flyteidl::core::Identifier(*from.launch_plan_id_);
   } else {
-    workflow_id_ = nullptr;
+    launch_plan_id_ = nullptr;
   }
   // @@protoc_insertion_point(copy_constructor:flyteidl.event.CloudEventWorkflowExecution)
 }
@@ -452,8 +453,8 @@ void CloudEventWorkflowExecution::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_CloudEventWorkflowExecution_flyteidl_2fevent_2fcloudevents_2eproto.base);
   ::memset(&raw_event_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&workflow_id_) -
-      reinterpret_cast<char*>(&raw_event_)) + sizeof(workflow_id_));
+      reinterpret_cast<char*>(&launch_plan_id_) -
+      reinterpret_cast<char*>(&raw_event_)) + sizeof(launch_plan_id_));
 }
 
 CloudEventWorkflowExecution::~CloudEventWorkflowExecution() {
@@ -469,7 +470,7 @@ void CloudEventWorkflowExecution::SharedDtor() {
   if (this != internal_default_instance()) delete scheduled_at_;
   if (this != internal_default_instance()) delete parent_node_execution_;
   if (this != internal_default_instance()) delete reference_execution_;
-  if (this != internal_default_instance()) delete workflow_id_;
+  if (this != internal_default_instance()) delete launch_plan_id_;
 }
 
 void CloudEventWorkflowExecution::SetCachedSize(int size) const {
@@ -516,10 +517,10 @@ void CloudEventWorkflowExecution::Clear() {
     delete reference_execution_;
   }
   reference_execution_ = nullptr;
-  if (GetArenaNoVirtual() == nullptr && workflow_id_ != nullptr) {
-    delete workflow_id_;
+  if (GetArenaNoVirtual() == nullptr && launch_plan_id_ != nullptr) {
+    delete launch_plan_id_;
   }
-  workflow_id_ = nullptr;
+  launch_plan_id_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -643,13 +644,13 @@ const char* CloudEventWorkflowExecution::_InternalParse(const char* begin, const
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
-      // .flyteidl.core.Identifier workflow_id = 9;
+      // .flyteidl.core.Identifier launch_plan_id = 9;
       case 9: {
         if (static_cast<::google::protobuf::uint8>(tag) != 74) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::core::Identifier::_InternalParse;
-        object = msg->mutable_workflow_id();
+        object = msg->mutable_launch_plan_id();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -774,11 +775,11 @@ bool CloudEventWorkflowExecution::MergePartialFromCodedStream(
         break;
       }
 
-      // .flyteidl.core.Identifier workflow_id = 9;
+      // .flyteidl.core.Identifier launch_plan_id = 9;
       case 9: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (74 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_workflow_id()));
+               input, mutable_launch_plan_id()));
         } else {
           goto handle_unusual;
         }
@@ -863,10 +864,10 @@ void CloudEventWorkflowExecution::SerializeWithCachedSizes(
       8, HasBitSetters::reference_execution(this), output);
   }
 
-  // .flyteidl.core.Identifier workflow_id = 9;
-  if (this->has_workflow_id()) {
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  if (this->has_launch_plan_id()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      9, HasBitSetters::workflow_id(this), output);
+      9, HasBitSetters::launch_plan_id(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -939,11 +940,11 @@ void CloudEventWorkflowExecution::SerializeWithCachedSizes(
         8, HasBitSetters::reference_execution(this), target);
   }
 
-  // .flyteidl.core.Identifier workflow_id = 9;
-  if (this->has_workflow_id()) {
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  if (this->has_launch_plan_id()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        9, HasBitSetters::workflow_id(this), target);
+        9, HasBitSetters::launch_plan_id(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -1027,11 +1028,11 @@ size_t CloudEventWorkflowExecution::ByteSizeLong() const {
         *reference_execution_);
   }
 
-  // .flyteidl.core.Identifier workflow_id = 9;
-  if (this->has_workflow_id()) {
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  if (this->has_launch_plan_id()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *workflow_id_);
+        *launch_plan_id_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1083,8 +1084,8 @@ void CloudEventWorkflowExecution::MergeFrom(const CloudEventWorkflowExecution& f
   if (from.has_reference_execution()) {
     mutable_reference_execution()->::flyteidl::core::WorkflowExecutionIdentifier::MergeFrom(from.reference_execution());
   }
-  if (from.has_workflow_id()) {
-    mutable_workflow_id()->::flyteidl::core::Identifier::MergeFrom(from.workflow_id());
+  if (from.has_launch_plan_id()) {
+    mutable_launch_plan_id()->::flyteidl::core::Identifier::MergeFrom(from.launch_plan_id());
   }
 }
 
@@ -1121,7 +1122,7 @@ void CloudEventWorkflowExecution::InternalSwap(CloudEventWorkflowExecution* othe
   swap(scheduled_at_, other->scheduled_at_);
   swap(parent_node_execution_, other->parent_node_execution_);
   swap(reference_execution_, other->reference_execution_);
-  swap(workflow_id_, other->workflow_id_);
+  swap(launch_plan_id_, other->launch_plan_id_);
 }
 
 ::google::protobuf::Metadata CloudEventWorkflowExecution::GetMetadata() const {
@@ -1440,7 +1441,7 @@ void CloudEventTaskExecution::InitAsDefaultInstance() {
       ::flyteidl::core::NodeExecutionIdentifier::internal_default_instance());
   ::flyteidl::event::_CloudEventTaskExecution_default_instance_._instance.get_mutable()->reference_execution_ = const_cast< ::flyteidl::core::WorkflowExecutionIdentifier*>(
       ::flyteidl::core::WorkflowExecutionIdentifier::internal_default_instance());
-  ::flyteidl::event::_CloudEventTaskExecution_default_instance_._instance.get_mutable()->workflow_id_ = const_cast< ::flyteidl::core::Identifier*>(
+  ::flyteidl::event::_CloudEventTaskExecution_default_instance_._instance.get_mutable()->launch_plan_id_ = const_cast< ::flyteidl::core::Identifier*>(
       ::flyteidl::core::Identifier::internal_default_instance());
 }
 class CloudEventTaskExecution::HasBitSetters {
@@ -1452,7 +1453,7 @@ class CloudEventTaskExecution::HasBitSetters {
   static const ::google::protobuf::Timestamp& scheduled_at(const CloudEventTaskExecution* msg);
   static const ::flyteidl::core::NodeExecutionIdentifier& parent_node_execution(const CloudEventTaskExecution* msg);
   static const ::flyteidl::core::WorkflowExecutionIdentifier& reference_execution(const CloudEventTaskExecution* msg);
-  static const ::flyteidl::core::Identifier& workflow_id(const CloudEventTaskExecution* msg);
+  static const ::flyteidl::core::Identifier& launch_plan_id(const CloudEventTaskExecution* msg);
 };
 
 const ::flyteidl::event::TaskExecutionEvent&
@@ -1484,8 +1485,8 @@ CloudEventTaskExecution::HasBitSetters::reference_execution(const CloudEventTask
   return *msg->reference_execution_;
 }
 const ::flyteidl::core::Identifier&
-CloudEventTaskExecution::HasBitSetters::workflow_id(const CloudEventTaskExecution* msg) {
-  return *msg->workflow_id_;
+CloudEventTaskExecution::HasBitSetters::launch_plan_id(const CloudEventTaskExecution* msg) {
+  return *msg->launch_plan_id_;
 }
 void CloudEventTaskExecution::clear_raw_event() {
   if (GetArenaNoVirtual() == nullptr && raw_event_ != nullptr) {
@@ -1532,11 +1533,11 @@ void CloudEventTaskExecution::clear_reference_execution() {
   }
   reference_execution_ = nullptr;
 }
-void CloudEventTaskExecution::clear_workflow_id() {
-  if (GetArenaNoVirtual() == nullptr && workflow_id_ != nullptr) {
-    delete workflow_id_;
+void CloudEventTaskExecution::clear_launch_plan_id() {
+  if (GetArenaNoVirtual() == nullptr && launch_plan_id_ != nullptr) {
+    delete launch_plan_id_;
   }
-  workflow_id_ = nullptr;
+  launch_plan_id_ = nullptr;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int CloudEventTaskExecution::kRawEventFieldNumber;
@@ -1547,7 +1548,7 @@ const int CloudEventTaskExecution::kScheduledAtFieldNumber;
 const int CloudEventTaskExecution::kArtifactIdsFieldNumber;
 const int CloudEventTaskExecution::kParentNodeExecutionFieldNumber;
 const int CloudEventTaskExecution::kReferenceExecutionFieldNumber;
-const int CloudEventTaskExecution::kWorkflowIdFieldNumber;
+const int CloudEventTaskExecution::kLaunchPlanIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 CloudEventTaskExecution::CloudEventTaskExecution()
@@ -1595,10 +1596,10 @@ CloudEventTaskExecution::CloudEventTaskExecution(const CloudEventTaskExecution& 
   } else {
     reference_execution_ = nullptr;
   }
-  if (from.has_workflow_id()) {
-    workflow_id_ = new ::flyteidl::core::Identifier(*from.workflow_id_);
+  if (from.has_launch_plan_id()) {
+    launch_plan_id_ = new ::flyteidl::core::Identifier(*from.launch_plan_id_);
   } else {
-    workflow_id_ = nullptr;
+    launch_plan_id_ = nullptr;
   }
   // @@protoc_insertion_point(copy_constructor:flyteidl.event.CloudEventTaskExecution)
 }
@@ -1607,8 +1608,8 @@ void CloudEventTaskExecution::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_CloudEventTaskExecution_flyteidl_2fevent_2fcloudevents_2eproto.base);
   ::memset(&raw_event_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&workflow_id_) -
-      reinterpret_cast<char*>(&raw_event_)) + sizeof(workflow_id_));
+      reinterpret_cast<char*>(&launch_plan_id_) -
+      reinterpret_cast<char*>(&raw_event_)) + sizeof(launch_plan_id_));
 }
 
 CloudEventTaskExecution::~CloudEventTaskExecution() {
@@ -1624,7 +1625,7 @@ void CloudEventTaskExecution::SharedDtor() {
   if (this != internal_default_instance()) delete scheduled_at_;
   if (this != internal_default_instance()) delete parent_node_execution_;
   if (this != internal_default_instance()) delete reference_execution_;
-  if (this != internal_default_instance()) delete workflow_id_;
+  if (this != internal_default_instance()) delete launch_plan_id_;
 }
 
 void CloudEventTaskExecution::SetCachedSize(int size) const {
@@ -1671,10 +1672,10 @@ void CloudEventTaskExecution::Clear() {
     delete reference_execution_;
   }
   reference_execution_ = nullptr;
-  if (GetArenaNoVirtual() == nullptr && workflow_id_ != nullptr) {
-    delete workflow_id_;
+  if (GetArenaNoVirtual() == nullptr && launch_plan_id_ != nullptr) {
+    delete launch_plan_id_;
   }
-  workflow_id_ = nullptr;
+  launch_plan_id_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -1798,13 +1799,13 @@ const char* CloudEventTaskExecution::_InternalParse(const char* begin, const cha
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
-      // .flyteidl.core.Identifier workflow_id = 9;
+      // .flyteidl.core.Identifier launch_plan_id = 9;
       case 9: {
         if (static_cast<::google::protobuf::uint8>(tag) != 74) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::core::Identifier::_InternalParse;
-        object = msg->mutable_workflow_id();
+        object = msg->mutable_launch_plan_id();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -1929,11 +1930,11 @@ bool CloudEventTaskExecution::MergePartialFromCodedStream(
         break;
       }
 
-      // .flyteidl.core.Identifier workflow_id = 9;
+      // .flyteidl.core.Identifier launch_plan_id = 9;
       case 9: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (74 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_workflow_id()));
+               input, mutable_launch_plan_id()));
         } else {
           goto handle_unusual;
         }
@@ -2018,10 +2019,10 @@ void CloudEventTaskExecution::SerializeWithCachedSizes(
       8, HasBitSetters::reference_execution(this), output);
   }
 
-  // .flyteidl.core.Identifier workflow_id = 9;
-  if (this->has_workflow_id()) {
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  if (this->has_launch_plan_id()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      9, HasBitSetters::workflow_id(this), output);
+      9, HasBitSetters::launch_plan_id(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2094,11 +2095,11 @@ void CloudEventTaskExecution::SerializeWithCachedSizes(
         8, HasBitSetters::reference_execution(this), target);
   }
 
-  // .flyteidl.core.Identifier workflow_id = 9;
-  if (this->has_workflow_id()) {
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  if (this->has_launch_plan_id()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        9, HasBitSetters::workflow_id(this), target);
+        9, HasBitSetters::launch_plan_id(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2182,11 +2183,11 @@ size_t CloudEventTaskExecution::ByteSizeLong() const {
         *reference_execution_);
   }
 
-  // .flyteidl.core.Identifier workflow_id = 9;
-  if (this->has_workflow_id()) {
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  if (this->has_launch_plan_id()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *workflow_id_);
+        *launch_plan_id_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -2238,8 +2239,8 @@ void CloudEventTaskExecution::MergeFrom(const CloudEventTaskExecution& from) {
   if (from.has_reference_execution()) {
     mutable_reference_execution()->::flyteidl::core::WorkflowExecutionIdentifier::MergeFrom(from.reference_execution());
   }
-  if (from.has_workflow_id()) {
-    mutable_workflow_id()->::flyteidl::core::Identifier::MergeFrom(from.workflow_id());
+  if (from.has_launch_plan_id()) {
+    mutable_launch_plan_id()->::flyteidl::core::Identifier::MergeFrom(from.launch_plan_id());
   }
 }
 
@@ -2276,7 +2277,7 @@ void CloudEventTaskExecution::InternalSwap(CloudEventTaskExecution* other) {
   swap(scheduled_at_, other->scheduled_at_);
   swap(parent_node_execution_, other->parent_node_execution_);
   swap(reference_execution_, other->reference_execution_);
-  swap(workflow_id_, other->workflow_id_);
+  swap(launch_plan_id_, other->launch_plan_id_);
 }
 
 ::google::protobuf::Metadata CloudEventTaskExecution::GetMetadata() const {

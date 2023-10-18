@@ -536,6 +536,17 @@ type ExternalEventsConfig struct {
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
+//go:generate enumer -type=CloudEventVersion -trimprefix=CloudEventVersion
+type CloudEventVersion int
+
+const (
+	// This is the initial version of the cloud events
+	CloudEventVersionv1 CloudEventVersion = iota
+
+	// Version 2 of the cloud events add a lot more information into the event
+	CloudEventVersionv2
+)
+
 type CloudEventsConfig struct {
 	Enable bool `json:"enable"`
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
@@ -552,7 +563,7 @@ type CloudEventsConfig struct {
 	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 	// Transform the raw events into the fuller cloudevent events before publishing
-	TransformToCloudEvents bool `json:"transformToCloudEvents"`
+	CloudEventVersion CloudEventVersion `json:"cloudEventVersion"`
 }
 
 // Configuration specific to notifications handling

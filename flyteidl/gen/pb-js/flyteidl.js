@@ -17581,7 +17581,7 @@
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventWorkflowExecution artifactIds
                  * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventWorkflowExecution parentNodeExecution
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventWorkflowExecution referenceExecution
-                 * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventWorkflowExecution workflowId
+                 * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventWorkflowExecution launchPlanId
                  */
     
                 /**
@@ -17665,12 +17665,12 @@
                 CloudEventWorkflowExecution.prototype.referenceExecution = null;
     
                 /**
-                 * CloudEventWorkflowExecution workflowId.
-                 * @member {flyteidl.core.IIdentifier|null|undefined} workflowId
+                 * CloudEventWorkflowExecution launchPlanId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} launchPlanId
                  * @memberof flyteidl.event.CloudEventWorkflowExecution
                  * @instance
                  */
-                CloudEventWorkflowExecution.prototype.workflowId = null;
+                CloudEventWorkflowExecution.prototype.launchPlanId = null;
     
                 /**
                  * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -17713,8 +17713,8 @@
                         $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
-                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
-                        $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
+                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -17763,7 +17763,7 @@
                             message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
                             break;
                         case 9:
-                            message.workflowId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17828,10 +17828,10 @@
                         if (error)
                             return "referenceExecution." + error;
                     }
-                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
-                        var error = $root.flyteidl.core.Identifier.verify(message.workflowId);
+                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.launchPlanId);
                         if (error)
-                            return "workflowId." + error;
+                            return "launchPlanId." + error;
                     }
                     return null;
                 };
@@ -17965,7 +17965,7 @@
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventTaskExecution artifactIds
                  * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventTaskExecution parentNodeExecution
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventTaskExecution referenceExecution
-                 * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventTaskExecution workflowId
+                 * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventTaskExecution launchPlanId
                  */
     
                 /**
@@ -18049,12 +18049,12 @@
                 CloudEventTaskExecution.prototype.referenceExecution = null;
     
                 /**
-                 * CloudEventTaskExecution workflowId.
-                 * @member {flyteidl.core.IIdentifier|null|undefined} workflowId
+                 * CloudEventTaskExecution launchPlanId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} launchPlanId
                  * @memberof flyteidl.event.CloudEventTaskExecution
                  * @instance
                  */
-                CloudEventTaskExecution.prototype.workflowId = null;
+                CloudEventTaskExecution.prototype.launchPlanId = null;
     
                 /**
                  * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -18097,8 +18097,8 @@
                         $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
-                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
-                        $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
+                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -18147,7 +18147,7 @@
                             message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
                             break;
                         case 9:
-                            message.workflowId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18212,10 +18212,10 @@
                         if (error)
                             return "referenceExecution." + error;
                     }
-                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
-                        var error = $root.flyteidl.core.Identifier.verify(message.workflowId);
+                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.launchPlanId);
                         if (error)
-                            return "workflowId." + error;
+                            return "launchPlanId." + error;
                     }
                     return null;
                 };
@@ -55271,39 +55271,6 @@
                  * @instance
                  * @param {flyteidl.artifact.IRegisterConsumerRequest} request RegisterConsumerRequest message or plain object
                  * @returns {Promise<flyteidl.artifact.RegisterResponse>} Promise
-                 * @variation 2
-                 */
-    
-                /**
-                 * Callback as used by {@link flyteidl.artifact.ArtifactRegistry#handleCloudEvent}.
-                 * @memberof flyteidl.artifact.ArtifactRegistry
-                 * @typedef HandleCloudEventCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.artifact.CloudEventResponse} [response] CloudEventResponse
-                 */
-    
-                /**
-                 * Calls HandleCloudEvent.
-                 * @function handleCloudEvent
-                 * @memberof flyteidl.artifact.ArtifactRegistry
-                 * @instance
-                 * @param {flyteidl.artifact.ICloudEventRequest} request CloudEventRequest message or plain object
-                 * @param {flyteidl.artifact.ArtifactRegistry.HandleCloudEventCallback} callback Node-style callback called with the error, if any, and CloudEventResponse
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(ArtifactRegistry.prototype.handleCloudEvent = function handleCloudEvent(request, callback) {
-                    return this.rpcCall(handleCloudEvent, $root.flyteidl.artifact.CloudEventRequest, $root.flyteidl.artifact.CloudEventResponse, request, callback);
-                }, "name", { value: "HandleCloudEvent" });
-    
-                /**
-                 * Calls HandleCloudEvent.
-                 * @function handleCloudEvent
-                 * @memberof flyteidl.artifact.ArtifactRegistry
-                 * @instance
-                 * @param {flyteidl.artifact.ICloudEventRequest} request CloudEventRequest message or plain object
-                 * @returns {Promise<flyteidl.artifact.CloudEventResponse>} Promise
                  * @variation 2
                  */
     
