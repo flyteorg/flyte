@@ -452,12 +452,10 @@ The following instructions provide guidance on how to build single binary with y
    # Step1: Install flytekit
    pip install flytekit && export PATH=$PATH:/home/ubuntu/.local/bin
 
-   # Step2: The flytesnacks repository provides a lot of useful examples.
-   git clone https://github.com/flyteorg/flytesnacks && cd flytesnacks
-
-   # Step3: Run a hello world example
-   pyflyte run --remote examples/basics/basics/hello_world.py hello_world_wf
+   # Step2: Run a hello world example
+   pyflyte run --remote https://github.com/flyteorg/flytesnacks/blob/master/examples/basics/basics/hello_world.py  hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
+   # You can go to the [flytesnacks repository](https://github.com/flyteorg/flytesnacks) to see more useful examples.
 
 **6. Tear down the k3s cluster after finishing developing.**
 
@@ -513,7 +511,6 @@ If not, we can start backends with a single command.
    source ~/.virtualenvs/flytekit/bin/activate
    make setup
    pip install -e .
-   pip install gsutil awscli
    
    # If you are also developing the plugins, consider the followings:
 
@@ -538,9 +535,7 @@ If not, we can start backends with a single command.
    make test
 
    # Step3: Run a hello world sample to test locally
-   git clone https://github.com/flyteorg/flytesnacks
-   cd flytesnacks
-   python3 examples/basics/basics/hello_world.py hello_world_wf
+   pyflyte run https://github.com/flyteorg/flytesnacks/blob/master/examples/basics/basics/hello_world.py hello_world_wf
    # Running hello_world_wf() hello world
 
 **3. Run workflow in sandbox.**
@@ -582,9 +577,8 @@ the Flyte cluster, and finally submit the workflow.
    docker push ${FLYTE_INTERNAL_IMAGE}
 
    # Step4: Submit a hello world workflow to the Flyte cluster
-   git clone https://github.com/flyteorg/flytesnacks
    cd flytesnacks
-   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote examples/basics/basics/hello_world.py hello_world_wf
+   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote https://github.com/flyteorg/flytesnacks/blob/master/examples/basics/basics/hello_world.py hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
 
 How to setup dev environment for flyteconsole?
