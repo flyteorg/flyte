@@ -36,9 +36,10 @@ package config
 import (
 	"time"
 
+	"k8s.io/apimachinery/pkg/types"
+
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 //go:generate pflags Config --default-var=defaultConfig

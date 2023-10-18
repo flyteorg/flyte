@@ -4,13 +4,11 @@ import (
 	"context"
 	"testing"
 
-	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 )
 
 func TestHierarchicalNodeID(t *testing.T) {

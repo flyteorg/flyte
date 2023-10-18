@@ -6,14 +6,13 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/rest"
-
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 type kubeClient struct {

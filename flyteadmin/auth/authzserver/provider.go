@@ -9,27 +9,21 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"k8s.io/apimachinery/pkg/util/sets"
-
-	"github.com/lestrrat-go/jwx/jwk"
-
-	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
-
-	"github.com/flyteorg/flyte/flyteadmin/auth"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
 	jwtgo "github.com/golang-jwt/jwt/v4"
-	fositeOAuth2 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/token/jwt"
-
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/ory/fosite"
 	"github.com/ory/fosite/compose"
+	fositeOAuth2 "github.com/ory/fosite/handler/oauth2"
 	"github.com/ory/fosite/storage"
+	"github.com/ory/fosite/token/jwt"
+	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (

@@ -4,10 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/rand"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/util/rand"
 )
 
 func TestDurationToString(t *testing.T) {

@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"k8s.io/client-go/rest"
-
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 //go:generate mockery -name Client -case=underscore

@@ -8,10 +8,11 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
 	"github.com/ghodss/yaml"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
 )
 
 // Make sure existing config file(s) parse correctly before overriding them with this flag!

@@ -6,24 +6,21 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-
-	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/Masterminds/semver"
 	commonv1 "github.com/aws/amazon-sagemaker-operator-for-k8s/api/v1/common"
 	awsSdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteSagemakerIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/sagemaker"
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/golang/protobuf/proto"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (

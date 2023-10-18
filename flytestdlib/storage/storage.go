@@ -8,15 +8,14 @@ package storage
 
 import (
 	"context"
+	"io"
+	"net/url"
 	"strings"
 	"time"
 
-	"github.com/flyteorg/stow"
-
-	"io"
-	"net/url"
-
 	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/stow"
 )
 
 // DataReference defines a reference to data location.

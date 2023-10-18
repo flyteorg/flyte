@@ -4,13 +4,25 @@ package cmd
 import (
 	"context"
 	"flag"
+	"net/http"
+	"os"
+	"runtime"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"golang.org/x/sync/errgroup"
+	"k8s.io/client-go/rest"
+	"k8s.io/klog"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
+
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
-	"net/http"
-	"os"
-	"runtime"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
@@ -21,21 +33,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/version"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-
-	"golang.org/x/sync/errgroup"
-
-	"k8s.io/client-go/rest"
-	"k8s.io/klog"
-
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 const (

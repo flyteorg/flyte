@@ -3,8 +3,9 @@ package labeled
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 )
 
 func TestMetricKeys(t *testing.T) {

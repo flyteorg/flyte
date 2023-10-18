@@ -1,10 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"sync"
 	"testing"
-
-	"fmt"
 
 	"github.com/stretchr/testify/assert"
 )
