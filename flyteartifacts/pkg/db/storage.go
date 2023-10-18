@@ -4,6 +4,8 @@ import (
 	"context"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -18,24 +20,24 @@ type RDSStorage struct {
 }
 
 // WriteOne is a test function
-func (r *RDSStorage) WriteOne(ctx context.Context, gormModel Artifact) (models.Artifact, error) {
+func (r *RDSStorage) WriteOne(ctx context.Context, gormModel Artifact) (artifact.Artifact, error) {
 	timer := r.metrics.CreateDuration.Start()
 	logger.Debugf(ctx, "Attempt create artifact %s", gormModel.Version)
 	tx := r.db.Create(&gormModel)
 	timer.Stop()
 	if tx.Error != nil {
 		logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
-		return models.Artifact{}, tx.Error
+		return artifact.Artifact{}, tx.Error
 	}
-	return models.Artifact{}, nil
+	return artifact.Artifact{}, nil
 }
 
 // CreateArtifact helps implement StorageInterface
-func (r *RDSStorage) CreateArtifact(context.Context, *models.Artifact) (models.Artifact, error) {
+func (r *RDSStorage) CreateArtifact(ctx context.Context, x models.Artifact) (models.Artifact, error) {
 	return models.Artifact{}, nil
 }
 
-func (r *RDSStorage) GetArtifact(ctx context.Context) (models.Artifact, error) {
+func (r *RDSStorage) GetArtifact(ctx context.Context, query core.ArtifactQuery, details bool) (models.Artifact, error) {
 	return models.Artifact{}, nil
 }
 

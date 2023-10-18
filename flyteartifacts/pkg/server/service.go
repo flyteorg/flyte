@@ -17,20 +17,21 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 	if request == nil {
 		return nil, nil
 	}
-	model, err := CreateArtifactModelFrom(request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
+
+	artifactObj, err := CreateArtifactModelFromRequest(request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create artifact model from request: %v", err)
+		logger.Errorf(ctx, "Failed to validate Create request: %v", err)
 		return nil, err
 	}
 
-	created, err := c.Storage.CreateArtifact(ctx, &model)
+	// Offload the metadata object before storing and add the offload location instead.
+	created, err := c.Storage.CreateArtifact(ctx, artifactObj)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create artifact: %v", err)
 		return nil, err
 	}
-	idl := FromModelToIdl(created)
 
-	return &artifact.CreateArtifactResponse{Artifact: &idl}, nil
+	return &artifact.CreateArtifactResponse{Artifact: &created.Artifact}, nil
 }
 
 func (c *CoreService) GetArtifact(ctx context.Context, request *artifact.GetArtifactRequest) (*artifact.GetArtifactResponse, error) {
