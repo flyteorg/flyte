@@ -82,12 +82,8 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 		logger.Info(ctx, "retryAttempts: %v retryDuration: %v", s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelayMilliseconds)
 		response, err := sendAndRetryHttpRequest(httpClient, externalMetadataURL.String(), s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelayMilliseconds.Duration)
 		if err != nil {
-			if response != nil {
-				logger.Errorf(ctx, "Failed to get oauth metadata. Error code: %v. Err: %v", response.StatusCode, err)
-				return nil, flyteErrors.NewFlyteAdminError(codes.Code(response.StatusCode), "Failed to get oauth metadata.")
-			}
-			logger.Errorf(ctx, "Failed to get oauth metadata. Err: %v", err)
-			return nil, flyteErrors.NewFlyteAdminError(codes.Code(500), "Failed to get oauth metadata.")
+			logger.Errorf(ctx, "Failed to get oauth metadata. Error code: %v. Err: %v", response.StatusCode, err)
+			return nil, flyteErrors.NewFlyteAdminErrorf(codes.Code(response.StatusCode), "Failed to get oauth metadata. Err: %v", err)
 		}
 
 		raw, err := ioutil.ReadAll(response.Body)
