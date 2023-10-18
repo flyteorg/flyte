@@ -2,7 +2,7 @@ package db
 
 import (
 	"github.com/go-gormigrate/gormigrate/v2"
-	"github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/jackc/pgx/v5/pgtype"
 	"gorm.io/gorm"
 )
 
@@ -18,10 +18,10 @@ var Migrations = []*gormigrate.Migration{
 			}
 			type Artifact struct {
 				gorm.Model
-				ArtifactKeyID uint             `gorm:"uniqueIndex:idx_pdnv"`
-				ArtifactKey   ArtifactKey      `gorm:"foreignKey:ArtifactKeyID;references:ID"`
-				Version       string           `gorm:"type:varchar(255);index:idx_artifact_version;uniqueIndex:idx_pdnv"`
-				Partitions    *postgres.Hstore `gorm:"type:hstore;index:idx_artifact_partitions"`
+				ArtifactKeyID uint           `gorm:"uniqueIndex:idx_pdnv"`
+				ArtifactKey   ArtifactKey    `gorm:"foreignKey:ArtifactKeyID;references:ID"`
+				Version       string         `gorm:"type:varchar(255);index:idx_artifact_version;uniqueIndex:idx_pdnv"`
+				Partitions    *pgtype.Hstore `gorm:"type:hstore;index:idx_artifact_partitions"`
 
 				LiteralType  []byte `gorm:"not null"`
 				LiteralValue []byte `gorm:"not null"`
