@@ -76,8 +76,10 @@ func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *DbCon
 	return nil
 }
 
-func withDB(ctx context.Context, do func(db *gorm.DB) error) error {
-	databaseConfig := GetConfig()
+func withDB(ctx context.Context, databaseConfig *DbConfig, do func(db *gorm.DB) error) error {
+	if databaseConfig == nil {
+		databaseConfig = GetConfig()
+	}
 	logConfig := logger.GetConfig()
 
 	db, err := GetDB(ctx, databaseConfig, logConfig)
@@ -104,12 +106,12 @@ func withDB(ctx context.Context, do func(db *gorm.DB) error) error {
 }
 
 // Migrate runs all configured migrations
-func Migrate(ctx context.Context, migrations []*gormigrate.Migration, initializationSQL string) error {
+func Migrate(ctx context.Context, databaseConfig *DbConfig, migrations []*gormigrate.Migration, initializationSQL string) error {
 	if len(migrations) == 0 {
 		logger.Infof(ctx, "No migrations to run")
 		return nil
 	}
-	return withDB(ctx, func(db *gorm.DB) error {
+	return withDB(ctx, databaseConfig, func(db *gorm.DB) error {
 		tx := db.Exec(initializationSQL)
 		if tx.Error != nil {
 			return tx.Error
@@ -125,12 +127,12 @@ func Migrate(ctx context.Context, migrations []*gormigrate.Migration, initializa
 }
 
 // Rollback rolls back the last migration
-func Rollback(ctx context.Context, migrations []*gormigrate.Migration) error {
+func Rollback(ctx context.Context, databaseConfig *DbConfig, migrations []*gormigrate.Migration) error {
 	if len(migrations) == 0 {
 		logger.Infof(ctx, "No migrations to rollback")
 		return nil
 	}
-	return withDB(ctx, func(db *gorm.DB) error {
+	return withDB(ctx, databaseConfig, func(db *gorm.DB) error {
 		m := gormigrate.New(db, gormigrate.DefaultOptions, migrations)
 		err := m.RollbackLast()
 		if err != nil {

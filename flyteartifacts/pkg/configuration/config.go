@@ -3,13 +3,15 @@ package configuration
 import (
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	stdLibDb "github.com/flyteorg/flyte/flytestdlib/database"
+	stdLibStorage "github.com/flyteorg/flyte/flytestdlib/storage"
 	"time"
 )
 
 const artifactsServer = "artifactsServer"
 
 type ApplicationConfiguration struct {
-	ArtifactDatabaseConfig stdLibDb.DbConfig `json:"artifactDatabaseConfig" pflag:",Database configuration"`
+	ArtifactDatabaseConfig  stdLibDb.DbConfig    `json:"artifactDatabaseConfig" pflag:",Database configuration"`
+	ArtifactBlobStoreConfig stdLibStorage.Config `json:"artifactBlobStoreConfig" pflag:",Blob store configuration"`
 }
 
 var defaultApplicationConfiguration = ApplicationConfiguration{
@@ -27,6 +29,9 @@ var defaultApplicationConfiguration = ApplicationConfiguration{
 			Password:     "postgres",
 			ExtraOptions: "sslmode=disable",
 		},
+	},
+	ArtifactBlobStoreConfig: stdLibStorage.Config{
+		InitContainer: "flyte-artifacts",
 	},
 }
 

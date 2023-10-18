@@ -8,7 +8,8 @@ import (
 )
 
 type CoreService struct {
-	Storage StorageInterface
+	Storage   StorageInterface
+	BlobStore BlobStoreInterface
 	// TriggerHandler TriggerHandlerInterface
 	// SearchHandler  SearchHandlerInterface
 }
@@ -25,6 +26,16 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 	}
 
 	// Offload the metadata object before storing and add the offload location instead.
+	if artifactObj.Spec.UserMetadata != nil {
+		offloadLocation, err := c.BlobStore.OffloadArtifactCard(ctx,
+			artifactObj.ArtifactId.ArtifactKey.Name, artifactObj.ArtifactId.Version, artifactObj.Spec.UserMetadata)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to offload metadata: %v", err)
+			return nil, err
+		}
+		artifactObj.OffloadedMetadata = offloadLocation.String()
+	}
+
 	created, err := c.Storage.CreateArtifact(ctx, artifactObj)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create artifact: %v", err)
@@ -68,8 +79,9 @@ func (c *CoreService) HandleCloudEvent(ctx context.Context, request *artifact.Cl
 	return &artifact.CloudEventResponse{}, nil
 }
 
-func NewCoreService(storage StorageInterface, _ promutils.Scope) CoreService {
+func NewCoreService(storage StorageInterface, blobStore BlobStoreInterface, _ promutils.Scope) CoreService {
 	return CoreService{
-		Storage: storage,
+		Storage:   storage,
+		BlobStore: blobStore,
 	}
 }

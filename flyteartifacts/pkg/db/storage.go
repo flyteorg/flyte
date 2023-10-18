@@ -33,7 +33,17 @@ func (r *RDSStorage) WriteOne(ctx context.Context, gormModel Artifact) (artifact
 }
 
 // CreateArtifact helps implement StorageInterface
-func (r *RDSStorage) CreateArtifact(ctx context.Context, x models.Artifact) (models.Artifact, error) {
+func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Artifact) (models.Artifact, error) {
+	timer := r.metrics.CreateDuration.Start()
+	logger.Debugf(ctx, "Attempt create artifact [%s:%s]",
+		gormModel.Artifact.ArtifactId.ArtifactKey.Name, gormModel.Artifact.ArtifactId.Version)
+	tx := r.db.Create(&gormModel)
+	timer.Stop()
+	if tx.Error != nil {
+		logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
+		return models.Artifact{}, tx.Error
+	}
+
 	return models.Artifact{}, nil
 }
 
