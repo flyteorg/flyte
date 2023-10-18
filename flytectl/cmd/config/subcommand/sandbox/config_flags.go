@@ -61,5 +61,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.StringVar(&DefaultConfig.ImagePullOptions.Platform, fmt.Sprintf("%v%v", prefix, "imagePullOptions.platform"), DefaultConfig.ImagePullOptions.Platform, "Forces a specific platform's image to be pulled.'")
 	cmdFlags.BoolVar(&DefaultConfig.Dev, fmt.Sprintf("%v%v", prefix, "dev"), DefaultConfig.Dev, "Optional. Only start minio and postgres in the sandbox.")
 	cmdFlags.BoolVar(&DefaultConfig.DryRun, fmt.Sprintf("%v%v", prefix, "dryRun"), DefaultConfig.DryRun, "Optional. Only print the docker commands to bring up flyte sandbox/demo container.This will still call github api's to get the latest flyte release to use'")
+	cmdFlags.BoolVar(&DefaultConfig.Force, fmt.Sprintf("%v%v", prefix, "force"), DefaultConfig.Force, "Optional. Forcefully delete existing sandbox cluster if it exists.")
 	return cmdFlags
 }

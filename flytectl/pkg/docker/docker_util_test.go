@@ -21,6 +21,7 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/docker/docker/api/types"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/docker"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -88,6 +89,10 @@ func TestRemoveSandboxWithNoReply(t *testing.T) {
 		mockDocker.OnContainerRemove(ctx, mock.Anything, types.ContainerRemoveOptions{Force: true}).Return(nil)
 		err := RemoveSandbox(ctx, mockDocker, strings.NewReader("n"))
 		assert.NotNil(t, err)
+
+		docker.DefaultConfig.Force = true
+		err = RemoveSandbox(ctx, mockDocker, strings.NewReader(""))
+		assert.Nil(t, err)
 	})
 
 	t.Run("Successfully remove sandbox container with zero sandbox containers are running", func(t *testing.T) {

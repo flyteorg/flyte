@@ -14,6 +14,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	"github.com/enescakir/emoji"
 	"github.com/flyteorg/flytectl/clierrors"
+	dockerCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/docker"
 	sandboxCmdConfig "github.com/flyteorg/flytectl/cmd/config/subcommand/sandbox"
 	"github.com/flyteorg/flytectl/pkg/configutil"
 	"github.com/flyteorg/flytectl/pkg/docker"
@@ -157,6 +158,7 @@ func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService
 	if sandboxConfig.DryRun {
 		docker.PrintRemoveContainer(docker.FlyteSandboxClusterName)
 	} else {
+		dockerCmdConfig.DefaultConfig.Force = sandboxConfig.Force
 		if err := docker.RemoveSandbox(ctx, cli, reader); err != nil {
 			if err.Error() != clierrors.ErrSandboxExists {
 				return nil, err

@@ -12,8 +12,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/enescakir/emoji"
 
-	"github.com/flyteorg/flytectl/clierrors"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -21,6 +19,8 @@ import (
 	"github.com/docker/docker/api/types/volume"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
+	"github.com/flyteorg/flytectl/clierrors"
+	"github.com/flyteorg/flytectl/cmd/config/subcommand/docker"
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
 )
@@ -93,8 +93,9 @@ func RemoveSandbox(ctx context.Context, cli Docker, reader io.Reader) error {
 	if err != nil {
 		return err
 	}
+
 	if c != nil {
-		if cmdUtil.AskForConfirmation("delete existing sandbox cluster", reader) {
+		if docker.DefaultConfig.Force || cmdUtil.AskForConfirmation("delete existing sandbox cluster", reader) {
 			err := cli.ContainerRemove(context.Background(), c.ID, types.ContainerRemoveOptions{
 				Force: true,
 			})
