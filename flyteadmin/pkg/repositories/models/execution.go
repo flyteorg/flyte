@@ -3,9 +3,8 @@ package models
 import (
 	"time"
 
-	"gorm.io/gorm/clause"
-
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )

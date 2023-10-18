@@ -5,18 +5,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy"
-	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy/mocks"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
+
+	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy"
+	"github.com/flyteorg/flyte/flytepropeller/manager/shardstrategy/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var (

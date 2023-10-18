@@ -4,14 +4,12 @@ import (
 	"context"
 	"testing"
 
-	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
 
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestInitializeExternalResources(t *testing.T) {

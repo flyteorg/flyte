@@ -2,9 +2,10 @@
 package adminservice
 
 import (
+	"github.com/prometheus/client_golang/prometheus"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 type executionEndpointMetrics struct {

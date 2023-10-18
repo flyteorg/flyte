@@ -6,6 +6,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/robfig/cron/v3"
+	"golang.org/x/time/rate"
+
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/executor"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
@@ -13,10 +17,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/robfig/cron/v3"
-	"golang.org/x/time/rate"
 )
 
 // goCronMetrics mertrics recorded for go cron.

@@ -5,11 +5,12 @@ import (
 	"errors"
 	"reflect"
 
+	"github.com/jackc/pgconn"
+
 	errors2 "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/jackc/pgconn"
 )
 
 var migrationsScope = promutils.NewScope("migrations")
