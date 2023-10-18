@@ -107,9 +107,7 @@ func StartProfilingServer(ctx context.Context, pprofPort int) error {
 		}
 	}()
 
-	srv.Shutdown(ctx)
-
-	return nil
+	return srv.Shutdown(ctx)
 }
 
 func configureGlobalHTTPHandler(handlers map[string]http.Handler) error {
