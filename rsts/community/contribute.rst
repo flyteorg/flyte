@@ -415,48 +415,31 @@ that integrates all Flyte components into a single binary.
 **4. Build single binary with your own code.**
 
 
-The following instructions provide guidance on how to build single binary with your customized code, using ``flyteadmin`` as an example.
+The following instructions provide guidance on how to build single binary with your customized code under the ``flyteadmin`` as an example.
 
 
 - **Note** Although we'll use ``flyteadmin`` as an example, these steps can be applied to other Flyte components or libraries as well.
   ``{flyteadmin}`` below can be substituted with other Flyte components/libraries: ``flyteidl``, ``flyteplugins``, ``flytepropeller``, ``datacatalog``, or ``flytestdlib``.
-
-- **Note** If modifications are needed in multiple components/libraries, the steps will need to be repeated for each component/library.
+- **Note** If you want to learn how flyte compiles those components and replace the repositories, you can study how ``go mod edit`` works.
 
 .. code:: shell
 
-   # Step1: Fork and clone the {flyteadmin} repository, modify the source code accordingly.
-   git clone https://github.com/flyteorg/flyteadmin.git
-   cd flyteadmin
-
-   # Step2.1: {Flyteadmin} uses Go 1.19, so make sure to switch to Go 1.19.
+   # Step1: Install Go. Flyte uses Go 1.19, so make sure to switch to Go 1.19.
    export PATH=$PATH:$(go env GOPATH)/bin
    go install golang.org/dl/go1.19@latest
    go1.19 download
    export GOROOT=$(go1.19 env GOROOT)
    export PATH="$GOROOT/bin:$PATH"
- 
-   # Step2.2: You may need to install goimports to fix lint errors.
+
+   # You may need to install goimports to fix lint errors.
    # Refer to https://pkg.go.dev/golang.org/x/tools/cmd/goimports
    go install golang.org/x/tools/cmd/goimports@latest
    export PATH=$(go env GOPATH)/bin:$PATH
 
-   # Step 3.1: Review the go.mod file in the {flyteadmin} directory to identify the Flyte components/libraries that {flyteadmin} relies on.
-   # If you have modified any of these components/libraries, use `go mod edit -replace` in the {flyteadmin} repo to replace original components/libraries with your customized ones.
-   # For instance, if you have also modified `flytepropeller`, run the following commands:
-   go mod edit -replace github.com/flyteorg/flytepropeller=/home/ubuntu/flytepropeller #replace with your own local path to flytepropeller
+   # Step2: Go to the {flyteadmin} repository, modify the source code accordingly.
+   cd flyte/flyteadmin
 
-   # Step 3.2: Generate code, fix lint errors and run unit tests for {flyteadmin}.
-   # Note, flyteidl does not have unit tests, so you can skip the `make test_unit` command.
-   # Note, flytestdlib only have `make generate` command.
-   make generate
-   make lint
-   make test_unit
- 
-   # Step4: Now, you can build the single binary. Go back to Flyte directory, run `go mod edit -replace` to replace the {flyteadmin} code with your own.
-   go mod edit -replace github.com/flyteorg/flyteadmin=/home/ubuntu/flyteadmin #replace with your own local path to {flyteadmin} 
-
-   # Step5: Rebuild and rerun the single binary based on your own code.
+   # Step3: Now, you can build the single binary. Go back to Flyte directory.
    go mod tidy
    make compile
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
@@ -473,7 +456,7 @@ The following instructions provide guidance on how to build single binary with y
    git clone https://github.com/flyteorg/flytesnacks && cd flytesnacks
 
    # Step3: Run a hello world example
-   pyflyte run --remote examples/basics/basics/hello_world.py my_wf
+   pyflyte run --remote examples/basics/basics/hello_world.py hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/fd63f88a55fed4bba846 to see execution in the console.
 
 **6. Tear down the k3s cluster after finishing developing.**
@@ -531,9 +514,24 @@ If not, we can start backends with a single command.
    make setup
    pip install -e .
    pip install gsutil awscli
-   # If you are also developing the plugins, execute the following:
+   
+   # # If you are also developing the plugins, consider the followings:
+
+   # Installing Specific Plugins:
+   # If you wish to only use few plugins, you can install them individually.
+   # Take [Flytekit BigQuery Plugin](https://github.com/flyteorg/flytekit/tree/master/plugins/flytekit-bigquery#flytekit-bigquery-plugin) for example:
+   # You have to go to the bigquery plugin folder and install it.
+   cd plugins/flytekit-bigquery/
+   pip install -e .
+   # Now you can use the bigquery plugin, and the performance is fast.
+
+   # (Optional) Installing All Plugins:
+   # If you wish to install all available plugins, you can execute the command below.
+   # However, it's not typically recommended because the current version of plugins does not support
+   # lazy loading. This can lead to a slowdown in the performance of your Python engine.
    cd plugins
    pip install -e .
+   # Now you can use all plugins, but the performance is slow.
 
    # Step2: Modify the source code for flytekit, then run unit tests and lint.
    make lint
@@ -542,8 +540,8 @@ If not, we can start backends with a single command.
    # Step3: Run a hello world sample to test locally
    git clone https://github.com/flyteorg/flytesnacks
    cd flytesnacks
-   python3 examples/basics/basics/hello_world.py my_wf
-   # Running my_wf() hello world
+   python3 examples/basics/basics/hello_world.py hello_world_wf
+   # Running hello_world_wf() hello world
 
 **3. Run workflow in sandbox.**
 
@@ -586,7 +584,7 @@ the Flyte cluster, and finally submit the workflow.
    # Step4: Submit a hello world workflow to the Flyte cluster
    git clone https://github.com/flyteorg/flytesnacks
    cd flytesnacks
-   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote examples/basics/basics/hello_world.py my_wf
+   pyflyte run --image ${FLYTE_INTERNAL_IMAGE} --remote examples/basics/basics/hello_world.py hello_world_wf
    # Go to http://localhost:30080/console/projects/flytesnacks/domains/development/executions/f5c17e1b5640c4336bf8 to see execution in the console.
 
 How to setup dev environment for flyteconsole?
