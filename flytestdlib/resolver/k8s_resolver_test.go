@@ -66,7 +66,7 @@ func TestBuilder(t *testing.T) {
 	}
 
 	// Make sure watcher is started before we create the endpoint
-	time.Sleep(5 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	_, err = k8sClient.CoreV1().Endpoints("flyte").Create(context.Background(), &v1.Endpoints{
 		ObjectMeta: metav1.ObjectMeta{

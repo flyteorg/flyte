@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	K8sSchema = "k8s"
+	Schema = "k8s"
 )
 
 type targetInfo struct {
@@ -28,7 +28,7 @@ type targetInfo struct {
 }
 
 func (t targetInfo) String() string {
-	return fmt.Sprintf("%s:///%s.%s:%s", K8sSchema, t.serviceNamespace, t.serviceName, t.port)
+	return fmt.Sprintf("%s:///%s.%s:%s", Schema, t.serviceNamespace, t.serviceName, t.port)
 }
 
 // NewBuilder creates a kubeBuilder which is used by grpc resolver.
