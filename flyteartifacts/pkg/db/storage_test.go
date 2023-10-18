@@ -33,7 +33,6 @@ func TestWriteOne(t *testing.T) {
 	p := pgtype.Hstore{
 		"area": &pval1,
 	}
-	//p := postgres.Hstore{"area": &pval1}
 
 	lt := &core.LiteralType{
 		Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
@@ -69,6 +68,6 @@ func TestWriteOne(t *testing.T) {
 		RetryAttempt:  &one,
 	}
 
-	a, err := rds.WriteOne(ctx, gormA)
-	fmt.Println(a, err)
+	//a, err := rds.WriteOne(ctx, gormA)
+	//fmt.Println(a, err)
 }

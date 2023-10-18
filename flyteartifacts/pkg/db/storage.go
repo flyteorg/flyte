@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -19,24 +18,16 @@ type RDSStorage struct {
 	metrics gormMetrics
 }
 
-// WriteOne is a test function
-func (r *RDSStorage) WriteOne(ctx context.Context, gormModel Artifact) (artifact.Artifact, error) {
-	timer := r.metrics.CreateDuration.Start()
-	logger.Debugf(ctx, "Attempt create artifact %s", gormModel.Version)
-	tx := r.db.Create(&gormModel)
-	timer.Stop()
-	if tx.Error != nil {
-		logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
-		return artifact.Artifact{}, tx.Error
-	}
-	return artifact.Artifact{}, nil
-}
-
 // CreateArtifact helps implement StorageInterface
 func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Artifact) (models.Artifact, error) {
 	timer := r.metrics.CreateDuration.Start()
 	logger.Debugf(ctx, "Attempt create artifact [%s:%s]",
-		gormModel.Artifact.ArtifactId.ArtifactKey.Name, gormModel.Artifact.ArtifactId.Version)
+		serviceModel.Artifact.ArtifactId.ArtifactKey.Name, serviceModel.Artifact.ArtifactId.Version)
+	gormModel, err := ServiceToGormModel(serviceModel)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to convert service model to gorm model: %+v", err)
+		return models.Artifact{}, err
+	}
 	tx := r.db.Create(&gormModel)
 	timer.Stop()
 	if tx.Error != nil {

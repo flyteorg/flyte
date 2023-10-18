@@ -27,7 +27,12 @@ func (a *ArtifactBlobStore) OffloadArtifactCard(ctx context.Context, name, versi
 	return uri, nil
 }
 
-func (a *ArtifactBlobStore) RetrieveArtifactCard(ctx context.Context, uri storage.DataReference) ([]byte, error) {
+func (a *ArtifactBlobStore) RetrieveArtifactCard(ctx context.Context, uri storage.DataReference) (*any.Any, error) {
+	card := &any.Any{}
+	err := a.store.ReadProtobuf(ctx, uri, card)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read protobuf from %s with err: %v", uri, err)
+	}
 	return nil, nil
 }
 

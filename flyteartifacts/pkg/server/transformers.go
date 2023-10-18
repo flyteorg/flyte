@@ -1,13 +1,17 @@
 package server
 
 import (
+	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-func CreateArtifactModelFromRequest(key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (models.Artifact, error) {
+func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (models.Artifact, error) {
 	if key == nil || spec == nil {
 		return models.Artifact{}, fmt.Errorf("key and spec cannot be nil")
 	}
@@ -48,7 +52,22 @@ func CreateArtifactModelFromRequest(key *core.ArtifactKey, spec *artifact.Artifa
 	if principal != "" {
 		a.Spec.Principal = principal
 	}
-	return models.Artifact{Artifact: a}, nil
+	ltBytes, err := proto.Marshal(spec.Type)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to marshal type for artifact: %+v@%s, err: %v", key, version, err)
+		return models.Artifact{}, err
+	}
+	litBytes, err := proto.Marshal(spec.Value)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to marshal literal value for artifact: %+v@%s, err: %v", key, version, err)
+		return models.Artifact{}, err
+	}
+
+	return models.Artifact{
+		Artifact:          a,
+		LiteralTypeBytes:  ltBytes,
+		LiteralValueBytes: litBytes,
+	}, nil
 }
 
 func PartitionsToIdl(partitions map[string]string) *core.Partitions {

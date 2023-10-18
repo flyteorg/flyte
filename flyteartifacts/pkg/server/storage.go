@@ -17,5 +17,5 @@ type StorageInterface interface {
 type BlobStoreInterface interface {
 	OffloadArtifactCard(ctx context.Context, name string, version string, userMetadata *any.Any) (stdLibStorage.DataReference, error)
 
-	RetrieveArtifactCard(context.Context, stdLibStorage.DataReference) ([]byte, error)
+	RetrieveArtifactCard(context.Context, stdLibStorage.DataReference) (*any.Any, error)
 }

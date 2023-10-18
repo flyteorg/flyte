@@ -19,7 +19,7 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 		return nil, nil
 	}
 
-	artifactObj, err := CreateArtifactModelFromRequest(request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
+	artifactObj, err := CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to validate Create request: %v", err)
 		return nil, err
