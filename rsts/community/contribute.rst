@@ -515,7 +515,7 @@ If not, we can start backends with a single command.
    pip install -e .
    pip install gsutil awscli
    
-   # # If you are also developing the plugins, consider the followings:
+   # If you are also developing the plugins, consider the followings:
 
    # Installing Specific Plugins:
    # If you wish to only use few plugins, you can install them individually.
