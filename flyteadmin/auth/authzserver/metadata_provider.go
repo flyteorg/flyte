@@ -124,7 +124,7 @@ func NewService(config *authConfig.Config) OAuth2MetadataProvider {
 func sendAndRetryHttpRequest(client *http.Client, url string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
 	var response *http.Response
 	var err error
-	err = async.RetryOnSpecificErrorCodes(retryAttempts, retryDelay, func() (*http.Response, error) {
+	err = async.RetryOnSpecificErrorCodes(retryAttempts+1, retryDelay, func() (*http.Response, error) {
 		response, err = client.Get(url)
 		return response, err
 	}, isTransientErrorCode)
