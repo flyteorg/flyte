@@ -130,7 +130,7 @@ func TestSendAndRetryHttpRequest(t *testing.T) {
 	defer server.Close()
 	http.DefaultClient = server.Client()
 	retryAttempts := 5
-	totalAttempts := retryAttempts + 1 // 1 for the inital try
+	totalAttempts := retryAttempts + 1 // 1 for the initial try
 
 	resp, err := sendAndRetryHttpRequest(server.Client(), server.URL, retryAttempts, 0 /* for testing */)
 	assert.Error(t, err)

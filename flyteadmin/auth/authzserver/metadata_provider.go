@@ -79,7 +79,7 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 			}
 			httpClient.Transport = transport
 		}
-		logger.Printf(ctx, "retryAttempts: %v retryDuration: %v", s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelayMilliseconds)
+		logger.Info(ctx, "retryAttempts: %v retryDuration: %v", s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelayMilliseconds)
 		response, err := sendAndRetryHttpRequest(httpClient, externalMetadataURL.String(), s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelayMilliseconds.Duration)
 		if err != nil {
 			if response != nil {
