@@ -11,10 +11,10 @@ import (
 // RetryDelay indicates how long to wait between restarting a subscriber connection in the case of network failures.
 var RetryDelay = 30 * time.Second
 
-func RetryOnSpecificErrorCodes(attempts int, delay time.Duration, f func() (*http.Response, error), IsErrorCodeRetryable func(*http.Response) bool) error {
+func RetryOnSpecificErrorCodes(totalAttempts int, delay time.Duration, f func() (*http.Response, error), IsErrorCodeRetryable func(*http.Response) bool) error {
 	var err error
 	var resp *http.Response
-	for attempt := 0; attempt <= attempts; attempt++ {
+	for attempt := 1; attempt <= totalAttempts; attempt++ {
 		resp, err = f()
 		if err != nil {
 			return err
@@ -23,7 +23,7 @@ func RetryOnSpecificErrorCodes(attempts int, delay time.Duration, f func() (*htt
 			return err
 		}
 		logger.Warningf(context.Background(),
-			"Failed status code %v on attempt %d of %d", resp.StatusCode, attempt, attempts)
+			"Failed status code %v on attempt %d of %d", resp.StatusCode, attempt, totalAttempts)
 		time.Sleep(delay)
 	}
 	return err
