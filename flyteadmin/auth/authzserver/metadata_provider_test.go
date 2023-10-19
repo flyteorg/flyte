@@ -133,7 +133,7 @@ func TestSendAndRetryHttpRequest(t *testing.T) {
 		retryAttempts := 5
 		totalAttempts := retryAttempts + 1 // 1 for the initial try
 
-		resp, err := sendAndRetryHttpRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
+		resp, err := sendAndRetryHTTPRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
 		assert.Error(t, err)
 		assert.Equal(t, oauthMetadataFailureErrorMessage, err.Error())
 		assert.Nil(t, resp)
@@ -162,7 +162,7 @@ func TestSendAndRetryHttpRequest(t *testing.T) {
 		retryAttempts := 5
 		expectedRequestAttempts := 3
 
-		resp, err := sendAndRetryHttpRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
+		resp, err := sendAndRetryHTTPRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
 		assert.Equal(t, 200, resp.StatusCode)
@@ -186,7 +186,7 @@ func TestSendAndRetryHttpRequest(t *testing.T) {
 		retryAttempts := 5
 		expectedRequestAttempts := 0
 
-		resp, err := sendAndRetryHttpRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
+		resp, err := sendAndRetryHTTPRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
 		assert.Equal(t, 200, resp.StatusCode)
