@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
+
 	"gopkg.in/yaml.v3"
 
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
@@ -152,7 +154,14 @@ func ParamMapForWorkflow(lp *admin.LaunchPlan) (map[string]yaml.Node, error) {
 
 func getCommentedYamlNode(input interface{}, comment string) (yaml.Node, error) {
 	var node yaml.Node
-	err := node.Encode(input)
+	var err error
+
+	if s, ok := input.(*structpb.Struct); ok {
+		err = node.Encode(s.AsMap())
+	} else {
+		err = node.Encode(input)
+	}
+
 	node.LineComment = comment
 	return node, err
 }
