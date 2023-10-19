@@ -2,7 +2,6 @@ package authzserver
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -130,10 +129,7 @@ func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url strin
 	retryableOauthMetadataError := flyteErrors.NewFlyteAdminError(codes.Internal, "Failed to get oauth metadata.")
 	err = retry.OnError(backoff,
 		func(err error) bool { // Determine if error is retryable
-			if err == retryableOauthMetadataError {
-				return true
-			}
-			return false
+			return err == retryableOauthMetadataError
 		}, func() error { // Send HTTP request
 			response, err = client.Get(url)
 			if err != nil {
@@ -152,7 +148,7 @@ func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url strin
 	}
 
 	if response != nil && response.StatusCode != http.StatusOK {
-		return response, errors.New(fmt.Sprintf("Failed to get oauth metadata with status code %v", response.StatusCode))
+		return response, fmt.Errorf("failed to get oauth metadata with status code %v", response.StatusCode)
 	}
 
 	return response, nil
