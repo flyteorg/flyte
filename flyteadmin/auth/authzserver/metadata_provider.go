@@ -125,7 +125,7 @@ func NewService(config *authConfig.Config) OAuth2MetadataProvider {
 func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
 	var response *http.Response
 	var err error
-	totalAttempts := retryAttempts + 1 // Add 1 for the case where 0 retryAttempts are specified
+	totalAttempts := retryAttempts + 1 // Add one for initial http request attempt
 
 	backoff := wait.Backoff{
 		Duration: retryDelay,
