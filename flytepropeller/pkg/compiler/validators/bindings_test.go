@@ -3,6 +3,7 @@ package validators
 import (
 	"testing"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -292,6 +293,154 @@ func TestValidateBindings(t *testing.T) {
 			Variables: map[string]*core.Variable{
 				"x": {
 					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(5)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.True(t, ok)
+		if compileErrors.HasErrors() {
+			assert.NoError(t, compileErrors)
+		}
+	})
+
+	t.Run("List/Dict Promises with attribute path", func(t *testing.T) {
+		// List/Dict with attribute path should conduct validation
+
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+		n.OnGetInterface().Return(&core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+		})
+
+		n2 := &mocks.NodeBuilder{}
+		n2.OnGetId().Return("node2")
+		n2.OnGetOutputAliases().Return(nil)
+		n2.OnGetInterface().Return(&core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"n2_out": {
+						Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(map[string]interface{}{"x": []interface{}{1, 3, 4}})),
+					},
+				},
+			},
+		})
+
+		wf := &mocks.WorkflowBuilder{}
+		wf.OnGetNode("n2").Return(n2, true)
+		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: &core.BindingData{
+					Value: &core.BindingData_Promise{
+						Promise: &core.OutputReference{
+							Var:    "n2_out",
+							NodeId: "n2",
+							AttrPath: []*core.PromiseAttribute{
+								{
+									Value: &core.PromiseAttribute_StringValue{StringValue: "x"},
+								},
+								{
+									Value: &core.PromiseAttribute_IntValue{IntValue: 0},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(1)),
+				},
+			},
+		}
+
+		compileErrors := compilerErrors.NewCompileErrors()
+		_, ok := ValidateBindings(wf, n, bindings, vars, true, c.EdgeDirectionBidirectional, compileErrors)
+		assert.True(t, ok)
+		if compileErrors.HasErrors() {
+			assert.NoError(t, compileErrors)
+		}
+	})
+
+	t.Run("pb.Struct Promises with attribute path", func(t *testing.T) {
+		// Dataclass with attribute path should skip validation
+
+		n := &mocks.NodeBuilder{}
+		n.OnGetId().Return("node1")
+		n.OnGetInterface().Return(&core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+		})
+
+		n2 := &mocks.NodeBuilder{}
+		n2.OnGetId().Return("node2")
+		n2.OnGetOutputAliases().Return(nil)
+		literalType := LiteralTypeForLiteral(coreutils.MustMakeLiteral(&structpb.Struct{}))
+		literalType.Structure = &core.TypeStructure{}
+		literalType.Structure.DataclassType = map[string]*core.LiteralType{"x": LiteralTypeForLiteral(coreutils.MustMakeLiteral(1))}
+
+		n2.OnGetInterface().Return(&core.TypedInterface{
+			Inputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{},
+			},
+			Outputs: &core.VariableMap{
+				Variables: map[string]*core.Variable{
+					"n2_out": {
+						Type: literalType,
+					},
+				},
+			},
+		})
+
+		wf := &mocks.WorkflowBuilder{}
+		wf.OnGetNode("n2").Return(n2, true)
+		wf.On("AddExecutionEdge", mock.Anything, mock.Anything).Return(nil)
+
+		bindings := []*core.Binding{
+			{
+				Var: "x",
+				Binding: &core.BindingData{
+					Value: &core.BindingData_Promise{
+						Promise: &core.OutputReference{
+							Var:    "n2_out",
+							NodeId: "n2",
+							AttrPath: []*core.PromiseAttribute{
+								{
+									Value: &core.PromiseAttribute_StringValue{StringValue: "x"},
+								},
+								{
+									Value: &core.PromiseAttribute_IntValue{IntValue: 0},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+
+		vars := &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"x": {
+					Type: LiteralTypeForLiteral(coreutils.MustMakeLiteral(1)),
 				},
 			},
 		}
