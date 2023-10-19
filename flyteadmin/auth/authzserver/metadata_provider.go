@@ -130,24 +130,23 @@ func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url strin
 	backoff := wait.Backoff{
 		Duration: retryDelay,
 		Steps:    totalAttempts,
-		Cap:      0,
 	}
 
-	// First func is to determine if err is a retryable err. Second is executable logic
 	retryableOauthMetadataError := flyteErrors.NewFlyteAdminError(codes.Internal, "Failed to get oauth metadata.")
 	err = retry.OnError(backoff,
-		func(err error) bool { //
+		func(err error) bool { // Determine if error is retryable
 			if err == retryableOauthMetadataError {
-				logger.Debugf(ctx, "Failed to get oauth metadata, going to retry. Err: %v", err)
 				return true
 			}
 			return false
 		}, func() error { // Send HTTP request
 			response, err = client.Get(url)
 			if err != nil {
+				logger.Error(ctx, "Failed to send oauth metadata HTTP request. Err: %v", err)
 				return err
 			}
-			if response != nil && response.StatusCode >= http.StatusInternalServerError && response.StatusCode <= http.StatusNetworkAuthenticationRequired {
+			if response != nil && response.StatusCode >= http.StatusUnauthorized && response.StatusCode <= http.StatusNetworkAuthenticationRequired {
+				logger.Errorf(ctx, "Failed to get oauth metadata, going to retry. StatusCode: %v Err: %v", response.StatusCode, err)
 				return retryableOauthMetadataError
 			}
 			return nil
