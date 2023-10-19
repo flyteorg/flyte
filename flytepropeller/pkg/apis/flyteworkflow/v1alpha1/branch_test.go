@@ -6,9 +6,10 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestMarshalUnMarshal_BranchTask(t *testing.T) {
