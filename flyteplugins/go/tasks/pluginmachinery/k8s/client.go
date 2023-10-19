@@ -4,10 +4,9 @@ package k8s
 
 import (
 	"context"
-	"net/http"
-
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/rest"
+	"net/http"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
@@ -58,21 +57,11 @@ func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, 
 
 // ClientBuilder builder is the interface for the client builder.
 type ClientBuilder interface {
-	// WithUncached takes a list of runtime objects (plain or lists) that users don't want to cache
-	// for this client. This function can be called multiple times, it should append to an internal slice.
-	WithUncached(objs ...client.Object) ClientBuilder
-
 	// Build returns a new client.
 	Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error)
 }
 
 type fallbackClientBuilder struct {
-	uncached []client.Object
-}
-
-func (f *fallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilder {
-	f.uncached = append(f.uncached, objs...)
-	return f
 }
 
 func (f *fallbackClientBuilder) Build(_ cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
@@ -107,6 +96,7 @@ func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error
 	if options.CacheOptions == nil {
 		options.CacheOptions = &cache.Options{Mapper: mapper}
 	}
+
 	cache, err := cache.New(config, *options.CacheOptions)
 	if err != nil {
 		return nil, err

@@ -79,6 +79,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.4.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
+	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -139,4 +140,12 @@ replace (
 	github.com/flyteorg/flyte/flyteplugins => ../flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
+	github.com/google/gnostic => github.com/google/gnostic v0.6.9 // indirect
+	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.8 // indirect
+	k8s.io/api => k8s.io/api v0.24.1
+	k8s.io/apimachinery => k8s.io/apimachinery v0.24.1
+	k8s.io/client-go => k8s.io/client-go v0.24.1
+	k8s.io/klog/v2 => k8s.io/klog/v2 v2.60.1
+	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20230601164746-7562a1006961
+	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.12.1
 )
