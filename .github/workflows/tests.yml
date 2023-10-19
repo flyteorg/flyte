@@ -6,7 +6,7 @@ on:
   pull_request:
 jobs:
   compile:
-    runs-on: union-k8s-runner
+    runs-on: ubuntu-latest
     steps:
       - name: Fetch the code
         uses: actions/checkout@v2

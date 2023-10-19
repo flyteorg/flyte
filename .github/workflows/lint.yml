@@ -12,7 +12,7 @@ on:
 jobs:
   lint:
     name: Run Lint
-    runs-on: union-k8s-runner
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ${{ inputs.component }}
