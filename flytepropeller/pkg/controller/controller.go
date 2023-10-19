@@ -14,6 +14,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
+	"google.golang.org/grpc/resolver"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -54,6 +55,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	k8sResolver "github.com/flyteorg/flyte/flytestdlib/resolver"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -551,6 +553,8 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	if err != nil {
 		return errors.Wrapf(err, "error building Kubernetes Clientset")
 	}
+
+	resolver.Register(k8sResolver.NewBuilder(ctx, kubeClient, k8sResolver.Schema))
 
 	flyteworkflowClient, err := clientset.NewForConfig(kubecfg)
 	if err != nil {

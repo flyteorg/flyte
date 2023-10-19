@@ -100,13 +100,14 @@ func StartProfilingServer(ctx context.Context, pprofPort int) error {
 		Addr:         fmt.Sprintf(":%d", pprofPort),
 	}
 
-	e := srv.ListenAndServe()
-	if e != nil {
-		logger.Errorf(ctx, "Failed to start profiling server. Error: %v", e)
-		return fmt.Errorf("failed to start profiling server, %s", e)
-	}
+	go func() {
+		e := srv.ListenAndServe()
+		if e != nil {
+			logger.Errorf(ctx, "Failed to start profiling server. Error: %v", e)
+		}
+	}()
 
-	return nil
+	return srv.Shutdown(ctx)
 }
 
 func configureGlobalHTTPHandler(handlers map[string]http.Handler) error {
