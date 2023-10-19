@@ -16,7 +16,7 @@ import (
 	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
-var oauthMetadataFailureErrorMessage = "Failed to get oauth metadata"
+var oauthMetadataFailureErrorMessage = "Failed to get oauth metadata."
 
 func TestOAuth2MetadataProvider_FlyteClient(t *testing.T) {
 	provider := NewService(&authConfig.Config{
@@ -115,31 +115,82 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 }
 
 func TestSendAndRetryHttpRequest(t *testing.T) {
-	requestAttempts := 0
-	hf := func(w http.ResponseWriter, r *http.Request) {
-		switch strings.TrimSpace(r.URL.Path) {
-		case "/":
-			mockExternalMetadataEndpointTransientFailure(w, r)
-			requestAttempts++
-		default:
-			http.NotFoundHandler().ServeHTTP(w, r)
+	t.Run("Retry into failure", func(t *testing.T) {
+		requestAttempts := 0
+		hf := func(w http.ResponseWriter, r *http.Request) {
+			switch strings.TrimSpace(r.URL.Path) {
+			case "/":
+				w.WriteHeader(500)
+				requestAttempts++
+			default:
+				http.NotFoundHandler().ServeHTTP(w, r)
+			}
 		}
-	}
 
-	server := httptest.NewServer(http.HandlerFunc(hf))
-	defer server.Close()
-	http.DefaultClient = server.Client()
-	retryAttempts := 5
-	totalAttempts := retryAttempts + 1 // 1 for the initial try
+		server := httptest.NewServer(http.HandlerFunc(hf))
+		defer server.Close()
+		http.DefaultClient = server.Client()
+		retryAttempts := 5
+		totalAttempts := retryAttempts + 1 // 1 for the initial try
 
-	resp, err := sendAndRetryHttpRequest(server.Client(), server.URL, retryAttempts, 0 /* for testing */)
-	assert.Error(t, err)
-	assert.Equal(t, oauthMetadataFailureErrorMessage, err.Error())
-	assert.NotNil(t, resp)
-	assert.Equal(t, 500, resp.StatusCode)
-	assert.Equal(t, totalAttempts, requestAttempts)
-}
+		resp, err := sendAndRetryHttpRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
+		assert.Error(t, err)
+		assert.Equal(t, oauthMetadataFailureErrorMessage, err.Error())
+		assert.Nil(t, resp)
+		assert.Equal(t, totalAttempts, requestAttempts)
+	})
 
-func mockExternalMetadataEndpointTransientFailure(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(500)
+	t.Run("Retry into success", func(t *testing.T) {
+		requestAttempts := 0
+		hf := func(w http.ResponseWriter, r *http.Request) {
+			switch strings.TrimSpace(r.URL.Path) {
+			case "/":
+				if requestAttempts > 2 {
+					w.WriteHeader(200)
+				} else {
+					requestAttempts++
+					w.WriteHeader(500)
+				}
+			default:
+				http.NotFoundHandler().ServeHTTP(w, r)
+			}
+		}
+
+		server := httptest.NewServer(http.HandlerFunc(hf))
+		defer server.Close()
+		http.DefaultClient = server.Client()
+		retryAttempts := 5
+		expectedRequestAttempts := 3
+
+		resp, err := sendAndRetryHttpRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
+		assert.NoError(t, err)
+		assert.NotNil(t, resp)
+		assert.Equal(t, 200, resp.StatusCode)
+		assert.Equal(t, expectedRequestAttempts, requestAttempts)
+	})
+
+	t.Run("Success", func(t *testing.T) {
+		requestAttempts := 0
+		hf := func(w http.ResponseWriter, r *http.Request) {
+			switch strings.TrimSpace(r.URL.Path) {
+			case "/":
+				w.WriteHeader(200)
+			default:
+				http.NotFoundHandler().ServeHTTP(w, r)
+			}
+		}
+
+		server := httptest.NewServer(http.HandlerFunc(hf))
+		defer server.Close()
+		http.DefaultClient = server.Client()
+		retryAttempts := 5
+		expectedRequestAttempts := 0
+
+		resp, err := sendAndRetryHttpRequest(context.Background(), server.Client(), server.URL, retryAttempts, 0 /* for testing */)
+		assert.NoError(t, err)
+		assert.NotNil(t, resp)
+		assert.Equal(t, 200, resp.StatusCode)
+		assert.Equal(t, expectedRequestAttempts, requestAttempts)
+	})
+
 }

@@ -11,10 +11,12 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/util/retry"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -79,11 +81,15 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 			}
 			httpClient.Transport = transport
 		}
-		logger.Info(ctx, "retryAttempts: %v retryDuration: %v", s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelayMilliseconds)
-		response, err := sendAndRetryHttpRequest(httpClient, externalMetadataURL.String(), s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelayMilliseconds.Duration)
+		logger.Info(ctx, "retryAttempts: %v retryDuration: %v", s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelay)
+		response, err := sendAndRetryHttpRequest(ctx, httpClient, externalMetadataURL.String(), s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelay.Duration)
 		if err != nil {
-			logger.Errorf(ctx, "Failed to get oauth metadata. Error code: %v. Err: %v", response.StatusCode, err)
-			return nil, flyteErrors.NewFlyteAdminErrorf(codes.Code(response.StatusCode), "Failed to get oauth metadata. Err: %v", err)
+			if response != nil {
+				logger.Errorf(ctx, "Failed to get oauth metadata. Error code: %v. Err: %v", response.StatusCode, err)
+				return nil, flyteErrors.NewFlyteAdminErrorf(codes.Code(response.StatusCode), "Failed to get oauth metadata. Err: %v", err)
+			}
+			logger.Errorf(ctx, "Failed to get oauth metadata with no response. Err: %v", err)
+			return nil, flyteErrors.NewFlyteAdminErrorf(codes.Internal, "Failed to get oauth metadata. Err: %v", err)
 		}
 
 		raw, err := ioutil.ReadAll(response.Body)
@@ -117,28 +123,44 @@ func NewService(config *authConfig.Config) OAuth2MetadataProvider {
 	}
 }
 
-func sendAndRetryHttpRequest(client *http.Client, url string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
+func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
 	var response *http.Response
 	var err error
-	err = async.RetryOnSpecificErrorCodes(retryAttempts+1, retryDelay, func() (*http.Response, error) {
-		response, err = client.Get(url)
-		return response, err
-	}, isTransientErrorCode)
+	totalAttempts := retryAttempts + 1 // Add 1 for the case where 0 retryAttempts are specified
+
+	backoff := wait.Backoff{
+		Duration: retryDelay,
+		Steps:    totalAttempts,
+		Cap:      0,
+	}
+
+	// first func is to determine retriability of error
+	// second is to run logic
+	err = retry.OnError(backoff,
+		func(err error) bool { //
+			if grpcErr := status.Code(err); grpcErr == codes.Internal {
+				logger.Debugf(ctx, "Failed to get oauth metadata, going to retry. Err: %v", err)
+				return true
+			}
+			return false
+		}, func() error { // Send HTTP request
+			response, err = client.Get(url)
+			if err != nil {
+				return err
+			}
+			if response != nil && response.StatusCode >= http.StatusInternalServerError && response.StatusCode <= http.StatusNetworkAuthenticationRequired {
+				return flyteErrors.NewFlyteAdminError(codes.Internal, "Failed to get oauth metadata.")
+			}
+			return nil
+		})
 
 	if err != nil {
 		return nil, err
 	}
 
 	if response.StatusCode != http.StatusOK {
-		return response, errors.New(fmt.Sprint("Failed to get oauth metadata"))
+		return response, errors.New(fmt.Sprintf("Failed to get oauth metadata with status code %v", response.StatusCode))
 	}
 
 	return response, nil
-}
-
-func isTransientErrorCode(resp *http.Response) bool {
-	if resp.StatusCode >= 500 && resp.StatusCode <= 599 {
-		return true
-	}
-	return false
 }
