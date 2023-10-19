@@ -212,8 +212,8 @@ func TestGetLogsTemplateUri(t *testing.T) {
 	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
-	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T04:00:00-08:00"), jobLogs[0].Uri)
-	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-worker-0&timestamp>%s", "test", "2022-01-01T04:00:00-08:00"), jobLogs[1].Uri)
+	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[0].Uri)
+	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-worker-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[1].Uri)
 }
 
 func dummyPodSpec() v1.PodSpec {
