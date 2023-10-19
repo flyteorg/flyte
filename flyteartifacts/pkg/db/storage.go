@@ -39,6 +39,11 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 }
 
 func (r *RDSStorage) GetArtifact(ctx context.Context, query core.ArtifactQuery, details bool) (models.Artifact, error) {
+	timer := r.metrics.GetDuration.Start()
+
+	//var artifacts []models.Artifact
+
+	timer.Stop()
 	return models.Artifact{}, nil
 }
 

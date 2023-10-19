@@ -3,13 +3,14 @@ package db
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"os"
 	"testing"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/golang/protobuf/proto"
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -17,9 +18,9 @@ import (
 
 func TestWriteOne(t *testing.T) {
 	ctx := context.Background()
+	sandboxCfgFile := os.ExpandEnv("$GOPATH/src/github.com/flyteorg/flyte/flyteartifacts/sandbox.yaml")
 	configAccessor := viper.NewAccessor(config.Options{
-		// TODO: find an idiomatic way to point to this file
-		SearchPaths: []string{"/Users/eduardo/repos/flyte/flyteartifacts/sandbox.yaml"},
+		SearchPaths: []string{sandboxCfgFile},
 		StrictMode:  false,
 	})
 	err := configAccessor.UpdateConfig(ctx)
@@ -28,11 +29,11 @@ func TestWriteOne(t *testing.T) {
 	scope := promutils.NewTestScope()
 	rds := NewStorage(ctx, scope)
 
-	one := uint32(1)
-	pval1 := "51"
-	p := pgtype.Hstore{
-		"area": &pval1,
-	}
+	//one := uint32(1)
+	//pval1 := "51"
+	//p := pgtype.Hstore{
+	//	"area": &pval1,
+	//}
 
 	lt := &core.LiteralType{
 		Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
@@ -49,25 +50,63 @@ func TestWriteOne(t *testing.T) {
 		},
 	}
 
-	ltBytes, err := proto.Marshal(lt)
-	assert.NoError(t, err)
-	litBytes, err := proto.Marshal(lit)
-	assert.NoError(t, err)
+	//ltBytes, err := proto.Marshal(lt)
+	//assert.NoError(t, err)
+	//litBytes, err := proto.Marshal(lit)
+	//assert.NoError(t, err)
 
-	gormA := Artifact{
-		ArtifactKey: ArtifactKey{
+	//gormA := Artifact{
+	//	ArtifactKey: ArtifactKey{
+	//		Project: "demotst",
+	//		Domain:  "unit",
+	//		Name:    "testname 2",
+	//	},
+	//	Version:       "abc123/1/n0/7",
+	//	Partitions:    p,
+	//	LiteralType:   ltBytes,
+	//	LiteralValue:  litBytes,
+	//	ExecutionName: "ddd",
+	//	RetryAttempt:  &one,
+	//}
+	ak := &core.ArtifactKey{
+		Project: "demotst",
+		Domain:  "unit",
+		Name:    "testname 2",
+	}
+	spec := &artifact.ArtifactSpec{
+		Value: lit,
+		Type:  lt,
+		TaskExecution: &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Project:      "demotst",
+				Domain:       "unit",
+				Name:         "testname 2",
+				Version:      "testtaskversion",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				NodeId: "testnodeid",
+			},
+		},
+		Execution: &core.WorkflowExecutionIdentifier{
 			Project: "demotst",
 			Domain:  "unit",
-			Name:    "testname 2",
+			Name:    "exectest1",
 		},
-		Version:       "abc123/1/n0/7",
-		Partitions:    p,
-		LiteralType:   ltBytes,
-		LiteralValue:  litBytes,
-		ExecutionName: "ddd",
-		RetryAttempt:  &one,
+		Principal:        "userone",
+		ShortDescription: "",
+		UserMetadata:     nil,
+		MetadataType:     "",
+	}
+	partitions := map[string]string{
+		"area": "51",
+		"ds":   "2023-05-01",
 	}
 
-	//a, err := rds.WriteOne(ctx, gormA)
-	//fmt.Println(a, err)
+	am, err := models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/9", partitions, "tag", "principal")
+	assert.NoError(t, err)
+
+	newModel, err := rds.CreateArtifact(ctx, am)
+	assert.NoError(t, err)
+	fmt.Println(newModel)
 }

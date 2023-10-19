@@ -2,7 +2,10 @@ package server
 
 import (
 	"context"
+	"fmt"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -19,7 +22,7 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 		return nil, nil
 	}
 
-	artifactObj, err := CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
+	artifactObj, err := models.CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to validate Create request: %v", err)
 		return nil, err
@@ -45,7 +48,35 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 	return &artifact.CreateArtifactResponse{Artifact: &created.Artifact}, nil
 }
 
+func (c *CoreService) getByArtifactQuery(ctx context.Context, query core.ArtifactQuery) (models.Artifact, error) {
+
+	model, err := c.Storage.GetArtifact(ctx, query, false)
+
+	return model, err
+}
+
+func (c *CoreService) handleUriGet(ctx context.Context, uri string) (models.Artifact, error) {
+	// parse uri
+	// construct artifact query
+	// run query
+	return models.Artifact{}, nil
+}
+
 func (c *CoreService) GetArtifact(ctx context.Context, request *artifact.GetArtifactRequest) (*artifact.GetArtifactResponse, error) {
+	q := request.Query
+	if q == nil {
+		return nil, fmt.Errorf("query cannot be nil")
+	}
+	if q.GetUri() != "" {
+
+	} else if q.GetArtifactId() != nil {
+
+	} else if q.GetArtifactTag() != nil {
+
+	} else {
+		return nil, fmt.Errorf("query must contain either uri, artifact_id, or artifact_tag")
+	}
+
 	return &artifact.GetArtifactResponse{}, nil
 }
 

@@ -1,4 +1,4 @@
-package server
+package models
 
 import (
 	"context"
@@ -6,28 +6,27 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (models.Artifact, error) {
+func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (Artifact, error) {
 	if key == nil || spec == nil {
-		return models.Artifact{}, fmt.Errorf("key and spec cannot be nil")
+		return Artifact{}, fmt.Errorf("key and spec cannot be nil")
 	}
 	if len(version) == 0 {
-		return models.Artifact{}, fmt.Errorf("version cannot be empty")
+		return Artifact{}, fmt.Errorf("version cannot be empty")
 	}
 	if spec.Type == nil || spec.Value == nil {
-		return models.Artifact{}, fmt.Errorf("spec type and value cannot be nil")
+		return Artifact{}, fmt.Errorf("spec type and value cannot be nil")
 	}
 
 	ex := spec.Execution
 	if ex == nil {
-		return models.Artifact{}, fmt.Errorf("spec execution cannot be nil")
+		return Artifact{}, fmt.Errorf("spec execution cannot be nil")
 	}
-	if ex.Project != key.Project || ex.Domain != key.Domain || ex.Name != key.Name {
-		return models.Artifact{}, fmt.Errorf("spec execution must match key")
+	if ex.Project != key.Project || ex.Domain != key.Domain {
+		return Artifact{}, fmt.Errorf("spec execution must match key")
 	}
 
 	a := artifact.Artifact{
@@ -55,15 +54,15 @@ func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, 
 	ltBytes, err := proto.Marshal(spec.Type)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to marshal type for artifact: %+v@%s, err: %v", key, version, err)
-		return models.Artifact{}, err
+		return Artifact{}, err
 	}
 	litBytes, err := proto.Marshal(spec.Value)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to marshal literal value for artifact: %+v@%s, err: %v", key, version, err)
-		return models.Artifact{}, err
+		return Artifact{}, err
 	}
 
-	return models.Artifact{
+	return Artifact{
 		Artifact:          a,
 		LiteralTypeBytes:  ltBytes,
 		LiteralValueBytes: litBytes,
