@@ -80,15 +80,10 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 			}
 			httpClient.Transport = transport
 		}
-		logger.Info(ctx, "retryAttempts: %v retryDuration: %v", s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelay)
+
 		response, err := sendAndRetryHttpRequest(ctx, httpClient, externalMetadataURL.String(), s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelay.Duration)
 		if err != nil {
-			if response != nil {
-				logger.Errorf(ctx, "Failed to get oauth metadata. Error code: %v. Err: %v", response.StatusCode, err)
-				return nil, flyteErrors.NewFlyteAdminErrorf(codes.Code(response.StatusCode), "Failed to get oauth metadata. Err: %v", err)
-			}
-			logger.Errorf(ctx, "Failed to get oauth metadata with no response. Err: %v", err)
-			return nil, flyteErrors.NewFlyteAdminErrorf(codes.Internal, "Failed to get oauth metadata. Err: %v", err)
+			return nil, err
 		}
 
 		raw, err := ioutil.ReadAll(response.Body)
@@ -142,7 +137,7 @@ func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url strin
 		}, func() error { // Send HTTP request
 			response, err = client.Get(url)
 			if err != nil {
-				logger.Error(ctx, "Failed to send oauth metadata HTTP request. Err: %v", err)
+				logger.Errorf(ctx, "Failed to send oauth metadata HTTP request. Err: %v", err)
 				return err
 			}
 			if response != nil && response.StatusCode >= http.StatusUnauthorized && response.StatusCode <= http.StatusNetworkAuthenticationRequired {
