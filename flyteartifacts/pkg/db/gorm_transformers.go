@@ -1,18 +1,25 @@
 package db
 
 import (
+	"context"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
 func PartitionsIdlToHstore(idlPartitions *core.Partitions) pgtype.Hstore {
+	ctx := context.Background()
 	if idlPartitions == nil || idlPartitions.GetValue() == nil {
 		return nil
 	}
 	var hstore = make(pgtype.Hstore)
 
 	for k, v := range idlPartitions.GetValue() {
+		if len(v.GetStaticValue()) == 0 {
+			logger.Warningf(ctx, "Partition key [%s] missing static value, [%+v]", k, v.GetValue())
+			continue
+		}
 		sv := v.GetStaticValue()
 		hstore[k] = &sv
 	}

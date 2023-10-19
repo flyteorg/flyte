@@ -71,7 +71,7 @@ func TestWriteOne(t *testing.T) {
 	ak := &core.ArtifactKey{
 		Project: "demotst",
 		Domain:  "unit",
-		Name:    "testname 2",
+		Name:    "artfname 2",
 	}
 	spec := &artifact.ArtifactSpec{
 		Value: lit,

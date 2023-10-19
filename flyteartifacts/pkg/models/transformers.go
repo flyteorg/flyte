@@ -88,3 +88,20 @@ func PartitionsToIdl(partitions map[string]string) *core.Partitions {
 
 	return &cp
 }
+
+func PartitionsFromIdl(ctx context.Context, partitions *core.Partitions) map[string]string {
+	if partitions == nil {
+		return nil
+	}
+
+	p := make(map[string]string, len(partitions.Value))
+	for k, v := range partitions.Value {
+		if len(v.GetStaticValue()) == 0 {
+			logger.Warningf(ctx, "Partition key [%s] missing static value, [%+v]", k, v.GetValue())
+			continue
+		}
+		p[k] = v.GetStaticValue()
+	}
+
+	return p
+}

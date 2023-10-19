@@ -11,7 +11,7 @@ import (
 type StorageInterface interface {
 	CreateArtifact(context.Context, models.Artifact) (models.Artifact, error)
 
-	GetArtifact(context.Context, core.ArtifactQuery, bool) (models.Artifact, error)
+	GetArtifact(context.Context, core.ArtifactQuery) (models.Artifact, error)
 }
 
 type BlobStoreInterface interface {

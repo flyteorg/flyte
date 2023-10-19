@@ -1,55 +1,63 @@
 package lib
 
 import (
+	"context"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestURLParseWithTag(t *testing.T) {
-	project, domain, name, version, tag, queryDict, err := ParseFlyteURL("flyte://av0.1/project/domain/name:tag")
+	artifactID, tag, err := ParseFlyteURL("flyte://av0.1/project/domain/name:tag")
 	assert.NoError(t, err)
 
-	assert.Equal(t, "project", project)
-	assert.Equal(t, "domain", domain)
-	assert.Equal(t, "name", name)
-	assert.Equal(t, "", version)
+	assert.Equal(t, "project", artifactID.ArtifactKey.Project)
+	assert.Equal(t, "domain", artifactID.ArtifactKey.Domain)
+	assert.Equal(t, "name", artifactID.ArtifactKey.Name)
+	assert.Equal(t, "", artifactID.Version)
 	assert.Equal(t, "tag", tag)
-	assert.Equal(t, map[string]string{}, queryDict)
+	assert.Nil(t, artifactID.GetPartitions())
 }
 
 func TestURLParseWithVersionAndPartitions(t *testing.T) {
-	project, domain, name, version, tag, queryDict, err := ParseFlyteURL("flyte://av0.1/project/domain/name@version?foo=bar&ham=spam")
+	artifactID, tag, err := ParseFlyteURL("flyte://av0.1/project/domain/name@version?foo=bar&ham=spam")
 	expPartitions := map[string]string{"foo": "bar", "ham": "spam"}
 	assert.NoError(t, err)
 
-	assert.Equal(t, "project", project)
-	assert.Equal(t, "domain", domain)
-	assert.Equal(t, "name", name)
-	assert.Equal(t, "version", version)
+	assert.Equal(t, "project", artifactID.ArtifactKey.Project)
+	assert.Equal(t, "domain", artifactID.ArtifactKey.Domain)
+	assert.Equal(t, "name", artifactID.ArtifactKey.Name)
+	assert.Equal(t, "version", artifactID.Version)
 	assert.Equal(t, "", tag)
-	assert.Equal(t, expPartitions, queryDict)
+	p := artifactID.GetPartitions()
+	mapP := models.PartitionsFromIdl(context.TODO(), p)
+	assert.Equal(t, expPartitions, mapP)
 }
 
 func TestURLParseFailsWithBothTagAndPartitions(t *testing.T) {
-	_, _, _, _, _, _, err := ParseFlyteURL("flyte://av0.1/project/domain/name:tag?foo=bar&ham=spam")
+	_, _, err := ParseFlyteURL("flyte://av0.1/project/domain/name:tag?foo=bar&ham=spam")
 	assert.Error(t, err)
 }
 
 func TestURLParseWithBothTagAndVersion(t *testing.T) {
-	_, _, _, _, _, _, err := ParseFlyteURL("flyte://av0.1/project/domain/name:tag@version")
+	_, _, err := ParseFlyteURL("flyte://av0.1/project/domain/name:tag@version")
 	assert.Error(t, err)
 }
 
 func TestURLParseNameWithSlashes(t *testing.T) {
-	res := ParseFlyteURL("flyte://av0.1/project/domain/name/with/slashes")
-	expected := ("project", "domain", "name/with/slashes", "", "", map[string]string{})
-	if res != expected {
-		t.Errorf("Expected %v, but got %v", expected, res)
-	}
+	artifactID, tag, err := ParseFlyteURL("flyte://av0.1/project/domain/name/with/slashes")
+	assert.NoError(t, err)
+	assert.Equal(t, "project", artifactID.ArtifactKey.Project)
+	assert.Equal(t, "domain", artifactID.ArtifactKey.Domain)
+	assert.Equal(t, "name/with/slashes", artifactID.ArtifactKey.Name)
+	assert.Equal(t, "", tag)
 
-	res = ParseFlyteURL("flyte://av0.1/project/domain/name/with/slashes?ds=2020-01-01")
-	expected = ("project", "domain", "name/with/slashes", "", "", map[string]string{"ds": "2020-01-01"})
-	if res != expected {
-		t.Errorf("Expected %v, but got %v", expected, res)
-	}
+	artifactID, tag, err = ParseFlyteURL("flyte://av0.1/project/domain/name/with/slashes?ds=2020-01-01")
+	assert.Equal(t, "name/with/slashes", artifactID.ArtifactKey.Name)
+	assert.Equal(t, "project", artifactID.ArtifactKey.Project)
+	assert.Equal(t, "domain", artifactID.ArtifactKey.Domain)
+
+	expPartitions := map[string]string{"ds": "2020-01-01"}
+
+	assert.Equal(t, expPartitions, models.PartitionsFromIdl(context.TODO(), artifactID.GetPartitions()))
 }
