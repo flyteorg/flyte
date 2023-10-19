@@ -23,32 +23,6 @@ type Client interface {
 	GetCache() cache.Cache
 }
 
-// fallbackClientReader reads from the cache first and if not found then reads from the configured reader, which
-// directly reads from the API
-type fallbackClientReader struct {
-	orderedClients []client.Reader
-}
-
-func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.Get(ctx, key, out); err == nil {
-			return nil
-		}
-	}
-
-	return
-}
-
-func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.List(ctx, list, opts...); err == nil {
-			return nil
-		}
-	}
-
-	return
-}
-
 // ClientBuilder builder is the interface for the client builder.
 type ClientBuilder interface {
 	// Build returns a new client.

@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	testing2 "k8s.io/utils/clock/testing"
 	"strings"
 	"sync"
 	"testing"
@@ -12,6 +11,7 @@ import (
 	corev1Types "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	testing2 "k8s.io/utils/clock/testing"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"

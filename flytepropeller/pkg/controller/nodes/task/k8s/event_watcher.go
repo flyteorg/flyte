@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"context"
-	"k8s.io/client-go/tools/cache"
+	"fmt"
 	"sort"
 	"sync"
 	"time"
@@ -15,6 +15,7 @@ import (
 	"k8s.io/client-go/informers"
 	informerEventsv1 "k8s.io/client-go/informers/events/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -117,7 +118,11 @@ func NewEventWatcher(ctx context.Context, gvk schema.GroupVersionKind, kubeClien
 	watcher := &eventWatcher{
 		informer: eventInformer,
 	}
-	eventInformer.Informer().AddEventHandler(watcher)
+
+	_, err := eventInformer.Informer().AddEventHandler(watcher)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add event handler: %w", err)
+	}
 
 	go eventInformer.Informer().Run(ctx.Done())
 	logger.Debugf(ctx, "Started informer for [%s] events", gvk.Kind)

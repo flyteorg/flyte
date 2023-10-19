@@ -3,7 +3,6 @@ package backoff
 import (
 	"context"
 	"errors"
-	testing2 "k8s.io/utils/clock/testing"
 	"reflect"
 	"regexp"
 	"testing"
@@ -15,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/utils/clock"
+	testing2 "k8s.io/utils/clock/testing"
 
 	taskErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
