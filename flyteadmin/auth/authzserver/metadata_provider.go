@@ -80,7 +80,7 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 			httpClient.Transport = transport
 		}
 
-		response, err := sendAndRetryHttpRequest(ctx, httpClient, externalMetadataURL.String(), s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelay.Duration)
+		response, err := sendAndRetryHTTPRequest(ctx, httpClient, externalMetadataURL.String(), s.cfg.AppAuth.ExternalAuthServer.RetryAttempts, s.cfg.AppAuth.ExternalAuthServer.RetryDelay.Duration)
 		if err != nil {
 			return nil, err
 		}
@@ -116,7 +116,7 @@ func NewService(config *authConfig.Config) OAuth2MetadataProvider {
 	}
 }
 
-func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
+func sendAndRetryHTTPRequest(ctx context.Context, client *http.Client, url string, retryAttempts int, retryDelay time.Duration) (*http.Response, error) {
 	var response *http.Response
 	var err error
 	totalAttempts := retryAttempts + 1 // Add one for initial http request attempt
