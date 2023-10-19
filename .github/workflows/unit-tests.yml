@@ -18,7 +18,7 @@ jobs:
     defaults:
       run:
         working-directory: ${{ inputs.component }}
-    runs-on: ubuntu-latest
+    runs-on: union-k8s-runner
     steps:
       - name: Checkout
         uses: actions/checkout@v3

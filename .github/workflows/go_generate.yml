@@ -11,7 +11,7 @@ on:
         type: string
 jobs:
   generate:
-    runs-on: ubuntu-latest
+    runs-on: union-k8s-runner
     name: Go Generate
     defaults:
       run:
