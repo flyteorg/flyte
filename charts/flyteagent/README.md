@@ -9,7 +9,6 @@ A Helm chart for Flyte agent
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
-| additionalEnvs | list | `[{"name":"FLYTE_AWS_ENDPOINT","value":"http://flyte-sandbox-minio.flyte:9000"},{"name":"FLYTE_AWS_ACCESS_KEY_ID","value":"minio"},{"name":"FLYTE_AWS_SECRET_ACCESS_KEY","value":"miniostorage"}]` | additionalEnvs for flyteagent deployment |
 | additionalVolumeMounts | list | `[]` | Appends additional volume mounts to the main container's spec. May include template values. |
 | additionalVolumes | list | `[]` | Appends additional volumes to the deployment spec. May include template values. |
 | affinity | object | `{}` | affinity for flyteagent deployment |

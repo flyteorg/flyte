@@ -31,10 +31,6 @@ spec:
         - containerPort: {{ .Values.ports.containerPort }}
           name: {{ .Values.ports.name }}
         resources: {{- toYaml .Values.resources | nindent 10 }}
-        env:
-          {{- with .Values.additionalEnvs }}
-          {{- toYaml . | nindent 10 }}
-          {{- end }}
         {{- with .Values.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
