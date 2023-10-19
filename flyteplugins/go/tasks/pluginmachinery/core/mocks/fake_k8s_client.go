@@ -17,6 +17,10 @@ import (
 )
 
 type FakeKubeClient struct {
+	client.Reader
+	client.Writer
+	client.StatusClient
+	client.SubResourceClientConstructor
 	syncObj sync.RWMutex
 	Cache   map[string]runtime.Object
 }
@@ -26,7 +30,7 @@ func formatKey(name types.NamespacedName, kind schema.GroupVersionKind) string {
 	return key
 }
 
-func (m *FakeKubeClient) Get(ctx context.Context, key client.ObjectKey, out client.Object) error {
+func (m *FakeKubeClient) Get(ctx context.Context, key client.ObjectKey, out client.Object, opts ...client.GetOption) error {
 	m.syncObj.RLock()
 	defer m.syncObj.RUnlock()
 
@@ -55,6 +59,16 @@ func (m *FakeKubeClient) Get(ctx context.Context, key client.ObjectKey, out clie
 	}
 
 	return errors.NewNotFound(schema.GroupResource{}, key.Name)
+}
+
+// GroupVersionKindFor returns the GroupVersionKind for the given object.
+func (m *FakeKubeClient) GroupVersionKindFor(obj runtime.Object) (schema.GroupVersionKind, error) {
+	panic("implement me")
+}
+
+// IsObjectNamespaced returns true if the GroupVersionKind of the object is namespaced.
+func (m *FakeKubeClient) IsObjectNamespaced(obj runtime.Object) (bool, error) {
+	panic("implement me")
 }
 
 func (m *FakeKubeClient) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
