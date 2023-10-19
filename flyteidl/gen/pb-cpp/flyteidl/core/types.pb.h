@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/struct.pb.h>
@@ -43,7 +46,7 @@ struct TableStruct_flyteidl_2fcore_2ftypes_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[13]
+  static const ::google::protobuf::internal::ParseTable schema[14]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -88,6 +91,9 @@ extern TypeAnnotationDefaultTypeInternal _TypeAnnotation_default_instance_;
 class TypeStructure;
 class TypeStructureDefaultTypeInternal;
 extern TypeStructureDefaultTypeInternal _TypeStructure_default_instance_;
+class TypeStructure_DataclassTypeEntry_DoNotUse;
+class TypeStructure_DataclassTypeEntry_DoNotUseDefaultTypeInternal;
+extern TypeStructure_DataclassTypeEntry_DoNotUseDefaultTypeInternal _TypeStructure_DataclassTypeEntry_DoNotUse_default_instance_;
 class UnionType;
 class UnionTypeDefaultTypeInternal;
 extern UnionTypeDefaultTypeInternal _UnionType_default_instance_;
@@ -107,6 +113,7 @@ template<> ::flyteidl::core::StructuredDatasetType* Arena::CreateMaybeMessage<::
 template<> ::flyteidl::core::StructuredDatasetType_DatasetColumn* Arena::CreateMaybeMessage<::flyteidl::core::StructuredDatasetType_DatasetColumn>(Arena*);
 template<> ::flyteidl::core::TypeAnnotation* Arena::CreateMaybeMessage<::flyteidl::core::TypeAnnotation>(Arena*);
 template<> ::flyteidl::core::TypeStructure* Arena::CreateMaybeMessage<::flyteidl::core::TypeStructure>(Arena*);
+template<> ::flyteidl::core::TypeStructure_DataclassTypeEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::TypeStructure_DataclassTypeEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::UnionType* Arena::CreateMaybeMessage<::flyteidl::core::UnionType>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -1165,6 +1172,30 @@ class UnionType final :
 };
 // -------------------------------------------------------------------
 
+class TypeStructure_DataclassTypeEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<TypeStructure_DataclassTypeEntry_DoNotUse, 
+    ::std::string, ::flyteidl::core::LiteralType,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<TypeStructure_DataclassTypeEntry_DoNotUse, 
+    ::std::string, ::flyteidl::core::LiteralType,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
+    0 > SuperType;
+  TypeStructure_DataclassTypeEntry_DoNotUse();
+  TypeStructure_DataclassTypeEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const TypeStructure_DataclassTypeEntry_DoNotUse& other);
+  static const TypeStructure_DataclassTypeEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const TypeStructure_DataclassTypeEntry_DoNotUse*>(&_TypeStructure_DataclassTypeEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
 class TypeStructure final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.TypeStructure) */ {
  public:
@@ -1203,7 +1234,7 @@ class TypeStructure final :
                &_TypeStructure_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(TypeStructure* other);
   friend void swap(TypeStructure& a, TypeStructure& b) {
@@ -1258,7 +1289,17 @@ class TypeStructure final :
 
   // nested types ----------------------------------------------------
 
+
   // accessors -------------------------------------------------------
+
+  // map<string, .flyteidl.core.LiteralType> dataclass_type = 2;
+  int dataclass_type_size() const;
+  void clear_dataclass_type();
+  static const int kDataclassTypeFieldNumber = 2;
+  const ::google::protobuf::Map< ::std::string, ::flyteidl::core::LiteralType >&
+      dataclass_type() const;
+  ::google::protobuf::Map< ::std::string, ::flyteidl::core::LiteralType >*
+      mutable_dataclass_type();
 
   // string tag = 1;
   void clear_tag();
@@ -1279,6 +1320,12 @@ class TypeStructure final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::MapField<
+      TypeStructure_DataclassTypeEntry_DoNotUse,
+      ::std::string, ::flyteidl::core::LiteralType,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_MESSAGE,
+      0 > dataclass_type_;
   ::google::protobuf::internal::ArenaStringPtr tag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ftypes_2eproto;
@@ -1323,7 +1370,7 @@ class TypeAnnotation final :
                &_TypeAnnotation_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(TypeAnnotation* other);
   friend void swap(TypeAnnotation& a, TypeAnnotation& b) {
@@ -1450,7 +1497,7 @@ class LiteralType final :
                &_LiteralType_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(LiteralType* other);
   friend void swap(LiteralType& a, LiteralType& b) {
@@ -1683,7 +1730,7 @@ class OutputReference final :
                &_OutputReference_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(OutputReference* other);
   friend void swap(OutputReference& a, OutputReference& b) {
@@ -1837,7 +1884,7 @@ class PromiseAttribute final :
                &_PromiseAttribute_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(PromiseAttribute* other);
   friend void swap(PromiseAttribute& a, PromiseAttribute& b) {
@@ -1982,7 +2029,7 @@ class Error final :
                &_Error_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(Error* other);
   friend void swap(Error& a, Error& b) {
@@ -2670,6 +2717,8 @@ UnionType::variants() const {
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 // TypeStructure
 
 // string tag = 1;
@@ -2723,6 +2772,24 @@ inline void TypeStructure::set_allocated_tag(::std::string* tag) {
   }
   tag_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), tag);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TypeStructure.tag)
+}
+
+// map<string, .flyteidl.core.LiteralType> dataclass_type = 2;
+inline int TypeStructure::dataclass_type_size() const {
+  return dataclass_type_.size();
+}
+inline void TypeStructure::clear_dataclass_type() {
+  dataclass_type_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::flyteidl::core::LiteralType >&
+TypeStructure::dataclass_type() const {
+  // @@protoc_insertion_point(field_map:flyteidl.core.TypeStructure.dataclass_type)
+  return dataclass_type_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::flyteidl::core::LiteralType >*
+TypeStructure::mutable_dataclass_type() {
+  // @@protoc_insertion_point(field_mutable_map:flyteidl.core.TypeStructure.dataclass_type)
+  return dataclass_type_.MutableMap();
 }
 
 // -------------------------------------------------------------------
@@ -3639,6 +3706,8 @@ inline void Error::set_allocated_message(::std::string* message) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

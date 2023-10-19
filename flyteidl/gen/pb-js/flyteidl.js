@@ -9276,6 +9276,7 @@
                  * @memberof flyteidl.core
                  * @interface ITypeStructure
                  * @property {string|null} [tag] TypeStructure tag
+                 * @property {Object.<string,flyteidl.core.ILiteralType>|null} [dataclassType] TypeStructure dataclassType
                  */
     
                 /**
@@ -9287,6 +9288,7 @@
                  * @param {flyteidl.core.ITypeStructure=} [properties] Properties to set
                  */
                 function TypeStructure(properties) {
+                    this.dataclassType = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -9300,6 +9302,14 @@
                  * @instance
                  */
                 TypeStructure.prototype.tag = "";
+    
+                /**
+                 * TypeStructure dataclassType.
+                 * @member {Object.<string,flyteidl.core.ILiteralType>} dataclassType
+                 * @memberof flyteidl.core.TypeStructure
+                 * @instance
+                 */
+                TypeStructure.prototype.dataclassType = $util.emptyObject;
     
                 /**
                  * Creates a new TypeStructure instance using the specified properties.
@@ -9327,6 +9337,11 @@
                         writer = $Writer.create();
                     if (message.tag != null && message.hasOwnProperty("tag"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.tag);
+                    if (message.dataclassType != null && message.hasOwnProperty("dataclassType"))
+                        for (var keys = Object.keys(message.dataclassType), i = 0; i < keys.length; ++i) {
+                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
+                            $root.flyteidl.core.LiteralType.encode(message.dataclassType[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                        }
                     return writer;
                 };
     
@@ -9344,12 +9359,20 @@
                 TypeStructure.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TypeStructure();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TypeStructure(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
                             message.tag = reader.string();
+                            break;
+                        case 2:
+                            reader.skip().pos++;
+                            if (message.dataclassType === $util.emptyObject)
+                                message.dataclassType = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.dataclassType[key] = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -9373,6 +9396,16 @@
                     if (message.tag != null && message.hasOwnProperty("tag"))
                         if (!$util.isString(message.tag))
                             return "tag: string expected";
+                    if (message.dataclassType != null && message.hasOwnProperty("dataclassType")) {
+                        if (!$util.isObject(message.dataclassType))
+                            return "dataclassType: object expected";
+                        var key = Object.keys(message.dataclassType);
+                        for (var i = 0; i < key.length; ++i) {
+                            var error = $root.flyteidl.core.LiteralType.verify(message.dataclassType[key[i]]);
+                            if (error)
+                                return "dataclassType." + error;
+                        }
+                    }
                     return null;
                 };
     
