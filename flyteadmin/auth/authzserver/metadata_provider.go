@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/retry"
 
@@ -134,11 +133,11 @@ func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url strin
 		Cap:      0,
 	}
 
-	// first func is to determine retriability of error
-	// second is to run logic
+	// First func is to determine if err is a retryable err. Second is executable logic
+	retryableOauthMetadataError := flyteErrors.NewFlyteAdminError(codes.Internal, "Failed to get oauth metadata.")
 	err = retry.OnError(backoff,
 		func(err error) bool { //
-			if grpcErr := status.Code(err); grpcErr == codes.Internal {
+			if err == retryableOauthMetadataError {
 				logger.Debugf(ctx, "Failed to get oauth metadata, going to retry. Err: %v", err)
 				return true
 			}
@@ -149,7 +148,7 @@ func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url strin
 				return err
 			}
 			if response != nil && response.StatusCode >= http.StatusInternalServerError && response.StatusCode <= http.StatusNetworkAuthenticationRequired {
-				return flyteErrors.NewFlyteAdminError(codes.Internal, "Failed to get oauth metadata.")
+				return retryableOauthMetadataError
 			}
 			return nil
 		})
@@ -158,7 +157,7 @@ func sendAndRetryHttpRequest(ctx context.Context, client *http.Client, url strin
 		return nil, err
 	}
 
-	if response.StatusCode != http.StatusOK {
+	if response != nil && response.StatusCode != http.StatusOK {
 		return response, errors.New(fmt.Sprintf("Failed to get oauth metadata with status code %v", response.StatusCode))
 	}
 

@@ -491,14 +491,14 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_appAuth.externalAuthServer.retryDelayMilliseconds", func(t *testing.T) {
+	t.Run("Test_appAuth.externalAuthServer.retryDelay", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
-			testValue := DefaultConfig.AppAuth.ExternalAuthServer.RetryDelayMilliseconds.String()
+			testValue := DefaultConfig.AppAuth.ExternalAuthServer.RetryDelay.String()
 
-			cmdFlags.Set("appAuth.externalAuthServer.retryDelayMilliseconds", testValue)
-			if vString, err := cmdFlags.GetString("appAuth.externalAuthServer.retryDelayMilliseconds"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AppAuth.ExternalAuthServer.RetryDelayMilliseconds)
+			cmdFlags.Set("appAuth.externalAuthServer.retryDelay", testValue)
+			if vString, err := cmdFlags.GetString("appAuth.externalAuthServer.retryDelay"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AppAuth.ExternalAuthServer.RetryDelay)
 
 			} else {
 				assert.FailNow(t, err.Error())
