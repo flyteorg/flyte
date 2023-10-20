@@ -294,6 +294,18 @@ Command for external authentication token generation
   []
   
 
+proxyCommand ([]string)
+------------------------------------------------------------------------------------------------------------------------
+
+Command for external proxy-authorization token generation
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
 defaultServiceConfig (string)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -746,6 +758,9 @@ agent-service (`agent.Config`_)
       Value: 50
     ProjectScopeResourceConstraint:
       Value: 100
+  supportedTaskTypes:
+  - task_type_1
+  - task_type_2
   webApi:
     caching:
       maxSystemFailures: 5
@@ -931,7 +946,11 @@ k8s (`config.K8sPluginConfig`_)
   default-tolerations: null
   delete-resource-on-finalize: false
   enable-host-networking-pod: null
+  gpu-device-node-label: k8s.amazonaws.com/accelerator
+  gpu-partition-size-node-label: k8s.amazonaws.com/gpu-partition-size
   gpu-resource-name: nvidia.com/gpu
+  gpu-unpartitioned-node-selector-requirement: null
+  gpu-unpartitioned-toleration: null
   image-pull-backoff-grace-period: 3m0s
   inject-finalizer: false
   interruptible-node-selector: null
@@ -940,6 +959,7 @@ k8s (`config.K8sPluginConfig`_)
   non-interruptible-node-selector-requirement: null
   resource-tolerations: null
   scheduler-name: ""
+  send-object-events: false
   
 
 k8s-array (`k8s.Config`_)
@@ -1284,6 +1304,17 @@ agentForTaskTypes (map[string]string)
 .. code-block:: yaml
 
   null
+  
+
+supportedTaskTypes ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - task_type_1
+  - task_type_2
   
 
 agent.Agent
@@ -2305,6 +2336,46 @@ image-pull-backoff-grace-period (`config.Duration`_)
   3m0s
   
 
+gpu-device-node-label (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  k8s.amazonaws.com/accelerator
+  
+
+gpu-partition-size-node-label (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  k8s.amazonaws.com/gpu-partition-size
+  
+
+gpu-unpartitioned-node-selector-requirement (v1.NodeSelectorRequirement)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+gpu-unpartitioned-toleration (v1.Toleration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 gpu-resource-name (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2377,6 +2448,18 @@ Frequency of resyncing default pod templates
 .. code-block:: yaml
 
   30s
+  
+
+send-object-events (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+If true, will send k8s object events in TaskExecutionEvent updates.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.FlyteCoPilotConfig
@@ -4000,7 +4083,9 @@ config for a workflow node
     node-active-deadline: 0s
     node-execution-deadline: 0s
     workflow-active-deadline: 0s
-  interruptible-failure-threshold: 1
+  default-max-attempts: 1
+  ignore-retry-cause: false
+  interruptible-failure-threshold: -1
   max-node-retries-system-failures: 3
   
 
@@ -4123,6 +4208,18 @@ Enable creation of the FlyteWorkflow CRD on startup
 .. code-block:: yaml
 
   "false"
+  
+
+array-node-event-version (int)
+------------------------------------------------------------------------------------------------------------------------
+
+ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 admin-launcher (`launchplan.AdminConfig`_)
@@ -4583,16 +4680,40 @@ Maximum number of retries per node for node failure due to infra issues
   "3"
   
 
-interruptible-failure-threshold (int64)
+interruptible-failure-threshold (int32)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-number of failures for a node to be still considered interruptible'
+number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "-1"
+  
+
+default-max-attempts (int32)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default maximum number of attempts for a node
 
 **Default Value**: 
 
 .. code-block:: yaml
 
   "1"
+  
+
+ignore-retry-cause (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Ignore retry cause and count all attempts toward a node's max attempts
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.DefaultDeadlines
