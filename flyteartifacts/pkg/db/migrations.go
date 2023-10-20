@@ -12,9 +12,9 @@ var Migrations = []*gormigrate.Migration{
 		Migrate: func(tx *gorm.DB) error {
 			type ArtifactKey struct {
 				gorm.Model
-				Project string `gorm:"index:idx_pdn;index:idx_proj;type:varchar(64)"`
-				Domain  string `gorm:"index:idx_pdn;index:idx_dom;type:varchar(64)"`
-				Name    string `gorm:"index:idx_pdn;index:idx_name;type:varchar(255)"`
+				Project string `gorm:"uniqueIndex:idx_pdn;index:idx_proj;type:varchar(64)"`
+				Domain  string `gorm:"uniqueIndex:idx_pdn;index:idx_dom;type:varchar(64)"`
+				Name    string `gorm:"uniqueIndex:idx_pdn;index:idx_name;type:varchar(255)"`
 			}
 			type Artifact struct {
 				gorm.Model

@@ -15,7 +15,8 @@ func main() {
 	rootCmd := sharedCmd.NewRootCmd("artifacts", server.GrpcRegistrationHook, server.HttpRegistrationHook)
 	migs := server.GetMigrations(ctx)
 	initializationSql := "create extension if not exists hstore;"
-	rootCmd.AddCommand(sharedCmd.NewMigrateCmd(migs, initializationSql))
+	dbConfig := server.GetDbConfig()
+	rootCmd.AddCommand(sharedCmd.NewMigrateCmd(migs, dbConfig, initializationSql))
 	err := rootCmd.ExecuteContext(ctx)
 	if err != nil {
 		panic(err)

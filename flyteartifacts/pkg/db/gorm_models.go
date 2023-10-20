@@ -14,7 +14,6 @@ type ArtifactKey struct {
 
 type Artifact struct {
 	gorm.Model
-	// gatepr: this doesn't actually create a foreign key...
 	ArtifactKeyID uint
 	ArtifactKey   ArtifactKey   `gorm:"foreignKey:ArtifactKeyID;references:ID"`
 	Version       string        `gorm:"not null;type:varchar(255);index:idx_artifact_version"`

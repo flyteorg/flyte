@@ -3,9 +3,11 @@ package server
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/blob"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/db"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -27,7 +29,8 @@ func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactSer
 	fmt.Println(cfg)
 
 	storage := db.NewStorage(ctx, scope.NewSubScope("storage:rds"))
-	coreService := NewCoreService(storage, scope.NewSubScope("server"))
+	blobStore := blob.NewArtifactBlobStore(ctx, scope.NewSubScope("storage:s3"))
+	coreService := NewCoreService(storage, &blobStore, scope.NewSubScope("server"))
 
 	return &ArtifactService{
 		Metrics: InitMetrics(scope),
@@ -53,4 +56,8 @@ func GrpcRegistrationHook(ctx context.Context, server *grpc.Server, scope promut
 // GetMigrations should be hidden behind the storage interface in the future.
 func GetMigrations(ctx context.Context) []*gormigrate.Migration {
 	return db.Migrations
+}
+func GetDbConfig() *database.DbConfig {
+	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
+	return &cfg.ArtifactDatabaseConfig
 }

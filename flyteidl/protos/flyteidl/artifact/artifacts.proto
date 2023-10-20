@@ -22,6 +22,8 @@ message Artifact {
 
   // references the tag field in ArtifactTag
   repeated string tags = 3;
+
+  // 4. and the source message should be added here instead
 }
 
 message CreateArtifactRequest {
@@ -35,7 +37,12 @@ message CreateArtifactRequest {
   map<string, string> partitions = 4;
 
   string tag = 5;
+
+  // 2. We should add the source field to this.
 }
+
+// 1. Should add a new Source message that encapsulates all three of principal, task execution id, workflow execution id,
+// as well as the workflow and launch plan id responsible for the execution that generated the artifact (if not an upload)
 
 message ArtifactSpec {
   core.Literal value = 1;
@@ -45,6 +52,7 @@ message ArtifactSpec {
   // type to all Literals is a lot of work.
   core.LiteralType type = 2;
 
+  // 3. These fields should be removed.
   // Outputs of tasks will have this.
   core.TaskExecutionIdentifier task_execution = 5;
 
