@@ -154,11 +154,7 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		}
 
 		g.Go(func() error {
-			err := profutils.StartProfilingServerWithDefaultHandlers(childCtx, propellerCfg.ProfilerPort.Port, handlers)
-			if err != nil {
-				logger.Fatalf(childCtx, "Failed to Start profiling and metrics server. Error: %v", err)
-			}
-			return err
+			return profutils.StartProfilingServerWithDefaultHandlers(childCtx, propellerCfg.ProfilerPort.Port, handlers)
 		})
 
 		g.Go(func() error {
