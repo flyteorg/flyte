@@ -106,7 +106,8 @@ func Test_Handle(t *testing.T) {
 		ServiceName: "my-service",
 	}, promutils.NewTestScope())
 
-	decoder := admission.NewDecoder(latest.Scheme)
+	decoder, err := admission.NewDecoder(latest.Scheme)
+	assert.NoError(t, err)
 	assert.NoError(t, pm.InjectDecoder(decoder))
 
 	req := admission.Request{

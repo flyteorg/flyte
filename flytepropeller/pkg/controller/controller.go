@@ -19,12 +19,12 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/util/clock"
 	k8sInformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/record"
-	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
@@ -458,17 +458,10 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	logger.Info(ctx, "Setting up event handlers")
 	// Set up an event handler for when FlyteWorkflow resources change
-	_, err = flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
-	if err != nil {
-		return nil, fmt.Errorf("failed to register event handler for FlyteWorkflow resource changes: %w", err)
-	}
+	flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
 
 	updateHandler := flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore)
-	_, err = podTemplateInformer.Informer().AddEventHandler(updateHandler)
-	if err != nil {
-		return nil, fmt.Errorf("failed to register event handler for PodTemplate resource changes: %w", err)
-	}
-
+	podTemplateInformer.Informer().AddEventHandler(updateHandler)
 	return controller, nil
 }
 

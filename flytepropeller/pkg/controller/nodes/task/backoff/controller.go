@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"k8s.io/utils/clock"
+	"k8s.io/apimachinery/pkg/util/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"

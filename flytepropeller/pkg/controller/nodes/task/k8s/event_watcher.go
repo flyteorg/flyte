@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"sync"
 	"time"
@@ -15,7 +14,6 @@ import (
 	"k8s.io/client-go/informers"
 	informerEventsv1 "k8s.io/client-go/informers/events/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -30,7 +28,6 @@ type EventWatcher interface {
 // Note that cardinality of per object events is relatively low (10s), while they may occur repeatedly. For example
 // the ImagePullBackOff event may continue to fire, but this is only backed by a single event.
 type eventWatcher struct {
-	cache.ResourceEventHandler
 	informer    informerEventsv1.EventInformer
 	objectCache sync.Map
 }
@@ -49,7 +46,7 @@ type EventInfo struct {
 	RecordedAt time.Time
 }
 
-func (e *eventWatcher) OnAdd(obj interface{}, isInInitialList bool) {
+func (e *eventWatcher) OnAdd(obj interface{}) {
 	event := obj.(*eventsv1.Event)
 	objectNsName := types.NamespacedName{Namespace: event.Regarding.Namespace, Name: event.Regarding.Name}
 	eventNsName := types.NamespacedName{Namespace: event.Namespace, Name: event.Name}
@@ -118,11 +115,7 @@ func NewEventWatcher(ctx context.Context, gvk schema.GroupVersionKind, kubeClien
 	watcher := &eventWatcher{
 		informer: eventInformer,
 	}
-
-	_, err := eventInformer.Informer().AddEventHandler(watcher)
-	if err != nil {
-		return nil, fmt.Errorf("failed to add event handler: %w", err)
-	}
+	eventInformer.Informer().AddEventHandler(watcher)
 
 	go eventInformer.Informer().Run(ctx.Done())
 	logger.Debugf(ctx, "Started informer for [%s] events", gvk.Kind)
