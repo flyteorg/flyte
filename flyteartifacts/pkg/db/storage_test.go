@@ -1,3 +1,7 @@
+//go:build local_integration
+
+// Eduardo - add this build tag to run this test
+
 package db
 
 import (
@@ -16,7 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-func TestWriteOne(t *testing.T) {
+func TestBasicWrite(t *testing.T) {
 	ctx := context.Background()
 	sandboxCfgFile := os.ExpandEnv("$GOPATH/src/github.com/flyteorg/flyte/flyteartifacts/sandbox.yaml")
 	configAccessor := viper.NewAccessor(config.Options{
@@ -28,12 +32,6 @@ func TestWriteOne(t *testing.T) {
 	fmt.Println("Local integration testing using: ", configAccessor.ConfigFilesUsed())
 	scope := promutils.NewTestScope()
 	rds := NewStorage(ctx, scope)
-
-	//one := uint32(1)
-	//pval1 := "51"
-	//p := pgtype.Hstore{
-	//	"area": &pval1,
-	//}
 
 	lt := &core.LiteralType{
 		Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER},
@@ -50,28 +48,10 @@ func TestWriteOne(t *testing.T) {
 		},
 	}
 
-	//ltBytes, err := proto.Marshal(lt)
-	//assert.NoError(t, err)
-	//litBytes, err := proto.Marshal(lit)
-	//assert.NoError(t, err)
-
-	//gormA := Artifact{
-	//	ArtifactKey: ArtifactKey{
-	//		Project: "demotst",
-	//		Domain:  "unit",
-	//		Name:    "testname 2",
-	//	},
-	//	Version:       "abc123/1/n0/7",
-	//	Partitions:    p,
-	//	LiteralType:   ltBytes,
-	//	LiteralValue:  litBytes,
-	//	ExecutionName: "ddd",
-	//	RetryAttempt:  &one,
-	//}
 	ak := &core.ArtifactKey{
 		Project: "demotst",
 		Domain:  "unit",
-		Name:    "artfname 2",
+		Name:    "artfname 10",
 	}
 	spec := &artifact.ArtifactSpec{
 		Value: lit,
@@ -81,7 +61,7 @@ func TestWriteOne(t *testing.T) {
 				ResourceType: core.ResourceType_TASK,
 				Project:      "demotst",
 				Domain:       "unit",
-				Name:         "testname 2",
+				Name:         "testtaskname 2",
 				Version:      "testtaskversion",
 			},
 			NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -103,10 +83,69 @@ func TestWriteOne(t *testing.T) {
 		"ds":   "2023-05-01",
 	}
 
-	am, err := models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/9", partitions, "tag", "principal")
+	// Create one
+	am, err := models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/1", partitions, "tag", "principal")
 	assert.NoError(t, err)
 
 	newModel, err := rds.CreateArtifact(ctx, am)
 	assert.NoError(t, err)
 	fmt.Println(newModel)
+
+	// Create another
+	am, err = models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/2", partitions, "tag", "principal")
+	assert.NoError(t, err)
+
+	newModel, err = rds.CreateArtifact(ctx, am)
+	assert.NoError(t, err)
+	fmt.Println(newModel)
+}
+
+func TestBasicRead(t *testing.T) {
+	ctx := context.Background()
+	sandboxCfgFile := os.ExpandEnv("$GOPATH/src/github.com/flyteorg/flyte/flyteartifacts/sandbox.yaml")
+	configAccessor := viper.NewAccessor(config.Options{
+		SearchPaths: []string{sandboxCfgFile},
+		StrictMode:  false,
+	})
+	err := configAccessor.UpdateConfig(ctx)
+	fmt.Println("Local integration testing using: ", configAccessor.ConfigFilesUsed())
+
+	scope := promutils.NewTestScope()
+	rds := NewStorage(ctx, scope)
+	ak := &core.ArtifactKey{
+		Project: "demotst",
+		Domain:  "unit",
+		Name:    "artfname 10",
+	}
+	partitions := map[string]string{
+		"area": "51",
+		"ds":   "2023-05-01",
+	}
+	query := core.ArtifactQuery{
+		Identifier: &core.ArtifactQuery_ArtifactId{
+			ArtifactId: &core.ArtifactID{
+				ArtifactKey: ak,
+				Version:     "abc123/1/n0/1",
+			},
+		},
+	}
+	_, err = rds.GetArtifact(context.Background(), query)
+	assert.Error(t, err)
+
+	pidl := models.PartitionsToIdl(partitions)
+	query = core.ArtifactQuery{
+		Identifier: &core.ArtifactQuery_ArtifactId{
+			ArtifactId: &core.ArtifactID{
+				ArtifactKey: ak,
+				Version:     "abc123/1/n0/1",
+				Dimensions: &core.ArtifactID_Partitions{
+					Partitions: pidl,
+				},
+			},
+		},
+	}
+	ga, err := rds.GetArtifact(context.Background(), query)
+	assert.NoError(t, err)
+
+	fmt.Println(ga)
 }

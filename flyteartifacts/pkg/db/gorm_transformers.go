@@ -3,8 +3,10 @@ package db
 import (
 	"context"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -24,6 +26,23 @@ func PartitionsIdlToHstore(idlPartitions *core.Partitions) pgtype.Hstore {
 		hstore[k] = &sv
 	}
 	return hstore
+}
+
+func HstoreToIdlPartitions(hs pgtype.Hstore) *core.Partitions {
+	if hs == nil || len(hs) == 0 {
+		return nil
+	}
+	m := make(map[string]*core.LabelValue, len(hs))
+	for k, v := range hs {
+		m[k] = &core.LabelValue{
+			Value: &core.LabelValue_StaticValue{
+				StaticValue: *v,
+			},
+		}
+	}
+	return &core.Partitions{
+		Value: m,
+	}
 }
 
 func ServiceToGormModel(serviceModel models.Artifact) (Artifact, error) {
@@ -56,4 +75,55 @@ func ServiceToGormModel(serviceModel models.Artifact) (Artifact, error) {
 	}
 
 	return ga, nil
+}
+
+func GormToServiceModel(ga Artifact) (models.Artifact, error) {
+	lt := &core.LiteralType{}
+	lit := &core.Literal{}
+	if err := proto.Unmarshal(ga.LiteralType, lt); err != nil {
+		return models.Artifact{}, err
+	}
+	if err := proto.Unmarshal(ga.LiteralValue, lit); err != nil {
+		return models.Artifact{}, err
+	}
+
+	// gatepr: principal is missing still - can be added following discussion on source object.
+	// taskexecution and additional source information to be added when resolved.
+	// gatepr: implement tags
+	a := artifact.Artifact{
+		ArtifactId: &core.ArtifactID{
+			ArtifactKey: &core.ArtifactKey{
+				Project: ga.ArtifactKey.Project,
+				Domain:  ga.ArtifactKey.Domain,
+				Name:    ga.ArtifactKey.Name,
+			},
+			Version: ga.Version,
+		},
+		Spec: &artifact.ArtifactSpec{
+			Value:         lit,
+			Type:          lt,
+			TaskExecution: nil,
+			Execution: &core.WorkflowExecutionIdentifier{
+				Project: ga.ArtifactKey.Project,
+				Domain:  ga.ArtifactKey.Domain,
+				Name:    ga.ExecutionName,
+			},
+			Principal:        "",
+			ShortDescription: ga.Description,
+			UserMetadata:     nil,
+			MetadataType:     ga.MetadataType,
+		},
+		Tags: nil,
+	}
+	p := HstoreToIdlPartitions(ga.Partitions)
+	if p != nil {
+		a.ArtifactId.Dimensions = &core.ArtifactID_Partitions{Partitions: p}
+	}
+
+	return models.Artifact{
+		Artifact:          a,
+		OffloadedMetadata: "",
+		LiteralTypeBytes:  nil,
+		LiteralValueBytes: nil,
+	}, nil
 }

@@ -33,30 +33,33 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 	}
 
 	// Check to see if the artifact key already exists.
-	// this is not thread-safe, but whatever, gorm can't do this itself.
-	var extantKey ArtifactKey
-	db := r.db.Where("project = ? AND domain = ? and name = ?",
-		serviceModel.Artifact.ArtifactId.ArtifactKey.Project,
-		serviceModel.Artifact.ArtifactId.ArtifactKey.Domain,
-		serviceModel.Artifact.ArtifactId.ArtifactKey.Name)
-	db.First(&extantKey)
-	if err := db.Error; err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			logger.Errorf(ctx, "Failed to query for existing key: %+v", err)
-			return models.Artifact{}, err
+	// do the create in a transaction
+	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var extantKey ArtifactKey
+		ak := ArtifactKey{
+			Project: serviceModel.Artifact.ArtifactId.ArtifactKey.Project,
+			Domain:  serviceModel.Artifact.ArtifactId.ArtifactKey.Domain,
+			Name:    serviceModel.Artifact.ArtifactId.ArtifactKey.Name,
 		}
-		logger.Debugf(ctx, "Existing key [%+v] not found", extantKey)
-	} else {
-		gormModel.ArtifactKey = ArtifactKey{}
+		tx.FirstOrCreate(&extantKey, ak)
+		if err := tx.Error; err != nil {
+			logger.Errorf(ctx, "Failed to firstorcreate key: %+v", err)
+			return err
+		}
 		gormModel.ArtifactKeyID = extantKey.ID
+		gormModel.ArtifactKey = ArtifactKey{} // zero out the artifact key
+		tx.Create(&gormModel)
+		if tx.Error != nil {
+			logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
+			return tx.Error
+		}
+		return nil
+	})
+	if err != nil {
+		logger.Errorf(ctx, "Failed transaction upsert on key [%v]: %+v", serviceModel.ArtifactId, err)
+		return models.Artifact{}, err
 	}
-
-	tx := r.db.Create(&gormModel)
 	timer.Stop()
-	if tx.Error != nil {
-		logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
-		return models.Artifact{}, tx.Error
-	}
 
 	return models.Artifact{}, nil
 }
@@ -75,19 +78,24 @@ func (r *RDSStorage) handleUriGet(ctx context.Context, uri string) (models.Artif
 }
 
 func (r *RDSStorage) handleArtifactIdGet(ctx context.Context, artifactID core.ArtifactID) (models.Artifact, error) {
-
-	var gotArtifact models.Artifact
-	db := r.db.Where("project = ? AND domain = ? and name = ?",
-		artifactID.ArtifactKey.Project,
-		artifactID.ArtifactKey.Domain,
-		artifactID.ArtifactKey.Name)
-
+	var gotArtifact Artifact
+	ak := ArtifactKey{
+		Project: artifactID.ArtifactKey.Project,
+		Domain:  artifactID.ArtifactKey.Domain,
+		Name:    artifactID.ArtifactKey.Name,
+	}
+	db := r.db.Model(&Artifact{}).InnerJoins("ArtifactKey", r.db.Where(&ak))
 	if artifactID.Version != "" {
 		db = db.Where("version = ?", artifactID.Version)
 	}
+
 	if artifactID.GetPartitions() != nil && len(artifactID.GetPartitions().GetValue()) > 0 {
 		partitionMap := PartitionsIdlToHstore(artifactID.GetPartitions())
 		db = db.Where("partitions = ?", partitionMap)
+	} else {
+		// Be strict about partitions. If not specified, that means, we're looking
+		// for null
+		db = db.Where("partitions is null")
 	}
 	db.Order("created_at desc").Limit(1)
 	db = db.First(&gotArtifact)
@@ -99,7 +107,13 @@ func (r *RDSStorage) handleArtifactIdGet(ctx context.Context, artifactID core.Ar
 		logger.Errorf(ctx, "Failed to query for artifact: %+v", err)
 		return models.Artifact{}, err
 	}
-	return gotArtifact, nil
+	logger.Debugf(ctx, "Found and returning artifact key %v", gotArtifact)
+	m, err := GormToServiceModel(gotArtifact)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to convert gorm model to service model: %+v", err)
+		return models.Artifact{}, err
+	}
+	return m, nil
 }
 
 func (r *RDSStorage) GetArtifact(ctx context.Context, query core.ArtifactQuery) (models.Artifact, error) {
