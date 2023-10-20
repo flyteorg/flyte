@@ -9,8 +9,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
-	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -98,29 +96,19 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 	}
 
 	webhookScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("webhook")
-	var namespaceConfigs map[string]cache.Config
+	limitNamespace := ""
 	if propellerCfg.LimitNamespace != defaultNamespace {
-		namespaceConfigs = map[string]cache.Config{
-			propellerCfg.LimitNamespace: {},
-		}
+		limitNamespace = propellerCfg.LimitNamespace
 	}
-
 	options := manager.Options{
-		Cache: cache.Options{
-			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
-			DefaultNamespaces: namespaceConfigs,
+		Namespace:  limitNamespace,
+		SyncPeriod: &propellerCfg.DownstreamEval.Duration,
+		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
+			return executors.NewFallbackClientBuilder(webhookScope).Build(cache, config, options)
 		},
-		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(webhookScope).Build(nil, config, options)
-		},
-		Metrics: metricsserver.Options{
-			// Disable metrics serving
-			BindAddress: "0",
-		},
-		WebhookServer: ctrlWebhook.NewServer(ctrlWebhook.Options{
-			CertDir: cfg.CertDir,
-			Port:    cfg.ListenPort,
-		}),
+		CertDir:            cfg.CertDir,
+		Port:               cfg.ListenPort,
+		MetricsBindAddress: "0",
 	}
 
 	mgr, err := controller.CreateControllerManager(ctx, propellerCfg, options)

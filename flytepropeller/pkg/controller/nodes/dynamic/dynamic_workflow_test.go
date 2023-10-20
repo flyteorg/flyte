@@ -30,7 +30,7 @@ import (
 
 func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *testing.T) {
 	createNodeContext := func(ttype string, finalOutput storage.DataReference, dataStore *storage.DataStore) *mocks.NodeExecutionContext {
-		ctx := context.Background()
+		ctx := context.TODO()
 
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",

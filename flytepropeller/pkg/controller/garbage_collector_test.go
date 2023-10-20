@@ -10,8 +10,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	corev1Types "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/clock"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
-	testing2 "k8s.io/utils/clock/testing"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -26,7 +26,7 @@ func TestNewGarbageCollector(t *testing.T) {
 			MaxTTLInHours:  2,
 			LimitNamespace: "flyte",
 		}
-		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), testing2.NewFakeClock(time.Now()), nil, nil)
+		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), clock.NewFakeClock(time.Now()), nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, 2, gc.ttlHours)
 	})
@@ -37,7 +37,7 @@ func TestNewGarbageCollector(t *testing.T) {
 			MaxTTLInHours:  24,
 			LimitNamespace: "flyte",
 		}
-		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), testing2.NewFakeClock(time.Now()), nil, nil)
+		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), clock.NewFakeClock(time.Now()), nil, nil)
 		assert.NoError(t, err)
 		assert.Equal(t, 23, gc.ttlHours)
 	})
@@ -146,7 +146,7 @@ func TestGarbageCollector_StartGC(t *testing.T) {
 			LimitNamespace: "flyte",
 		}
 
-		fakeClock := testing2.NewFakeClock(b)
+		fakeClock := clock.NewFakeClock(b)
 		mockNamespaceInvoked = false
 		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), fakeClock, mockNamespaceClient, mockClient)
 		assert.NoError(t, err)
@@ -167,7 +167,7 @@ func TestGarbageCollector_StartGC(t *testing.T) {
 			LimitNamespace: "all",
 		}
 
-		fakeClock := testing2.NewFakeClock(b)
+		fakeClock := clock.NewFakeClock(b)
 		mockNamespaceInvoked = false
 		gc, err := NewGarbageCollector(cfg, promutils.NewTestScope(), fakeClock, mockNamespaceClient, mockClient)
 		assert.NoError(t, err)

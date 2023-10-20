@@ -34,4 +34,3 @@ dist
 vendor/
 /docker/sandbox-bundled/images/tar
 rsts/_tags/
-**/bin/

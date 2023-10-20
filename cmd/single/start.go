@@ -3,8 +3,6 @@ package single
 import (
 	"context"
 	"net/http"
-	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/flyte/datacatalog/pkg/repositories"
@@ -107,30 +105,18 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 	propellerCfg := propellerConfig.GetConfig()
 	propellerScope := promutils.NewScope(propellerConfig.GetConfig().MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
 	limitNamespace := ""
-	var namespaceConfigs map[string]cache.Config
 	if propellerCfg.LimitNamespace != defaultNamespace {
 		limitNamespace = propellerCfg.LimitNamespace
-		namespaceConfigs = map[string]cache.Config{
-			limitNamespace: {},
-		}
 	}
 
 	options := manager.Options{
-		Cache: cache.Options{
-			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
-			DefaultNamespaces: namespaceConfigs,
+		Namespace:  limitNamespace,
+		SyncPeriod: &propellerCfg.DownstreamEval.Duration,
+		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
+			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(cache, config, options)
 		},
-		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(nil, config, options)
-		},
-		Metrics: metricsserver.Options{
-			// Disable metrics serving
-			BindAddress: "0",
-		},
-		WebhookServer: ctrlWebhook.NewServer(ctrlWebhook.Options{
-			CertDir: webhookConfig.GetConfig().CertDir,
-			Port:    webhookConfig.GetConfig().ListenPort,
-		}),
+		CertDir: webhookConfig.GetConfig().CertDir,
+		Port:    webhookConfig.GetConfig().ListenPort,
 	}
 
 	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, options)
