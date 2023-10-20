@@ -17,15 +17,20 @@ import (
 )
 
 type FakeKubeCache struct {
+	// Reader acts as a client to objects stored in the cache.
+	client.Reader
+
+	// Informers loads informers and adds field indices.
+	cache.Informers
 	syncObj sync.RWMutex
 	Cache   map[string]runtime.Object
 }
 
-func (m *FakeKubeCache) GetInformer(ctx context.Context, obj client.Object) (cache.Informer, error) {
+func (m *FakeKubeCache) GetInformer(ctx context.Context, obj client.Object, opts ...cache.InformerGetOption) (cache.Informer, error) {
 	panic("implement me")
 }
 
-func (m *FakeKubeCache) GetInformerForKind(ctx context.Context, gvk schema.GroupVersionKind) (cache.Informer, error) {
+func (m *FakeKubeCache) GetInformerForKind(ctx context.Context, gvk schema.GroupVersionKind, opts ...cache.InformerGetOption) (cache.Informer, error) {
 	panic("implement me")
 }
 
@@ -41,7 +46,7 @@ func (m *FakeKubeCache) IndexField(ctx context.Context, obj client.Object, field
 	panic("implement me")
 }
 
-func (m *FakeKubeCache) Get(ctx context.Context, key client.ObjectKey, out client.Object) error {
+func (m *FakeKubeCache) Get(ctx context.Context, key client.ObjectKey, out client.Object, opts ...client.GetOption) error {
 	m.syncObj.RLock()
 	defer m.syncObj.RUnlock()
 
