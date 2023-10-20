@@ -17,7 +17,7 @@ permissions:
 jobs:
   codespell:
     name: Check for spelling errors
-    runs-on: union-k8s-runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout

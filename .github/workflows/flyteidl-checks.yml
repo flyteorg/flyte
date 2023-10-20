@@ -17,7 +17,7 @@ env:
   GO_VERSION: "1.19"
 jobs:
   unpack-envvars:
-    runs-on: union-k8s-runner
+    runs-on: ubuntu-latest
     outputs:
       go-version: ${{ steps.step.outputs.go-version }}
     steps:
