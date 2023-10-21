@@ -28,15 +28,6 @@ Discover the process of setting up AWS plugins for Flyte.
     ^^^^^^^^^^^^
     Guide to setting up the AWS Athena plugin.
 
-    ---
-
-    .. link-button:: deployment-plugin-setup-aws-sagemaker
-       :type: ref
-       :text: AWS Sagemaker
-       :classes: btn-block stretched-link
-    ^^^^^^^^^^^^
-    Guide to setting up the AWS Sagemaker plugin.
-
 .. toctree::
     :maxdepth: 1
     :name: AWS plugin setup
@@ -44,4 +35,3 @@ Discover the process of setting up AWS plugins for Flyte.
 
     batch
     athena
-    sagemaker

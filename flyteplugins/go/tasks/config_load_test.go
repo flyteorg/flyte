@@ -10,7 +10,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	sagemakerConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/sagemaker/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/spark"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
@@ -118,10 +117,6 @@ func TestLoadConfig(t *testing.T) {
 		assert.Equal(t, 2, len(spark.GetSparkConfig().Features[0].SparkConfig))
 		assert.Equal(t, 2, len(spark.GetSparkConfig().Features[1].SparkConfig))
 
-	})
-
-	t.Run("sagemaker-config-test", func(t *testing.T) {
-		assert.NotNil(t, sagemakerConfig.GetSagemakerConfig())
 	})
 }
 
