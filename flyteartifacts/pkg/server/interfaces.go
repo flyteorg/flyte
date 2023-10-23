@@ -19,3 +19,7 @@ type BlobStoreInterface interface {
 
 	RetrieveArtifactCard(context.Context, stdLibStorage.DataReference) (*any.Any, error)
 }
+
+// This interface is under server/ because it's going to take a pointer to
+// the main service itself to be able to directly invoke the endpoint.
+// If we're okay with a local grpc call, we can move it a level higher.

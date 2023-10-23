@@ -2,8 +2,8 @@ package implementations
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/Shopify/sarama"
@@ -25,8 +25,9 @@ type PubSubSender struct {
 
 func (s *PubSubSender) Send(ctx context.Context, notificationType string, event cloudevents.Event) error {
 	// gatepr: investigate why the previous statement didn't work.
-	// eventByte, err := pbcloudevents.Protobuf.Marshal(&event)
-	eventByte, err := json.Marshal(&event)
+	//  perhaps only because of redis.
+	eventByte, err := pbcloudevents.Protobuf.Marshal(&event)
+	//eventByte, err := json.Marshal(&event)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to marshal cloudevent with error: %v", err)
 		return err

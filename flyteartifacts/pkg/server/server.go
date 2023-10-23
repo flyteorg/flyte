@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/blob"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/db"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/server/processor"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -19,22 +20,28 @@ import (
 
 type ArtifactService struct {
 	artifact.UnimplementedArtifactRegistryServer
-	StorageProvider StorageInterface
-	Metrics         ServiceMetrics
-	Service         CoreService
+	Metrics       ServiceMetrics
+	Service       CoreService
+	EventConsumer processor.EventsProcessorInterface
 }
 
 func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactService {
-	cfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration)
+	cfg := configuration.GetApplicationConfig()
 	fmt.Println(cfg)
+	eventsCfg := configuration.GetEventsProcessorConfig()
 
 	storage := db.NewStorage(ctx, scope.NewSubScope("storage:rds"))
 	blobStore := blob.NewArtifactBlobStore(ctx, scope.NewSubScope("storage:s3"))
 	coreService := NewCoreService(storage, &blobStore, scope.NewSubScope("server"))
+	eventsReceiverAndHandler := processor.NewBackgroundProcessor(ctx, *eventsCfg, &coreService, scope.NewSubScope("events"))
+	if eventsReceiverAndHandler != nil {
+		eventsReceiverAndHandler.StartProcessing(ctx)
+	}
 
 	return &ArtifactService{
-		Metrics: InitMetrics(scope),
-		Service: coreService,
+		Metrics:       InitMetrics(scope),
+		Service:       coreService,
+		EventConsumer: eventsReceiverAndHandler,
 	}
 }
 
@@ -54,7 +61,7 @@ func GrpcRegistrationHook(ctx context.Context, server *grpc.Server, scope promut
 }
 
 // GetMigrations should be hidden behind the storage interface in the future.
-func GetMigrations(ctx context.Context) []*gormigrate.Migration {
+func GetMigrations(_ context.Context) []*gormigrate.Migration {
 	return db.Migrations
 }
 func GetDbConfig() *database.DbConfig {

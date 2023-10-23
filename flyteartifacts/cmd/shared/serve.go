@@ -28,7 +28,7 @@ func NewServeCmd(commandName string, grpcHook GrpcRegistrationHook, httpHook Htt
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx := context.Background()
 			serverCfg := sharedCfg.SharedServerConfig.GetConfig().(*sharedCfg.ServerConfiguration)
-			return serveGateway(ctx, commandName, serverCfg, grpcHook, httpHook)
+			return ServeGateway(ctx, commandName, serverCfg, grpcHook, httpHook)
 		},
 	}
 }
@@ -74,8 +74,8 @@ func newGRPCServer(ctx context.Context, serviceName string, serverCfg *sharedCfg
 	return grpcServer, nil
 }
 
-// serveGateway launches the grpc and http servers.
-func serveGateway(ctx context.Context, serviceName string, serverCfg *sharedCfg.ServerConfiguration, grpcHook GrpcRegistrationHook, httpHook HttpRegistrationHook) error {
+// ServeGateway launches the grpc and http servers.
+func ServeGateway(ctx context.Context, serviceName string, serverCfg *sharedCfg.ServerConfiguration, grpcHook GrpcRegistrationHook, httpHook HttpRegistrationHook) error {
 
 	if grpcHook != nil {
 		if err := launchGrpcServer(ctx, serviceName, serverCfg, grpcHook); err != nil {

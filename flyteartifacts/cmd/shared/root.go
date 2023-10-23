@@ -7,11 +7,8 @@ import (
 	sharedCfg "github.com/flyteorg/flyte/flyteartifacts/pkg/configuration/shared"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"os"
@@ -50,12 +47,6 @@ func NewRootCmd(rootUse string, grpcHook GrpcRegistrationHook, httpHook HttpRegi
 
 	initSubCommands(rootCmd, grpcHook, httpHook)
 	return rootCmd
-}
-
-func init() {
-	// Set Keys
-	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey,
-		contextutils.DomainKey, storage.FailureTypeLabel)
 }
 
 func initConfig(cmd *cobra.Command, _ []string) error {

@@ -2,6 +2,7 @@ package cloudevent
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flytestdlib/sandbox_utils"
 	"time"
 
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
@@ -17,7 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	cloudEventImplementations "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
-	redisPublisher "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/redis"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -90,20 +90,27 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 		}
 		sender = &cloudEventImplementations.KafkaSender{Client: client}
 
-	case common.Redis:
+	case common.Sandbox:
 		var publisher pubsub.Publisher
-		var err error
-		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
-			publisher, err = redisPublisher.NewPublisher(cloudEventsConfig.RedisConfig)
-			return err
-		})
-		logger.Infof(ctx, "Using Redis cloud events publisher [%v] [%+v]", publisher, cloudEventsConfig.RedisConfig)
-
-		// Persistent errors should hard fail
-		if err != nil {
-			panic(err)
+		publisher = sandbox_utils.CloudEventsPublisher
+		sender = &cloudEventImplementations.PubSubSender{
+			Pub: publisher,
 		}
-		sender = &cloudEventImplementations.PubSubSender{Pub: publisher}
+
+	//case common.Redis:
+	//	var publisher pubsub.Publisher
+	//	var err error
+	//	err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
+	//		publisher, err = redisPublisher.NewPublisher(cloudEventsConfig.RedisConfig)
+	//		return err
+	//	})
+	//	logger.Infof(ctx, "Using Redis cloud events publisher [%v] [%+v]", publisher, cloudEventsConfig.RedisConfig)
+	//
+	//	// Persistent errors should hard fail
+	//	if err != nil {
+	//		panic(err)
+	//	}
+	//	sender = &cloudEventImplementations.PubSubSender{Pub: publisher}
 
 	case common.Local:
 		fallthrough

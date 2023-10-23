@@ -37,7 +37,7 @@ func (a *ArtifactBlobStore) RetrieveArtifactCard(ctx context.Context, uri storag
 }
 
 func NewArtifactBlobStore(ctx context.Context, scope promutils.Scope) ArtifactBlobStore {
-	storageCfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration).ArtifactBlobStoreConfig
+	storageCfg := configuration.GetApplicationConfig().ArtifactBlobStoreConfig
 	logger.Infof(ctx, "Initializing storage client with config [%+v]", storageCfg)
 
 	dataStorageClient, err := storage.NewDataStore(&storageCfg, scope)

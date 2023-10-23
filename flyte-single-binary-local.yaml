@@ -1,5 +1,7 @@
 # This is a sample configuration file for running single-binary Flyte locally against
 # a sandbox.
+# gatepr: revert the local dir to reflect home.
+#   paths were changed to personal to ensure settings didn't get lost.
 admin:
   endpoint: localhost:8089
   insecure: true
@@ -80,14 +82,30 @@ database:
 #    options: "sslmode=disable"
 cloudEvents:
   enable: true
-  cloudEventVersion: v2
-  type: redis
-  redis:
-    addr: "localhost:30004"
+  cloudEventVersion: 2
+  type: sandbox
+# For admin to find artifacts service
 artifacts:
   host: localhost
   port: 50051
   insecure: true
+# For artifact service itself
+# todo: gatepr - move this to under artifacts server config, shared configs don't make sense even in single binary.
+sharedServer:
+  port: 50051
+  httpPort: 50050
+artifactsServer:
+  artifactBlobStoreConfig:
+    type: stow
+    stow:
+      kind: s3
+      config:
+        disable_ssl: true
+        v2_signing: true
+        endpoint: http://localhost:30002
+        auth_type: accesskey
+        access_key_id: minio
+        secret_key: miniostorage
 storage:
   type: stow
   stow:

@@ -36,3 +36,7 @@ var defaultApplicationConfiguration = ApplicationConfiguration{
 }
 
 var ApplicationConfig = config.MustRegisterSection(artifactsServer, &defaultApplicationConfiguration)
+
+func GetApplicationConfig() *ApplicationConfiguration {
+	return ApplicationConfig.GetConfig().(*ApplicationConfiguration)
+}
