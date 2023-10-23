@@ -323,13 +323,13 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_grpc.enable-grpc-latency-metrics", func(t *testing.T) {
+	t.Run("Test_grpc.enableGrpcLatencyMetrics", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("grpc.enable-grpc-latency-metrics", testValue)
-			if vBool, err := cmdFlags.GetBool("grpc.enable-grpc-latency-metrics"); err == nil {
+			cmdFlags.Set("grpc.enableGrpcLatencyMetrics", testValue)
+			if vBool, err := cmdFlags.GetBool("grpc.enableGrpcLatencyMetrics"); err == nil {
 				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.GrpcConfig.EnableGrpcLatencyMetrics)
 
 			} else {
