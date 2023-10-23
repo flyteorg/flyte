@@ -6,7 +6,7 @@ import (
 
 	"github.com/flyteorg/flytectl/pkg/filters"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func (a *AdminFetcherExtClient) ListProjects(ctx context.Context, filter filters.Filters) (*admin.Projects, error) {

@@ -6,13 +6,13 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	config "github.com/flyteorg/flytectl/cmd/config/subcommand/compile"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/flyteorg/flytectl/cmd/register"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flytepropeller/pkg/compiler"
-	"github.com/flyteorg/flytepropeller/pkg/compiler/common"
 )
 
 // Utility function for compiling a list of Tasks

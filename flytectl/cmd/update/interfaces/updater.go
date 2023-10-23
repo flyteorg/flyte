@@ -3,8 +3,8 @@ package interfaces
 import (
 	"context"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 //go:generate mockery -name=Updater -case=underscore

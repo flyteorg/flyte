@@ -3,7 +3,7 @@ package ext
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func (a *AdminUpdaterExtClient) UpdateWorkflowAttributes(ctx context.Context, project, domain, name string, matchingAttr *admin.MatchingAttributes) error {

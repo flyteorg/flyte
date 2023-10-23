@@ -1,7 +1,7 @@
 package workflowexecutionconfig
 
 import (
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // FileConfig shadow Config for WorkflowExecutionConfig.

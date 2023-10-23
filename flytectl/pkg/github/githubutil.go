@@ -9,10 +9,10 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 	"github.com/flyteorg/flytectl/pkg/platformutil"
 	"github.com/flyteorg/flytectl/pkg/util"
-	"github.com/flyteorg/flytestdlib/logger"
-	stdlibversion "github.com/flyteorg/flytestdlib/version"
 
 	"github.com/google/go-github/v42/github"
 	"github.com/mouuff/go-rocket-update/pkg/provider"

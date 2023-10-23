@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/pkg/filters"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"gopkg.in/yaml.v3"
 )

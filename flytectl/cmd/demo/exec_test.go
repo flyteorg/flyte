@@ -10,7 +10,7 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/testutils"
 
-	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
 	"github.com/stretchr/testify/assert"

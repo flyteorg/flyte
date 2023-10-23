@@ -93,7 +93,7 @@ SEE ALSO
 
 * :doc:`flytectl` 	 - Flytectl CLI tool
 * :doc:`flytectl_config_discover` 	 - Searches for a config in one of the default search paths.
-* :doc:`flytectl_config_docs` 	 - Generate configuration documetation in rst format
+* :doc:`flytectl_config_docs` 	 - Generate configuration documentation in rst format
 * :doc:`flytectl_config_init` 	 - Generates a Flytectl config file in the user's home directory.
 * :doc:`flytectl_config_validate` 	 - Validates the loaded config.
 

@@ -3,7 +3,7 @@ package ext
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/stretchr/testify/assert"
 )
 

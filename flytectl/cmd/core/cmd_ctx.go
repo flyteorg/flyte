@@ -3,10 +3,10 @@ package cmdcore
 import (
 	"io"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flytectl/pkg/ext"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 type CommandContext struct {

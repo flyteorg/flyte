@@ -1,6 +1,6 @@
 package config
 
-import "github.com/flyteorg/flytestdlib/config"
+import "github.com/flyteorg/flyte/flytestdlib/config"
 
 //go:generate pflags ConsoleConfig --default-var DefaultConsoleConfig --bind-default-var
 

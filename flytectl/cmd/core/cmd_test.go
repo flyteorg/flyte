@@ -5,8 +5,8 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flytestdlib/config"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"

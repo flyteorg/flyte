@@ -1,6 +1,6 @@
 package register
 
-import "github.com/flyteorg/flytestdlib/config"
+import "github.com/flyteorg/flyte/flytestdlib/config"
 
 //go:generate pflags FilesConfig --default-var DefaultFilesConfig --bind-default-var
 

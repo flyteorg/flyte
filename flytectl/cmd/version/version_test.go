@@ -10,14 +10,14 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/testutils"
 
-	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
 	"github.com/spf13/cobra"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	stdlibversion "github.com/flyteorg/flytestdlib/version"
 	"github.com/stretchr/testify/assert"
 )
 

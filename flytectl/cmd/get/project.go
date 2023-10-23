@@ -5,8 +5,8 @@ import (
 
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flytectl/cmd/config"

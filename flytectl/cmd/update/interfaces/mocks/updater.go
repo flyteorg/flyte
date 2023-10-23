@@ -7,7 +7,7 @@ import (
 
 	cmdcore "github.com/flyteorg/flytectl/cmd/core"
 
-	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	mock "github.com/stretchr/testify/mock"
 )

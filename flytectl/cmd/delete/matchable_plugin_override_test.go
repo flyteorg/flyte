@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flytectl/cmd/config"
 	pluginoverride "github.com/flyteorg/flytectl/cmd/config/subcommand/plugin_override"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"

@@ -10,11 +10,11 @@ import (
 
 	"github.com/flyteorg/flytectl/pkg/util"
 
-	stdlibversion "github.com/flyteorg/flytestdlib/version"
+	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 
 	"github.com/flyteorg/flytectl/pkg/github"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/mouuff/go-rocket-update/pkg/updater"
 
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"

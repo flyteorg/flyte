@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 
 	"github.com/flyteorg/flytectl/pkg/configutil"
 
@@ -35,7 +35,7 @@ func TestCreateInitCommand(t *testing.T) {
 	assert.Equal(t, "discover", cmdNouns[0].Use)
 	assert.Equal(t, "Searches for a config in one of the default search paths.", cmdNouns[0].Short)
 	assert.Equal(t, "docs", cmdNouns[1].Use)
-	assert.Equal(t, "Generate configuration documetation in rst format", cmdNouns[1].Short)
+	assert.Equal(t, "Generate configuration documentation in rst format", cmdNouns[1].Short)
 
 	assert.Equal(t, "init", cmdNouns[2].Use)
 	assert.Equal(t, initCmdShort, cmdNouns[2].Short)

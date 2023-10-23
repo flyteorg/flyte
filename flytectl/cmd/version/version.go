@@ -10,10 +10,10 @@ import (
 
 	"github.com/flyteorg/flytectl/pkg/platformutil"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	stdlibversion "github.com/flyteorg/flyte/flytestdlib/version"
 	cmdCore "github.com/flyteorg/flytectl/cmd/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytestdlib/logger"
-	stdlibversion "github.com/flyteorg/flytestdlib/version"
 	"github.com/spf13/cobra"
 )
 
