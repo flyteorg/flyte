@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	sharedCfg "github.com/flyteorg/flyte/flyteartifacts/pkg/configuration/shared"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -33,9 +33,9 @@ func NewRootCmd(rootUse string, grpcHook GrpcRegistrationHook, httpHook HttpRegi
 
 			go func() {
 				ctx := context.Background()
-				sharedConfig := sharedCfg.SharedServerConfig.GetConfig().(*sharedCfg.ServerConfiguration)
+				metricsCfg := configuration.GetApplicationConfig().ArtifactServerConfig.Metrics
 				err := profutils.StartProfilingServerWithDefaultHandlers(ctx,
-					sharedConfig.Metrics.Port.Port, nil)
+					metricsCfg.Port.Port, nil)
 				if err != nil {
 					logger.Panicf(ctx, "Failed to Start profiling and metrics server. Error: %v", err)
 				}
@@ -77,7 +77,8 @@ func initSubCommands(rootCmd *cobra.Command, grpcHook GrpcRegistrationHook, http
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "artifact_config.yaml", "config file (default is ./artifact_config.yaml)")
 
 	rootCmd.AddCommand(viper.GetConfigCommand())
-	rootCmd.AddCommand(NewServeCmd(rootCmd.Use, grpcHook, httpHook))
+	cfg := configuration.GetApplicationConfig()
+	rootCmd.AddCommand(NewServeCmd(rootCmd.Use, cfg.ArtifactServerConfig, grpcHook, httpHook))
 
 	// Allow viper to read the value of the flags
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())

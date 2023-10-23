@@ -3,7 +3,7 @@ package single
 import (
 	"context"
 	sharedCmd "github.com/flyteorg/flyte/flyteartifacts/cmd/shared"
-	sharedCfg "github.com/flyteorg/flyte/flyteartifacts/pkg/configuration/shared"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	artifactsServer "github.com/flyteorg/flyte/flyteartifacts/pkg/server"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"net/http"
@@ -83,7 +83,8 @@ func startArtifact(ctx context.Context, cfg Artifacts) error {
 
 	// Rough copy of NewServeCmd
 	g.Go(func() error {
-		serverCfg := sharedCfg.SharedServerConfig.GetConfig().(*sharedCfg.ServerConfiguration)
+		cfg := configuration.GetApplicationConfig()
+		serverCfg := &cfg.ArtifactServerConfig
 		return sharedCmd.ServeGateway(childCtx, "artifacts", serverCfg, artifactsServer.GrpcRegistrationHook,
 			artifactsServer.HttpRegistrationHook)
 	})

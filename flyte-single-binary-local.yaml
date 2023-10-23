@@ -90,7 +90,6 @@ artifacts:
   port: 50051
   insecure: true
 # For artifact service itself
-# todo: gatepr - move this to under artifacts server config, shared configs don't make sense even in single binary.
 sharedServer:
   port: 50051
   httpPort: 50050
