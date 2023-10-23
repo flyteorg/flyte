@@ -97,21 +97,6 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 			Pub: publisher,
 		}
 
-	//case common.Redis:
-	//	var publisher pubsub.Publisher
-	//	var err error
-	//	err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
-	//		publisher, err = redisPublisher.NewPublisher(cloudEventsConfig.RedisConfig)
-	//		return err
-	//	})
-	//	logger.Infof(ctx, "Using Redis cloud events publisher [%v] [%+v]", publisher, cloudEventsConfig.RedisConfig)
-	//
-	//	// Persistent errors should hard fail
-	//	if err != nil {
-	//		panic(err)
-	//	}
-	//	sender = &cloudEventImplementations.PubSubSender{Pub: publisher}
-
 	case common.Local:
 		fallthrough
 	default:
