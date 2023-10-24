@@ -67,6 +67,7 @@ func (f TokenOrchestrator) FetchTokenFromAuthFlow(ctx context.Context) (*oauth2.
 	// Pass along http client used in oauth2
 	httpClient, ok := ctx.Value(oauth2.HTTPClient).(*http.Client)
 	if !ok {
+		logger.Debugf(ctx, "using default http client instead")
 		httpClient = http.DefaultClient
 	}
 
