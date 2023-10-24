@@ -4,9 +4,8 @@ import (
 	"strings"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/rand"
-
 	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/apimachinery/pkg/util/rand"
 )
 
 const defaultScopeDelimiterStr = ":"

@@ -539,9 +539,7 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 	}
 
 	logger.Infof(ctx, "Initializing K8s plugin [%s]", entry.ID)
-	src := source.Kind{
-		Type: entry.ResourceToWatch,
-	}
+	src := source.Kind(iCtx.KubeClient().GetCache(), entry.ResourceToWatch)
 
 	workflowParentPredicate := func(o metav1.Object) bool {
 		if entry.Plugin.GetProperties().DisableInjectOwnerReferences {
@@ -558,11 +556,6 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		return false
 	}
 
-	if err := src.InjectCache(kubeClient.GetCache()); err != nil {
-		logger.Errorf(ctx, "failed to set informers for ObjectType %s", src.String())
-		return nil, err
-	}
-
 	metricsScope := iCtx.MetricsScope().NewSubScope(entry.ID)
 	updateCount := labeled.NewCounter("informer_update", "Update events from informer", metricsScope)
 	droppedUpdateCount := labeled.NewCounter("informer_update_dropped", "Update events from informer that have the same resource version", metricsScope)
@@ -573,10 +566,10 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 		ctx,
 		// Handlers
 		handler.Funcs{
-			CreateFunc: func(evt event.CreateEvent, q2 workqueue.RateLimitingInterface) {
+			CreateFunc: func(ctx context.Context, evt event.CreateEvent, q2 workqueue.RateLimitingInterface) {
 				logger.Debugf(context.Background(), "Create received for %s, ignoring.", evt.Object.GetName())
 			},
-			UpdateFunc: func(evt event.UpdateEvent, q2 workqueue.RateLimitingInterface) {
+			UpdateFunc: func(ctx context.Context, evt event.UpdateEvent, q2 workqueue.RateLimitingInterface) {
 				if evt.ObjectNew == nil {
 					logger.Warn(context.Background(), "Received an Update event with nil MetaNew.")
 				} else if evt.ObjectOld == nil || evt.ObjectOld.GetResourceVersion() != evt.ObjectNew.GetResourceVersion() {
@@ -601,10 +594,10 @@ func NewPluginManager(ctx context.Context, iCtx pluginsCore.SetupContext, entry 
 					droppedUpdateCount.Inc(newCtx)
 				}
 			},
-			DeleteFunc: func(evt event.DeleteEvent, q2 workqueue.RateLimitingInterface) {
+			DeleteFunc: func(ctx context.Context, evt event.DeleteEvent, q2 workqueue.RateLimitingInterface) {
 				logger.Debugf(context.Background(), "Delete received for %s, ignoring.", evt.Object.GetName())
 			},
-			GenericFunc: func(evt event.GenericEvent, q2 workqueue.RateLimitingInterface) {
+			GenericFunc: func(ctx context.Context, evt event.GenericEvent, q2 workqueue.RateLimitingInterface) {
 				logger.Debugf(context.Background(), "Generic received for %s, ignoring.", evt.Object.GetName())
 				genericCount.Inc(ctx)
 			},

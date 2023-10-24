@@ -5,6 +5,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws/mocks"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
@@ -12,11 +17,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc/codes"
 )
 
 const testScheduleName = "flyte_16301494360130577061"

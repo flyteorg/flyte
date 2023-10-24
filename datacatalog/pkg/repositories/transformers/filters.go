@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
-
 	"github.com/flyteorg/flyte/datacatalog/pkg/manager/impl/validators"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/gormimpl"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"

@@ -7,14 +7,12 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth"
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-
 	"github.com/lestrrat-go/jwx/jwk"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
+	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var (

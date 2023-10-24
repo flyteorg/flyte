@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const maxGRPCStatusCode = 17 // From _maxCode in "google.golang.org/grpc/codes"

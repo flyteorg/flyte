@@ -8,14 +8,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/database"
-
-	"gorm.io/driver/sqlite"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/jackc/pgconn"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	"github.com/flyteorg/flyte/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const pqInvalidDBCode = "3D000"

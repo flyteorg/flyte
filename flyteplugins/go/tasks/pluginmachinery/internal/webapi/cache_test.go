@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func TestNewResourceCache(t *testing.T) {

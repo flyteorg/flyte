@@ -3,34 +3,25 @@ package awsbatch
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
+	"github.com/go-test/deep"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-
+	"golang.org/x/net/context"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
-	core3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
-	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
-
-	"github.com/go-test/deep"
-
-	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-
-	v1 "k8s.io/api/core/v1"
-
-	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/stretchr/testify/assert"
-
+	core3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
+	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/utils"
-	"golang.org/x/net/context"
 )
 
 func TestLaunchSubTasks(t *testing.T) {
@@ -134,7 +125,7 @@ func TestLaunchSubTasks(t *testing.T) {
 			JobDefinitionArn: "arn",
 		}
 
-		newState, err := LaunchSubTasks(context.TODO(), tCtx, batchClient, &config.Config{MaxArrayJobSize: 10}, currentState, getAwsBatchExecutorMetrics(promutils.NewTestScope()), 0)
+		newState, err := LaunchSubTasks(context.Background(), tCtx, batchClient, &config.Config{MaxArrayJobSize: 10}, currentState, getAwsBatchExecutorMetrics(promutils.NewTestScope()), 0)
 		assert.NoError(t, err)
 		assertEqual(t, expectedState, newState)
 	})

@@ -1,10 +1,11 @@
 package v1alpha1
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 
-	"testing"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func TestRawOutputConfig(t *testing.T) {

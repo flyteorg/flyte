@@ -103,10 +103,19 @@ class UnionType(_message.Message):
     def __init__(self, variants: _Optional[_Iterable[_Union[LiteralType, _Mapping]]] = ...) -> None: ...
 
 class TypeStructure(_message.Message):
-    __slots__ = ["tag"]
+    __slots__ = ["tag", "dataclass_type"]
+    class DataclassTypeEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: LiteralType
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[_Union[LiteralType, _Mapping]] = ...) -> None: ...
     TAG_FIELD_NUMBER: _ClassVar[int]
+    DATACLASS_TYPE_FIELD_NUMBER: _ClassVar[int]
     tag: str
-    def __init__(self, tag: _Optional[str] = ...) -> None: ...
+    dataclass_type: _containers.MessageMap[str, LiteralType]
+    def __init__(self, tag: _Optional[str] = ..., dataclass_type: _Optional[_Mapping[str, LiteralType]] = ...) -> None: ...
 
 class TypeAnnotation(_message.Message):
     __slots__ = ["annotations"]

@@ -2,12 +2,12 @@ package gormimpl
 
 import (
 	"context"
+	"database/sql/driver"
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/stretchr/testify/assert"
-
-	"database/sql/driver"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	apiErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
@@ -18,7 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"google.golang.org/grpc/codes"
 )
 
 func init() {
