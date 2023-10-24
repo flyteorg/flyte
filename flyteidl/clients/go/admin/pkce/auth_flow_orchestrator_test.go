@@ -31,7 +31,7 @@ func TestFetchFromAuthFlow(t *testing.T) {
 		assert.Nil(t, refreshedToken)
 		assert.NotNil(t, err)
 		// Throws an exitError since browser cannot be opened.
-		// But this makes sure that atleast code is tested till the browser action is invoked.
+		// But this makes sure that at least code is tested till the browser action is invoked.
 		// Earlier change had broken this by introducing a hard dependency on the http Client from the context
 		_, isAnExitError := err.(*exec.ExitError)
 		assert.True(t, isAnExitError)
