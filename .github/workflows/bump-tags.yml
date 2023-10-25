@@ -34,6 +34,6 @@ jobs:
       - bump_version
     uses: ./.github/workflows/tag-components.yml
     with:
-      tag: ${{ steps.get_semver.outputs.next_version }}
+      tag: ${{ needs.bump_version.outputs.next_version }}
     secrets:
       FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
