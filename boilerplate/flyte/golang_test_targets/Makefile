@@ -3,6 +3,9 @@
 #
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
+.PHONY: codespell
+codespell:
+	git ls-files | grep -vE 'go\.mod|go\.sum|flyteidl/|\.pb$$|\.git|\.pdf|\.svg|requirements\.txt|gen/' | xargs codespell -w
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
@@ -13,7 +16,7 @@ generate: download_tooling #generate go code
 	@boilerplate/flyte/golang_test_targets/go-gen.sh
 
 .PHONY: lint
-lint: download_tooling #lints the package for common code smells
+lint: codespell download_tooling #lints the package for common code smells
 	GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v
 
 # If code is failing goimports linter, this will fix.
