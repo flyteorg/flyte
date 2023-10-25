@@ -28,31 +28,12 @@ jobs:
         run: |
           echo "Current version: ${{ steps.get_semver.outputs.current_version  }}"
           echo "Next version: ${{ steps.get_semver.outputs.next_version }}"
-      # Generate all tags for all components
-      - uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.FLYTE_BOT_PAT }}
-          script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: `refs/tags/${{ steps.get_semver.outputs.next_version }}`,
-              sha: context.sha
-            })
-            const components = [
-              "datacatalog",
-              "flyteadmin",
-              "flytecopilot",
-              "flyteidl",
-              "flyteplugins",
-              "flytepropeller",
-              "flytestdlib",
-            ];
-            for (const c of components) {
-              github.rest.git.createRef({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                ref: `refs/tags/${c}/${{ steps.get_semver.outputs.next_version }}`,
-                sha: context.sha
-              })
-            }
+
+  tag-components:
+    needs:
+      - bump_version
+    uses: ./.github/workflows/tag-components.yml
+    with:
+      tag: ${{ steps.get_semver.outputs.next_version }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}

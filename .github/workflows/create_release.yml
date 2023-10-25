@@ -8,23 +8,11 @@ on:
 
 jobs:
   bump-version:
-    name: bump-version
-    runs-on: ubuntu-latest
-    outputs:
-      version: ${{ steps.bump-version.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: "0"
-
-      - name: Bump version and push tag
-        id: bump-version
-        uses: anothrNick/github-tag-action@1.36.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-          WITH_V: true
-          CUSTOM_TAG: ${{ github.event.inputs.version }}
-          RELEASE_BRANCHES: master
+    uses: ./.github/workflows/tag-components.yml
+    with:
+      tag: ${{ github.event.inputs.version }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
   publish-flyte-binary-image:
     name: Publish flyte binary image for the release version
@@ -57,12 +45,12 @@ jobs:
       matrix:
         component:
           [
-              flyteconsole,
-              flytepropeller,
-              flyteadmin,
               datacatalog,
-              flytescheduler,
+              flyteadmin,
+              flyteconsole,
               flytecopilot,
+              flytepropeller,
+              flytescheduler,
           ]
     steps:
       - name: Checkout
@@ -94,6 +82,11 @@ jobs:
         run: |
           for release in latest ${{ needs.bump-version.outputs.version }}; do
             docker buildx imagetools create --tag "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}-release:${release}" "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}:${{ steps.set_version.outputs.version }}"
+            # If matrix component is not flyteconsole, create this extra tag
+            # TODO(monorepo): remove this conditional once flyteconsole moves to the monorepo
+            if [ ${{ matrix.component }} != "flyteconsole" ]; then
+              docker buildx imagetools create --tag "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}:${release}" "ghcr.io/${{ github.repository_owner }}/${{ matrix.component }}:${{ steps.set_version.outputs.version }}"
+            fi
           done
 
   helm-release:

@@ -1,0 +1,47 @@
+name: Tag components
+
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: "Tag"
+        type: string
+        required: true
+    secrets:
+      FLYTE_BOT_PAT:
+        required: true
+
+jobs:
+  tag-components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: '0'
+      - uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.FLYTE_BOT_PAT }}
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ inputs.tag }}`,
+              sha: context.sha
+            })
+            const components = [
+              "datacatalog",
+              "flyteadmin",
+              "flytecopilot",
+              "flyteidl",
+              "flyteplugins",
+              "flytepropeller",
+              "flytestdlib",
+            ];
+            for (const c of components) {
+              github.rest.git.createRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `refs/tags/${c}/${{ inputs.tag }}`,
+                sha: context.sha
+              })
+            }

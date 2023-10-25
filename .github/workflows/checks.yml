@@ -136,7 +136,6 @@ jobs:
 
   bump-tags:
     name: Bump git tags
-    # TODO(monorepo): skip this if author is flyte-bot?
     if: ${{ github.event_name != 'pull_request' }}
     needs:
       - integration
