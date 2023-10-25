@@ -93,13 +93,16 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 		})
 	}
 
-	if !cfg.Disabled {
-		g.Go(func() error {
-			logger.Infof(ctx, "Starting Admin server...")
-			registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
-			return adminServer.Serve(childCtx, registry.Load(), GetConsoleHandlers())
-		})
-	}
+        if !cfg.Disabled {
+                g.Go(func() error {
+            	l	ogger.Infof(ctx, "Starting Admin server...")
+            		registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
+            		// Pass the output format to your function
+            		return adminServer.Serve(childCtx, registry.Load(), GetConsoleHandlers(), outputFormat)
+        	})
+    	}
+	
+	
 	return g.Wait()
 }
 
@@ -184,23 +187,26 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 }
 
 var startCmd = &cobra.Command{
-	Use:   "start",
-	Short: "This command will start Flyte cluster locally",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx := context.Background()
-		g, childCtx := errgroup.WithContext(ctx)
-		cfg := GetConfig()
+    Use:   "start",
+    Short: "This command will start Flyte cluster locally",
+    RunE: func(cmd *cobra.Command, args []string) error {
+        ctx := context.Background()
+        g, childCtx := errgroup.WithContext(ctx)
+        cfg := GetConfig()
+        
+        // Get the value of the --output flag
+        outputFormat, _ := cmd.Flags().GetString("output")
 
-		if !cfg.Admin.Disabled {
-			g.Go(func() error {
-				err := startAdmin(childCtx, cfg.Admin)
-				if err != nil {
-					logger.Panicf(childCtx, "Failed to start Admin, err: %v", err)
-					return err
-				}
-				return nil
-			})
-		}
+        if !cfg.Admin.Disabled {
+            g.Go(func() error {
+                err := startAdmin(childCtx, cfg.Admin, outputFormat)
+                if err != nil {
+                    logger.Panicf(childCtx, "Failed to start Admin, err: %v", err)
+                    return err
+                }
+                return nil
+            })
+        }
 
 		if !cfg.Propeller.Disabled {
 			g.Go(func() error {
