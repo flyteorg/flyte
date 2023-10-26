@@ -190,10 +190,8 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 	// Get outputs from the workflow execution
 	var outputs *core.LiteralMap
 	if rawEvent.GetOutputData() != nil {
-		fmt.Printf("remove this - Got output data")
 		outputs = rawEvent.GetOutputData()
 	} else if len(rawEvent.GetOutputUri()) > 0 {
-		fmt.Printf("remove this - Got output URI")
 		// GetInputs actually fetches the data, even though this is an output
 		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig, c.storageClient, rawEvent.GetOutputUri())
 		if err != nil {
@@ -282,10 +280,8 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 
 	var outputs *core.LiteralMap
 	if rawEvent.GetOutputData() != nil {
-		fmt.Printf("remove this - task Got output data")
 		outputs = rawEvent.GetOutputData()
 	} else if len(rawEvent.GetOutputUri()) > 0 {
-		fmt.Printf("remove this - task Got output URI")
 		// GetInputs actually fetches the data, even though this is an output
 		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
 			c.storageClient, rawEvent.GetOutputUri())
@@ -375,6 +371,7 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		executionID = msgType.ExecutionId.String()
 		eventID = fmt.Sprintf("%v", executionID)
 		eventTime = time.Now()
+		// CloudEventExecutionStart don't have a nested event
 		finalMsg = msgType
 	default:
 		return fmt.Errorf("unsupported event types [%+v]", reflect.TypeOf(msg))

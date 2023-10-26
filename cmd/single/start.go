@@ -85,8 +85,13 @@ func startArtifact(ctx context.Context, cfg Artifacts) error {
 	g.Go(func() error {
 		cfg := configuration.GetApplicationConfig()
 		serverCfg := &cfg.ArtifactServerConfig
-		return sharedCmd.ServeGateway(childCtx, "artifacts", serverCfg, artifactsServer.GrpcRegistrationHook,
+		err := sharedCmd.ServeGateway(childCtx, "artifacts", serverCfg, artifactsServer.GrpcRegistrationHook,
 			artifactsServer.HttpRegistrationHook)
+		if err != nil {
+			logger.Errorf(childCtx, "Failed to start Artifacts server. Error: %v", err)
+			return err
+		}
+		return nil
 	})
 
 	return g.Wait()

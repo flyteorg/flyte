@@ -92,7 +92,7 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 
 	case common.Sandbox:
 		var publisher pubsub.Publisher
-		publisher = sandbox_utils.CloudEventsPublisher
+		publisher = sandbox_utils.NewCloudEventsPublisher()
 		sender = &cloudEventImplementations.PubSubSender{
 			Pub: publisher,
 		}

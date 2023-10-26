@@ -2,14 +2,14 @@ package processor
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/golang/protobuf/proto"
 )
 
 type EventsHandlerInterface interface {
-	HandleEventExecStart(context.Context, *event.CloudEventExecutionStart) error
-	HandleEventWorkflowExec(context.Context, *event.CloudEventWorkflowExecution) error
-	HandleEventTaskExec(context.Context, *event.CloudEventTaskExecution) error
-	HandleEventNodeExec(context.Context, *event.CloudEventNodeExecution) error
+	// HandleEvent The cloudEvent here is the original deserialized event and the proto msg is message
+	// that's been unmarshalled already from the cloudEvent.Data() field.
+	HandleEvent(ctx context.Context, cloudEvent *event.Event, msg proto.Message) error
 }
 
 // EventsProcessorInterface is a copy of the notifications processor in admin except that start takes a context

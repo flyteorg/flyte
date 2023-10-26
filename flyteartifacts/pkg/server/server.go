@@ -9,6 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/server/processor"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -35,7 +36,10 @@ func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactSer
 	coreService := NewCoreService(storage, &blobStore, scope.NewSubScope("server"))
 	eventsReceiverAndHandler := processor.NewBackgroundProcessor(ctx, *eventsCfg, &coreService, scope.NewSubScope("events"))
 	if eventsReceiverAndHandler != nil {
-		eventsReceiverAndHandler.StartProcessing(ctx)
+		go func() {
+			logger.Info(ctx, "Starting Artifact service background processing...")
+			eventsReceiverAndHandler.StartProcessing(ctx)
+		}()
 	}
 
 	return &ArtifactService{

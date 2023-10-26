@@ -536,8 +536,8 @@ type ExternalEventsConfig struct {
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
-//go:generate enumer -type=CloudEventVersion -trimprefix=CloudEventVersion
-type CloudEventVersion int
+//go:generate enumer -type=CloudEventVersion -json -yaml -trimprefix=CloudEventVersion
+type CloudEventVersion uint8
 
 const (
 	// This is the initial version of the cloud events

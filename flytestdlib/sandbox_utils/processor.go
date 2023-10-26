@@ -6,6 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
 	"sync"
+	"time"
 )
 
 var MsgChan chan SandboxMessage
@@ -13,7 +14,7 @@ var once sync.Once
 
 func init() {
 	once.Do(func() {
-		MsgChan = make(chan SandboxMessage)
+		MsgChan = make(chan SandboxMessage, 1000)
 	})
 }
 
@@ -29,36 +30,39 @@ type CloudEventsSandboxOnlyPublisher struct {
 
 func (z *CloudEventsSandboxOnlyPublisher) Publish(ctx context.Context, topic string, msg proto.Message) error {
 	logger.Debugf(ctx, "Sandbox cloud event publisher, sending to topic [%s]", topic)
-
-	select {
-	case z.subChan <- SandboxMessage{
+	sm := SandboxMessage{
 		Msg:   msg,
 		Topic: topic,
-	}:
+	}
+	select {
+	case z.subChan <- sm:
 		return nil
 	case <-ctx.Done():
 		return ctx.Err()
-	default:
-		return fmt.Errorf("channel has been closed")
 	}
 }
 
 // PublishRaw will publish a raw byte array as a message with context.
 func (z *CloudEventsSandboxOnlyPublisher) PublishRaw(ctx context.Context, topic string, msgRaw []byte) error {
-	select {
-	case z.subChan <- SandboxMessage{
+	logger.Debugf(ctx, "Sandbox cloud event publisher, sending raw to topic [%s]", topic)
+	sm := SandboxMessage{
 		Raw:   msgRaw,
 		Topic: topic,
-	}:
+	}
+	select {
+	case z.subChan <- sm:
+		fmt.Println("HERE222!!!!!!!!!!-send")
+		logger.Debugf(ctx, "Sandbox publisher sent message to %s", topic)
 		return nil
-	case <-ctx.Done():
-		return ctx.Err()
-	default:
-		return fmt.Errorf("channel has been closed, can't publish raw")
+	case <-time.After(10000 * time.Millisecond):
+		logger.Errorf(context.Background(), "CloudEventsSandboxOnlyPublisher PublishRaw timed out")
+		return fmt.Errorf("CloudEventsSandboxOnlyPublisher PublishRaw timed out")
 	}
 
 }
 
-var CloudEventsPublisher = &CloudEventsSandboxOnlyPublisher{
-	subChan: MsgChan,
+func NewCloudEventsPublisher() *CloudEventsSandboxOnlyPublisher {
+	return &CloudEventsSandboxOnlyPublisher{
+		subChan: MsgChan,
+	}
 }

@@ -17,7 +17,7 @@ cluster_resources:
 
 logger:
   show-source: true
-  level: 6
+  level: 3
 
 propeller:
   create-flyteworkflow-crd: true
@@ -82,7 +82,7 @@ database:
 #    options: "sslmode=disable"
 cloudEvents:
   enable: true
-  cloudEventVersion: 2
+  cloudEventVersion: v2
   type: sandbox
 # For admin to find artifacts service
 artifacts:
@@ -90,9 +90,6 @@ artifacts:
   port: 50051
   insecure: true
 # For artifact service itself
-sharedServer:
-  port: 50051
-  httpPort: 50050
 artifactsServer:
   artifactBlobStoreConfig:
     type: stow
@@ -105,6 +102,8 @@ artifactsServer:
         auth_type: accesskey
         access_key_id: minio
         secret_key: miniostorage
+artifactsProcessor:
+  cloudProvider: Sandbox
 storage:
   type: stow
   stow:
