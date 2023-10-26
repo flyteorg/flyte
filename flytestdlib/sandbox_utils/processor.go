@@ -51,10 +51,11 @@ func (z *CloudEventsSandboxOnlyPublisher) PublishRaw(ctx context.Context, topic 
 	}
 	select {
 	case z.subChan <- sm:
-		fmt.Println("HERE222!!!!!!!!!!-send")
+		// metric
 		logger.Debugf(ctx, "Sandbox publisher sent message to %s", topic)
 		return nil
 	case <-time.After(10000 * time.Millisecond):
+		// metric
 		logger.Errorf(context.Background(), "CloudEventsSandboxOnlyPublisher PublishRaw timed out")
 		return fmt.Errorf("CloudEventsSandboxOnlyPublisher PublishRaw timed out")
 	}

@@ -3,7 +3,6 @@ package processor
 import (
 	"bytes"
 	"context"
-	"fmt"
 	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
 	flyteEvents "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
@@ -26,6 +25,8 @@ func (p *SandboxCloudEventsReceiver) StartProcessing(ctx context.Context) {
 		if err != nil {
 			logger.Errorf(context.Background(), "error with running processor err: [%v], sleeping and restarting", err)
 			time.Sleep(1000 * 1000 * 1000 * 1)
+			// metric
+			continue
 		}
 		break
 	}
@@ -87,7 +88,7 @@ func (p *SandboxCloudEventsReceiver) run(ctx context.Context) error {
 			return nil
 
 		case sandboxMsg := <-p.subChan:
-			fmt.Println("HERE222!!!!!!!!!!-receive")
+			// metric
 			logger.Debugf(ctx, "received message [%v]", sandboxMsg)
 			if sandboxMsg.Raw != nil {
 				err := p.handleMessage(ctx, sandboxMsg)
@@ -96,7 +97,6 @@ func (p *SandboxCloudEventsReceiver) run(ctx context.Context) error {
 					// add metric
 					logger.Infof(ctx, "error processing sandbox cloud event [%v] with err [%v]", sandboxMsg, err)
 				}
-				fmt.Println("HERE222!!!!!!!!!!-success")
 			} else {
 				logger.Infof(ctx, "sandbox receiver ignoring message [%v]", sandboxMsg)
 			}

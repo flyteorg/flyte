@@ -163,13 +163,12 @@ func getPartitionsAndTag(ctx context.Context, partialID core.ArtifactID, variabl
 }
 
 func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source string, evt *event.CloudEventTaskExecution) error {
-	fmt.Println("-------->> TASK EVENT 1")
 
 	if evt.RawEvent.Phase != core.TaskExecution_SUCCEEDED {
 		logger.Debug(ctx, "Skipping non-successful task execution event")
 		return nil
 	}
-	fmt.Println("-------->> TASK EVENT 1 - start")
+	// metric
 
 	execID := evt.RawEvent.ParentNodeExecutionId.ExecutionId
 	if evt.GetOutputData().GetLiterals() == nil || len(evt.OutputData.Literals) == 0 {
@@ -228,13 +227,12 @@ func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source str
 				Tag:         tag,
 			}
 
-			fmt.Println("-------->> TASK EVENT 2 - create")
 			resp, err := s.service.CreateArtifact(ctx, &req)
 			if err != nil {
 				logger.Errorf(ctx, "failed to create artifact for [%s] with error: %v", varName, err)
 				return err
 			}
-			fmt.Println("-------->> TASK EVENT 3 - end")
+			// metric
 			logger.Debugf(ctx, "Created artifact id [%+v] for key %s", resp.Artifact.ArtifactId, varName)
 		}
 	}

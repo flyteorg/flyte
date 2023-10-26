@@ -22,8 +22,12 @@ import (
 type ArtifactService struct {
 	artifact.UnimplementedArtifactRegistryServer
 	Metrics       ServiceMetrics
-	Service       CoreService
+	Service       *CoreService
 	EventConsumer processor.EventsProcessorInterface
+}
+
+func (a *ArtifactService) GetArtifact(ctx context.Context, req *artifact.GetArtifactRequest) (*artifact.GetArtifactResponse, error) {
+	return a.Service.GetArtifact(ctx, req)
 }
 
 func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactService {
@@ -44,7 +48,7 @@ func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactSer
 
 	return &ArtifactService{
 		Metrics:       InitMetrics(scope),
-		Service:       coreService,
+		Service:       &coreService,
 		EventConsumer: eventsReceiverAndHandler,
 	}
 }
