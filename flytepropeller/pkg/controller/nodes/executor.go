@@ -180,6 +180,7 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 	currentNodeCtx := contextutils.WithNodeID(ctx, currentNode.GetID())
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
+	logger.Infof(currentNodeCtx, "Handling node [%v] Status [%v]", currentNode.GetID(), nodePhase.String())
 
 	if canHandleNode(nodePhase) {
 		// TODO Follow up Pull Request,
@@ -989,7 +990,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 
 	if np != nodeStatus.GetPhase() {
 		// assert np == Queued!
-		logger.Infof(ctx, "Change in node state detected from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
+		logger.Infof(ctx, "Change in node state detected1 from [%s] -> [%s]", nodeStatus.GetPhase().String(), np.String())
 		p = p.WithOccuredAt(occurredAt)
 
 		nev, err := ToNodeExecutionEvent(nCtx.NodeExecutionMetadata().GetNodeExecutionID(),

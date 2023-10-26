@@ -2,6 +2,7 @@ package executors
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
@@ -46,6 +47,7 @@ type staticNodeLookup struct {
 }
 
 func (s staticNodeLookup) GetNode(nodeID v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool) {
+	fmt.Print("staticNodeLookup.GetNode")
 	n, ok := s.nodes[nodeID]
 	return n, ok
 }
