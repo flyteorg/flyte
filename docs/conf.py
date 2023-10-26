@@ -44,10 +44,14 @@ release = "1.8.0"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
+    "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
     "sphinx.ext.autosectionlabel",
     "sphinx.ext.doctest",
+    "sphinx.ext.inheritance_diagram",
     "sphinx.ext.intersphinx",
+    "sphinx.ext.graphviz",
     "sphinx.ext.todo",
     "sphinx.ext.coverage",
     "sphinx.ext.ifconfig",
@@ -61,6 +65,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinxext.remoteliteralinclude",
     "sphinx_issues",
+    "sphinx_click",
     "sphinx_panels",
     "sphinxcontrib.mermaid",
     "sphinxcontrib.video",
@@ -70,6 +75,7 @@ extensions = [
     "myst_nb",
     # custom extensions
     "auto_examples",
+    "import_projects",
 ]
 
 source_suffix = {
@@ -87,6 +93,15 @@ extlinks = {
     "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
 }
 
+autosummary_generate = True
+autodoc_typehints = "description"
+suppress_warnings = ["autosectionlabel.*"]
+
+# autosectionlabel throws warnings if section names are duplicated.
+# The following tells autosectionlabel to not throw a warning for
+# duplicated section names that are in different documents.
+autosectionlabel_prefix_document = True
+
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']
 
@@ -101,7 +116,7 @@ master_doc = "index"
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -144,7 +159,6 @@ html_theme_options = {
         "color-brand-primary": "#9D68E4",
         "color-brand-content": "#9D68E4",
     },
-    "language": "en",
     # custom flyteorg furo theme options
     # "github_repo": "flyte",
     # "github_username": "flyteorg",
@@ -249,11 +263,11 @@ intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/master/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
-    "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/latest/", None),
+    # "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/latest/", None),
     # "flytekit": ("/Users/yourusername/go/src/github.com/flyteorg/flytekit/docs.rst/build/html", None),
-    "flytectl": ("https://flytectl.readthedocs.io/en/latest/", None),
+    # "flytectl": ("https://flytectl.readthedocs.io/en/latest/", None),
     # "flytectl": ("/Users/yourusername/go/src/github.com/flyteorg/flytectl/docs/build/html", None),
-    "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
+    # "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
 }
 
@@ -277,8 +291,27 @@ nb_execution_excludepatterns = [
     "auto_examples/**/*",
 ]
 
+import_projects = [
+    {
+        "source": "https://github.com/flyteorg/flytesnacks",
+        "dest": "flytesnacks",
+        "git": True,
+    },
+    # {
+    #     "source": "https://github.com/flyteorg/flytekit",
+    #     "dest": "flytekit",
+    #     "git": True,
+    # },
+    {
+        "source": "https://github.com/flyteorg/flytectl",
+        "dest": "flytectl",
+        "git": True,
+        "cmd": ["make", "-C", "flytectl/docs", "gendocs"],
+    }
+]
+
 # myst notebook docs customization
-auto_examples_dir_root = "_repos/flytesnacks/examples"
+auto_examples_dir_root = "flytesnacks/examples"
 
 # -- Options for todo extension ----------------------------------------------
 

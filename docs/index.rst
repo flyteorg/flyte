@@ -357,9 +357,9 @@ Have questions or need support? The best way to reach us is through Slack:
    :name: apitoc
    :hidden:
 
-   flytekit <https://flytekit.readthedocs.io>
+   flytekit <reference_flytekit>
    flytekit-java <https://github.com/spotify/flytekit-java>
-   flytectl <https://flytectl.readthedocs.io>
+   flytectl <reference_flytectl>
    flyteidl <https://flyteidl.readthedocs.io>
    flyteadmin <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html>
 

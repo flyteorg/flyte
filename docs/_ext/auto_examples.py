@@ -8,6 +8,7 @@ import jupytext
 from docutils import nodes
 from docutils.statemachine import StringList, string2lines
 from sphinx.application import Sphinx
+from sphinx.config import Config
 from sphinx.util.docutils import SphinxDirective
 
 __version__ = "0.0.0"
@@ -105,7 +106,7 @@ def convert_py_example(file: Path, dest_dir: Path):
     convert_to_mdmyst(file, dest_dir, "py:percent")
 
 
-def generate_auto_examples(app, config):
+def generate_auto_examples(app: Sphinx, config: Config):
     """Converts all example files into myst markdown format."""
     # copy files over to docs directory
     for source_dir in (x for x in Path(config.auto_examples_dir_root).glob("*") if x.is_dir()):
