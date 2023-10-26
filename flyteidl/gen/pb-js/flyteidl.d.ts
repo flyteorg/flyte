@@ -3872,6 +3872,9 @@ export namespace flyteidl {
 
             /** TypeStructure tag */
             tag?: (string|null);
+
+            /** TypeStructure dataclassType */
+            dataclassType?: ({ [k: string]: flyteidl.core.ILiteralType }|null);
         }
 
         /** Represents a TypeStructure. */
@@ -3885,6 +3888,9 @@ export namespace flyteidl {
 
             /** TypeStructure tag. */
             public tag: string;
+
+            /** TypeStructure dataclassType. */
+            public dataclassType: { [k: string]: flyteidl.core.ILiteralType };
 
             /**
              * Creates a new TypeStructure instance using the specified properties.

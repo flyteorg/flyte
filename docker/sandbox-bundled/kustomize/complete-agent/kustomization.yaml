@@ -10,3 +10,6 @@ helmCharts:
 namespace: flyte
 resources:
 - ../namespace.yaml
+
+patchesStrategicMerge:
+  - patch.yaml

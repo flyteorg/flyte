@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flyteagent
+  namespace: flyte
+spec:
+  template:
+    spec:
+      containers:
+      - name: flyteagent
+        env:
+        - name: FLYTE_AWS_ENDPOINT
+          value: http://flyte-sandbox-minio.flyte:9000
+        - name: FLYTE_AWS_ACCESS_KEY_ID
+          value: minio
+        - name: FLYTE_AWS_SECRET_ACCESS_KEY
+          value: miniostorage
