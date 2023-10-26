@@ -804,6 +804,20 @@ func TestUpdatePodWithDefaultAffinityAndInterruptibleNodeSelectorRequirement(t *
 	}
 }
 
+func TestPhaseInfoFailureWithCleanup(t *testing.T) {
+    t.Run("cleanup-required", func(t *testing.T) {
+        phaseInfo := PhaseInfoFailureWithCleanup("CleanupRequired", "Pod cleanup is required", &pluginsCore.TaskInfo{})
+        assert.Equal(t, pluginsCore.PhaseFailure, phaseInfo.Phase())
+        assert.Equal(t, "CleanupRequired", phaseInfo.Err().Code)
+        // Check if the cleanupInfo is not nil
+        cleanupInfo, ok := phaseInfo.Err().GetInfo().(*CleanupInfo)
+        assert.True(t, ok)
+        assert.NotNil(t, cleanupInfo)
+        assert.Equal(t, "CleanupRequired", cleanupInfo.CleanupReason)
+        assert.Equal(t, "Pod cleanup is required", cleanupInfo.CleanupMessage)
+    })
+}
+
 func toK8sPodInterruptible(t *testing.T) {
 	ctx := context.TODO()
 
