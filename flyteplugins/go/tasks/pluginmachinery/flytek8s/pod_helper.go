@@ -676,13 +676,27 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 									&pluginsCore.TaskInfo{OccurredAt: &t},
 								), nil
 
-							case "CreateContainerConfigError", "InvalidImageName":
+							case "CreateContainerConfigError":
+								fmt.Println("TOM ADDITION DemystifyPending CreateContainerConfigError")
 								t := c.LastTransitionTime.Time
-								fmt.Println("TOM ADDITION DemystifyPending CreateContainerConfigError InvalidImageName", finalReason, finalMessage)
+								if time.Since(t) >= config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration {
+									fmt.Println("TOM ADDITION DemystifyPending CreateContainerConfigError - grace period expired", finalReason, finalMessage)
+									return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+										OccurredAt: &t,
+									}), nil
+								}
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), nil
+							case "InvalidImageName":
+								t := c.LastTransitionTime.Time
+								fmt.Println("TOM ADDITION DemystifyPending InvalidImageName", finalReason, finalMessage)
 								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), nil
-
 							case "ImagePullBackOff":
 								fmt.Println("TOM ADDITION DemystifyPending ImagePullBackOff", finalReason, finalMessage)
 								t := c.LastTransitionTime.Time
