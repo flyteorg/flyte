@@ -13,7 +13,7 @@ builds:
       - arm64
       - amd64
     ldflags:
-      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+      - -s -w -X github.com/flyteorg/flyte/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flyte/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flyte/flytestdlib/version.BuildTime={{.Date}}
   - env:
       - CGO_ENABLED=0
     main: ./main.go
@@ -25,7 +25,7 @@ builds:
       - arm64
       - amd64
     ldflags:
-      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+      - -s -w -X github.com/flyteorg/flyte/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flyte/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flyte/flytestdlib/version.BuildTime={{.Date}}
   - env:
       - CGO_ENABLED=0
     main: ./main.go
@@ -34,7 +34,7 @@ builds:
     goos:
       - windows
     ldflags:
-      - -s -w -X github.com/flyteorg/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flytestdlib/version.BuildTime={{.Date}}
+      - -s -w -X github.com/flyteorg/flyte/flytestdlib/version.Version={{.Version}} -X github.com/flyteorg/flyte/flytestdlib/version.Build={{.ShortCommit}} -X github.com/flyteorg/flyte/flytestdlib/version.BuildTime={{.Date}}
 archives:
   - name_template: |-
       {{ .ProjectName }}_

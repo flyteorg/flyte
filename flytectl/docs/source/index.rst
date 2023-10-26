@@ -95,7 +95,7 @@ The full list of available configurable options can be found by running ``flytec
 
 .. tabbed:: Others
 
-    For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flytestdlib/storage#Config>`__.
+    For other supported storage backends like Oracle, Azure, etc., refer to the configuration structure `here <https://pkg.go.dev/github.com/flyteorg/flyte/flytestdlib/storage#Config>`__.
 
     Place the config file in ``$HOME/.flyte`` directory with the name config.yaml.
     This file is typically searched in:
