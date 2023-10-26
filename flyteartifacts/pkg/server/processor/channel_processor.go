@@ -53,13 +53,13 @@ func (p *SandboxCloudEventsReceiver) handleMessage(ctx context.Context, sandboxM
 	if ce.Type() == "com.flyte.resource.cloudevents.TaskExecution" {
 		flyteEvent = &flyteEvents.CloudEventTaskExecution{}
 		err = unmarshaler.Unmarshal(ceData, flyteEvent)
-	} else if ce.Type() == "cloudevents.WorkflowExecution" {
+	} else if ce.Type() == "com.flyte.resource.cloudevents.WorkflowExecution" {
 		flyteEvent = &flyteEvents.CloudEventWorkflowExecution{}
 		err = unmarshaler.Unmarshal(ceData, flyteEvent)
-	} else if ce.Type() == "cloudevents.NodeExecution" {
+	} else if ce.Type() == "com.flyte.resource.cloudevents.NodeExecution" {
 		flyteEvent = &flyteEvents.CloudEventNodeExecution{}
 		err = unmarshaler.Unmarshal(ceData, flyteEvent)
-	} else if ce.Type() == "cloudevents.ExecutionStart" {
+	} else if ce.Type() == "com.flyte.resource.cloudevents.ExecutionStart" {
 		flyteEvent = &flyteEvents.CloudEventExecutionStart{}
 		err = unmarshaler.Unmarshal(ceData, flyteEvent)
 	} else {

@@ -42,12 +42,72 @@ func (s *ServiceCallHandler) HandleEventExecStart(_ context.Context, _ *event.Cl
 	return nil
 }
 
+// HandleEventWorkflowExec and the task one below are very similar. Can be combined in the future.
 func (s *ServiceCallHandler) HandleEventWorkflowExec(ctx context.Context, source string, evt *event.CloudEventWorkflowExecution) error {
 
 	if evt.RawEvent.Phase != core.WorkflowExecution_SUCCEEDED {
 		logger.Debug(ctx, "Skipping non-successful workflow execution event")
 		return nil
 	}
+
+	execID := evt.RawEvent.ExecutionId
+	if evt.GetOutputData().GetLiterals() == nil || len(evt.OutputData.Literals) == 0 {
+		logger.Debugf(ctx, "No output data to process for workflow event from [%v]", execID)
+	}
+
+	for varName, variable := range evt.OutputInterface.Outputs.Variables {
+		if variable.GetArtifactPartialId() != nil {
+			logger.Debugf(ctx, "Processing workflow output for %s, artifact name %s, from %v", varName, variable.GetArtifactPartialId().ArtifactKey.Name, execID)
+
+			output := evt.OutputData.Literals[varName]
+
+			// Add a tracking tag to the Literal before saving.
+			version := fmt.Sprintf("%s/%s", source, varName)
+			trackingTag := fmt.Sprintf("%s/%s/%s", execID.Project, execID.Domain, version)
+			if output.Metadata == nil {
+				output.Metadata = make(map[string]string, 1)
+			}
+			output.Metadata[lib.ArtifactKey] = trackingTag
+
+			spec := artifact.ArtifactSpec{
+				Value:     output,
+				Type:      evt.OutputInterface.Outputs.Variables[varName].Type,
+				Execution: execID,
+			}
+
+			partitions, tag, err := getPartitionsAndTag(
+				ctx,
+				*variable.GetArtifactPartialId(),
+				variable,
+				evt.InputData,
+			)
+			if err != nil {
+				logger.Errorf(ctx, "failed processing [%s] variable [%v] with error: %v", varName, variable, err)
+				return err
+			}
+			ak := core.ArtifactKey{
+				Project: execID.Project,
+				Domain:  execID.Domain,
+				Name:    variable.GetArtifactPartialId().ArtifactKey.Name,
+			}
+
+			req := artifact.CreateArtifactRequest{
+				ArtifactKey: &ak,
+				Version:     version,
+				Spec:        &spec,
+				Partitions:  partitions,
+				Tag:         tag,
+			}
+
+			resp, err := s.service.CreateArtifact(ctx, &req)
+			if err != nil {
+				logger.Errorf(ctx, "failed to create artifact for [%s] with error: %v", varName, err)
+				return err
+			}
+			logger.Debugf(ctx, "Created wf artifact id [%+v] for key %s", resp.Artifact.ArtifactId, varName)
+		}
+	}
+
 	return nil
 }
 
