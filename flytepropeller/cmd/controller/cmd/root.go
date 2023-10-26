@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"runtime"
+	"fmt"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
@@ -61,6 +62,7 @@ var rootCmd = &cobra.Command{
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
 	version.LogBuildInformation(appName)
+	fmt.Println("TOMNEWTON edit") 
 	logger.Infof(context.TODO(), "Detected: %d CPU's\n", runtime.NumCPU())
 	if err := rootCmd.Execute(); err != nil {
 		logger.Error(context.TODO(), err)
