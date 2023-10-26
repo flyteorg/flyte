@@ -670,11 +670,13 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
 								), nil
+
 							case "InvalidImageName":
 								t := c.LastTransitionTime.Time
 								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), nil
+
 							case "ImagePullBackOff":
 								t := c.LastTransitionTime.Time
 								if time.Since(t) >= config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration {
