@@ -638,7 +638,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// PodInitializing -> Init containers are running
 								return pluginsCore.PhaseInfoInitializing(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &c.LastTransitionTime.Time}), nil
 
-							case "CreateContainerError":
+							case "CreateContainerError", "CreateContainerConfigError":
 								// This may consist of:
 								// 1. Transient errors: e.g. failed to reserve
 								// container name, container name [...] already in use
@@ -658,20 +658,6 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// synced, and therefore, only provides an
 								// approximation of the elapsed time since the last
 								// transition.
-								t := c.LastTransitionTime.Time
-								if time.Since(t) >= config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration {
-									return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
-										OccurredAt: &t,
-									}), nil
-								}
-								return pluginsCore.PhaseInfoInitializing(
-									t,
-									pluginsCore.DefaultPhaseVersion,
-									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
-									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), nil
-
-							case "CreateContainerConfigError":
 								t := c.LastTransitionTime.Time
 								if time.Since(t) >= config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration {
 									return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
