@@ -1398,19 +1398,40 @@ func TestDemystifyPending(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 	})
 
-	t.Run("CreateContainerConfigError", func(t *testing.T) {
-		s.ContainerStatuses = []v1.ContainerStatus{
+	t.Run("CreateContainerConfigErrorWithinGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime = metav1.Now()
+		s2.ContainerStatuses = []v1.ContainerStatus{
 			{
 				Ready: false,
 				State: v1.ContainerState{
 					Waiting: &v1.ContainerStateWaiting{
 						Reason:  "CreateContainerConfigError",
-						Message: "this an error",
+						Message: "this is a transient error",
 					},
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s2)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
+	})
+
+	t.Run("CreateContainerConfigErrorOutsideGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration)
+		s2.ContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "CreateContainerConfigError",
+						Message: "this a permanent error",
+					},
+				},
+			},
+		}
+		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
 	})
