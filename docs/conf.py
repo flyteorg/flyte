@@ -287,7 +287,7 @@ copybutton_exclude = 'style[type="text/css"]'
 
 nb_execution_mode = "off"
 nb_execution_excludepatterns = [
-    "_repos/**/*",
+    "flytesnacks/**/*",
     "auto_examples/**/*",
 ]
 
@@ -297,11 +297,11 @@ import_projects = [
         "dest": "flytesnacks",
         "git": True,
     },
-    # {
-    #     "source": "https://github.com/flyteorg/flytekit",
-    #     "dest": "flytekit",
-    #     "git": True,
-    # },
+    {
+        "source": "https://github.com/flyteorg/flytekit",
+        "dest": "flytekit",
+        "git": True,
+    },
     {
         "source": "https://github.com/flyteorg/flytectl",
         "dest": "flytectl",

@@ -1,5 +1,5 @@
 codespell
-git+https://github.com/flyteorg/furo@main
+furo
 flytekit
 flytekitplugins-deck-standard
 flytekitplugins-kfpytorch
@@ -49,7 +49,7 @@ sqlalchemy                  # sqlalchemy
 torch                       # pytorch
 skl2onnx                    # onnxscikitlearn
 tf2onnx                     # onnxtensorflow
-tensorflow==2.13.0          # onnxtensorflow
+tensorflow>=2.13.0          # onnxtensorflow
 whylogs==1.3.3              # whylogs
 whylabs-client              # whylogs
 ray==2.6.3                  # ray

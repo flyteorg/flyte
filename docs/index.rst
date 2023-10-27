@@ -320,13 +320,13 @@ Have questions or need support? The best way to reach us is through Slack:
 
 .. toctree::
    :maxdepth: 1
-   :caption: Overview
-   :name: overview
+   :caption: Getting Started
+   :name: getting_started
    :hidden:
 
    Introduction <introduction>
-   Flyte Fundamentals <_repos/flytesnacks/docs/getting_started/flyte_fundamentals>
-   Core Use Cases <_repos/flytesnacks/docs/getting_started/core_use_cases>
+   Flyte Fundamentals <flytesnacks/docs/getting_started/flyte_fundamentals>
+   Core Use Cases <flytesnacks/docs/getting_started/core_use_cases>
 
 .. toctree::
    :maxdepth: 1
