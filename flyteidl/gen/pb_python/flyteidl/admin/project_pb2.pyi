@@ -59,6 +59,12 @@ class ProjectListRequest(_message.Message):
     sort_by: _common_pb2.Sort
     def __init__(self, limit: _Optional[int] = ..., token: _Optional[str] = ..., filters: _Optional[str] = ..., sort_by: _Optional[_Union[_common_pb2.Sort, _Mapping]] = ...) -> None: ...
 
+class ProjectRequest(_message.Message):
+    __slots__ = ["project"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    project: Project
+    def __init__(self, project: _Optional[_Union[Project, _Mapping]] = ...) -> None: ...
+
 class ProjectRegisterRequest(_message.Message):
     __slots__ = ["project"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]

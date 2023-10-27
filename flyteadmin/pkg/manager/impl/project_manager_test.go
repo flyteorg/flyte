@@ -278,3 +278,30 @@ func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T)
 	})
 	assert.EqualError(t, err, "project_name cannot exceed 64 characters")
 }
+
+func TestGetProject(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	mockedProject := &admin.Project{Id: project}
+	activeState := int32(admin.Project_ACTIVE)
+	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
+
+		return models.Project{
+			BaseModel:   models.BaseModel{},
+			Identifier:  projectID,
+			Name:        "a-mocked-project",
+			Description: "A mocked project",
+			State:       &activeState,
+		}, nil
+	}
+
+	projectManager := NewProjectManager(repository, runtimeMocks.NewMockConfigurationProvider(
+		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+
+	resp, _ := projectManager.GetProject(context.Background(),
+		admin.ProjectRequest{Project: mockedProject})
+
+	assert.Equal(t, mockedProject.Id, resp.Id)
+	assert.Equal(t, "a-mocked-project", resp.Name)
+	assert.Equal(t, "A mocked project", resp.Description)
+	assert.Equal(t, admin.Project_ProjectState(0), resp.State)
+}

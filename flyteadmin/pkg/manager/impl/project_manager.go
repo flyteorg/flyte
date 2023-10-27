@@ -127,6 +127,18 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 	return &response, nil
 }
 
+func (m *ProjectManager) GetProject(ctx context.Context, request admin.ProjectRequest) (*admin.Project, error) {
+	projectRequest := request.Project
+
+	projectModel, err := m.db.ProjectRepo().Get(ctx, projectRequest.Id)
+	if err != nil {
+		return nil, err
+	}
+	projectResponse := transformers.FromProjectModel(projectModel, m.getDomains())
+
+	return &projectResponse, nil
+}
+
 func NewProjectManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration) interfaces.ProjectInterface {
 	return &ProjectManager{
 		db:     db,

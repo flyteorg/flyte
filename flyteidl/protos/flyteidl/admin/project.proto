@@ -79,6 +79,12 @@ message ProjectListRequest {
     Sort sort_by    = 4;
 }
 
+// Request to retrieve a single project matching the project id.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message ProjectRequest{
+    Project project = 1;
+}
+
 // Adds a new user-project within the Flyte deployment.
 // See :ref:`ref_flyteidl.admin.Project` for more details
 message ProjectRegisterRequest {
