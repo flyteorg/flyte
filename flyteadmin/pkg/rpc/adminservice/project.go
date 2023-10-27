@@ -70,7 +70,7 @@ func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectReq
 	}
 	var response *admin.Project
 	var err error
-	m.Metrics.projectEndpointMetrics.list.Time(func() {
+	m.Metrics.projectEndpointMetrics.get.Time(func() {
 		response, err = m.ProjectManager.GetProject(ctx, *request)
 	})
 	if err != nil {
