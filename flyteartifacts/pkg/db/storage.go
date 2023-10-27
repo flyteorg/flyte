@@ -122,7 +122,7 @@ func (r *RDSStorage) GetArtifact(ctx context.Context, query core.ArtifactQuery) 
 	var resp models.Artifact
 	var err error
 	if query.GetUri() != "" {
-		logger.Debugf(ctx, "found uri in query: %+v", *query.GetArtifactId())
+		logger.Debugf(ctx, "found uri in query: %+v", query.GetUri())
 		resp, err = r.handleUriGet(ctx, query.GetUri())
 	} else if query.GetArtifactId() != nil {
 		logger.Debugf(ctx, "found artifact_id in query: %+v", *query.GetArtifactId())

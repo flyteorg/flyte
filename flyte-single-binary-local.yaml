@@ -87,7 +87,7 @@ cloudEvents:
 # For admin to find artifacts service
 artifacts:
   host: localhost
-  port: 50051
+  port: 30080
   insecure: true
 # For artifact service itself
 artifactsServer:

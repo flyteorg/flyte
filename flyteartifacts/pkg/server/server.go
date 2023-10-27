@@ -15,19 +15,46 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc"
-
 	_ "net/http/pprof" // Required to serve application.
 )
 
 type ArtifactService struct {
 	artifact.UnimplementedArtifactRegistryServer
 	Metrics       ServiceMetrics
-	Service       *CoreService
+	Service       CoreService
 	EventConsumer processor.EventsProcessorInterface
+}
+
+func (a *ArtifactService) CreateArtifact(ctx context.Context, req *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
+	return a.Service.CreateArtifact(ctx, req)
 }
 
 func (a *ArtifactService) GetArtifact(ctx context.Context, req *artifact.GetArtifactRequest) (*artifact.GetArtifactResponse, error) {
 	return a.Service.GetArtifact(ctx, req)
+}
+
+func (a *ArtifactService) SearchArtifacts(ctx context.Context, req *artifact.SearchArtifactsRequest) (*artifact.SearchArtifactsResponse, error) {
+	return a.Service.SearchArtifacts(ctx, req)
+}
+
+func (a *ArtifactService) CreateTrigger(ctx context.Context, req *artifact.CreateTriggerRequest) (*artifact.CreateTriggerResponse, error) {
+	return a.Service.CreateTrigger(ctx, req)
+}
+
+func (a *ArtifactService) DeleteTrigger(ctx context.Context, req *artifact.DeleteTriggerRequest) (*artifact.DeleteTriggerResponse, error) {
+	return a.Service.DeleteTrigger(ctx, req)
+}
+
+func (a *ArtifactService) AddTag(ctx context.Context, req *artifact.AddTagRequest) (*artifact.AddTagResponse, error) {
+	return a.Service.AddTag(ctx, req)
+}
+
+func (a *ArtifactService) RegisterProducer(ctx context.Context, req *artifact.RegisterProducerRequest) (*artifact.RegisterResponse, error) {
+	return a.Service.RegisterProducer(ctx, req)
+}
+
+func (a *ArtifactService) RegisterConsumer(ctx context.Context, req *artifact.RegisterConsumerRequest) (*artifact.RegisterResponse, error) {
+	return a.Service.RegisterConsumer(ctx, req)
 }
 
 func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactService {
@@ -48,7 +75,7 @@ func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactSer
 
 	return &ArtifactService{
 		Metrics:       InitMetrics(scope),
-		Service:       &coreService,
+		Service:       coreService,
 		EventConsumer: eventsReceiverAndHandler,
 	}
 }
