@@ -287,6 +287,7 @@ copybutton_exclude = 'style[type="text/css"]'
 
 nb_execution_mode = "off"
 nb_execution_excludepatterns = [
+    "flytekit/**/*",
     "flytesnacks/**/*",
     "auto_examples/**/*",
 ]
@@ -307,6 +308,11 @@ import_projects = [
         "dest": "flytectl",
         "git": True,
         "cmd": ["make", "-C", "flytectl/docs", "gendocs"],
+    },
+    {
+        "source": "../flyteidl",
+        "dest": "flyteidl",
+        "cmd": ["make", "-C", "flyteidl", "download_tooling", "generate"],
     }
 ]
 

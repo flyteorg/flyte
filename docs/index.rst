@@ -360,7 +360,7 @@ Have questions or need support? The best way to reach us is through Slack:
    flytekit <reference_flytekit>
    flytekit-java <https://github.com/spotify/flytekit-java>
    flytectl <reference_flytectl>
-   flyteidl <https://flyteidl.readthedocs.io>
+   flyteidl <reference_flyteidl>
    flyteadmin <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html>
 
 .. toctree::

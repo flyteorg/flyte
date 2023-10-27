@@ -10,7 +10,8 @@ jupytext
 myst-nb
 plotly
 psycopg2-binary
-sphinx
+recommonmark
+sphinx==4.5.0
 sphinx-prompt
 sphinx-click
 sphinx-code-include
@@ -20,6 +21,7 @@ sphinxext-remoteliteralinclude
 sphinx-issues
 sphinx_fontawesome
 sphinx-panels
+sphinx_markdown_tables
 sphinxcontrib-mermaid
 sphinxcontrib-video
 sphinxcontrib-youtube==1.2.0

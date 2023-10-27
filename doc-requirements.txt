@@ -36,8 +36,6 @@ annotated-types==0.6.0
     # via pydantic
 ansiwrap==0.8.4
     # via papermill
-anyascii==0.3.2
-    # via sphinx-autoapi
 anyio==3.7.1
     # via
     #   fastapi
@@ -109,8 +107,6 @@ blake3==0.3.3
     # via vaex-core
 bleach==6.1.0
     # via nbconvert
-blinker==1.6.3
-    # via flask
 botocore==1.31.64
     # via
     #   -r doc-requirements.in
@@ -177,6 +173,8 @@ comm==0.1.4
     # via
     #   ipykernel
     #   ipywidgets
+commonmark==0.9.1
+    # via recommonmark
 contourpy==1.1.1
     # via matplotlib
 cookiecutter==2.4.0
@@ -237,9 +235,10 @@ docker-image-py==0.1.12
     # via flytekit
 docstring-parser==0.15
     # via flytekit
-docutils==0.18.1
+docutils==0.17.1
     # via
     #   myst-parser
+    #   recommonmark
     #   sphinx
     #   sphinx-click
     #   sphinx-panels
@@ -273,7 +272,7 @@ filelock==3.13.0
     #   torch
     #   vaex-core
     #   virtualenv
-flask==2.3.3
+flask==2.2.5
     # via mlflow
 flatbuffers==23.5.26
     # via
@@ -318,7 +317,7 @@ fsspec[http]==2023.10.0
     #   modin
     #   s3fs
     #   torch
-furo==2023.3.27
+furo==2022.9.29
     # via -r doc-requirements.in
 future==0.18.3
     # via vaex-core
@@ -503,7 +502,7 @@ jaraco-classes==3.3.0
     # via keyring
 jedi==0.19.1
     # via ipython
-jinja2==3.1.2
+jinja2==3.0.3
     # via
     #   altair
     #   branca
@@ -519,6 +518,7 @@ jinja2==3.1.2
     #   nbconvert
     #   sphinx
     #   sphinx-autoapi
+    #   sphinx-tabs
     #   torch
     #   vaex-ml
     #   ydata-profiling
@@ -625,6 +625,7 @@ markdown==3.5
     #   -r doc-requirements.in
     #   flytekitplugins-deck-standard
     #   mlflow
+    #   sphinx-markdown-tables
     #   tensorboard
 markdown-it-py==2.2.0
     # via
@@ -1084,6 +1085,8 @@ querystring-parser==1.2.4
     # via mlflow
 ray==2.6.3
     # via -r doc-requirements.in
+recommonmark==0.7.1
+    # via -r doc-requirements.in
 referencing==0.30.2
     # via
     #   jsonschema
@@ -1210,12 +1213,13 @@ sortedcontainers==2.4.0
     #   snowflake-connector-python
 soupsieve==2.5
     # via beautifulsoup4
-sphinx==5.3.0
+sphinx==4.5.0
     # via
     #   -r doc-requirements.in
     #   furo
     #   myst-nb
     #   myst-parser
+    #   recommonmark
     #   sphinx-autoapi
     #   sphinx-basic-ng
     #   sphinx-click
@@ -1227,14 +1231,9 @@ sphinx==5.3.0
     #   sphinx-prompt
     #   sphinx-tabs
     #   sphinx-tags
-    #   sphinxcontrib-applehelp
-    #   sphinxcontrib-devhelp
-    #   sphinxcontrib-htmlhelp
-    #   sphinxcontrib-qthelp
-    #   sphinxcontrib-serializinghtml
     #   sphinxcontrib-video
     #   sphinxcontrib-youtube
-sphinx-autoapi==2.1.1
+sphinx-autoapi==2.0.1
     # via -r doc-requirements.in
 sphinx-basic-ng==1.0.0b2
     # via furo
@@ -1248,27 +1247,29 @@ sphinx-fontawesome==0.0.6
     # via -r doc-requirements.in
 sphinx-issues==3.0.1
     # via -r doc-requirements.in
-sphinx-panels==0.4.1
+sphinx-markdown-tables==0.0.17
+    # via -r doc-requirements.in
+sphinx-panels==0.6.0
     # via -r doc-requirements.in
 sphinx-prompt==1.5.0
     # via -r doc-requirements.in
-sphinx-tabs==3.4.4
+sphinx-tabs==3.4.0
     # via -r doc-requirements.in
 sphinx-tags==0.2.1
     # via -r doc-requirements.in
-sphinxcontrib-applehelp==1.0.7
+sphinxcontrib-applehelp==1.0.4
     # via sphinx
-sphinxcontrib-devhelp==1.0.5
+sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==2.0.4
+sphinxcontrib-htmlhelp==2.0.1
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-mermaid==0.9.2
     # via -r doc-requirements.in
-sphinxcontrib-qthelp==1.0.6
+sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.9
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 sphinxcontrib-video==0.2.0
     # via -r doc-requirements.in
@@ -1441,6 +1442,8 @@ typing-inspect==0.9.0
     #   pandera
 tzlocal==5.2
     # via great-expectations
+unidecode==1.3.7
+    # via sphinx-autoapi
 uri-template==1.3.0
     # via jsonschema
 urllib3==1.26.18
