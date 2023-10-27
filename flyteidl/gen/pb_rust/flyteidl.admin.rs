@@ -2257,6 +2257,14 @@ pub struct ProjectListRequest {
     #[prost(message, optional, tag="4")]
     pub sort_by: ::core::option::Option<Sort>,
 }
+/// Request to retrieve a single project matching the project id.
+/// See :ref:`ref_flyteidl.admin.Project` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ProjectRequest {
+    #[prost(message, optional, tag="1")]
+    pub project: ::core::option::Option<Project>,
+}
 /// Adds a new user-project within the Flyte deployment.
 /// See :ref:`ref_flyteidl.admin.Project` for more details
 #[allow(clippy::derive_partial_eq_without_eq)]
