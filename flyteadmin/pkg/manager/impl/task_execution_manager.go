@@ -126,13 +126,18 @@ func (m *TaskExecutionManager) updateTaskExecutionModelState(
 
 func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, request admin.TaskExecutionEventRequest) (
 	*admin.TaskExecutionEventResponse, error) {
+
+	logger.Warningf(ctx, "HERE!!!123")
+
 	if err := validation.ValidateTaskExecutionRequest(request, m.config.ApplicationConfiguration().GetRemoteDataConfig().MaxSizeInBytes); err != nil {
 		return nil, err
 	}
+	logger.Warningf(ctx, "HERE!!!123-1")
 
 	if err := validation.ValidateClusterForExecutionID(ctx, m.db, request.Event.ParentNodeExecutionId.ExecutionId, request.Event.ProducerId); err != nil {
 		return nil, err
 	}
+	logger.Warningf(ctx, "HERE!!!123-2")
 
 	// Get the parent node execution, if none found a MissingEntityError will be returned
 	nodeExecutionID := request.Event.ParentNodeExecutionId
@@ -204,10 +209,12 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
 	}
 
+	logger.Warningf(ctx, "HERE!!!123-3")
 	go func() {
-		ceCtx := context.TODO()
+		ceCtx := context.Background()
+		logger.Warningf(ctx, "HERE!!!123-4")
 		if err := m.cloudEventsPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
-			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
+			logger.Errorf(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
 		}
 	}()
 

@@ -4,14 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	sharedCfg "github.com/flyteorg/flyte/flyteartifacts/pkg/configuration/shared"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"os"
@@ -36,9 +33,9 @@ func NewRootCmd(rootUse string, grpcHook GrpcRegistrationHook, httpHook HttpRegi
 
 			go func() {
 				ctx := context.Background()
-				sharedConfig := sharedCfg.SharedServerConfig.GetConfig().(*sharedCfg.ServerConfiguration)
+				metricsCfg := configuration.GetApplicationConfig().ArtifactServerConfig.Metrics
 				err := profutils.StartProfilingServerWithDefaultHandlers(ctx,
-					sharedConfig.Metrics.Port.Port, nil)
+					metricsCfg.Port.Port, nil)
 				if err != nil {
 					logger.Panicf(ctx, "Failed to Start profiling and metrics server. Error: %v", err)
 				}
@@ -50,12 +47,6 @@ func NewRootCmd(rootUse string, grpcHook GrpcRegistrationHook, httpHook HttpRegi
 
 	initSubCommands(rootCmd, grpcHook, httpHook)
 	return rootCmd
-}
-
-func init() {
-	// Set Keys
-	labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey,
-		contextutils.DomainKey, storage.FailureTypeLabel)
 }
 
 func initConfig(cmd *cobra.Command, _ []string) error {
@@ -86,7 +77,8 @@ func initSubCommands(rootCmd *cobra.Command, grpcHook GrpcRegistrationHook, http
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "artifact_config.yaml", "config file (default is ./artifact_config.yaml)")
 
 	rootCmd.AddCommand(viper.GetConfigCommand())
-	rootCmd.AddCommand(NewServeCmd(rootCmd.Use, grpcHook, httpHook))
+	cfg := configuration.GetApplicationConfig()
+	rootCmd.AddCommand(NewServeCmd(rootCmd.Use, cfg.ArtifactServerConfig, grpcHook, httpHook))
 
 	// Allow viper to read the value of the flags
 	configAccessor.InitializePflags(rootCmd.PersistentFlags())

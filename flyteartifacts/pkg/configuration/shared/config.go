@@ -54,11 +54,9 @@ var sharedServerConfiguration = ServerConfiguration{
 }
 
 func (s ServerConfiguration) GetGrpcHostAddress() string {
-	return fmt.Sprintf(":%s", s.Port.String())
+	return fmt.Sprintf("0.0.0.0:%s", s.Port.String())
 }
 
 func (s ServerConfiguration) GetHttpHostAddress() string {
-	return fmt.Sprintf(":%s", s.HttpPort.String())
+	return fmt.Sprintf("0.0.0.0:%s", s.HttpPort.String())
 }
-
-var SharedServerConfig = config.MustRegisterSection(sharedServer, &sharedServerConfiguration)

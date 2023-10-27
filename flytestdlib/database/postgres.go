@@ -52,7 +52,6 @@ func getPostgresDsn(ctx context.Context, pgConfig PostgresConfig) string {
 
 // CreatePostgresDbIfNotExists creates DB if it doesn't exist for the passed in config
 func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, pgConfig PostgresConfig) (*gorm.DB, error) {
-	fmt.Printf("CreatePostgresDbIfNotExist=================================s: %v\n", pgConfig)
 	dialector := postgres.Open(getPostgresDsn(ctx, pgConfig))
 	gormDb, err := gorm.Open(dialector, gormConfig)
 	if err == nil {
