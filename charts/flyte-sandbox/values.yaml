@@ -49,12 +49,10 @@ flyte-binary:
           memory: 0
       cloudEvents:
         enable: true
-        transformToCloudEvents: true
-        type: redis
-        redis:
-          addr: "flyte-sandbox-redis-headless.flyte.svc.cluster.local:6379"
+        cloudEventVersion: v2
+        type: sandbox
       artifacts:
-        host: artifact-service.flyte.svc.cluster.local
+        host: localhost
         port: 50051
         insecure: true
       storage:
