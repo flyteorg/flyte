@@ -509,15 +509,13 @@ data:
       container: my-s3-bucket
   100-inline-config.yaml: |
     artifacts:
-      host: artifact-service.flyte.svc.cluster.local
+      host: localhost
       insecure: true
       port: 50051
     cloudEvents:
+      cloudEventVersion: v2
       enable: true
-      redis:
-        addr: flyte-sandbox-redis-headless.flyte.svc.cluster.local:6379
-      transformToCloudEvents: true
-      type: redis
+      type: sandbox
     plugins:
       k8s:
         default-env-vars:
@@ -844,7 +842,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: MFFzaWFuNWNIMHozSFh6Yg==
+  haSharedSecret: bHpJN3NncmQzSGVzZkhpWQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1328,7 +1326,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: c86a3f997d43ba1f7612d3f5e9675ef534131308a682edc09d06cf4f6e79be64
+        checksum/configuration: 8d7c7929fda964a4ac1982becf5115c6074afbb8146eddd279352492ed6043cd
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1491,7 +1489,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: beab063e2091f135bea9b399b4781b3cfc6a1f8daaa6f36c9457ad57a747c018
+        checksum/secret: 24d3ab901378068911558ada4baa51b1930a530c2e2baba642b785d17498480e
       labels:
         app: docker-registry
         release: flyte-sandbox
