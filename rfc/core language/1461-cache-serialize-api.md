@@ -1,35 +1,49 @@
-# [RFC] Cache Serialize API
+# Cache Serialize API
 
-**Authors:**
+**Author:** @hamersaw
 
-- @hamersaw 
+## Table of Contents
 
-## 1 Executive Summary
+1. [Executive Summary](#1-executive-summary)
+2. [Motivation](#2-motivation)
+3. [Proposed Implementation](#3-proposed-implementation)
+    - [Guide-level Explanation](#guide-level-explanation)
+    - [Add Reservations to FlyteIDL](#add-reservations-to-flyteidl)
+    - [Datacatalog Managed Reservations](#datacatalog-managed-reservations)
+    - [FlytePropeller Integration](#flytepropeller-integration)
+4. [Metrics & Dashboards](#4-metrics--dashboards)
+5. [Drawbacks](#5-drawbacks)
+6. [Alternatives](#6-alternatives)
+7. [Potential Impact and Dependencies](#7-potential-impact-and-dependencies)
+8. [Unresolved Questions](#8-unresolved-questions)
+9. [Conclusion](#9-conclusion)
 
-The cache serialize API provides a lease-based reservation system for cacheable tasks in Flyte. The purpose is to mitigate simultaneous evaluations of cacheable tasks over identical inputs, resulting in duplication of work and therefore inefficient resource utilization. The proposed approach will more effectively process workflows with potentially significant improvements in end-to-end workflow evaluation times for instances with long running cacheable tasks.
+## 1. Executive Summary
 
-## 2 Motivation
+The cache serialize API provides a lease-based reservation system for cacheable tasks in Flyte. Its purpose is to mitigate simultaneous evaluations of cacheable tasks over identical inputs, resulting in duplication of work and, therefore, inefficient resource utilization. The proposed approach aims to process workflows more effectively, potentially leading to significant improvements in end-to-end workflow evaluation times for instances with long-running cacheable tasks.
 
-Currently, Flyte initializes cacheable tasks with a lookup the the datacatalog cache. If a previous instance of the task (ie. identical version and inputs) has completed the cached values are used, otherwise the task is executed.
+## 2. Motivation
 
-The issue is that disparate workflows, or unique executions of the same workflow, may execute an identical cacheable task before a previous has completed. This results in multiple instances of the same task execution being performed simultaneously. For example, two workflows, namely A and B, contain the same long running (ex. 2 time units) identical cacheable task. Workflow A executes the task beginning at t0 (finishing at t2) and workflow B executes the task at t1 (finishing at t3). The inefficiencies are twofold:
+Currently, Flyte initializes cacheable tasks with a lookup in the data catalog cache. If a previous instance of the task (i.e., identical version and inputs) has completed, the cached values are used; otherwise, the task is executed.
 
-1. From t1 (workflow B task execution) to t2 (workflow A task completion) there are two instances of the same task performing identical work (albeit at different stages).
-2. The execution from workflow B will not complete until t3, whereas it could use the cached results from workflow A at t2 to complete faster.
+The issue is that different workflows or unique executions of the same workflow may execute an identical cacheable task before a previous one has completed. This results in multiple instances of the same task execution being performed simultaneously, leading to inefficiencies:
 
-The proposed solution will mitigate unnecessary resource utilization by disallowing duplicate task executions and provide more efficient workflow processing by using all available cacheable task results.
+1. There are instances of the same task performing identical work at different stages.
+2. Workflow executions are delayed, even when they could use cached results to complete faster.
 
-## Proposed Implementation
+The proposed solution mitigates unnecessary resource utilization by disallowing duplicate task executions and makes more efficient use of cacheable task results.
 
-### Guide-level explanation
+## 3. Proposed Implementation
 
-User-side functionality will require the introduction of a cache_serialize Flyte task annotation. This may be added to all task definitions that support caching (ex. spark, hive, tensorflow, etc). An elementary example is how this may look is provided below:
-    
+### Guide-level Explanation
+
+Users can enable the cache serialize API by adding a `cache_serialize` Flyte task annotation to their task definitions. The annotation requires `cache` to be set, and it provides minimal additional overhead. Users can use this feature by specifying the following annotation in their task definitions:
+
 ```python
 @task(cache=True, cache_serialize=True, cache_version="1.0")
 def long_running_task():
-    # redacted long operation
-    
+    # Redacted long operation
+
 @workflow
 def wf():
     return long_running_task()
@@ -85,8 +99,8 @@ We introduce a new task phase, namely WaitingForCache, which denotes tasks that 
 
 ## 4 Metrics & Dashboards
 
-- Latency and frequency of reservation gRPC function calls to get an idea of cache serialize overhead
-- Task execution idle time in comparison to heartbeat-interval-seconds configuration
+- Monitor the latency and frequency of reservation gRPC function calls to assess cache serialize overhead.
+- Track task execution idle time in comparison to the heartbeat-interval-seconds configuration.
 
 ## 5 Drawbacks
 
