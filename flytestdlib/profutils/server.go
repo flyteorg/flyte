@@ -101,13 +101,13 @@ func StartProfilingServer(ctx context.Context, pprofPort int) error {
 	}
 
 	go func() {
-		e := srv.ListenAndServe()
-		if e != nil {
-			logger.Errorf(ctx, "Failed to start profiling server. Error: %v", e)
+		<-ctx.Done()
+		if err := srv.Shutdown(context.Background()); err != nil {
+			logger.Errorf(ctx, "Failed to gracefully shutdown profiling server. Error: %v", err)
 		}
 	}()
 
-	return srv.Shutdown(ctx)
+	return srv.ListenAndServe()
 }
 
 func configureGlobalHTTPHandler(handlers map[string]http.Handler) error {
