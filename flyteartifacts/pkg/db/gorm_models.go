@@ -41,3 +41,32 @@ type Artifact struct {
 	// Here nullable in the case of workflow output.
 	RetryAttempt *uint32
 }
+
+type TriggerKey struct {
+	gorm.Model
+	Project string        `gorm:"index:idx_pdn;index:idx_proj;type:varchar(64)"`
+	Domain  string        `gorm:"index:idx_pdn;index:idx_dom;type:varchar(64)"`
+	Name    string        `gorm:"index:idx_pdn;index:idx_name;type:varchar(255)"`
+	RunsOn  []ArtifactKey `gorm:"many2many:active_trigger_artifact_keys;"`
+}
+
+type LaunchPlanID struct {
+	Name    string `gorm:"not null;index:idx_lp_id;type:varchar(255)"`
+	Version string `gorm:"not null;type:varchar(255);index:idx_launch_plan_version"`
+}
+
+type Trigger struct {
+	gorm.Model
+	TriggerKeyID uint
+	TriggerKey   TriggerKey `gorm:"foreignKey:TriggerKeyID;references:ID"`
+	Version      string     `gorm:"not null;type:varchar(255);index:idx_trigger_version"`
+
+	// Unlike the one in the TriggerKey table, these are the list of artifact keys as specified by the user
+	// for this specific version. Currently just the key but can add additional fields in the future.
+	RunsOn []ArtifactKey `gorm:"many2many:trigger_ids_artifact_keys;"`
+
+	Active            bool         `gorm:"index:idx_active"`
+	LaunchPlanID      LaunchPlanID `gorm:"embedded"`
+	LaunchPlanSpec    []byte       `gorm:"not null"`
+	LaunchPlanClosure []byte       `gorm:"not null"`
+}

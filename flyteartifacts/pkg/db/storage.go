@@ -136,6 +136,85 @@ func (r *RDSStorage) GetArtifact(ctx context.Context, query core.ArtifactQuery) 
 	return resp, err
 }
 
+func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) (models.Trigger, error) {
+
+	timer := r.metrics.CreateTriggerDuration.Start()
+	logger.Debugf(ctx, "Attempt create trigger [%s:%s]", trigger.Name, trigger.Version)
+	dbTrigger := ServiceToGormTrigger(trigger)
+
+	// Check to see if the trigger key already exists. Create if not
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var extantKey TriggerKey
+
+		tx.FirstOrCreate(&extantKey, dbTrigger.TriggerKey)
+		if err := tx.Error; err != nil {
+			logger.Errorf(ctx, "Failed to firstorcreate key: %+v", err)
+			return err
+		}
+
+		// Look for all earlier versions of the trigger and mark them inactive
+		db := r.db.Model(&Trigger{}).InnerJoins("TriggerKey", r.db.Where(&dbTrigger.TriggerKey))
+		db = db.Update("active", false)
+		if err := db.Error; err != nil {
+			logger.Errorf(ctx, "Failed to mark earlier versions inactive for %s: %+v", dbTrigger.TriggerKey.Name, err)
+			return err
+		}
+
+		dbTrigger.TriggerKeyID = extantKey.ID
+		dbTrigger.TriggerKey = TriggerKey{} // zero out the artifact key
+		// This create should update the join table between individual triggers and artifact keys
+		tx.Create(&dbTrigger)
+		if tx.Error != nil {
+			logger.Errorf(ctx, "Failed to create trigger %+v", tx.Error)
+			return tx.Error
+		}
+
+		// Next update the active_trigger_artifact_keys join table that keeps track of active key relationships
+		err := tx.Model(&dbTrigger.TriggerKey).Association("RunsOn").Replace(dbTrigger.RunsOn)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to update active_trigger_artifact_keys: %+v", err)
+			return err
+		}
+
+		return nil
+
+	})
+	if err != nil {
+		logger.Errorf(ctx, "Failed transaction upsert on key [%s]: %+v", trigger.Name, err)
+		return models.Trigger{}, err
+	}
+	timer.Stop()
+
+	return models.Trigger{}, nil
+}
+
+func (r *RDSStorage) GetLatestTrigger(ctx context.Context, project, domain, name string) (models.Trigger, error) {
+	var gotTrigger Trigger
+	tk := TriggerKey{
+		Project: project,
+		Domain:  domain,
+		Name:    name,
+	}
+	db := r.db.Model(&Trigger{}).InnerJoins("TriggerKey", r.db.Where(&tk))
+	db = db.Where("active = true").Order("created_at desc").Limit(1).First(&gotTrigger)
+	if err := db.Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			logger.Infof(ctx, "Trigger not found: %+v", tk)
+			return models.Trigger{}, fmt.Errorf("could not find a latest trigger")
+		}
+		logger.Errorf(ctx, "Failed to query for triggers: %+v", err)
+		return models.Trigger{}, err
+	}
+	logger.Debugf(ctx, "Found and returning trigger obj %v", gotTrigger)
+
+	m := GormToServiceTrigger(gotTrigger)
+	return m, nil
+}
+
+func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.ArtifactKey) ([]models.Trigger, error) {
+	return nil, nil
+}
+
 func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {
 	dbCfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration).ArtifactDatabaseConfig
 	logConfig := logger.GetConfig()

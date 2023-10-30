@@ -45,6 +45,9 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 		return nil, err
 	}
 
+	// will need to be re-implemented on the cloud side to be not lossy.
+	// if enabled, call trigger handler, evaluate trigger(storage)
+
 	return &artifact.CreateArtifactResponse{Artifact: &created.Artifact}, nil
 }
 
@@ -71,10 +74,31 @@ func (c *CoreService) GetArtifact(ctx context.Context, request *artifact.GetArti
 }
 
 func (c *CoreService) CreateTrigger(ctx context.Context, request *artifact.CreateTriggerRequest) (*artifact.CreateTriggerResponse, error) {
+	// Create the new trigger object.
+	// Mark all older versions of the trigger as inactive.
+
+	// trigger handler create trigger(storage layer)
+	serviceTrigger, err := models.CreateTriggerModelFromRequest(ctx, request)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create a valid Trigger from create request: %v with err %v", request, err)
+		return nil, err
+	}
+
+	createdTrigger, err := c.Storage.CreateTrigger(ctx, serviceTrigger)
+	logger.Infof(ctx, "Created trigger: %+v", createdTrigger)
+
 	return &artifact.CreateTriggerResponse{}, nil
 }
 
 func (c *CoreService) DeleteTrigger(ctx context.Context, request *artifact.DeleteTriggerRequest) (*artifact.DeleteTriggerResponse, error) {
+	// set trigger to deactivate
+
+	/*
+		artifact key -> trigger keys
+		what does this tell you? given an artifact, list the trigger names that are relevant to it.
+
+		so
+	*/
 	return &artifact.DeleteTriggerResponse{}, nil
 }
 

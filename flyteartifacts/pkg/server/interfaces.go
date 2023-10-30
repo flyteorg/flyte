@@ -12,6 +12,14 @@ type StorageInterface interface {
 	CreateArtifact(context.Context, models.Artifact) (models.Artifact, error)
 
 	GetArtifact(context.Context, core.ArtifactQuery) (models.Artifact, error)
+
+	CreateTrigger(context.Context, models.Trigger) (models.Trigger, error)
+
+	GetLatestTrigger(ctx context.Context, project, domain, name string) (models.Trigger, error)
+
+	GetTriggersByArtifactKey(ctx context.Context, key core.ArtifactKey) ([]models.Trigger, error)
+
+	// DeleteTrigger(context.Context, models.Trigger) error
 }
 
 type BlobStoreInterface interface {

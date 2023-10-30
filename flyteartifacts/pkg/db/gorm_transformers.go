@@ -127,3 +127,61 @@ func GormToServiceModel(ga Artifact) (models.Artifact, error) {
 		LiteralValueBytes: nil,
 	}, nil
 }
+
+func ServiceToGormTrigger(serviceTrigger models.Trigger) Trigger {
+
+	t := Trigger{
+		TriggerKey: TriggerKey{
+			Project: serviceTrigger.Project,
+			Domain:  serviceTrigger.Domain,
+			Name:    serviceTrigger.Name,
+		},
+		Version: serviceTrigger.Version,
+		Active:  serviceTrigger.Active,
+		LaunchPlanID: LaunchPlanID{
+			Name:    serviceTrigger.LaunchPlan.Id.Name,
+			Version: serviceTrigger.LaunchPlan.Id.Version,
+		},
+		LaunchPlanSpec:    serviceTrigger.SpecBytes,
+		LaunchPlanClosure: serviceTrigger.ClosureBytes,
+	}
+
+	var runsOn = make([]ArtifactKey, len(serviceTrigger.RunsOn))
+	for i, a := range serviceTrigger.RunsOn {
+		runsOn[i] = ArtifactKey{
+			Project: a.ArtifactKey.Project,
+			Domain:  a.ArtifactKey.Domain,
+			Name:    a.ArtifactKey.Name,
+		}
+	}
+
+	return t
+}
+
+func GormToServiceTrigger(gormTrigger Trigger) models.Trigger {
+
+	t := models.Trigger{
+		Project:      gormTrigger.TriggerKey.Project,
+		Domain:       gormTrigger.TriggerKey.Domain,
+		Name:         gormTrigger.TriggerKey.Name,
+		Version:      gormTrigger.Version,
+		Active:       gormTrigger.Active,
+		LaunchPlan:   nil,
+		SpecBytes:    gormTrigger.LaunchPlanSpec,
+		ClosureBytes: gormTrigger.LaunchPlanClosure,
+	}
+
+	var runsOn = make([]core.ArtifactID, len(gormTrigger.RunsOn))
+	for i, a := range gormTrigger.RunsOn {
+		runsOn[i] = core.ArtifactID{
+			ArtifactKey: &core.ArtifactKey{
+				Project: a.Project,
+				Domain:  a.Domain,
+				Name:    a.Name,
+			},
+		}
+	}
+	t.RunsOn = runsOn
+
+	return t
+}
