@@ -797,10 +797,6 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - name: grpc-2
-    port: 8089
-    protocol: TCP
-    targetPort: 8089
   - name: http
     port: 88
     protocol: TCP
