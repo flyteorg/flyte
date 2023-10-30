@@ -108,7 +108,7 @@ System retry can be of two types:
 
 .. note::
 
-   `RFC 3902 <https://github.com/flyteorg/flyte/pull/3902>`_ implements an alternative, simplified retry behaviour with which both system and user retries are counted towards a single retry budget defined in the task decorator (thus, without a second retry budget defined in the platform configuration). The last retries are always performed on non-spot instances to guarantee completion. To activate this behaviour, set ``TODO`` to ``TODO`` in the helm values.
+   `RFC 3902 <https://github.com/flyteorg/flyte/pull/3902>`_ implements an alternative, simplified retry behaviour with which both system and user retries are counted towards a single retry budget defined in the task decorator (thus, without a second retry budget defined in the platform configuration). The last retries are always performed on non-spot instances to guarantee completion. To activate this behaviour, set ``configmap.core.propeller.node-config.ignore-retry-cause`` to ``true`` in the helm values.
 
 **Timeouts**
   
