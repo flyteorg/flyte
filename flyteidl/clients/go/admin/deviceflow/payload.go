@@ -40,6 +40,6 @@ type DeviceAccessTokenRequest struct {
 
 type DeviceAccessTokenResponse struct {
 	oauth2.Token
-	Error string `json:"error"`
-  ExpiresIn int64 `json:"expires_in"` // relative seconds from now
+	Error     string `json:"error"`
+	ExpiresIn int64  `json:"expires_in"` // relative seconds from now
 }
