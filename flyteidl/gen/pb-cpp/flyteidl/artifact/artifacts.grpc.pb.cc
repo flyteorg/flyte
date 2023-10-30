@@ -22,6 +22,7 @@ namespace artifact {
 static const char* ArtifactRegistry_method_names[] = {
   "/flyteidl.artifact.ArtifactRegistry/CreateArtifact",
   "/flyteidl.artifact.ArtifactRegistry/GetArtifact",
+  "/flyteidl.artifact.ArtifactRegistry/SearchArtifacts",
   "/flyteidl.artifact.ArtifactRegistry/CreateTrigger",
   "/flyteidl.artifact.ArtifactRegistry/DeleteTrigger",
   "/flyteidl.artifact.ArtifactRegistry/AddTag",
@@ -38,11 +39,12 @@ std::unique_ptr< ArtifactRegistry::Stub> ArtifactRegistry::NewStub(const std::sh
 ArtifactRegistry::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   : channel_(channel), rpcmethod_CreateArtifact_(ArtifactRegistry_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetArtifact_(ArtifactRegistry_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_CreateTrigger_(ArtifactRegistry_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_DeleteTrigger_(ArtifactRegistry_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_AddTag_(ArtifactRegistry_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_RegisterProducer_(ArtifactRegistry_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_RegisterConsumer_(ArtifactRegistry_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_SearchArtifacts_(ArtifactRegistry_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CreateTrigger_(ArtifactRegistry_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_DeleteTrigger_(ArtifactRegistry_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_AddTag_(ArtifactRegistry_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_RegisterProducer_(ArtifactRegistry_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_RegisterConsumer_(ArtifactRegistry_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status ArtifactRegistry::Stub::CreateArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateArtifactRequest& request, ::flyteidl::artifact::CreateArtifactResponse* response) {
@@ -99,6 +101,34 @@ void ArtifactRegistry::Stub::experimental_async::GetArtifact(::grpc::ClientConte
 
 ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::GetArtifactResponse>* ArtifactRegistry::Stub::PrepareAsyncGetArtifactRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::artifact::GetArtifactResponse>::Create(channel_.get(), cq, rpcmethod_GetArtifact_, context, request, false);
+}
+
+::grpc::Status ArtifactRegistry::Stub::SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::flyteidl::artifact::SearchArtifactsResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SearchArtifacts_, context, request, response);
+}
+
+void ArtifactRegistry::Stub::experimental_async::SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SearchArtifacts_, context, request, response, std::move(f));
+}
+
+void ArtifactRegistry::Stub::experimental_async::SearchArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SearchArtifacts_, context, request, response, std::move(f));
+}
+
+void ArtifactRegistry::Stub::experimental_async::SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_SearchArtifacts_, context, request, response, reactor);
+}
+
+void ArtifactRegistry::Stub::experimental_async::SearchArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_SearchArtifacts_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* ArtifactRegistry::Stub::AsyncSearchArtifactsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::artifact::SearchArtifactsResponse>::Create(channel_.get(), cq, rpcmethod_SearchArtifacts_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* ArtifactRegistry::Stub::PrepareAsyncSearchArtifactsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::artifact::SearchArtifactsResponse>::Create(channel_.get(), cq, rpcmethod_SearchArtifacts_, context, request, false);
 }
 
 ::grpc::Status ArtifactRegistry::Stub::CreateTrigger(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateTriggerRequest& request, ::flyteidl::artifact::CreateTriggerResponse* response) {
@@ -255,25 +285,30 @@ ArtifactRegistry::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       ArtifactRegistry_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::SearchArtifactsRequest, ::flyteidl::artifact::SearchArtifactsResponse>(
+          std::mem_fn(&ArtifactRegistry::Service::SearchArtifacts), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      ArtifactRegistry_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::CreateTriggerRequest, ::flyteidl::artifact::CreateTriggerResponse>(
           std::mem_fn(&ArtifactRegistry::Service::CreateTrigger), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      ArtifactRegistry_method_names[3],
+      ArtifactRegistry_method_names[4],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::DeleteTriggerRequest, ::flyteidl::artifact::DeleteTriggerResponse>(
           std::mem_fn(&ArtifactRegistry::Service::DeleteTrigger), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      ArtifactRegistry_method_names[4],
+      ArtifactRegistry_method_names[5],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::AddTagRequest, ::flyteidl::artifact::AddTagResponse>(
           std::mem_fn(&ArtifactRegistry::Service::AddTag), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      ArtifactRegistry_method_names[5],
+      ArtifactRegistry_method_names[6],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::RegisterProducerRequest, ::flyteidl::artifact::RegisterResponse>(
           std::mem_fn(&ArtifactRegistry::Service::RegisterProducer), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      ArtifactRegistry_method_names[6],
+      ArtifactRegistry_method_names[7],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::RegisterConsumerRequest, ::flyteidl::artifact::RegisterResponse>(
           std::mem_fn(&ArtifactRegistry::Service::RegisterConsumer), this)));
@@ -290,6 +325,13 @@ ArtifactRegistry::Service::~Service() {
 }
 
 ::grpc::Status ArtifactRegistry::Service::GetArtifact(::grpc::ServerContext* context, const ::flyteidl::artifact::GetArtifactRequest* request, ::flyteidl::artifact::GetArtifactResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status ArtifactRegistry::Service::SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) {
   (void) context;
   (void) request;
   (void) response;

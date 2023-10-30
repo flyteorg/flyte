@@ -256,7 +256,7 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 					"The Variable component of the Parameter %s in %s either is missing, or has a missing Type",
 					name, fieldName)
 			}
-			if defaultInput.GetDefault() == nil && !defaultInput.GetRequired() {
+			if defaultInput.GetDefault() == nil && defaultInput.GetArtifactQuery() == nil && !defaultInput.GetRequired() {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"Invalid variable %s in %s - variable has neither default, nor is required. "+
 						"One must be specified", name, fieldName)

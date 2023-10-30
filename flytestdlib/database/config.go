@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	database = "database"
-	postgres = "postgres"
+	database    = "database"
+	postgresStr = "postgres"
 )
 
 //go:generate pflags DbConfig --default-var=defaultConfig
@@ -18,10 +18,12 @@ var defaultConfig = &DbConfig{
 	MaxOpenConnections: 100,
 	ConnMaxLifeTime:    config.Duration{Duration: time.Hour},
 	Postgres: PostgresConfig{
-		Port:         5432,
-		User:         postgres,
-		Host:         postgres,
-		DbName:       postgres,
+		// These values are suitable for local sandbox development
+		Host:         "localhost",
+		Port:         30001,
+		DbName:       postgresStr,
+		User:         postgresStr,
+		Password:     postgresStr,
 		ExtraOptions: "sslmode=disable",
 	},
 }

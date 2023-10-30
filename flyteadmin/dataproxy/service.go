@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -138,10 +139,32 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create a signed url. Error: %v", err)
 	}
 
+	// The artifact returned here has no relevant entry in the admin database, so call the artifact service synchronously
+	// to persist the information.
+	artifactCreate := &artifact.CreateArtifactRequest{
+		ArtifactKey: &core.ArtifactKey{
+			Project: req.Project,
+			Domain:  req.Domain,
+		},
+		Spec: req.GetArtifactSpec(),
+	}
+	fmt.Printf("Will call artifact service with request: %v\n", artifactCreate)
+	// artifact := artifact_service.CreateArtifact
+
 	return &service.CreateUploadLocationResponse{
 		SignedUrl: resp.URL.String(),
 		NativeUrl: storagePath.String(),
 		ExpiresAt: timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration())),
+		// replace with created artifact
+		Artifact: &artifact.Artifact{
+			ArtifactId: &core.ArtifactID{
+				ArtifactKey: &core.ArtifactKey{
+					Project: req.Project,
+					Domain:  req.Domain,
+				},
+			},
+			Spec: req.GetArtifactSpec(),
+		},
 	}, nil
 }
 

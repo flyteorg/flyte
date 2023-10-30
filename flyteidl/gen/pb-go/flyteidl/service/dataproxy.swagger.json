@@ -240,9 +240,6 @@
         "short_description": {
           "type": "string"
         },
-        "long_description": {
-          "type": "string"
-        },
         "user_metadata": {
           "$ref": "#/definitions/protobufAny",
           "title": "Additional user metadata"

@@ -253,6 +253,15 @@ class CloudEventWorkflowExecution final :
   ::flyteidl::core::WorkflowExecutionIdentifier* mutable_reference_execution();
   void set_allocated_reference_execution(::flyteidl::core::WorkflowExecutionIdentifier* reference_execution);
 
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  bool has_launch_plan_id() const;
+  void clear_launch_plan_id();
+  static const int kLaunchPlanIdFieldNumber = 9;
+  const ::flyteidl::core::Identifier& launch_plan_id() const;
+  ::flyteidl::core::Identifier* release_launch_plan_id();
+  ::flyteidl::core::Identifier* mutable_launch_plan_id();
+  void set_allocated_launch_plan_id(::flyteidl::core::Identifier* launch_plan_id);
+
   // @@protoc_insertion_point(class_scope:flyteidl.event.CloudEventWorkflowExecution)
  private:
   class HasBitSetters;
@@ -266,6 +275,7 @@ class CloudEventWorkflowExecution final :
   ::google::protobuf::Timestamp* scheduled_at_;
   ::flyteidl::core::NodeExecutionIdentifier* parent_node_execution_;
   ::flyteidl::core::WorkflowExecutionIdentifier* reference_execution_;
+  ::flyteidl::core::Identifier* launch_plan_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fevent_2fcloudevents_2eproto;
 };
@@ -556,6 +566,15 @@ class CloudEventTaskExecution final :
   ::flyteidl::core::WorkflowExecutionIdentifier* mutable_reference_execution();
   void set_allocated_reference_execution(::flyteidl::core::WorkflowExecutionIdentifier* reference_execution);
 
+  // .flyteidl.core.Identifier launch_plan_id = 9;
+  bool has_launch_plan_id() const;
+  void clear_launch_plan_id();
+  static const int kLaunchPlanIdFieldNumber = 9;
+  const ::flyteidl::core::Identifier& launch_plan_id() const;
+  ::flyteidl::core::Identifier* release_launch_plan_id();
+  ::flyteidl::core::Identifier* mutable_launch_plan_id();
+  void set_allocated_launch_plan_id(::flyteidl::core::Identifier* launch_plan_id);
+
   // @@protoc_insertion_point(class_scope:flyteidl.event.CloudEventTaskExecution)
  private:
   class HasBitSetters;
@@ -569,6 +588,7 @@ class CloudEventTaskExecution final :
   ::google::protobuf::Timestamp* scheduled_at_;
   ::flyteidl::core::NodeExecutionIdentifier* parent_node_execution_;
   ::flyteidl::core::WorkflowExecutionIdentifier* reference_execution_;
+  ::flyteidl::core::Identifier* launch_plan_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fevent_2fcloudevents_2eproto;
 };
@@ -1097,6 +1117,51 @@ inline void CloudEventWorkflowExecution::set_allocated_reference_execution(::fly
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventWorkflowExecution.reference_execution)
 }
 
+// .flyteidl.core.Identifier launch_plan_id = 9;
+inline bool CloudEventWorkflowExecution::has_launch_plan_id() const {
+  return this != internal_default_instance() && launch_plan_id_ != nullptr;
+}
+inline const ::flyteidl::core::Identifier& CloudEventWorkflowExecution::launch_plan_id() const {
+  const ::flyteidl::core::Identifier* p = launch_plan_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.event.CloudEventWorkflowExecution.launch_plan_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
+      &::flyteidl::core::_Identifier_default_instance_);
+}
+inline ::flyteidl::core::Identifier* CloudEventWorkflowExecution::release_launch_plan_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.CloudEventWorkflowExecution.launch_plan_id)
+  
+  ::flyteidl::core::Identifier* temp = launch_plan_id_;
+  launch_plan_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::Identifier* CloudEventWorkflowExecution::mutable_launch_plan_id() {
+  
+  if (launch_plan_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
+    launch_plan_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.CloudEventWorkflowExecution.launch_plan_id)
+  return launch_plan_id_;
+}
+inline void CloudEventWorkflowExecution::set_allocated_launch_plan_id(::flyteidl::core::Identifier* launch_plan_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(launch_plan_id_);
+  }
+  if (launch_plan_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      launch_plan_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, launch_plan_id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  launch_plan_id_ = launch_plan_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventWorkflowExecution.launch_plan_id)
+}
+
 // -------------------------------------------------------------------
 
 // CloudEventNodeExecution
@@ -1491,6 +1556,51 @@ inline void CloudEventTaskExecution::set_allocated_reference_execution(::flyteid
   }
   reference_execution_ = reference_execution;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventTaskExecution.reference_execution)
+}
+
+// .flyteidl.core.Identifier launch_plan_id = 9;
+inline bool CloudEventTaskExecution::has_launch_plan_id() const {
+  return this != internal_default_instance() && launch_plan_id_ != nullptr;
+}
+inline const ::flyteidl::core::Identifier& CloudEventTaskExecution::launch_plan_id() const {
+  const ::flyteidl::core::Identifier* p = launch_plan_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.event.CloudEventTaskExecution.launch_plan_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
+      &::flyteidl::core::_Identifier_default_instance_);
+}
+inline ::flyteidl::core::Identifier* CloudEventTaskExecution::release_launch_plan_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.CloudEventTaskExecution.launch_plan_id)
+  
+  ::flyteidl::core::Identifier* temp = launch_plan_id_;
+  launch_plan_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::Identifier* CloudEventTaskExecution::mutable_launch_plan_id() {
+  
+  if (launch_plan_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
+    launch_plan_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.CloudEventTaskExecution.launch_plan_id)
+  return launch_plan_id_;
+}
+inline void CloudEventTaskExecution::set_allocated_launch_plan_id(::flyteidl::core::Identifier* launch_plan_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(launch_plan_id_);
+  }
+  if (launch_plan_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      launch_plan_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, launch_plan_id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  launch_plan_id_ = launch_plan_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventTaskExecution.launch_plan_id)
 }
 
 // -------------------------------------------------------------------

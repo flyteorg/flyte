@@ -3,10 +3,10 @@ package implementations
 import (
 	"context"
 	"fmt"
+	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/Shopify/sarama"
-	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/protocol/kafka_sarama/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

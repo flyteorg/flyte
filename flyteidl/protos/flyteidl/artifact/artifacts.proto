@@ -3,8 +3,8 @@ package flyteidl.artifact;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact";
 
-
 import "google/protobuf/any.proto";
+import "google/api/annotations.proto";
 
 import "flyteidl/admin/launch_plan.proto";
 import "flyteidl/core/literals.proto";
@@ -12,6 +12,7 @@ import "flyteidl/core/types.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/interface.proto";
+import "flyteidl/event/cloudevents.proto";
 
 
 message Artifact {
@@ -21,6 +22,8 @@ message Artifact {
 
   // references the tag field in ArtifactTag
   repeated string tags = 3;
+
+  // 4. and the source message should be added here instead
 }
 
 message CreateArtifactRequest {
@@ -34,7 +37,12 @@ message CreateArtifactRequest {
   map<string, string> partitions = 4;
 
   string tag = 5;
+
+  // 2. We should add the source field to this.
 }
+
+// 1. Should add a new Source message that encapsulates all three of principal, task execution id, workflow execution id,
+// as well as the workflow and launch plan id responsible for the execution that generated the artifact (if not an upload)
 
 message ArtifactSpec {
   core.Literal value = 1;
@@ -44,6 +52,7 @@ message ArtifactSpec {
   // type to all Literals is a lot of work.
   core.LiteralType type = 2;
 
+  // 3. These fields should be removed.
   // Outputs of tasks will have this.
   core.TaskExecutionIdentifier task_execution = 5;
 
@@ -54,7 +63,6 @@ message ArtifactSpec {
   string principal = 7;
 
   string short_description = 8;
-  string long_description = 9;
 
   // Additional user metadata
   google.protobuf.Any user_metadata = 10;
@@ -87,11 +95,15 @@ message ListArtifactNamesResponse {
   repeated core.ArtifactKey artifact_keys = 1;
 }
 
-message ListArtifactsRequest {
+message SearchArtifactsRequest {
   core.ArtifactKey artifact_key = 1;
+
+  string filters = 2;
+  string token = 3;
+  int32 limit = 4;
 }
 
-message ListArtifactsResponse {
+message SearchArtifactsResponse {
   repeated Artifact artifacts = 1;
 }
 
@@ -146,14 +158,38 @@ message RegisterConsumerRequest {
 
 message RegisterResponse {}
 
+message CloudEventRequest {
+  oneof event {
+    event.CloudEventWorkflowExecution workflow_execution_event = 1;
+    event.CloudEventTaskExecution task_execution_event = 2;
+    event.CloudEventNodeExecution node_execution_event = 3;
+  }
+}
+
+message CloudEventResponse {}
+
 service ArtifactRegistry {
-  rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {}
+  rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {
 
-  rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {}
+  }
 
-//  rpc ListArtifactNames (ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {}
-//
-//  rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse) {}
+  rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {
+    option (google.api.http) = {
+      get: "/data/v1/artifacts"
+      additional_bindings {get: "/data/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
+      additional_bindings {get: "/data/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
+      additional_bindings {get: "/data/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
+    };
+
+
+  }
+
+  rpc SearchArtifacts (SearchArtifactsRequest) returns (SearchArtifactsResponse) {
+    option (google.api.http) = {
+      get: "/data/v1/query/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
+      additional_bindings {get: "/data/v1/query/{artifact_key.project}/{artifact_key.domain}"}
+    };
+  }
 
   rpc CreateTrigger (CreateTriggerRequest) returns (CreateTriggerResponse) {}
 

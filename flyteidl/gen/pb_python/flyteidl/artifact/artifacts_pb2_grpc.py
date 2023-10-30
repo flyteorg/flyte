@@ -24,6 +24,11 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.GetArtifactRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.GetArtifactResponse.FromString,
                 )
+        self.SearchArtifacts = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/SearchArtifacts',
+                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
+                )
         self.CreateTrigger = channel.unary_unary(
                 '/flyteidl.artifact.ArtifactRegistry/CreateTrigger',
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.CreateTriggerRequest.SerializeToString,
@@ -66,12 +71,14 @@ class ArtifactRegistryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SearchArtifacts(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def CreateTrigger(self, request, context):
-        """rpc ListArtifactNames (ListArtifactNamesRequest) returns (ListArtifactNamesResponse) {}
-
-        rpc ListArtifacts (ListArtifactsRequest) returns (ListArtifactsResponse) {}
-
-        """
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -112,6 +119,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.GetArtifact,
                     request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.GetArtifactRequest.FromString,
                     response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.GetArtifactResponse.SerializeToString,
+            ),
+            'SearchArtifacts': grpc.unary_unary_rpc_method_handler(
+                    servicer.SearchArtifacts,
+                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsRequest.FromString,
+                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.SerializeToString,
             ),
             'CreateTrigger': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateTrigger,
@@ -179,6 +191,23 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/GetArtifact',
             flyteidl_dot_artifact_dot_artifacts__pb2.GetArtifactRequest.SerializeToString,
             flyteidl_dot_artifact_dot_artifacts__pb2.GetArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SearchArtifacts(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/SearchArtifacts',
+            flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsRequest.SerializeToString,
+            flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -13,11 +13,16 @@ type Config struct {
 	Propeller   Propeller   `json:"propeller" pflag:",Configuration to disable propeller or any of its components."`
 	Admin       Admin       `json:"admin" pflag:",Configuration to disable FlyteAdmin or any of its components"`
 	DataCatalog DataCatalog `json:"dataCatalog" pflag:",Configuration to disable DataCatalog or any of its components"`
+	Artifact    Artifacts   `json:"artifact" pflag:",Configuration to disable Artifact or any of its components"`
 }
 
 type Propeller struct {
 	Disabled       bool `json:"disabled" pflag:",Disables flytepropeller in the single binary mode"`
 	DisableWebhook bool `json:"disableWebhook" pflag:",Disables webhook only"`
+}
+
+type Artifacts struct {
+	Disabled bool `json:"disabled" pflag:",Disables flyteartifacts in the single binary mode"`
 }
 
 type Admin struct {

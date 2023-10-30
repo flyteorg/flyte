@@ -7297,6 +7297,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution launchPlanId */
+            launchPlanId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventWorkflowExecution. */
@@ -7331,6 +7334,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution launchPlanId. */
+            public launchPlanId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventWorkflowExecution instance using the specified properties.
@@ -7443,6 +7449,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventTaskExecution launchPlanId */
+            launchPlanId?: (flyteidl.core.IIdentifier|null);
         }
 
         /** Represents a CloudEventTaskExecution. */
@@ -7477,6 +7486,9 @@ export namespace flyteidl {
 
             /** CloudEventTaskExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventTaskExecution launchPlanId. */
+            public launchPlanId?: (flyteidl.core.IIdentifier|null);
 
             /**
              * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -22426,9 +22438,6 @@ export namespace flyteidl {
             /** ArtifactSpec shortDescription */
             shortDescription?: (string|null);
 
-            /** ArtifactSpec longDescription */
-            longDescription?: (string|null);
-
             /** ArtifactSpec userMetadata */
             userMetadata?: (google.protobuf.IAny|null);
 
@@ -22462,9 +22471,6 @@ export namespace flyteidl {
 
             /** ArtifactSpec shortDescription. */
             public shortDescription: string;
-
-            /** ArtifactSpec longDescription. */
-            public longDescription: string;
 
             /** ArtifactSpec userMetadata. */
             public userMetadata?: (google.protobuf.IAny|null);
@@ -22777,104 +22783,122 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a ListArtifactsRequest. */
-        interface IListArtifactsRequest {
+        /** Properties of a SearchArtifactsRequest. */
+        interface ISearchArtifactsRequest {
 
-            /** ListArtifactsRequest artifactKey */
+            /** SearchArtifactsRequest artifactKey */
             artifactKey?: (flyteidl.core.IArtifactKey|null);
+
+            /** SearchArtifactsRequest filters */
+            filters?: (string|null);
+
+            /** SearchArtifactsRequest token */
+            token?: (string|null);
+
+            /** SearchArtifactsRequest limit */
+            limit?: (number|null);
         }
 
-        /** Represents a ListArtifactsRequest. */
-        class ListArtifactsRequest implements IListArtifactsRequest {
+        /** Represents a SearchArtifactsRequest. */
+        class SearchArtifactsRequest implements ISearchArtifactsRequest {
 
             /**
-             * Constructs a new ListArtifactsRequest.
+             * Constructs a new SearchArtifactsRequest.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.artifact.IListArtifactsRequest);
+            constructor(properties?: flyteidl.artifact.ISearchArtifactsRequest);
 
-            /** ListArtifactsRequest artifactKey. */
+            /** SearchArtifactsRequest artifactKey. */
             public artifactKey?: (flyteidl.core.IArtifactKey|null);
 
-            /**
-             * Creates a new ListArtifactsRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ListArtifactsRequest instance
-             */
-            public static create(properties?: flyteidl.artifact.IListArtifactsRequest): flyteidl.artifact.ListArtifactsRequest;
+            /** SearchArtifactsRequest filters. */
+            public filters: string;
+
+            /** SearchArtifactsRequest token. */
+            public token: string;
+
+            /** SearchArtifactsRequest limit. */
+            public limit: number;
 
             /**
-             * Encodes the specified ListArtifactsRequest message. Does not implicitly {@link flyteidl.artifact.ListArtifactsRequest.verify|verify} messages.
-             * @param message ListArtifactsRequest message or plain object to encode
+             * Creates a new SearchArtifactsRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns SearchArtifactsRequest instance
+             */
+            public static create(properties?: flyteidl.artifact.ISearchArtifactsRequest): flyteidl.artifact.SearchArtifactsRequest;
+
+            /**
+             * Encodes the specified SearchArtifactsRequest message. Does not implicitly {@link flyteidl.artifact.SearchArtifactsRequest.verify|verify} messages.
+             * @param message SearchArtifactsRequest message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.artifact.IListArtifactsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.artifact.ISearchArtifactsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a ListArtifactsRequest message from the specified reader or buffer.
+             * Decodes a SearchArtifactsRequest message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns ListArtifactsRequest
+             * @returns SearchArtifactsRequest
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.ListArtifactsRequest;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.SearchArtifactsRequest;
 
             /**
-             * Verifies a ListArtifactsRequest message.
+             * Verifies a SearchArtifactsRequest message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a ListArtifactsResponse. */
-        interface IListArtifactsResponse {
+        /** Properties of a SearchArtifactsResponse. */
+        interface ISearchArtifactsResponse {
 
-            /** ListArtifactsResponse artifacts */
+            /** SearchArtifactsResponse artifacts */
             artifacts?: (flyteidl.artifact.IArtifact[]|null);
         }
 
-        /** Represents a ListArtifactsResponse. */
-        class ListArtifactsResponse implements IListArtifactsResponse {
+        /** Represents a SearchArtifactsResponse. */
+        class SearchArtifactsResponse implements ISearchArtifactsResponse {
 
             /**
-             * Constructs a new ListArtifactsResponse.
+             * Constructs a new SearchArtifactsResponse.
              * @param [properties] Properties to set
              */
-            constructor(properties?: flyteidl.artifact.IListArtifactsResponse);
+            constructor(properties?: flyteidl.artifact.ISearchArtifactsResponse);
 
-            /** ListArtifactsResponse artifacts. */
+            /** SearchArtifactsResponse artifacts. */
             public artifacts: flyteidl.artifact.IArtifact[];
 
             /**
-             * Creates a new ListArtifactsResponse instance using the specified properties.
+             * Creates a new SearchArtifactsResponse instance using the specified properties.
              * @param [properties] Properties to set
-             * @returns ListArtifactsResponse instance
+             * @returns SearchArtifactsResponse instance
              */
-            public static create(properties?: flyteidl.artifact.IListArtifactsResponse): flyteidl.artifact.ListArtifactsResponse;
+            public static create(properties?: flyteidl.artifact.ISearchArtifactsResponse): flyteidl.artifact.SearchArtifactsResponse;
 
             /**
-             * Encodes the specified ListArtifactsResponse message. Does not implicitly {@link flyteidl.artifact.ListArtifactsResponse.verify|verify} messages.
-             * @param message ListArtifactsResponse message or plain object to encode
+             * Encodes the specified SearchArtifactsResponse message. Does not implicitly {@link flyteidl.artifact.SearchArtifactsResponse.verify|verify} messages.
+             * @param message SearchArtifactsResponse message or plain object to encode
              * @param [writer] Writer to encode to
              * @returns Writer
              */
-            public static encode(message: flyteidl.artifact.IListArtifactsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+            public static encode(message: flyteidl.artifact.ISearchArtifactsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
 
             /**
-             * Decodes a ListArtifactsResponse message from the specified reader or buffer.
+             * Decodes a SearchArtifactsResponse message from the specified reader or buffer.
              * @param reader Reader or buffer to decode from
              * @param [length] Message length if known beforehand
-             * @returns ListArtifactsResponse
+             * @returns SearchArtifactsResponse
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.ListArtifactsResponse;
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.SearchArtifactsResponse;
 
             /**
-             * Verifies a ListArtifactsResponse message.
+             * Verifies a SearchArtifactsResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -23453,6 +23477,119 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a CloudEventRequest. */
+        interface ICloudEventRequest {
+
+            /** CloudEventRequest workflowExecutionEvent */
+            workflowExecutionEvent?: (flyteidl.event.ICloudEventWorkflowExecution|null);
+
+            /** CloudEventRequest taskExecutionEvent */
+            taskExecutionEvent?: (flyteidl.event.ICloudEventTaskExecution|null);
+
+            /** CloudEventRequest nodeExecutionEvent */
+            nodeExecutionEvent?: (flyteidl.event.ICloudEventNodeExecution|null);
+        }
+
+        /** Represents a CloudEventRequest. */
+        class CloudEventRequest implements ICloudEventRequest {
+
+            /**
+             * Constructs a new CloudEventRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.artifact.ICloudEventRequest);
+
+            /** CloudEventRequest workflowExecutionEvent. */
+            public workflowExecutionEvent?: (flyteidl.event.ICloudEventWorkflowExecution|null);
+
+            /** CloudEventRequest taskExecutionEvent. */
+            public taskExecutionEvent?: (flyteidl.event.ICloudEventTaskExecution|null);
+
+            /** CloudEventRequest nodeExecutionEvent. */
+            public nodeExecutionEvent?: (flyteidl.event.ICloudEventNodeExecution|null);
+
+            /** CloudEventRequest event. */
+            public event?: ("workflowExecutionEvent"|"taskExecutionEvent"|"nodeExecutionEvent");
+
+            /**
+             * Creates a new CloudEventRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventRequest instance
+             */
+            public static create(properties?: flyteidl.artifact.ICloudEventRequest): flyteidl.artifact.CloudEventRequest;
+
+            /**
+             * Encodes the specified CloudEventRequest message. Does not implicitly {@link flyteidl.artifact.CloudEventRequest.verify|verify} messages.
+             * @param message CloudEventRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.artifact.ICloudEventRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.CloudEventRequest;
+
+            /**
+             * Verifies a CloudEventRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CloudEventResponse. */
+        interface ICloudEventResponse {
+        }
+
+        /** Represents a CloudEventResponse. */
+        class CloudEventResponse implements ICloudEventResponse {
+
+            /**
+             * Constructs a new CloudEventResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.artifact.ICloudEventResponse);
+
+            /**
+             * Creates a new CloudEventResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CloudEventResponse instance
+             */
+            public static create(properties?: flyteidl.artifact.ICloudEventResponse): flyteidl.artifact.CloudEventResponse;
+
+            /**
+             * Encodes the specified CloudEventResponse message. Does not implicitly {@link flyteidl.artifact.CloudEventResponse.verify|verify} messages.
+             * @param message CloudEventResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.artifact.ICloudEventResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CloudEventResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CloudEventResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.artifact.CloudEventResponse;
+
+            /**
+             * Verifies a CloudEventResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Represents an ArtifactRegistry */
         class ArtifactRegistry extends $protobuf.rpc.Service {
 
@@ -23500,6 +23637,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public getArtifact(request: flyteidl.artifact.IGetArtifactRequest): Promise<flyteidl.artifact.GetArtifactResponse>;
+
+            /**
+             * Calls SearchArtifacts.
+             * @param request SearchArtifactsRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and SearchArtifactsResponse
+             */
+            public searchArtifacts(request: flyteidl.artifact.ISearchArtifactsRequest, callback: flyteidl.artifact.ArtifactRegistry.SearchArtifactsCallback): void;
+
+            /**
+             * Calls SearchArtifacts.
+             * @param request SearchArtifactsRequest message or plain object
+             * @returns Promise
+             */
+            public searchArtifacts(request: flyteidl.artifact.ISearchArtifactsRequest): Promise<flyteidl.artifact.SearchArtifactsResponse>;
 
             /**
              * Calls CreateTrigger.
@@ -23587,6 +23738,13 @@ export namespace flyteidl {
              * @param [response] GetArtifactResponse
              */
             type GetArtifactCallback = (error: (Error|null), response?: flyteidl.artifact.GetArtifactResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.artifact.ArtifactRegistry#searchArtifacts}.
+             * @param error Error, if any
+             * @param [response] SearchArtifactsResponse
+             */
+            type SearchArtifactsCallback = (error: (Error|null), response?: flyteidl.artifact.SearchArtifactsResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.artifact.ArtifactRegistry#createTrigger}.

@@ -42,6 +42,7 @@ jobs:
             const components = [
               "datacatalog",
               "flyteadmin",
+              "flyteartifacts",
               "flytecopilot",
               "flyteidl",
               "flyteplugins",

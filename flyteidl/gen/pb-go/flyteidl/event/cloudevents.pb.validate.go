@@ -129,6 +129,16 @@ func (m *CloudEventWorkflowExecution) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CloudEventWorkflowExecutionValidationError{
+				field:  "LaunchPlanId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -353,6 +363,16 @@ func (m *CloudEventTaskExecution) Validate() error {
 		if err := v.Validate(); err != nil {
 			return CloudEventTaskExecutionValidationError{
 				field:  "ReferenceExecution",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CloudEventTaskExecutionValidationError{
+				field:  "LaunchPlanId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

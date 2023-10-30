@@ -1,5 +1,7 @@
 # This is a sample configuration file for running single-binary Flyte locally against
 # a sandbox.
+# gatepr: revert the local dir to reflect home.
+#   paths were changed to personal to ensure settings didn't get lost.
 admin:
   endpoint: localhost:8089
   insecure: true
@@ -15,7 +17,7 @@ cluster_resources:
 
 logger:
   show-source: true
-  level: 6
+  level: 3
 
 propeller:
   create-flyteworkflow-crd: true
@@ -80,14 +82,28 @@ database:
 #    options: "sslmode=disable"
 cloudEvents:
   enable: true
-  transformToCloudEvents: true
-  type: redis
-  redis:
-    addr: "localhost:30004"
+  cloudEventVersion: v2
+  type: sandbox
+# For admin to find artifacts service
 artifacts:
   host: localhost
-  port: 50051
+  port: 30080
   insecure: true
+# For artifact service itself
+artifactsServer:
+  artifactBlobStoreConfig:
+    type: stow
+    stow:
+      kind: s3
+      config:
+        disable_ssl: true
+        v2_signing: true
+        endpoint: http://localhost:30002
+        auth_type: accesskey
+        access_key_id: minio
+        secret_key: miniostorage
+artifactsProcessor:
+  cloudProvider: Sandbox
 storage:
   type: stow
   stow:
