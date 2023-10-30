@@ -24,10 +24,11 @@ type Metadata struct {
 
 // An identifier for a catalog object.
 type Key struct {
-	Identifier     core.Identifier
-	CacheVersion   string
-	TypedInterface core.TypedInterface
-	InputReader    io.InputReader
+	Identifier           core.Identifier
+	CacheVersion         string
+	CacheIgnoreInputVars []string
+	TypedInterface       core.TypedInterface
+	InputReader          io.InputReader
 }
 
 func (k Key) String() string {
