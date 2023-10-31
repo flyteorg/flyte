@@ -5390,6 +5390,9 @@ export namespace flyteidl {
 
             /** TaskMetadata podTemplateName */
             podTemplateName?: (string|null);
+
+            /** TaskMetadata cacheIgnoreInputVars */
+            cacheIgnoreInputVars?: (string[]|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -5433,6 +5436,9 @@ export namespace flyteidl {
 
             /** TaskMetadata podTemplateName. */
             public podTemplateName: string;
+
+            /** TaskMetadata cacheIgnoreInputVars. */
+            public cacheIgnoreInputVars: string[];
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";

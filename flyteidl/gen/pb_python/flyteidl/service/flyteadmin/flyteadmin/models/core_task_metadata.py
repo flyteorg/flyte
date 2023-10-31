@@ -44,7 +44,8 @@ class CoreTaskMetadata(object):
         'cache_serializable': 'bool',
         'generates_deck': 'bool',
         'tags': 'dict(str, str)',
-        'pod_template_name': 'str'
+        'pod_template_name': 'str',
+        'cache_ignore_input_vars': 'list[str]'
     }
 
     attribute_map = {
@@ -58,10 +59,11 @@ class CoreTaskMetadata(object):
         'cache_serializable': 'cache_serializable',
         'generates_deck': 'generates_deck',
         'tags': 'tags',
-        'pod_template_name': 'pod_template_name'
+        'pod_template_name': 'pod_template_name',
+        'cache_ignore_input_vars': 'cache_ignore_input_vars'
     }
 
-    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None, pod_template_name=None):  # noqa: E501
+    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None, pod_template_name=None, cache_ignore_input_vars=None):  # noqa: E501
         """CoreTaskMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._discoverable = None
@@ -75,6 +77,7 @@ class CoreTaskMetadata(object):
         self._generates_deck = None
         self._tags = None
         self._pod_template_name = None
+        self._cache_ignore_input_vars = None
         self.discriminator = None
 
         if discoverable is not None:
@@ -99,6 +102,8 @@ class CoreTaskMetadata(object):
             self.tags = tags
         if pod_template_name is not None:
             self.pod_template_name = pod_template_name
+        if cache_ignore_input_vars is not None:
+            self.cache_ignore_input_vars = cache_ignore_input_vars
 
     @property
     def discoverable(self):
@@ -346,6 +351,29 @@ class CoreTaskMetadata(object):
         """
 
         self._pod_template_name = pod_template_name
+
+    @property
+    def cache_ignore_input_vars(self):
+        """Gets the cache_ignore_input_vars of this CoreTaskMetadata.  # noqa: E501
+
+        cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.  # noqa: E501
+
+        :return: The cache_ignore_input_vars of this CoreTaskMetadata.  # noqa: E501
+        :rtype: list[str]
+        """
+        return self._cache_ignore_input_vars
+
+    @cache_ignore_input_vars.setter
+    def cache_ignore_input_vars(self, cache_ignore_input_vars):
+        """Sets the cache_ignore_input_vars of this CoreTaskMetadata.
+
+        cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.  # noqa: E501
+
+        :param cache_ignore_input_vars: The cache_ignore_input_vars of this CoreTaskMetadata.  # noqa: E501
+        :type: list[str]
+        """
+
+        self._cache_ignore_input_vars = cache_ignore_input_vars
 
     def to_dict(self):
         """Returns the model properties as a dict"""

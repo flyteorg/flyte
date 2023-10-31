@@ -29,4 +29,6 @@ type CoreTaskMetadata struct {
 	Tags map[string]string `json:"tags,omitempty"`
 	// pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied identically as, the default PodTemplate configured in FlytePropeller.
 	PodTemplateName string `json:"pod_template_name,omitempty"`
+	// cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+	CacheIgnoreInputVars []string `json:"cache_ignore_input_vars,omitempty"`
 }
