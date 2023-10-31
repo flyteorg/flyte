@@ -20,17 +20,10 @@ import (
 
 	"github.com/lestrrat-go/jwx/jwk"
 
-<<<<<<< HEAD
-	"github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	stdlibConfig "github.com/flyteorg/flyte/flytestdlib/config"
-=======
-	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/flyteorg/flyteadmin/auth/config"
-	authConfig "github.com/flyteorg/flyteadmin/auth/config"
-	stdlibConfig "github.com/flyteorg/flytestdlib/config"
->>>>>>> flyteadmin/upgrade-coreos/go-oidc
 )
 
 func newMockResourceServer(t testing.TB, publicKey rsa.PublicKey) (resourceServer ResourceServer, closer func()) {

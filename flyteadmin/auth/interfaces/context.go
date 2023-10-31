@@ -15,13 +15,8 @@ import (
 	"github.com/ory/fosite"
 	fositeOAuth2 "github.com/ory/fosite/handler/oauth2"
 
-<<<<<<< HEAD
-	"github.com/coreos/go-oidc"
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-=======
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/flyteorg/flyteadmin/auth/config"
->>>>>>> flyteadmin/upgrade-coreos/go-oidc
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"golang.org/x/oauth2"
 )
 

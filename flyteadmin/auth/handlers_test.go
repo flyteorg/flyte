@@ -11,12 +11,8 @@ import (
 	"strings"
 	"testing"
 
-<<<<<<< HEAD
-	"github.com/coreos/go-oidc"
-	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
-=======
 	"github.com/coreos/go-oidc/v3/oidc"
->>>>>>> flyteadmin/upgrade-coreos/go-oidc
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
