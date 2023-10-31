@@ -10,8 +10,6 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/ory/fosite"
 	fositeOAuth2 "github.com/ory/fosite/handler/oauth2"
-
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"golang.org/x/oauth2"
 	"k8s.io/apimachinery/pkg/util/sets"
 
