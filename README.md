@@ -81,7 +81,7 @@ We ship new features, bug fixes and performance improvements regularly. Read our
 :fast_forward: **GPU acceleration**: Enable and control your tasks’ GPU demands by requesting resources in the task decorator. <br />
 :whale: **Dependency isolation via containers**: Maintain separate sets of dependencies for your tasks so no dependency conflicts arise. <br />
 :arrows_counterclockwise: **Parallelism**: Flyte tasks are inherently parallel to optimize resource consumption and improve performance. <br />
-:floppy_disk: **Allocate resources dynamically** at the task level. <br />
+:floppy_disk: **Dynamic Resource allocation**: Allocate resources dynamically at the task level. <br />
 :play_or_pause_button: [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
 
 ## Quick start
