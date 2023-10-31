@@ -202,6 +202,7 @@ spec:
             httpGet:
               path: /healthcheck
               port: http
+            initialDelaySeconds: 30
           {{- end }}
           {{- if .Values.deployment.resources }}
           resources: {{- toYaml .Values.deployment.resources | nindent 12 }}
