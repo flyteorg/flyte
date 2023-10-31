@@ -7743,7 +7743,7 @@ public final class Dataproxy {
     /**
      * <pre>
      * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
      *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -7755,7 +7755,7 @@ public final class Dataproxy {
     /**
      * <pre>
      * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
      *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -7853,7 +7853,7 @@ public final class Dataproxy {
     /**
      * <pre>
      * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
      *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -7876,7 +7876,7 @@ public final class Dataproxy {
     /**
      * <pre>
      * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
      * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
      *      flyte://v1/proj/development/execid/n2/i (for node execution input)
      *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -8208,7 +8208,7 @@ public final class Dataproxy {
       /**
        * <pre>
        * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
        *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -8231,7 +8231,7 @@ public final class Dataproxy {
       /**
        * <pre>
        * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
        *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -8255,7 +8255,7 @@ public final class Dataproxy {
       /**
        * <pre>
        * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
        *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -8276,7 +8276,7 @@ public final class Dataproxy {
       /**
        * <pre>
        * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
        *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -8293,7 +8293,7 @@ public final class Dataproxy {
       /**
        * <pre>
        * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
-       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
        * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
        *      flyte://v1/proj/development/execid/n2/i (for node execution input)
        *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
@@ -9796,9 +9796,9 @@ public final class Dataproxy {
       "Response\"*\202\323\344\223\002$\"\037/api/v1/dataproxy/arti" +
       "fact_link:\001*\022d\n\007GetData\022 .flyteidl.servi" +
       "ce.GetDataRequest\032!.flyteidl.service.Get" +
-      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB9Z7gi" +
-      "thub.com/flyteorg/flyteidl/gen/pb-go/fly" +
-      "teidl/serviceb\006proto3"
+      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB?Z=gi" +
+      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
+      "go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

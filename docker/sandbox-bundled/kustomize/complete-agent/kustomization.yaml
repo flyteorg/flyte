@@ -1,0 +1,15 @@
+helmGlobals:
+  chartHome: ../../../../charts
+helmCharts:
+- name: flyte-sandbox
+  releaseName: flyte-sandbox
+  namespace: flyte
+- name: flyteagent
+  releaseName: flyteagent
+  namespace: flyte
+namespace: flyte
+resources:
+- ../namespace.yaml
+
+patchesStrategicMerge:
+  - patch.yaml

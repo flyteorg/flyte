@@ -4,14 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
 func TestInvertBitSet(t *testing.T) {

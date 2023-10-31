@@ -4,10 +4,8 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const clustersKey = "clusters"

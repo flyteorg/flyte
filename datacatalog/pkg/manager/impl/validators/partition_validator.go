@@ -3,9 +3,10 @@ package validators
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 const (

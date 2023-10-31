@@ -6,7 +6,7 @@ import (
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const DefaultPhaseVersion = uint32(0)
@@ -226,7 +226,6 @@ func PhaseInfoQueuedWithTaskInfo(version uint32, reason string, info *TaskInfo) 
 }
 
 func PhaseInfoInitializing(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
-
 	pi := phaseInfo(PhaseInitializing, version, nil, info, false)
 	pi.reason = reason
 	return pi

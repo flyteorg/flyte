@@ -228,14 +228,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fdescription_5fentity_2ep
   "n.Sort*\215\001\n\021DescriptionFormat\022\036\n\032DESCRIPT"
   "ION_FORMAT_UNKNOWN\020\000\022\037\n\033DESCRIPTION_FORM"
   "AT_MARKDOWN\020\001\022\033\n\027DESCRIPTION_FORMAT_HTML"
-  "\020\002\022\032\n\026DESCRIPTION_FORMAT_RST\020\003B7Z5github"
-  ".com/flyteorg/flyteidl/gen/pb-go/flyteid"
-  "l/adminb\006proto3"
+  "\020\002\022\032\n\026DESCRIPTION_FORMAT_RST\020\003B=Z;github"
+  ".com/flyteorg/flyte/flyteidl/gen/pb-go/f"
+  "lyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fdescription_5fentity_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fdescription_5fentity_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fdescription_5fentity_2eproto,
-  "flyteidl/admin/description_entity.proto", &assign_descriptors_table_flyteidl_2fadmin_2fdescription_5fentity_2eproto, 1015,
+  "flyteidl/admin/description_entity.proto", &assign_descriptors_table_flyteidl_2fadmin_2fdescription_5fentity_2eproto, 1021,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fdescription_5fentity_2eproto() {

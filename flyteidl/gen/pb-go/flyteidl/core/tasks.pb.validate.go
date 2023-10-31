@@ -130,6 +130,160 @@ var _ interface {
 	ErrorName() string
 } = ResourcesValidationError{}
 
+// Validate checks the field values on GPUAccelerator with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *GPUAccelerator) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Device
+
+	switch m.PartitionSizeValue.(type) {
+
+	case *GPUAccelerator_Unpartitioned:
+		// no validation rules for Unpartitioned
+
+	case *GPUAccelerator_PartitionSize:
+		// no validation rules for PartitionSize
+
+	}
+
+	return nil
+}
+
+// GPUAcceleratorValidationError is the validation error returned by
+// GPUAccelerator.Validate if the designated constraints aren't met.
+type GPUAcceleratorValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GPUAcceleratorValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GPUAcceleratorValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GPUAcceleratorValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GPUAcceleratorValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GPUAcceleratorValidationError) ErrorName() string { return "GPUAcceleratorValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GPUAcceleratorValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGPUAccelerator.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GPUAcceleratorValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GPUAcceleratorValidationError{}
+
+// Validate checks the field values on ExtendedResources with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *ExtendedResources) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetGpuAccelerator()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExtendedResourcesValidationError{
+				field:  "GpuAccelerator",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// ExtendedResourcesValidationError is the validation error returned by
+// ExtendedResources.Validate if the designated constraints aren't met.
+type ExtendedResourcesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExtendedResourcesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExtendedResourcesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExtendedResourcesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExtendedResourcesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExtendedResourcesValidationError) ErrorName() string {
+	return "ExtendedResourcesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExtendedResourcesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExtendedResources.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExtendedResourcesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExtendedResourcesValidationError{}
+
 // Validate checks the field values on RuntimeMetadata with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.
@@ -373,6 +527,16 @@ func (m *TaskTemplate) Validate() error {
 		if err := v.Validate(); err != nil {
 			return TaskTemplateValidationError{
 				field:  "SecurityContext",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetExtendedResources()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskTemplateValidationError{
+				field:  "ExtendedResources",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

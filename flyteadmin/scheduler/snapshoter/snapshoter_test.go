@@ -6,6 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	adminModels "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -13,8 +15,6 @@ import (
 	schedMocks "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var (

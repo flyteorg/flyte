@@ -3,15 +3,15 @@ package gormimpl
 import (
 	"context"
 
-	idl_datacatalog "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	idl_datacatalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"gorm.io/gorm"
 )
 
 type dataSetRepo struct {

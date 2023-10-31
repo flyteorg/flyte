@@ -5084,9 +5084,9 @@ public final class Auth {
       "ClientConfig\022/.flyteidl.service.PublicCl" +
       "ientAuthConfigRequest\0320.flyteidl.service" +
       ".PublicClientAuthConfigResponse\"\037\202\323\344\223\002\031\022" +
-      "\027/config/v1/flyte_clientB9Z7github.com/f" +
-      "lyteorg/flyteidl/gen/pb-go/flyteidl/serv" +
-      "iceb\006proto3"
+      "\027/config/v1/flyte_clientB?Z=github.com/f" +
+      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
+      "l/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

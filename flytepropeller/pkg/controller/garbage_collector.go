@@ -3,20 +3,19 @@ package controller
 import (
 	"context"
 	"runtime/pprof"
+	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
-	"strings"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/clock"
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type gcMetrics struct {
@@ -129,7 +128,7 @@ func (g *GarbageCollector) deleteWorkflowsForNamespace(ctx context.Context, name
 }
 
 // runGC runs GC periodically
-func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Ticker) {
+func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Timer) {
 	logger.Infof(ctx, "Background workflow garbage collection started, with duration [%s], TTL [%d] hours", g.interval.String(), g.ttlHours)
 
 	ctx = contextutils.WithGoroutineLabel(ctx, "gc-worker")
@@ -163,7 +162,7 @@ func (g *GarbageCollector) StartGC(ctx context.Context) error {
 		logger.Warningf(ctx, "Garbage collector is disabled, as ttl [%d] is <=0", g.ttlHours)
 		return nil
 	}
-	ticker := g.clk.NewTicker(g.interval)
+	ticker := g.clk.NewTimer(g.interval)
 	go g.runGC(ctx, ticker)
 	return nil
 }

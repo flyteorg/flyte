@@ -594,6 +594,13 @@
         "tag": {
           "type": "string",
           "title": "Must exactly match for types to be castable"
+        },
+        "dataclass_type": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "title": "dataclass_type only exists for dataclasses.\nThis is used to resolve the type of the fields of dataclass\nThe key is the field name, and the value is the literal type of the field\ne.g. For dataclass Foo, with fields a, and a is a string\nFoo.a will be resolved as a literal type of string from dataclass_type"
         }
       },
       "description": "Hints to improve type matching\ne.g. allows distinguishing output from custom type transformers\neven if the underlying IDL serialization matches."

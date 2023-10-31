@@ -78,6 +78,9 @@ pub struct Resource {
     /// +optional
     #[prost(message, optional, tag="2")]
     pub outputs: ::core::option::Option<super::core::LiteralMap>,
+    /// A descriptive message for the current state. e.g. waiting for cluster.
+    #[prost(string, tag="3")]
+    pub message: ::prost::alloc::string::String,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1434,11 +1437,11 @@ pub struct LaunchPlanSpec {
     #[prost(message, optional, tag="2")]
     pub entity_metadata: ::core::option::Option<LaunchPlanMetadata>,
     /// Input values to be passed for the execution.
-    /// These can be overriden when an execution is created with this launch plan.
+    /// These can be overridden when an execution is created with this launch plan.
     #[prost(message, optional, tag="3")]
     pub default_inputs: ::core::option::Option<super::core::ParameterMap>,
     /// Fixed, non-overridable inputs for the Launch Plan.
-    /// These can not be overriden when an execution is created with this launch plan.
+    /// These can not be overridden when an execution is created with this launch plan.
     #[prost(message, optional, tag="4")]
     pub fixed_inputs: ::core::option::Option<super::core::LiteralMap>,
     /// String to indicate the role to use to execute the workflow underneath
@@ -1972,6 +1975,10 @@ pub struct NodeExecutionMetaData {
     /// This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
     #[prost(bool, tag="4")]
     pub is_dynamic: bool,
+    /// Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+    /// array nodes from other nodes which can have is_parent_node as true.
+    #[prost(bool, tag="5")]
+    pub is_array: bool,
 }
 /// Request structure to retrieve a list of node execution entities.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
@@ -2412,7 +2419,7 @@ pub struct ProjectDomainAttributesDeleteRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectDomainAttributesDeleteResponse {
 }
-/// SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+/// SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
 /// See :ref:`ref_flyteidl.admin.Signal` for more details
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2871,7 +2878,7 @@ pub struct WorkflowErrorExistsIdenticalStructure {
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<super::core::Identifier>,
 }
-/// When a CreateWorkflowRequest failes due to matching id
+/// When a CreateWorkflowRequest fails due to matching id
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateWorkflowFailureReason {

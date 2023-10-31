@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
 	corev1 "k8s.io/api/core/v1"
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -35,7 +34,7 @@ func TestEventWatcher_OnAdd(t *testing.T) {
 				Namespace: "ns1",
 				Name:      "name1",
 			},
-		})
+		}, false)
 
 		v, _ := ew.objectCache.Load(types.NamespacedName{Namespace: "ns1", Name: "name1"})
 		assert.NotNil(t, v)
@@ -55,7 +54,7 @@ func TestEventWatcher_OnAdd(t *testing.T) {
 				Namespace: "ns2",
 				Name:      "name2",
 			},
-		})
+		}, false)
 
 		v, _ := ew.objectCache.Load(types.NamespacedName{Namespace: "ns2", Name: "name2"})
 		assert.NotNil(t, v)
@@ -75,7 +74,7 @@ func TestEventWatcher_OnAdd(t *testing.T) {
 				Namespace: "ns3",
 				Name:      "name3",
 			},
-		})
+		}, false)
 
 		v, _ := ew.objectCache.Load(types.NamespacedName{Namespace: "ns3", Name: "name3"})
 		assert.NotNil(t, v)

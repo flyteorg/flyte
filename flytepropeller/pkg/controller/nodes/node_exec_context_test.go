@@ -6,10 +6,12 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -17,14 +19,9 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/stretchr/testify/assert"
 )
 
 type TaskReader struct{}
@@ -372,6 +369,80 @@ func Test_NodeContext_RecordTaskEvent(t1 *testing.T) {
 			}); (err != nil) != tt.wantErr {
 				t1.Errorf("RecordTaskEvent() error = %v, wantErr %v", err, tt.wantErr)
 			}
+		})
+	}
+}
+
+func Test_NodeContext_IsInterruptible(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name                          string
+		ignoreRetryCause              bool
+		attempts                      uint32
+		systemFailures                uint32
+		maxAttempts                   int32
+		maxSystemFailures             uint32
+		interruptibleFailureThreshold int32
+		expectedInterruptible         bool
+	}{
+		{"Interruptible", false, 0, 0, 2, 1, 1, true},
+		{"NonInterruptible", false, 0, 1, 2, 1, 1, false},
+		{"InterruptibleNegativeThreshold", false, 0, 0, 2, 1, -1, true},
+		{"InterruptibleNegativeThreshold2", false, 3, 3, 5, 4, -1, true},
+		{"NonInterruptibleNegativeThreshold", false, 1, 1, 2, 1, -1, false},
+		// maxSystemFailures should be ignored if ignoreRetryCause is true
+		{"IgnoreCauseInterruptible", true, 0, 0, 2, 999, 1, true},
+		{"IgnoreCauseInterruptibleFirstTry", true, 0, 0, 1, 999, -1, true}, // First try should always be interruptible if interruptible is set
+		{"IgnoreCauseInterruptibleNegativeThreshold", true, 0, 0, 2, 999, -1, true},
+		{"IgnoreCauseInterruptibleNegativeThreshold2", true, 2, 1, 4, 999, -1, true},
+		{"IgnoreCauseNonInterruptibleSystem", true, 1, 1, 2, 999, 1, false},
+		{"IgnoreCauseNonInterruptibleUser", true, 1, 0, 2, 999, 1, false},
+		{"IgnoreCauseNonInterruptibleSystemNegativeThreshold", true, 3, 3, 4, 0, -1, false},
+		{"IgnoreCauseNonInterruptibleUserNegativeThreshold", true, 3, 0, 4, 0, -1, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			scope := promutils.NewTestScope()
+
+			// mock all inputs
+			config.GetConfig().NodeConfig.DefaultMaxAttempts = tt.maxAttempts
+			config.GetConfig().NodeConfig.IgnoreRetryCause = tt.ignoreRetryCause
+
+			dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, scope.NewSubScope("dataStore"))
+			nodeExecutor := nodeExecutor{
+				interruptibleFailureThreshold:   tt.interruptibleFailureThreshold,
+				maxNodeRetriesForSystemFailures: tt.maxSystemFailures,
+				maxDatasetSizeBytes:             0,
+				defaultDataSandbox:              "s3://bucket-a",
+				store:                           dataStore,
+				shardSelector:                   ioutils.NewConstantShardSelector([]string{"x"}),
+				enqueueWorkflow:                 func(workflowID v1alpha1.WorkflowID) {},
+				metrics: &nodeMetrics{
+					InterruptibleNodesRunning:    labeled.NewCounter("running", "xyz", scope.NewSubScope("interruptible1")),
+					InterruptibleNodesTerminated: labeled.NewCounter("terminated", "xyz", scope.NewSubScope("interruptible2")),
+					InterruptedThresholdHit:      labeled.NewCounter("thresholdHit", "xyz", scope.NewSubScope("interruptible3")),
+				},
+			}
+
+			w := getTestFlyteWorkflow()
+
+			nodeLookup := &mocks2.NodeLookup{}
+			interruptible := true
+			nodeLookup.OnGetNode("node-a").Return(getTestNodeSpec(&interruptible), true)
+			nodeLookup.OnGetNodeExecutionStatus(ctx, "node-a").Return(&v1alpha1.NodeStatus{
+				Attempts:       tt.attempts,
+				SystemFailures: tt.systemFailures,
+			})
+
+			p := parentInfo{}
+			execContext := executors.NewExecutionContext(w, w, w, p, nil)
+
+			// validate interruptible
+			nCtx, err := nodeExecutor.BuildNodeExecutionContext(context.Background(), execContext, nodeLookup, "node-a")
+			assert.NoError(t, err)
+			assert.Equal(t, tt.expectedInterruptible, nCtx.NodeExecutionMetadata().IsInterruptible())
 		})
 	}
 }

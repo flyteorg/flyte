@@ -10,22 +10,19 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (
@@ -144,14 +141,14 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err,
 			"Unable to fetch statementHandle from http response")
 	}
-	runID := fmt.Sprintf("%v", data["run_id"])
+	runID := fmt.Sprintf("%.0f", data["run_id"])
 
-	return &ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
-		&ResourceWrapper{StatusCode: resp.StatusCode}, nil
+	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
+		ResourceWrapper{StatusCode: resp.StatusCode}, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	req, err := buildRequest(get, nil, p.cfg.databricksEndpoint,
 		p.cfg.DatabricksInstance, exec.Token, exec.RunID, false)
 	if err != nil {
@@ -159,6 +156,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 	resp, err := p.client.Do(req)
+	logger.Debugf(ctx, "Get databricks job response", "resp", resp)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get databricks job status [%v]", resp)
 		return nil, err
@@ -176,7 +174,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	jobID := fmt.Sprintf("%.0f", data["job_id"])
 	lifeCycleState := fmt.Sprintf("%s", jobState["life_cycle_state"])
 	resultState := fmt.Sprintf("%s", jobState["result_state"])
-	return &ResourceWrapper{
+	return ResourceWrapper{
 		StatusCode:     resp.StatusCode,
 		JobID:          jobID,
 		LifeCycleState: lifeCycleState,
@@ -206,8 +204,8 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 }
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
-	resource := taskCtx.Resource().(*ResourceWrapper)
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
+	resource := taskCtx.Resource().(ResourceWrapper)
 	message := resource.Message
 	statusCode := resource.StatusCode
 	jobID := resource.JobID
@@ -224,7 +222,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case http.StatusAccepted:
 		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
 	case http.StatusOK:
-		if lifeCycleState == "TERMINATED" {
+		if lifeCycleState == "TERMINATED" || lifeCycleState == "SKIPPED" || lifeCycleState == "INTERNAL_ERROR" {
 			if resultState == "SUCCESS" {
 				if err := writeOutput(ctx, taskCtx); err != nil {
 					pluginsCore.PhaseInfoFailure(string(rune(statusCode)), "failed to write output", taskInfo)

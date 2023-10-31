@@ -2090,8 +2090,8 @@ public final class VersionOuterClass {
       "plane_version\030\001 \001(\0132\027.flyteidl.admin.Ver" +
       "sion\"<\n\007Version\022\r\n\005Build\030\001 \001(\t\022\017\n\007Versio" +
       "n\030\002 \001(\t\022\021\n\tBuildTime\030\003 \001(\t\"\023\n\021GetVersion" +
-      "RequestB7Z5github.com/flyteorg/flyteidl/" +
-      "gen/pb-go/flyteidl/adminb\006proto3"
+      "RequestB=Z;github.com/flyteorg/flyte/fly" +
+      "teidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

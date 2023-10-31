@@ -50,6 +50,8 @@ func (m *DistributedTensorflowTrainingTask) Validate() error {
 
 	// no validation rules for ChiefReplicas
 
+	// no validation rules for EvaluatorReplicas
+
 	return nil
 }
 

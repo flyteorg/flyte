@@ -83,6 +83,9 @@ pub struct NodeExecutionEvent {
     /// Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
     #[prost(message, optional, tag="21")]
     pub reported_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Indicates if this node is an ArrayNode.
+    #[prost(bool, tag="22")]
+    pub is_array: bool,
     #[prost(oneof="node_execution_event::InputValue", tags="5, 20")]
     pub input_value: ::core::option::Option<node_execution_event::InputValue>,
     #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15")]

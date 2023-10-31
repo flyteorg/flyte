@@ -15,7 +15,7 @@ import (
 
 	oidc "github.com/coreos/go-oidc/v3/oidc"
 
-	service "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	service "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 
 	url "net/url"
 )

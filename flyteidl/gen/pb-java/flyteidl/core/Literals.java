@@ -18531,9 +18531,9 @@ public final class Literals {
       "\"C\n\007Binding\022\013\n\003var\030\001 \001(\t\022+\n\007binding\030\002 \001(" +
       "\0132\032.flyteidl.core.BindingData\"*\n\014KeyValu" +
       "ePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\" \n\rRet" +
-      "ryStrategy\022\017\n\007retries\030\005 \001(\rB6Z4github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
-      "oreb\006proto3"
+      "ryStrategy\022\017\n\007retries\030\005 \001(\rB<Z:github.co" +
+      "m/flyteorg/flyte/flyteidl/gen/pb-go/flyt" +
+      "eidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

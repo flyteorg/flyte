@@ -83,6 +83,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fkubeflow_2ften
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask, ps_replicas_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask, chief_replicas_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask, run_policy_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask, evaluator_replicas_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -95,7 +96,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fkubeflow_2ften
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask)},
-  { 9, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec)},
+  { 10, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -113,7 +114,7 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_
   "\n*flyteidl/plugins/kubeflow/tensorflow.p"
   "roto\022\031flyteidl.plugins.kubeflow\032\031flyteid"
   "l/core/tasks.proto\032&flyteidl/plugins/kub"
-  "eflow/common.proto\"\362\002\n!DistributedTensor"
+  "eflow/common.proto\"\323\003\n!DistributedTensor"
   "flowTrainingTask\022\\\n\017worker_replicas\030\001 \001("
   "\0132C.flyteidl.plugins.kubeflow.Distribute"
   "dTensorflowTrainingReplicaSpec\022X\n\013ps_rep"
@@ -122,19 +123,21 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_
   "\022[\n\016chief_replicas\030\003 \001(\0132C.flyteidl.plug"
   "ins.kubeflow.DistributedTensorflowTraini"
   "ngReplicaSpec\0228\n\nrun_policy\030\004 \001(\0132$.flyt"
-  "eidl.plugins.kubeflow.RunPolicy\"\272\001\n(Dist"
-  "ributedTensorflowTrainingReplicaSpec\022\020\n\010"
-  "replicas\030\001 \001(\005\022\r\n\005image\030\002 \001(\t\022+\n\tresourc"
-  "es\030\003 \001(\0132\030.flyteidl.core.Resources\022@\n\016re"
-  "start_policy\030\004 \001(\0162(.flyteidl.plugins.ku"
-  "beflow.RestartPolicyB9Z7github.com/flyte"
-  "org/flyteidl/gen/pb-go/flyteidl/pluginsb"
-  "\006proto3"
+  "eidl.plugins.kubeflow.RunPolicy\022_\n\022evalu"
+  "ator_replicas\030\005 \001(\0132C.flyteidl.plugins.k"
+  "ubeflow.DistributedTensorflowTrainingRep"
+  "licaSpec\"\272\001\n(DistributedTensorflowTraini"
+  "ngReplicaSpec\022\020\n\010replicas\030\001 \001(\005\022\r\n\005image"
+  "\030\002 \001(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.cor"
+  "e.Resources\022@\n\016restart_policy\030\004 \001(\0162(.fl"
+  "yteidl.plugins.kubeflow.RestartPolicyB\?Z"
+  "=github.com/flyteorg/flyte/flyteidl/gen/"
+  "pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto,
-  "flyteidl/plugins/kubeflow/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 767,
+  "flyteidl/plugins/kubeflow/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 870,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto() {
@@ -163,6 +166,8 @@ void DistributedTensorflowTrainingTask::InitAsDefaultInstance() {
       ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec::internal_default_instance());
   ::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingTask_default_instance_._instance.get_mutable()->run_policy_ = const_cast< ::flyteidl::plugins::kubeflow::RunPolicy*>(
       ::flyteidl::plugins::kubeflow::RunPolicy::internal_default_instance());
+  ::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingTask_default_instance_._instance.get_mutable()->evaluator_replicas_ = const_cast< ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec*>(
+      ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec::internal_default_instance());
 }
 class DistributedTensorflowTrainingTask::HasBitSetters {
  public:
@@ -170,6 +175,7 @@ class DistributedTensorflowTrainingTask::HasBitSetters {
   static const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec& ps_replicas(const DistributedTensorflowTrainingTask* msg);
   static const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec& chief_replicas(const DistributedTensorflowTrainingTask* msg);
   static const ::flyteidl::plugins::kubeflow::RunPolicy& run_policy(const DistributedTensorflowTrainingTask* msg);
+  static const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec& evaluator_replicas(const DistributedTensorflowTrainingTask* msg);
 };
 
 const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec&
@@ -188,6 +194,10 @@ const ::flyteidl::plugins::kubeflow::RunPolicy&
 DistributedTensorflowTrainingTask::HasBitSetters::run_policy(const DistributedTensorflowTrainingTask* msg) {
   return *msg->run_policy_;
 }
+const ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec&
+DistributedTensorflowTrainingTask::HasBitSetters::evaluator_replicas(const DistributedTensorflowTrainingTask* msg) {
+  return *msg->evaluator_replicas_;
+}
 void DistributedTensorflowTrainingTask::clear_run_policy() {
   if (GetArenaNoVirtual() == nullptr && run_policy_ != nullptr) {
     delete run_policy_;
@@ -199,6 +209,7 @@ const int DistributedTensorflowTrainingTask::kWorkerReplicasFieldNumber;
 const int DistributedTensorflowTrainingTask::kPsReplicasFieldNumber;
 const int DistributedTensorflowTrainingTask::kChiefReplicasFieldNumber;
 const int DistributedTensorflowTrainingTask::kRunPolicyFieldNumber;
+const int DistributedTensorflowTrainingTask::kEvaluatorReplicasFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 DistributedTensorflowTrainingTask::DistributedTensorflowTrainingTask()
@@ -230,6 +241,11 @@ DistributedTensorflowTrainingTask::DistributedTensorflowTrainingTask(const Distr
   } else {
     run_policy_ = nullptr;
   }
+  if (from.has_evaluator_replicas()) {
+    evaluator_replicas_ = new ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec(*from.evaluator_replicas_);
+  } else {
+    evaluator_replicas_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.kubeflow.DistributedTensorflowTrainingTask)
 }
 
@@ -237,8 +253,8 @@ void DistributedTensorflowTrainingTask::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_DistributedTensorflowTrainingTask_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto.base);
   ::memset(&worker_replicas_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&run_policy_) -
-      reinterpret_cast<char*>(&worker_replicas_)) + sizeof(run_policy_));
+      reinterpret_cast<char*>(&evaluator_replicas_) -
+      reinterpret_cast<char*>(&worker_replicas_)) + sizeof(evaluator_replicas_));
 }
 
 DistributedTensorflowTrainingTask::~DistributedTensorflowTrainingTask() {
@@ -251,6 +267,7 @@ void DistributedTensorflowTrainingTask::SharedDtor() {
   if (this != internal_default_instance()) delete ps_replicas_;
   if (this != internal_default_instance()) delete chief_replicas_;
   if (this != internal_default_instance()) delete run_policy_;
+  if (this != internal_default_instance()) delete evaluator_replicas_;
 }
 
 void DistributedTensorflowTrainingTask::SetCachedSize(int size) const {
@@ -284,6 +301,10 @@ void DistributedTensorflowTrainingTask::Clear() {
     delete run_policy_;
   }
   run_policy_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && evaluator_replicas_ != nullptr) {
+    delete evaluator_replicas_;
+  }
+  evaluator_replicas_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -346,6 +367,19 @@ const char* DistributedTensorflowTrainingTask::_InternalParse(const char* begin,
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::plugins::kubeflow::RunPolicy::_InternalParse;
         object = msg->mutable_run_policy();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec::_InternalParse;
+        object = msg->mutable_evaluator_replicas();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -426,6 +460,17 @@ bool DistributedTensorflowTrainingTask::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_evaluator_replicas()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -477,6 +522,12 @@ void DistributedTensorflowTrainingTask::SerializeWithCachedSizes(
       4, HasBitSetters::run_policy(this), output);
   }
 
+  // .flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 5;
+  if (this->has_evaluator_replicas()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, HasBitSetters::evaluator_replicas(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -516,6 +567,13 @@ void DistributedTensorflowTrainingTask::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         4, HasBitSetters::run_policy(this), target);
+  }
+
+  // .flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 5;
+  if (this->has_evaluator_replicas()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        5, HasBitSetters::evaluator_replicas(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -567,6 +625,13 @@ size_t DistributedTensorflowTrainingTask::ByteSizeLong() const {
         *run_policy_);
   }
 
+  // .flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 5;
+  if (this->has_evaluator_replicas()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *evaluator_replicas_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -606,6 +671,9 @@ void DistributedTensorflowTrainingTask::MergeFrom(const DistributedTensorflowTra
   if (from.has_run_policy()) {
     mutable_run_policy()->::flyteidl::plugins::kubeflow::RunPolicy::MergeFrom(from.run_policy());
   }
+  if (from.has_evaluator_replicas()) {
+    mutable_evaluator_replicas()->::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec::MergeFrom(from.evaluator_replicas());
+  }
 }
 
 void DistributedTensorflowTrainingTask::CopyFrom(const ::google::protobuf::Message& from) {
@@ -637,6 +705,7 @@ void DistributedTensorflowTrainingTask::InternalSwap(DistributedTensorflowTraini
   swap(ps_replicas_, other->ps_replicas_);
   swap(chief_replicas_, other->chief_replicas_);
   swap(run_policy_, other->run_policy_);
+  swap(evaluator_replicas_, other->evaluator_replicas_);
 }
 
 ::google::protobuf::Metadata DistributedTensorflowTrainingTask::GetMetadata() const {

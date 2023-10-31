@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -18,7 +17,7 @@ type arrayNodeExecutionContextBuilder struct {
 	inputReader        io.InputReader
 	currentParallelism *uint32
 	maxParallelism     uint32
-	eventRecorder      interfaces.EventRecorder
+	eventRecorder      arrayEventRecorder
 }
 
 func (a *arrayNodeExecutionContextBuilder) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
@@ -38,9 +37,8 @@ func (a *arrayNodeExecutionContextBuilder) BuildNodeExecutionContext(ctx context
 	return nCtx, nil
 }
 
-func newArrayNodeExecutionContextBuilder(nCtxBuilder interfaces.NodeExecutionContextBuilder, subNodeID v1alpha1.NodeID,
-	subNodeIndex int, subNodeStatus *v1alpha1.NodeStatus, inputReader io.InputReader, eventRecorder interfaces.EventRecorder,
-	currentParallelism *uint32, maxParallelism uint32) interfaces.NodeExecutionContextBuilder {
+func newArrayNodeExecutionContextBuilder(nCtxBuilder interfaces.NodeExecutionContextBuilder, subNodeID v1alpha1.NodeID, subNodeIndex int, subNodeStatus *v1alpha1.NodeStatus,
+	inputReader io.InputReader, currentParallelism *uint32, maxParallelism uint32, eventRecorder arrayEventRecorder) interfaces.NodeExecutionContextBuilder {
 
 	return &arrayNodeExecutionContextBuilder{
 		nCtxBuilder:        nCtxBuilder,

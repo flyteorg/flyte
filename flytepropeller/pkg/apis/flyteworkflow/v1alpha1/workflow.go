@@ -5,14 +5,13 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"k8s.io/apimachinery/pkg/types"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 // Defines a non-configurable keyspace size for shard keys. This needs to be a small value because we use label

@@ -14,7 +14,7 @@ generate: download_tooling #generate go code
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
-	GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v
+	GL_DEBUG=linters_output,env golangci-lint run --fix --deadline=5m --exclude deprecated -v
 
 # If code is failing goimports linter, this will fix.
 # skips 'vendor'
@@ -50,7 +50,7 @@ test_unit_cover:
 test_unit_visual:
 	go test ./... -coverprofile /tmp/cover.out -covermode=count
 	go tool cover -html=/tmp/cover.out
-	
+
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic

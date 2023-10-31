@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"k8s.io/apimachinery/pkg/util/rand"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
@@ -19,9 +22,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"k8s.io/apimachinery/pkg/util/rand"
 )
 
 type dynamicWorkflowContext struct {

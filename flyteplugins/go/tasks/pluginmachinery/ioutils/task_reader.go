@@ -3,12 +3,12 @@ package ioutils
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/pkg/errors"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/atomic"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/pkg/errors"
 )
 
 var (

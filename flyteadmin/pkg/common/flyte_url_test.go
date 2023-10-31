@@ -3,8 +3,9 @@ package common
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestFlyteURLsFromNodeExecutionID(t *testing.T) {

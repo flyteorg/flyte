@@ -1,15 +1,17 @@
 package core
 
 import (
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	v1 "k8s.io/api/core/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // TaskOverrides interface to expose any overrides that have been set for this task (like resource overrides etc)
 type TaskOverrides interface {
 	GetResources() *v1.ResourceRequirements
+	GetExtendedResources() *core.ExtendedResources
 	GetConfig() *v1.ConfigMap
 }
 
@@ -44,6 +46,6 @@ type TaskExecutionMetadata interface {
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
 	GetPlatformResources() *v1.ResourceRequirements
-	GetInterruptibleFailureThreshold() uint32
+	GetInterruptibleFailureThreshold() int32
 	GetEnvironmentVariables() map[string]string
 }

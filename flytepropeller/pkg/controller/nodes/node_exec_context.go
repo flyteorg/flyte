@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -19,13 +20,8 @@ import (
 	nodeerrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/pkg/errors"
-
-	"k8s.io/apimachinery/pkg/types"
 )
 
 const NodeIDLabel = "node-id"
@@ -94,7 +90,7 @@ type nodeExecMetadata struct {
 	v1alpha1.Meta
 	nodeExecID                    *core.NodeExecutionIdentifier
 	interruptible                 bool
-	interruptibleFailureThreshold uint32
+	interruptibleFailureThreshold int32
 	nodeLabels                    map[string]string
 }
 
@@ -114,7 +110,7 @@ func (e nodeExecMetadata) IsInterruptible() bool {
 	return e.interruptible
 }
 
-func (e nodeExecMetadata) GetInterruptibleFailureThreshold() uint32 {
+func (e nodeExecMetadata) GetInterruptibleFailureThreshold() int32 {
 	return e.interruptibleFailureThreshold
 }
 
@@ -208,7 +204,7 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 }
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
-	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold uint32,
+	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
 	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
 	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
 
@@ -255,6 +251,14 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 	}
 }
 
+func isAboveInterruptibleFailureThreshold(numFailures uint32, maxAttempts uint32, interruptibleThreshold int32) bool {
+	if interruptibleThreshold > 0 {
+		return numFailures >= uint32(interruptibleThreshold)
+	}
+
+	return numFailures >= maxAttempts-uint32(-interruptibleThreshold)
+}
+
 func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
 	nl executors.NodeLookup, currentNodeID v1alpha1.NodeID) (interfaces.NodeExecutionContext, error) {
 	n, ok := nl.GetNode(currentNodeID)
@@ -286,10 +290,25 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 
 	s := nl.GetNodeExecutionStatus(ctx, currentNodeID)
 
-	// a node is not considered interruptible if the system failures have exceeded the configured threshold
-	if interruptible && s.GetSystemFailures() >= c.interruptibleFailureThreshold {
-		interruptible = false
-		c.metrics.InterruptedThresholdHit.Inc(ctx)
+	if config.GetConfig().NodeConfig.IgnoreRetryCause {
+		// For the unified retry behavior we execute the last interruptibleFailureThreshold attempts on a non
+		// interruptible machine
+		maxAttempts := uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+		if n.GetRetryStrategy() != nil && n.GetRetryStrategy().MinAttempts != nil && *n.GetRetryStrategy().MinAttempts != 1 {
+			maxAttempts = uint32(*n.GetRetryStrategy().MinAttempts)
+		}
+
+		// For interruptible nodes run at least one attempt on an interruptible machine (thus s.GetAttempts() > 0) even if there won't be any retries
+		if interruptible && s.GetAttempts() > 0 && isAboveInterruptibleFailureThreshold(s.GetAttempts(), maxAttempts, c.interruptibleFailureThreshold) {
+			interruptible = false
+			c.metrics.InterruptedThresholdHit.Inc(ctx)
+		}
+	} else {
+		// Else a node is not considered interruptible if the system failures have exceeded the configured threshold
+		if interruptible && isAboveInterruptibleFailureThreshold(s.GetSystemFailures(), c.maxNodeRetriesForSystemFailures+1, c.interruptibleFailureThreshold) {
+			interruptible = false
+			c.metrics.InterruptedThresholdHit.Inc(ctx)
+		}
 	}
 
 	rawOutputPrefix := c.defaultDataSandbox
