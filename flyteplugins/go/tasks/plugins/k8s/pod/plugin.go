@@ -211,7 +211,17 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		} else {
 			// if the primary container annotation exists, we use the status of the specified container
 			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
-			if phaseInfo.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
+			if phaseInfo.Phase() == pluginsCore.PhasePermanentFailure && phaseInfo.Err() != nil && 
+				phaseInfo.Err().GetCode() == flytek8s.PrimaryContainerNotFound {
+				// if the primary container status is not found ensure that the primary container exists.
+				// note: it should be impossible for the primary container to not exist at this point.
+				for _, container := range pod.Spec.Containers {
+					if container.Name == primaryContainerName {
+						phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
+						break
+					}
+				}
+			} else if phaseInfo.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 		}
