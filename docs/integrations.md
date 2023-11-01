@@ -5,7 +5,7 @@
 Flyte is designed to be highly extensible and can be customized in multiple ways.
 
 ```{note}
-Want to contribute an example? Check out the {doc}`Example Contribution Guide <contribute>`.
+Want to contribute an example? Check out the {ref}`Example Contribution Guide <flytesnacks/contribute>`.
 ```
 
 ## Flytekit Plugins
@@ -18,27 +18,27 @@ Flytekit functionality. These plugins can be anything and for comparison can be 
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`SQL <auto_examples/sql_plugin/index>`
+* - {doc}`SQL <flytesnacks/examples/sql_plugin/index>`
   - Execute SQL queries as tasks.
-* - {doc}`Great Expectations <auto_examples/greatexpectations_plugin/index>`
+* - {doc}`Great Expectations <flytesnacks/examples/greatexpectations_plugin/index>`
   - Validate data with `great_expectations`.
-* - {doc}`Papermill <auto_examples/papermill_plugin/index>`
+* - {doc}`Papermill <flytesnacks/examples/papermill_plugin/index>`
   - Execute Jupyter Notebooks with `papermill`.
-* - {doc}`Pandera <auto_examples/pandera_plugin/index>`
+* - {doc}`Pandera <flytesnacks/examples/pandera_plugin/index>`
   - Validate pandas dataframes with `pandera`.
-* - {doc}`Modin <auto_examples/modin_plugin/index>`
+* - {doc}`Modin <flytesnacks/examples/modin_plugin/index>`
   - Scale pandas workflows with `modin`.
-* - {doc}`Dolt <auto_examples/dolt_plugin/index>`
+* - {doc}`Dolt <flytesnacks/examples/dolt_plugin/index>`
   - Version your SQL database with `dolt`.
-* - {doc}`DBT <auto_examples/dbt_plugin/index>`
+* - {doc}`DBT <flytesnacks/examples/dbt_plugin/index>`
   - Run and test your `dbt` pipelines in Flyte.
-* - {doc}`WhyLogs <auto_examples/whylogs_plugin/index>`
+* - {doc}`WhyLogs <flytesnacks/examples/whylogs_plugin/index>`
   - `whylogs`: the open standard for data logging.
-* - {doc}`MLFlow <auto_examples/mlflow_plugin/index>`
+* - {doc}`MLFlow <flytesnacks/examples/mlflow_plugin/index>`
   - `mlflow`: the open standard for model tracking.
-* - {doc}`ONNX <auto_examples/onnx_plugin/index>`
+* - {doc}`ONNX <flytesnacks/examples/onnx_plugin/index>`
   - Convert ML models to ONNX models seamlessly.
-* - {doc}`DuckDB <auto_examples/duckdb_plugin/index>`
+* - {doc}`DuckDB <flytesnacks/examples/duckdb_plugin/index>`
   - Run analytical queries using DuckDB.
 ```
 
@@ -65,19 +65,19 @@ orchestrated by Flyte itself, within its provisioned Kubernetes clusters.
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`K8s Pods <auto_examples/k8s_pod_plugin/index>`
+* - {doc}`K8s Pods <flytesnacks/examples/k8s_pod_plugin/index>`
   - Execute K8s pods for arbitrary workloads.
-* - {doc}`K8s Cluster Dask Jobs <auto_examples/k8s_dask_plugin/index>`
+* - {doc}`K8s Cluster Dask Jobs <flytesnacks/examples/k8s_dask_plugin/index>`
   - Run Dask jobs on a K8s Cluster.
-* - {doc}`K8s Cluster Spark Jobs <auto_examples/k8s_spark_plugin/index>`
+* - {doc}`K8s Cluster Spark Jobs <flytesnacks/examples/k8s_spark_plugin/index>`
   - Run Spark jobs on a K8s Cluster.
-* - {doc}`Kubeflow PyTorch <auto_examples/kfpytorch_plugin/index>`
+* - {doc}`Kubeflow PyTorch <flytesnacks/examples/kfpytorch_plugin/index>`
   - Run distributed PyTorch training jobs using `Kubeflow`.
-* - {doc}`Kubeflow TensorFlow <auto_examples/kftensorflow_plugin/index>`
+* - {doc}`Kubeflow TensorFlow <flytesnacks/examples/kftensorflow_plugin/index>`
   - Run distributed TensorFlow training jobs using `Kubeflow`.
-* - {doc}`MPI Operator <auto_examples/kfmpi_plugin/index>`
+* - {doc}`MPI Operator <flytesnacks/examples/kfmpi_plugin/index>`
   - Run distributed deep learning training jobs using Horovod and MPI.
-* - {doc}`Ray Task <auto_examples/ray_plugin/index>`
+* - {doc}`Ray Task <flytesnacks/examples/ray_plugin/index>`
   - Run Ray jobs on a K8s Cluster.
 ```
 
@@ -96,21 +96,21 @@ the Flyte task that use the respective plugin.
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`AWS Sagemaker: Model Training <auto_examples/sagemaker_training_plugin/index>`
+* - {doc}`AWS Sagemaker: Model Training <flytesnacks/examples/sagemaker_training_plugin/index>`
   - Train models with built-in or define your own custom algorithms.
-* - {doc}`AWS Sagemaker: Pytorch Training <auto_examples/sagemaker_pytorch_plugin/index>`
+* - {doc}`AWS Sagemaker: Pytorch Training <flytesnacks/examples/sagemaker_pytorch_plugin/index>`
   - Train Pytorch models using Sagemaker, with support for distributed training.
-* - {doc}`AWS Athena <auto_examples/athena_plugin/index>`
+* - {doc}`AWS Athena <flytesnacks/examples/athena_plugin/index>`
   - Execute queries using AWS Athena
-* - {doc}`AWS Batch <auto_examples/aws_batch_plugin/index>`
+* - {doc}`AWS Batch <flytesnacks/examples/aws_batch_plugin/index>`
   - Running tasks and workflows on AWS batch service
-* - {doc}`Hive <auto_examples/hive_plugin/index>`
+* - {doc}`Hive <flytesnacks/examples/hive_plugin/index>`
   - Run Hive jobs in your workflows.
-* - {doc}`Snowflake <auto_examples/snowflake_plugin/index>`
+* - {doc}`Snowflake <flytesnacks/examples/snowflake_plugin/index>`
   - Run Snowflake jobs in your workflows.
-* - {doc}`Databricks <auto_examples/databricks_plugin/index>`
+* - {doc}`Databricks <flytesnacks/examples/databricks_plugin/index>`
   - Run Databricks jobs in your workflows.
-* - {doc}`BigQuery <auto_examples/bigquery_plugin/index>`
+* - {doc}`BigQuery <flytesnacks/examples/bigquery_plugin/index>`
   - Run BigQuery jobs in your workflows.
 ```
 
@@ -146,7 +146,7 @@ Because Flyte uses executable docker containers as the smallest unit of compute,
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Raw Container Tasks <auto_examples/containerization/raw_container>`
+* - {doc}`Raw Container Tasks <flytesnacks/examples/customizing_dependencies/raw_container>`
   - Execute arbitrary containers: You can write C++ code, bash scripts and any containerized program.
 ```
 
@@ -173,7 +173,7 @@ constructs natively within other orchestration tools.
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Airflow <auto_examples/airflow_plugin/index>`
+* - {doc}`Airflow <flytesnacks/examples/airflow_plugin/index>`
   - Trigger Flyte executions from Airflow.
 ```
 
@@ -182,31 +182,31 @@ constructs natively within other orchestration tools.
 :caption: Integrations
 :hidden:
 
-auto_examples/sql_plugin/index
-auto_examples/greatexpectations_plugin/index
-auto_examples/papermill_plugin/index
-auto_examples/pandera_plugin/index
-auto_examples/modin_plugin/index
-auto_examples/dolt_plugin/index
-auto_examples/dbt_plugin/index
-auto_examples/whylogs_plugin/index
-auto_examples/mlflow_plugin/index
-auto_examples/onnx_plugin/index
-auto_examples/duckdb_plugin/index
-auto_examples/k8s_pod_plugin/index
-auto_examples/k8s_dask_plugin/index
-auto_examples/k8s_spark_plugin/index
-auto_examples/kfpytorch_plugin/index
-auto_examples/kftensorflow_plugin/index
-auto_examples/kfmpi_plugin/index
-auto_examples/ray_plugin/index
-auto_examples/sagemaker_training_plugin/index
-auto_examples/sagemaker_pytorch_plugin/index
-auto_examples/athena_plugin/index
-auto_examples/aws_batch_plugin/index
-auto_examples/hive_plugin/index
-auto_examples/snowflake_plugin/index
-auto_examples/databricks_plugin/index
-auto_examples/bigquery_plugin/index
-auto_examples/airflow_plugin/index
+flytesnacks/examples/sql_plugin/index
+flytesnacks/examples/greatexpectations_plugin/index
+flytesnacks/examples/papermill_plugin/index
+flytesnacks/examples/pandera_plugin/index
+flytesnacks/examples/modin_plugin/index
+flytesnacks/examples/dolt_plugin/index
+flytesnacks/examples/dbt_plugin/index
+flytesnacks/examples/whylogs_plugin/index
+flytesnacks/examples/mlflow_plugin/index
+flytesnacks/examples/onnx_plugin/index
+flytesnacks/examples/duckdb_plugin/index
+flytesnacks/examples/k8s_pod_plugin/index
+flytesnacks/examples/k8s_dask_plugin/index
+flytesnacks/examples/k8s_spark_plugin/index
+flytesnacks/examples/kfpytorch_plugin/index
+flytesnacks/examples/kftensorflow_plugin/index
+flytesnacks/examples/kfmpi_plugin/index
+flytesnacks/examples/ray_plugin/index
+flytesnacks/examples/sagemaker_training_plugin/index
+flytesnacks/examples/sagemaker_pytorch_plugin/index
+flytesnacks/examples/athena_plugin/index
+flytesnacks/examples/aws_batch_plugin/index
+flytesnacks/examples/hive_plugin/index
+flytesnacks/examples/snowflake_plugin/index
+flytesnacks/examples/databricks_plugin/index
+flytesnacks/examples/bigquery_plugin/index
+flytesnacks/examples/airflow_plugin/index
 ```

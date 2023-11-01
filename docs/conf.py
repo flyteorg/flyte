@@ -18,6 +18,9 @@ import sys
 import sphinx.application
 import sphinx.errors
 
+from recommonmark.transform import AutoStructify
+
+
 sys.path.insert(0, os.path.abspath("../"))
 sys.path.append(os.path.abspath("./_ext"))
 
@@ -102,12 +105,6 @@ suppress_warnings = ["autosectionlabel.*"]
 # duplicated section names that are in different documents.
 autosectionlabel_prefix_document = True
 
-# Add any paths that contain templates here, relative to this directory.
-# templates_path = ['_templates']
-
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-
 # The master toctree document.
 master_doc = "index"
 
@@ -128,11 +125,25 @@ exclude_patterns = [
     "auto/**/*.ipynb",
     "auto/**/*.py",
     "auto/**/*.md",
-    "auto_examples/**/*.ipynb",
-    "auto_examples/**/*.py",
-    # "auto_examples/**/*.md",
+    "examples/**/*.ipynb",
+    "examples/**/*.py",
     "jupyter_execute/**",
     "README.md",
+    "_projects/**",
+    "_src/**",
+    "examples/**",
+    "flytesnacks/index.md",
+    "flytesnacks/tutorials.md",
+    "flytesnacks/userguide.md",
+    "flytesnacks/ml_training.md",
+    "flytesnacks/integrations.md",
+    "flytesnacks/feature_engineering.md",
+    "flytekit/**/README.md",
+    "flytekit/_templates/**",
+    "flyteidl/boilerplate/**",
+    "flyteidl/tmp/**",
+    "flyteidl/*.rst",
+    "flyteidl/*.md",
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -289,42 +300,55 @@ nb_execution_mode = "off"
 nb_execution_excludepatterns = [
     "flytekit/**/*",
     "flytesnacks/**/*",
-    "auto_examples/**/*",
+    "examples/**/*",
 ]
+
+import_projects_config = {
+    "clone_dir": "_projects",
+}
 
 import_projects = [
     {
         "source": "https://github.com/flyteorg/flytesnacks",
         "dest": "flytesnacks",
-        "git": True,
+        "gen_cmd": ["cp", "-R", "_projects/flytesnacks/examples", "examples"],
+        "docs_path": "docs",
     },
     {
         "source": "https://github.com/flyteorg/flytekit",
         "dest": "flytekit",
-        "git": True,
+        "gen_cmd": [
+            ["mkdir", "-p", "_src/flytekit"],
+            ["cp", "-R", "_projects/flytekit/flytekit", "_src/flytekit/"],
+            ["cp", "-R", "_projects/flytekit/plugins", "_src/flytekit/"],
+        ],
+        "docs_path": "docs/source",
     },
     {
         "source": "https://github.com/flyteorg/flytectl",
         "dest": "flytectl",
-        "git": True,
-        "cmd": ["make", "-C", "flytectl/docs", "gendocs"],
+        "gen_cmd": ["make", "-C", "_projects/flytectl/docs", "gendocs"],
+        "docs_path": "docs/source",
     },
     {
         "source": "../flyteidl",
         "dest": "flyteidl",
-        "cmd": ["make", "-C", "flyteidl", "download_tooling", "generate"],
+        "local": True,
+        "gen_cmd": ["make", "-C", "../flyteidl", "download_tooling", "generate"],
+        "docs_path": ".",
     }
 ]
 
 # myst notebook docs customization
-auto_examples_dir_root = "flytesnacks/examples"
+auto_examples_dir_root = "examples"
+auto_examples_dir_dest = "flytesnacks/examples"
 
 # -- Options for todo extension ----------------------------------------------
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-# -- Options for Sphix issues extension --------------------------------------
+# -- Options for Sphinx issues extension --------------------------------------
 
 # GitHub repo
 issues_github_path = "flyteorg/flyte"
@@ -334,8 +358,16 @@ issues_uri = "https://github.com/flyteorg/flyte/issues/{issue}"
 issues_pr_uri = "https://github.com/flyteorg/flyte/pull/{pr}"
 issues_commit_uri = "https://github.com/flyteorg/flyte/commit/{commit}"
 
-# Usage:
-# See issue :issue:`42`
-# See issues :issue:`12,13`
-# See :issue:`sloria/konch#45`.
-# See PR :pr:`58`
+
+def setup(app):
+    app.add_config_value(
+        "recommonmark_config",
+        {
+            "auto_toc_tree_section": "Contents",
+            "enable_math": False,
+            "enable_inline_math": False,
+            "enable_eval_rst": True,
+        },
+        True,
+    )
+    app.add_transform(AutoStructify)

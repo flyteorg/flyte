@@ -31,3 +31,8 @@ html .tabbed-set > label:hover {
 html .tabbed-content {
     box-shadow: 0 -.0625rem var(--color-background-border),0 .0625rem var(--color-background-border);
 }
+
+table {
+    width: 100%;
+    box-shadow: none !important;
+}

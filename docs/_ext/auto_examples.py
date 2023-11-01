@@ -43,13 +43,8 @@ class AutoExamplesTOC(SphinxDirective):
         index_fp, _ = self.get_source_info()
         index_fp = Path(index_fp)
         example_fp = []
-        collect = False
-        for part in index_fp.parts:
-            if part == "auto_examples":
-                collect = True
-            if collect:
-                example_fp.append(part)
-        return str(Path("/".join(example_fp)).parent)
+        example_fp = str(index_fp).split(f"{self.config.auto_examples_dir_dest}/")[-1]
+        return str(Path(self.config.auto_examples_dir_dest) / Path(example_fp).parent)
 
     def parse(self):
         """Parses the directive"""
@@ -111,7 +106,7 @@ def generate_auto_examples(app: Sphinx, config: Config):
     # copy files over to docs directory
     for source_dir in (x for x in Path(config.auto_examples_dir_root).glob("*") if x.is_dir()):
         source_dir = Path(source_dir)
-        dest_dir = Path("auto_examples", *source_dir.parts[-1:])
+        dest_dir = Path(config.auto_examples_dir_dest, *source_dir.parts[-1:])
         dest_dir.mkdir(exist_ok=True, parents=True)
 
         # copy README.md file for root project content and table of contents
@@ -134,10 +129,13 @@ def generate_auto_examples(app: Sphinx, config: Config):
         for f in (x for x in source_dir.glob(f"{project_name}/*.md")):
             convert_to_mdmyst(f, dest_dir, from_format="md")
 
+        for f in (x for x in source_dir.glob("**/Dockerfile")):
+            shutil.copy(f, dest_dir)
+
 
 def setup(app: Sphinx) -> dict:
     app.add_config_value("auto_examples_dir_root", None, False)
-    app.add_config_value("auto_examples_dirs", None, False)
+    app.add_config_value("auto_examples_dir_dest", None, False)
     app.connect("config-inited", generate_auto_examples, priority=500)
     app.add_directive("auto-examples-toc", AutoExamplesTOC)
     return {

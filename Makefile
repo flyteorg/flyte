@@ -3,7 +3,7 @@ include boilerplate/flyte/end2end/Makefile
 include boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
-pip-compile $(1) --upgrade --verbose --resolver=backtracking
+pip-compile $(1) --upgrade --verbose --resolver=backtracking --annotation-style=line
 endef
 
 GIT_VERSION := $(shell git describe --always --tags)

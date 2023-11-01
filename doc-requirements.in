@@ -26,7 +26,7 @@ sphinxcontrib-mermaid
 sphinxcontrib-video
 sphinxcontrib-youtube==1.2.0
 sphinx-tabs
-sphinx-tags
+sphinx-tags==0.2.1
 
 # Packages for Plugin docs
 # Package name              Plugin needing it
