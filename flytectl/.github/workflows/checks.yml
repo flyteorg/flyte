@@ -85,7 +85,7 @@ jobs:
           # to serve requests when the above command exits successfully.
           # Fixed in: https://github.com/flyteorg/flyte/pull/4348
           # TODO (jeev): Remove this when ^ is released.
-          sleep 5
+          sleep 10
       - name: Setup flytectl config
         run: bin/flytectl config init
       - name: Register cookbook
