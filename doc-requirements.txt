@@ -46,7 +46,7 @@ certifi==2023.7.22        # via kubernetes, requests, snowflake-connector-python
 cffi==1.16.0              # via argon2-cffi-bindings, azure-datalake-store, cryptography, snowflake-connector-python
 cfgv==3.4.0               # via pre-commit
 chardet==5.2.0            # via binaryornot
-charset-normalizer==3.3.1  # via aiohttp, requests, snowflake-connector-python
+charset-normalizer==3.3.2  # via aiohttp, requests, snowflake-connector-python
 click==8.1.7              # via cookiecutter, dask, databricks-cli, distributed, flask, flytekit, great-expectations, jupyter-cache, mlflow, papermill, ray, rich-click, sphinx-click, uvicorn
 cloudpickle==2.2.1        # via dask, distributed, flytekit, flytekitplugins-kfpytorch, mlflow, vaex-core
 codespell==2.2.6          # via -r doc-requirements.in
@@ -220,7 +220,6 @@ oscrypto==1.3.0           # via snowflake-connector-python
 overrides==7.4.0          # via jupyter-server
 packaging==23.2           # via astropy, dask, datasets, distributed, docker, google-cloud-bigquery, great-expectations, gunicorn, huggingface-hub, ipykernel, jupyter-server, jupyterlab, jupyterlab-server, marshmallow, matplotlib, mlflow, modin, nbconvert, onnxconverter-common, pandera, plotly, qtconsole, qtpy, ray, snowflake-connector-python, sphinx, statsmodels, tensorflow-macos, xarray
 pandas==1.5.3             # via altair, bqplot, datasets, dolt-integrations, flytekit, great-expectations, mlflow, modin, pandera, phik, seaborn, statsmodels, vaex-core, visions, xarray, ydata-profiling
-pandas-profiling==3.6.6   # via -r doc-requirements.in
 pandera==0.17.2           # via -r doc-requirements.in
 pandocfilters==1.5.0      # via nbconvert
 papermill==2.4.0          # via -r doc-requirements.in
@@ -282,7 +281,7 @@ requests-oauthlib==1.3.1  # via google-auth-oauthlib, kubernetes
 rfc3339-validator==0.1.4  # via jsonschema, jupyter-events
 rfc3986-validator==0.1.1  # via jsonschema, jupyter-events
 rich==13.6.0              # via cookiecutter, flytekit, rich-click, vaex-core
-rich-click==1.7.0         # via flytekit
+rich-click==1.7.1         # via flytekit
 rpds-py==0.10.6           # via jsonschema, referencing
 rsa==4.9                  # via google-auth
 ruamel-yaml==0.17.17      # via great-expectations
@@ -396,7 +395,7 @@ xarray==2023.10.1         # via vaex-jupyter
 xxhash==3.4.1             # via datasets
 xyzservices==2023.10.1    # via ipyleaflet
 yarl==1.9.2               # via aiohttp
-ydata-profiling==4.6.1    # via flytekitplugins-deck-standard, pandas-profiling
+ydata-profiling==4.6.1    # via -r doc-requirements.in, flytekitplugins-deck-standard
 zict==3.0.0               # via distributed
 zipp==3.17.0              # via importlib-metadata
 

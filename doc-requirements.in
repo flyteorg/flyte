@@ -36,7 +36,7 @@ google-cloud                # bigquery
 google-cloud-bigquery       # bigquery
 markdown                    # deck
 plotly                      # deck
-pandas_profiling            # deck
+ydata_profiling             # deck
 dolt_integrations           # dolt
 great-expectations          # greatexpectations
 datasets                    # huggingface
