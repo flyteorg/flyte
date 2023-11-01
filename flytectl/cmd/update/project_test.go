@@ -5,14 +5,13 @@ import (
 	"testing"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
 	"github.com/flyteorg/flytectl/cmd/testutils"
 	"github.com/flyteorg/flytectl/pkg/ext"
-
-	"github.com/flyteorg/flytectl/cmd/config"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestProjectCanBeActivated(t *testing.T) {
@@ -181,6 +180,26 @@ func TestProjectUpdateRequiresProjectId(t *testing.T) {
 		},
 		func(s *testutils.TestStruct, err error) {
 			assert.ErrorContains(t, err, "project id wasn't passed")
+		})
+}
+
+func TestProjectUpdateDoesNotActivateArchivedProject(t *testing.T) {
+	testProjectUpdate(
+		/* setup */ func(s *testutils.TestStruct, config *project.ConfigProject, project *admin.Project) {
+			project.State = admin.Project_ARCHIVED
+			config.Activate = false
+			config.Archive = false
+			config.Description = testutils.RandomName(12)
+			config.Force = true
+		},
+		/* assert */ func(s *testutils.TestStruct, err error) {
+			assert.Nil(t, err)
+			s.MockAdminClient.AssertCalled(
+				t, "UpdateProject", s.Ctx,
+				mock.MatchedBy(
+					func(r *admin.Project) bool {
+						return r.State == admin.Project_ARCHIVED
+					}))
 		})
 }
 

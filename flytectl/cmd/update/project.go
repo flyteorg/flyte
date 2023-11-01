@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+
 	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/cmd/config"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/project"
@@ -85,7 +86,9 @@ Usage
 )
 
 func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.CommandContext) error {
-	edits, err := project.DefaultProjectConfig.GetProjectSpec(config.GetConfig())
+	projectConfig := project.DefaultProjectConfig
+
+	edits, err := projectConfig.GetProjectSpec(config.GetConfig())
 	if err != nil {
 		return err
 	}
@@ -103,7 +106,7 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 	// have a complete set of project's fields - it will only contain fields that
 	// the update command allows updating. (For example, it won't have Domains field
 	// initialized.)
-	currentProjectWithEdits := copyProjectWithEdits(currentProject, edits)
+	currentProjectWithEdits := copyProjectWithEdits(currentProject, edits, projectConfig)
 	patch, err := DiffAsYaml(diffPathBefore, diffPathAfter, currentProject, currentProjectWithEdits)
 	if err != nil {
 		panic(err)
@@ -136,10 +139,9 @@ func updateProjectsFunc(ctx context.Context, args []string, cmdCtx cmdCore.Comma
 // Makes a shallow copy of target and applies certain properties from edited to it.
 // The properties applied are only the ones supported by update command: state, name,
 // description, labels, etc.
-func copyProjectWithEdits(target *admin.Project, edited *admin.Project) *admin.Project {
+func copyProjectWithEdits(target *admin.Project, edited *admin.Project, projectConfig *project.ConfigProject) *admin.Project {
 	copy := *target
 
-	copy.State = edited.State
 	if edited.Name != "" {
 		copy.Name = edited.Name
 	}
@@ -150,5 +152,29 @@ func copyProjectWithEdits(target *admin.Project, edited *admin.Project) *admin.P
 		copy.Labels = edited.Labels
 	}
 
+	// `edited` comes with `admin.Project_ACTIVE` state by default
+	// if both `activate` and `archive` flags have not been set.
+	//
+	// This will overwrite state of `copy` if we directly set it
+	// without checking for flags, which will show up on the diff.
+	//
+	// Also, after showing the diff, the `edited` is used for updating
+	// the project, which comes with `Project_ACTIVE` by default
+	// unless overwritten. Therefore, on the `else` block,
+	// we overwrite the `edited` with the state of `copy`
+	// if both `archive` and `activate` flags are unset.
+	//
+	// This is a bit hacky IMO. Proper solution would be to
+	// refactor `project.ConfigProject` and this file in order to
+	// separate the logic of setting `ConfigProject` struct fields
+	// from creation of a 'default' project based on those flags.
+	// Having a proper order of precedence between global config,
+	// YAML file input, and the flags for `ConfigProject` would also
+	// be good.
+	if projectConfig.Archive || projectConfig.Activate {
+		copy.State = edited.State
+	} else {
+		edited.State = copy.State
+	}
 	return &copy
 }
