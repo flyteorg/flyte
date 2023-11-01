@@ -535,6 +535,7 @@ configmap:
           - "flyte-authorization"
     # Refer to the full [structure](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/runtime/interfaces#ApplicationConfig) for documentation.
     flyteadmin:
+      useOffloadedWorkflowClosure: true
       roleNameKey: "iam.amazonaws.com/role"
       profilerPort: 10254
       metricsScope: "flyte:"

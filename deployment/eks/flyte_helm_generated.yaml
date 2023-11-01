@@ -173,6 +173,7 @@ data:
       roleNameKey: iam.amazonaws.com/role
       testing:
         host: http://flyteadmin
+      useOffloadedWorkflowClosure: true
     server:
       grpcPort: 8089
       httpPort: 8088
@@ -878,7 +879,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "197b4d482b4408072b0755c2e240db771e2e07ac5bd5572b27d66cc5002f054"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1257,7 +1258,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "197b4d482b4408072b0755c2e240db771e2e07ac5bd5572b27d66cc5002f054"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
