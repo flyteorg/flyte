@@ -63,6 +63,7 @@ jobs:
     name: Test Getting started
     runs-on: ubuntu-latest
     steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
       - name: Checkout
         uses: actions/checkout@v2
       - uses: actions/cache@v2
@@ -78,7 +79,13 @@ jobs:
       - name: Build Flytectl binary
         run: make compile
       - name: Create a sandbox cluster
-        run: bin/flytectl sandbox start
+        run: |
+          bin/flytectl demo start
+          # Sleep is necessary here since `flyte-proxy` might not be ready
+          # to serve requests when the above command exits successfully.
+          # Fixed in: https://github.com/flyteorg/flyte/pull/4348
+          # TODO (jeev): Remove this when ^ is released.
+          sleep 5
       - name: Setup flytectl config
         run: bin/flytectl config init
       - name: Register cookbook

@@ -87,7 +87,7 @@ func initFlytectlConfig(reader io.Reader) error {
 	}
 
 	templateValues := configutil.ConfigTemplateSpec{
-		Host:     "dns:///localhost:30081",
+		Host:     "dns:///localhost:30080",
 		Insecure: true,
 	}
 	templateStr := configutil.GetTemplate()

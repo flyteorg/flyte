@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/apoorvam/goterminal"
 	"github.com/avast/retry-go"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/go-connections/nat"
@@ -27,6 +28,7 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/kubernetes/pkg/api/v1/pod"
 )
 
 const (
@@ -62,13 +64,6 @@ func isNodeTainted(ctx context.Context, client corev1.CoreV1Interface) (bool, er
 	return false, nil
 }
 
-func isPodReady(v corev1api.Pod) bool {
-	if (v.Status.Phase == corev1api.PodRunning) || (v.Status.Phase == corev1api.PodSucceeded) {
-		return true
-	}
-	return false
-}
-
 func getFlyteDeployment(ctx context.Context, client corev1.CoreV1Interface) (*corev1api.PodList, error) {
 	pods, err := client.Pods(flyteNamespace).List(ctx, v1.ListOptions{})
 	if err != nil {
@@ -78,11 +73,14 @@ func getFlyteDeployment(ctx context.Context, client corev1.CoreV1Interface) (*co
 }
 
 func WatchFlyteDeployment(ctx context.Context, appsClient corev1.CoreV1Interface) error {
-	var data = os.Stdout
-	table := tablewriter.NewWriter(data)
+	writer := goterminal.New(os.Stdout)
+	defer writer.Reset()
+
+	table := tablewriter.NewWriter(writer)
 	table.SetHeader([]string{"Service", "Status", "Namespace"})
 	table.SetRowLine(true)
 
+	done := false
 	for {
 		isTaint, err := isNodeTainted(ctx, appsClient)
 		if err != nil {
@@ -100,15 +98,15 @@ func WatchFlyteDeployment(ctx context.Context, appsClient corev1.CoreV1Interface
 		table.SetAutoWrapText(false)
 		table.SetAutoFormatHeaders(true)
 
-		// Clear os.Stdout
-		_, _ = data.WriteString("\x1b[3;J\x1b[H\x1b[2J")
-
 		var total, ready int
 		total = len(pods.Items)
 		ready = 0
 		if total != 0 {
 			for _, v := range pods.Items {
-				if isPodReady(v) {
+				// TODO (jeev): We should really be using
+				// `IsContainersReadyConditionTrue`, but that is not available until
+				// version v1.22.11. We are on v1.13.0 for some reason.
+				if pod.IsPodReadyConditionTrue(v.Status) {
 					ready++
 				}
 				if len(v.Status.Conditions) > 0 {
@@ -117,14 +115,21 @@ func WatchFlyteDeployment(ctx context.Context, appsClient corev1.CoreV1Interface
 			}
 			table.Render()
 			if total == ready {
-				break
+				done = true
 			}
 		} else {
 			table.Append([]string{"k8s: This might take a little bit", "Bootstrapping", ""})
 			table.Render()
 		}
 
-		time.Sleep(40 * time.Second)
+		writer.Clear()
+		writer.Print()
+
+		if done {
+			break
+		}
+
+		time.Sleep(5 * time.Second)
 	}
 
 	return nil
@@ -150,11 +155,11 @@ func UpdateLocalKubeContext(k8sCtxMgr k8s.ContextOps, dockerCtx string, contextN
 		GlobalFile:   kubeConfigPath,
 		LoadingRules: clientcmd.NewDefaultClientConfigLoadingRules(),
 	}
-	return k8sCtxMgr.CopyContext(srcConfigAccess, dockerCtx, contextName)
+	return k8sCtxMgr.CopyContext(srcConfigAccess, dockerCtx, contextName, flyteNamespace)
 }
 
 func startSandbox(ctx context.Context, cli docker.Docker, g github.GHRepoService, reader io.Reader, sandboxConfig *sandboxCmdConfig.Config, defaultImageName string, defaultImagePrefix string, exposedPorts map[nat.Port]struct{}, portBindings map[nat.Port][]nat.PortBinding, consolePort int) (*bufio.Scanner, error) {
-	fmt.Printf("%v Bootstrapping a brand new flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
+	fmt.Printf("%v Bootstrapping a brand new Flyte cluster... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
 	if sandboxConfig.DryRun {
 		docker.PrintRemoveContainer(docker.FlyteSandboxClusterName)
 	} else {
@@ -291,10 +296,10 @@ func StartCluster(ctx context.Context, args []string, sandboxConfig *sandboxCmdC
 		}
 
 		// Live-ness check
+		fmt.Printf("%v Waiting for cluster to come up... %v\n", emoji.HourglassNotDone, emoji.HourglassNotDone)
 		err = retry.Do(
 			func() error {
 				// Have to get a new client every time because you run into x509 errors if not
-				fmt.Println("Waiting for cluster to come up...")
 				k8sClient, err = k8s.GetK8sClient(docker.Kubeconfig, K8sEndpoint)
 				if err != nil {
 					logger.Debugf(ctx, "Error getting K8s client in liveness check %s", err)

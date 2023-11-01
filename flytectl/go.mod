@@ -3,6 +3,7 @@ module github.com/flyteorg/flytectl
 go 1.19
 
 require (
+	github.com/apoorvam/goterminal v0.0.0-20180523175556-614d345c47e5
 	github.com/avast/retry-go v3.0.0+incompatible
 	github.com/awalterschulze/gographviz v2.0.3+incompatible
 	github.com/disiqueira/gotree v1.0.0
@@ -22,6 +23,7 @@ require (
 	github.com/kataras/tablewriter v0.0.0-20180708051242-e063d29b7c23
 	github.com/landoop/tableprinter v0.0.0-20180806200924-8bd8c2576d27
 	github.com/mitchellh/mapstructure v1.5.0
+	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635
 	github.com/mouuff/go-rocket-update v1.5.1
 	github.com/opencontainers/image-spec v1.0.2
 	github.com/pkg/browser v0.0.0-20210115035449-ce105d075bb4
@@ -41,6 +43,7 @@ require (
 	k8s.io/api v0.24.1
 	k8s.io/apimachinery v0.24.1
 	k8s.io/client-go v0.24.1
+	k8s.io/kubernetes v1.13.0
 	sigs.k8s.io/yaml v1.3.0
 )
 
@@ -54,6 +57,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v0.23.1 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v0.9.2 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.0 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest v0.11.27 // indirect
 	github.com/Azure/go-autorest/autorest/adal v0.9.18 // indirect
@@ -113,7 +117,6 @@ require (
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
-	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect

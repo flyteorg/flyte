@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,6 +43,10 @@ func setupSandbox() {
 		},
 	}
 	containers = append(containers, container1)
+}
+
+func dummyReader() io.ReadCloser {
+	return io.NopCloser(strings.NewReader(""))
 }
 
 func TestGetSandbox(t *testing.T) {
@@ -109,43 +114,67 @@ func TestRemoveSandboxWithNoReply(t *testing.T) {
 }
 
 func TestPullDockerImage(t *testing.T) {
-	t.Run("Successfully pull image Always", func(t *testing.T) {
-		setupSandbox()
+	t.Run("Successful pull existing image with ImagePullPolicyAlways", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]types.ImageSummary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
+		assert.Nil(t, err)
+	})
+
+	t.Run("Successful pull non-existent image with ImagePullPolicyAlways", func(t *testing.T) {
+		mockDocker := &mocks.Docker{}
+		ctx := context.Background()
+		// Verify the attributes
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
+		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]types.ImageSummary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
 
 	t.Run("Error in pull image", func(t *testing.T) {
-		setupSandbox()
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, fmt.Errorf("error"))
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), fmt.Errorf("error"))
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyAlways, ImagePullOptions{}, false)
 		assert.NotNil(t, err)
 	})
 
-	t.Run("Successfully pull image IfNotPresent", func(t *testing.T) {
-		setupSandbox()
+	t.Run("Success pull non-existent image with ImagePullPolicyIfNotPresent", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
 		// Verify the attributes
-		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(os.Stdin, nil)
+		mockDocker.OnImagePullMatch(ctx, mock.Anything, types.ImagePullOptions{}).Return(dummyReader(), nil)
 		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]types.ImageSummary{}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyIfNotPresent, ImagePullOptions{}, false)
 		assert.Nil(t, err)
 	})
 
-	t.Run("Successfully pull image Never", func(t *testing.T) {
-		setupSandbox()
+	t.Run("Success skip existing image with ImagePullPolicyIfNotPresent", func(t *testing.T) {
 		mockDocker := &mocks.Docker{}
 		ctx := context.Background()
+		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]types.ImageSummary{{RepoTags: []string{"nginx:latest"}}}, nil)
+		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyIfNotPresent, ImagePullOptions{}, false)
+		assert.Nil(t, err)
+	})
+
+	t.Run("Success skip existing image with ImagePullPolicyNever", func(t *testing.T) {
+		mockDocker := &mocks.Docker{}
+		ctx := context.Background()
+		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]types.ImageSummary{{RepoTags: []string{"nginx:latest"}}}, nil)
 		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyNever, ImagePullOptions{}, false)
 		assert.Nil(t, err)
+	})
+
+	t.Run("Error non-existent image with ImagePullPolicyNever", func(t *testing.T) {
+		mockDocker := &mocks.Docker{}
+		ctx := context.Background()
+		mockDocker.OnImageListMatch(ctx, types.ImageListOptions{}).Return([]types.ImageSummary{}, nil)
+		err := PullDockerImage(ctx, mockDocker, "nginx:latest", ImagePullPolicyNever, ImagePullOptions{}, false)
+		assert.ErrorContains(t, err, "Image does not exist, but image pull policy prevents pulling it")
 	})
 }
 

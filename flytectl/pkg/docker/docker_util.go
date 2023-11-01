@@ -17,12 +17,14 @@ import (
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/api/types/volume"
+	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/docker/go-connections/nat"
 	"github.com/flyteorg/flytectl/clierrors"
 	"github.com/flyteorg/flytectl/cmd/config/subcommand/docker"
 	cmdUtil "github.com/flyteorg/flytectl/pkg/commandutils"
 	f "github.com/flyteorg/flytectl/pkg/filesystemutils"
+	"github.com/moby/term"
 )
 
 var (
@@ -152,34 +154,51 @@ func PullDockerImage(ctx context.Context, cli Docker, image string, pullPolicy I
 		PrintPullImage(image, imagePullOptions)
 		return nil
 	}
-	fmt.Printf("%v pulling docker image for release %s\n", emoji.Whale, image)
-	if pullPolicy == ImagePullPolicyAlways || pullPolicy == ImagePullPolicyIfNotPresent {
-		if pullPolicy == ImagePullPolicyIfNotPresent {
-			imageSummary, err := cli.ImageList(ctx, types.ImageListOptions{})
-			if err != nil {
-				return err
-			}
-			for _, img := range imageSummary {
-				for _, tags := range img.RepoTags {
-					if image == tags {
-						return nil
-					}
-				}
-			}
-		}
 
-		r, err := cli.ImagePull(ctx, image, types.ImagePullOptions{
-			RegistryAuth: imagePullOptions.RegistryAuth,
-			Platform:     imagePullOptions.Platform,
-		})
+	var needsPull bool
+	if pullPolicy == ImagePullPolicyAlways {
+		needsPull = true
+	} else {
+		imageSummary, err := cli.ImageList(ctx, types.ImageListOptions{})
 		if err != nil {
 			return err
 		}
+		found := false
+		for _, img := range imageSummary {
+			for _, tags := range img.RepoTags {
+				if image == tags {
+					found = true
+					break
+				}
+			}
+			if found {
+				break
+			}
+		}
+		needsPull = !found
+	}
 
-		_, err = io.Copy(os.Stdout, r)
+	// Image already exists, nothing to do.
+	if !needsPull {
+		return nil
+	}
+
+	// Image needs to be pulled but pull policy prevents it
+	if pullPolicy == ImagePullPolicyNever {
+		return fmt.Errorf("Image does not exist, but image pull policy prevents pulling it: %s", image)
+	}
+
+	fmt.Printf("%v Pulling image %s\n", emoji.Whale, image)
+	r, err := cli.ImagePull(ctx, image, types.ImagePullOptions{
+		RegistryAuth: imagePullOptions.RegistryAuth,
+		Platform:     imagePullOptions.Platform,
+	})
+	if err != nil {
 		return err
 	}
-	return nil
+	defer r.Close()
+	termFd, isTerm := term.GetFdInfo(os.Stderr)
+	return jsonmessage.DisplayJSONMessagesStream(r, os.Stderr, termFd, isTerm, nil)
 }
 
 // PrintPullImage helper function to print the sandbox pull image command
@@ -237,7 +256,7 @@ func StartContainer(ctx context.Context, cli Docker, volumes []mount.Mount, expo
 		PrintCreateContainer(volumes, portBindings, name, image, Environment)
 		return "", nil
 	}
-	fmt.Printf("%v booting Flyte-sandbox container\n", emoji.FactoryWorker)
+	fmt.Printf("%v Starting container... %v %v\n", emoji.FactoryWorker, emoji.Hammer, emoji.Wrench)
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Env:          Environment,
 		Image:        image,

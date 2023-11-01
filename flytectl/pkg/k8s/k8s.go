@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/enescakir/emoji"
 	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
@@ -18,7 +19,7 @@ type K8s interface {
 //go:generate mockery -name=ContextOps -case=underscore
 type ContextOps interface {
 	CheckConfig() error
-	CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName string) error
+	CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName, targetNamespace string) error
 	RemoveContext(ctxName string) error
 }
 
@@ -64,7 +65,7 @@ func (k *ContextManager) CheckConfig() error {
 }
 
 // CopyContext copies context srcCtxName part of srcConfigAccess to targetCtxName part of targetConfigAccess.
-func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName string) error {
+func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName, targetCtxName, targetNamespace string) error {
 	err := k.CheckConfig()
 	if err != nil {
 		return err
@@ -86,7 +87,7 @@ func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, src
 
 	_, exists = toStartingConfig.Contexts[targetCtxName]
 	if exists {
-		fmt.Printf("context %v already exist. Overwriting it\n", targetCtxName)
+		fmt.Printf("%v Context %q already exists. Overwriting it!\n", emoji.FactoryWorker, targetCtxName)
 	} else {
 		toStartingConfig.Contexts[targetCtxName] = clientcmdapi.NewContext()
 	}
@@ -97,12 +98,13 @@ func (k *ContextManager) CopyContext(srcConfigAccess clientcmd.ConfigAccess, src
 	toStartingConfig.AuthInfos[targetCtxName].LocationOfOrigin = k.configAccess.GetDefaultFilename()
 	toStartingConfig.Contexts[targetCtxName].Cluster = targetCtxName
 	toStartingConfig.Contexts[targetCtxName].AuthInfo = targetCtxName
+	toStartingConfig.Contexts[targetCtxName].Namespace = targetNamespace
 	toStartingConfig.CurrentContext = targetCtxName
 	if err := clientcmd.ModifyConfig(k.configAccess, *toStartingConfig, true); err != nil {
 		return err
 	}
 
-	fmt.Printf("context modified for %q and switched over to it.\n", targetCtxName)
+	fmt.Printf("%v Activated context %q!\n", emoji.FactoryWorker, targetCtxName)
 	return nil
 }
 

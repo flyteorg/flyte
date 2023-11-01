@@ -53,8 +53,8 @@ func (_m ContextOps_CopyContext) Return(_a0 error) *ContextOps_CopyContext {
 	return &ContextOps_CopyContext{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ContextOps) OnCopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName string, targetCtxName string) *ContextOps_CopyContext {
-	c_call := _m.On("CopyContext", srcConfigAccess, srcCtxName, targetCtxName)
+func (_m *ContextOps) OnCopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName string, targetCtxName string, targetNamespace string) *ContextOps_CopyContext {
+	c_call := _m.On("CopyContext", srcConfigAccess, srcCtxName, targetCtxName, targetNamespace)
 	return &ContextOps_CopyContext{Call: c_call}
 }
 
@@ -63,13 +63,13 @@ func (_m *ContextOps) OnCopyContextMatch(matchers ...interface{}) *ContextOps_Co
 	return &ContextOps_CopyContext{Call: c_call}
 }
 
-// CopyContext provides a mock function with given fields: srcConfigAccess, srcCtxName, targetCtxName
-func (_m *ContextOps) CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName string, targetCtxName string) error {
-	ret := _m.Called(srcConfigAccess, srcCtxName, targetCtxName)
+// CopyContext provides a mock function with given fields: srcConfigAccess, srcCtxName, targetCtxName, targetNamespace
+func (_m *ContextOps) CopyContext(srcConfigAccess clientcmd.ConfigAccess, srcCtxName string, targetCtxName string, targetNamespace string) error {
+	ret := _m.Called(srcConfigAccess, srcCtxName, targetCtxName, targetNamespace)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(clientcmd.ConfigAccess, string, string) error); ok {
-		r0 = rf(srcConfigAccess, srcCtxName, targetCtxName)
+	if rf, ok := ret.Get(0).(func(clientcmd.ConfigAccess, string, string, string) error); ok {
+		r0 = rf(srcConfigAccess, srcCtxName, targetCtxName, targetNamespace)
 	} else {
 		r0 = ret.Error(0)
 	}
