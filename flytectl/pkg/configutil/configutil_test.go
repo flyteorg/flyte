@@ -25,11 +25,8 @@ func TestSetupConfig(t *testing.T) {
 	expected := `admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
   endpoint: dns:///localhost:30081
-  authType: Pkce
   insecure: true
-logger:
-  show-source: true
-  level: 0`
+`
 	assert.Equal(t, expected, string(configBytes))
 
 	file, err = os.Create(file.Name())
@@ -46,13 +43,41 @@ logger:
 	expected = `admin:
   # For GRPC endpoints you might want to use dns:///flyte.myexample.com
   endpoint: dns:///admin.example.com
-  authType: Pkce
   insecure: true
 console:
   endpoint: https://console.example.com
-logger:
-  show-source: true
-  level: 0`
+`
+	assert.Equal(t, expected, string(configBytes))
+
+	file, err = os.Create(file.Name())
+	require.NoError(t, err)
+	templateValue = ConfigTemplateSpec{
+		Host:     "dns:///admin.example.com",
+		Insecure: true,
+		DataConfig: &DataConfig{
+			Endpoint:  "http://localhost:9000",
+			AccessKey: "my-access-key",
+			SecretKey: "my-secret-key",
+		},
+	}
+	err = SetupConfig(file.Name(), AdminConfigTemplate, templateValue)
+	assert.NoError(t, err)
+	configBytes, err = ioutil.ReadAll(file)
+	assert.NoError(t, err)
+	expected = `admin:
+  # For GRPC endpoints you might want to use dns:///flyte.myexample.com
+  endpoint: dns:///admin.example.com
+  insecure: true
+# This is not a needed configuration, only useful if you want to explore the data in sandbox. For non sandbox, please
+# do not use this configuration, instead prefer to use aws, gcs, azure sessions. Flytekit, should use fsspec to
+# auto select the right backend to pull data as long as the sessions are configured. For Sandbox, this is special, as
+# minio is s3 compatible and we ship with minio in sandbox.
+storage:
+  connection:
+    endpoint: http://localhost:9000
+    access-key: my-access-key
+    secret-key: my-secret-key
+`
 	assert.Equal(t, expected, string(configBytes))
 
 	// Cleanup
