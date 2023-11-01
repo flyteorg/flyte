@@ -36,6 +36,8 @@ func constructLiteralMap(ctx context.Context, inputReader io.InputReader, index 
 	for name, literal := range inputs.Literals {
 		if literalCollection := literal.GetCollection(); literalCollection != nil {
 			literals[name] = literalCollection.Literals[index]
+		} else {
+			literals[name] = literal
 		}
 	}
 
