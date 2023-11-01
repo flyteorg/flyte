@@ -30,9 +30,10 @@ dist
 vendor/
 /docker/sandbox-bundled/images/tar
 **/bin/
-docs/
 docs/_tags/
-docs/_repos/
-docs/_sources/
-docs/flytekit/flytekit.interfaces.html
-docs/searchindex.js
+docs/flytectl
+docs/flyteidl
+docs/flytekit
+docs/flytesnacks
+docs/examples
+docs/_src
