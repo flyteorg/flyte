@@ -469,7 +469,7 @@ func ConstructStaticInputReaders(inputPaths io.InputFilePaths, inputLiterals map
 		literals := make(map[string]*idlCore.Literal)
 		for inputName, inputLiteral := range inputLiterals {
 			if literalCollection = inputLiteral.GetCollection(); literalCollection != nil {
-				// if literal is a collection then we need to retreive the specific literal for this subtask index
+				// if literal is a collection then we need to retrieve the specific literal for this subtask index
 				literals[inputName] = literalCollection.Literals[i]
 			} else {
 				literals[inputName] = inputLiteral
