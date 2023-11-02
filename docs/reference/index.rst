@@ -64,7 +64,7 @@ API Reference
 .. toctree::
    :maxdepth: 1
    :caption: API Reference
-   :name: apitoc
+   :name: apiref
    :hidden:
 
    FlyteCTL <https://flytectl.readthedocs.io>

@@ -11,7 +11,7 @@ of the examples can be found in the [flytesnacks repo](https://github.com/flyteo
 
 It comes with a specific environment to make running, documenting
 and contributing samples easy. If this is your first time running these examples, follow the
-{ref}`environment setup guide <flytesnacks/environment_setup>` to get started.
+{doc}`environment setup guide <flytesnacks/environment_setup>` to get started.
 
 ```{tip}
 To learn about how to spin up and manage a Flyte cluster in the cloud, see the
@@ -19,7 +19,7 @@ To learn about how to spin up and manage a Flyte cluster in the cloud, see the
 ```
 
 ```{note}
-Want to contribute an example? Check out the {doc}`Example Contribution Guide <flytesnacks/docs/contribute>`.
+Want to contribute an example? Check out the {doc}`Example Contribution Guide <flytesnacks/contribute>`.
 ```
 
 ## Table of Contents

@@ -18,8 +18,6 @@ import sys
 import sphinx.application
 import sphinx.errors
 
-from recommonmark.transform import AutoStructify
-
 
 sys.path.insert(0, os.path.abspath("../"))
 sys.path.append(os.path.abspath("./_ext"))
@@ -96,6 +94,8 @@ extlinks = {
     "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
 }
 
+myst_enable_extensions = ["colon_fence"]
+
 autosummary_generate = True
 autodoc_typehints = "description"
 suppress_warnings = ["autosectionlabel.*"]
@@ -133,17 +133,24 @@ exclude_patterns = [
     "_src/**",
     "examples/**",
     "flytesnacks/index.md",
+    "flytesnacks/bioinformatics_examples.md",
+    "flytesnacks/feature_engineering.md",
+    "flytesnacks/flyte_lab.md",
+    "flytesnacks/integrations.md",
+    "flytesnacks/ml_training.md",
     "flytesnacks/tutorials.md",
     "flytesnacks/userguide.md",
-    "flytesnacks/ml_training.md",
-    "flytesnacks/integrations.md",
-    "flytesnacks/feature_engineering.md",
+    "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
-    "flyteidl/boilerplate/**",
-    "flyteidl/tmp/**",
-    "flyteidl/*.rst",
-    "flyteidl/*.md",
+    "flytectl/index.rst",
+    "protos/boilerplate/**",
+    "protos/tmp/**",
+    "protos/gen/**",
+    "api/flytekit/_templates/**",
+    "api/flytekit/index.rst",
+    "deployment/index.rst",
+    "reference/index.rst",
 ]
 
 # -- Options for HTML output -------------------------------------------------
@@ -274,15 +281,8 @@ intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/master/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
-    # "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/latest/", None),
-    # "flytekit": ("/Users/yourusername/go/src/github.com/flyteorg/flytekit/docs.rst/build/html", None),
-    # "flytectl": ("https://flytectl.readthedocs.io/en/latest/", None),
-    # "flytectl": ("/Users/yourusername/go/src/github.com/flyteorg/flytectl/docs/build/html", None),
-    # "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
-    "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
 }
 
-copybutton_exclude = 'style[type="text/css"]'
 myst_enable_extensions = ["colon_fence"]
 
 # Sphinx-mermaid config
@@ -305,37 +305,38 @@ nb_execution_excludepatterns = [
 
 import_projects_config = {
     "clone_dir": "_projects",
+    "flytekit_api_dir": "_src/flytekit/",
 }
 
 import_projects = [
     {
         "source": "https://github.com/flyteorg/flytesnacks",
-        "dest": "flytesnacks",
-        "gen_cmd": ["cp", "-R", "_projects/flytesnacks/examples", "examples"],
         "docs_path": "docs",
+        "dest": "flytesnacks",
+        "cmd": ["cp", "-R", "_projects/flytesnacks/examples", "examples"],
     },
     {
         "source": "https://github.com/flyteorg/flytekit",
-        "dest": "flytekit",
-        "gen_cmd": [
-            ["mkdir", "-p", "_src/flytekit"],
-            ["cp", "-R", "_projects/flytekit/flytekit", "_src/flytekit/"],
-            ["cp", "-R", "_projects/flytekit/plugins", "_src/flytekit/"],
-        ],
         "docs_path": "docs/source",
+        "dest": "api/flytekit",
+        "cmd": [
+            ["mkdir", "-p", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", "_projects/api/flytekit/flytekit", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", "_projects/api/flytekit/plugins", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", "_projects/api/flytekit/tests", "./tests"],
+        ],
     },
     {
         "source": "https://github.com/flyteorg/flytectl",
-        "dest": "flytectl",
-        "gen_cmd": ["make", "-C", "_projects/flytectl/docs", "gendocs"],
         "docs_path": "docs/source",
+        "dest": "flytectl",
     },
     {
         "source": "../flyteidl",
-        "dest": "flyteidl",
+        "docs_path": "protos",
+        "dest": "protos",  # to stay compatible with flyteidl docs path naming
+        "cmd": ["cp", "../flyteidl/README.md", "protos/README.md"],
         "local": True,
-        "gen_cmd": ["make", "-C", "../flyteidl", "download_tooling", "generate"],
-        "docs_path": ".",
     }
 ]
 
@@ -359,15 +360,8 @@ issues_pr_uri = "https://github.com/flyteorg/flyte/pull/{pr}"
 issues_commit_uri = "https://github.com/flyteorg/flyte/commit/{commit}"
 
 
-def setup(app):
-    app.add_config_value(
-        "recommonmark_config",
-        {
-            "auto_toc_tree_section": "Contents",
-            "enable_math": False,
-            "enable_inline_math": False,
-            "enable_eval_rst": True,
-        },
-        True,
-    )
-    app.add_transform(AutoStructify)
+# Disable warnings from flytekit
+os.environ["FLYTE_SDK_LOGGING_LEVEL_ROOT"] = "50"
+
+# Disable warnings from tensorflow
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"

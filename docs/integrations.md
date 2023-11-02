@@ -5,7 +5,7 @@
 Flyte is designed to be highly extensible and can be customized in multiple ways.
 
 ```{note}
-Want to contribute an example? Check out the {ref}`Example Contribution Guide <flytesnacks/contribute>`.
+Want to contribute an example? Check out the {doc}`Example Contribution Guide <flytesnacks/contribute>`.
 ```
 
 ## Flytekit Plugins
@@ -106,6 +106,8 @@ the Flyte task that use the respective plugin.
   - Running tasks and workflows on AWS batch service
 * - {doc}`Hive <flytesnacks/examples/hive_plugin/index>`
   - Run Hive jobs in your workflows.
+* - {doc}`MMCloud <flytesnacks/examples/mmcloud_plugin/index>`
+  - Execute tasks using MemVerge Memory Machine Cloud
 * - {doc}`Snowflake <flytesnacks/examples/snowflake_plugin/index>`
   - Run Snowflake jobs in your workflows.
 * - {doc}`Databricks <flytesnacks/examples/databricks_plugin/index>`
@@ -205,6 +207,7 @@ flytesnacks/examples/sagemaker_pytorch_plugin/index
 flytesnacks/examples/athena_plugin/index
 flytesnacks/examples/aws_batch_plugin/index
 flytesnacks/examples/hive_plugin/index
+flytesnacks/examples/mmcloud_plugin/index
 flytesnacks/examples/snowflake_plugin/index
 flytesnacks/examples/databricks_plugin/index
 flytesnacks/examples/bigquery_plugin/index

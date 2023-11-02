@@ -17,7 +17,7 @@ contributing samples easy. If this is your first time running these examples, fo
 {ref}`setup guide <env_setup>` to get started.
 
 ```{note}
-Want to contribute an example? Check out the {ref}`Example Contribution Guide <flytesnacks/contribute>`.
+Want to contribute an example? Check out the {doc}`Example Contribution Guide <flytesnacks/contribute>`.
 ```
 
 ## 🤖 Model Training

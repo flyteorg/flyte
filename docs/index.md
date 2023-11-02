@@ -57,7 +57,7 @@ learning and analytics.
 
 Created at [Lyft](https://www.lyft.com/) in collaboration with Spotify,
 Freenome, and many others, Flyte provides first-class support for
-{ref}`Python <reference_flytekit>`,
+{doc}`Python <reference_flytekit>`,
 [Java, and Scala](https://github.com/flyteorg/flytekit-java). Data Scientists
 and ML Engineers in the industry use Flyte to create:
 
@@ -107,7 +107,7 @@ Below are the API reference to the different components of Flyte:
   - Flyte's command-line interface for interacting with a Flyte cluster.
 * - {doc}`FlyteIDL <reference_flyteidl>`
   - Flyte's core specification language.
-* - {doc}`FlyteAdmin <flyteidl/protos/docs/service/service>`
+* - {doc}`FlyteAdmin <protos/docs/service/service>`
   - The protocol for communicating with Flyte's Admin service.
 ```
 
@@ -176,7 +176,7 @@ reference/swagger
 flytekit <reference_flytekit>
 flytectl <reference_flytectl>
 flyteidl <reference_flyteidl>
-flyteadmin <flyteidl/protos/docs/service/service>
+flyteadmin <protos/docs/service/service>
 ```
 
 ```{toctree}
@@ -199,6 +199,7 @@ latch sdk <https://docs.latch.bio/>
 
 Community Resources <community/index>
 community/contribute
+Contributing Examples <flytesnacks/contribute>
 community/roadmap
 Frequently Asked Questions <https://github.com/flyteorg/flyte/discussions/categories/q-a>
 community/troubleshoot

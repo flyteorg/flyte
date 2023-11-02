@@ -32,8 +32,11 @@ vendor/
 **/bin/
 docs/_tags/
 docs/flytectl
-docs/flyteidl
+docs/protos
 docs/flytekit
 docs/flytesnacks
 docs/examples
 docs/_src
+docs/_projects
+docs/api
+docs/tests
