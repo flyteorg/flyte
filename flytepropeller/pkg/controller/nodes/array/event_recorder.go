@@ -120,10 +120,39 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		OccurredAt:            occurredAt,
 		Metadata: &event.TaskExecutionMetadata{
 			ExternalResources: e.externalResources,
-			PluginIdentifier:  "k8s-array",
+			PluginIdentifier:  "container",
 		},
 		TaskType:     "k8s-array",
 		EventVersion: 1,
+	}
+
+	// only attach input values if taskPhase is QUEUED meaning this the first evaluation
+	if taskPhase == idlcore.TaskExecution_QUEUED {
+		if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
+			fmt.Printf("HAMERSAW - FIRST HERE\n")
+			// pass inputs by value
+			literalMap, err := nCtx.InputReader().Get(ctx)
+			if err != nil {
+				return err
+			}
+
+			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputData{
+				InputData: literalMap,
+			}
+		} else {
+			fmt.Printf("HAMERSAW - THEN HERE\n")
+			// pass inputs by reference
+			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputUri{
+				InputUri: nCtx.InputReader().GetInputPath().String(),
+			}
+		}
+	}
+
+	// only attach output uri if taskPhase is SUCCEEDED
+	if taskPhase == idlcore.TaskExecution_SUCCEEDED {
+		taskExecutionEvent.OutputResult = &event.TaskExecutionEvent_OutputUri{
+			OutputUri: v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir()).String(),
+		}
 	}
 
 	// record TaskExecutionEvent
