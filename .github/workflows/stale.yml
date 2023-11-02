@@ -17,6 +17,6 @@ jobs:
         stale-issue-label: "stale"
         exempt-issue-labels: "needs discussion,untriaged"  # Comma-separated list of labels.
         days-before-stale: 270
-        days-before-close: 7
+        days-before-close: -1
         ascending: true # https://github.com/actions/stale#ascending
         operations-per-run: 500
