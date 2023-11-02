@@ -295,9 +295,9 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 
 func (m *TaskExecutionManager) GetTaskExecutionData(
 	ctx context.Context, request admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
-	/*if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
+	if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "Invalid identifier [%+v]: %v", request.Id, err)
-	}*/
+	}
 	ctx = getTaskExecutionContext(ctx, request.Id)
 	taskExecution, err := m.GetTaskExecution(ctx, admin.TaskExecutionGetRequest{
 		Id: request.Id,
