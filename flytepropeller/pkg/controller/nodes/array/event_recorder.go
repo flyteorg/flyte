@@ -120,6 +120,7 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		OccurredAt:            occurredAt,
 		Metadata: &event.TaskExecutionMetadata{
 			ExternalResources: e.externalResources,
+			PluginIdentifier:  "k8s-array",
 		},
 		TaskType:     "k8s-array",
 		EventVersion: 1,
