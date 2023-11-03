@@ -1,3 +1,6 @@
+# Sourced from: https://k3d.io/v5.6.0/usage/advanced/cuda/?h=gpu#the-nvidia-device-plugin
+# Thank you to the k3d team for their work on this.
+
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
