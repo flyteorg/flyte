@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 
@@ -133,6 +134,7 @@ func initializeAdminClientFromConfig(ctx context.Context) (client service.AdminS
 	opt := grpc.WithUnaryInterceptor(
 		otelgrpc.UnaryClientInterceptor(
 			otelgrpc.WithTracerProvider(tracerProvider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
 		),
 	)
 	clients, err := admin2.NewClientsetBuilder().WithDialOptions(opt).WithConfig(cfg).Build(ctx)

@@ -18,6 +18,8 @@ import (
 
 const (
 	AdminClientTracer       = "admin-client"
+	AdminGormTracer         = "admin-gorm"
+	AdminServerTracer       = "admin-server"
 	BlobstoreClientTracer   = "blobstore-client"
 	DataCatalogClientTracer = "datacatalog-client"
 	FlytePropellerTracer    = "flytepropeller"
