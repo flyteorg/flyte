@@ -28,6 +28,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -117,6 +118,15 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 	logger.Infof(context.TODO(), "setting metrics keys to %+v", keys)
 	if len(keys) > 0 {
 		labeled.SetMetricKeys(keys...)
+	}
+
+	// register opentelementry tracer providers
+	for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.BlobstoreClientTracer,
+		otelutils.DataCatalogClientTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+		if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+			logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+			return err
+		}
 	}
 
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
