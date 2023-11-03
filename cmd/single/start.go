@@ -23,6 +23,7 @@ import (
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -190,6 +191,14 @@ var startCmd = &cobra.Command{
 		ctx := context.Background()
 		g, childCtx := errgroup.WithContext(ctx)
 		cfg := GetConfig()
+
+		for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.BlobstoreClientTracer,
+			otelutils.DataCatalogClientTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()) ; err != nil {
+				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+				return err
+			}
+		}
 
 		if !cfg.Admin.Disabled {
 			g.Go(func() error {
