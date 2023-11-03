@@ -374,7 +374,9 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 	// update the GetExecutionStatus block of the FlyteWorkflow resource. UpdateStatus will not
 	// allow changes to the Spec of the resource, which is ideal for ensuring
 	// nothing other than resource status has been updated.
+	_, wfStoreUpdateSpan := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "WorkflowStore.Update")
 	newWf, updateErr := p.wfStore.Update(ctx, mutatedWf, workflowstore.PriorityClassCritical)
+	wfStoreUpdateSpan.End()
 	if updateErr != nil {
 		// The update has failed, lets check if this is because the size is too large. If so
 		if workflowstore.IsWorkflowTooLarge(updateErr) {
