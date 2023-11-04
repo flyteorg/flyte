@@ -90,7 +90,7 @@ class FlyteUserDashboard(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:workflow:failed_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
+                            expr='sum(flyte:propeller:all:workflow:failure_duration_ms{project=~"$project", domain=~"$domain", wf=~"$workflow"}) by (quantile)',
                             refId='A',
                         ),
                     ],

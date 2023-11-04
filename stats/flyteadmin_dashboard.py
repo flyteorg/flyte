@@ -35,7 +35,7 @@ class FlyteAdmin(object):
         "list_workflow",
         "list_node_execution",
         "list_task_execution",
-        "list_active_launch_plan",
+        "list_active_launch_plans",
     ]
 
     ENTITIES = [
@@ -52,7 +52,6 @@ class FlyteAdmin(object):
         "list",
         "create",
         "update",
-        "list",
         "list_identifiers",
         "delete",
         "exists",
@@ -65,22 +64,22 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(irate(flyte:admin:{api}:codes:OK[{interval}m]))',
+                    expr=f'sum(irate(flyte:admin:admin:{api}:codes:OK[{interval}m]))',
                     legendFormat="ok",
                     refId='A',
                 ),
                 Target(
-                    expr=f'sum(irate(flyte:admin:{api}:codes:InvalidArgument[{interval}m]))',
+                    expr=f'sum(irate(flyte:admin:admin:{api}:codes:InvalidArgument[{interval}m]))',
                     legendFormat="invalid-args",
                     refId='B',
                 ),
                 Target(
-                    expr=f'sum(irate(flyte:admin:{api}:codes:AlreadyExists[{interval}m]))',
+                    expr=f'sum(irate(flyte:admin:admin:{api}:codes:AlreadyExists[{interval}m]))',
                     legendFormat="already-exists",
                     refId='C',
                 ),
                 Target(
-                    expr=f'sum(irate(flyte:admin:{api}:codes:FailedPrecondition[{interval}m]))',
+                    expr=f'sum(irate(flyte:admin:admin:{api}:codes:FailedPrecondition[{interval}m]))',
                     legendFormat="failed-precondition",
                     refId='D',
                 ),
@@ -98,12 +97,12 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(irate(flyte:admin:{api}:errors[{interval}m]))',
+                    expr=f'sum(irate(flyte:admin:admin:{api}:errors[{interval}m]))',
                     legendFormat="errors",
                     refId='A',
                 ),
                 Target(
-                    expr=f'sum(irate(flyte:admin:{api}:success[{interval}m]))',
+                    expr=f'sum(irate(flyte:admin:admin:{api}:success[{interval}m]))',
                     legendFormat="success",
                     refId='B',
                 ),
@@ -121,7 +120,7 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(flyte:admin:{api}:duration_ms) by (quantile)',
+                    expr=f'sum(flyte:admin:admin:{api}:duration_ms) by (quantile)',
                     refId='A',
                 ),
             ],
@@ -147,7 +146,7 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(flyte:admin:database:postgres:repositories:{entity}:{op}_ms) by (quantile)',
+                    expr=f'sum(flyte:admin:admin:database:{entity}:{op}_ms) by (quantile)',
                     refId='A',
                 ),
             ],
@@ -172,7 +171,7 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:admin:database:postgres:repositories:{entity}:{op}_ms_count[{interval}m]))',
+                    expr=f'sum(rate(flyte:admin:admin:database:{entity}:{op}_ms_count[{interval}m]))',
                     refId='A',
                 ),
             ],
