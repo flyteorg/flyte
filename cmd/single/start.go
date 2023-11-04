@@ -193,7 +193,8 @@ var startCmd = &cobra.Command{
 		cfg := GetConfig()
 
 		for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.AdminGormTracer, otelutils.AdminServerTracer,
-			otelutils.BlobstoreClientTracer, otelutils.DataCatalogClientTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+			otelutils.BlobstoreClientTracer, otelutils.DataCatalogClientTracer, otelutils.DataCatalogGormTracer,
+			otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
 			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()) ; err != nil {
 				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
 				return err

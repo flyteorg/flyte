@@ -22,6 +22,8 @@ const (
 	AdminServerTracer       = "admin-server"
 	BlobstoreClientTracer   = "blobstore-client"
 	DataCatalogClientTracer = "datacatalog-client"
+	DataCatalogGormTracer   = "datacatalog-gorm"
+	DataCatalogServerTracer = "datacatalog-server"
 	FlytePropellerTracer    = "flytepropeller"
 	K8sClientTracer         = "k8s-client"
 )

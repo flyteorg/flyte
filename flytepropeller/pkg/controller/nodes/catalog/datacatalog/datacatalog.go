@@ -11,6 +11,7 @@ import (
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -479,6 +480,7 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 		grpcPrometheus.UnaryClientInterceptor,
 		otelgrpc.UnaryClientInterceptor(
 			otelgrpc.WithTracerProvider(tracerProvider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
 		),
 		retryInterceptor))
 	clientConn, err := grpc.Dial(endpoint, opts...)
