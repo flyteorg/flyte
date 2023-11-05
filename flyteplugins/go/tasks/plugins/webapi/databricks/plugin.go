@@ -236,6 +236,11 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 			}
 			return pluginsCore.PhaseInfoFailure(string(rune(statusCode)), message, taskInfo), nil
 		}
+
+		if lifeCycleState == "PENDING" {
+			return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
+		}
+
 		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
 	case http.StatusBadRequest:
 		fallthrough
@@ -283,7 +288,7 @@ func buildRequest(
 	var err error
 	if isCancel {
 		databricksURL += "/cancel"
-		data = []byte(fmt.Sprintf("{ run_id: %v }", runID))
+		data = []byte(fmt.Sprintf("{ \"run_id\": %v }", runID))
 	} else if method == post {
 		databricksURL += "/submit"
 		mJSON, err := json.Marshal(databricksJob)
