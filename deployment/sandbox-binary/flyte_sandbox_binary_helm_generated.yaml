@@ -417,6 +417,7 @@ spec:
             httpGet:
               path: /healthcheck
               port: http
+            initialDelaySeconds: 30
           readinessProbe:
             httpGet:
               path: /healthcheck

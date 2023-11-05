@@ -3,6 +3,8 @@ package ray
 import (
 	"context"
 
+	v1 "k8s.io/api/core/v1"
+
 	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
@@ -78,6 +80,7 @@ type Config struct {
 	// Remote Ray Cluster Config
 	RemoteClusterConfig pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
 	Logs                logs.LogConfig                `json:"logs" pflag:"-,Log configuration for ray jobs"`
+	LogsSidecar         *v1.Container                 `json:"logsSidecar" pflag:"-,Sidecar to inject into head pods for capturing ray job logs"`
 	Defaults            DefaultConfig                 `json:"defaults" pflag:"-,Default configuration for ray jobs"`
 	EnableUsageStats    bool                          `json:"enableUsageStats" pflag:",Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html"`
 }
