@@ -35,7 +35,7 @@ Happy contributing!
 
 ## Setup Process
 
-<!-- Describe how you set up this PR's environment to help maintainers reproduce your results more easily. -->
+<!-- Describe how you set up this PR's environment to help maintainers reproduce your results more easily -->
 
 ## Screenshots
 
