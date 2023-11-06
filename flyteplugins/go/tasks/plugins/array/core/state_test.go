@@ -333,7 +333,7 @@ func TestSummaryToPhase(t *testing.T) {
 				core.PhaseSuccess: 10,
 			},
 		},
-		 {
+		{
 			"FailedToRetry",
 			PhaseWriteToDiscoveryThenFail,
 			map[core.Phase]int64{
@@ -356,6 +356,15 @@ func TestSummaryToPhase(t *testing.T) {
 			map[core.Phase]int64{
 				core.PhaseSuccess:          10,
 				core.PhaseRetryableFailure: 1,
+			},
+		},
+		{
+			// ensure all tasks are executed even if minSuccesses is achieved
+			"ExecuteAllMinSuccessRatio",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseSuccess:   10,
+				core.PhaseUndefined: 1,
 			},
 		},
 	}
