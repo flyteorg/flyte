@@ -12,6 +12,10 @@ Happy contributing!
 
 <!-- Example: Closes #31 -->
 
+## Docs link
+
+<!-- Add documentation link built by CI jobs here, and specify the changed place. -->
+
 ## Describe your changes
 
 <!-- List all the proposed changes in your PR -->
@@ -29,6 +33,10 @@ Happy contributing!
 - [ ] All new and existing tests passed.
 - [ ] All commits are signed-off.
 
+## Setup Process
+
+<!-- Describe how you set up this PR's environment to help maintainers reproduce your results more easily. -->
+
 ## Screenshots
 
 <!-- Add all the screenshots which support your changes -->
@@ -36,3 +44,8 @@ Happy contributing!
 ## Note to reviewers
 
 <!-- Add notes to reviewers if applicable -->
+
+## Related PRs
+
+<!-- Add related pull requests for reviewers to check -->
+
