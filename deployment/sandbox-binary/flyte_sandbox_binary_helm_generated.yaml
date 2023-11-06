@@ -422,6 +422,7 @@ spec:
             httpGet:
               path: /healthcheck
               port: http
+            initialDelaySeconds: 30
           volumeMounts:
             - name: cluster-resource-templates
               mountPath: /etc/flyte/cluster-resource-templates
