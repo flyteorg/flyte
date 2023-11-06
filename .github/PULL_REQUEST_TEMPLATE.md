@@ -14,7 +14,7 @@ Happy contributing!
 
 ## Docs link
 
-<!-- Add documentation link built by CI jobs here, and specify the changed place. -->
+<!-- Add documentation link built by CI jobs here, and specify the changed place -->
 
 ## Describe your changes
 
