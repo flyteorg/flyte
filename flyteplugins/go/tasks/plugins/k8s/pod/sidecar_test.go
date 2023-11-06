@@ -869,7 +869,6 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
 }
 
-// TODO @hamersaw
 func TestDemystifiedSidecarStatus_PrimaryNotExistsYet(t *testing.T) {
 	res := &v1.Pod{
 		Spec: v1.PodSpec{
