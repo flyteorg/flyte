@@ -14,12 +14,14 @@ class RayJob(_message.Message):
     def __init__(self, ray_cluster: _Optional[_Union[RayCluster, _Mapping]] = ..., runtime_env: _Optional[str] = ...) -> None: ...
 
 class RayCluster(_message.Message):
-    __slots__ = ["head_group_spec", "worker_group_spec"]
+    __slots__ = ["head_group_spec", "worker_group_spec", "enable_in_tree_autoscaling"]
     HEAD_GROUP_SPEC_FIELD_NUMBER: _ClassVar[int]
     WORKER_GROUP_SPEC_FIELD_NUMBER: _ClassVar[int]
+    ENABLE_IN_TREE_AUTOSCALING_FIELD_NUMBER: _ClassVar[int]
     head_group_spec: HeadGroupSpec
     worker_group_spec: _containers.RepeatedCompositeFieldContainer[WorkerGroupSpec]
-    def __init__(self, head_group_spec: _Optional[_Union[HeadGroupSpec, _Mapping]] = ..., worker_group_spec: _Optional[_Iterable[_Union[WorkerGroupSpec, _Mapping]]] = ...) -> None: ...
+    enable_in_tree_autoscaling: bool
+    def __init__(self, head_group_spec: _Optional[_Union[HeadGroupSpec, _Mapping]] = ..., worker_group_spec: _Optional[_Iterable[_Union[WorkerGroupSpec, _Mapping]]] = ..., enable_in_tree_autoscaling: bool = ...) -> None: ...
 
 class HeadGroupSpec(_message.Message):
     __slots__ = ["ray_start_params"]

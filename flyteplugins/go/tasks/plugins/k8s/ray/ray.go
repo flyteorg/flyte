@@ -79,6 +79,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	cfg := GetConfig()
+	fmt.Println("cfg", cfg)
 	headReplicas := int32(1)
 	headNodeRayStartParams := make(map[string]string)
 	if rayJob.RayCluster.HeadGroupSpec != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {
@@ -118,7 +119,8 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 			EnableIngress:  &enableIngress,
 			RayStartParams: headNodeRayStartParams,
 		},
-		WorkerGroupSpecs: []rayv1alpha1.WorkerGroupSpec{},
+		WorkerGroupSpecs:        []rayv1alpha1.WorkerGroupSpec{},
+		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableInTreeAutoscaling,
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {

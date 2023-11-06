@@ -144,6 +144,8 @@ func (m *RayCluster) Validate() error {
 
 	}
 
+	// no validation rules for EnableInTreeAutoscaling
+
 	return nil
 }
 

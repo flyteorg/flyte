@@ -334,6 +334,12 @@ class RayCluster final :
   ::flyteidl::plugins::HeadGroupSpec* mutable_head_group_spec();
   void set_allocated_head_group_spec(::flyteidl::plugins::HeadGroupSpec* head_group_spec);
 
+  // bool enable_in_tree_autoscaling = 3;
+  void clear_enable_in_tree_autoscaling();
+  static const int kEnableInTreeAutoscalingFieldNumber = 3;
+  bool enable_in_tree_autoscaling() const;
+  void set_enable_in_tree_autoscaling(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.plugins.RayCluster)
  private:
   class HasBitSetters;
@@ -341,6 +347,7 @@ class RayCluster final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::plugins::WorkerGroupSpec > worker_group_spec_;
   ::flyteidl::plugins::HeadGroupSpec* head_group_spec_;
+  bool enable_in_tree_autoscaling_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fplugins_2fray_2eproto;
 };
@@ -868,6 +875,20 @@ inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::plugins::WorkerGr
 RayCluster::worker_group_spec() const {
   // @@protoc_insertion_point(field_list:flyteidl.plugins.RayCluster.worker_group_spec)
   return worker_group_spec_;
+}
+
+// bool enable_in_tree_autoscaling = 3;
+inline void RayCluster::clear_enable_in_tree_autoscaling() {
+  enable_in_tree_autoscaling_ = false;
+}
+inline bool RayCluster::enable_in_tree_autoscaling() const {
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.RayCluster.enable_in_tree_autoscaling)
+  return enable_in_tree_autoscaling_;
+}
+inline void RayCluster::set_enable_in_tree_autoscaling(bool value) {
+  
+  enable_in_tree_autoscaling_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.plugins.RayCluster.enable_in_tree_autoscaling)
 }
 
 // -------------------------------------------------------------------

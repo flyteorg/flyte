@@ -942,6 +942,15 @@ public final class Ray {
      */
     flyteidl.plugins.Ray.WorkerGroupSpecOrBuilder getWorkerGroupSpecOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * Whether to enable in-tree autoscaling.
+     * </pre>
+     *
+     * <code>bool enable_in_tree_autoscaling = 3;</code>
+     */
+    boolean getEnableInTreeAutoscaling();
   }
   /**
    * <pre>
@@ -1007,6 +1016,11 @@ public final class Ray {
               }
               workerGroupSpec_.add(
                   input.readMessage(flyteidl.plugins.Ray.WorkerGroupSpec.parser(), extensionRegistry));
+              break;
+            }
+            case 24: {
+
+              enableInTreeAutoscaling_ = input.readBool();
               break;
             }
             default: {
@@ -1133,6 +1147,19 @@ public final class Ray {
       return workerGroupSpec_.get(index);
     }
 
+    public static final int ENABLE_IN_TREE_AUTOSCALING_FIELD_NUMBER = 3;
+    private boolean enableInTreeAutoscaling_;
+    /**
+     * <pre>
+     * Whether to enable in-tree autoscaling.
+     * </pre>
+     *
+     * <code>bool enable_in_tree_autoscaling = 3;</code>
+     */
+    public boolean getEnableInTreeAutoscaling() {
+      return enableInTreeAutoscaling_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1153,6 +1180,9 @@ public final class Ray {
       for (int i = 0; i < workerGroupSpec_.size(); i++) {
         output.writeMessage(2, workerGroupSpec_.get(i));
       }
+      if (enableInTreeAutoscaling_ != false) {
+        output.writeBool(3, enableInTreeAutoscaling_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1169,6 +1199,10 @@ public final class Ray {
       for (int i = 0; i < workerGroupSpec_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, workerGroupSpec_.get(i));
+      }
+      if (enableInTreeAutoscaling_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, enableInTreeAutoscaling_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1192,6 +1226,8 @@ public final class Ray {
       }
       if (!getWorkerGroupSpecList()
           .equals(other.getWorkerGroupSpecList())) return false;
+      if (getEnableInTreeAutoscaling()
+          != other.getEnableInTreeAutoscaling()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1211,6 +1247,9 @@ public final class Ray {
         hash = (37 * hash) + WORKER_GROUP_SPEC_FIELD_NUMBER;
         hash = (53 * hash) + getWorkerGroupSpecList().hashCode();
       }
+      hash = (37 * hash) + ENABLE_IN_TREE_AUTOSCALING_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getEnableInTreeAutoscaling());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1361,6 +1400,8 @@ public final class Ray {
         } else {
           workerGroupSpecBuilder_.clear();
         }
+        enableInTreeAutoscaling_ = false;
+
         return this;
       }
 
@@ -1403,6 +1444,7 @@ public final class Ray {
         } else {
           result.workerGroupSpec_ = workerGroupSpecBuilder_.build();
         }
+        result.enableInTreeAutoscaling_ = enableInTreeAutoscaling_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1480,6 +1522,9 @@ public final class Ray {
               workerGroupSpecBuilder_.addAllMessages(other.workerGroupSpec_);
             }
           }
+        }
+        if (other.getEnableInTreeAutoscaling() != false) {
+          setEnableInTreeAutoscaling(other.getEnableInTreeAutoscaling());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1974,6 +2019,44 @@ public final class Ray {
           workerGroupSpec_ = null;
         }
         return workerGroupSpecBuilder_;
+      }
+
+      private boolean enableInTreeAutoscaling_ ;
+      /**
+       * <pre>
+       * Whether to enable in-tree autoscaling.
+       * </pre>
+       *
+       * <code>bool enable_in_tree_autoscaling = 3;</code>
+       */
+      public boolean getEnableInTreeAutoscaling() {
+        return enableInTreeAutoscaling_;
+      }
+      /**
+       * <pre>
+       * Whether to enable in-tree autoscaling.
+       * </pre>
+       *
+       * <code>bool enable_in_tree_autoscaling = 3;</code>
+       */
+      public Builder setEnableInTreeAutoscaling(boolean value) {
+        
+        enableInTreeAutoscaling_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Whether to enable in-tree autoscaling.
+       * </pre>
+       *
+       * <code>bool enable_in_tree_autoscaling = 3;</code>
+       */
+      public Builder clearEnableInTreeAutoscaling() {
+        
+        enableInTreeAutoscaling_ = false;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -4110,22 +4193,23 @@ public final class Ray {
       "\n\032flyteidl/plugins/ray.proto\022\020flyteidl.p" +
       "lugins\"P\n\006RayJob\0221\n\013ray_cluster\030\001 \001(\0132\034." +
       "flyteidl.plugins.RayCluster\022\023\n\013runtime_e" +
-      "nv\030\002 \001(\t\"\204\001\n\nRayCluster\0228\n\017head_group_sp" +
+      "nv\030\002 \001(\t\"\250\001\n\nRayCluster\0228\n\017head_group_sp" +
       "ec\030\001 \001(\0132\037.flyteidl.plugins.HeadGroupSpe" +
       "c\022<\n\021worker_group_spec\030\002 \003(\0132!.flyteidl." +
-      "plugins.WorkerGroupSpec\"\225\001\n\rHeadGroupSpe" +
-      "c\022M\n\020ray_start_params\030\001 \003(\01323.flyteidl.p" +
-      "lugins.HeadGroupSpec.RayStartParamsEntry" +
-      "\0325\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005" +
-      "value\030\002 \001(\t:\0028\001\"\353\001\n\017WorkerGroupSpec\022\022\n\ng" +
-      "roup_name\030\001 \001(\t\022\020\n\010replicas\030\002 \001(\005\022\024\n\014min" +
-      "_replicas\030\003 \001(\005\022\024\n\014max_replicas\030\004 \001(\005\022O\n" +
-      "\020ray_start_params\030\005 \003(\01325.flyteidl.plugi" +
-      "ns.WorkerGroupSpec.RayStartParamsEntry\0325" +
-      "\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
-      "lue\030\002 \001(\t:\0028\001B?Z=github.com/flyteorg/fly" +
-      "te/flyteidl/gen/pb-go/flyteidl/pluginsb\006" +
-      "proto3"
+      "plugins.WorkerGroupSpec\022\"\n\032enable_in_tre" +
+      "e_autoscaling\030\003 \001(\010\"\225\001\n\rHeadGroupSpec\022M\n" +
+      "\020ray_start_params\030\001 \003(\01323.flyteidl.plugi" +
+      "ns.HeadGroupSpec.RayStartParamsEntry\0325\n\023" +
+      "RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005valu" +
+      "e\030\002 \001(\t:\0028\001\"\353\001\n\017WorkerGroupSpec\022\022\n\ngroup" +
+      "_name\030\001 \001(\t\022\020\n\010replicas\030\002 \001(\005\022\024\n\014min_rep" +
+      "licas\030\003 \001(\005\022\024\n\014max_replicas\030\004 \001(\005\022O\n\020ray" +
+      "_start_params\030\005 \003(\01325.flyteidl.plugins.W" +
+      "orkerGroupSpec.RayStartParamsEntry\0325\n\023Ra" +
+      "yStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
+      "\002 \001(\t:\0028\001B?Z=github.com/flyteorg/flyte/f" +
+      "lyteidl/gen/pb-go/flyteidl/pluginsb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4150,7 +4234,7 @@ public final class Ray {
     internal_static_flyteidl_plugins_RayCluster_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_RayCluster_descriptor,
-        new java.lang.String[] { "HeadGroupSpec", "WorkerGroupSpec", });
+        new java.lang.String[] { "HeadGroupSpec", "WorkerGroupSpec", "EnableInTreeAutoscaling", });
     internal_static_flyteidl_plugins_HeadGroupSpec_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_plugins_HeadGroupSpec_fieldAccessorTable = new

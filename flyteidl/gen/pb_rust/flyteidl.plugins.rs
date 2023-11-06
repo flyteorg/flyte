@@ -186,6 +186,9 @@ pub struct RayCluster {
     /// WorkerGroupSpecs are the specs for the worker pods
     #[prost(message, repeated, tag="2")]
     pub worker_group_spec: ::prost::alloc::vec::Vec<WorkerGroupSpec>,
+    /// Whether to enable in-tree autoscaling.
+    #[prost(bool, tag="3")]
+    pub enable_in_tree_autoscaling: bool,
 }
 /// HeadGroupSpec are the spec for the head pod
 #[allow(clippy::derive_partial_eq_without_eq)]

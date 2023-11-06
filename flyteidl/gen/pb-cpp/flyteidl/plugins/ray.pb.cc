@@ -164,6 +164,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fray_2eproto::o
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::RayCluster, head_group_spec_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::RayCluster, worker_group_spec_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::RayCluster, enable_in_tree_autoscaling_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HeadGroupSpec_RayStartParamsEntry_DoNotUse, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::HeadGroupSpec_RayStartParamsEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -202,10 +203,10 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fray_2eproto::o
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::RayJob)},
   { 7, -1, sizeof(::flyteidl::plugins::RayCluster)},
-  { 14, 21, sizeof(::flyteidl::plugins::HeadGroupSpec_RayStartParamsEntry_DoNotUse)},
-  { 23, -1, sizeof(::flyteidl::plugins::HeadGroupSpec)},
-  { 29, 36, sizeof(::flyteidl::plugins::WorkerGroupSpec_RayStartParamsEntry_DoNotUse)},
-  { 38, -1, sizeof(::flyteidl::plugins::WorkerGroupSpec)},
+  { 15, 22, sizeof(::flyteidl::plugins::HeadGroupSpec_RayStartParamsEntry_DoNotUse)},
+  { 24, -1, sizeof(::flyteidl::plugins::HeadGroupSpec)},
+  { 30, 37, sizeof(::flyteidl::plugins::WorkerGroupSpec_RayStartParamsEntry_DoNotUse)},
+  { 39, -1, sizeof(::flyteidl::plugins::WorkerGroupSpec)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -227,27 +228,28 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fray_2eproto[] =
   "\n\032flyteidl/plugins/ray.proto\022\020flyteidl.p"
   "lugins\"P\n\006RayJob\0221\n\013ray_cluster\030\001 \001(\0132\034."
   "flyteidl.plugins.RayCluster\022\023\n\013runtime_e"
-  "nv\030\002 \001(\t\"\204\001\n\nRayCluster\0228\n\017head_group_sp"
+  "nv\030\002 \001(\t\"\250\001\n\nRayCluster\0228\n\017head_group_sp"
   "ec\030\001 \001(\0132\037.flyteidl.plugins.HeadGroupSpe"
   "c\022<\n\021worker_group_spec\030\002 \003(\0132!.flyteidl."
-  "plugins.WorkerGroupSpec\"\225\001\n\rHeadGroupSpe"
-  "c\022M\n\020ray_start_params\030\001 \003(\01323.flyteidl.p"
-  "lugins.HeadGroupSpec.RayStartParamsEntry"
-  "\0325\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005"
-  "value\030\002 \001(\t:\0028\001\"\353\001\n\017WorkerGroupSpec\022\022\n\ng"
-  "roup_name\030\001 \001(\t\022\020\n\010replicas\030\002 \001(\005\022\024\n\014min"
-  "_replicas\030\003 \001(\005\022\024\n\014max_replicas\030\004 \001(\005\022O\n"
-  "\020ray_start_params\030\005 \003(\01325.flyteidl.plugi"
-  "ns.WorkerGroupSpec.RayStartParamsEntry\0325"
-  "\n\023RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va"
-  "lue\030\002 \001(\t:\0028\001B\?Z=github.com/flyteorg/fly"
-  "te/flyteidl/gen/pb-go/flyteidl/pluginsb\006"
-  "proto3"
+  "plugins.WorkerGroupSpec\022\"\n\032enable_in_tre"
+  "e_autoscaling\030\003 \001(\010\"\225\001\n\rHeadGroupSpec\022M\n"
+  "\020ray_start_params\030\001 \003(\01323.flyteidl.plugi"
+  "ns.HeadGroupSpec.RayStartParamsEntry\0325\n\023"
+  "RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005valu"
+  "e\030\002 \001(\t:\0028\001\"\353\001\n\017WorkerGroupSpec\022\022\n\ngroup"
+  "_name\030\001 \001(\t\022\020\n\010replicas\030\002 \001(\005\022\024\n\014min_rep"
+  "licas\030\003 \001(\005\022\024\n\014max_replicas\030\004 \001(\005\022O\n\020ray"
+  "_start_params\030\005 \003(\01325.flyteidl.plugins.W"
+  "orkerGroupSpec.RayStartParamsEntry\0325\n\023Ra"
+  "yStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030"
+  "\002 \001(\t:\0028\001B\?Z=github.com/flyteorg/flyte/f"
+  "lyteidl/gen/pb-go/flyteidl/pluginsb\006prot"
+  "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fray_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fray_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fray_2eproto,
-  "flyteidl/plugins/ray.proto", &assign_descriptors_table_flyteidl_2fplugins_2fray_2eproto, 726,
+  "flyteidl/plugins/ray.proto", &assign_descriptors_table_flyteidl_2fplugins_2fray_2eproto, 762,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fray_2eproto() {
@@ -644,6 +646,7 @@ RayCluster::HasBitSetters::head_group_spec(const RayCluster* msg) {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int RayCluster::kHeadGroupSpecFieldNumber;
 const int RayCluster::kWorkerGroupSpecFieldNumber;
+const int RayCluster::kEnableInTreeAutoscalingFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 RayCluster::RayCluster()
@@ -661,13 +664,16 @@ RayCluster::RayCluster(const RayCluster& from)
   } else {
     head_group_spec_ = nullptr;
   }
+  enable_in_tree_autoscaling_ = from.enable_in_tree_autoscaling_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.plugins.RayCluster)
 }
 
 void RayCluster::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_RayCluster_flyteidl_2fplugins_2fray_2eproto.base);
-  head_group_spec_ = nullptr;
+  ::memset(&head_group_spec_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&enable_in_tree_autoscaling_) -
+      reinterpret_cast<char*>(&head_group_spec_)) + sizeof(enable_in_tree_autoscaling_));
 }
 
 RayCluster::~RayCluster() {
@@ -699,6 +705,7 @@ void RayCluster::Clear() {
     delete head_group_spec_;
   }
   head_group_spec_ = nullptr;
+  enable_in_tree_autoscaling_ = false;
   _internal_metadata_.Clear();
 }
 
@@ -742,6 +749,13 @@ const char* RayCluster::_InternalParse(const char* begin, const char* end, void*
               {parser_till_end, object}, ptr - size, ptr));
           if (ptr >= end) break;
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
+        break;
+      }
+      // bool enable_in_tree_autoscaling = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
+        msg->set_enable_in_tree_autoscaling(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -796,6 +810,19 @@ bool RayCluster::MergePartialFromCodedStream(
         break;
       }
 
+      // bool enable_in_tree_autoscaling = 3;
+      case 3: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &enable_in_tree_autoscaling_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -838,6 +865,11 @@ void RayCluster::SerializeWithCachedSizes(
       output);
   }
 
+  // bool enable_in_tree_autoscaling = 3;
+  if (this->enable_in_tree_autoscaling() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->enable_in_tree_autoscaling(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -864,6 +896,11 @@ void RayCluster::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         2, this->worker_group_spec(static_cast<int>(i)), target);
+  }
+
+  // bool enable_in_tree_autoscaling = 3;
+  if (this->enable_in_tree_autoscaling() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->enable_in_tree_autoscaling(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -905,6 +942,11 @@ size_t RayCluster::ByteSizeLong() const {
         *head_group_spec_);
   }
 
+  // bool enable_in_tree_autoscaling = 3;
+  if (this->enable_in_tree_autoscaling() != 0) {
+    total_size += 1 + 1;
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -936,6 +978,9 @@ void RayCluster::MergeFrom(const RayCluster& from) {
   if (from.has_head_group_spec()) {
     mutable_head_group_spec()->::flyteidl::plugins::HeadGroupSpec::MergeFrom(from.head_group_spec());
   }
+  if (from.enable_in_tree_autoscaling() != 0) {
+    set_enable_in_tree_autoscaling(from.enable_in_tree_autoscaling());
+  }
 }
 
 void RayCluster::CopyFrom(const ::google::protobuf::Message& from) {
@@ -965,6 +1010,7 @@ void RayCluster::InternalSwap(RayCluster* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   CastToBase(&worker_group_spec_)->InternalSwap(CastToBase(&other->worker_group_spec_));
   swap(head_group_spec_, other->head_group_spec_);
+  swap(enable_in_tree_autoscaling_, other->enable_in_tree_autoscaling_);
 }
 
 ::google::protobuf::Metadata RayCluster::GetMetadata() const {

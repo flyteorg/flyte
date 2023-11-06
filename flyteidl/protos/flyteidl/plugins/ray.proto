@@ -19,6 +19,8 @@ message RayCluster {
   HeadGroupSpec head_group_spec = 1;
   // WorkerGroupSpecs are the specs for the worker pods
   repeated WorkerGroupSpec worker_group_spec = 2;
+  // Whether to enable in-tree autoscaling.
+  bool enable_in_tree_autoscaling = 3;
 }
 
 // HeadGroupSpec are the spec for the head pod
