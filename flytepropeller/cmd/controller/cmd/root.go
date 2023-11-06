@@ -144,7 +144,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 			SyncPeriod:        &cfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache: func(config *rest.Config, opts cache.Options) (cache.Cache, error) {
+		NewCache: func(config *rest.Config, options cache.Options) (cache.Cache, error) {
 			k8sCache, err := cache.New(config, options)
 			if err != nil {
 				return k8sCache, err
