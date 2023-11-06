@@ -150,7 +150,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 				return k8sCache, err
 			}
 
-			return otelutils.WrapK8sCache(k8sCache)
+			return otelutils.WrapK8sCache(k8sCache), nil
 		},
 		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
 			k8sClient, err := client.New(config, options)
@@ -158,7 +158,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 				return k8sClient, err
 			}
 
-			return otelutils.WrapK8sClient(k8sClient)
+			return otelutils.WrapK8sClient(k8sClient), nil
 		},
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
