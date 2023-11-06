@@ -131,16 +131,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 			taskCtx,
 		)
 
-		minReplicas := spec.Replicas
-		maxReplicas := spec.Replicas
-		if spec.MinReplicas != 0 {
-			minReplicas = spec.MinReplicas
-		}
-
-		if spec.MaxReplicas != 0 {
-			maxReplicas = spec.MaxReplicas
-		}
-
 		workerNodeRayStartParams := make(map[string]string)
 		if spec.RayStartParams != nil {
 			workerNodeRayStartParams = spec.RayStartParams
@@ -158,8 +148,8 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 		workerNodeSpec := rayv1alpha1.WorkerGroupSpec{
 			GroupName:      spec.GroupName,
-			MinReplicas:    &minReplicas,
-			MaxReplicas:    &maxReplicas,
+			MinReplicas:    &spec.MinReplicas,
+			MaxReplicas:    &spec.MaxReplicas,
 			Replicas:       &spec.Replicas,
 			RayStartParams: workerNodeRayStartParams,
 			Template:       workerPodTemplate,
