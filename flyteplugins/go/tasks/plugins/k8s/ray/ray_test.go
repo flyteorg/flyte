@@ -78,8 +78,9 @@ func transformPodSpecToTaskTemplateTarget(podSpec *corev1.PodSpec) *core.TaskTem
 func dummyRayCustomObj() *plugins.RayJob {
 	return &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:   &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
-			WorkerGroupSpec: []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3}},
+			HeadGroupSpec:           &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
+			WorkerGroupSpec:         []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableInTreeAutoscaling: false,
 		},
 	}
 }
@@ -174,6 +175,8 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.NotNil(t, RayResource)
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
+
+	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, false)
 
 	headReplica := int32(1)
 	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
@@ -344,8 +347,9 @@ func TestDefaultStartParameters(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	rayJob := &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:   &plugins.HeadGroupSpec{},
-			WorkerGroupSpec: []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3}},
+			HeadGroupSpec:           &plugins.HeadGroupSpec{},
+			WorkerGroupSpec:         []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableInTreeAutoscaling: false,
 		},
 	}
 
@@ -365,6 +369,8 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.NotNil(t, RayResource)
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
+
+	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, false)
 
 	headReplica := int32(1)
 	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
