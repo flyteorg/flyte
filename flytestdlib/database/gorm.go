@@ -28,11 +28,11 @@ func GetGormLogger(ctx context.Context, logConfig *logger.Config) gormLogger.Int
 	case logger.FatalLevel:
 		fallthrough
 	case logger.ErrorLevel:
-		logLevel = gormLogger.Error
+		logLevel = gormLogger.Info
 	case logger.WarnLevel:
 		fallthrough
 	case logger.InfoLevel:
-		logLevel = gormLogger.Warn
+		logLevel = gormLogger.Info
 	case logger.DebugLevel:
 		logLevel = gormLogger.Info
 		ignoreRecordNotFoundError = false

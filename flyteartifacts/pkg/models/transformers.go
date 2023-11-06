@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 )
 
 func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (Artifact, error) {
@@ -121,14 +122,13 @@ func CreateTriggerModelFromRequest(ctx context.Context, request *artifact.Create
 
 	lc := spec.GetEntityMetadata().GetLaunchConditions()
 
-	// Until we upgrade to google protobuf instead of github, need to do a dance
-	idlTriggerV2 := proto.MessageV2(core.Trigger{})
-	err := lc.UnmarshalTo(idlTriggerV2)
+	var err error
+	idlTrigger := core.Trigger{}
+	err = ptypes.UnmarshalAny(lc, &idlTrigger)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to unmarshal launch conditions to idl, metadata: [%+v]", spec.GetEntityMetadata())
 		return Trigger{}, err
 	}
-	idlTrigger := proto.MessageV1(core.Trigger{}).(*core.Trigger)
 	if len(idlTrigger.Triggers) == 0 {
 		logger.Errorf(ctx, "Launch conditions cannot be empty in CreateTrigger, [%+v]", request)
 		return Trigger{}, fmt.Errorf("invalid request to CreateTrigger, launch conditions cannot be empty")

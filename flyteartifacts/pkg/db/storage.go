@@ -153,35 +153,74 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 		}
 
 		// Look for all earlier versions of the trigger and mark them inactive
-		db := r.db.Model(&Trigger{}).InnerJoins("TriggerKey", r.db.Where(&dbTrigger.TriggerKey))
-		db = db.Update("active", false)
-		if err := db.Error; err != nil {
-			logger.Errorf(ctx, "Failed to mark earlier versions inactive for %s: %+v", dbTrigger.TriggerKey.Name, err)
-			return err
+		setFalse := tx.Model(&Trigger{}).Where("trigger_key_id = ?", extantKey.ID).Update("active", false)
+		if tx.Error != nil {
+			logger.Errorf(ctx, "transaction error marking earlier versions inactive for %s: %+v", dbTrigger.TriggerKey.Name, tx.Error)
+			return tx.Error
 		}
+		if setFalse.Error != nil {
+			logger.Errorf(ctx, "Failed to mark earlier versions inactive for %s: %+v", dbTrigger.TriggerKey.Name, setFalse.Error)
+			return setFalse.Error
+		}
+
+		var artifactKeys []ArtifactKey
+		// should we use tx here?
+		db := r.db.Model(&ArtifactKey{}).Where(&dbTrigger.RunsOn).Find(&artifactKeys)
+		if db.Error != nil {
+			logger.Errorf(ctx, "Error %v", db.Error)
+			return db.Error
+		}
+		if len(artifactKeys) != len(dbTrigger.RunsOn) {
+			logger.Errorf(ctx, "Could not find all artifact keys for trigger: %+v, only found %v", dbTrigger.RunsOn, artifactKeys)
+			return fmt.Errorf("could not find all artifact keys for trigger")
+		}
+		dbTrigger.RunsOn = artifactKeys
 
 		dbTrigger.TriggerKeyID = extantKey.ID
 		dbTrigger.TriggerKey = TriggerKey{} // zero out the artifact key
 		// This create should update the join table between individual triggers and artifact keys
-		tx.Create(&dbTrigger)
-		if tx.Error != nil {
-			logger.Errorf(ctx, "Failed to create trigger %+v", tx.Error)
-			return tx.Error
+		tt := tx.Save(&dbTrigger)
+		if tx.Error != nil || tt.Error != nil {
+			if tx.Error != nil {
+				logger.Errorf(ctx, "Transaction error: %v", tx.Error)
+				return tx.Error
+			}
+			logger.Errorf(ctx, "Save query failed with: %v", tt.Error)
+			return tt.Error
+		}
+		var savedTrigger Trigger
+		tt = tx.Preload("TriggerKey").Preload("RunsOn").First(&savedTrigger, "id = ?", dbTrigger.ID)
+		if tx.Error != nil || tt.Error != nil {
+			if tx.Error != nil {
+				logger.Errorf(ctx, "Transaction error: %v", tx.Error)
+				return tx.Error
+			}
+			logger.Errorf(ctx, "Failed to find trigger that was just saved: %+v", tx.Error)
+			return tt.Error
 		}
 
 		// Next update the active_trigger_artifact_keys join table that keeps track of active key relationships
-		err := tx.Model(&dbTrigger.TriggerKey).Association("RunsOn").Replace(dbTrigger.RunsOn)
+		// That is, if you have a trigger_on=[artifactA, artifactB], this table links the trigger's name to those
+		// artifact names. If you register a new version of the trigger that is just trigger_on=[artifactC], then
+		// this table should just hold the reference to artifactC.
+		err := tx.Model(&savedTrigger.TriggerKey).Association("RunsOn").Replace(savedTrigger.RunsOn)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to update active_trigger_artifact_keys: %+v", err)
 			return err
 		}
 
 		return nil
-
 	})
 	if err != nil {
-		logger.Errorf(ctx, "Failed transaction upsert on key [%s]: %+v", trigger.Name, err)
-		return models.Trigger{}, err
+		if database.IsPgErrorWithCode(err, database.PgDuplicatedKey) {
+			logger.Infof(ctx, "Duplicate key detected, the current transaction will be cancelled: %s %s", trigger.Name, trigger.Version)
+			// TODO: Replace with the retrieved Trigger object maybe
+			// TODO: Add an error handling layer that translates from pg errors to a general service error.
+			return models.Trigger{}, err
+		} else {
+			logger.Errorf(ctx, "Failed transaction upsert on key [%s]: %+v", trigger.Name, err)
+			return models.Trigger{}, err
+		}
 	}
 	timer.Stop()
 

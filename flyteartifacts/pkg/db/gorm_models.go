@@ -7,9 +7,9 @@ import (
 
 type ArtifactKey struct {
 	gorm.Model
-	Project string `gorm:"index:idx_pdn;index:idx_proj;type:varchar(64)"`
-	Domain  string `gorm:"index:idx_pdn;index:idx_dom;type:varchar(64)"`
-	Name    string `gorm:"index:idx_pdn;index:idx_name;type:varchar(255)"`
+	Project string `gorm:"uniqueIndex:idx_pdn;index:idx_proj;type:varchar(64)"`
+	Domain  string `gorm:"uniqueIndex:idx_pdn;index:idx_dom;type:varchar(64)"`
+	Name    string `gorm:"uniqueIndex:idx_pdn;index:idx_name;type:varchar(255)"`
 }
 
 type Artifact struct {
@@ -57,9 +57,9 @@ type LaunchPlanID struct {
 
 type Trigger struct {
 	gorm.Model
-	TriggerKeyID uint
+	TriggerKeyID uint       `gorm:"uniqueIndex:idx_trigger_pdnv"`
 	TriggerKey   TriggerKey `gorm:"foreignKey:TriggerKeyID;references:ID"`
-	Version      string     `gorm:"not null;type:varchar(255);index:idx_trigger_version"`
+	Version      string     `gorm:"not null;type:varchar(255);index:idx_trigger_version;uniqueIndex:idx_trigger_pdnv"`
 
 	// Unlike the one in the TriggerKey table, these are the list of artifact keys as specified by the user
 	// for this specific version. Currently just the key but can add additional fields in the future.

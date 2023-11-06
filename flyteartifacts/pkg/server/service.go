@@ -85,6 +85,9 @@ func (c *CoreService) CreateTrigger(ctx context.Context, request *artifact.Creat
 	}
 
 	createdTrigger, err := c.Storage.CreateTrigger(ctx, serviceTrigger)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create trigger: %v", err)
+	}
 	logger.Infof(ctx, "Created trigger: %+v", createdTrigger)
 
 	return &artifact.CreateTriggerResponse{}, nil

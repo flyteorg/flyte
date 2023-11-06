@@ -154,6 +154,7 @@ func ServiceToGormTrigger(serviceTrigger models.Trigger) Trigger {
 			Name:    a.ArtifactKey.Name,
 		}
 	}
+	t.RunsOn = runsOn
 
 	return t
 }
