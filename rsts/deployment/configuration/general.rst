@@ -111,7 +111,6 @@ Define an attributes file, ``cra.yaml``:
         projectQuotaCpu: "1000"
         projectQuotaMemory: 5Ti
 
-
 To ensure that the overrides reflect in the Kubernetes namespace
 ``flyteexamples-development`` (that is, the namespace has a resource quota of
 1000 CPU cores and 5TB of memory) when the admin fills in cluster resource
