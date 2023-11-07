@@ -178,11 +178,11 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 
 func createTaskInfo(queryID string, cfg awsSdk.Config) *core.TaskInfo {
 	timeNow := time.Now()
-	var consoleUrl str
+	var consoleUrl string
 	if strings.Contains(cfg.Region, "gov") {
 		consoleUrl = "console.amazonaws-us-gov.com"
 	} else {
-		consoleUrl = "console.aws.amazon.com
+		consoleUrl = "console.aws.amazon.com"
 	}
 	return &core.TaskInfo{
 		OccurredAt: &timeNow,
