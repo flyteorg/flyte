@@ -74,10 +74,17 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
 	if taskTemplate.GetMetadata().GetRuntime().GetFlavor() == syncPlugin {
-		phaseInfo, err := c.p.(webapi.SyncPlugin).Do(ctx, tCtx)
+		plugin, ok := c.p.(webapi.SyncPlugin)
+		if !ok {
+			return core.UnknownTransition, fmt.Errorf("plugin does not have the required sync pluigin interface")
+		}
+
+		phaseInfo, err := plugin.Do(ctx, tCtx)
 		if err != nil {
+			logger.Errorf(ctx, "please check if the sync plugin interface is implemented or not")
 			return core.UnknownTransition, err
 		}
+
 		return core.DoTransition(phaseInfo), nil
 	}
 
@@ -88,7 +95,11 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	var nextState *State
 	var phaseInfo core.PhaseInfo
-	plugin := c.p.(webapi.AsyncPlugin)
+	plugin, ok := c.p.(webapi.AsyncPlugin)
+	if !ok {
+		return core.UnknownTransition, fmt.Errorf("plugin does not have the required async pluigin interface")
+	}
+
 	switch incomingState.Phase {
 	case PhaseNotStarted:
 		if len(c.p.GetConfig().ResourceQuotas) > 0 {
