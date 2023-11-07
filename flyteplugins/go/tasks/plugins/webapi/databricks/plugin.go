@@ -337,7 +337,7 @@ func newDatabricksJobTaskPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "databricks",
 		SupportedTaskTypes: []core.TaskType{"spark"},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         GetConfig(),

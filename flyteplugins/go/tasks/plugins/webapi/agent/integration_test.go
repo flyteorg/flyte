@@ -133,7 +133,7 @@ func TestEndToEnd(t *testing.T) {
 
 	t.Run("failed to create a job", func(t *testing.T) {
 		agentPlugin := newMockAgentPlugin()
-		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
+		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
 					metricScope: iCtx.MetricsScope(),

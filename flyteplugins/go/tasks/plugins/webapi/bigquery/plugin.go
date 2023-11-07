@@ -559,7 +559,7 @@ func newBigQueryJobTaskPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "bigquery",
 		SupportedTaskTypes: []core.TaskType{bigqueryQueryJobTask},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			cfg := GetConfig()
 
 			return NewPlugin(cfg, iCtx.MetricsScope())
