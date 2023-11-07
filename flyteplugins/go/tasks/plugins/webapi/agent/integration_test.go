@@ -268,7 +268,7 @@ func newMockAgentPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job", "api_task"},
-		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.Plugin, error) {
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
