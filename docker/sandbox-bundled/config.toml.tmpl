@@ -1,3 +1,5 @@
+# Exactly the same as: https://github.com/k3s-io/k3s/blob/master/pkg/agent/templates/templates_linux.go#L10
+# EXCEPT under the heading: [plugins."io.containerd.grpc.v1.cri".containerd] we add: default_runtime_name = "nvidia"
 version = 2
 
 [plugins."io.containerd.internal.v1.opt"]
@@ -115,4 +117,5 @@ enable_keychain = true
   runtime_type = "{{$v.RuntimeType}}"
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes."{{$k}}".options]
   BinaryName = "{{$v.BinaryName}}"
+  SystemdCgroup = {{ $.SystemdCgroup }}
 {{end}}
