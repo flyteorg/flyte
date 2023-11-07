@@ -178,11 +178,11 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 
 func createTaskInfo(queryID string, cfg awsSdk.Config) *core.TaskInfo {
 	timeNow := time.Now()
-	var consoleUrl string
+	var consoleURL string
 	if strings.Contains(cfg.Region, "gov") {
-		consoleUrl = "console.amazonaws-us-gov.com"
+		consoleURL = "console.amazonaws-us-gov.com"
 	} else {
-		consoleUrl = "console.aws.amazon.com"
+		consoleURL = "console.aws.amazon.com"
 	}
 	return &core.TaskInfo{
 		OccurredAt: &timeNow,
@@ -190,7 +190,7 @@ func createTaskInfo(queryID string, cfg awsSdk.Config) *core.TaskInfo {
 			{
 				Uri: fmt.Sprintf("https://%v.%v/athena/home?force&region=%v#query/history/%v",
 					cfg.Region,
-					consoleUrl,
+					consoleURL,
 					cfg.Region,
 					queryID),
 				Name: "Athena Query Console",
