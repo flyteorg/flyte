@@ -51,9 +51,6 @@ COPY --from=k3s /etc /etc
 # Provide custom containerd configuration to configure the nvidia-container-runtime
 COPY config.toml.tmpl /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
 
-# Deploy the nvidia driver plugin on startup
-COPY device-plugin-daemonset.yaml /var/lib/rancher/k3s/server/manifests/nvidia-device-plugin-daemonset.yaml
-
 COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
 COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
 COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
