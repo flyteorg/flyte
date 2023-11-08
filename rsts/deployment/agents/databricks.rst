@@ -156,9 +156,6 @@ Specify agent configuration
             agent-service:
               supportedTaskTypes:
               - spark
-            databricks:
-              entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
             k8s:
               default-env-vars:
                 - FLYTE_AWS_ACCESS_KEY_ID: <AWS_ACCESS_KEY_ID>
@@ -215,24 +212,13 @@ Specify agent configuration
               agent-service:
                 supportedTaskTypes:
                 - spark
-        
-        .. code-block:: yaml
-          :emphasize-lines: 3-5
-
-          inline:
-            plugins:
-              databricks:
-                entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-                databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
-        
-        Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account.
 
   .. group-tab:: Flyte core
 
     Create a file named ``values-override.yaml`` and add the following config to it:
 
     .. code-block:: yaml
-      :emphasize-lines: 9,14,15-21
+      :emphasize-lines: 9,14-17
 
         enabled_plugins:
           tasks:
@@ -251,15 +237,6 @@ Specify agent configuration
             agent-service:
               supportedTaskTypes:
               - spark
-      databricks:
-        enabled: True
-        plugin_config:
-          plugins:
-            databricks:
-              entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
-    
-    Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account.
 
 Add the Databricks access token
 -------------------------------
