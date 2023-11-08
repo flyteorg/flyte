@@ -156,42 +156,6 @@ Specify agent configuration
             agent-service:
               supportedTaskTypes:
               - spark
-            databricks:
-              entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
-            k8s:
-              default-env-vars:
-                - FLYTE_AWS_ACCESS_KEY_ID: <AWS_ACCESS_KEY_ID>
-                - FLYTE_AWS_SECRET_ACCESS_KEY: <AWS_SECRET_ACCESS_KEY>
-                - AWS_DEFAULT_REGION: <AWS_REGION>
-          remoteData:
-            region: <AWS_REGION>
-            scheme: aws
-            signedUrls:
-              durationMinutes: 3
-          propeller:
-            rawoutput-prefix: s3://<S3_BUCKET_NAME>/
-          storage:
-            container: "<S3_BUCKET_NAME>"
-            type: s3
-            stow:
-              kind: s3
-              config:
-                region: <AWS_REGION>
-                disable_ssl: true
-                v2_signing: false
-                auth_type: accesskey
-                access_key_id: <AWS_ACCESS_KEY_ID>
-                secret_key: <AWS_SECRET_ACCESS_KEY>
-            signedURL:
-              stowConfigOverride:
-                endpoint: ""
-
-        Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account, 
-        ``<AWS_REGION>`` with the region where you created your AWS bucket,
-        ``<AWS_ACCESS_KEY_ID>`` with your AWS access key ID,
-        ``<AWS_SECRET_ACCESS_KEY>`` with your AWS secret access key,
-        and ``<S3_BUCKET_NAME>`` with the name of your S3 bucket.
 
       .. group-tab:: Helm chart
 
