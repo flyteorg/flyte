@@ -131,7 +131,7 @@ Specify agent configuration
       
       .. group-tab:: Demo cluster
 
-        Enable the Databricks agent on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
+        Enable the Databricks agent on the demo cluster by updating the ConfigMap:
 
         .. code-block:: bash
 
@@ -156,6 +156,9 @@ Specify agent configuration
             agent-service:
               supportedTaskTypes:
               - spark
+            databricks:
+              entrypointFile: dbfs:///FileStore/tables/entrypoint.py
+              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
             k8s:
               default-env-vars:
                 - FLYTE_AWS_ACCESS_KEY_ID: <AWS_ACCESS_KEY_ID>
@@ -247,11 +250,8 @@ You have to set the Databricks token to the Flyte configuration.
   
 .. code-block::
   
-  cd flyte/charts/flyteagent
-
-.. code-block::
-
-  helm install flyteagent . -n flyte
+  helm repo add flyteorg https://flyteorg.github.io/flyte
+  helm install flyteagent flyteorg/flyteagent --namespace flyte
 
 2. Get the base64 value of your Databricks token.
 
@@ -271,7 +271,6 @@ You have to set the Databricks token to the Flyte configuration.
         apiVersion: v1
         data:
           flyte_databricks_access_token: <BASE64_ENCODED_DATABRICKS_TOKEN>
-          username: User
         kind: Secret
         metadata:
           annotations:
