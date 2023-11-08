@@ -33,11 +33,6 @@ manifests:
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/complete-agent > manifests/complete-agent.yaml
 
-.PHONY: manifests-gpu
-manifests-gpu: manifests
-	cat kustomize/gpu-operator.yaml >> manifests/complete.yaml
-
-
 .PHONY: build
 build: flyte manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
