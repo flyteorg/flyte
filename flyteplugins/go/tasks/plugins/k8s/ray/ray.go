@@ -444,10 +444,10 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	// TODO: Retrieve the name of head pod from rayJob.status, and add it to task logs
 	// RayJob CRD does not include the name of the worker or head pod for now
 
-	taskID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	logOutput, err := logPlugin.GetTaskLogs(tasklog.Input{
-		Namespace:               rayJob.Namespace,
-		TaskExecutionIdentifier: &taskID,
+		Namespace:       rayJob.Namespace,
+		TaskExecutionID: taskExecID,
 	})
 
 	if err != nil {

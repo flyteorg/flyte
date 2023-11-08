@@ -33,12 +33,17 @@ var (
 const IDMaxLength = 50
 
 type taskExecutionID struct {
-	execName string
-	id       *core.TaskExecutionIdentifier
+	execName     string
+	id           *core.TaskExecutionIdentifier
+	uniqueNodeId string
 }
 
 func (te taskExecutionID) GetID() core.TaskExecutionIdentifier {
 	return *te.id
+}
+
+func (te taskExecutionID) GetUniqueNodeID() string {
+	return te.uniqueNodeId
 }
 
 func (te taskExecutionID) GetGeneratedName() string {
@@ -291,11 +296,15 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		NodeExecutionContext: nCtx,
 		tm: taskExecutionMetadata{
 			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
-			taskExecID:            taskExecutionID{execName: uniqueID, id: id},
-			o:                     nCtx.Node(),
-			maxAttempts:           maxAttempts,
-			platformResources:     convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
-			environmentVariables:  nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
+			taskExecID: taskExecutionID{
+				execName:     uniqueID,
+				id:           id,
+				uniqueNodeId: currentNodeUniqueID,
+			},
+			o:                    nCtx.Node(),
+			maxAttempts:          maxAttempts,
+			platformResources:    convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
+			environmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
 		},
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),
