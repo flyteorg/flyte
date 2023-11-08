@@ -502,8 +502,8 @@ func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
 						logger.Warningf(ctx, "failed to marshal claim [%s] to json: %v", k, err)
 						continue
 					}
-          logger.Infof(ctx, "adding header  %v with value %v ", header, string(jsonBytes))
 					header := fmt.Sprintf("X-User-Claim-%s", strings.ReplaceAll(k, "_", "-"))
+          logger.Infof(ctx, "adding header  %v with value %v ", header, string(jsonBytes))
 					w.Header().Set(header, string(jsonBytes))
 				}
 			}
