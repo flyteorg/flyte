@@ -11,8 +11,7 @@ func TestRegisterTracerProvider(t *testing.T) {
 	serviceName := "foo"
 
 	// register tracer provider with no exporters
-	emptyConfig := Config{}
-	err := RegisterTracerProvider(serviceName, &emptyConfig)
+	err := RegisterTracerProvider(serviceName, defaultConfig)
 	assert.Nil(t, err)
 
 	// validate no tracerProviders are registered
@@ -20,12 +19,11 @@ func TestRegisterTracerProvider(t *testing.T) {
 
 	// register tracer provider with all exporters
 	fullConfig := Config{
+		ExporterType: FileExporter,
 		FileConfig: FileConfig{
-			Enabled:  true,
 			Filename: "/dev/null",
 		},
 		JaegerConfig: JaegerConfig{
-			Enabled: true,
 		},
 	}
 	err = RegisterTracerProvider(serviceName, &fullConfig)
