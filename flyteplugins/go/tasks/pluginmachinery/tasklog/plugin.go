@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 //go:generate enumer --type=TemplateScheme --trimprefix=TemplateScheme -json -yaml
@@ -42,7 +43,7 @@ type Input struct {
 	PodUnixStartTime          int64
 	PodUnixFinishTime         int64
 	PodUID                    string
-	TaskExecutionIdentifier   *core.TaskExecutionIdentifier
+	TaskExecutionID           pluginsCore.TaskExecutionID
 	ExtraTemplateVarsByScheme *TemplateVarsByScheme
 }
 

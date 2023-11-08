@@ -114,55 +114,55 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 			vars = append(vars, input.ExtraTemplateVarsByScheme.Pod...)
 		}
 	case TemplateSchemeTaskExecution:
-		if input.TaskExecutionIdentifier != nil {
-			vars = append(vars, TemplateVar{
+		taskExecutionIdentifier := input.TaskExecutionID.GetID()
+		vars = append(
+			vars,
+			TemplateVar{
+				defaultRegexes.NodeID,
+				input.TaskExecutionID.GetUniqueNodeID(),
+			},
+			TemplateVar{
 				defaultRegexes.TaskRetryAttempt,
-				strconv.FormatUint(uint64(input.TaskExecutionIdentifier.RetryAttempt), 10),
-			})
-			if input.TaskExecutionIdentifier.TaskId != nil {
-				vars = append(
-					vars,
-					TemplateVar{
-						defaultRegexes.TaskID,
-						input.TaskExecutionIdentifier.TaskId.Name,
-					},
-					TemplateVar{
-						defaultRegexes.TaskVersion,
-						input.TaskExecutionIdentifier.TaskId.Version,
-					},
-					TemplateVar{
-						defaultRegexes.TaskProject,
-						input.TaskExecutionIdentifier.TaskId.Project,
-					},
-					TemplateVar{
-						defaultRegexes.TaskDomain,
-						input.TaskExecutionIdentifier.TaskId.Domain,
-					},
-				)
-			}
-			if input.TaskExecutionIdentifier.NodeExecutionId != nil {
-				vars = append(vars, TemplateVar{
-					defaultRegexes.NodeID,
-					input.TaskExecutionIdentifier.NodeExecutionId.NodeId,
-				})
-				if input.TaskExecutionIdentifier.NodeExecutionId.ExecutionId != nil {
-					vars = append(
-						vars,
-						TemplateVar{
-							defaultRegexes.ExecutionName,
-							input.TaskExecutionIdentifier.NodeExecutionId.ExecutionId.Name,
-						},
-						TemplateVar{
-							defaultRegexes.ExecutionProject,
-							input.TaskExecutionIdentifier.NodeExecutionId.ExecutionId.Project,
-						},
-						TemplateVar{
-							defaultRegexes.ExecutionDomain,
-							input.TaskExecutionIdentifier.NodeExecutionId.ExecutionId.Domain,
-						},
-					)
-				}
-			}
+				strconv.FormatUint(uint64(taskExecutionIdentifier.RetryAttempt), 10),
+			},
+		)
+		if taskExecutionIdentifier.TaskId != nil {
+			vars = append(
+				vars,
+				TemplateVar{
+					defaultRegexes.TaskID,
+					taskExecutionIdentifier.TaskId.Name,
+				},
+				TemplateVar{
+					defaultRegexes.TaskVersion,
+					taskExecutionIdentifier.TaskId.Version,
+				},
+				TemplateVar{
+					defaultRegexes.TaskProject,
+					taskExecutionIdentifier.TaskId.Project,
+				},
+				TemplateVar{
+					defaultRegexes.TaskDomain,
+					taskExecutionIdentifier.TaskId.Domain,
+				},
+			)
+		}
+		if taskExecutionIdentifier.NodeExecutionId != nil && taskExecutionIdentifier.NodeExecutionId.ExecutionId != nil {
+			vars = append(
+				vars,
+				TemplateVar{
+					defaultRegexes.ExecutionName,
+					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Name,
+				},
+				TemplateVar{
+					defaultRegexes.ExecutionProject,
+					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Project,
+				},
+				TemplateVar{
+					defaultRegexes.ExecutionDomain,
+					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Domain,
+				},
+			)
 		}
 		if gotExtraTemplateVars {
 			vars = append(vars, input.ExtraTemplateVarsByScheme.TaskExecution...)
