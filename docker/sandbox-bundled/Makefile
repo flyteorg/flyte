@@ -44,7 +44,7 @@ build: flyte manifests
 		--tag flyte-sandbox:latest .
 
 .PHONY: build-gpu
-build-gpu: flyte manifests-gpu
+build-gpu: flyte manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
