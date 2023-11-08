@@ -156,42 +156,6 @@ Specify agent configuration
             agent-service:
               supportedTaskTypes:
               - spark
-            databricks:
-              entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
-            k8s:
-              default-env-vars:
-                - FLYTE_AWS_ACCESS_KEY_ID: <AWS_ACCESS_KEY_ID>
-                - FLYTE_AWS_SECRET_ACCESS_KEY: <AWS_SECRET_ACCESS_KEY>
-                - AWS_DEFAULT_REGION: <AWS_REGION>
-          remoteData:
-            region: <AWS_REGION>
-            scheme: aws
-            signedUrls:
-              durationMinutes: 3
-          propeller:
-            rawoutput-prefix: s3://<S3_BUCKET_NAME>/
-          storage:
-            container: "<S3_BUCKET_NAME>"
-            type: s3
-            stow:
-              kind: s3
-              config:
-                region: <AWS_REGION>
-                disable_ssl: true
-                v2_signing: false
-                auth_type: accesskey
-                access_key_id: <AWS_ACCESS_KEY_ID>
-                secret_key: <AWS_SECRET_ACCESS_KEY>
-            signedURL:
-              stowConfigOverride:
-                endpoint: ""
-
-        Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account, 
-        ``<AWS_REGION>`` with the region where you created your AWS bucket,
-        ``<AWS_ACCESS_KEY_ID>`` with your AWS access key ID,
-        ``<AWS_SECRET_ACCESS_KEY>`` with your AWS secret access key,
-        and ``<S3_BUCKET_NAME>`` with the name of your S3 bucket.
 
       .. group-tab:: Helm chart
 
@@ -215,17 +179,6 @@ Specify agent configuration
               agent-service:
                 supportedTaskTypes:
                 - spark
-        
-        .. code-block:: yaml
-          :emphasize-lines: 3-5
-
-          inline:
-            plugins:
-              databricks:
-                entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-                databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
-        
-        Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account.
 
   .. group-tab:: Flyte core
 
@@ -251,15 +204,6 @@ Specify agent configuration
             agent-service:
               supportedTaskTypes:
               - spark
-      databricks:
-        enabled: True
-        plugin_config:
-          plugins:
-            databricks:
-              entrypointFile: dbfs:///FileStore/tables/entrypoint.py
-              databricksInstance: <DATABRICKS_ACCOUNT>.cloud.databricks.com
-    
-    Substitute ``<DATABRICKS_ACCOUNT>`` with the name of your Databricks account.
 
 Add the Databricks access token
 -------------------------------
@@ -270,11 +214,8 @@ You have to set the Databricks token to the Flyte configuration.
   
 .. code-block::
   
-  cd flyte/charts/flyteagent
-
-.. code-block::
-
-  helm install flyteagent . -n flyte
+  helm repo add flyteorg https://flyteorg.github.io/flyte
+  helm install flyteagent flyteorg/flyteagent --namespace flyte
 
 2. Get the base64 value of your Databricks token.
 
@@ -294,7 +235,6 @@ You have to set the Databricks token to the Flyte configuration.
         apiVersion: v1
         data:
           flyte_databricks_access_token: <BASE64_ENCODED_DATABRICKS_TOKEN>
-          username: User
         kind: Secret
         metadata:
           annotations:
