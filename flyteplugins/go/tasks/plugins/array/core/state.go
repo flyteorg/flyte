@@ -273,7 +273,10 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 		logger.Infof(ctx, "Array is still running and waiting for resources totalWaitingForResources[%v]", totalWaitingForResources)
 		return PhaseWaitingForResources
 	}
-	if totalSuccesses >= minSuccesses && totalRunning == 0 {
+
+	// if we have enough successes, ensure all tasks are in a terminal phase (success or failure)
+	// before transitioning to the next phase.
+	if totalSuccesses >= minSuccesses && totalSuccesses+totalPermanentFailures == totalCount {
 		logger.Infof(ctx, "Array succeeded because totalSuccesses[%v] >= minSuccesses[%v]", totalSuccesses, minSuccesses)
 		return PhaseWriteToDiscovery
 	}
