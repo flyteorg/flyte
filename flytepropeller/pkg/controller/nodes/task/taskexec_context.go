@@ -35,7 +35,7 @@ const IDMaxLength = 50
 type taskExecutionID struct {
 	execName     string
 	id           *core.TaskExecutionIdentifier
-	uniqueNodeId string
+	uniqueNodeID string
 }
 
 func (te taskExecutionID) GetID() core.TaskExecutionIdentifier {
@@ -43,7 +43,7 @@ func (te taskExecutionID) GetID() core.TaskExecutionIdentifier {
 }
 
 func (te taskExecutionID) GetUniqueNodeID() string {
-	return te.uniqueNodeId
+	return te.uniqueNodeID
 }
 
 func (te taskExecutionID) GetGeneratedName() string {
@@ -299,7 +299,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 			taskExecID: taskExecutionID{
 				execName:     uniqueID,
 				id:           id,
-				uniqueNodeId: currentNodeUniqueID,
+				uniqueNodeID: currentNodeUniqueID,
 			},
 			o:                    nCtx.Node(),
 			maxAttempts:          maxAttempts,
