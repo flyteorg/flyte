@@ -50,7 +50,7 @@ var (
 			Duration: time.Minute * 3,
 		},
 		CreateContainerConfigErrorGracePeriod: config2.Duration{
-			Duration: time.Minute * 3,
+			Duration: time.Minute * 15,
 		},
 		ImagePullBackoffGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
