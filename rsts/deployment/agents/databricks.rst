@@ -131,7 +131,7 @@ Specify agent configuration
       
       .. group-tab:: Demo cluster
 
-        Enable the Databricks agent on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
+        Enable the Databricks agent on the demo cluster by updating the ConfigMap:
 
         .. code-block:: bash
 
