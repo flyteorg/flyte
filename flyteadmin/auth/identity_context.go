@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
+  "github.com/flyteorg/flyte/flytestdlib/logger"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -106,13 +107,15 @@ func NewIdentityContext(audience, userID, appID string, authenticatedAt time.Tim
 	if len(userInfo.Subject) == 0 {
 		userInfo.Subject = userID
 	}
-
+  logger.Infof(context.TODO(), "claims raw : %v ", claims)
 	if len(claims) > 0 {
 		claimsStruct, err := utils.MarshalObjToStruct(claims)
 		if err != nil {
 			return IdentityContext{}, fmt.Errorf("failed to marshal claims [%+v] to struct: %w", claims, err)
 		}
+    logger.Infof(context.TODO(), "claims struct : %v ", claimsStruct)
 		userInfo.AdditionalClaims = claimsStruct
+		logger.Infof(context.TODO(), "userInfo struct : %v ", userInfo.AdditionalClaims)
 	}
 
 	return IdentityContext{
