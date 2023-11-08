@@ -129,7 +129,6 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 	// only attach input values if taskPhase is QUEUED meaning this the first evaluation
 	if taskPhase == idlcore.TaskExecution_QUEUED {
 		if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
-			fmt.Printf("HAMERSAW - FIRST HERE\n")
 			// pass inputs by value
 			literalMap, err := nCtx.InputReader().Get(ctx)
 			if err != nil {
@@ -140,7 +139,6 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 				InputData: literalMap,
 			}
 		} else {
-			fmt.Printf("HAMERSAW - THEN HERE\n")
 			// pass inputs by reference
 			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputUri{
 				InputUri: nCtx.InputReader().GetInputPath().String(),
