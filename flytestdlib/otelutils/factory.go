@@ -2,6 +2,7 @@ package otelutils
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"go.opentelemetry.io/otel/attribute"
