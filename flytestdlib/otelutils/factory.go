@@ -37,7 +37,10 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 	}
 
 	var opts []trace.TracerProviderOption
-	if config.FileConfig.Enabled {
+	switch config.ExporterType {
+	case NoopExporter:
+		return nil
+	case FileExporter:
 		// configure file exporter
 		f, err := os.Create(config.FileConfig.Filename)
 		if err != nil {
@@ -53,9 +56,7 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		}
 
 		opts = append(opts, trace.WithBatcher(exporter))
-	}
-
-	if config.JaegerConfig.Enabled {
+	case JaegerExporter:
 		// configure jaeger exporter
 		exporter, err := jaeger.New(
 			jaeger.WithCollectorEndpoint(
@@ -67,10 +68,8 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		}
 
 		opts = append(opts, trace.WithBatcher(exporter))
-	}
-
-	// if no exporters are enabled then we can return
-	if len(opts) == 0 {
+	default:
+		// TODO @hamersaw - warn
 		return nil
 	}
 

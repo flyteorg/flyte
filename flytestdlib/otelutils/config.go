@@ -9,36 +9,40 @@ import (
 
 //go:generate pflags Config --default-var=defaultConfig
 
-type Type = string
-
 const configSectionKey = "otel"
+
+type ExporterType = string
+
+const (
+	NoopExporter   ExporterType = "noop"
+	FileExporter   ExporterType = "file"
+	JaegerExporter ExporterType = "jaeger"
+)
 
 var (
 	ConfigSection = config.MustRegisterSection(configSectionKey, defaultConfig)
 	defaultConfig = &Config{
+		ExporterType: NoopExporter,
 		FileConfig: FileConfig{
-			Enabled:  false,
 			Filename: "/tmp/trace.txt",
 		},
 		JaegerConfig: JaegerConfig{
-			Enabled:  false,
 			Endpoint: "http://localhost:14268/api/traces",
 		},
 	}
 )
 
 type Config struct {
+	ExporterType ExporterType `json:"type" pflag:",Sets the type of exporter to configure [noop/file/jaeger]."`
 	FileConfig   FileConfig   `json:"file" pflag:",Configuration for exporting telemetry traces to a file"`
 	JaegerConfig JaegerConfig `json:"jaeger" pflag:",Configuration for exporting telemetry traces to a jaeger"`
 }
 
 type FileConfig struct {
-	Enabled  bool   `json:"enabled" pflag:",Set to true to enable the file exporter"`
 	Filename string `json:"filename" pflag:",Filename to store exported telemetry traces"`
 }
 
 type JaegerConfig struct {
-	Enabled  bool   `json:"enabled" pflag:",Set to true to enable the jaeger exporter"`
 	Endpoint string `json:"endpoint" pflag:",Endpoint for the jaeger telemtry trace ingestor"`
 }
 
