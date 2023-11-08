@@ -69,8 +69,7 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 
 		opts = append(opts, trace.WithBatcher(exporter))
 	default:
-		// TODO @hamersaw - warn
-		return nil
+		return fmt.Errorf("unknown otel exporter type [%v]", config.ExporterType)
 	}
 
 	telemetryResource, err := resource.Merge(
