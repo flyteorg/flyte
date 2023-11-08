@@ -49,6 +49,9 @@ var (
 		CreateContainerErrorGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
 		},
+		CreateContainerConfigErrorGracePeriod: config2.Duration{
+			Duration: time.Minute * 3,
+		},
 		ImagePullBackoffGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
 		},
@@ -135,6 +138,11 @@ type K8sPluginConfig struct {
 	// error persists past this grace period, it will be inferred to be a permanent
 	// one, and the corresponding task marked as failed
 	CreateContainerErrorGracePeriod config2.Duration `json:"create-container-error-grace-period" pflag:"-,Time to wait for transient CreateContainerError errors to be resolved."`
+
+	// Time to wait for transient CreateContainerConfigError errors to be resolved. If the
+	// error persists past this grace period, it will be inferred to be a permanent
+	// one, and the corresponding task marked as failed
+	CreateContainerConfigErrorGracePeriod config2.Duration `json:"create-container-config-error-grace-period" pflag:"-,Time to wait for transient CreateContainerConfigError errors to be resolved."`
 
 	// Time to wait for transient ImagePullBackoff errors to be resolved. If the
 	// error persists past this grace period, it will be inferred to be a permanent

@@ -642,7 +642,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// This may consist of:
 								// 1. Transient errors: e.g. failed to reserve
 								// container name, container name [...] already in use
-								// by container
+								// by container, secret sync error
 								// 2. Permanent errors: e.g. no command specified
 								// To handle both types of errors gracefully without
 								// arbitrary pattern matching in the message, we simply
@@ -659,7 +659,19 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// approximation of the elapsed time since the last
 								// transition.
 								t := c.LastTransitionTime.Time
-								if time.Since(t) >= config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration {
+								var gracePeriod time.Duration
+								switch reason {
+								case "CreateContainerError":
+									gracePeriod = config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
+									break
+								case "CreateContainerConfigError":
+									gracePeriod = config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
+									break
+								default:
+									gracePeriod = time.Minute * 3
+								}
+
+								if time.Since(t) >= gracePeriod {
 									return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), nil
