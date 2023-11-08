@@ -1175,6 +1175,9 @@ func TestDemystifyPending(t *testing.T) {
 		CreateContainerErrorGracePeriod: config1.Duration{
 			Duration: time.Minute * 3,
 		},
+		CreateContainerConfigErrorGracePeriod: config1.Duration{
+			Duration: time.Minute * 4,
+		},
 		ImagePullBackoffGracePeriod: config1.Duration{
 			Duration: time.Minute * 3,
 		},
@@ -1419,7 +1422,7 @@ func TestDemystifyPending(t *testing.T) {
 
 	t.Run("CreateContainerConfigErrorOutsideGracePeriod", func(t *testing.T) {
 		s2 := *s.DeepCopy()
-		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration)
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration)
 		s2.ContainerStatuses = []v1.ContainerStatus{
 			{
 				Ready: false,
