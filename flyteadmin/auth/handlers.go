@@ -495,12 +495,14 @@ func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
 			if info.AdditionalClaims != nil {
+        logger.Infof(ctx, "admin info additional claims %v", info.AdditionalClaims)
 				for k, v := range info.AdditionalClaims.GetFields() {
 					jsonBytes, err := v.MarshalJSON()
 					if err != nil {
 						logger.Warningf(ctx, "failed to marshal claim [%s] to json: %v", k, err)
 						continue
 					}
+          logger.Infof(ctx, "adding header  %v with value %v ", header, string(jsonBytes))
 					header := fmt.Sprintf("X-User-Claim-%s", strings.ReplaceAll(k, "_", "-"))
 					w.Header().Set(header, string(jsonBytes))
 				}
