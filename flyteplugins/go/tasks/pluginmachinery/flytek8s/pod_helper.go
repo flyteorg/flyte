@@ -638,11 +638,11 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// PodInitializing -> Init containers are running
 								return pluginsCore.PhaseInfoInitializing(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &c.LastTransitionTime.Time}), nil
 
-							case "CreateContainerError", "CreateContainerConfigError":
+							case "CreateContainerError":
 								// This may consist of:
 								// 1. Transient errors: e.g. failed to reserve
 								// container name, container name [...] already in use
-								// by container, secret sync error
+								// by container
 								// 2. Permanent errors: e.g. no command specified
 								// To handle both types of errors gracefully without
 								// arbitrary pattern matching in the message, we simply
@@ -659,20 +659,24 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// approximation of the elapsed time since the last
 								// transition.
 								t := c.LastTransitionTime.Time
-								var gracePeriod time.Duration
-								switch reason {
-								case "CreateContainerError":
-									gracePeriod = config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
-									break
-								case "CreateContainerConfigError":
-									gracePeriod = config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
-									break
-								default:
-									gracePeriod = time.Minute * 3
-								}
-
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
 									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+										OccurredAt: &t,
+									}), nil
+								}
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), nil
+
+							case "CreateContainerConfigError":
+								t := c.LastTransitionTime.Time
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), nil
 								}
