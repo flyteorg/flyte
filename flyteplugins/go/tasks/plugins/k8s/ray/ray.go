@@ -13,6 +13,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
@@ -441,22 +442,35 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		return nil, nil
 	}
 
-	// TODO: Retrieve the name of head pod from rayJob.status, and add it to task logs
-	// RayJob CRD does not include the name of the worker or head pod for now
+	var taskLogs []*core.TaskLog
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
-	logOutput, err := logPlugin.GetTaskLogs(tasklog.Input{
+	input := tasklog.Input{
 		Namespace:       rayJob.Namespace,
 		TaskExecutionID: taskExecID,
-	})
+	}
 
+	// TODO: Retrieve the name of head pod from rayJob.status, and add it to task logs
+	// RayJob CRD does not include the name of the worker or head pod for now
+	logOutput, err := logPlugin.GetTaskLogs(input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate task logs. Error: %w", err)
 	}
+	taskLogs = append(taskLogs, logOutput.TaskLogs...)
 
-	return &pluginsCore.TaskInfo{
-		Logs: logOutput.TaskLogs,
-	}, nil
+	// Handling for Ray Dashboard
+	dashboardUrlTemplate := GetConfig().DashboardUrlTemplate
+	if dashboardUrlTemplate != nil &&
+		rayJob.Status.JobDeploymentStatus == rayv1alpha1.JobDeploymentStatusRunning &&
+		rayJob.Status.DashboardURL != "" {
+		dashboardUrlOutput, err := dashboardUrlTemplate.GetTaskLogs(input)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate Ray dashboard link. Error: %w", err)
+		}
+		taskLogs = append(taskLogs, dashboardUrlOutput.TaskLogs...)
+	}
+
+	return &pluginsCore.TaskInfo{Logs: logOutput.TaskLogs}, nil
 }
 
 func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
