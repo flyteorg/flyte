@@ -500,7 +500,7 @@ type RuntimeMetadata struct {
 	// Version of the runtime. All versions should be backward compatible. However, certain cases call for version
 	// checks to ensure tighter validation or setting expectations.
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	//+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+	//+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
 	Flavor               string   `protobuf:"bytes,3,opt,name=flavor,proto3" json:"flavor,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

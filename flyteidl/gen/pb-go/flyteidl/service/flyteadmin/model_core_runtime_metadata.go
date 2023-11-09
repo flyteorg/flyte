@@ -15,6 +15,6 @@ type CoreRuntimeMetadata struct {
 	Type_ *RuntimeMetadataRuntimeType `json:"type,omitempty"`
 	// Version of the runtime. All versions should be backward compatible. However, certain cases call for version checks to ensure tighter validation or setting expectations.
 	Version string `json:"version,omitempty"`
-	// +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+	// +optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
 	Flavor string `json:"flavor,omitempty"`
 }

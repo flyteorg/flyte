@@ -4015,7 +4015,7 @@ public final class Tasks {
 
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
@@ -4023,7 +4023,7 @@ public final class Tasks {
     java.lang.String getFlavor();
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
@@ -4298,7 +4298,7 @@ public final class Tasks {
     private volatile java.lang.Object flavor_;
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
@@ -4317,7 +4317,7 @@ public final class Tasks {
     }
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
@@ -4837,7 +4837,7 @@ public final class Tasks {
       private java.lang.Object flavor_ = "";
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4856,7 +4856,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4876,7 +4876,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4893,7 +4893,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4906,7 +4906,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>

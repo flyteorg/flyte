@@ -109,7 +109,7 @@ class CoreRuntimeMetadata(object):
     def flavor(self):
         """Gets the flavor of this CoreRuntimeMetadata.  # noqa: E501
 
-        +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).  # noqa: E501
+        +optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).  # noqa: E501
 
         :return: The flavor of this CoreRuntimeMetadata.  # noqa: E501
         :rtype: str
@@ -120,7 +120,7 @@ class CoreRuntimeMetadata(object):
     def flavor(self, flavor):
         """Sets the flavor of this CoreRuntimeMetadata.
 
-        +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).  # noqa: E501
+        +optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).  # noqa: E501
 
         :param flavor: The flavor of this CoreRuntimeMetadata.  # noqa: E501
         :type: str

@@ -1064,7 +1064,7 @@ pub struct RuntimeMetadata {
     /// checks to ensure tighter validation or setting expectations.
     #[prost(string, tag="2")]
     pub version: ::prost::alloc::string::String,
-    /// +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
+    /// +optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
     #[prost(string, tag="3")]
     pub flavor: ::prost::alloc::string::String,
 }

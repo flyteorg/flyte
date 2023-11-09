@@ -698,7 +698,7 @@
         },
         "flavor": {
           "type": "string",
-          "description": "+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
+          "description": "+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.)."
         }
       },
       "description": "Runtime information. This is loosely defined to allow for extensibility."
