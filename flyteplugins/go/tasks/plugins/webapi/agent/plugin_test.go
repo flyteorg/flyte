@@ -45,7 +45,8 @@ func TestDo(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Call the Do function by Flavor
-	inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	inputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	assert.NoError(t, err)
 	basePrefix := storage.DataReference("fake://bucket/prefix/")
 	inputReader := &ioMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return(basePrefix)
