@@ -1,0 +1,19 @@
+{{- if and .Values.flyteadmin.serviceMonitor.enabled .Values.flyteadmin.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "flyteadmin.name" . }}
+  namespace: {{ template "flyte.namespace" . }}
+  labels:
+  {{- with .Values.flyteadmin.serviceMonitor.labels }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+    - interval: 60s
+      port: http-metrics
+      path: /metrics
+      scrapeTimeout: 30s
+  selector:
+    matchLabels: {{ include "flyteadmin.selectorLabels" . | nindent 6 }}
+{{- end }}
