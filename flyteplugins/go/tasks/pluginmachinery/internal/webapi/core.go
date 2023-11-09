@@ -111,8 +111,14 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	}
 
 	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
-	if taskTemplate.GetMetadata().GetRuntime().GetFlavor() == syncPlugin {
-		return c.syncHandle(ctx, tCtx)
+	metadata := taskTemplate.GetMetadata()
+	if metadata != nil {
+		runtime := metadata.GetRuntime()
+		if runtime != nil {
+			if runtime.GetFlavor() == syncPlugin {
+				return c.syncHandle(ctx, tCtx)
+			}
+		}
 	}
 
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
