@@ -11,13 +11,13 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-func NewBackgroundProcessor(ctx context.Context, processorConfiguration configuration.EventProcessorConfiguration, service artifact.ArtifactRegistryServer, scope promutils.Scope) EventsProcessorInterface {
+func NewBackgroundProcessor(ctx context.Context, processorConfiguration configuration.EventProcessorConfiguration, service artifact.ArtifactRegistryServer, created chan<- artifact.Artifact, scope promutils.Scope) EventsProcessorInterface {
+
 	// TODO: Add retry logic
-	//reconnectAttempts := processorConfiguration.ReconnectAttempts
-	//reconnectDelay := time.Duration(processorConfiguration.ReconnectDelaySeconds) * time.Second
 	var sub pubsub.Subscriber
 	switch processorConfiguration.CloudProvider {
 	case configCommon.CloudDeploymentAWS:
+		// TODO: When we start using this, the created channel will also need to be added to the pubsubprocessor
 		sqsConfig := gizmoAWS.SQSConfig{
 			QueueName:           processorConfiguration.Subscriber.QueueName,
 			QueueOwnerAccountID: processorConfiguration.Subscriber.AccountID,
@@ -43,7 +43,7 @@ func NewBackgroundProcessor(ctx context.Context, processorConfiguration configur
 	case configCommon.CloudDeploymentGCP:
 		panic("Artifacts not implemented for GCP")
 	case configCommon.CloudDeploymentSandbox:
-		handler := NewServiceCallHandler(ctx, service)
+		handler := NewServiceCallHandler(ctx, service, created)
 		return NewSandboxCloudEventProcessor(handler)
 	case configCommon.CloudDeploymentLocal:
 		fallthrough

@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+const DateFormat string = "2006-01-02"
+
 func RenderLiteral(lit *core.Literal) (string, error) {
 	if lit == nil {
 		return "", fmt.Errorf("can't RenderLiteral, input is nil")
@@ -35,7 +37,7 @@ func RenderLiteral(lit *core.Literal) (string, error) {
 		case *core.Primitive_Datetime:
 			// just date for now, not sure if we should support time...
 			dt := scalar.GetPrimitive().GetDatetime().AsTime()
-			txt := dt.Format("2006-01-02")
+			txt := dt.Format(DateFormat)
 			return txt, nil
 		case *core.Primitive_Duration:
 			dur := scalar.GetPrimitive().GetDuration().AsDuration()

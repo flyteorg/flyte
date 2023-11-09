@@ -11,6 +11,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 )
 
@@ -53,6 +55,11 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 			logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
 			return tx.Error
 		}
+		getSaved := tx.Preload("ArtifactKey").First(&gormModel, "id = ?", gormModel.ID)
+		if getSaved.Error != nil {
+			logger.Errorf(ctx, "Failed to find artifact that was just saved: %+v", getSaved.Error)
+			return getSaved.Error
+		}
 		return nil
 	})
 	if err != nil {
@@ -60,8 +67,14 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 		return models.Artifact{}, err
 	}
 	timer.Stop()
+	svcModel, err := GormToServiceModel(gormModel)
+	if err != nil {
+		// metric
+		logger.Errorf(ctx, "Failed to convert gorm model to service model: %+v", err)
+		return models.Artifact{}, err
+	}
 
-	return models.Artifact{}, nil
+	return svcModel, nil
 }
 
 func (r *RDSStorage) handleUriGet(ctx context.Context, uri string) (models.Artifact, error) {
@@ -102,7 +115,8 @@ func (r *RDSStorage) handleArtifactIdGet(ctx context.Context, artifactID core.Ar
 	if err := db.Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			logger.Infof(ctx, "Artifact not found: %+v", artifactID)
-			return models.Artifact{}, fmt.Errorf("artifact [%v] not found", artifactID)
+			// todo: return grpc errors at the service layer not here.
+			return models.Artifact{}, status.Errorf(codes.NotFound, "artifact [%v] not found", artifactID)
 		}
 		logger.Errorf(ctx, "Failed to query for artifact: %+v", err)
 		return models.Artifact{}, err
@@ -141,6 +155,7 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 	timer := r.metrics.CreateTriggerDuration.Start()
 	logger.Debugf(ctx, "Attempt create trigger [%s:%s]", trigger.Name, trigger.Version)
 	dbTrigger := ServiceToGormTrigger(trigger)
+	// TODO: Add a check to ensure that the artifact IDs that the trigger is triggering on are unique if more than one.
 
 	// Check to see if the trigger key already exists. Create if not
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -246,12 +261,58 @@ func (r *RDSStorage) GetLatestTrigger(ctx context.Context, project, domain, name
 	}
 	logger.Debugf(ctx, "Found and returning trigger obj %v", gotTrigger)
 
-	m := GormToServiceTrigger(gotTrigger)
+	m, err := GormToServiceTrigger(gotTrigger)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to convert gorm model to service model: %+v", err)
+		return models.Trigger{}, err
+	}
 	return m, nil
 }
 
+// GetTriggersByArtifactKey - Given an artifact key, presumably of a newly created artifact, find active triggers that
+// trigger on that key (and potentially others).
 func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.ArtifactKey) ([]models.Trigger, error) {
-	return nil, nil
+	// First find the trigger keys relevant to the artifact key
+	// then find the most recent, active, version of each trigger key.
+
+	var triggerKey []TriggerKey
+	db := r.db.Preload("RunsOn").
+		Joins("inner join active_trigger_artifact_keys ug on ug.trigger_key_id = trigger_keys.id ").
+		Joins("inner join artifact_keys g on g.id= ug.artifact_key_id ").
+		Where("g.project = ? and g.domain = ? and g.name = ?", key.Project, key.Domain, key.Name).
+		Find(&triggerKey)
+
+	err := db.Error
+	if err != nil {
+		logger.Errorf(ctx, "Failed to find triggers for artifact key %v: %+v", key, err)
+		return nil, err
+	}
+	logger.Debugf(ctx, "Found trigger keys: %+v for artifact key %v", triggerKey, key)
+	if triggerKey == nil || len(triggerKey) == 0 {
+		logger.Infof(ctx, "No triggers found for artifact key %v", key)
+		return nil, nil
+	}
+
+	ts := make([]Trigger, len(triggerKey))
+
+	db = r.db.Preload("RunsOn").Model(&Trigger{}).InnerJoins("TriggerKey", r.db.Where(&triggerKey)).Where("active = true").Find(&ts)
+	if err := db.Error; err != nil {
+		logger.Errorf(ctx, "Failed to query for triggers: %+v", err)
+		return nil, err
+	}
+	logger.Debugf(ctx, "Found (%d) triggers %v", len(ts), ts)
+
+	modelTriggers := make([]models.Trigger, len(ts))
+	for i, t := range ts {
+		st, err := GormToServiceTrigger(t)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to convert gorm model to service model: %+v", err)
+			return nil, err
+		}
+		modelTriggers[i] = st
+	}
+
+	return modelTriggers, nil
 }
 
 func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {

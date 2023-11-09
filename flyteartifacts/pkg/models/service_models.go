@@ -22,6 +22,8 @@ type Trigger struct {
 	Name    string
 	Version string
 
+	LaunchPlanID core.Identifier
+
 	// The trigger as defined in the user code becomes a launch plan as it is the most similar.
 	*admin.LaunchPlan
 

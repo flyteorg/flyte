@@ -130,7 +130,6 @@ func CreateTriggerModelFromRequest(ctx context.Context, request *artifact.Create
 		return Trigger{}, err
 	}
 	if len(idlTrigger.Triggers) == 0 {
-		logger.Errorf(ctx, "Launch conditions cannot be empty in CreateTrigger, [%+v]", request)
 		return Trigger{}, fmt.Errorf("invalid request to CreateTrigger, launch conditions cannot be empty")
 	}
 	// Create a list of the Artifact IDs referenced by the trigger definition.
@@ -156,10 +155,14 @@ func CreateTriggerModelFromRequest(ctx context.Context, request *artifact.Create
 
 	// Always set the project/domain of the trigger equal to the underlying launch plan
 	t := Trigger{
-		Project:      lpID.Project,
-		Domain:       lpID.Domain,
-		Name:         idlTrigger.TriggerId.Name,
+		Project: lpID.Project,
+		Domain:  lpID.Domain,
+		Name:    idlTrigger.TriggerId.Name,
+		// Use LP id for the version because the trigger doesn't come with its own
+		// version for now... too difficult to update the version of the trigger
+		// inside the launch conditions object during registration.
 		Version:      lpID.Version,
+		LaunchPlanID: *lpID,
 		LaunchPlan:   request.GetTriggerLaunchPlan(),
 		RunsOn:       runsOnArtifactIDs,
 		Active:       true,
