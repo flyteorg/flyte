@@ -28,6 +28,7 @@ const (
 	maxBurst           = 10000
 	minQPS             = 1
 	maxQPS             = 100000
+	asyncPlugin        = "async_plugin"
 	syncPlugin         = "sync_plugin"
 )
 
@@ -66,24 +67,41 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
-func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	plugin, ok := c.p.(webapi.SyncPlugin)
-	if !ok {
-		taskTemplate, err := tCtx.TaskReader().Read(ctx)
-		if err != nil {
-			return core.UnknownTransition, err
+func (c CorePlugin) getPlugin(pluginType string) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
+	if pluginType == syncPlugin {
+		plugin, ok := c.p.(webapi.SyncPlugin)
+		if !ok {
+			return nil, nil, fmt.Errorf("Core plugin does not implement the sync plugin interface")
 		}
-		return core.UnknownTransition, fmt.Errorf("%s does not implement required sync plugin interface methods", taskTemplate.GetType())
+		return nil, plugin, nil
+	}
+	// Assume the plugin is an async plugin if not explicitly specified as sync.
+	// This helps maintain backward compatibility with existing implementations that
+	// expect an async plugin by default, thereby avoiding breaking changes.
+	plugin, ok := c.p.(webapi.AsyncPlugin)
+	if !ok {
+		return nil, nil, fmt.Errorf("Core plugin does not implement the async plugin interface")
+	}
+	return plugin, nil, nil
+}
+
+func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
+	_, plugin, err := c.getPlugin(syncPlugin)
+	if err != nil {
+		return core.UnknownTransition, err
 	}
 
 	phaseInfo, err := plugin.Do(ctx, tCtx)
 	if err != nil {
-		logger.Errorf(ctx, "please check if the sync plugin interface is implemented or not")
+		taskTemplate, err := tCtx.TaskReader().Read(ctx)
+		if err != nil {
+			return core.UnknownTransition, err
+		}
+		logger.Errorf(ctx, "please check if [%v] task type has implemented sync plugin method or not", taskTemplate.GetType())
 		return core.UnknownTransition, err
 	}
 
 	return core.DoTransition(phaseInfo), nil
-
 }
 
 func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
@@ -104,9 +122,9 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	var nextState *State
 	var phaseInfo core.PhaseInfo
-	plugin, ok := c.p.(webapi.AsyncPlugin)
-	if !ok {
-		return core.UnknownTransition, fmt.Errorf("%s does not implement required async plugin interface methods", taskTemplate.GetType())
+	plugin, _, err := c.getPlugin(asyncPlugin)
+	if err != nil {
+		return core.UnknownTransition, err
 	}
 
 	switch incomingState.Phase {
@@ -141,13 +159,9 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 
 	logger.Infof(ctx, "Attempting to abort resource [%v].", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID())
 
-	plugin, ok := c.p.(webapi.AsyncPlugin)
-	if !ok {
-		taskTemplate, err := tCtx.TaskReader().Read(ctx)
-		if err != nil {
-			return err
-		}
-		return fmt.Errorf("%s does not implement required plugin interface methods", taskTemplate.GetType())
+	plugin, _, err := c.getPlugin(asyncPlugin)
+	if err != nil {
+		return err
 	}
 
 	err = plugin.Delete(ctx, newPluginContext(incomingState.ResourceMeta, nil, "Aborted", tCtx))
@@ -169,13 +183,9 @@ func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext
 	logger.Infof(ctx, "Attempting to finalize resource [%v].",
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 
-	plugin, ok := c.p.(webapi.AsyncPlugin)
-	if !ok {
-		taskTemplate, err := tCtx.TaskReader().Read(ctx)
-		if err != nil {
-			return err
-		}
-		return fmt.Errorf("%s does not implement required plugin interface methods", taskTemplate.GetType())
+	plugin, _, err := c.getPlugin(asyncPlugin)
+	if err != nil {
+		return err
 	}
 
 	return c.tokenAllocator.releaseToken(ctx, plugin, tCtx, c.metrics)

@@ -25,6 +25,7 @@ func TestHandle(t *testing.T) {
 	ctx := context.TODO()
 	tCtx := getTaskContext(t)
 	taskReader := new(mocks.TaskReader)
+	taskInfo := &core.TaskInfo{}
 
 	template := flyteIdlCore.TaskTemplate{
 		Type: "api_task",
@@ -40,7 +41,7 @@ func TestHandle(t *testing.T) {
 	tCtx.On("TaskReader").Return(taskReader)
 
 	p := new(webapiMocks.SyncPlugin)
-	p.On("Do", ctx, tCtx).Return(core.PhaseInfo{}, nil)
+	p.On("Do", ctx, tCtx).Return(core.PhaseInfoSuccess(taskInfo), nil)
 
 	c := CorePlugin{
 		id: "test",
@@ -50,6 +51,8 @@ func TestHandle(t *testing.T) {
 	transition, err := c.Handle(ctx, tCtx)
 	assert.NoError(t, err)
 	assert.NotNil(t, transition)
+	assert.Equal(t, core.PhaseInfoSuccess(taskInfo), transition.Info())
+	assert.Equal(t, core.TransitionTypeEphemeral, transition.Type())
 }
 
 func Test_validateConfig(t *testing.T) {
