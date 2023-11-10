@@ -24,6 +24,7 @@ import (
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
@@ -615,6 +616,8 @@ func newPluginContext() k8s.PluginContext {
 			},
 		},
 	})
+	taskExecID.OnGetUniqueNodeID().Return("unique-node")
+	taskExecID.OnGetGeneratedName().Return("generated-name")
 
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
@@ -642,17 +645,19 @@ func TestGetTaskPhase(t *testing.T) {
 		rayJobPhase       rayv1alpha1.JobStatus
 		rayClusterPhase   rayv1alpha1.JobDeploymentStatus
 		expectedCorePhase pluginsCore.Phase
+		expectedError     bool
 	}{
-		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseUndefined},
-		{rayv1alpha1.JobStatusRunning, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess},
-		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess},
+		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusRunning, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess, false},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
+		{rayv1alpha1.JobStatusStopped, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseUndefined, true},
 	}
 
 	for _, tc := range testCases {
@@ -663,8 +668,65 @@ func TestGetTaskPhase(t *testing.T) {
 			startTime := metav1.NewTime(time.Now())
 			rayObject.Status.StartTime = &startTime
 			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
-			assert.Nil(t, err)
+			if tc.expectedError {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
 			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
+		})
+	}
+}
+
+func TestGetEventInfo_DashboardURL(t *testing.T) {
+	pluginCtx := newPluginContext()
+	testCases := []struct {
+		name                 string
+		rayJob               rayv1alpha1.RayJob
+		dashboardURLTemplate tasklog.TemplateLogPlugin
+		expectedTaskLogs     []*core.TaskLog
+	}{
+		{
+			name: "dashboard URL displayed",
+			rayJob: rayv1alpha1.RayJob{
+				Status: rayv1alpha1.RayJobStatus{
+					DashboardURL: "exists",
+					JobStatus:    rayv1alpha1.JobStatusRunning,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "Ray Dashboard",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{.generatedName}}"},
+				Scheme:       tasklog.TemplateSchemeTaskExecution,
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "Ray Dashboard",
+					Uri:  "http://test/generated-name",
+				},
+			},
+		},
+		{
+			name: "dashboard URL is not displayed",
+			rayJob: rayv1alpha1.RayJob{
+				Status: rayv1alpha1.RayJobStatus{
+					JobStatus: rayv1alpha1.JobStatusPending,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "dummy",
+				TemplateURIs: []tasklog.TemplateURI{"http://dummy"},
+			},
+			expectedTaskLogs: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
+			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
 	}
 }

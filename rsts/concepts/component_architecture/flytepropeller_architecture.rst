@@ -13,6 +13,7 @@ Introduction
 ============
 
 A Flyte :ref:`workflow <divedeep-workflows>` is represented as a Directed Acyclic Graph (DAG) of interconnected Nodes. Flyte supports a robust collection of Node types to ensure diverse functionality.
+
 - ``TaskNodes`` support a plugin system to externally add system integrations.
 - Control flow can be altered during runtime using ``BranchNodes``, which prune downstream evaluation paths based on input. 
 - ``DynamicNodes`` add nodes to the DAG.
