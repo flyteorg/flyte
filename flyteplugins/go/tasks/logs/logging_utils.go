@@ -109,10 +109,5 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 	}
 
 	plugins = append(plugins, cfg.Templates...)
-
-	if len(plugins) == 0 {
-		return nil, nil
-	}
-
 	return templateLogPluginCollection{plugins: plugins}, nil
 }
