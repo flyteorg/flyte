@@ -438,10 +438,6 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		return nil, fmt.Errorf("failed to initialize log plugins. Error: %w", err)
 	}
 
-	if logPlugin == nil {
-		return nil, nil
-	}
-
 	var taskLogs []*core.TaskLog
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
@@ -459,15 +455,15 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	taskLogs = append(taskLogs, logOutput.TaskLogs...)
 
 	// Handling for Ray Dashboard
-	dashboardUrlTemplate := GetConfig().DashboardUrlTemplate
-	if dashboardUrlTemplate != nil &&
+	dashboardURLTemplate := GetConfig().DashboardUrlTemplate
+	if dashboardURLTemplate != nil &&
 		rayJob.Status.DashboardURL != "" &&
 		rayJob.Status.JobStatus == rayv1alpha1.JobStatusRunning {
-		dashboardUrlOutput, err := dashboardUrlTemplate.GetTaskLogs(input)
+		dashboardURLOutput, err := dashboardURLTemplate.GetTaskLogs(input)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate Ray dashboard link. Error: %w", err)
 		}
-		taskLogs = append(taskLogs, dashboardUrlOutput.TaskLogs...)
+		taskLogs = append(taskLogs, dashboardURLOutput.TaskLogs...)
 	}
 
 	return &pluginsCore.TaskInfo{Logs: taskLogs}, nil

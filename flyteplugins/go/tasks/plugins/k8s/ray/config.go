@@ -82,7 +82,7 @@ type Config struct {
 	RemoteClusterConfig  pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
 	Logs                 logs.LogConfig                `json:"logs" pflag:"-,Log configuration for ray jobs"`
 	LogsSidecar          *v1.Container                 `json:"logsSidecar" pflag:"-,Sidecar to inject into head pods for capturing ray job logs"`
-	DashboardUrlTemplate *tasklog.TemplateLogPlugin    `json:"dashboardUrlTemplate" pflag:",Template for URL of Ray dashboard running on a head node."`
+	DashboardUrlTemplate *tasklog.TemplateLogPlugin    `json:"dashboardURLTemplate" pflag:",Template for URL of Ray dashboard running on a head node."`
 	Defaults             DefaultConfig                 `json:"defaults" pflag:"-,Default configuration for ray jobs"`
 	EnableUsageStats     bool                          `json:"enableUsageStats" pflag:",Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html"`
 }
