@@ -9,6 +9,7 @@ import (
 // Artifact is a wrapper object for easier handling of additional fields
 type Artifact struct {
 	artifact.Artifact
+	Org               string
 	OffloadedMetadata string
 	LiteralTypeBytes  []byte
 	LiteralValueBytes []byte
@@ -21,6 +22,7 @@ type Trigger struct {
 	Domain  string
 	Name    string
 	Version string
+	Org     string
 
 	LaunchPlanID core.Identifier
 

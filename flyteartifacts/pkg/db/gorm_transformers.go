@@ -53,6 +53,7 @@ func ServiceToGormModel(serviceModel models.Artifact) (Artifact, error) {
 
 	ga := Artifact{
 		ArtifactKey: ArtifactKey{
+			Org:     serviceModel.Org,
 			Project: serviceModel.Artifact.ArtifactId.ArtifactKey.Project,
 			Domain:  serviceModel.Artifact.ArtifactId.ArtifactKey.Domain,
 			Name:    serviceModel.Artifact.ArtifactId.ArtifactKey.Name,
@@ -124,6 +125,7 @@ func GormToServiceModel(ga Artifact) (models.Artifact, error) {
 
 	return models.Artifact{
 		Artifact:          a,
+		Org:               ga.ArtifactKey.Org,
 		OffloadedMetadata: "",
 		LiteralTypeBytes:  ga.LiteralType,
 		LiteralValueBytes: ga.LiteralValue,
@@ -134,6 +136,7 @@ func ServiceToGormTrigger(serviceTrigger models.Trigger) Trigger {
 
 	t := Trigger{
 		TriggerKey: TriggerKey{
+			Org:     serviceTrigger.Org,
 			Project: serviceTrigger.Project,
 			Domain:  serviceTrigger.Domain,
 			Name:    serviceTrigger.Name,
@@ -151,6 +154,7 @@ func ServiceToGormTrigger(serviceTrigger models.Trigger) Trigger {
 	var runsOn = make([]ArtifactKey, len(serviceTrigger.RunsOn))
 	for i, a := range serviceTrigger.RunsOn {
 		runsOn[i] = ArtifactKey{
+			Org:     serviceTrigger.Org,
 			Project: a.ArtifactKey.Project,
 			Domain:  a.ArtifactKey.Domain,
 			Name:    a.ArtifactKey.Name,
@@ -178,6 +182,7 @@ func GormToServiceTrigger(gormTrigger Trigger) (models.Trigger, error) {
 		Version:      gormTrigger.Version, // gormTrigger.LaunchPlanID.Version,
 	}
 	t := models.Trigger{
+		Org:          gormTrigger.TriggerKey.Org,
 		Project:      gormTrigger.TriggerKey.Project,
 		Domain:       gormTrigger.TriggerKey.Domain,
 		Name:         gormTrigger.TriggerKey.Name,

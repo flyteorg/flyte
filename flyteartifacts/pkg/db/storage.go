@@ -25,6 +25,7 @@ type RDSStorage struct {
 
 // CreateArtifact helps implement StorageInterface
 func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Artifact) (models.Artifact, error) {
+	org := "union"
 	timer := r.metrics.CreateDuration.Start()
 	logger.Debugf(ctx, "Attempt create artifact [%s:%s]",
 		serviceModel.Artifact.ArtifactId.ArtifactKey.Name, serviceModel.Artifact.ArtifactId.Version)
@@ -39,6 +40,7 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var extantKey ArtifactKey
 		ak := ArtifactKey{
+			Org:     org,
 			Project: serviceModel.Artifact.ArtifactId.ArtifactKey.Project,
 			Domain:  serviceModel.Artifact.ArtifactId.ArtifactKey.Domain,
 			Name:    serviceModel.Artifact.ArtifactId.ArtifactKey.Name,
@@ -92,7 +94,9 @@ func (r *RDSStorage) handleUriGet(ctx context.Context, uri string) (models.Artif
 
 func (r *RDSStorage) handleArtifactIdGet(ctx context.Context, artifactID core.ArtifactID) (models.Artifact, error) {
 	var gotArtifact Artifact
+	org := "union"
 	ak := ArtifactKey{
+		Org:     org,
 		Project: artifactID.ArtifactKey.Project,
 		Domain:  artifactID.ArtifactKey.Domain,
 		Name:    artifactID.ArtifactKey.Name,
@@ -194,7 +198,7 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 		dbTrigger.TriggerKeyID = extantKey.ID
 		dbTrigger.TriggerKey = TriggerKey{} // zero out the artifact key
 		// This create should update the join table between individual triggers and artifact keys
-		tt := tx.Save(&dbTrigger)
+		tt := tx.Create(&dbTrigger)
 		if tx.Error != nil || tt.Error != nil {
 			if tx.Error != nil {
 				logger.Errorf(ctx, "Transaction error: %v", tx.Error)
@@ -243,8 +247,10 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 }
 
 func (r *RDSStorage) GetLatestTrigger(ctx context.Context, project, domain, name string) (models.Trigger, error) {
+	org := "union"
 	var gotTrigger Trigger
 	tk := TriggerKey{
+		Org:     org,
 		Project: project,
 		Domain:  domain,
 		Name:    name,

@@ -11,6 +11,7 @@ import (
 )
 
 func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (Artifact, error) {
+	org := "union"
 	if key == nil || spec == nil {
 		return Artifact{}, fmt.Errorf("key and spec cannot be nil")
 	}
@@ -64,6 +65,7 @@ func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, 
 
 	return Artifact{
 		Artifact:          a,
+		Org:               org,
 		LiteralTypeBytes:  ltBytes,
 		LiteralValueBytes: litBytes,
 	}, nil
@@ -107,6 +109,7 @@ func PartitionsFromIdl(ctx context.Context, partitions *core.Partitions) map[str
 }
 
 func CreateTriggerModelFromRequest(ctx context.Context, request *artifact.CreateTriggerRequest) (Trigger, error) {
+	org := "union"
 	if request.GetTriggerLaunchPlan().GetSpec() == nil || request.GetTriggerLaunchPlan().GetId() == nil || request.GetTriggerLaunchPlan().GetClosure() == nil {
 		logger.Errorf(ctx, "Something nil in CreateTrigger, [%+v]", request)
 		return Trigger{}, fmt.Errorf("invalid request to CreateTrigger, something is nil")
@@ -162,6 +165,7 @@ func CreateTriggerModelFromRequest(ctx context.Context, request *artifact.Create
 		// version for now... too difficult to update the version of the trigger
 		// inside the launch conditions object during registration.
 		Version:      lpID.Version,
+		Org:          org,
 		LaunchPlanID: *lpID,
 		LaunchPlan:   request.GetTriggerLaunchPlan(),
 		RunsOn:       runsOnArtifactIDs,
