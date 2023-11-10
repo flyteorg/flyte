@@ -211,6 +211,7 @@ func (w *WorkflowManager) CreateWorkflow(
 	if descriptionModel != nil {
 		workflowModel.ShortDescription = descriptionModel.ShortDescription
 	}
+	logger.Info(ctx, "placeholder: workflow manager")
 	if err = w.db.WorkflowRepo().Create(ctx, workflowModel, descriptionModel); err != nil {
 		logger.Infof(ctx, "Failed to create workflow model [%+v] with err %v", request.Id, err)
 		return nil, err

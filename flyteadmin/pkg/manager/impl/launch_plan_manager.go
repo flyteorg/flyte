@@ -104,6 +104,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 			request, workflowInterface.Outputs, err)
 		return nil, err
 	}
+	logger.Info(ctx, "placeholder: launch plan manager")
 	err = m.db.LaunchPlanRepo().Create(ctx, launchPlanModel)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to save launch plan model %+v with err: %v", request.Id, err)

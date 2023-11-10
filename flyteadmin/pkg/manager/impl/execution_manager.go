@@ -724,6 +724,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
 		return nil, nil, err
 	}
+	logger.Info(ctx, "placeholder: execution_manager")
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
 		request.Inputs,
 		launchPlan.Spec.FixedInputs,
