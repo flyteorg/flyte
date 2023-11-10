@@ -13,6 +13,8 @@ type gormMetrics struct {
 	GetDuration    promutils.StopWatch
 	UpdateDuration promutils.StopWatch
 	SearchDuration promutils.StopWatch
+
+	CreateTriggerDuration promutils.StopWatch
 }
 
 func newMetrics(scope promutils.Scope) gormMetrics {
@@ -26,5 +28,7 @@ func newMetrics(scope promutils.Scope) gormMetrics {
 			"update", "time taken to update an entry", time.Millisecond),
 		SearchDuration: scope.MustNewStopWatch(
 			"search", "time taken for searching", time.Millisecond),
+		CreateTriggerDuration: scope.MustNewStopWatch(
+			"createT", "time taken to create a new trigger", time.Millisecond),
 	}
 }

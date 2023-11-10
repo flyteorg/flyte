@@ -20,13 +20,27 @@ import (
 
 type ArtifactService struct {
 	artifact.UnimplementedArtifactRegistryServer
-	Metrics       ServiceMetrics
-	Service       CoreService
-	EventConsumer processor.EventsProcessorInterface
+	Metrics         ServiceMetrics
+	Service         CoreService
+	EventConsumer   processor.EventsProcessorInterface
+	TriggerEngine   TriggerHandlerInterface
+	eventsToTrigger chan artifact.Artifact
 }
 
 func (a *ArtifactService) CreateArtifact(ctx context.Context, req *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
-	return a.Service.CreateArtifact(ctx, req)
+	resp, err := a.Service.CreateArtifact(ctx, req)
+	if err != nil {
+		return resp, err
+	}
+
+	// gatepr add go func
+	execIDs, err := a.TriggerEngine.EvaluateNewArtifact(ctx, resp.Artifact)
+	if err != nil {
+		logger.Warnf(ctx, "Failed to evaluate triggers for artifact: %v, err: %v", resp.Artifact, err)
+	} else {
+		logger.Infof(ctx, "Triggered %v executions", len(execIDs))
+	}
+	return resp, err
 }
 
 func (a *ArtifactService) GetArtifact(ctx context.Context, req *artifact.GetArtifactRequest) (*artifact.GetArtifactResponse, error) {
@@ -57,15 +71,42 @@ func (a *ArtifactService) RegisterConsumer(ctx context.Context, req *artifact.Re
 	return a.Service.RegisterConsumer(ctx, req)
 }
 
+func (a *ArtifactService) runProcessor(ctx context.Context) {
+	for {
+		select {
+		case art := <-a.eventsToTrigger:
+			logger.Infof(ctx, "Received artifact: %v", art)
+			execIDs, err := a.TriggerEngine.EvaluateNewArtifact(ctx, &art)
+			if err != nil {
+				logger.Warnf(ctx, "Failed to evaluate triggers for artifact: %v, err: %v", art, err)
+			} else {
+				logger.Infof(ctx, "Triggered %v executions", len(execIDs))
+			}
+		case <-ctx.Done():
+			logger.Infof(ctx, "Stopping artifact processor")
+			return
+		}
+	}
+}
+
 func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactService {
 	cfg := configuration.GetApplicationConfig()
 	fmt.Println(cfg)
 	eventsCfg := configuration.GetEventsProcessorConfig()
 
+	// channel that the event processor should use to pass created artifacts to, which this artifact server will
+	// then call the trigger engine with.
+	createdArtifacts := make(chan artifact.Artifact, 1000)
+
 	storage := db.NewStorage(ctx, scope.NewSubScope("storage:rds"))
 	blobStore := blob.NewArtifactBlobStore(ctx, scope.NewSubScope("storage:s3"))
 	coreService := NewCoreService(storage, &blobStore, scope.NewSubScope("server"))
-	eventsReceiverAndHandler := processor.NewBackgroundProcessor(ctx, *eventsCfg, &coreService, scope.NewSubScope("events"))
+	triggerHandler, err := NewTriggerEngine(ctx, storage, &coreService, scope.NewSubScope("triggers"))
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create Admin client, stopping server. Error: %v", err)
+		panic(err)
+	}
+	eventsReceiverAndHandler := processor.NewBackgroundProcessor(ctx, *eventsCfg, &coreService, createdArtifacts, scope.NewSubScope("events"))
 	if eventsReceiverAndHandler != nil {
 		go func() {
 			logger.Info(ctx, "Starting Artifact service background processing...")
@@ -73,11 +114,17 @@ func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactSer
 		}()
 	}
 
-	return &ArtifactService{
-		Metrics:       InitMetrics(scope),
-		Service:       coreService,
-		EventConsumer: eventsReceiverAndHandler,
+	as := &ArtifactService{
+		Metrics:         InitMetrics(scope),
+		Service:         coreService,
+		EventConsumer:   eventsReceiverAndHandler,
+		TriggerEngine:   &triggerHandler,
+		eventsToTrigger: createdArtifacts,
 	}
+
+	go as.runProcessor(ctx)
+
+	return as
 }
 
 func HttpRegistrationHook(ctx context.Context, gwmux *runtime.ServeMux, grpcAddress string, grpcConnectionOpts []grpc.DialOption, _ promutils.Scope) error {

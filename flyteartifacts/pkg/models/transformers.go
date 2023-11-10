@@ -3,11 +3,11 @@ package models
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 )
 
 func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (Artifact, error) {
@@ -104,4 +104,71 @@ func PartitionsFromIdl(ctx context.Context, partitions *core.Partitions) map[str
 	}
 
 	return p
+}
+
+func CreateTriggerModelFromRequest(ctx context.Context, request *artifact.CreateTriggerRequest) (Trigger, error) {
+	if request.GetTriggerLaunchPlan().GetSpec() == nil || request.GetTriggerLaunchPlan().GetId() == nil || request.GetTriggerLaunchPlan().GetClosure() == nil {
+		logger.Errorf(ctx, "Something nil in CreateTrigger, [%+v]", request)
+		return Trigger{}, fmt.Errorf("invalid request to CreateTrigger, something is nil")
+	}
+
+	spec := request.GetTriggerLaunchPlan().GetSpec()
+	if spec.GetEntityMetadata().GetLaunchConditions() == nil {
+		logger.Errorf(ctx, "Launch conditions cannot be nil in CreateTrigger, [%+v]", request)
+		return Trigger{}, fmt.Errorf("invalid request to CreateTrigger, launch conditions cannot be nil")
+	}
+
+	lpID := request.GetTriggerLaunchPlan().GetId()
+
+	lc := spec.GetEntityMetadata().GetLaunchConditions()
+
+	var err error
+	idlTrigger := core.Trigger{}
+	err = ptypes.UnmarshalAny(lc, &idlTrigger)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to unmarshal launch conditions to idl, metadata: [%+v]", spec.GetEntityMetadata())
+		return Trigger{}, err
+	}
+	if len(idlTrigger.Triggers) == 0 {
+		return Trigger{}, fmt.Errorf("invalid request to CreateTrigger, launch conditions cannot be empty")
+	}
+	// Create a list of the Artifact IDs referenced by the trigger definition.
+	// Keep in mind: these are not real IDs, they just contain partial information like the name.
+	// Always set the referenced artifacts to the project/domain of the launch plan
+	var runsOnArtifactIDs = make([]core.ArtifactID, len(idlTrigger.Triggers))
+	for i, t := range idlTrigger.Triggers {
+		runsOnArtifactIDs[i] = *t
+		runsOnArtifactIDs[i].ArtifactKey.Project = lpID.Project
+		runsOnArtifactIDs[i].ArtifactKey.Domain = lpID.Domain
+	}
+
+	specBytes, err := proto.Marshal(request.GetTriggerLaunchPlan().GetSpec())
+	if err != nil {
+		logger.Errorf(ctx, "Failed to marshal lp spec for CreateTrigger err: %v", err)
+		return Trigger{}, err
+	}
+	closureBytes, err := proto.Marshal(request.GetTriggerLaunchPlan().GetClosure())
+	if err != nil {
+		logger.Errorf(ctx, "Failed to marshal lp closure for CreateTrigger err: %v", err)
+		return Trigger{}, err
+	}
+
+	// Always set the project/domain of the trigger equal to the underlying launch plan
+	t := Trigger{
+		Project: lpID.Project,
+		Domain:  lpID.Domain,
+		Name:    idlTrigger.TriggerId.Name,
+		// Use LP id for the version because the trigger doesn't come with its own
+		// version for now... too difficult to update the version of the trigger
+		// inside the launch conditions object during registration.
+		Version:      lpID.Version,
+		LaunchPlanID: *lpID,
+		LaunchPlan:   request.GetTriggerLaunchPlan(),
+		RunsOn:       runsOnArtifactIDs,
+		Active:       true,
+		SpecBytes:    specBytes,
+		ClosureBytes: closureBytes,
+	}
+
+	return t, nil
 }

@@ -16,6 +16,8 @@ import (
 
 const pqInvalidDBCode = "3D000"
 const pqDbAlreadyExistsCode = "42P04"
+const PgDuplicatedForeignKey = "23503"
+const PgDuplicatedKey = "23505"
 const defaultDB = "postgres"
 
 // Resolves a password value from either a user-provided inline value or a filepath whose contents contain a password.
@@ -57,7 +59,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	if err == nil {
 		return gormDb, nil
 	}
-	if !isPgErrorWithCode(err, pqInvalidDBCode) {
+	if !IsPgErrorWithCode(err, pqInvalidDBCode) {
 		return nil, err
 	}
 	logger.Warningf(ctx, "Database [%v] does not exist", pgConfig.DbName)
@@ -80,7 +82,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	result := gormDb.Exec(createDBStatement)
 
 	if result.Error != nil {
-		if !isPgErrorWithCode(result.Error, pqDbAlreadyExistsCode) {
+		if !IsPgErrorWithCode(result.Error, pqDbAlreadyExistsCode) {
 			return nil, result.Error
 		}
 		logger.Warningf(ctx, "Got DB already exists error for [%s], skipping...", pgConfig.DbName)
@@ -89,7 +91,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	return gorm.Open(dialector, gormConfig)
 }
 
-func isPgErrorWithCode(err error, code string) bool {
+func IsPgErrorWithCode(err error, code string) bool {
 	// Make sure the pgconn you're using is "github.com/jackc/pgx/v5/pgconn"
 	// See https://github.com/go-gorm/gorm/issues/4135
 	pgErr := &pgconn.PgError{}

@@ -15,6 +15,7 @@ import (
 // ServiceCallHandler will take events and call the grpc endpoints directly. The service should most likely be local.
 type ServiceCallHandler struct {
 	service artifact.ArtifactRegistryServer
+	created chan<- artifact.Artifact
 }
 
 func (s *ServiceCallHandler) HandleEvent(ctx context.Context, cloudEvent *event2.Event, msg proto.Message) error {
@@ -103,6 +104,14 @@ func (s *ServiceCallHandler) HandleEventWorkflowExec(ctx context.Context, source
 			if err != nil {
 				logger.Errorf(ctx, "failed to create artifact for [%s] with error: %v", varName, err)
 				return err
+			}
+			// metric
+			select {
+			case s.created <- *resp.Artifact:
+				logger.Debugf(ctx, "Sent %v from handle workflow", resp.Artifact.ArtifactId)
+			default:
+				// metric
+				logger.Debugf(ctx, "Channel is full. didn't send %v", resp.Artifact.ArtifactId)
 			}
 			logger.Debugf(ctx, "Created wf artifact id [%+v] for key %s", resp.Artifact.ArtifactId, varName)
 		}
@@ -233,6 +242,14 @@ func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source str
 				return err
 			}
 			// metric
+			select {
+			case s.created <- *resp.Artifact:
+				logger.Debugf(ctx, "Sent %v from handle task", resp.Artifact.ArtifactId)
+			default:
+				// metric
+				logger.Debugf(ctx, "Channel is full. task handler didn't send %v", resp.Artifact.ArtifactId)
+			}
+
 			logger.Debugf(ctx, "Created artifact id [%+v] for key %s", resp.Artifact.ArtifactId, varName)
 		}
 	}
@@ -244,9 +261,10 @@ func (s *ServiceCallHandler) HandleEventNodeExec(_ context.Context, _ *event.Clo
 	return nil
 }
 
-func NewServiceCallHandler(ctx context.Context, svc artifact.ArtifactRegistryServer) EventsHandlerInterface {
+func NewServiceCallHandler(ctx context.Context, svc artifact.ArtifactRegistryServer, created chan<- artifact.Artifact) EventsHandlerInterface {
 	logger.Infof(ctx, "Creating new service call handler")
 	return &ServiceCallHandler{
 		service: svc,
+		created: created,
 	}
 }

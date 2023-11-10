@@ -13,7 +13,6 @@ import (
 type CoreService struct {
 	Storage   StorageInterface
 	BlobStore BlobStoreInterface
-	// TriggerHandler TriggerHandlerInterface
 	// SearchHandler  SearchHandlerInterface
 }
 
@@ -71,33 +70,55 @@ func (c *CoreService) GetArtifact(ctx context.Context, request *artifact.GetArti
 }
 
 func (c *CoreService) CreateTrigger(ctx context.Context, request *artifact.CreateTriggerRequest) (*artifact.CreateTriggerResponse, error) {
+	// Create the new trigger object.
+	// Mark all older versions of the trigger as inactive.
+
+	// trigger handler create trigger(storage layer)
+	serviceTrigger, err := models.CreateTriggerModelFromRequest(ctx, request)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create a valid Trigger from create request: %v with err %v", request, err)
+		return nil, err
+	}
+
+	createdTrigger, err := c.Storage.CreateTrigger(ctx, serviceTrigger)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create trigger: %v", err)
+	}
+	logger.Infof(ctx, "Created trigger: %+v", createdTrigger)
+
 	return &artifact.CreateTriggerResponse{}, nil
 }
 
 func (c *CoreService) DeleteTrigger(ctx context.Context, request *artifact.DeleteTriggerRequest) (*artifact.DeleteTriggerResponse, error) {
+	// Todo: gatepr - This needs to be implemented before merging.
 	return &artifact.DeleteTriggerResponse{}, nil
 }
 
 func (c *CoreService) AddTag(ctx context.Context, request *artifact.AddTagRequest) (*artifact.AddTagResponse, error) {
+	// Holding off on implementing for a while.
 	return &artifact.AddTagResponse{}, nil
 }
 
 func (c *CoreService) RegisterProducer(ctx context.Context, request *artifact.RegisterProducerRequest) (*artifact.RegisterResponse, error) {
+	// These are lineage endpoints slated for future work
 	return &artifact.RegisterResponse{}, nil
 }
 
 func (c *CoreService) RegisterConsumer(ctx context.Context, request *artifact.RegisterConsumerRequest) (*artifact.RegisterResponse, error) {
+	// These are lineage endpoints slated for future work
 	return &artifact.RegisterResponse{}, nil
 }
 
 func (c *CoreService) SearchArtifacts(ctx context.Context, request *artifact.SearchArtifactsRequest) (*artifact.SearchArtifactsResponse, error) {
+	// This is demo test code, will be deleted.
+	logger.Infof(ctx, "SearchArtifactsRequest: %+v", request)
+	triggers, err := c.Storage.GetTriggersByArtifactKey(ctx, *request.ArtifactKey)
+	if err != nil {
+		logger.Errorf(ctx, "delete me Failed to get triggers by artifact key [%+v]: %v", request.ArtifactKey, err)
+		return nil, err
+	}
+	fmt.Println(triggers)
 	return &artifact.SearchArtifactsResponse{}, nil
-}
-
-// HandleCloudEvent is the stand-in for simple open-source handling of the event stream, rather than using
-// a real
-func (c *CoreService) HandleCloudEvent(ctx context.Context, request *artifact.CloudEventRequest) (*artifact.CloudEventResponse, error) {
-	return &artifact.CloudEventResponse{}, nil
 }
 
 func NewCoreService(storage StorageInterface, blobStore BlobStoreInterface, _ promutils.Scope) CoreService {
