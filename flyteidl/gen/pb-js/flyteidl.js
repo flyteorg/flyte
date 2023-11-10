@@ -20362,6 +20362,8 @@
                  * @interface IDoTaskRequest
                  * @property {flyteidl.core.ILiteralMap|null} [inputs] DoTaskRequest inputs
                  * @property {flyteidl.core.ITaskTemplate|null} [template] DoTaskRequest template
+                 * @property {string|null} [outputPrefix] DoTaskRequest outputPrefix
+                 * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] DoTaskRequest taskExecutionMetadata
                  */
     
                 /**
@@ -20396,6 +20398,22 @@
                 DoTaskRequest.prototype.template = null;
     
                 /**
+                 * DoTaskRequest outputPrefix.
+                 * @member {string} outputPrefix
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @instance
+                 */
+                DoTaskRequest.prototype.outputPrefix = "";
+    
+                /**
+                 * DoTaskRequest taskExecutionMetadata.
+                 * @member {flyteidl.admin.ITaskExecutionMetadata|null|undefined} taskExecutionMetadata
+                 * @memberof flyteidl.admin.DoTaskRequest
+                 * @instance
+                 */
+                DoTaskRequest.prototype.taskExecutionMetadata = null;
+    
+                /**
                  * Creates a new DoTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.DoTaskRequest
@@ -20423,6 +20441,10 @@
                         $root.flyteidl.core.LiteralMap.encode(message.inputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.template != null && message.hasOwnProperty("template"))
                         $root.flyteidl.core.TaskTemplate.encode(message.template, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputPrefix);
+                    if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata"))
+                        $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -20449,6 +20471,12 @@
                             break;
                         case 2:
                             message.template = $root.flyteidl.core.TaskTemplate.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.outputPrefix = reader.string();
+                            break;
+                        case 4:
+                            message.taskExecutionMetadata = $root.flyteidl.admin.TaskExecutionMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20478,6 +20506,14 @@
                         var error = $root.flyteidl.core.TaskTemplate.verify(message.template);
                         if (error)
                             return "template." + error;
+                    }
+                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
+                        if (!$util.isString(message.outputPrefix))
+                            return "outputPrefix: string expected";
+                    if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata")) {
+                        var error = $root.flyteidl.admin.TaskExecutionMetadata.verify(message.taskExecutionMetadata);
+                        if (error)
+                            return "taskExecutionMetadata." + error;
                     }
                     return null;
                 };

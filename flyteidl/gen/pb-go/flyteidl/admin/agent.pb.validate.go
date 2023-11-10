@@ -679,6 +679,18 @@ func (m *DoTaskRequest) Validate() error {
 		}
 	}
 
+	// no validation rules for OutputPrefix
+
+	if v, ok := interface{}(m.GetTaskExecutionMetadata()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return DoTaskRequestValidationError{
+				field:  "TaskExecutionMetadata",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

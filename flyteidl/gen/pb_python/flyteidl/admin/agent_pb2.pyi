@@ -115,12 +115,16 @@ class DeleteTaskResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class DoTaskRequest(_message.Message):
-    __slots__ = ["inputs", "template"]
+    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
+    TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
     inputs: _literals_pb2.LiteralMap
     template: _tasks_pb2.TaskTemplate
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ...) -> None: ...
+    output_prefix: str
+    task_execution_metadata: TaskExecutionMetadata
+    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
 
 class DoTaskResponse(_message.Message):
     __slots__ = ["resource"]

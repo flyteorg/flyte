@@ -242,6 +242,11 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	})
 	tMeta := &pluginCoreMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.OnGetNamespace().Return("test-namespace")
+	tMeta.OnGetLabels().Return(map[string]string{"foo": "bar"})
+	tMeta.OnGetAnnotations().Return(map[string]string{"foo": "bar"})
+	tMeta.OnGetK8sServiceAccount().Return("k8s-account")
+	tMeta.OnGetEnvironmentVariables().Return(map[string]string{"foo": "bar"})
 	resourceManager := &pluginCoreMocks.ResourceManager{}
 	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
 	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)

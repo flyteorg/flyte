@@ -97,6 +97,10 @@ message DoTaskRequest {
   core.LiteralMap inputs = 1;
   // Template of the task that encapsulates all the metadata of the task.
   core.TaskTemplate template = 2;
+  // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+  string output_prefix = 3;
+  // subset of runtime task execution metadata.
+  TaskExecutionMetadata task_execution_metadata = 4;
 }
 
 message DoTaskResponse {

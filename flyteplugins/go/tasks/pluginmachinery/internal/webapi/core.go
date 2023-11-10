@@ -8,6 +8,7 @@ import (
 
 	"k8s.io/utils/clock"
 
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
@@ -104,21 +105,29 @@ func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionConte
 	return core.DoTransition(phaseInfo), nil
 }
 
-func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	taskTemplate, err := tCtx.TaskReader().Read(ctx)
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
+func (c CorePlugin) useSyncPlugin(taskTemplate *flyteIdlCore.TaskTemplate) bool {
 	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
 	metadata := taskTemplate.GetMetadata()
 	if metadata != nil {
 		runtime := metadata.GetRuntime()
 		if runtime != nil {
 			if runtime.GetFlavor() == syncPlugin {
-				return c.syncHandle(ctx, tCtx)
+				return true
 			}
 		}
+	}
+
+	return false
+}
+
+func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return core.UnknownTransition, err
+	}
+
+	if c.useSyncPlugin(taskTemplate) {
+		return c.syncHandle(ctx, tCtx)
 	}
 
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())

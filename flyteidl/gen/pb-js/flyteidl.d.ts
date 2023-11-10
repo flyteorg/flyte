@@ -8355,6 +8355,12 @@ export namespace flyteidl {
 
             /** DoTaskRequest template */
             template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** DoTaskRequest outputPrefix */
+            outputPrefix?: (string|null);
+
+            /** DoTaskRequest taskExecutionMetadata */
+            taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
         }
 
         /** Represents a DoTaskRequest. */
@@ -8371,6 +8377,12 @@ export namespace flyteidl {
 
             /** DoTaskRequest template. */
             public template?: (flyteidl.core.ITaskTemplate|null);
+
+            /** DoTaskRequest outputPrefix. */
+            public outputPrefix: string;
+
+            /** DoTaskRequest taskExecutionMetadata. */
+            public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
 
             /**
              * Creates a new DoTaskRequest instance using the specified properties.

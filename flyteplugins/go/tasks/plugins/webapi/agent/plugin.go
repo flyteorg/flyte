@@ -74,7 +74,6 @@ func (p pluginContext) ResourceMeta() webapi.ResourceMeta {
 }
 
 func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (phase core.PhaseInfo, err error) {
-	// write the resource here
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return core.PhaseInfoUndefined, err
@@ -84,6 +83,8 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (ph
 	if err != nil {
 		return core.PhaseInfoUndefined, err
 	}
+
+	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
 	if err != nil {
@@ -98,7 +99,8 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (ph
 	finalCtx, cancel := getFinalContext(ctx, "DoTask", agent)
 	defer cancel()
 
-	res, err := client.DoTask(finalCtx, &admin.DoTaskRequest{Inputs: inputs, Template: taskTemplate})
+	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	res, err := client.DoTask(finalCtx, &admin.DoTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
 	if err != nil {
 		return core.PhaseInfoUndefined, err
 	}
