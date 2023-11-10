@@ -11198,7 +11198,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:create_execution:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:create_execution:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -11206,7 +11206,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:create_execution:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:create_execution:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -11649,7 +11649,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:create_launch_plan:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:create_launch_plan:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -11657,7 +11657,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:create_launch_plan:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:create_launch_plan:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -12100,7 +12100,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:create_task:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:create_task:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -12108,7 +12108,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:create_task:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:create_task:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -12551,7 +12551,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:create_workflow:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:create_workflow:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -12559,7 +12559,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:create_workflow:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:create_workflow:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -13002,7 +13002,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:create_node_execution_event:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:create_node_execution_event:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -13010,7 +13010,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:create_node_execution_event:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:create_node_execution_event:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -13453,7 +13453,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:create_task_execution_event:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:create_task_execution_event:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -13461,7 +13461,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:create_task_execution_event:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:create_task_execution_event:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -13904,7 +13904,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:get_execution:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:get_execution:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -13912,7 +13912,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:get_execution:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:get_execution:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -14355,7 +14355,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:get_launch_plan:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:get_launch_plan:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -14363,7 +14363,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:get_launch_plan:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:get_launch_plan:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -14806,7 +14806,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:get_task:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:get_task:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -14814,7 +14814,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:get_task:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:get_task:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -15257,7 +15257,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:get_workflow:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:get_workflow:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -15265,7 +15265,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:get_workflow:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:get_workflow:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -15708,7 +15708,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:get_node_execution:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:get_node_execution:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -15716,7 +15716,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:get_node_execution:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:get_node_execution:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -16159,7 +16159,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:get_task_execution:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:get_task_execution:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -16167,7 +16167,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:get_task_execution:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:get_task_execution:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -16610,7 +16610,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:get_active_launch_plan:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:get_active_launch_plan:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -16618,7 +16618,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:get_active_launch_plan:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:get_active_launch_plan:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -17061,7 +17061,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:list_execution:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:list_execution:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -17069,7 +17069,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:list_execution:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:list_execution:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -17512,7 +17512,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:list_launch_plan:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:list_launch_plan:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -17520,7 +17520,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:list_launch_plan:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:list_launch_plan:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -17963,7 +17963,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:list_task:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:list_task:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -17971,7 +17971,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:list_task:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:list_task:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -18414,7 +18414,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:list_workflow:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:list_workflow:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -18422,7 +18422,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:list_workflow:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:list_workflow:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -18865,7 +18865,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:list_node_execution:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:list_node_execution:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -18873,7 +18873,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:list_node_execution:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:list_node_execution:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -19316,7 +19316,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:list_task_execution:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:list_task_execution:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -19324,7 +19324,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:list_task_execution:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:list_task_execution:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -19767,7 +19767,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:admin:admin:list_active_launch_plans:duration_ms) by (quantile)",
+              "expr": "max(flyte:admin:admin:list_active_launch_plans:duration_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -19775,7 +19775,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:admin:admin:list_active_launch_plans:duration_ms) by (quantile)",
+              "query": "max(flyte:admin:admin:list_active_launch_plans:duration_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""

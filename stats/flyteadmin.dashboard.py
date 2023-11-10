@@ -120,7 +120,7 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(flyte:admin:admin:{api}:duration_ms) by (quantile)',
+                    expr=f'max(flyte:admin:admin:{api}:duration_ms) by (quantile)',
                     refId='A',
                 ),
             ],
