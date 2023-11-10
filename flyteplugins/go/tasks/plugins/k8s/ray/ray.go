@@ -489,8 +489,11 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 			return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
 		case rayv1alpha1.JobStatusSucceeded:
 			return pluginsCore.PhaseInfoSuccess(info), nil
-		case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusRunning, rayv1alpha1.JobStatusStopped:
+		case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusRunning:
 			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+		case rayv1alpha1.JobStatusStopped:
+			// There is no current usage of this job status in KubeRay. It's unclear what it represents
+			fallthrough
 		default:
 			// We already handle all known job status, so this should never happen unless a future version of ray
 			// introduced a new job status.
