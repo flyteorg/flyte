@@ -470,7 +470,7 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		taskLogs = append(taskLogs, dashboardUrlOutput.TaskLogs...)
 	}
 
-	return &pluginsCore.TaskInfo{Logs: logOutput.TaskLogs}, nil
+	return &pluginsCore.TaskInfo{Logs: taskLogs}, nil
 }
 
 func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
