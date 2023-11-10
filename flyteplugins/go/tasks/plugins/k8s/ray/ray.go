@@ -455,7 +455,7 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	taskLogs = append(taskLogs, logOutput.TaskLogs...)
 
 	// Handling for Ray Dashboard
-	dashboardURLTemplate := GetConfig().DashboardUrlTemplate
+	dashboardURLTemplate := GetConfig().DashboardURLTemplate
 	if dashboardURLTemplate != nil &&
 		rayJob.Status.DashboardURL != "" &&
 		rayJob.Status.JobStatus == rayv1alpha1.JobStatusRunning {

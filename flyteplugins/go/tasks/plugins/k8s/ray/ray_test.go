@@ -645,17 +645,19 @@ func TestGetTaskPhase(t *testing.T) {
 		rayJobPhase       rayv1alpha1.JobStatus
 		rayClusterPhase   rayv1alpha1.JobDeploymentStatus
 		expectedCorePhase pluginsCore.Phase
+		expectedError     bool
 	}{
-		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseUndefined},
-		{rayv1alpha1.JobStatusRunning, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess},
-		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess},
+		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusRunning, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess, false},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
+		{rayv1alpha1.JobStatusStopped, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseUndefined, true},
 	}
 
 	for _, tc := range testCases {
@@ -666,7 +668,11 @@ func TestGetTaskPhase(t *testing.T) {
 			startTime := metav1.NewTime(time.Now())
 			rayObject.Status.StartTime = &startTime
 			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
-			assert.Nil(t, err)
+			if tc.expectedError {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
 			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
 		})
 	}
@@ -717,7 +723,7 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.NoError(t, SetConfig(&Config{DashboardUrlTemplate: &tc.dashboardURLTemplate}))
+			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
 			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
