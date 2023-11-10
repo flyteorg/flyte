@@ -91,13 +91,6 @@ func (c *CoreService) CreateTrigger(ctx context.Context, request *artifact.Creat
 
 func (c *CoreService) DeleteTrigger(ctx context.Context, request *artifact.DeleteTriggerRequest) (*artifact.DeleteTriggerResponse, error) {
 	// Todo: gatepr - This needs to be implemented before merging.
-
-	/*
-		artifact key -> trigger keys
-		what does this tell you? given an artifact, list the trigger names that are relevant to it.
-
-		so
-	*/
 	return &artifact.DeleteTriggerResponse{}, nil
 }
 
