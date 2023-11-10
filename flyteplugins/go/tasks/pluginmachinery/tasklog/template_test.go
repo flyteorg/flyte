@@ -9,6 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func TestTemplateLog(t *testing.T) {
@@ -36,6 +38,30 @@ func Benchmark_initDefaultRegexes(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		initDefaultRegexes()
 	}
+}
+
+func dummyTaskExecID() pluginCore.TaskExecutionID {
+	tID := &coreMocks.TaskExecutionID{}
+	tID.OnGetGeneratedName().Return("generated-name")
+	tID.OnGetID().Return(core.TaskExecutionIdentifier{
+		TaskId: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Name:         "my-task-name",
+			Project:      "my-task-project",
+			Domain:       "my-task-domain",
+			Version:      "1",
+		},
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Name:    "my-execution-name",
+				Project: "my-execution-project",
+				Domain:  "my-execution-domain",
+			},
+		},
+		RetryAttempt: 1,
+	})
+	tID.OnGetUniqueNodeID().Return("n0-0-n0")
+	return tID
 }
 
 func Test_Input_templateVarsForScheme(t *testing.T) {
@@ -66,25 +92,8 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		PodUnixFinishTime:    12345,
 	}
 	taskExecutionBase := Input{
-		LogName: "main_logs",
-		TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
-			TaskId: &core.Identifier{
-				ResourceType: core.ResourceType_TASK,
-				Name:         "my-task-name",
-				Project:      "my-task-project",
-				Domain:       "my-task-domain",
-				Version:      "1",
-			},
-			NodeExecutionId: &core.NodeExecutionIdentifier{
-				NodeId: "n0",
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Name:    "my-execution-name",
-					Project: "my-execution-project",
-					Domain:  "my-execution-domain",
-				},
-			},
-			RetryAttempt: 0,
-		},
+		LogName:         "main_logs",
+		TaskExecutionID: dummyTaskExecID(),
 	}
 
 	tests := []struct {
@@ -162,12 +171,12 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			nil,
 			TemplateVars{
 				{defaultRegexes.LogName, "main_logs"},
-				{defaultRegexes.TaskRetryAttempt, "0"},
+				{defaultRegexes.NodeID, "n0-0-n0"},
+				{defaultRegexes.TaskRetryAttempt, "1"},
 				{defaultRegexes.TaskID, "my-task-name"},
 				{defaultRegexes.TaskVersion, "1"},
 				{defaultRegexes.TaskProject, "my-task-project"},
 				{defaultRegexes.TaskDomain, "my-task-domain"},
-				{defaultRegexes.NodeID, "n0"},
 				{defaultRegexes.ExecutionName, "my-execution-name"},
 				{defaultRegexes.ExecutionProject, "my-execution-project"},
 				{defaultRegexes.ExecutionDomain, "my-execution-domain"},
@@ -484,30 +493,13 @@ func TestTemplateLogPlugin_NewTaskLog(t *testing.T) {
 					PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
 					PodUnixStartTime:     123,
 					PodUnixFinishTime:    12345,
-					TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
-						TaskId: &core.Identifier{
-							ResourceType: core.ResourceType_TASK,
-							Name:         "my-task-name",
-							Project:      "my-task-project",
-							Domain:       "my-task-domain",
-							Version:      "1",
-						},
-						NodeExecutionId: &core.NodeExecutionIdentifier{
-							NodeId: "n0",
-							ExecutionId: &core.WorkflowExecutionIdentifier{
-								Name:    "my-execution-name",
-								Project: "my-execution-project",
-								Domain:  "my-execution-domain",
-							},
-						},
-						RetryAttempt: 0,
-					},
+					TaskExecutionID:      dummyTaskExecID(),
 				},
 			},
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "https://flyte.corp.net/console/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0/taskId/my-task-name/attempt/0/view/logs",
+						Uri:           "https://flyte.corp.net/console/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0-0-n0/taskId/my-task-name/attempt/1/view/logs",
 						MessageFormat: core.TaskLog_JSON,
 						Name:          "main_logs",
 					},
@@ -534,24 +526,7 @@ func TestTemplateLogPlugin_NewTaskLog(t *testing.T) {
 					PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
 					PodUnixStartTime:     123,
 					PodUnixFinishTime:    12345,
-					TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
-						TaskId: &core.Identifier{
-							ResourceType: core.ResourceType_TASK,
-							Name:         "my-task-name",
-							Project:      "my-task-project",
-							Domain:       "my-task-domain",
-							Version:      "1",
-						},
-						NodeExecutionId: &core.NodeExecutionIdentifier{
-							NodeId: "n0",
-							ExecutionId: &core.WorkflowExecutionIdentifier{
-								Name:    "my-execution-name",
-								Project: "my-execution-project",
-								Domain:  "my-execution-domain",
-							},
-						},
-						RetryAttempt: 0,
-					},
+					TaskExecutionID:      dummyTaskExecID(),
 					ExtraTemplateVarsByScheme: &TemplateVarsByScheme{
 						TaskExecution: TemplateVars{
 							{MustCreateRegex("subtaskExecutionIndex"), "1"},
@@ -564,7 +539,7 @@ func TestTemplateLogPlugin_NewTaskLog(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "https://flyte.corp.net/console/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0/taskId/my-task-name/attempt/0/mappedIndex/1/mappedAttempt/1/view/logs",
+						Uri:           "https://flyte.corp.net/console/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0-0-n0/taskId/my-task-name/attempt/0/mappedIndex/1/mappedAttempt/1/view/logs",
 						MessageFormat: core.TaskLog_JSON,
 						Name:          "main_logs",
 					},

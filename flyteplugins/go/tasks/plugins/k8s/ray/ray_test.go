@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	rayv1alpha1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1alpha1"
 	"github.com/stretchr/testify/assert"
@@ -56,6 +55,26 @@ var (
 	workerGroupName = "worker-group"
 )
 
+func transformRayJobToCustomObj(rayJob *plugins.RayJob) *structpb.Struct {
+	structObj, err := utils.MarshalObjToStruct(rayJob)
+	if err != nil {
+		panic(err)
+	}
+	return structObj
+}
+
+func transformPodSpecToTaskTemplateTarget(podSpec *corev1.PodSpec) *core.TaskTemplate_K8SPod {
+	structObj, err := utils.MarshalObjToStruct(&podSpec)
+	if err != nil {
+		panic(err)
+	}
+	return &core.TaskTemplate_K8SPod{
+		K8SPod: &core.K8SPod{
+			PodSpec: structObj,
+		},
+	}
+}
+
 func dummyRayCustomObj() *plugins.RayJob {
 	return &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
@@ -65,19 +84,7 @@ func dummyRayCustomObj() *plugins.RayJob {
 	}
 }
 
-func dummyRayTaskTemplate(id string, rayJobObj *plugins.RayJob) *core.TaskTemplate {
-	ptObjJSON, err := utils.MarshalToString(rayJobObj)
-	if err != nil {
-		panic(err)
-	}
-
-	structObj := structpb.Struct{}
-
-	err = jsonpb.UnmarshalString(ptObjJSON, &structObj)
-	if err != nil {
-		panic(err)
-	}
-
+func dummyRayTaskTemplate(id string, rayJob *plugins.RayJob) *core.TaskTemplate {
 	return &core.TaskTemplate{
 		Id:   &core.Identifier{Name: id},
 		Type: "container",
@@ -88,7 +95,7 @@ func dummyRayTaskTemplate(id string, rayJobObj *plugins.RayJob) *core.TaskTempla
 				Env:   dummyEnvVars,
 			},
 		},
-		Custom: &structObj,
+		Custom: transformRayJobToCustomObj(rayJob),
 	}
 }
 
@@ -198,7 +205,7 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
 	}))
 
-	fixtures := []struct {
+	params := []struct {
 		name                      string
 		resources                 *corev1.ResourceRequirements
 		extendedResourcesBase     *core.ExtendedResources
@@ -292,11 +299,11 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 		},
 	}
 
-	for _, f := range fixtures {
-		t.Run(f.name, func(t *testing.T) {
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
 			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
-			taskTemplate.ExtendedResources = f.extendedResourcesBase
-			taskContext := dummyRayTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
+			taskTemplate.ExtendedResources = p.extendedResourcesBase
+			taskContext := dummyRayTaskContext(taskTemplate, p.resources, p.extendedResourcesOverride)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -308,12 +315,12 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
 			assert.EqualValues(
 				t,
-				f.expectedNsr,
+				p.expectedNsr,
 				headNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
 			)
 			assert.EqualValues(
 				t,
-				f.expectedTol,
+				p.expectedTol,
 				headNodeSpec.Tolerations,
 			)
 
@@ -321,12 +328,12 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
 			assert.EqualValues(
 				t,
-				f.expectedNsr,
+				p.expectedNsr,
 				workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
 			)
 			assert.EqualValues(
 				t,
-				f.expectedTol,
+				p.expectedTol,
 				workerNodeSpec.Tolerations,
 			)
 		})
@@ -380,6 +387,219 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
+}
+
+func TestInjectLogsSidecar(t *testing.T) {
+	rayJobObj := transformRayJobToCustomObj(dummyRayCustomObj())
+	params := []struct {
+		name         string
+		taskTemplate core.TaskTemplate
+		// primaryContainerName string
+		logsSidecarCfg                       *corev1.Container
+		expectedVolumes                      []corev1.Volume
+		expectedPrimaryContainerVolumeMounts []corev1.VolumeMount
+		expectedLogsSidecarVolumeMounts      []corev1.VolumeMount
+	}{
+		{
+			"container target",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: &core.TaskTemplate_Container{
+					Container: &core.Container{
+						Image: testImage,
+						Args:  testArgs,
+					},
+				},
+				Custom: rayJobObj,
+			},
+			&corev1.Container{
+				Name:  "logs-sidecar",
+				Image: "test-image",
+			},
+			[]corev1.Volume{
+				{
+					Name: "system-ray-state",
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+					ReadOnly:  true,
+				},
+			},
+		},
+		{
+			"container target with no sidecar",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: &core.TaskTemplate_Container{
+					Container: &core.Container{
+						Image: testImage,
+						Args:  testArgs,
+					},
+				},
+				Custom: rayJobObj,
+			},
+			nil,
+			nil,
+			nil,
+			nil,
+		},
+		{
+			"pod target",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: transformPodSpecToTaskTemplateTarget(&corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "main",
+							Image: "primary-image",
+						},
+					},
+				}),
+				Custom: rayJobObj,
+				Config: map[string]string{
+					flytek8s.PrimaryContainerKey: "main",
+				},
+			},
+			&corev1.Container{
+				Name:  "logs-sidecar",
+				Image: "test-image",
+			},
+			[]corev1.Volume{
+				{
+					Name: "system-ray-state",
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+					ReadOnly:  true,
+				},
+			},
+		},
+		{
+			"pod target with existing ray state volume",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: transformPodSpecToTaskTemplateTarget(&corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "main",
+							Image: "primary-image",
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "test-vol",
+									MountPath: "/tmp/ray",
+								},
+							},
+						},
+					},
+					Volumes: []corev1.Volume{
+						{
+							Name: "test-vol",
+							VolumeSource: corev1.VolumeSource{
+								EmptyDir: &corev1.EmptyDirVolumeSource{},
+							},
+						},
+					},
+				}),
+				Custom: rayJobObj,
+				Config: map[string]string{
+					flytek8s.PrimaryContainerKey: "main",
+				},
+			},
+			&corev1.Container{
+				Name:  "logs-sidecar",
+				Image: "test-image",
+			},
+			[]corev1.Volume{
+				{
+					Name: "test-vol",
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "test-vol",
+					MountPath: "/tmp/ray",
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "test-vol",
+					MountPath: "/tmp/ray",
+					ReadOnly:  true,
+				},
+			},
+		},
+	}
+
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
+			assert.NoError(t, SetConfig(&Config{
+				LogsSidecar: p.logsSidecarCfg,
+			}))
+			taskContext := dummyRayTaskContext(&p.taskTemplate, resourceRequirements, nil)
+			rayJobResourceHandler := rayJobResourceHandler{}
+			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			rayJob, ok := r.(*rayv1alpha1.RayJob)
+			assert.True(t, ok)
+
+			headPodSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+
+			// Check volumes
+			assert.EqualValues(t, p.expectedVolumes, headPodSpec.Volumes)
+
+			// Check containers and respective volume mounts
+			foundPrimaryContainer := false
+			foundLogsSidecar := false
+			for _, cnt := range headPodSpec.Containers {
+				if cnt.Name == "ray-head" {
+					foundPrimaryContainer = true
+					assert.EqualValues(
+						t,
+						p.expectedPrimaryContainerVolumeMounts,
+						cnt.VolumeMounts,
+					)
+				}
+				if p.logsSidecarCfg != nil && cnt.Name == p.logsSidecarCfg.Name {
+					foundLogsSidecar = true
+					assert.EqualValues(
+						t,
+						p.expectedLogsSidecarVolumeMounts,
+						cnt.VolumeMounts,
+					)
+				}
+			}
+			assert.Equal(t, true, foundPrimaryContainer)
+			assert.Equal(t, p.logsSidecarCfg != nil, foundLogsSidecar)
+		})
+	}
 }
 
 func newPluginContext() k8s.PluginContext {
