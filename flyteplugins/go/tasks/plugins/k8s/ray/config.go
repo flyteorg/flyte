@@ -8,6 +8,7 @@ import (
 	pluginsConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
@@ -78,11 +79,12 @@ type Config struct {
 	DeprecatedNodeIPAddress string `json:"nodeIPAddress,omitempty" pflag:"-,DEPRECATED. Please use DefaultConfig.[HeadNode|WorkerNode].IPAddress"`
 
 	// Remote Ray Cluster Config
-	RemoteClusterConfig pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
-	Logs                logs.LogConfig                `json:"logs" pflag:"-,Log configuration for ray jobs"`
-	LogsSidecar         *v1.Container                 `json:"logsSidecar" pflag:"-,Sidecar to inject into head pods for capturing ray job logs"`
-	Defaults            DefaultConfig                 `json:"defaults" pflag:"-,Default configuration for ray jobs"`
-	EnableUsageStats    bool                          `json:"enableUsageStats" pflag:",Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html"`
+	RemoteClusterConfig  pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
+	Logs                 logs.LogConfig                `json:"logs" pflag:"-,Log configuration for ray jobs"`
+	LogsSidecar          *v1.Container                 `json:"logsSidecar" pflag:"-,Sidecar to inject into head pods for capturing ray job logs"`
+	DashboardURLTemplate *tasklog.TemplateLogPlugin    `json:"dashboardURLTemplate" pflag:",Template for URL of Ray dashboard running on a head node."`
+	Defaults             DefaultConfig                 `json:"defaults" pflag:"-,Default configuration for ray jobs"`
+	EnableUsageStats     bool                          `json:"enableUsageStats" pflag:",Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html"`
 }
 
 type DefaultConfig struct {
