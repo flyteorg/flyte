@@ -461,8 +461,8 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	// Handling for Ray Dashboard
 	dashboardUrlTemplate := GetConfig().DashboardUrlTemplate
 	if dashboardUrlTemplate != nil &&
-		rayJob.Status.JobDeploymentStatus == rayv1alpha1.JobDeploymentStatusRunning &&
-		rayJob.Status.DashboardURL != "" {
+		rayJob.Status.DashboardURL != "" &&
+		rayJob.Status.JobStatus == rayv1alpha1.JobStatusRunning {
 		dashboardUrlOutput, err := dashboardUrlTemplate.GetTaskLogs(input)
 		if err != nil {
 			return nil, fmt.Errorf("failed to generate Ray dashboard link. Error: %w", err)
@@ -503,8 +503,14 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 			return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
 		case rayv1alpha1.JobStatusSucceeded:
 			return pluginsCore.PhaseInfoSuccess(info), nil
-		case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusRunning:
+		case rayv1alpha1.JobStatusPending:
 			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+		case rayv1alpha1.JobStatusRunning:
+			phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
+			if len(info.Logs) > 0 {
+				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
+			}
+			return phaseInfo, nil
 		}
 	}
 
