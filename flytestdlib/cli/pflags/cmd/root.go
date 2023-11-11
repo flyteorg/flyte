@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/flyteorg/flyte/flytestdlib/cli/pflags/api"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/spf13/cobra"
 )
 
 var (

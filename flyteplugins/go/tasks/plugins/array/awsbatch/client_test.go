@@ -6,20 +6,16 @@ package awsbatch
 
 import (
 	"context"
-
-	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/batch"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func newClientWithMockBatch() *client {

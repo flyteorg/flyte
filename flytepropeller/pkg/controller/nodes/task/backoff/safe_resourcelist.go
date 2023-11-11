@@ -4,10 +4,9 @@ import (
 	"strings"
 	"sync"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 // SyncResourceList is a thread-safe Map. It's meant to replace v1.ResourceList for concurrency-sensitive

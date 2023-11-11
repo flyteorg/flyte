@@ -1,28 +1,23 @@
 package gormimpl
 
 import (
+	"context"
+	"database/sql/driver"
 	"testing"
 
-	"github.com/jackc/pgconn"
-
-	"gorm.io/gorm"
-
-	"context"
-
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/jackc/pgconn"
 	"github.com/stretchr/testify/assert"
-
-	"database/sql/driver"
+	"google.golang.org/grpc/codes"
+	"gorm.io/gorm"
 
 	datacatalog_error "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
-
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/utils"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"google.golang.org/grpc/codes"
 )
 
 func init() {

@@ -6,10 +6,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func executeCommand(root *cobra.Command, args ...string) (output string, err error) {

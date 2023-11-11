@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -14,7 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-	"google.golang.org/grpc/codes"
 )
 
 var entityToResourceType = map[common.Entity]core.ResourceType{

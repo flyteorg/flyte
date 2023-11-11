@@ -15,7 +15,7 @@ import (
 type FakeInformers struct {
 }
 
-func (f *FakeInformers) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+func (f *FakeInformers) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	return nil
 }
 
@@ -31,7 +31,7 @@ func (f *FakeInformers) List(ctx context.Context, list client.ObjectList, opts .
 	return nil
 }
 
-func (f *FakeInformers) GetInformerForKind(ctx context.Context, gvk schema.GroupVersionKind) (cache.Informer, error) {
+func (f *FakeInformers) GetInformerForKind(ctx context.Context, gvk schema.GroupVersionKind, opts ...cache.InformerGetOption) (cache.Informer, error) {
 	return &controllertest.FakeInformer{}, nil
 }
 
@@ -39,7 +39,7 @@ func (f *FakeInformers) Start(ctx context.Context) error {
 	return nil
 }
 
-func (f *FakeInformers) GetInformer(ctx context.Context, obj client.Object) (cache.Informer, error) {
+func (f *FakeInformers) GetInformer(ctx context.Context, obj client.Object, opts ...cache.InformerGetOption) (cache.Informer, error) {
 	return &controllertest.FakeInformer{}, nil
 }
 

@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_container import CoreContainer  # noqa: F401,E501
+from flyteadmin.models.core_extended_resources import CoreExtendedResources  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_k8s_pod import CoreK8sPod  # noqa: F401,E501
 from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
@@ -50,6 +51,7 @@ class CoreTaskTemplate(object):
         'sql': 'CoreSql',
         'task_type_version': 'int',
         'security_context': 'CoreSecurityContext',
+        'extended_resources': 'CoreExtendedResources',
         'config': 'dict(str, str)'
     }
 
@@ -64,10 +66,11 @@ class CoreTaskTemplate(object):
         'sql': 'sql',
         'task_type_version': 'task_type_version',
         'security_context': 'security_context',
+        'extended_resources': 'extended_resources',
         'config': 'config'
     }
 
-    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, k8s_pod=None, sql=None, task_type_version=None, security_context=None, config=None):  # noqa: E501
+    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, k8s_pod=None, sql=None, task_type_version=None, security_context=None, extended_resources=None, config=None):  # noqa: E501
         """CoreTaskTemplate - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -80,6 +83,7 @@ class CoreTaskTemplate(object):
         self._sql = None
         self._task_type_version = None
         self._security_context = None
+        self._extended_resources = None
         self._config = None
         self.discriminator = None
 
@@ -103,6 +107,8 @@ class CoreTaskTemplate(object):
             self.task_type_version = task_type_version
         if security_context is not None:
             self.security_context = security_context
+        if extended_resources is not None:
+            self.extended_resources = extended_resources
         if config is not None:
             self.config = config
 
@@ -329,6 +335,29 @@ class CoreTaskTemplate(object):
         """
 
         self._security_context = security_context
+
+    @property
+    def extended_resources(self):
+        """Gets the extended_resources of this CoreTaskTemplate.  # noqa: E501
+
+        Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to allocate to a task.  # noqa: E501
+
+        :return: The extended_resources of this CoreTaskTemplate.  # noqa: E501
+        :rtype: CoreExtendedResources
+        """
+        return self._extended_resources
+
+    @extended_resources.setter
+    def extended_resources(self, extended_resources):
+        """Sets the extended_resources of this CoreTaskTemplate.
+
+        Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to allocate to a task.  # noqa: E501
+
+        :param extended_resources: The extended_resources of this CoreTaskTemplate.  # noqa: E501
+        :type: CoreExtendedResources
+        """
+
+        self._extended_resources = extended_resources
 
     @property
     def config(self):

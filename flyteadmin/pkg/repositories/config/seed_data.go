@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"gorm.io/gorm"
 )
 
 // Returns a function to seed the database with default values.

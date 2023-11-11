@@ -174,7 +174,7 @@ metadata:
 ```
 This can work the same way cluster resource templates are mounted as ConfigMaps in the FlyteAdmin deployment but are [fully customizable](https://github.com/flyteorg/flyte/blob/5ab8cb887a5a7051070cb93fca603ed1f22f2f74/charts/flyte-core/values.yaml#L752-L810).
 
-This does require restarting the FlyteAdmin deployment for individual overrides changes but allows for declaratively defining the complete set of overrides in a reproducible manner. See more discusison on the trade-offs [here](https://github.com/flyteorg/flyte/discussions/3731#discussioncomment-6053743).
+This does require restarting the FlyteAdmin deployment for individual overrides changes but allows for declaratively defining the complete set of overrides in a reproducible manner. See more discussion on the trade-offs [here](https://github.com/flyteorg/flyte/discussions/3731#discussioncomment-6053743).
 
 #### FlyteAdmin changes
 

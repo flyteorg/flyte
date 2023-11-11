@@ -6,9 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime/configs"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )

@@ -80,6 +80,11 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
 		RequestIDInterceptor, auth.BlanketAuthorization, auth.ExecutionUserIdentifierInterceptor))
 
+	if cfg.GrpcConfig.EnableGrpcLatencyMetrics {
+		logger.Debugf(ctx, "enabling grpc histogram metrics")
+		grpcprometheus.EnableHandlingTimeHistogram()
+	}
+
 	// Not yet implemented for streaming
 	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
 	if cfg.Security.UseAuth {

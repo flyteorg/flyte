@@ -8,15 +8,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/atomic"
-
+	"github.com/stretchr/testify/assert"
 	"k8s.io/client-go/util/workqueue"
 
+	"github.com/flyteorg/flyte/flytestdlib/atomic"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
-
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/stretchr/testify/assert"
 )
 
 const fakeCacheItemValueLimit = 10
@@ -62,7 +59,7 @@ func syncTerminalItem(_ context.Context, batch Batch) ([]ItemSyncResponse, error
 	panic("This should never be called")
 }
 
-func TestCacheThree(t *testing.T) {
+func TestCacheFour(t *testing.T) {
 	testResyncPeriod := time.Millisecond
 	rateLimiter := workqueue.DefaultControllerRateLimiter()
 
@@ -139,6 +136,34 @@ func TestCacheThree(t *testing.T) {
 		// Wait half a second for all resync periods to complete
 		// If the cache tries to enqueue the item, a panic will be thrown.
 		time.Sleep(500 * time.Millisecond)
+
+		cancel()
+	})
+
+	t.Run("Test update and delete cache", func(t *testing.T) {
+		cache, err := NewAutoRefreshCache("fake3", syncTerminalItem, rateLimiter, testResyncPeriod, 10, 2, promutils.NewTestScope())
+		assert.NoError(t, err)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		assert.NoError(t, cache.Start(ctx))
+
+		itemID := "dummy_id"
+		_, err = cache.GetOrCreate(itemID, terminalCacheItem{
+			val: 0,
+		})
+		assert.NoError(t, err)
+
+		// Wait half a second for all resync periods to complete
+		// If the cache tries to enqueue the item, a panic will be thrown.
+		time.Sleep(500 * time.Millisecond)
+
+		err = cache.DeleteDelayed(itemID)
+		assert.NoError(t, err)
+
+		time.Sleep(500 * time.Millisecond)
+		item, err := cache.Get(itemID)
+		assert.Nil(t, item)
+		assert.Error(t, err)
 
 		cancel()
 	})

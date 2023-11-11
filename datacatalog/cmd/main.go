@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/flyteorg/flyte/datacatalog/cmd/entrypoints"
 	"github.com/golang/glog"
+
+	"github.com/flyteorg/flyte/datacatalog/cmd/entrypoints"
 )
 
 func main() {

@@ -5,21 +5,17 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-
-	"k8s.io/client-go/tools/clientcmd/api/latest"
-
-	"k8s.io/apimachinery/pkg/runtime"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
-	"github.com/stretchr/testify/mock"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/clientcmd/api/latest"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func TestPodMutator_Mutate(t *testing.T) {
@@ -110,8 +106,7 @@ func Test_Handle(t *testing.T) {
 		ServiceName: "my-service",
 	}, promutils.NewTestScope())
 
-	decoder, err := admission.NewDecoder(latest.Scheme)
-	assert.NoError(t, err)
+	decoder := admission.NewDecoder(latest.Scheme)
 	assert.NoError(t, pm.InjectDecoder(decoder))
 
 	req := admission.Request{

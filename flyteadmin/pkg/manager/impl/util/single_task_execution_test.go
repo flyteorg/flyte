@@ -5,21 +5,19 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
-
-	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
-
-	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestGenerateNodeNameFromTask(t *testing.T) {
