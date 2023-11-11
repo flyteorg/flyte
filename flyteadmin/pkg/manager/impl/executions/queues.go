@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/rand"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
@@ -64,7 +65,7 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier core.Ident
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	})
 
-	if err != nil {
+	if err != nil && !errors.IsDoesNotExistError(err) {
 		logger.Warningf(ctx, "Failed to fetch override values when assigning execution queue for [%+v] with err: %v",
 			identifier, err)
 	}
