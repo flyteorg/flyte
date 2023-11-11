@@ -320,7 +320,7 @@ func assertTestSucceeded(tb testing.TB, config *LogConfig, expectedTaskLogs []*c
 
 func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 	assertTestSucceeded(t, &LogConfig{
-		Templates: []TemplateLogPluginConfig{
+		Templates: []tasklog.TemplateLogPlugin{
 			{
 				DisplayName: "StackDriver",
 				TemplateURIs: []string{
