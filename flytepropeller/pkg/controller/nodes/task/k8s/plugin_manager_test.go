@@ -16,7 +16,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
-	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
 
@@ -51,7 +50,7 @@ func (e extendedFakeClient) Create(ctx context.Context, obj client.Object, opts 
 	return e.Client.Create(ctx, obj)
 }
 
-func (e extendedFakeClient) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+func (e extendedFakeClient) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	if e.GetError != nil {
 		return e.GetError
 	}
@@ -472,7 +471,7 @@ func TestPluginManager_Abort(t *testing.T) {
 	t.Run("Abort Pod Exists", func(t *testing.T) {
 		// common setup code
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
-		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme, res)}
+		fc := extendedFakeClient{Client: fake.NewFakeClient(res)}
 		mockClientset := k8sfake.NewSimpleClientset()
 
 		// common setup code
@@ -498,7 +497,7 @@ func TestPluginManager_Abort(t *testing.T) {
 	t.Run("Abort Pod doesn't exist", func(t *testing.T) {
 		// common setup code
 		tctx := getMockTaskContext(PluginPhaseStarted, PluginPhaseStarted)
-		fc := extendedFakeClient{Client: fake.NewFakeClientWithScheme(scheme.Scheme)}
+		fc := extendedFakeClient{Client: fake.NewFakeClient()}
 		mockClientset := k8sfake.NewSimpleClientset()
 		// common setup code
 		mockResourceHandler := &pluginsk8sMock.Plugin{}

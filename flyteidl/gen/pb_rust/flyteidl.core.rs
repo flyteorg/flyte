@@ -173,6 +173,13 @@ pub struct TypeStructure {
     /// Must exactly match for types to be castable
     #[prost(string, tag="1")]
     pub tag: ::prost::alloc::string::String,
+    /// dataclass_type only exists for dataclasses.
+    /// This is used to resolve the type of the fields of dataclass
+    /// The key is the field name, and the value is the literal type of the field
+    /// e.g. For dataclass Foo, with fields a, and a is a string
+    /// Foo.a will be resolved as a literal type of string from dataclass_type
+    #[prost(map="string, message", tag="2")]
+    pub dataclass_type: ::std::collections::HashMap<::prost::alloc::string::String, LiteralType>,
 }
 /// TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
 #[allow(clippy::derive_partial_eq_without_eq)]

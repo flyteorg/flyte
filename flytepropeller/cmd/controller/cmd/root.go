@@ -18,6 +18,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -121,16 +122,26 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
 	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
 	limitNamespace := ""
+	var namespaceConfigs map[string]cache.Config
 	if cfg.LimitNamespace != defaultNamespace {
 		limitNamespace = cfg.LimitNamespace
+		namespaceConfigs = map[string]cache.Config{
+			limitNamespace: {},
+		}
 	}
+
 	options := manager.Options{
-		Namespace:  limitNamespace,
-		SyncPeriod: &cfg.DownstreamEval.Duration,
-		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(cache, config, options)
+		Cache: cache.Options{
+			SyncPeriod:        &cfg.DownstreamEval.Duration,
+			DefaultNamespaces: namespaceConfigs,
 		},
-		MetricsBindAddress: "0",
+		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
+			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(nil, config, options)
+		},
+		Metrics: metricsserver.Options{
+			// Disable metrics serving
+			BindAddress: "0",
+		},
 	}
 
 	mgr, err := controller.CreateControllerManager(ctx, cfg, options)
