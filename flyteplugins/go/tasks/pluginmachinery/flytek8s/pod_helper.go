@@ -24,6 +24,7 @@ import (
 const PodKind = "pod"
 const OOMKilled = "OOMKilled"
 const Interrupted = "Interrupted"
+const PrimaryContainerNotFound = "PrimaryContainerNotFound"
 const SIGKILL = 137
 
 const defaultContainerTemplateName = "default"
@@ -746,7 +747,7 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 	}
 
 	// If for some reason we can't find the primary container, always just return a permanent failure
-	return pluginsCore.PhaseInfoFailure("PrimaryContainerMissing",
+	return pluginsCore.PhaseInfoFailure(PrimaryContainerNotFound,
 		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
 }
 

@@ -13,6 +13,7 @@ import (
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
@@ -437,26 +438,35 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		return nil, fmt.Errorf("failed to initialize log plugins. Error: %w", err)
 	}
 
-	if logPlugin == nil {
-		return nil, nil
+	var taskLogs []*core.TaskLog
+
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
+	input := tasklog.Input{
+		Namespace:       rayJob.Namespace,
+		TaskExecutionID: taskExecID,
 	}
 
 	// TODO: Retrieve the name of head pod from rayJob.status, and add it to task logs
 	// RayJob CRD does not include the name of the worker or head pod for now
-
-	taskID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	logOutput, err := logPlugin.GetTaskLogs(tasklog.Input{
-		Namespace:               rayJob.Namespace,
-		TaskExecutionIdentifier: &taskID,
-	})
-
+	logOutput, err := logPlugin.GetTaskLogs(input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate task logs. Error: %w", err)
 	}
+	taskLogs = append(taskLogs, logOutput.TaskLogs...)
 
-	return &pluginsCore.TaskInfo{
-		Logs: logOutput.TaskLogs,
-	}, nil
+	// Handling for Ray Dashboard
+	dashboardURLTemplate := GetConfig().DashboardURLTemplate
+	if dashboardURLTemplate != nil &&
+		rayJob.Status.DashboardURL != "" &&
+		rayJob.Status.JobStatus == rayv1alpha1.JobStatusRunning {
+		dashboardURLOutput, err := dashboardURLTemplate.GetTaskLogs(input)
+		if err != nil {
+			return nil, fmt.Errorf("failed to generate Ray dashboard link. Error: %w", err)
+		}
+		taskLogs = append(taskLogs, dashboardURLOutput.TaskLogs...)
+	}
+
+	return &pluginsCore.TaskInfo{Logs: taskLogs}, nil
 }
 
 func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
@@ -470,7 +480,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 		return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
 	}
 
-	// Kuberay creates a Ray cluster first, and then submits a Ray job to the cluster
+	// KubeRay creates a Ray cluster first, and then submits a Ray job to the cluster
 	switch rayJob.Status.JobDeploymentStatus {
 	case rayv1alpha1.JobDeploymentStatusInitializing:
 		return pluginsCore.PhaseInfoInitializing(rayJob.CreationTimestamp.Time, pluginsCore.DefaultPhaseVersion, "cluster is creating", info), nil
@@ -480,7 +490,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	case rayv1alpha1.JobDeploymentStatusFailedJobDeploy:
 		reason := fmt.Sprintf("Failed to submit Ray job %s with error: %s", rayJob.Name, rayJob.Status.Message)
 		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
-	case rayv1alpha1.JobDeploymentStatusWaitForDashboard:
+	case rayv1alpha1.JobDeploymentStatusWaitForDashboard, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 	case rayv1alpha1.JobDeploymentStatusRunning, rayv1alpha1.JobDeploymentStatusComplete:
 		switch rayJob.Status.JobStatus {
@@ -489,12 +499,27 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 			return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
 		case rayv1alpha1.JobStatusSucceeded:
 			return pluginsCore.PhaseInfoSuccess(info), nil
-		case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusRunning:
+		case rayv1alpha1.JobStatusPending:
 			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
+		case rayv1alpha1.JobStatusRunning:
+			phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
+			if len(info.Logs) > 0 {
+				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
+			}
+			return phaseInfo, nil
+		case rayv1alpha1.JobStatusStopped:
+			// There is no current usage of this job status in KubeRay. It's unclear what it represents
+			fallthrough
+		default:
+			// We already handle all known job status, so this should never happen unless a future version of ray
+			// introduced a new job status.
+			return pluginsCore.PhaseInfoUndefined, fmt.Errorf("unknown job status: %s", rayJob.Status.JobStatus)
 		}
+	default:
+		// We already handle all known deployment status, so this should never happen unless a future version of ray
+		// introduced a new job status.
+		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("unknown job deployment status: %s", rayJob.Status.JobDeploymentStatus)
 	}
-
-	return pluginsCore.PhaseInfoUndefined, nil
 }
 
 func init() {
