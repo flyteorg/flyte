@@ -349,6 +349,24 @@ func TestSummaryToPhase(t *testing.T) {
 				core.PhaseRetryableFailure: 5,
 			},
 		},
+		{
+			// complete retry even though minSuccesses is achieved
+			"RetryMinSuccessRatio",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseSuccess:          10,
+				core.PhaseRetryableFailure: 1,
+			},
+		},
+		{
+			// ensure all tasks are executed even if minSuccesses is achieved
+			"ExecuteAllMinSuccessRatio",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseSuccess:   10,
+				core.PhaseUndefined: 1,
+			},
+		},
 	}
 
 	for _, tt := range tests {

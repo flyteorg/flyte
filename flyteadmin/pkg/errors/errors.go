@@ -140,3 +140,8 @@ func NewWorkflowExistsIdenticalStructureError(ctx context.Context, request *admi
 	}
 	return statusErr
 }
+
+func IsDoesNotExistError(err error) bool {
+	adminError, ok := err.(FlyteAdminError)
+	return ok && adminError.Code() == codes.NotFound
+}

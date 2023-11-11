@@ -14,7 +14,7 @@ generate: download_tooling #generate go code
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
-	GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v
+	GL_DEBUG=linters_output,env golangci-lint run --fix --deadline=5m --exclude deprecated -v
 
 # If code is failing goimports linter, this will fix.
 # skips 'vendor'

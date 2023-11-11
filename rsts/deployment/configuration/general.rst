@@ -105,11 +105,11 @@ Define an attributes file, ``cra.yaml``:
 
 .. code-block:: yaml
 
+    domain: development
+    project: flyteexamples
     attributes:
         projectQuotaCpu: "1000"
         projectQuotaMemory: 5Ti
-    domain: development
-    project: flyteexamples
 
 To ensure that the overrides reflect in the Kubernetes namespace
 ``flyteexamples-development`` (that is, the namespace has a resource quota of

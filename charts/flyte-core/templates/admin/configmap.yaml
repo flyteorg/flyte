@@ -48,6 +48,11 @@ data:
   notifications.yaml: |
     notifications:
       type: {{ .Values.workflow_notifications.config.notifications.type }}
+      {{- if not .Values.workflow_notifications.config.notifications.aws }}
+      {{- with .Values.workflow_notifications.config.notifications.region }}
+      region: {{ tpl . $ }}
+      {{- end }}
+      {{- end }}
       {{- if eq .Values.workflow_notifications.config.notifications.type "aws" }}
       {{- with .Values.workflow_notifications.config.notifications.aws }}
       aws: {{ tpl (toYaml .) $ | nindent 8 }}
