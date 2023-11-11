@@ -9,10 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
 )
 
 type MockClient struct {
@@ -66,7 +67,7 @@ func TestBuildRequest(t *testing.T) {
 	token := "test-token"
 	runID := "019e70eb"
 	databricksEndpoint := ""
-	databricksURL := "https://" + testInstance + "/api/2.0/jobs/runs"
+	databricksURL := "https://" + testInstance + "/api/2.1/jobs/runs"
 	t.Run("build http request for submitting a databricks job", func(t *testing.T) {
 		req, err := buildRequest(post, nil, databricksEndpoint, testInstance, token, runID, false)
 		header := http.Header{}

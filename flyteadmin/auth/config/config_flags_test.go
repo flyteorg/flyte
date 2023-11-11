@@ -477,6 +477,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_appAuth.externalAuthServer.retryAttempts", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("appAuth.externalAuthServer.retryAttempts", testValue)
+			if vInt, err := cmdFlags.GetInt("appAuth.externalAuthServer.retryAttempts"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.AppAuth.ExternalAuthServer.RetryAttempts)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_appAuth.externalAuthServer.retryDelay", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := DefaultConfig.AppAuth.ExternalAuthServer.RetryDelay.String()
+
+			cmdFlags.Set("appAuth.externalAuthServer.retryDelay", testValue)
+			if vString, err := cmdFlags.GetString("appAuth.externalAuthServer.retryDelay"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AppAuth.ExternalAuthServer.RetryDelay)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_appAuth.thirdPartyConfig.flyteClient.clientId", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

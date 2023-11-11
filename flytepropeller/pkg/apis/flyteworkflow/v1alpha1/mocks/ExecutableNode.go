@@ -3,9 +3,10 @@
 package mocks
 
 import (
-	time "time"
-
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
+
+	time "time"
 
 	v1 "k8s.io/api/core/v1"
 
@@ -181,6 +182,40 @@ func (_m *ExecutableNode) GetExecutionDeadline() *time.Duration {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*time.Duration)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNode_GetExtendedResources struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetExtendedResources) Return(_a0 *core.ExtendedResources) *ExecutableNode_GetExtendedResources {
+	return &ExecutableNode_GetExtendedResources{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetExtendedResources() *ExecutableNode_GetExtendedResources {
+	c_call := _m.On("GetExtendedResources")
+	return &ExecutableNode_GetExtendedResources{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetExtendedResourcesMatch(matchers ...interface{}) *ExecutableNode_GetExtendedResources {
+	c_call := _m.On("GetExtendedResources", matchers...)
+	return &ExecutableNode_GetExtendedResources{Call: c_call}
+}
+
+// GetExtendedResources provides a mock function with given fields:
+func (_m *ExecutableNode) GetExtendedResources() *core.ExtendedResources {
+	ret := _m.Called()
+
+	var r0 *core.ExtendedResources
+	if rf, ok := ret.Get(0).(func() *core.ExtendedResources); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.ExtendedResources)
 		}
 	}
 

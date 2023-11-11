@@ -8,12 +8,10 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
-
 	"github.com/golang/protobuf/proto"
-
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 

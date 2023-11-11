@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func TestDataReference_Split(t *testing.T) {

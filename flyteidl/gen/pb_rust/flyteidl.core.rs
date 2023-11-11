@@ -173,6 +173,13 @@ pub struct TypeStructure {
     /// Must exactly match for types to be castable
     #[prost(string, tag="1")]
     pub tag: ::prost::alloc::string::String,
+    /// dataclass_type only exists for dataclasses.
+    /// This is used to resolve the type of the fields of dataclass
+    /// The key is the field name, and the value is the literal type of the field
+    /// e.g. For dataclass Foo, with fields a, and a is a string
+    /// Foo.a will be resolved as a literal type of string from dataclass_type
+    #[prost(map="string, message", tag="2")]
+    pub dataclass_type: ::std::collections::HashMap<::prost::alloc::string::String, LiteralType>,
 }
 /// TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1008,6 +1015,44 @@ pub mod resources {
         }
     }
 }
+/// Metadata associated with the GPU accelerator to allocate to a task. Contains
+/// information about device type, and for multi-instance GPUs, the partition size to
+/// use.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GpuAccelerator {
+    /// This can be any arbitrary string, and should be informed by the labels or taints
+    /// associated with the nodes in question. Default cloud provider labels typically
+    /// use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+    #[prost(string, tag="1")]
+    pub device: ::prost::alloc::string::String,
+    #[prost(oneof="gpu_accelerator::PartitionSizeValue", tags="2, 3")]
+    pub partition_size_value: ::core::option::Option<gpu_accelerator::PartitionSizeValue>,
+}
+/// Nested message and enum types in `GPUAccelerator`.
+pub mod gpu_accelerator {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum PartitionSizeValue {
+        #[prost(bool, tag="2")]
+        Unpartitioned(bool),
+        /// Like `device`, this can be any arbitrary string, and should be informed by
+        /// the labels or taints associated with the nodes in question. Default cloud
+        /// provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+        #[prost(string, tag="3")]
+        PartitionSize(::prost::alloc::string::String),
+    }
+}
+/// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
+/// allocate to a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExtendedResources {
+    /// GPU accelerator to select for task. Contains information about device type, and
+    /// for multi-instance GPUs, the partition size to use.
+    #[prost(message, optional, tag="1")]
+    pub gpu_accelerator: ::core::option::Option<GpuAccelerator>,
+}
 /// Runtime information. This is loosely defined to allow for extensibility.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1144,6 +1189,10 @@ pub struct TaskTemplate {
     /// security_context encapsulates security attributes requested to run this task.
     #[prost(message, optional, tag="8")]
     pub security_context: ::core::option::Option<SecurityContext>,
+    /// Encapsulates all non-standard resources, not captured by
+    /// v1.ResourceRequirements, to allocate to a task.
+    #[prost(message, optional, tag="9")]
+    pub extended_resources: ::core::option::Option<ExtendedResources>,
     /// Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
     /// to use as required.
     /// reserve the field numbers 1 through 15 for very frequently occurring message elements
@@ -2345,6 +2394,10 @@ pub struct TaskNodeOverrides {
     /// A customizable interface to convey resources requested for a task container. 
     #[prost(message, optional, tag="1")]
     pub resources: ::core::option::Option<Resources>,
+    /// Overrides for all non-standard resources, not captured by
+    /// v1.ResourceRequirements, to allocate to a task.
+    #[prost(message, optional, tag="2")]
+    pub extended_resources: ::core::option::Option<ExtendedResources>,
 }
 /// Adjacency list for the workflow. This is created as part of the compilation process. Every process after the compilation
 /// step uses this created ConnectionSet

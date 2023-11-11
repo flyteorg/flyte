@@ -5,10 +5,11 @@ import (
 	"encoding/base64"
 	"net/http"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth"
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/gtank/cryptopasta"
 	"github.com/ory/fosite"
+
+	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 )
 
 func interfaceSliceToStringSlice(raw []interface{}) []string {

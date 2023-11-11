@@ -4570,6 +4570,7 @@
                  * @memberof flyteidl.core
                  * @interface ITaskNodeOverrides
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
+                 * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
                  */
     
                 /**
@@ -4594,6 +4595,14 @@
                  * @instance
                  */
                 TaskNodeOverrides.prototype.resources = null;
+    
+                /**
+                 * TaskNodeOverrides extendedResources.
+                 * @member {flyteidl.core.IExtendedResources|null|undefined} extendedResources
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.extendedResources = null;
     
                 /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
@@ -4621,6 +4630,8 @@
                         writer = $Writer.create();
                     if (message.resources != null && message.hasOwnProperty("resources"))
                         $root.flyteidl.core.Resources.encode(message.resources, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.extendedResources != null && message.hasOwnProperty("extendedResources"))
+                        $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -4645,6 +4656,9 @@
                         case 1:
                             message.resources = $root.flyteidl.core.Resources.decode(reader, reader.uint32());
                             break;
+                        case 2:
+                            message.extendedResources = $root.flyteidl.core.ExtendedResources.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -4668,6 +4682,11 @@
                         var error = $root.flyteidl.core.Resources.verify(message.resources);
                         if (error)
                             return "resources." + error;
+                    }
+                    if (message.extendedResources != null && message.hasOwnProperty("extendedResources")) {
+                        var error = $root.flyteidl.core.ExtendedResources.verify(message.extendedResources);
+                        if (error)
+                            return "extendedResources." + error;
                     }
                     return null;
                 };
@@ -9257,6 +9276,7 @@
                  * @memberof flyteidl.core
                  * @interface ITypeStructure
                  * @property {string|null} [tag] TypeStructure tag
+                 * @property {Object.<string,flyteidl.core.ILiteralType>|null} [dataclassType] TypeStructure dataclassType
                  */
     
                 /**
@@ -9268,6 +9288,7 @@
                  * @param {flyteidl.core.ITypeStructure=} [properties] Properties to set
                  */
                 function TypeStructure(properties) {
+                    this.dataclassType = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -9281,6 +9302,14 @@
                  * @instance
                  */
                 TypeStructure.prototype.tag = "";
+    
+                /**
+                 * TypeStructure dataclassType.
+                 * @member {Object.<string,flyteidl.core.ILiteralType>} dataclassType
+                 * @memberof flyteidl.core.TypeStructure
+                 * @instance
+                 */
+                TypeStructure.prototype.dataclassType = $util.emptyObject;
     
                 /**
                  * Creates a new TypeStructure instance using the specified properties.
@@ -9308,6 +9337,11 @@
                         writer = $Writer.create();
                     if (message.tag != null && message.hasOwnProperty("tag"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.tag);
+                    if (message.dataclassType != null && message.hasOwnProperty("dataclassType"))
+                        for (var keys = Object.keys(message.dataclassType), i = 0; i < keys.length; ++i) {
+                            writer.uint32(/* id 2, wireType 2 =*/18).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
+                            $root.flyteidl.core.LiteralType.encode(message.dataclassType[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                        }
                     return writer;
                 };
     
@@ -9325,12 +9359,20 @@
                 TypeStructure.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TypeStructure();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TypeStructure(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
                             message.tag = reader.string();
+                            break;
+                        case 2:
+                            reader.skip().pos++;
+                            if (message.dataclassType === $util.emptyObject)
+                                message.dataclassType = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.dataclassType[key] = $root.flyteidl.core.LiteralType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -9354,6 +9396,16 @@
                     if (message.tag != null && message.hasOwnProperty("tag"))
                         if (!$util.isString(message.tag))
                             return "tag: string expected";
+                    if (message.dataclassType != null && message.hasOwnProperty("dataclassType")) {
+                        if (!$util.isObject(message.dataclassType))
+                            return "dataclassType: object expected";
+                        var key = Object.keys(message.dataclassType);
+                        for (var i = 0; i < key.length; ++i) {
+                            var error = $root.flyteidl.core.LiteralType.verify(message.dataclassType[key[i]]);
+                            if (error)
+                                return "dataclassType." + error;
+                        }
+                    }
                     return null;
                 };
     
@@ -12276,6 +12328,283 @@
                 return Resources;
             })();
     
+            core.GPUAccelerator = (function() {
+    
+                /**
+                 * Properties of a GPUAccelerator.
+                 * @memberof flyteidl.core
+                 * @interface IGPUAccelerator
+                 * @property {string|null} [device] GPUAccelerator device
+                 * @property {boolean|null} [unpartitioned] GPUAccelerator unpartitioned
+                 * @property {string|null} [partitionSize] GPUAccelerator partitionSize
+                 */
+    
+                /**
+                 * Constructs a new GPUAccelerator.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a GPUAccelerator.
+                 * @implements IGPUAccelerator
+                 * @constructor
+                 * @param {flyteidl.core.IGPUAccelerator=} [properties] Properties to set
+                 */
+                function GPUAccelerator(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * GPUAccelerator device.
+                 * @member {string} device
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @instance
+                 */
+                GPUAccelerator.prototype.device = "";
+    
+                /**
+                 * GPUAccelerator unpartitioned.
+                 * @member {boolean} unpartitioned
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @instance
+                 */
+                GPUAccelerator.prototype.unpartitioned = false;
+    
+                /**
+                 * GPUAccelerator partitionSize.
+                 * @member {string} partitionSize
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @instance
+                 */
+                GPUAccelerator.prototype.partitionSize = "";
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * GPUAccelerator partitionSizeValue.
+                 * @member {"unpartitioned"|"partitionSize"|undefined} partitionSizeValue
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @instance
+                 */
+                Object.defineProperty(GPUAccelerator.prototype, "partitionSizeValue", {
+                    get: $util.oneOfGetter($oneOfFields = ["unpartitioned", "partitionSize"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new GPUAccelerator instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @static
+                 * @param {flyteidl.core.IGPUAccelerator=} [properties] Properties to set
+                 * @returns {flyteidl.core.GPUAccelerator} GPUAccelerator instance
+                 */
+                GPUAccelerator.create = function create(properties) {
+                    return new GPUAccelerator(properties);
+                };
+    
+                /**
+                 * Encodes the specified GPUAccelerator message. Does not implicitly {@link flyteidl.core.GPUAccelerator.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @static
+                 * @param {flyteidl.core.IGPUAccelerator} message GPUAccelerator message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                GPUAccelerator.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.device != null && message.hasOwnProperty("device"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.device);
+                    if (message.unpartitioned != null && message.hasOwnProperty("unpartitioned"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).bool(message.unpartitioned);
+                    if (message.partitionSize != null && message.hasOwnProperty("partitionSize"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.partitionSize);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a GPUAccelerator message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.GPUAccelerator} GPUAccelerator
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                GPUAccelerator.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.GPUAccelerator();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.device = reader.string();
+                            break;
+                        case 2:
+                            message.unpartitioned = reader.bool();
+                            break;
+                        case 3:
+                            message.partitionSize = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a GPUAccelerator message.
+                 * @function verify
+                 * @memberof flyteidl.core.GPUAccelerator
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                GPUAccelerator.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.device != null && message.hasOwnProperty("device"))
+                        if (!$util.isString(message.device))
+                            return "device: string expected";
+                    if (message.unpartitioned != null && message.hasOwnProperty("unpartitioned")) {
+                        properties.partitionSizeValue = 1;
+                        if (typeof message.unpartitioned !== "boolean")
+                            return "unpartitioned: boolean expected";
+                    }
+                    if (message.partitionSize != null && message.hasOwnProperty("partitionSize")) {
+                        if (properties.partitionSizeValue === 1)
+                            return "partitionSizeValue: multiple values";
+                        properties.partitionSizeValue = 1;
+                        if (!$util.isString(message.partitionSize))
+                            return "partitionSize: string expected";
+                    }
+                    return null;
+                };
+    
+                return GPUAccelerator;
+            })();
+    
+            core.ExtendedResources = (function() {
+    
+                /**
+                 * Properties of an ExtendedResources.
+                 * @memberof flyteidl.core
+                 * @interface IExtendedResources
+                 * @property {flyteidl.core.IGPUAccelerator|null} [gpuAccelerator] ExtendedResources gpuAccelerator
+                 */
+    
+                /**
+                 * Constructs a new ExtendedResources.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents an ExtendedResources.
+                 * @implements IExtendedResources
+                 * @constructor
+                 * @param {flyteidl.core.IExtendedResources=} [properties] Properties to set
+                 */
+                function ExtendedResources(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExtendedResources gpuAccelerator.
+                 * @member {flyteidl.core.IGPUAccelerator|null|undefined} gpuAccelerator
+                 * @memberof flyteidl.core.ExtendedResources
+                 * @instance
+                 */
+                ExtendedResources.prototype.gpuAccelerator = null;
+    
+                /**
+                 * Creates a new ExtendedResources instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.ExtendedResources
+                 * @static
+                 * @param {flyteidl.core.IExtendedResources=} [properties] Properties to set
+                 * @returns {flyteidl.core.ExtendedResources} ExtendedResources instance
+                 */
+                ExtendedResources.create = function create(properties) {
+                    return new ExtendedResources(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExtendedResources message. Does not implicitly {@link flyteidl.core.ExtendedResources.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.ExtendedResources
+                 * @static
+                 * @param {flyteidl.core.IExtendedResources} message ExtendedResources message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExtendedResources.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.gpuAccelerator != null && message.hasOwnProperty("gpuAccelerator"))
+                        $root.flyteidl.core.GPUAccelerator.encode(message.gpuAccelerator, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExtendedResources message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.ExtendedResources
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.ExtendedResources} ExtendedResources
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExtendedResources.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ExtendedResources();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.gpuAccelerator = $root.flyteidl.core.GPUAccelerator.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExtendedResources message.
+                 * @function verify
+                 * @memberof flyteidl.core.ExtendedResources
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExtendedResources.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.gpuAccelerator != null && message.hasOwnProperty("gpuAccelerator")) {
+                        var error = $root.flyteidl.core.GPUAccelerator.verify(message.gpuAccelerator);
+                        if (error)
+                            return "gpuAccelerator." + error;
+                    }
+                    return null;
+                };
+    
+                return ExtendedResources;
+            })();
+    
             core.RuntimeMetadata = (function() {
     
                 /**
@@ -12770,6 +13099,7 @@
                  * @property {flyteidl.core.ISql|null} [sql] TaskTemplate sql
                  * @property {number|null} [taskTypeVersion] TaskTemplate taskTypeVersion
                  * @property {flyteidl.core.ISecurityContext|null} [securityContext] TaskTemplate securityContext
+                 * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskTemplate extendedResources
                  * @property {Object.<string,string>|null} [config] TaskTemplate config
                  */
     
@@ -12870,6 +13200,14 @@
                 TaskTemplate.prototype.securityContext = null;
     
                 /**
+                 * TaskTemplate extendedResources.
+                 * @member {flyteidl.core.IExtendedResources|null|undefined} extendedResources
+                 * @memberof flyteidl.core.TaskTemplate
+                 * @instance
+                 */
+                TaskTemplate.prototype.extendedResources = null;
+    
+                /**
                  * TaskTemplate config.
                  * @member {Object.<string,string>} config
                  * @memberof flyteidl.core.TaskTemplate
@@ -12931,6 +13269,8 @@
                         writer.uint32(/* id 7, wireType 0 =*/56).int32(message.taskTypeVersion);
                     if (message.securityContext != null && message.hasOwnProperty("securityContext"))
                         $root.flyteidl.core.SecurityContext.encode(message.securityContext, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.extendedResources != null && message.hasOwnProperty("extendedResources"))
+                        $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     if (message.config != null && message.hasOwnProperty("config"))
                         for (var keys = Object.keys(message.config), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 16, wireType 2 =*/130).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.config[keys[i]]).ldelim();
@@ -12988,6 +13328,9 @@
                             break;
                         case 8:
                             message.securityContext = $root.flyteidl.core.SecurityContext.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.extendedResources = $root.flyteidl.core.ExtendedResources.decode(reader, reader.uint32());
                             break;
                         case 16:
                             reader.skip().pos++;
@@ -13075,6 +13418,11 @@
                         var error = $root.flyteidl.core.SecurityContext.verify(message.securityContext);
                         if (error)
                             return "securityContext." + error;
+                    }
+                    if (message.extendedResources != null && message.hasOwnProperty("extendedResources")) {
+                        var error = $root.flyteidl.core.ExtendedResources.verify(message.extendedResources);
+                        if (error)
+                            return "extendedResources." + error;
                     }
                     if (message.config != null && message.hasOwnProperty("config")) {
                         if (!$util.isObject(message.config))
@@ -19640,6 +19988,7 @@
                  * @interface IResource
                  * @property {flyteidl.admin.State|null} [state] Resource state
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
+                 * @property {string|null} [message] Resource message
                  */
     
                 /**
@@ -19674,6 +20023,14 @@
                 Resource.prototype.outputs = null;
     
                 /**
+                 * Resource message.
+                 * @member {string} message
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.message = "";
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -19701,6 +20058,8 @@
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.state);
                     if (message.outputs != null && message.hasOwnProperty("outputs"))
                         $root.flyteidl.core.LiteralMap.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.message);
                     return writer;
                 };
     
@@ -19727,6 +20086,9 @@
                             break;
                         case 2:
                             message.outputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.message = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -19763,6 +20125,9 @@
                         if (error)
                             return "outputs." + error;
                     }
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        if (!$util.isString(message.message))
+                            return "message: string expected";
                     return null;
                 };
     

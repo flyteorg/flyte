@@ -5,12 +5,13 @@ import (
 	"testing"
 
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var (
@@ -47,7 +48,7 @@ func TestGcpProcessor_StartProcessing(t *testing.T) {
 	m := &dto.Metric{}
 	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageSuccess.Write(m)
 	assert.Nil(t, err)
-	assert.Equal(t, "counter:<value:1 > ", m.String())
+	assert.Equal(t, "counter:{value:1}", m.String())
 }
 
 func TestGcpProcessor_StartProcessingNoMessages(t *testing.T) {
@@ -62,7 +63,7 @@ func TestGcpProcessor_StartProcessingNoMessages(t *testing.T) {
 	m := &dto.Metric{}
 	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageSuccess.Write(m)
 	assert.Nil(t, err)
-	assert.Equal(t, "counter:<value:0 > ", m.String())
+	assert.Equal(t, "counter:{value:0}", m.String())
 }
 
 func TestGcpProcessor_StartProcessingError(t *testing.T) {
@@ -95,7 +96,7 @@ func TestGcpProcessor_StartProcessingEmailError(t *testing.T) {
 	m := &dto.Metric{}
 	err := testGcpProcessor.(*GcpProcessor).systemMetrics.MessageProcessorError.Write(m)
 	assert.Nil(t, err)
-	assert.Equal(t, "counter:<value:1 > ", m.String())
+	assert.Equal(t, "counter:{value:1}", m.String())
 }
 
 func TestGcpProcessor_StopProcessing(t *testing.T) {

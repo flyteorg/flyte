@@ -2,17 +2,16 @@ package gormimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
-	"errors"
+	"gorm.io/gorm"
 
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"gorm.io/gorm"
 )
 
 // SchedulableEntityRepo Implementation of SchedulableEntityRepoInterface.

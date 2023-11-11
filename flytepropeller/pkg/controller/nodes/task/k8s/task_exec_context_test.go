@@ -3,9 +3,10 @@ package k8s
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/stretchr/testify/assert"
 )
 
 func Test_newTaskExecutionMetadata(t *testing.T) {

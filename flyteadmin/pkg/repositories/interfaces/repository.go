@@ -1,8 +1,9 @@
 package interfaces
 
 import (
-	schedulerInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	"gorm.io/gorm"
+
+	schedulerInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 )
 
 // The Repository indicates the methods that each Repository must support.

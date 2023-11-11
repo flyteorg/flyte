@@ -1,11 +1,12 @@
 package transformers
 
 import (
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/golang/protobuf/ptypes"
-	"google.golang.org/grpc/codes"
 )
 
 // Transforms a NodeExecutionEventRequest to a NodeExecutionEvent model

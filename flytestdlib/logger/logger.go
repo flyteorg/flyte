@@ -10,9 +10,9 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-
 	"github.com/sirupsen/logrus"
+
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 )
 
 const (
