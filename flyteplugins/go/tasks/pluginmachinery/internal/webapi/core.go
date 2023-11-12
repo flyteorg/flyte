@@ -103,33 +103,7 @@ func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionConte
 	return core.DoTransition(phaseInfo), nil
 }
 
-func (c CorePlugin) useSyncPlugin(taskTemplate *flyteIdlCore.TaskTemplate) bool {
-	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
-	metadata := taskTemplate.GetMetadata()
-	if metadata != nil {
-		runtime := metadata.GetRuntime()
-		if runtime != nil {
-			if runtime.GetFlavor() == syncPlugin {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	taskTemplate, err := tCtx.TaskReader().Read(ctx)
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-	// Assume the plugin is an async plugin if not explicitly specified as sync.
-	// This helps maintain backward compatibility with existing implementations that
-	// expect an async plugin by default, thereby avoiding breaking changes.
-	if c.useSyncPlugin(taskTemplate) {
-		return c.syncHandle(ctx, tCtx)
-	}
-
+func (c CorePlugin) asyncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
 	if err != nil {
 		return core.UnknownTransition, err
@@ -165,6 +139,36 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	}
 
 	return core.DoTransition(phaseInfo), nil
+}
+
+func (c CorePlugin) useSyncPlugin(taskTemplate *flyteIdlCore.TaskTemplate) bool {
+	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
+	metadata := taskTemplate.GetMetadata()
+	if metadata != nil {
+		runtime := metadata.GetRuntime()
+		if runtime != nil {
+			if runtime.GetFlavor() == syncPlugin {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
+	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	if err != nil {
+		return core.UnknownTransition, err
+	}
+	// Assume the plugin is an async plugin if not explicitly specified as sync.
+	// This helps maintain backward compatibility with existing implementations that
+	// expect an async plugin by default, thereby avoiding breaking changes.
+	if c.useSyncPlugin(taskTemplate) {
+		return c.syncHandle(ctx, tCtx)
+	}
+
+	return c.asyncHandle(ctx, tCtx)
 }
 
 func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
