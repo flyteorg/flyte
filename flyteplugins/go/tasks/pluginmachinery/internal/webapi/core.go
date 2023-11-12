@@ -68,26 +68,24 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
-func (c CorePlugin) getPlugin(pluginType string) (webapi.AsyncPlugin, webapi.SyncPlugin, error) {
-	if pluginType == syncPlugin {
-		plugin, ok := c.p.(webapi.SyncPlugin)
-		if !ok {
-			return nil, nil, fmt.Errorf("Core plugin does not implement the sync plugin interface")
-		}
-		return nil, plugin, nil
+func (c CorePlugin) toSyncPlugin() (webapi.SyncPlugin, error) {
+	plugin, ok := c.p.(webapi.SyncPlugin)
+	if !ok {
+		return nil, fmt.Errorf("Core plugin does not implement the sync plugin interface")
 	}
-	// Assume the plugin is an async plugin if not explicitly specified as sync.
-	// This helps maintain backward compatibility with existing implementations that
-	// expect an async plugin by default, thereby avoiding breaking changes.
+	return plugin, nil
+}
+
+func (c CorePlugin) toAsyncPlugin() (webapi.AsyncPlugin, error) {
 	plugin, ok := c.p.(webapi.AsyncPlugin)
 	if !ok {
-		return nil, nil, fmt.Errorf("Core plugin does not implement the async plugin interface")
+		return nil, fmt.Errorf("Core plugin does not implement the async plugin interface")
 	}
-	return plugin, nil, nil
+	return plugin, nil
 }
 
 func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	_, plugin, err := c.getPlugin(syncPlugin)
+	plugin, err := c.toSyncPlugin()
 	if err != nil {
 		return core.UnknownTransition, err
 	}
@@ -125,7 +123,9 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	if err != nil {
 		return core.UnknownTransition, err
 	}
-
+	// Assume the plugin is an async plugin if not explicitly specified as sync.
+	// This helps maintain backward compatibility with existing implementations that
+	// expect an async plugin by default, thereby avoiding breaking changes.
 	if c.useSyncPlugin(taskTemplate) {
 		return c.syncHandle(ctx, tCtx)
 	}
@@ -137,7 +137,8 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	var nextState *State
 	var phaseInfo core.PhaseInfo
-	plugin, _, err := c.getPlugin(asyncPlugin)
+
+	plugin, err := c.toAsyncPlugin()
 	if err != nil {
 		return core.UnknownTransition, err
 	}
@@ -174,7 +175,7 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 
 	logger.Infof(ctx, "Attempting to abort resource [%v].", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID())
 
-	plugin, _, err := c.getPlugin(asyncPlugin)
+	plugin, err := c.toAsyncPlugin()
 	if err != nil {
 		return err
 	}
@@ -198,7 +199,7 @@ func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext
 	logger.Infof(ctx, "Attempting to finalize resource [%v].",
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 
-	plugin, _, err := c.getPlugin(asyncPlugin)
+	plugin, err := c.toAsyncPlugin()
 	if err != nil {
 		return err
 	}
