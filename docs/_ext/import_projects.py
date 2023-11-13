@@ -73,12 +73,13 @@ def import_projects(app: Sphinx, config: Config):
         if project.refresh or not dest_docs_dir.exists():
             shutil.rmtree(dest_docs_dir, ignore_errors=True)
             shutil.copytree(local_docs_path, dest_docs_dir, dirs_exist_ok=True)
-            if project.cmd:
-                if isinstance(project.cmd[0], list):
-                    for c in project.cmd:
-                        subprocess.run(c)
-                else:
-                    subprocess.run(project.cmd)
+
+        if project.cmd:
+            if isinstance(project.cmd[0], list):
+                for c in project.cmd:
+                    subprocess.run(c)
+            else:
+                subprocess.run(project.cmd)
 
     # remove cloned directories
     shutil.rmtree(import_projects_config.clone_dir)

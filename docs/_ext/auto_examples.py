@@ -104,12 +104,6 @@ def convert_py_example(file: Path, dest_dir: Path):
 def generate_auto_examples(app: Sphinx, config: Config):
     """Converts all example files into myst markdown format."""
     # copy files over to docs directory
-    if not config.auto_examples_refresh:
-        return
-
-    if Path(config.auto_examples_dir_dest).exists():
-        shutil.rmtree(config.auto_examples_dir_dest)
-
     for source_dir in (x for x in Path(config.auto_examples_dir_root).glob("*") if x.is_dir()):
         source_dir = Path(source_dir)
         dest_dir = Path(config.auto_examples_dir_dest, *source_dir.parts[-1:])
@@ -140,7 +134,6 @@ def generate_auto_examples(app: Sphinx, config: Config):
 
 
 def setup(app: Sphinx) -> dict:
-    app.add_config_value("auto_examples_refresh", None, False)
     app.add_config_value("auto_examples_dir_root", None, False)
     app.add_config_value("auto_examples_dir_dest", None, False)
     app.connect("config-inited", generate_auto_examples, priority=2)
