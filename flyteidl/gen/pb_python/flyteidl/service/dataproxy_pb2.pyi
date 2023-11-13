@@ -1,10 +1,8 @@
 from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
-from flyteidl.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
-from flyteidl.artifact import artifacts_pb2 as _artifacts_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -21,34 +19,30 @@ ARTIFACT_TYPE_UNDEFINED: ArtifactType
 ARTIFACT_TYPE_DECK: ArtifactType
 
 class CreateUploadLocationResponse(_message.Message):
-    __slots__ = ["signed_url", "native_url", "expires_at", "artifact"]
+    __slots__ = ["signed_url", "native_url", "expires_at"]
     SIGNED_URL_FIELD_NUMBER: _ClassVar[int]
     NATIVE_URL_FIELD_NUMBER: _ClassVar[int]
     EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_FIELD_NUMBER: _ClassVar[int]
     signed_url: str
     native_url: str
     expires_at: _timestamp_pb2.Timestamp
-    artifact: _artifacts_pb2.Artifact
-    def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., artifact: _Optional[_Union[_artifacts_pb2.Artifact, _Mapping]] = ...) -> None: ...
+    def __init__(self, signed_url: _Optional[str] = ..., native_url: _Optional[str] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class CreateUploadLocationRequest(_message.Message):
-    __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root", "artifact_spec"]
+    __slots__ = ["project", "domain", "filename", "expires_in", "content_md5", "filename_root"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     FILENAME_FIELD_NUMBER: _ClassVar[int]
     EXPIRES_IN_FIELD_NUMBER: _ClassVar[int]
     CONTENT_MD5_FIELD_NUMBER: _ClassVar[int]
     FILENAME_ROOT_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_SPEC_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     filename: str
     expires_in: _duration_pb2.Duration
     content_md5: bytes
     filename_root: str
-    artifact_spec: _artifacts_pb2.ArtifactSpec
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ..., filename_root: _Optional[str] = ..., artifact_spec: _Optional[_Union[_artifacts_pb2.ArtifactSpec, _Mapping]] = ...) -> None: ...
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., filename: _Optional[str] = ..., expires_in: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., content_md5: _Optional[bytes] = ..., filename_root: _Optional[str] = ...) -> None: ...
 
 class CreateDownloadLocationRequest(_message.Message):
     __slots__ = ["native_url", "expires_in"]
@@ -95,21 +89,17 @@ class PreSignedURLs(_message.Message):
     def __init__(self, signed_url: _Optional[_Iterable[str]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class GetDataRequest(_message.Message):
-    __slots__ = ["flyte_url", "artifact_id"]
+    __slots__ = ["flyte_url"]
     FLYTE_URL_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     flyte_url: str
-    artifact_id: _artifact_id_pb2.ArtifactID
-    def __init__(self, flyte_url: _Optional[str] = ..., artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ...) -> None: ...
+    def __init__(self, flyte_url: _Optional[str] = ...) -> None: ...
 
 class GetDataResponse(_message.Message):
-    __slots__ = ["literal_map", "pre_signed_urls", "literal", "artifact"]
+    __slots__ = ["literal_map", "pre_signed_urls", "literal"]
     LITERAL_MAP_FIELD_NUMBER: _ClassVar[int]
     PRE_SIGNED_URLS_FIELD_NUMBER: _ClassVar[int]
     LITERAL_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_FIELD_NUMBER: _ClassVar[int]
     literal_map: _literals_pb2.LiteralMap
     pre_signed_urls: PreSignedURLs
     literal: _literals_pb2.Literal
-    artifact: _artifacts_pb2.Artifact
-    def __init__(self, literal_map: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ..., literal: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., artifact: _Optional[_Union[_artifacts_pb2.Artifact, _Mapping]] = ...) -> None: ...
+    def __init__(self, literal_map: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., pre_signed_urls: _Optional[_Union[PreSignedURLs, _Mapping]] = ..., literal: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ...) -> None: ...

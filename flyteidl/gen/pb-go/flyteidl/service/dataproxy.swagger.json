@@ -29,31 +29,7 @@
         "parameters": [
           {
             "name": "flyte_url",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "artifact_id.artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "artifact_id.artifact_key.domain",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "artifact_id.artifact_key.name",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "artifact_id.version",
+            "description": "A unique identifier in the form of flyte://\u003csomething\u003e that uniquely, for a given Flyte\nbackend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).\ne.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)\n     flyte://v1/proj/development/execid/n2/i (for node execution input)\n     flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node).",
             "in": "query",
             "required": false,
             "type": "string"
@@ -197,104 +173,6 @@
         }
       }
     },
-    "artifactArtifact": {
-      "type": "object",
-      "properties": {
-        "artifact_id": {
-          "$ref": "#/definitions/coreArtifactID"
-        },
-        "spec": {
-          "$ref": "#/definitions/artifactArtifactSpec"
-        },
-        "tags": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "title": "references the tag field in ArtifactTag"
-        }
-      }
-    },
-    "artifactArtifactSpec": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "$ref": "#/definitions/coreLiteral"
-        },
-        "type": {
-          "$ref": "#/definitions/coreLiteralType",
-          "description": "This type will not form part of the artifact key, so for user-named artifacts, if the user changes the type, but\nforgets to change the name, that is okay. And the reason why this is a separate field is because adding the\ntype to all Literals is a lot of work."
-        },
-        "task_execution": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "description": "Outputs of tasks will have this."
-        },
-        "execution": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
-          "description": "Workflow outputs will have this."
-        },
-        "principal": {
-          "type": "string",
-          "description": "Uploads, either from the UI or from the CLI, or FlyteRemote, will have this."
-        },
-        "short_description": {
-          "type": "string"
-        },
-        "user_metadata": {
-          "$ref": "#/definitions/protobufAny",
-          "title": "Additional user metadata"
-        },
-        "metadata_type": {
-          "type": "string"
-        }
-      }
-    },
-    "coreArtifactBindingData": {
-      "type": "object",
-      "properties": {
-        "index": {
-          "type": "integer",
-          "format": "int64"
-        },
-        "partition_key": {
-          "type": "string",
-          "title": "These two fields are only relevant in the partition value case"
-        },
-        "transform": {
-          "type": "string"
-        }
-      },
-      "title": "Only valid for triggers"
-    },
-    "coreArtifactID": {
-      "type": "object",
-      "properties": {
-        "artifact_key": {
-          "$ref": "#/definitions/coreArtifactKey"
-        },
-        "version": {
-          "type": "string"
-        },
-        "partitions": {
-          "$ref": "#/definitions/corePartitions"
-        }
-      }
-    },
-    "coreArtifactKey": {
-      "type": "object",
-      "properties": {
-        "project": {
-          "type": "string",
-          "description": "Project and domain and suffix needs to be unique across a given artifact store."
-        },
-        "domain": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
     "coreBinary": {
       "type": "object",
       "properties": {
@@ -367,54 +245,6 @@
         }
       },
       "description": "Represents an error thrown from a node."
-    },
-    "coreIdentifier": {
-      "type": "object",
-      "properties": {
-        "resource_type": {
-          "$ref": "#/definitions/coreResourceType",
-          "description": "Identifies the specific type of resource that this identifier corresponds to."
-        },
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User provided value for the resource."
-        },
-        "version": {
-          "type": "string",
-          "description": "Specific version of the resource."
-        }
-      },
-      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
-    },
-    "coreInputBindingData": {
-      "type": "object",
-      "properties": {
-        "var": {
-          "type": "string"
-        }
-      }
-    },
-    "coreLabelValue": {
-      "type": "object",
-      "properties": {
-        "static_value": {
-          "type": "string"
-        },
-        "triggered_binding": {
-          "$ref": "#/definitions/coreArtifactBindingData"
-        },
-        "input_binding": {
-          "$ref": "#/definitions/coreInputBindingData"
-        }
-      }
     },
     "coreLiteral": {
       "type": "object",
@@ -531,17 +361,6 @@
       },
       "description": "Encapsulation of fields that identify a Flyte node execution entity."
     },
-    "corePartitions": {
-      "type": "object",
-      "properties": {
-        "value": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/coreLabelValue"
-          }
-        }
-      }
-    },
     "corePrimitive": {
       "type": "object",
       "properties": {
@@ -569,18 +388,6 @@
         }
       },
       "title": "Primitive Types"
-    },
-    "coreResourceType": {
-      "type": "string",
-      "enum": [
-        "UNSPECIFIED",
-        "TASK",
-        "WORKFLOW",
-        "LAUNCH_PLAN",
-        "DATASET"
-      ],
-      "default": "UNSPECIFIED",
-      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects"
     },
     "coreScalar": {
       "type": "object",
@@ -702,22 +509,6 @@
         }
       }
     },
-    "coreTaskExecutionIdentifier": {
-      "type": "object",
-      "properties": {
-        "task_id": {
-          "$ref": "#/definitions/coreIdentifier"
-        },
-        "node_execution_id": {
-          "$ref": "#/definitions/coreNodeExecutionIdentifier"
-        },
-        "retry_attempt": {
-          "type": "integer",
-          "format": "int64"
-        }
-      },
-      "description": "Encapsulation of fields that identify a Flyte task execution entity."
-    },
     "coreTypeAnnotation": {
       "type": "object",
       "properties": {
@@ -784,21 +575,6 @@
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
-    },
-    "protobufAny": {
-      "type": "object",
-      "properties": {
-        "type_url": {
-          "type": "string",
-          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
-        },
-        "value": {
-          "type": "string",
-          "format": "byte",
-          "description": "Must be a valid serialized protocol buffer of the above specified type."
-        }
-      },
-      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "protobufListValue": {
       "type": "object",
@@ -957,10 +733,6 @@
         "filename_root": {
           "type": "string",
           "title": "If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included\nthis makes the upload location deterministic. The native url will still be prefixed by the upload location prefix\nin data proxy config. This option is useful when uploading multiple files.\n+optional"
-        },
-        "artifact_spec": {
-          "$ref": "#/definitions/artifactArtifactSpec",
-          "description": "If provided, the Artifact that the upload creates will contain the information specified here."
         }
       },
       "description": "CreateUploadLocationRequest specified request for the CreateUploadLocation API.\nThe implementation in data proxy service will create the s3 location with some server side configured prefixes,\nand then:\n  - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR\n  - project/domain/filename_root (if present)/filename (if present)."
@@ -980,9 +752,6 @@
           "type": "string",
           "format": "date-time",
           "description": "ExpiresAt defines when will the signed URL expires."
-        },
-        "artifact": {
-          "$ref": "#/definitions/artifactArtifact"
         }
       }
     },
@@ -1000,9 +769,6 @@
         "literal": {
           "$ref": "#/definitions/coreLiteral",
           "description": "Single literal will be returned. This is returned when the user/url requests a specific output or input\nby name. See the o3 example above."
-        },
-        "artifact": {
-          "$ref": "#/definitions/artifactArtifact"
         }
       }
     },

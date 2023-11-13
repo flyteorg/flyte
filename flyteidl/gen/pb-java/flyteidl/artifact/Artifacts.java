@@ -2572,6 +2572,7 @@ public final class Artifacts {
 
     /**
      * <pre>
+     * 3. These fields should be removed.
      * Outputs of tasks will have this.
      * </pre>
      *
@@ -2580,6 +2581,7 @@ public final class Artifacts {
     boolean hasTaskExecution();
     /**
      * <pre>
+     * 3. These fields should be removed.
      * Outputs of tasks will have this.
      * </pre>
      *
@@ -2588,6 +2590,7 @@ public final class Artifacts {
     flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecution();
     /**
      * <pre>
+     * 3. These fields should be removed.
      * Outputs of tasks will have this.
      * </pre>
      *
@@ -2904,6 +2907,7 @@ public final class Artifacts {
     private flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier taskExecution_;
     /**
      * <pre>
+     * 3. These fields should be removed.
      * Outputs of tasks will have this.
      * </pre>
      *
@@ -2914,6 +2918,7 @@ public final class Artifacts {
     }
     /**
      * <pre>
+     * 3. These fields should be removed.
      * Outputs of tasks will have this.
      * </pre>
      *
@@ -2924,6 +2929,7 @@ public final class Artifacts {
     }
     /**
      * <pre>
+     * 3. These fields should be removed.
      * Outputs of tasks will have this.
      * </pre>
      *
@@ -3888,6 +3894,7 @@ public final class Artifacts {
           flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder> taskExecutionBuilder_;
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -3898,6 +3905,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -3912,6 +3920,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -3932,6 +3941,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -3950,6 +3960,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -3972,6 +3983,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -3990,6 +4002,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -4002,6 +4015,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *
@@ -4017,6 +4031,7 @@ public final class Artifacts {
       }
       /**
        * <pre>
+       * 3. These fields should be removed.
        * Outputs of tasks will have this.
        * </pre>
        *

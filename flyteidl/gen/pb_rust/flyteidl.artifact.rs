@@ -25,6 +25,9 @@ pub struct CreateArtifactRequest {
     #[prost(string, tag="5")]
     pub tag: ::prost::alloc::string::String,
 }
+// 1. Should add a new Source message that encapsulates all three of principal, task execution id, workflow execution id,
+// as well as the workflow and launch plan id responsible for the execution that generated the artifact (if not an upload)
+
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactSpec {
@@ -35,6 +38,7 @@ pub struct ArtifactSpec {
     /// type to all Literals is a lot of work.
     #[prost(message, optional, tag="2")]
     pub r#type: ::core::option::Option<super::core::LiteralType>,
+    /// 3. These fields should be removed.
     /// Outputs of tasks will have this.
     #[prost(message, optional, tag="5")]
     pub task_execution: ::core::option::Option<super::core::TaskExecutionIdentifier>,
