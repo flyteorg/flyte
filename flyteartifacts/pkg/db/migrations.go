@@ -60,9 +60,9 @@ var Migrations = []*gormigrate.Migration{
 		Migrate: func(tx *gorm.DB) error {
 			type TriggerKey struct {
 				gorm.Model
-				Project string        `gorm:"index:idx_t_pdn;index:idx_t_proj;type:varchar(64)"`
-				Domain  string        `gorm:"index:idx_t_pdn;index:idx_t_dom;type:varchar(64)"`
-				Name    string        `gorm:"index:idx_t_pdn;index:idx_t_name;type:varchar(255)"`
+				Project string        `gorm:"uniqueIndex:idx_t_pdn;index:idx_t_proj;type:varchar(64)"`
+				Domain  string        `gorm:"uniqueIndex:idx_t_pdn;index:idx_t_dom;type:varchar(64)"`
+				Name    string        `gorm:"uniqueIndex:idx_t_pdn;index:idx_t_name;type:varchar(255)"`
 				RunsOn  []ArtifactKey `gorm:"many2many:active_trigger_artifact_keys;"`
 			}
 
