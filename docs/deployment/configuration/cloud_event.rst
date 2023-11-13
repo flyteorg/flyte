@@ -109,7 +109,7 @@ Which of these three events is being sent can be distinguished by the subject
 line of the message, which will be one of the three strings above.
 
 Note that these message wrap the underlying event messages
-:std:doc:`found here <flyteidl:protos/docs/event/event>`.
+:std:ref:`found here <ref_flyteidl/event/event.proto>`.
 
 CloudEvent Spec
 ===============

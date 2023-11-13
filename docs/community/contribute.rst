@@ -76,21 +76,21 @@ Here is an example using ``:std:doc``:
 
   .. code-block:: text
 
-      Task: :std:doc:`generated/flytekit.task`
+      Task: :std:doc:`/api/flytekit/generated/flytekit.task`
 
   Output:
 
-  Task: :std:doc:`generated/flytekit.task`
+  Task: :std:doc:`/api/flytekit/generated/flytekit.task`
 
 * Custom name
 
   .. code-block:: text
 
-      :std:doc:`Using custom words <generated/flytekit.task>`
+      :std:doc:`Using custom words </api/flytekit/generated/flytekit.task>`
 
   Output:
 
-  :std:doc:`Using custom words <generated/flytekit.task>`
+  :std:doc:`Using custom words </api/flytekit/generated/flytekit.task>`
 
 |
 

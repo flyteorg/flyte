@@ -50,6 +50,7 @@ pyspark                     # spark
 sqlalchemy                  # sqlalchemy
 torch                       # pytorch
 skl2onnx                    # onnxscikitlearn
+numpy==1.23.5               # onnxtensorflow numpy.bool warning
 tf2onnx                     # onnxtensorflow
 tensorflow>=2.13.0          # onnxtensorflow
 whylogs==1.3.3              # whylogs

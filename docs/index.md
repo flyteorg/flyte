@@ -1,4 +1,4 @@
-# Production-grade Data and ML Workflows Made Easy
+# Welcome to Flyte!
 
 ```{eval-rst}
 .. raw:: html
@@ -75,7 +75,7 @@ contribute its architecture and design.
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`🔤 Getting Started <introduction>`
+* - {doc}`🔤 Intro to Flyte <introduction>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
 * - {doc}`📖 User Guide <userguide>`
@@ -133,8 +133,6 @@ Have questions or need support? The best way to reach us is through Slack:
 
 ```{toctree}
 :maxdepth: 1
-:caption: Getting Started
-:name: getting_started
 :hidden:
 
 Introduction <introduction>
@@ -145,7 +143,7 @@ Core Use Cases <flytesnacks/getting_started/core_use_cases>
 ```{toctree}
 :maxdepth: 1
 :caption: Examples
-:name: examples
+:name: examples-guides
 :hidden:
 
 User Guide <userguide>
@@ -154,11 +152,12 @@ Integrations <integrations>
 ```
 
 ```{toctree}
-:caption: Deployment
+:caption: Cluster Deployment
 :maxdepth: -1
 :name: deploymenttoc
 :hidden:
 
+Getting Started <deployment/index>
 deployment/deployment/index
 deployment/plugins/index
 deployment/configuration/index
@@ -214,4 +213,13 @@ community/troubleshoot
 concepts/basics
 concepts/control_plane
 concepts/architecture
+```
+
+```{toctree}
+:caption: Tags
+:maxdepth: -1
+:name: tags
+:hidden:
+
+Pages by Tag <_tags/tagsindex>
 ```

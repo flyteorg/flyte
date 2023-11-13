@@ -7,7 +7,7 @@ Adding New Customizable Resources
 .. tags:: Infrastructure, Advanced
 
 As a quick refresher, custom resources allow you to manage configurations for specific combinations of user projects, domains and workflows that override default values.
-Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <flyteidl:protos/docs/admin/admin:matchableresource>`.
+Examples of such resources include execution clusters, task resource defaults, and :std:ref:`more <ref_flyteidl.admin.MatchableResource>`.
 
 .. note::
     For background on customizable resources, refer to :ref:`deployment-configuration-general`.
@@ -29,7 +29,7 @@ Here's how you could do that.
 Flyte IDL
 ^^^^^^^^^
 
-Introduce a new :std:ref:`matchable resource <protos/docs/admin/admin:matchableresource>` that includes a unique enum value and proto message definition.
+Introduce a new :std:ref:`matchable resource <ref_flyteidl.admin.MatchableResource>` that includes a unique enum value and proto message definition.
 
 For example:
 

@@ -156,7 +156,7 @@ This can done in multiple ways
        flyteadmin:
           maxParallelism: 25
 
-#. Default for a specific launch plan. For any launch plan, the maxParallelism value can be changed or altered. This can be done using :py:meth:`flytekit.LaunchPlan.get_or_create` or the :std:ref:`protos/docs/admin/admin:launchplancreaterequest`
+#. Default for a specific launch plan. For any launch plan, the maxParallelism value can be changed or altered. This can be done using :py:meth:`flytekit.LaunchPlan.get_or_create` or the :std:ref:`ref_flyteidl.admin.LaunchPlanCreateRequest`
    **Flytekit Example**
 
    .. code-block:: python

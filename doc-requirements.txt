@@ -14,14 +14,13 @@ alabaster==0.7.13         # via sphinx
 alembic==1.12.1           # via mlflow
 altair==4.2.2             # via great-expectations
 annotated-types==0.6.0    # via pydantic
-ansiwrap==0.8.4           # via papermill
 anyio==3.7.1              # via fastapi, jupyter-server, starlette, watchfiles
 aplus==0.11.0             # via vaex-core
 appnope==0.1.3            # via ipykernel, ipython
 argon2-cffi==23.1.0       # via jupyter-server
 argon2-cffi-bindings==21.2.0  # via argon2-cffi
 arrow==1.3.0              # via cookiecutter, isoduration
-asn1crypto==1.5.1         # via oscrypto, snowflake-connector-python
+asn1crypto==1.5.1         # via snowflake-connector-python
 astroid==3.0.1            # via sphinx-autoapi
 astropy==5.3.4            # via vaex-astro
 asttokens==2.4.1          # via stack-data
@@ -40,7 +39,7 @@ blake3==0.3.3             # via vaex-core
 bleach==6.1.0             # via nbconvert
 botocore==1.31.64         # via -r doc-requirements.in, aiobotocore
 bqplot==0.12.42           # via ipyvolume, vaex-jupyter
-branca==0.6.0             # via ipyleaflet
+branca==0.7.0             # via ipyleaflet
 cachetools==5.3.2         # via google-auth, vaex-server
 certifi==2023.7.22        # via kubernetes, requests, snowflake-connector-python
 cffi==1.16.0              # via argon2-cffi-bindings, azure-datalake-store, cryptography, snowflake-connector-python
@@ -51,9 +50,9 @@ click==8.1.7              # via cookiecutter, dask, databricks-cli, distributed,
 cloudpickle==2.2.1        # via dask, distributed, flytekit, flytekitplugins-kfpytorch, mlflow, vaex-core
 codespell==2.2.6          # via -r doc-requirements.in
 colorama==0.4.6           # via great-expectations
-comm==0.1.4               # via ipykernel, ipywidgets
+comm==0.2.0               # via ipykernel, ipywidgets
 commonmark==0.9.1         # via recommonmark
-contourpy==1.1.1          # via matplotlib
+contourpy==1.2.0          # via matplotlib
 cookiecutter==2.4.0       # via flytekit
 croniter==2.0.1           # via flytekit
 cryptography==41.0.5      # via azure-identity, azure-storage-blob, great-expectations, msal, pyjwt, pyopenssl, snowflake-connector-python
@@ -91,7 +90,7 @@ flytekit==1.10.0          # via -r doc-requirements.in, flytekitplugins-deck-sta
 flytekitplugins-deck-standard==1.10.0  # via -r doc-requirements.in
 flytekitplugins-kfpytorch==1.10.0  # via -r doc-requirements.in
 flytekitplugins-sqlalchemy==1.10.0  # via -r doc-requirements.in
-fonttools==4.43.1         # via matplotlib
+fonttools==4.44.0         # via matplotlib
 fqdn==1.5.1               # via jsonschema
 frozendict==2.3.8         # via vaex-core
 frozenlist==1.4.0         # via aiohttp, aiosignal, ray
@@ -113,7 +112,7 @@ google-crc32c==1.5.0      # via google-cloud-storage, google-resumable-media
 google-pasta==0.2.0       # via tensorflow-macos
 google-resumable-media==2.6.0  # via google-cloud-bigquery, google-cloud-storage
 googleapis-common-protos==1.61.0  # via flyteidl, flytekit, google-api-core, grpcio-status
-great-expectations==0.18.0  # via -r doc-requirements.in
+great-expectations==0.18.1  # via -r doc-requirements.in
 grpcio==1.59.2            # via flytekit, google-api-core, google-cloud-bigquery, grpcio-status, ray, tensorboard, tensorflow-macos
 grpcio-status==1.59.2     # via flytekit, google-api-core
 gunicorn==21.2.0          # via mlflow
@@ -132,7 +131,7 @@ ipykernel==6.26.0         # via jupyter, jupyter-console, jupyterlab, myst-nb, q
 ipyleaflet==0.17.4        # via vaex-jupyter
 ipympl==0.9.3             # via vaex-jupyter
 ipython==8.17.2           # via -r doc-requirements.in, great-expectations, ipykernel, ipympl, ipywidgets, jupyter-console, myst-nb
-ipython-genutils==0.2.0   # via ipympl, qtconsole
+ipython-genutils==0.2.0   # via ipympl
 ipyvolume==0.6.3          # via vaex-jupyter
 ipyvue==1.10.1            # via ipyvolume, ipyvuetify
 ipyvuetify==1.8.10        # via ipyvolume, vaex-jupyter
@@ -154,14 +153,14 @@ jsonschema[format-nongpl]==4.19.2  # via altair, great-expectations, jupyter-eve
 jsonschema-specifications==2023.7.1  # via jsonschema
 jupyter==1.0.0            # via -r doc-requirements.in
 jupyter-cache==0.6.1      # via myst-nb
-jupyter-client==8.5.0     # via ipykernel, jupyter-console, jupyter-server, nbclient, qtconsole
+jupyter-client==8.6.0     # via ipykernel, jupyter-console, jupyter-server, nbclient, qtconsole
 jupyter-console==6.6.3    # via jupyter
 jupyter-core==5.5.0       # via ipykernel, jupyter-client, jupyter-console, jupyter-server, jupyterlab, nbclient, nbconvert, nbformat, qtconsole
-jupyter-events==0.8.0     # via jupyter-server
+jupyter-events==0.9.0     # via jupyter-server
 jupyter-lsp==2.2.0        # via jupyterlab
-jupyter-server==2.9.1     # via jupyter-lsp, jupyterlab, jupyterlab-server, notebook, notebook-shim
+jupyter-server==2.10.0    # via jupyter-lsp, jupyterlab, jupyterlab-server, notebook, notebook-shim
 jupyter-server-terminals==0.4.4  # via jupyter-server
-jupyterlab==4.0.7         # via notebook
+jupyterlab==4.0.8         # via notebook
 jupyterlab-pygments==0.2.2  # via nbconvert
 jupyterlab-server==2.25.0  # via jupyterlab, notebook
 jupyterlab-widgets==3.0.9  # via ipywidgets
@@ -192,7 +191,7 @@ mlflow==2.7.0             # via -r doc-requirements.in
 modin==0.22.3             # via -r doc-requirements.in
 more-itertools==10.1.0    # via jaraco-classes
 mpmath==1.3.0             # via sympy
-msal==1.24.1              # via azure-datalake-store, azure-identity, msal-extensions
+msal==1.25.0              # via azure-datalake-store, azure-identity, msal-extensions
 msal-extensions==1.0.0    # via azure-identity
 msgpack==1.0.7            # via distributed, ray
 multidict==6.0.4          # via aiohttp, yarl
@@ -203,7 +202,7 @@ myst-nb==0.17.2           # via -r doc-requirements.in
 myst-parser==0.18.1       # via myst-nb
 natsort==8.4.0            # via flytekit
 nbclient==0.7.4           # via jupyter-cache, myst-nb, nbconvert, papermill
-nbconvert==7.10.0         # via jupyter, jupyter-server
+nbconvert==7.11.0         # via jupyter, jupyter-server
 nbformat==5.9.2           # via great-expectations, jupyter-cache, jupyter-server, jupytext, myst-nb, nbclient, nbconvert, papermill
 nest-asyncio==1.5.8       # via ipykernel, vaex-core
 networkx==3.2.1           # via torch, visions
@@ -211,18 +210,17 @@ nodeenv==1.8.0            # via pre-commit
 notebook==7.0.6           # via great-expectations, jupyter
 notebook-shim==0.2.3      # via jupyterlab, notebook
 numba==0.58.1             # via vaex-ml, ydata-profiling
-numpy==1.25.2             # via altair, astropy, bqplot, contourpy, datasets, flytekit, great-expectations, h5py, imagehash, ipydatawidgets, ipympl, ipyvolume, matplotlib, ml-dtypes, mlflow, modin, numba, onnx, onnxconverter-common, opt-einsum, pandas, pandera, patsy, phik, pyarrow, pyerfa, pythreejs, pywavelets, ray, scikit-learn, scipy, seaborn, statsmodels, tensorboard, tensorflow-macos, tf2onnx, vaex-core, visions, wordcloud, xarray, ydata-profiling
+numpy==1.23.5             # via -r doc-requirements.in, altair, astropy, bqplot, contourpy, datasets, flytekit, great-expectations, h5py, imagehash, ipydatawidgets, ipympl, ipyvolume, matplotlib, ml-dtypes, mlflow, modin, numba, onnx, onnxconverter-common, opt-einsum, pandas, pandera, patsy, phik, pyarrow, pyerfa, pythreejs, pywavelets, ray, scikit-learn, scipy, seaborn, statsmodels, tensorboard, tensorflow-macos, tf2onnx, vaex-core, visions, wordcloud, xarray, ydata-profiling
 oauthlib==3.2.2           # via databricks-cli, kubernetes, requests-oauthlib
 onnx==1.15.0              # via onnxconverter-common, skl2onnx, tf2onnx
 onnxconverter-common==1.13.0  # via skl2onnx
 opt-einsum==3.3.0         # via tensorflow-macos
-oscrypto==1.3.0           # via snowflake-connector-python
 overrides==7.4.0          # via jupyter-server
 packaging==23.2           # via astropy, dask, datasets, distributed, docker, google-cloud-bigquery, great-expectations, gunicorn, huggingface-hub, ipykernel, jupyter-server, jupyterlab, jupyterlab-server, marshmallow, matplotlib, mlflow, modin, nbconvert, onnxconverter-common, pandera, plotly, qtconsole, qtpy, ray, snowflake-connector-python, sphinx, statsmodels, tensorflow-macos, xarray
 pandas==1.5.3             # via altair, bqplot, datasets, dolt-integrations, flytekit, great-expectations, mlflow, modin, pandera, phik, seaborn, statsmodels, vaex-core, visions, xarray, ydata-profiling
 pandera==0.17.2           # via -r doc-requirements.in
 pandocfilters==1.5.0      # via nbconvert
-papermill==2.4.0          # via -r doc-requirements.in
+papermill==2.5.0          # via -r doc-requirements.in
 parso==0.8.3              # via jedi
 partd==1.4.1              # via dask
 patsy==0.5.3              # via statsmodels
@@ -238,7 +236,7 @@ progressbar2==4.2.0       # via vaex-core
 prometheus-client==0.18.0  # via jupyter-server
 prompt-toolkit==3.0.39    # via ipython, jupyter-console
 proto-plus==1.22.3        # via google-cloud-bigquery
-protobuf==4.24.4          # via flyteidl, google-api-core, google-cloud-bigquery, googleapis-common-protos, grpcio-status, mlflow, onnx, onnxconverter-common, proto-plus, protoc-gen-swagger, ray, tensorboard, tensorflow-macos, whylogs
+protobuf==4.25.0          # via flyteidl, google-api-core, google-cloud-bigquery, googleapis-common-protos, grpcio-status, mlflow, onnx, onnxconverter-common, proto-plus, protoc-gen-swagger, ray, tensorboard, tensorflow-macos, whylogs
 protoc-gen-swagger==0.1.0  # via flyteidl
 psutil==5.9.6             # via distributed, ipykernel, modin
 psycopg2-binary==2.9.9    # via -r doc-requirements.in
@@ -249,7 +247,6 @@ pyarrow==10.0.1           # via datasets, flytekit, mlflow, vaex-core
 pyasn1==0.5.0             # via pyasn1-modules, rsa
 pyasn1-modules==0.3.0     # via google-auth
 pycparser==2.21           # via cffi
-pycryptodomex==3.19.0     # via snowflake-connector-python
 pydantic==2.4.2           # via fastapi, great-expectations, pandera, vaex-core, ydata-profiling
 pydantic-core==2.10.1     # via pydantic
 pyerfa==2.0.1.1           # via astropy
@@ -269,7 +266,7 @@ pytz==2023.3.post1        # via croniter, flytekit, great-expectations, mlflow, 
 pywavelets==1.4.1         # via imagehash
 pyyaml==6.0.1             # via astropy, cookiecutter, dask, datasets, distributed, flytekit, huggingface-hub, jupyter-cache, jupyter-events, jupytext, kubernetes, mlflow, myst-nb, myst-parser, papermill, pre-commit, ray, sphinx-autoapi, uvicorn, vaex-core, ydata-profiling
 pyzmq==25.1.1             # via ipykernel, jupyter-client, jupyter-console, jupyter-server, qtconsole
-qtconsole==5.4.4          # via jupyter
+qtconsole==5.5.0          # via jupyter
 qtpy==2.4.1               # via qtconsole
 querystring-parser==1.2.4  # via mlflow
 ray==2.6.3                # via -r doc-requirements.in
@@ -282,7 +279,7 @@ rfc3339-validator==0.1.4  # via jsonschema, jupyter-events
 rfc3986-validator==0.1.1  # via jsonschema, jupyter-events
 rich==13.6.0              # via cookiecutter, flytekit, rich-click, vaex-core
 rich-click==1.7.1         # via flytekit
-rpds-py==0.10.6           # via jsonschema, referencing
+rpds-py==0.12.0           # via jsonschema, referencing
 rsa==4.9                  # via google-auth
 ruamel-yaml==0.17.17      # via great-expectations
 s3fs==2023.10.0           # via flytekit
@@ -295,7 +292,7 @@ skl2onnx==1.15.0          # via -r doc-requirements.in
 smmap==5.0.1              # via gitdb
 sniffio==1.3.0            # via anyio
 snowballstemmer==2.2.0    # via sphinx
-snowflake-connector-python==3.3.1  # via -r doc-requirements.in
+snowflake-connector-python==3.4.0  # via -r doc-requirements.in
 sortedcontainers==2.4.0   # via distributed, flytekit, snowflake-connector-python
 soupsieve==2.5            # via beautifulsoup4
 sphinx==4.5.0             # via -r doc-requirements.in, furo, myst-nb, myst-parser, recommonmark, sphinx-autoapi, sphinx-basic-ng, sphinx-click, sphinx-code-include, sphinx-copybutton, sphinx-fontawesome, sphinx-issues, sphinx-panels, sphinx-prompt, sphinx-tabs, sphinx-tags, sphinxcontrib-video, sphinxcontrib-youtube, sphinxext-remoteliteralinclude
@@ -321,7 +318,7 @@ sphinxcontrib-serializinghtml==1.1.5  # via sphinx
 sphinxcontrib-video==0.2.0  # via -r doc-requirements.in
 sphinxcontrib-youtube==1.2.0  # via -r doc-requirements.in
 sphinxext-remoteliteralinclude==0.4.0  # via -r doc-requirements.in
-sqlalchemy==2.0.22        # via -r doc-requirements.in, alembic, flytekitplugins-sqlalchemy, jupyter-cache, mlflow
+sqlalchemy==2.0.23        # via -r doc-requirements.in, alembic, flytekitplugins-sqlalchemy, jupyter-cache, mlflow
 sqlparse==0.4.4           # via mlflow
 stack-data==0.6.3         # via ipython
 starlette==0.27.0         # via fastapi
@@ -341,13 +338,12 @@ tensorflow-macos==2.14.0  # via tensorflow
 termcolor==2.3.0          # via tensorflow-macos
 terminado==0.17.1         # via jupyter-server, jupyter-server-terminals
 text-unidecode==1.3       # via python-slugify
-textwrap3==0.9.2          # via ansiwrap
 tf2onnx==1.8.4            # via -r doc-requirements.in
 threadpoolctl==3.2.0      # via scikit-learn
 tinycss2==1.2.1           # via nbconvert
 toml==0.10.2              # via jupytext
 tomli==2.0.1              # via jupyterlab
-tomlkit==0.12.1           # via snowflake-connector-python
+tomlkit==0.12.2           # via snowflake-connector-python
 toolz==0.12.0             # via altair, dask, distributed, partd
 torch==2.1.0              # via -r doc-requirements.in
 tornado==6.3.3            # via distributed, ipykernel, jupyter-client, jupyter-server, jupyterlab, notebook, terminado, vaex-server
@@ -365,7 +361,7 @@ tzlocal==5.2              # via great-expectations
 unidecode==1.3.7          # via sphinx-autoapi
 uri-template==1.3.0       # via jsonschema
 urllib3==1.26.18          # via botocore, databricks-cli, distributed, docker, flytekit, great-expectations, kubernetes, requests, snowflake-connector-python, whylabs-client
-uvicorn[standard]==0.23.2  # via vaex-server
+uvicorn[standard]==0.24.0.post1  # via vaex-server
 uvloop==0.19.0            # via uvicorn
 vaex==4.17.0              # via -r doc-requirements.in
 vaex-astro==0.9.3         # via vaex

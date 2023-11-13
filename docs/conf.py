@@ -13,10 +13,12 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 import os
+import logging
 import sys
 
 import sphinx.application
 import sphinx.errors
+from sphinx.util import logging as sphinx_logging
 
 
 sys.path.insert(0, os.path.abspath("../"))
@@ -58,10 +60,6 @@ extensions = [
     "sphinx.ext.ifconfig",
     "sphinx.ext.viewcode",
     "sphinx.ext.extlinks",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.doctest",
-    "sphinx.ext.intersphinx",
-    "sphinx.ext.coverage",
     "sphinx-prompt",
     "sphinx_copybutton",
     "sphinxext.remoteliteralinclude",
@@ -94,16 +92,10 @@ extlinks = {
     "cookbook": ("https://flytecookbook.readthedocs.io/en/latest/", None),
 }
 
-myst_enable_extensions = ["colon_fence"]
 
 autosummary_generate = True
-autodoc_typehints = "description"
 suppress_warnings = ["autosectionlabel.*"]
-
-# autosectionlabel throws warnings if section names are duplicated.
-# The following tells autosectionlabel to not throw a warning for
-# duplicated section names that are in different documents.
-autosectionlabel_prefix_document = True
+autodoc_typehints = "description"
 
 # The master toctree document.
 master_doc = "index"
@@ -149,7 +141,6 @@ exclude_patterns = [
     "protos/gen/**",
     "api/flytekit/_templates/**",
     "api/flytekit/index.rst",
-    "deployment/index.rst",
     "reference/index.rst",
 ]
 
@@ -261,13 +252,14 @@ texinfo_documents = [
 ]
 
 # -- Extension configuration -------------------------------------------------
-autosectionlabel_prefix_document = True
+# autosectionlabel_prefix_document = True
 autosectionlabel_maxdepth = 2
 
 # Tags config
 tags_create_tags = True
+tags_extension = ["md", "rst"]
 tags_page_title = "Tag"
-tags_overview_title = "All Tags"
+tags_overview_title = "Pages by Tags"
 
 # -- Options for intersphinx extension ---------------------------------------
 
@@ -281,6 +273,7 @@ intersphinx_mapping = {
     "torch": ("https://pytorch.org/docs/master/", None),
     "scipy": ("https://docs.scipy.org/doc/scipy/reference", None),
     "matplotlib": ("https://matplotlib.org", None),
+    "pandera": ("https://pandera.readthedocs.io/en/stable/", None),
 }
 
 myst_enable_extensions = ["colon_fence"]
@@ -313,7 +306,7 @@ import_projects = [
         "source": "https://github.com/flyteorg/flytesnacks",
         "docs_path": "docs",
         "dest": "flytesnacks",
-        "cmd": ["cp", "-R", "_projects/flytesnacks/examples", "examples"],
+        "cmd": ["cp", "-R", "_projects/flytesnacks/examples", "./examples"],
     },
     {
         "source": "https://github.com/flyteorg/flytekit",
@@ -343,6 +336,7 @@ import_projects = [
 # myst notebook docs customization
 auto_examples_dir_root = "examples"
 auto_examples_dir_dest = "flytesnacks/examples"
+auto_examples_refresh = False
 
 # -- Options for todo extension ----------------------------------------------
 
@@ -365,3 +359,36 @@ os.environ["FLYTE_SDK_LOGGING_LEVEL_ROOT"] = "50"
 
 # Disable warnings from tensorflow
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+
+
+class CustomWarningSuppressor(logging.Filter):
+    """Filter logs by `suppress_warnings`."""
+
+    def __init__(self, app: sphinx.application.Sphinx) -> None:
+        self.app = app
+        super().__init__()
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        msg = record.getMessage()
+
+        filter_out = (
+            "duplicate label",
+            "Unexpected indentation",
+            'Error with CSV data in "csv-table" directive',
+            "Definition list ends without a blank line",
+        )
+
+        if msg.strip().startswith(filter_out):
+            return False
+        return True
+
+
+def setup(app: sphinx.application.Sphinx) -> None:
+    """Setup root logger for Sphinx"""
+    logger = logging.getLogger("sphinx")
+
+    warning_handler, *_ = [
+        h for h in logger.handlers
+        if isinstance(h, sphinx_logging.WarningStreamHandler)
+    ]
+    warning_handler.filters.insert(0, CustomWarningSuppressor(app))

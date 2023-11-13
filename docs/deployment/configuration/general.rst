@@ -19,7 +19,7 @@ You can customize these settings along increasing levels of specificity with Fly
 - Project, Domain, and Workflow name
 - Project, Domain, Workflow name and LaunchPlan name
 
-See :ref:`concepts/control_plane:control plane` to understand projects and domains.
+See :ref:`control-plane` to understand projects and domains.
 The following section will show you how to configure the settings along
 these dimensions.
 
