@@ -6,7 +6,6 @@ import (
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/mysql"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

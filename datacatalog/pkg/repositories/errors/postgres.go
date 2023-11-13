@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/jackc/pgconn"
-
-	catalogErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
+
+	catalogErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Postgres error codes

@@ -6,7 +6,6 @@ import (
 	"time"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -16,7 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
 	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
-
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"

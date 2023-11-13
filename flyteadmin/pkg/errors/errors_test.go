@@ -2,14 +2,15 @@ package errors
 
 import (
 	"context"
+	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGrpcStatusError(t *testing.T) {
@@ -89,4 +90,16 @@ func TestNewWorkflowExistsIdenticalStructureError(t *testing.T) {
 	assert.True(t, ok)
 	_, ok = details.GetReason().(*admin.CreateWorkflowFailureReason_ExistsIdenticalStructure)
 	assert.True(t, ok)
+}
+
+func TestIsDoesNotExistError(t *testing.T) {
+	assert.True(t, IsDoesNotExistError(NewFlyteAdminError(codes.NotFound, "foo")))
+}
+
+func TestIsNotDoesNotExistError(t *testing.T) {
+	assert.False(t, IsDoesNotExistError(NewFlyteAdminError(codes.Canceled, "foo")))
+}
+
+func TestIsNotDoesNotExistErrorBecauseOfNoneAdminError(t *testing.T) {
+	assert.False(t, IsDoesNotExistError(errors.New("foo")))
 }

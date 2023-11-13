@@ -1,8 +1,9 @@
 package core
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // When a change is observed, the owning entity with id types.NamespacedName can be triggered for re-validation

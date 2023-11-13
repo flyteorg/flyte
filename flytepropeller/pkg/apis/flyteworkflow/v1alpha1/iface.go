@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -436,6 +435,7 @@ type ExecutableNode interface {
 	GetOutputAlias() []Alias
 	GetInputBindings() []*Binding
 	GetResources() *v1.ResourceRequirements
+	GetExtendedResources() *core.ExtendedResources
 	GetConfig() *v1.ConfigMap
 	GetRetryStrategy() *RetryStrategy
 	GetExecutionDeadline() *time.Duration

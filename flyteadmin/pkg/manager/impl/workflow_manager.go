@@ -4,16 +4,10 @@ import (
 	"bytes"
 	"context"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
+	"github.com/golang/protobuf/proto"
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	compiler "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
@@ -29,6 +23,13 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengine "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/impl"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	compiler "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var defaultStorageOptions = storage.Options{}
@@ -221,13 +222,14 @@ func (w *WorkflowManager) CreateWorkflow(
 
 	// Send the interface definition to Artifact service, this is so that it can statically pick up one dimension of
 	// lineage information
+	tIfaceCopy := proto.Clone(workflowClosure.CompiledWorkflow.Primary.Template.Interface).(*core.TypedInterface)
 	go func() {
 		ceCtx := context.TODO()
 		if workflowClosure.CompiledWorkflow == nil || workflowClosure.CompiledWorkflow.Primary == nil {
 			logger.Debugf(ceCtx, "Insufficient fields to submit workflow interface %v", finalizedRequest.Id)
 			return
 		}
-		w.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *workflowClosure.CompiledWorkflow.Primary.Template.Interface)
+		w.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
 	}()
 
 	return &admin.WorkflowCreateResponse{}, nil

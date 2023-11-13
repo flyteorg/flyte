@@ -1,6 +1,7 @@
 package mocks
 
 import (
+	artifactsClient "github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 )
@@ -14,6 +15,7 @@ type MockApplicationProvider struct {
 	domainsConfig        interfaces.DomainsConfig
 	externalEventsConfig interfaces.ExternalEventsConfig
 	cloudEventConfig     interfaces.CloudEventsConfig
+	artifactsConfig      artifactsClient.Config
 }
 
 func (p *MockApplicationProvider) GetDbConfig() *database.DbConfig {
@@ -78,4 +80,8 @@ func (p *MockApplicationProvider) SetCloudEventsConfig(cloudEventConfig interfac
 
 func (p *MockApplicationProvider) GetCloudEventsConfig() *interfaces.CloudEventsConfig {
 	return &p.cloudEventConfig
+}
+
+func (p *MockApplicationProvider) GetArtifactsConfig() *artifactsClient.Config {
+	return &p.artifactsConfig
 }

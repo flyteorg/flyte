@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
-
 	corev1 "k8s.io/api/core/v1"
 )
 

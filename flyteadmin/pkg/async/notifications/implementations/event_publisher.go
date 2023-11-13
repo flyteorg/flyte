@@ -3,17 +3,15 @@ package implementations
 import (
 	"context"
 
-	"k8s.io/apimachinery/pkg/util/sets"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
-
 	"github.com/NYTimes/gizmo/pubsub"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type EventPublisherSystemMetrics struct {

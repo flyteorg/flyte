@@ -2,15 +2,13 @@ package gormimpl
 
 import (
 	"context"
+	"database/sql/driver"
 	"testing"
 	"time"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"google.golang.org/grpc/codes"
-
 	"github.com/stretchr/testify/assert"
-
-	"database/sql/driver"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	datacatalog_error "github.com/flyteorg/flyte/datacatalog/pkg/errors"

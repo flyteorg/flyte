@@ -294,6 +294,8 @@ Class | Method | HTTP request | Description
  - [CoreEnumType](docs/CoreEnumType.md)
  - [CoreError](docs/CoreError.md)
  - [CoreExecutionError](docs/CoreExecutionError.md)
+ - [CoreExtendedResources](docs/CoreExtendedResources.md)
+ - [CoreGPUAccelerator](docs/CoreGPUAccelerator.md)
  - [CoreGateNode](docs/CoreGateNode.md)
  - [CoreIOStrategy](docs/CoreIOStrategy.md)
  - [CoreIdentifier](docs/CoreIdentifier.md)

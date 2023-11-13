@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Special enum to indicate if the node under consideration is ready to be executed or should be skipped

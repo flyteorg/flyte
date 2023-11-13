@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 // Implementation of an interfaces.FlyteAdminDataProvider which fetches data using a flyteadmin service client

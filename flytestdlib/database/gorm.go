@@ -6,9 +6,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	gormLogger "gorm.io/gorm/logger"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // GetGormLogger converts between the flytestdlib configured log level to the equivalent gorm log level and outputs

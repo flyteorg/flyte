@@ -3,6 +3,7 @@ package impl
 import (
 	"bytes"
 	"context"
+	"github.com/golang/protobuf/proto"
 	"strconv"
 	"time"
 
@@ -132,13 +133,14 @@ func (t *TaskManager) CreateTask(
 			contextWithRuntimeMeta, common.RuntimeVersionKey, finalizedRequest.Spec.Template.Metadata.Runtime.Version)
 		t.metrics.Registered.Inc(contextWithRuntimeMeta)
 	}
+	tIfaceCopy := proto.Clone(finalizedRequest.Spec.Template.Interface).(*core.TypedInterface)
 	go func() {
 		ceCtx := context.TODO()
 		if finalizedRequest.Spec.Template.Interface == nil {
 			logger.Debugf(ceCtx, "Task [%+v] has no interface, skipping registration", finalizedRequest.Id)
 			return
 		}
-		t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *finalizedRequest.Spec.Template.Interface)
+		t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
 	}()
 
 	return &admin.TaskCreateResponse{}, nil

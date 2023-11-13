@@ -5,13 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
-
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"k8s.io/apimachinery/pkg/util/clock"
 )
 
 // Controller is a name-spaced collection of back-off handlers

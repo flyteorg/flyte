@@ -11,15 +11,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/jackc/pgconn"
-
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func TestResolvePassword(t *testing.T) {

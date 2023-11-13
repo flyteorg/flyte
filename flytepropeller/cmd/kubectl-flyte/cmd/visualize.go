@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 	"github.com/spf13/cobra"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 )
 
 type VisualizeOpts struct {

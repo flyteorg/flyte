@@ -1549,6 +1549,16 @@ func (m *TaskNodeOverrides) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetExtendedResources()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskNodeOverridesValidationError{
+				field:  "ExtendedResources",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

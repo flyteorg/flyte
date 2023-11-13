@@ -185,6 +185,8 @@ from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig
 from flyteadmin.models.core_enum_type import CoreEnumType
 from flyteadmin.models.core_error import CoreError
 from flyteadmin.models.core_execution_error import CoreExecutionError
+from flyteadmin.models.core_extended_resources import CoreExtendedResources
+from flyteadmin.models.core_gpu_accelerator import CoreGPUAccelerator
 from flyteadmin.models.core_gate_node import CoreGateNode
 from flyteadmin.models.core_io_strategy import CoreIOStrategy
 from flyteadmin.models.core_identifier import CoreIdentifier

@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	"github.com/golang/protobuf/proto"
+	"golang.org/x/time/rate"
 
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
@@ -13,8 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/golang/protobuf/proto"
-	"golang.org/x/time/rate"
 )
 
 type adminEventSink struct {
