@@ -1320,6 +1320,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.Abort(ctx, h, nCtx, "node failing", false); err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
+		nodeStatus.ClearSubNodeStatus()
 		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
 		c.metrics.FailureDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
