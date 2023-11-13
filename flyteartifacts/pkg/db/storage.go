@@ -295,7 +295,14 @@ func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.Arti
 
 	ts := make([]Trigger, len(triggerKey))
 
-	db = r.db.Preload("RunsOn").Model(&Trigger{}).InnerJoins("TriggerKey", r.db.Where(&triggerKey)).Where("active = true").Find(&ts)
+	var triggerCondition = r.db.Where(&triggerKey[0])
+	if len(triggerKey) > 1 {
+		for _, tk := range triggerKey[1:] {
+			triggerCondition = triggerCondition.Or(&tk)
+		}
+	}
+
+	db = r.db.Preload("RunsOn").Model(&Trigger{}).InnerJoins("TriggerKey", triggerCondition).Where("active = true").Find(&ts)
 	if err := db.Error; err != nil {
 		logger.Errorf(ctx, "Failed to query for triggers: %+v", err)
 		return nil, err
