@@ -163,6 +163,7 @@ type ArtifactSpec struct {
 	// forgets to change the name, that is okay. And the reason why this is a separate field is because adding the
 	// type to all Literals is a lot of work.
 	Type *core.LiteralType `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	// 3. These fields should be removed.
 	// Outputs of tasks will have this.
 	TaskExecution *core.TaskExecutionIdentifier `protobuf:"bytes,5,opt,name=task_execution,json=taskExecution,proto3" json:"task_execution,omitempty"`
 	// Workflow outputs will have this.

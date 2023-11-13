@@ -198,19 +198,6 @@ public final class Dataproxy {
      * <code>.google.protobuf.Timestamp expires_at = 3;</code>
      */
     com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder();
-
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    boolean hasArtifact();
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    flyteidl.artifact.Artifacts.Artifact getArtifact();
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    flyteidl.artifact.Artifacts.ArtifactOrBuilder getArtifactOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.service.CreateUploadLocationResponse}
@@ -274,19 +261,6 @@ public final class Dataproxy {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(expiresAt_);
                 expiresAt_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            case 34: {
-              flyteidl.artifact.Artifacts.Artifact.Builder subBuilder = null;
-              if (artifact_ != null) {
-                subBuilder = artifact_.toBuilder();
-              }
-              artifact_ = input.readMessage(flyteidl.artifact.Artifacts.Artifact.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(artifact_);
-                artifact_ = subBuilder.buildPartial();
               }
 
               break;
@@ -440,27 +414,6 @@ public final class Dataproxy {
       return getExpiresAt();
     }
 
-    public static final int ARTIFACT_FIELD_NUMBER = 4;
-    private flyteidl.artifact.Artifacts.Artifact artifact_;
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    public boolean hasArtifact() {
-      return artifact_ != null;
-    }
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    public flyteidl.artifact.Artifacts.Artifact getArtifact() {
-      return artifact_ == null ? flyteidl.artifact.Artifacts.Artifact.getDefaultInstance() : artifact_;
-    }
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    public flyteidl.artifact.Artifacts.ArtifactOrBuilder getArtifactOrBuilder() {
-      return getArtifact();
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -484,9 +437,6 @@ public final class Dataproxy {
       if (expiresAt_ != null) {
         output.writeMessage(3, getExpiresAt());
       }
-      if (artifact_ != null) {
-        output.writeMessage(4, getArtifact());
-      }
       unknownFields.writeTo(output);
     }
 
@@ -505,10 +455,6 @@ public final class Dataproxy {
       if (expiresAt_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getExpiresAt());
-      }
-      if (artifact_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getArtifact());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -534,11 +480,6 @@ public final class Dataproxy {
         if (!getExpiresAt()
             .equals(other.getExpiresAt())) return false;
       }
-      if (hasArtifact() != other.hasArtifact()) return false;
-      if (hasArtifact()) {
-        if (!getArtifact()
-            .equals(other.getArtifact())) return false;
-      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -557,10 +498,6 @@ public final class Dataproxy {
       if (hasExpiresAt()) {
         hash = (37 * hash) + EXPIRES_AT_FIELD_NUMBER;
         hash = (53 * hash) + getExpiresAt().hashCode();
-      }
-      if (hasArtifact()) {
-        hash = (37 * hash) + ARTIFACT_FIELD_NUMBER;
-        hash = (53 * hash) + getArtifact().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -705,12 +642,6 @@ public final class Dataproxy {
           expiresAt_ = null;
           expiresAtBuilder_ = null;
         }
-        if (artifactBuilder_ == null) {
-          artifact_ = null;
-        } else {
-          artifact_ = null;
-          artifactBuilder_ = null;
-        }
         return this;
       }
 
@@ -743,11 +674,6 @@ public final class Dataproxy {
           result.expiresAt_ = expiresAt_;
         } else {
           result.expiresAt_ = expiresAtBuilder_.build();
-        }
-        if (artifactBuilder_ == null) {
-          result.artifact_ = artifact_;
-        } else {
-          result.artifact_ = artifactBuilder_.build();
         }
         onBuilt();
         return result;
@@ -807,9 +733,6 @@ public final class Dataproxy {
         }
         if (other.hasExpiresAt()) {
           mergeExpiresAt(other.getExpiresAt());
-        }
-        if (other.hasArtifact()) {
-          mergeArtifact(other.getArtifact());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1170,123 +1093,6 @@ public final class Dataproxy {
         }
         return expiresAtBuilder_;
       }
-
-      private flyteidl.artifact.Artifacts.Artifact artifact_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.artifact.Artifacts.Artifact, flyteidl.artifact.Artifacts.Artifact.Builder, flyteidl.artifact.Artifacts.ArtifactOrBuilder> artifactBuilder_;
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public boolean hasArtifact() {
-        return artifactBuilder_ != null || artifact_ != null;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public flyteidl.artifact.Artifacts.Artifact getArtifact() {
-        if (artifactBuilder_ == null) {
-          return artifact_ == null ? flyteidl.artifact.Artifacts.Artifact.getDefaultInstance() : artifact_;
-        } else {
-          return artifactBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder setArtifact(flyteidl.artifact.Artifacts.Artifact value) {
-        if (artifactBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          artifact_ = value;
-          onChanged();
-        } else {
-          artifactBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder setArtifact(
-          flyteidl.artifact.Artifacts.Artifact.Builder builderForValue) {
-        if (artifactBuilder_ == null) {
-          artifact_ = builderForValue.build();
-          onChanged();
-        } else {
-          artifactBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder mergeArtifact(flyteidl.artifact.Artifacts.Artifact value) {
-        if (artifactBuilder_ == null) {
-          if (artifact_ != null) {
-            artifact_ =
-              flyteidl.artifact.Artifacts.Artifact.newBuilder(artifact_).mergeFrom(value).buildPartial();
-          } else {
-            artifact_ = value;
-          }
-          onChanged();
-        } else {
-          artifactBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder clearArtifact() {
-        if (artifactBuilder_ == null) {
-          artifact_ = null;
-          onChanged();
-        } else {
-          artifact_ = null;
-          artifactBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public flyteidl.artifact.Artifacts.Artifact.Builder getArtifactBuilder() {
-        
-        onChanged();
-        return getArtifactFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public flyteidl.artifact.Artifacts.ArtifactOrBuilder getArtifactOrBuilder() {
-        if (artifactBuilder_ != null) {
-          return artifactBuilder_.getMessageOrBuilder();
-        } else {
-          return artifact_ == null ?
-              flyteidl.artifact.Artifacts.Artifact.getDefaultInstance() : artifact_;
-        }
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.artifact.Artifacts.Artifact, flyteidl.artifact.Artifacts.Artifact.Builder, flyteidl.artifact.Artifacts.ArtifactOrBuilder> 
-          getArtifactFieldBuilder() {
-        if (artifactBuilder_ == null) {
-          artifactBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.artifact.Artifacts.Artifact, flyteidl.artifact.Artifacts.Artifact.Builder, flyteidl.artifact.Artifacts.ArtifactOrBuilder>(
-                  getArtifact(),
-                  getParentForChildren(),
-                  isClean());
-          artifact_ = null;
-        }
-        return artifactBuilder_;
-      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -1469,31 +1275,6 @@ public final class Dataproxy {
      */
     com.google.protobuf.ByteString
         getFilenameRootBytes();
-
-    /**
-     * <pre>
-     * If provided, the Artifact that the upload creates will contain the information specified here.
-     * </pre>
-     *
-     * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-     */
-    boolean hasArtifactSpec();
-    /**
-     * <pre>
-     * If provided, the Artifact that the upload creates will contain the information specified here.
-     * </pre>
-     *
-     * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-     */
-    flyteidl.artifact.Artifacts.ArtifactSpec getArtifactSpec();
-    /**
-     * <pre>
-     * If provided, the Artifact that the upload creates will contain the information specified here.
-     * </pre>
-     *
-     * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-     */
-    flyteidl.artifact.Artifacts.ArtifactSpecOrBuilder getArtifactSpecOrBuilder();
   }
   /**
    * <pre>
@@ -1587,19 +1368,6 @@ public final class Dataproxy {
               java.lang.String s = input.readStringRequireUtf8();
 
               filenameRoot_ = s;
-              break;
-            }
-            case 58: {
-              flyteidl.artifact.Artifacts.ArtifactSpec.Builder subBuilder = null;
-              if (artifactSpec_ != null) {
-                subBuilder = artifactSpec_.toBuilder();
-              }
-              artifactSpec_ = input.readMessage(flyteidl.artifact.Artifacts.ArtifactSpec.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(artifactSpec_);
-                artifactSpec_ = subBuilder.buildPartial();
-              }
-
               break;
             }
             default: {
@@ -1868,39 +1636,6 @@ public final class Dataproxy {
       }
     }
 
-    public static final int ARTIFACT_SPEC_FIELD_NUMBER = 7;
-    private flyteidl.artifact.Artifacts.ArtifactSpec artifactSpec_;
-    /**
-     * <pre>
-     * If provided, the Artifact that the upload creates will contain the information specified here.
-     * </pre>
-     *
-     * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-     */
-    public boolean hasArtifactSpec() {
-      return artifactSpec_ != null;
-    }
-    /**
-     * <pre>
-     * If provided, the Artifact that the upload creates will contain the information specified here.
-     * </pre>
-     *
-     * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-     */
-    public flyteidl.artifact.Artifacts.ArtifactSpec getArtifactSpec() {
-      return artifactSpec_ == null ? flyteidl.artifact.Artifacts.ArtifactSpec.getDefaultInstance() : artifactSpec_;
-    }
-    /**
-     * <pre>
-     * If provided, the Artifact that the upload creates will contain the information specified here.
-     * </pre>
-     *
-     * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-     */
-    public flyteidl.artifact.Artifacts.ArtifactSpecOrBuilder getArtifactSpecOrBuilder() {
-      return getArtifactSpec();
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1933,9 +1668,6 @@ public final class Dataproxy {
       if (!getFilenameRootBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 6, filenameRoot_);
       }
-      if (artifactSpec_ != null) {
-        output.writeMessage(7, getArtifactSpec());
-      }
       unknownFields.writeTo(output);
     }
 
@@ -1964,10 +1696,6 @@ public final class Dataproxy {
       }
       if (!getFilenameRootBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, filenameRoot_);
-      }
-      if (artifactSpec_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, getArtifactSpec());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1999,11 +1727,6 @@ public final class Dataproxy {
           .equals(other.getContentMd5())) return false;
       if (!getFilenameRoot()
           .equals(other.getFilenameRoot())) return false;
-      if (hasArtifactSpec() != other.hasArtifactSpec()) return false;
-      if (hasArtifactSpec()) {
-        if (!getArtifactSpec()
-            .equals(other.getArtifactSpec())) return false;
-      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2029,10 +1752,6 @@ public final class Dataproxy {
       hash = (53 * hash) + getContentMd5().hashCode();
       hash = (37 * hash) + FILENAME_ROOT_FIELD_NUMBER;
       hash = (53 * hash) + getFilenameRoot().hashCode();
-      if (hasArtifactSpec()) {
-        hash = (37 * hash) + ARTIFACT_SPEC_FIELD_NUMBER;
-        hash = (53 * hash) + getArtifactSpec().hashCode();
-      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2190,12 +1909,6 @@ public final class Dataproxy {
 
         filenameRoot_ = "";
 
-        if (artifactSpecBuilder_ == null) {
-          artifactSpec_ = null;
-        } else {
-          artifactSpec_ = null;
-          artifactSpecBuilder_ = null;
-        }
         return this;
       }
 
@@ -2232,11 +1945,6 @@ public final class Dataproxy {
         }
         result.contentMd5_ = contentMd5_;
         result.filenameRoot_ = filenameRoot_;
-        if (artifactSpecBuilder_ == null) {
-          result.artifactSpec_ = artifactSpec_;
-        } else {
-          result.artifactSpec_ = artifactSpecBuilder_.build();
-        }
         onBuilt();
         return result;
       }
@@ -2306,9 +2014,6 @@ public final class Dataproxy {
         if (!other.getFilenameRoot().isEmpty()) {
           filenameRoot_ = other.filenameRoot_;
           onChanged();
-        }
-        if (other.hasArtifactSpec()) {
-          mergeArtifactSpec(other.getArtifactSpec());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2941,159 +2646,6 @@ public final class Dataproxy {
         filenameRoot_ = value;
         onChanged();
         return this;
-      }
-
-      private flyteidl.artifact.Artifacts.ArtifactSpec artifactSpec_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.artifact.Artifacts.ArtifactSpec, flyteidl.artifact.Artifacts.ArtifactSpec.Builder, flyteidl.artifact.Artifacts.ArtifactSpecOrBuilder> artifactSpecBuilder_;
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public boolean hasArtifactSpec() {
-        return artifactSpecBuilder_ != null || artifactSpec_ != null;
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public flyteidl.artifact.Artifacts.ArtifactSpec getArtifactSpec() {
-        if (artifactSpecBuilder_ == null) {
-          return artifactSpec_ == null ? flyteidl.artifact.Artifacts.ArtifactSpec.getDefaultInstance() : artifactSpec_;
-        } else {
-          return artifactSpecBuilder_.getMessage();
-        }
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public Builder setArtifactSpec(flyteidl.artifact.Artifacts.ArtifactSpec value) {
-        if (artifactSpecBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          artifactSpec_ = value;
-          onChanged();
-        } else {
-          artifactSpecBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public Builder setArtifactSpec(
-          flyteidl.artifact.Artifacts.ArtifactSpec.Builder builderForValue) {
-        if (artifactSpecBuilder_ == null) {
-          artifactSpec_ = builderForValue.build();
-          onChanged();
-        } else {
-          artifactSpecBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public Builder mergeArtifactSpec(flyteidl.artifact.Artifacts.ArtifactSpec value) {
-        if (artifactSpecBuilder_ == null) {
-          if (artifactSpec_ != null) {
-            artifactSpec_ =
-              flyteidl.artifact.Artifacts.ArtifactSpec.newBuilder(artifactSpec_).mergeFrom(value).buildPartial();
-          } else {
-            artifactSpec_ = value;
-          }
-          onChanged();
-        } else {
-          artifactSpecBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public Builder clearArtifactSpec() {
-        if (artifactSpecBuilder_ == null) {
-          artifactSpec_ = null;
-          onChanged();
-        } else {
-          artifactSpec_ = null;
-          artifactSpecBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public flyteidl.artifact.Artifacts.ArtifactSpec.Builder getArtifactSpecBuilder() {
-        
-        onChanged();
-        return getArtifactSpecFieldBuilder().getBuilder();
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      public flyteidl.artifact.Artifacts.ArtifactSpecOrBuilder getArtifactSpecOrBuilder() {
-        if (artifactSpecBuilder_ != null) {
-          return artifactSpecBuilder_.getMessageOrBuilder();
-        } else {
-          return artifactSpec_ == null ?
-              flyteidl.artifact.Artifacts.ArtifactSpec.getDefaultInstance() : artifactSpec_;
-        }
-      }
-      /**
-       * <pre>
-       * If provided, the Artifact that the upload creates will contain the information specified here.
-       * </pre>
-       *
-       * <code>.flyteidl.artifact.ArtifactSpec artifact_spec = 7;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.artifact.Artifacts.ArtifactSpec, flyteidl.artifact.Artifacts.ArtifactSpec.Builder, flyteidl.artifact.Artifacts.ArtifactSpecOrBuilder> 
-          getArtifactSpecFieldBuilder() {
-        if (artifactSpecBuilder_ == null) {
-          artifactSpecBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.artifact.Artifacts.ArtifactSpec, flyteidl.artifact.Artifacts.ArtifactSpec.Builder, flyteidl.artifact.Artifacts.ArtifactSpecOrBuilder>(
-                  getArtifactSpec(),
-                  getParentForChildren(),
-                  isClean());
-          artifactSpec_ = null;
-        }
-        return artifactSpecBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8189,29 +7741,30 @@ public final class Dataproxy {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
      * <code>string flyte_url = 1;</code>
      */
     java.lang.String getFlyteUrl();
     /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
      * <code>string flyte_url = 1;</code>
      */
     com.google.protobuf.ByteString
         getFlyteUrlBytes();
-
-    /**
-     * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-     */
-    boolean hasArtifactId();
-    /**
-     * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-     */
-    flyteidl.core.ArtifactId.ArtifactID getArtifactId();
-    /**
-     * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-     */
-    flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdOrBuilder();
-
-    public flyteidl.service.Dataproxy.GetDataRequest.QueryCase getQueryCase();
   }
   /**
    * <pre>
@@ -8230,6 +7783,7 @@ public final class Dataproxy {
       super(builder);
     }
     private GetDataRequest() {
+      flyteUrl_ = "";
     }
 
     @java.lang.Override
@@ -8258,22 +7812,8 @@ public final class Dataproxy {
               break;
             case 10: {
               java.lang.String s = input.readStringRequireUtf8();
-              queryCase_ = 1;
-              query_ = s;
-              break;
-            }
-            case 18: {
-              flyteidl.core.ArtifactId.ArtifactID.Builder subBuilder = null;
-              if (queryCase_ == 2) {
-                subBuilder = ((flyteidl.core.ArtifactId.ArtifactID) query_).toBuilder();
-              }
-              query_ =
-                  input.readMessage(flyteidl.core.ArtifactId.ArtifactID.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((flyteidl.core.ArtifactId.ArtifactID) query_);
-                query_ = subBuilder.buildPartial();
-              }
-              queryCase_ = 2;
+
+              flyteUrl_ = s;
               break;
             }
             default: {
@@ -8308,111 +7848,54 @@ public final class Dataproxy {
               flyteidl.service.Dataproxy.GetDataRequest.class, flyteidl.service.Dataproxy.GetDataRequest.Builder.class);
     }
 
-    private int queryCase_ = 0;
-    private java.lang.Object query_;
-    public enum QueryCase
-        implements com.google.protobuf.Internal.EnumLite {
-      FLYTE_URL(1),
-      ARTIFACT_ID(2),
-      QUERY_NOT_SET(0);
-      private final int value;
-      private QueryCase(int value) {
-        this.value = value;
-      }
-      /**
-       * @deprecated Use {@link #forNumber(int)} instead.
-       */
-      @java.lang.Deprecated
-      public static QueryCase valueOf(int value) {
-        return forNumber(value);
-      }
-
-      public static QueryCase forNumber(int value) {
-        switch (value) {
-          case 1: return FLYTE_URL;
-          case 2: return ARTIFACT_ID;
-          case 0: return QUERY_NOT_SET;
-          default: return null;
-        }
-      }
-      public int getNumber() {
-        return this.value;
-      }
-    };
-
-    public QueryCase
-    getQueryCase() {
-      return QueryCase.forNumber(
-          queryCase_);
-    }
-
     public static final int FLYTE_URL_FIELD_NUMBER = 1;
+    private volatile java.lang.Object flyteUrl_;
     /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
      * <code>string flyte_url = 1;</code>
      */
     public java.lang.String getFlyteUrl() {
-      java.lang.Object ref = "";
-      if (queryCase_ == 1) {
-        ref = query_;
-      }
+      java.lang.Object ref = flyteUrl_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        if (queryCase_ == 1) {
-          query_ = s;
-        }
+        flyteUrl_ = s;
         return s;
       }
     }
     /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
      * <code>string flyte_url = 1;</code>
      */
     public com.google.protobuf.ByteString
         getFlyteUrlBytes() {
-      java.lang.Object ref = "";
-      if (queryCase_ == 1) {
-        ref = query_;
-      }
+      java.lang.Object ref = flyteUrl_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        if (queryCase_ == 1) {
-          query_ = b;
-        }
+        flyteUrl_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
-    }
-
-    public static final int ARTIFACT_ID_FIELD_NUMBER = 2;
-    /**
-     * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-     */
-    public boolean hasArtifactId() {
-      return queryCase_ == 2;
-    }
-    /**
-     * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-     */
-    public flyteidl.core.ArtifactId.ArtifactID getArtifactId() {
-      if (queryCase_ == 2) {
-         return (flyteidl.core.ArtifactId.ArtifactID) query_;
-      }
-      return flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance();
-    }
-    /**
-     * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-     */
-    public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdOrBuilder() {
-      if (queryCase_ == 2) {
-         return (flyteidl.core.ArtifactId.ArtifactID) query_;
-      }
-      return flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -8429,11 +7912,8 @@ public final class Dataproxy {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (queryCase_ == 1) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, query_);
-      }
-      if (queryCase_ == 2) {
-        output.writeMessage(2, (flyteidl.core.ArtifactId.ArtifactID) query_);
+      if (!getFlyteUrlBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, flyteUrl_);
       }
       unknownFields.writeTo(output);
     }
@@ -8444,12 +7924,8 @@ public final class Dataproxy {
       if (size != -1) return size;
 
       size = 0;
-      if (queryCase_ == 1) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, query_);
-      }
-      if (queryCase_ == 2) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, (flyteidl.core.ArtifactId.ArtifactID) query_);
+      if (!getFlyteUrlBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, flyteUrl_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -8466,19 +7942,8 @@ public final class Dataproxy {
       }
       flyteidl.service.Dataproxy.GetDataRequest other = (flyteidl.service.Dataproxy.GetDataRequest) obj;
 
-      if (!getQueryCase().equals(other.getQueryCase())) return false;
-      switch (queryCase_) {
-        case 1:
-          if (!getFlyteUrl()
-              .equals(other.getFlyteUrl())) return false;
-          break;
-        case 2:
-          if (!getArtifactId()
-              .equals(other.getArtifactId())) return false;
-          break;
-        case 0:
-        default:
-      }
+      if (!getFlyteUrl()
+          .equals(other.getFlyteUrl())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -8490,18 +7955,8 @@ public final class Dataproxy {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      switch (queryCase_) {
-        case 1:
-          hash = (37 * hash) + FLYTE_URL_FIELD_NUMBER;
-          hash = (53 * hash) + getFlyteUrl().hashCode();
-          break;
-        case 2:
-          hash = (37 * hash) + ARTIFACT_ID_FIELD_NUMBER;
-          hash = (53 * hash) + getArtifactId().hashCode();
-          break;
-        case 0:
-        default:
-      }
+      hash = (37 * hash) + FLYTE_URL_FIELD_NUMBER;
+      hash = (53 * hash) + getFlyteUrl().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -8639,8 +8094,8 @@ public final class Dataproxy {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        queryCase_ = 0;
-        query_ = null;
+        flyteUrl_ = "";
+
         return this;
       }
 
@@ -8667,17 +8122,7 @@ public final class Dataproxy {
       @java.lang.Override
       public flyteidl.service.Dataproxy.GetDataRequest buildPartial() {
         flyteidl.service.Dataproxy.GetDataRequest result = new flyteidl.service.Dataproxy.GetDataRequest(this);
-        if (queryCase_ == 1) {
-          result.query_ = query_;
-        }
-        if (queryCase_ == 2) {
-          if (artifactIdBuilder_ == null) {
-            result.query_ = query_;
-          } else {
-            result.query_ = artifactIdBuilder_.build();
-          }
-        }
-        result.queryCase_ = queryCase_;
+        result.flyteUrl_ = flyteUrl_;
         onBuilt();
         return result;
       }
@@ -8726,20 +8171,9 @@ public final class Dataproxy {
 
       public Builder mergeFrom(flyteidl.service.Dataproxy.GetDataRequest other) {
         if (other == flyteidl.service.Dataproxy.GetDataRequest.getDefaultInstance()) return this;
-        switch (other.getQueryCase()) {
-          case FLYTE_URL: {
-            queryCase_ = 1;
-            query_ = other.query_;
-            onChanged();
-            break;
-          }
-          case ARTIFACT_ID: {
-            mergeArtifactId(other.getArtifactId());
-            break;
-          }
-          case QUERY_NOT_SET: {
-            break;
-          }
+        if (!other.getFlyteUrl().isEmpty()) {
+          flyteUrl_ = other.flyteUrl_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -8769,64 +8203,64 @@ public final class Dataproxy {
         }
         return this;
       }
-      private int queryCase_ = 0;
-      private java.lang.Object query_;
-      public QueryCase
-          getQueryCase() {
-        return QueryCase.forNumber(
-            queryCase_);
-      }
 
-      public Builder clearQuery() {
-        queryCase_ = 0;
-        query_ = null;
-        onChanged();
-        return this;
-      }
-
-
+      private java.lang.Object flyteUrl_ = "";
       /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
        * <code>string flyte_url = 1;</code>
        */
       public java.lang.String getFlyteUrl() {
-        java.lang.Object ref = "";
-        if (queryCase_ == 1) {
-          ref = query_;
-        }
+        java.lang.Object ref = flyteUrl_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          if (queryCase_ == 1) {
-            query_ = s;
-          }
+          flyteUrl_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
         }
       }
       /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
        * <code>string flyte_url = 1;</code>
        */
       public com.google.protobuf.ByteString
           getFlyteUrlBytes() {
-        java.lang.Object ref = "";
-        if (queryCase_ == 1) {
-          ref = query_;
-        }
+        java.lang.Object ref = flyteUrl_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          if (queryCase_ == 1) {
-            query_ = b;
-          }
+          flyteUrl_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
         }
       }
       /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
        * <code>string flyte_url = 1;</code>
        */
       public Builder setFlyteUrl(
@@ -8834,23 +8268,37 @@ public final class Dataproxy {
         if (value == null) {
     throw new NullPointerException();
   }
-  queryCase_ = 1;
-        query_ = value;
+  
+        flyteUrl_ = value;
         onChanged();
         return this;
       }
       /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
        * <code>string flyte_url = 1;</code>
        */
       public Builder clearFlyteUrl() {
-        if (queryCase_ == 1) {
-          queryCase_ = 0;
-          query_ = null;
-          onChanged();
-        }
+        
+        flyteUrl_ = getDefaultInstance().getFlyteUrl();
+        onChanged();
         return this;
       }
       /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]output, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
        * <code>string flyte_url = 1;</code>
        */
       public Builder setFlyteUrlBytes(
@@ -8859,146 +8307,10 @@ public final class Dataproxy {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        queryCase_ = 1;
-        query_ = value;
+        
+        flyteUrl_ = value;
         onChanged();
         return this;
-      }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder> artifactIdBuilder_;
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public boolean hasArtifactId() {
-        return queryCase_ == 2;
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public flyteidl.core.ArtifactId.ArtifactID getArtifactId() {
-        if (artifactIdBuilder_ == null) {
-          if (queryCase_ == 2) {
-            return (flyteidl.core.ArtifactId.ArtifactID) query_;
-          }
-          return flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance();
-        } else {
-          if (queryCase_ == 2) {
-            return artifactIdBuilder_.getMessage();
-          }
-          return flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public Builder setArtifactId(flyteidl.core.ArtifactId.ArtifactID value) {
-        if (artifactIdBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          query_ = value;
-          onChanged();
-        } else {
-          artifactIdBuilder_.setMessage(value);
-        }
-        queryCase_ = 2;
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public Builder setArtifactId(
-          flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
-        if (artifactIdBuilder_ == null) {
-          query_ = builderForValue.build();
-          onChanged();
-        } else {
-          artifactIdBuilder_.setMessage(builderForValue.build());
-        }
-        queryCase_ = 2;
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public Builder mergeArtifactId(flyteidl.core.ArtifactId.ArtifactID value) {
-        if (artifactIdBuilder_ == null) {
-          if (queryCase_ == 2 &&
-              query_ != flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance()) {
-            query_ = flyteidl.core.ArtifactId.ArtifactID.newBuilder((flyteidl.core.ArtifactId.ArtifactID) query_)
-                .mergeFrom(value).buildPartial();
-          } else {
-            query_ = value;
-          }
-          onChanged();
-        } else {
-          if (queryCase_ == 2) {
-            artifactIdBuilder_.mergeFrom(value);
-          }
-          artifactIdBuilder_.setMessage(value);
-        }
-        queryCase_ = 2;
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public Builder clearArtifactId() {
-        if (artifactIdBuilder_ == null) {
-          if (queryCase_ == 2) {
-            queryCase_ = 0;
-            query_ = null;
-            onChanged();
-          }
-        } else {
-          if (queryCase_ == 2) {
-            queryCase_ = 0;
-            query_ = null;
-          }
-          artifactIdBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public flyteidl.core.ArtifactId.ArtifactID.Builder getArtifactIdBuilder() {
-        return getArtifactIdFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdOrBuilder() {
-        if ((queryCase_ == 2) && (artifactIdBuilder_ != null)) {
-          return artifactIdBuilder_.getMessageOrBuilder();
-        } else {
-          if (queryCase_ == 2) {
-            return (flyteidl.core.ArtifactId.ArtifactID) query_;
-          }
-          return flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.ArtifactID artifact_id = 2;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
-          getArtifactIdFieldBuilder() {
-        if (artifactIdBuilder_ == null) {
-          if (!(queryCase_ == 2)) {
-            query_ = flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance();
-          }
-          artifactIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder>(
-                  (flyteidl.core.ArtifactId.ArtifactID) query_,
-                  getParentForChildren(),
-                  isClean());
-          query_ = null;
-        }
-        queryCase_ = 2;
-        onChanged();;
-        return artifactIdBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -9135,19 +8447,6 @@ public final class Dataproxy {
      */
     flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder();
 
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    boolean hasArtifact();
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    flyteidl.artifact.Artifacts.Artifact getArtifact();
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    flyteidl.artifact.Artifacts.ArtifactOrBuilder getArtifactOrBuilder();
-
     public flyteidl.service.Dataproxy.GetDataResponse.DataCase getDataCase();
   }
   /**
@@ -9231,20 +8530,6 @@ public final class Dataproxy {
               dataCase_ = 3;
               break;
             }
-            case 34: {
-              flyteidl.artifact.Artifacts.Artifact.Builder subBuilder = null;
-              if (dataCase_ == 4) {
-                subBuilder = ((flyteidl.artifact.Artifacts.Artifact) data_).toBuilder();
-              }
-              data_ =
-                  input.readMessage(flyteidl.artifact.Artifacts.Artifact.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((flyteidl.artifact.Artifacts.Artifact) data_);
-                data_ = subBuilder.buildPartial();
-              }
-              dataCase_ = 4;
-              break;
-            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -9284,7 +8569,6 @@ public final class Dataproxy {
       LITERAL_MAP(1),
       PRE_SIGNED_URLS(2),
       LITERAL(3),
-      ARTIFACT(4),
       DATA_NOT_SET(0);
       private final int value;
       private DataCase(int value) {
@@ -9303,7 +8587,6 @@ public final class Dataproxy {
           case 1: return LITERAL_MAP;
           case 2: return PRE_SIGNED_URLS;
           case 3: return LITERAL;
-          case 4: return ARTIFACT;
           case 0: return DATA_NOT_SET;
           default: return null;
         }
@@ -9436,32 +8719,6 @@ public final class Dataproxy {
       return flyteidl.core.Literals.Literal.getDefaultInstance();
     }
 
-    public static final int ARTIFACT_FIELD_NUMBER = 4;
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    public boolean hasArtifact() {
-      return dataCase_ == 4;
-    }
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    public flyteidl.artifact.Artifacts.Artifact getArtifact() {
-      if (dataCase_ == 4) {
-         return (flyteidl.artifact.Artifacts.Artifact) data_;
-      }
-      return flyteidl.artifact.Artifacts.Artifact.getDefaultInstance();
-    }
-    /**
-     * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-     */
-    public flyteidl.artifact.Artifacts.ArtifactOrBuilder getArtifactOrBuilder() {
-      if (dataCase_ == 4) {
-         return (flyteidl.artifact.Artifacts.Artifact) data_;
-      }
-      return flyteidl.artifact.Artifacts.Artifact.getDefaultInstance();
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -9485,9 +8742,6 @@ public final class Dataproxy {
       if (dataCase_ == 3) {
         output.writeMessage(3, (flyteidl.core.Literals.Literal) data_);
       }
-      if (dataCase_ == 4) {
-        output.writeMessage(4, (flyteidl.artifact.Artifacts.Artifact) data_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -9508,10 +8762,6 @@ public final class Dataproxy {
       if (dataCase_ == 3) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, (flyteidl.core.Literals.Literal) data_);
-      }
-      if (dataCase_ == 4) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, (flyteidl.artifact.Artifacts.Artifact) data_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -9542,10 +8792,6 @@ public final class Dataproxy {
           if (!getLiteral()
               .equals(other.getLiteral())) return false;
           break;
-        case 4:
-          if (!getArtifact()
-              .equals(other.getArtifact())) return false;
-          break;
         case 0:
         default:
       }
@@ -9572,10 +8818,6 @@ public final class Dataproxy {
         case 3:
           hash = (37 * hash) + LITERAL_FIELD_NUMBER;
           hash = (53 * hash) + getLiteral().hashCode();
-          break;
-        case 4:
-          hash = (37 * hash) + ARTIFACT_FIELD_NUMBER;
-          hash = (53 * hash) + getArtifact().hashCode();
           break;
         case 0:
         default:
@@ -9762,13 +9004,6 @@ public final class Dataproxy {
             result.data_ = literalBuilder_.build();
           }
         }
-        if (dataCase_ == 4) {
-          if (artifactBuilder_ == null) {
-            result.data_ = data_;
-          } else {
-            result.data_ = artifactBuilder_.build();
-          }
-        }
         result.dataCase_ = dataCase_;
         onBuilt();
         return result;
@@ -9829,10 +9064,6 @@ public final class Dataproxy {
           }
           case LITERAL: {
             mergeLiteral(other.getLiteral());
-            break;
-          }
-          case ARTIFACT: {
-            mergeArtifact(other.getArtifact());
             break;
           }
           case DATA_NOT_SET: {
@@ -10407,142 +9638,6 @@ public final class Dataproxy {
         onChanged();;
         return literalBuilder_;
       }
-
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.artifact.Artifacts.Artifact, flyteidl.artifact.Artifacts.Artifact.Builder, flyteidl.artifact.Artifacts.ArtifactOrBuilder> artifactBuilder_;
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public boolean hasArtifact() {
-        return dataCase_ == 4;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public flyteidl.artifact.Artifacts.Artifact getArtifact() {
-        if (artifactBuilder_ == null) {
-          if (dataCase_ == 4) {
-            return (flyteidl.artifact.Artifacts.Artifact) data_;
-          }
-          return flyteidl.artifact.Artifacts.Artifact.getDefaultInstance();
-        } else {
-          if (dataCase_ == 4) {
-            return artifactBuilder_.getMessage();
-          }
-          return flyteidl.artifact.Artifacts.Artifact.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder setArtifact(flyteidl.artifact.Artifacts.Artifact value) {
-        if (artifactBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          data_ = value;
-          onChanged();
-        } else {
-          artifactBuilder_.setMessage(value);
-        }
-        dataCase_ = 4;
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder setArtifact(
-          flyteidl.artifact.Artifacts.Artifact.Builder builderForValue) {
-        if (artifactBuilder_ == null) {
-          data_ = builderForValue.build();
-          onChanged();
-        } else {
-          artifactBuilder_.setMessage(builderForValue.build());
-        }
-        dataCase_ = 4;
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder mergeArtifact(flyteidl.artifact.Artifacts.Artifact value) {
-        if (artifactBuilder_ == null) {
-          if (dataCase_ == 4 &&
-              data_ != flyteidl.artifact.Artifacts.Artifact.getDefaultInstance()) {
-            data_ = flyteidl.artifact.Artifacts.Artifact.newBuilder((flyteidl.artifact.Artifacts.Artifact) data_)
-                .mergeFrom(value).buildPartial();
-          } else {
-            data_ = value;
-          }
-          onChanged();
-        } else {
-          if (dataCase_ == 4) {
-            artifactBuilder_.mergeFrom(value);
-          }
-          artifactBuilder_.setMessage(value);
-        }
-        dataCase_ = 4;
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public Builder clearArtifact() {
-        if (artifactBuilder_ == null) {
-          if (dataCase_ == 4) {
-            dataCase_ = 0;
-            data_ = null;
-            onChanged();
-          }
-        } else {
-          if (dataCase_ == 4) {
-            dataCase_ = 0;
-            data_ = null;
-          }
-          artifactBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public flyteidl.artifact.Artifacts.Artifact.Builder getArtifactBuilder() {
-        return getArtifactFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      public flyteidl.artifact.Artifacts.ArtifactOrBuilder getArtifactOrBuilder() {
-        if ((dataCase_ == 4) && (artifactBuilder_ != null)) {
-          return artifactBuilder_.getMessageOrBuilder();
-        } else {
-          if (dataCase_ == 4) {
-            return (flyteidl.artifact.Artifacts.Artifact) data_;
-          }
-          return flyteidl.artifact.Artifacts.Artifact.getDefaultInstance();
-        }
-      }
-      /**
-       * <code>.flyteidl.artifact.Artifact artifact = 4;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.artifact.Artifacts.Artifact, flyteidl.artifact.Artifacts.Artifact.Builder, flyteidl.artifact.Artifacts.ArtifactOrBuilder> 
-          getArtifactFieldBuilder() {
-        if (artifactBuilder_ == null) {
-          if (!(dataCase_ == 4)) {
-            data_ = flyteidl.artifact.Artifacts.Artifact.getDefaultInstance();
-          }
-          artifactBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.artifact.Artifacts.Artifact, flyteidl.artifact.Artifacts.Artifact.Builder, flyteidl.artifact.Artifacts.ArtifactOrBuilder>(
-                  (flyteidl.artifact.Artifacts.Artifact) data_,
-                  getParentForChildren(),
-                  isClean());
-          data_ = null;
-        }
-        dataCase_ = 4;
-        onChanged();;
-        return artifactBuilder_;
-      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -10653,64 +9748,57 @@ public final class Dataproxy {
       "\n flyteidl/service/dataproxy.proto\022\020flyt" +
       "eidl.service\032\034google/api/annotations.pro" +
       "to\032\036google/protobuf/duration.proto\032\037goog" +
-      "le/protobuf/timestamp.proto\032\037flyteidl/co" +
-      "re/artifact_id.proto\032\036flyteidl/core/iden" +
-      "tifier.proto\032\034flyteidl/core/literals.pro" +
-      "to\032!flyteidl/artifact/artifacts.proto\"\245\001" +
-      "\n\034CreateUploadLocationResponse\022\022\n\nsigned" +
-      "_url\030\001 \001(\t\022\022\n\nnative_url\030\002 \001(\t\022.\n\nexpire" +
-      "s_at\030\003 \001(\0132\032.google.protobuf.Timestamp\022-" +
-      "\n\010artifact\030\004 \001(\0132\033.flyteidl.artifact.Art" +
-      "ifact\"\343\001\n\033CreateUploadLocationRequest\022\017\n" +
-      "\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010filena" +
-      "me\030\003 \001(\t\022-\n\nexpires_in\030\004 \001(\0132\031.google.pr" +
-      "otobuf.Duration\022\023\n\013content_md5\030\005 \001(\014\022\025\n\r" +
-      "filename_root\030\006 \001(\t\0226\n\rartifact_spec\030\007 \001" +
-      "(\0132\037.flyteidl.artifact.ArtifactSpec\"f\n\035C" +
-      "reateDownloadLocationRequest\022\022\n\nnative_u" +
-      "rl\030\001 \001(\t\022-\n\nexpires_in\030\002 \001(\0132\031.google.pr" +
-      "otobuf.Duration:\002\030\001\"h\n\036CreateDownloadLoc" +
-      "ationResponse\022\022\n\nsigned_url\030\001 \001(\t\022.\n\nexp" +
-      "ires_at\030\002 \001(\0132\032.google.protobuf.Timestam" +
-      "p:\002\030\001\"\320\001\n\031CreateDownloadLinkRequest\0225\n\ra" +
-      "rtifact_type\030\001 \001(\0162\036.flyteidl.service.Ar" +
-      "tifactType\022-\n\nexpires_in\030\002 \001(\0132\031.google." +
-      "protobuf.Duration\022C\n\021node_execution_id\030\003" +
-      " \001(\0132&.flyteidl.core.NodeExecutionIdenti" +
-      "fierH\000B\010\n\006source\"\242\001\n\032CreateDownloadLinkR" +
-      "esponse\022\026\n\nsigned_url\030\001 \003(\tB\002\030\001\0222\n\nexpir" +
-      "es_at\030\002 \001(\0132\032.google.protobuf.TimestampB" +
-      "\002\030\001\0228\n\017pre_signed_urls\030\003 \001(\0132\037.flyteidl." +
-      "service.PreSignedURLs\"S\n\rPreSignedURLs\022\022" +
-      "\n\nsigned_url\030\001 \003(\t\022.\n\nexpires_at\030\002 \001(\0132\032" +
-      ".google.protobuf.Timestamp\"`\n\016GetDataReq" +
-      "uest\022\023\n\tflyte_url\030\001 \001(\tH\000\0220\n\013artifact_id" +
-      "\030\002 \001(\0132\031.flyteidl.core.ArtifactIDH\000B\007\n\005q" +
-      "uery\"\343\001\n\017GetDataResponse\0220\n\013literal_map\030" +
-      "\001 \001(\0132\031.flyteidl.core.LiteralMapH\000\022:\n\017pr" +
-      "e_signed_urls\030\002 \001(\0132\037.flyteidl.service.P" +
-      "reSignedURLsH\000\022)\n\007literal\030\003 \001(\0132\026.flytei" +
-      "dl.core.LiteralH\000\022/\n\010artifact\030\004 \001(\0132\033.fl" +
-      "yteidl.artifact.ArtifactH\000B\006\n\004data*C\n\014Ar" +
-      "tifactType\022\033\n\027ARTIFACT_TYPE_UNDEFINED\020\000\022" +
-      "\026\n\022ARTIFACT_TYPE_DECK\020\0012\342\004\n\020DataProxySer" +
-      "vice\022\240\001\n\024CreateUploadLocation\022-.flyteidl" +
-      ".service.CreateUploadLocationRequest\032..f" +
-      "lyteidl.service.CreateUploadLocationResp" +
-      "onse\")\202\323\344\223\002#\"\036/api/v1/dataproxy/artifact" +
-      "_urn:\001*\022\246\001\n\026CreateDownloadLocation\022/.fly" +
-      "teidl.service.CreateDownloadLocationRequ" +
-      "est\0320.flyteidl.service.CreateDownloadLoc" +
-      "ationResponse\")\210\002\001\202\323\344\223\002 \022\036/api/v1/datapr" +
-      "oxy/artifact_urn\022\233\001\n\022CreateDownloadLink\022" +
-      "+.flyteidl.service.CreateDownloadLinkReq" +
-      "uest\032,.flyteidl.service.CreateDownloadLi" +
-      "nkResponse\"*\202\323\344\223\002$\"\037/api/v1/dataproxy/ar" +
-      "tifact_link:\001*\022d\n\007GetData\022 .flyteidl.ser" +
-      "vice.GetDataRequest\032!.flyteidl.service.G" +
-      "etDataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB?Z=" +
-      "github.com/flyteorg/flyte/flyteidl/gen/p" +
-      "b-go/flyteidl/serviceb\006proto3"
+      "le/protobuf/timestamp.proto\032\036flyteidl/co" +
+      "re/identifier.proto\032\034flyteidl/core/liter" +
+      "als.proto\"v\n\034CreateUploadLocationRespons" +
+      "e\022\022\n\nsigned_url\030\001 \001(\t\022\022\n\nnative_url\030\002 \001(" +
+      "\t\022.\n\nexpires_at\030\003 \001(\0132\032.google.protobuf." +
+      "Timestamp\"\253\001\n\033CreateUploadLocationReques" +
+      "t\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010fi" +
+      "lename\030\003 \001(\t\022-\n\nexpires_in\030\004 \001(\0132\031.googl" +
+      "e.protobuf.Duration\022\023\n\013content_md5\030\005 \001(\014" +
+      "\022\025\n\rfilename_root\030\006 \001(\t\"f\n\035CreateDownloa" +
+      "dLocationRequest\022\022\n\nnative_url\030\001 \001(\t\022-\n\n" +
+      "expires_in\030\002 \001(\0132\031.google.protobuf.Durat" +
+      "ion:\002\030\001\"h\n\036CreateDownloadLocationRespons" +
+      "e\022\022\n\nsigned_url\030\001 \001(\t\022.\n\nexpires_at\030\002 \001(" +
+      "\0132\032.google.protobuf.Timestamp:\002\030\001\"\320\001\n\031Cr" +
+      "eateDownloadLinkRequest\0225\n\rartifact_type" +
+      "\030\001 \001(\0162\036.flyteidl.service.ArtifactType\022-" +
+      "\n\nexpires_in\030\002 \001(\0132\031.google.protobuf.Dur" +
+      "ation\022C\n\021node_execution_id\030\003 \001(\0132&.flyte" +
+      "idl.core.NodeExecutionIdentifierH\000B\010\n\006so" +
+      "urce\"\242\001\n\032CreateDownloadLinkResponse\022\026\n\ns" +
+      "igned_url\030\001 \003(\tB\002\030\001\0222\n\nexpires_at\030\002 \001(\0132" +
+      "\032.google.protobuf.TimestampB\002\030\001\0228\n\017pre_s" +
+      "igned_urls\030\003 \001(\0132\037.flyteidl.service.PreS" +
+      "ignedURLs\"S\n\rPreSignedURLs\022\022\n\nsigned_url" +
+      "\030\001 \003(\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.prot" +
+      "obuf.Timestamp\"#\n\016GetDataRequest\022\021\n\tflyt" +
+      "e_url\030\001 \001(\t\"\262\001\n\017GetDataResponse\0220\n\013liter" +
+      "al_map\030\001 \001(\0132\031.flyteidl.core.LiteralMapH" +
+      "\000\022:\n\017pre_signed_urls\030\002 \001(\0132\037.flyteidl.se" +
+      "rvice.PreSignedURLsH\000\022)\n\007literal\030\003 \001(\0132\026" +
+      ".flyteidl.core.LiteralH\000B\006\n\004data*C\n\014Arti" +
+      "factType\022\033\n\027ARTIFACT_TYPE_UNDEFINED\020\000\022\026\n" +
+      "\022ARTIFACT_TYPE_DECK\020\0012\342\004\n\020DataProxyServi" +
+      "ce\022\240\001\n\024CreateUploadLocation\022-.flyteidl.s" +
+      "ervice.CreateUploadLocationRequest\032..fly" +
+      "teidl.service.CreateUploadLocationRespon" +
+      "se\")\202\323\344\223\002#\"\036/api/v1/dataproxy/artifact_u" +
+      "rn:\001*\022\246\001\n\026CreateDownloadLocation\022/.flyte" +
+      "idl.service.CreateDownloadLocationReques" +
+      "t\0320.flyteidl.service.CreateDownloadLocat" +
+      "ionResponse\")\210\002\001\202\323\344\223\002 \022\036/api/v1/dataprox" +
+      "y/artifact_urn\022\233\001\n\022CreateDownloadLink\022+." +
+      "flyteidl.service.CreateDownloadLinkReque" +
+      "st\032,.flyteidl.service.CreateDownloadLink" +
+      "Response\"*\202\323\344\223\002$\"\037/api/v1/dataproxy/arti" +
+      "fact_link:\001*\022d\n\007GetData\022 .flyteidl.servi" +
+      "ce.GetDataRequest\032!.flyteidl.service.Get" +
+      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB?Z=gi" +
+      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
+      "go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10726,23 +9814,21 @@ public final class Dataproxy {
           com.google.api.AnnotationsProto.getDescriptor(),
           com.google.protobuf.DurationProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
-          flyteidl.core.ArtifactId.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
-          flyteidl.artifact.Artifacts.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_service_CreateUploadLocationResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_flyteidl_service_CreateUploadLocationResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_CreateUploadLocationResponse_descriptor,
-        new java.lang.String[] { "SignedUrl", "NativeUrl", "ExpiresAt", "Artifact", });
+        new java.lang.String[] { "SignedUrl", "NativeUrl", "ExpiresAt", });
     internal_static_flyteidl_service_CreateUploadLocationRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_service_CreateUploadLocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_CreateUploadLocationRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", "FilenameRoot", "ArtifactSpec", });
+        new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", "FilenameRoot", });
     internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_service_CreateDownloadLocationRequest_fieldAccessorTable = new
@@ -10778,13 +9864,13 @@ public final class Dataproxy {
     internal_static_flyteidl_service_GetDataRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_GetDataRequest_descriptor,
-        new java.lang.String[] { "FlyteUrl", "ArtifactId", "Query", });
+        new java.lang.String[] { "FlyteUrl", });
     internal_static_flyteidl_service_GetDataResponse_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_service_GetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_GetDataResponse_descriptor,
-        new java.lang.String[] { "LiteralMap", "PreSignedUrls", "Literal", "Artifact", "Data", });
+        new java.lang.String[] { "LiteralMap", "PreSignedUrls", "Literal", "Data", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
@@ -10793,10 +9879,8 @@ public final class Dataproxy {
     com.google.api.AnnotationsProto.getDescriptor();
     com.google.protobuf.DurationProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
-    flyteidl.core.ArtifactId.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
-    flyteidl.artifact.Artifacts.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

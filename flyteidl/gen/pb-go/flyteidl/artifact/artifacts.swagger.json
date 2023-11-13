@@ -1051,7 +1051,7 @@
         },
         "task_execution": {
           "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "description": "Outputs of tasks will have this."
+          "description": "3. These fields should be removed.\nOutputs of tasks will have this."
         },
         "execution": {
           "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
