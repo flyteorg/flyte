@@ -3,6 +3,7 @@ package ray
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -36,6 +37,14 @@ const (
 	DashboardHost                   = "dashboard-host"
 	DisableUsageStatsStartParameter = "disable-usage-stats"
 )
+
+var logTemplateRegexes = struct {
+	RayClusterName *regexp.Regexp
+	RayJobID       *regexp.Regexp
+}{
+	tasklog.MustCreateRegex("rayClusterName"),
+	tasklog.MustCreateRegex("rayJobID"),
+}
 
 type rayJobResourceHandler struct {
 }
@@ -442,8 +451,27 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	input := tasklog.Input{
-		Namespace:       rayJob.Namespace,
-		TaskExecutionID: taskExecID,
+		Namespace:                 rayJob.Namespace,
+		TaskExecutionID:           taskExecID,
+		ExtraTemplateVarsByScheme: &tasklog.TemplateVarsByScheme{},
+	}
+	if rayJob.Status.JobId != "" {
+		input.ExtraTemplateVarsByScheme.Common = append(
+			input.ExtraTemplateVarsByScheme.Common,
+			tasklog.TemplateVar{
+				Regex: logTemplateRegexes.RayJobID,
+				Value: rayJob.Status.JobId,
+			},
+		)
+	}
+	if rayJob.Status.RayClusterName != "" {
+		input.ExtraTemplateVarsByScheme.Common = append(
+			input.ExtraTemplateVarsByScheme.Common,
+			tasklog.TemplateVar{
+				Regex: logTemplateRegexes.RayClusterName,
+				Value: rayJob.Status.RayClusterName,
+			},
+		)
 	}
 
 	// TODO: Retrieve the name of head pod from rayJob.status, and add it to task logs
