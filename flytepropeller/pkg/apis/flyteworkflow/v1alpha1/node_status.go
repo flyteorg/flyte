@@ -607,6 +607,7 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 	}
 
 	n := occurredAt
+	in.LastUpdatedAt = &n
 	if occurredAt.IsZero() {
 		n = metav1.Now()
 	}
@@ -630,30 +631,24 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		if in.StoppedAt == nil {
 			in.StoppedAt = &n
 		}
-		if in.StartedAt == nil {
-			in.StartedAt = &n
-		}
-		if in.LastAttemptStartedAt == nil {
-			in.LastAttemptStartedAt = &n
-		}
-	}
-	in.LastUpdatedAt = &n
-
-	// For cases in which the node is either Succeeded or Skipped we clear most fields from the status
-	// except for StoppedAt and Phase. StoppedAt is used to calculate transition latency between this node and
-	// any downstream nodes and Phase is required for propeller to continue to downstream nodes.
-	if p == NodePhaseSucceeded || p == NodePhaseSkipped {
-		in.Message = ""
+		// Clear most fields after reaching a terminal state. This keeps the CRD state small and avoid etcd size 
+		// limits. We keep phase and StoppedAt. StoppedAt is used to calculate transition latency between this 
+		// node and any downstream nodes and Phase is required for propeller to continue to downstream nodes.
 		in.QueuedAt = nil
 		in.StartedAt = nil
+		in.LastUpdatedAt = nil
 		in.LastAttemptStartedAt = nil
 		in.DynamicNodeStatus = nil
 		in.BranchStatus = nil
 		in.SubNodeStatus = nil
 		in.TaskNodeStatus = nil
 		in.WorkflowNodeStatus = nil
-		in.LastUpdatedAt = nil
 	}
+	// For cases in which the node is either Succeeded or Skipped we clear the message. Potentially this will be useful 
+	// for other failed states. 
+	in.Message = ""
+	// if p == NodePhaseSucceeded || p == NodePhaseSkipped {
+	// }
 	in.SetDirty()
 }
 
