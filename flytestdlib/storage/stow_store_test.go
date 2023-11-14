@@ -274,7 +274,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 			},
 		}, nil, false, metrics)
 		assert.NoError(t, err)
-		dataReference := writeTestFileWithSize(ctx, t, s, "s3://container/path", 3*MiB)
+		dataReference := writeTestFileWithSize(ctx, t, s, "s3://container/path", 2*MiB+1)
 		_, err = s.ReadRaw(ctx, dataReference)
 		assert.Error(t, err)
 		assert.True(t, IsExceedsLimit(err))

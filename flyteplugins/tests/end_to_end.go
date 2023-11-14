@@ -136,6 +136,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 		},
 		RetryAttempt: 0,
 	})
+	tID.OnGetUniqueNodeID().Return("unique-node-id")
 
 	overrides := &coreMocks.TaskOverrides{}
 	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
