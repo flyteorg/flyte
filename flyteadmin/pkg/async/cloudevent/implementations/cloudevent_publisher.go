@@ -288,10 +288,6 @@ func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Con
 			return nil, err
 		}
 	}
-	if outputs == nil {
-		// todo: remove
-		fmt.Printf("No output data found for task execution %v\n", rawEvent)
-	}
 
 	return &event.CloudEventTaskExecution{
 		RawEvent:            rawEvent,
