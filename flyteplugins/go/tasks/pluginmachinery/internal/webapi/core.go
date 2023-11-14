@@ -29,7 +29,6 @@ const (
 	maxBurst           = 10000
 	minQPS             = 1
 	maxQPS             = 100000
-	asyncPlugin        = "async_plugin"
 	syncPlugin         = "sync_plugin"
 )
 
@@ -96,7 +95,7 @@ func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionConte
 		if err != nil {
 			return core.UnknownTransition, err
 		}
-		logger.Errorf(ctx, "please check if [%v] task type has implemented sync plugin method or not", taskTemplate.GetType())
+		logger.Errorf(ctx, "failed to run [%v] task with err: [%v]", taskTemplate.GetType(), err)
 		return core.UnknownTransition, err
 	}
 
