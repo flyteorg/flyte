@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	oldPgConn "github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -92,14 +93,21 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 }
 
 func IsPgErrorWithCode(err error, code string) bool {
-	// Make sure the pgconn you're using is "github.com/jackc/pgx/v5/pgconn"
+	// Newer versions of the gorm postgres driver seem to use
+	// "github.com/jackc/pgx/v5/pgconn"
 	// See https://github.com/go-gorm/gorm/issues/4135
+	// Let's just try both of them to make sure.
 	pgErr := &pgconn.PgError{}
-	if !errors.As(err, &pgErr) {
+	if errors.As(err, &pgErr) {
 		// err chain does not contain a pgconn.PgError
-		return false
+		return pgErr.Code == code
 	}
 
-	// pgconn.PgError found in chain and set to code specified
-	return pgErr.Code == code
+	oldPgErr := &oldPgConn.PgError{}
+	if errors.As(err, &oldPgErr) {
+		// err chain does not contain a pgconn.PgError
+		return oldPgErr.Code == code
+	}
+
+	return false
 }

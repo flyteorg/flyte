@@ -3,6 +3,7 @@ package errors
 import (
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"reflect"
 
 	"github.com/jackc/pgconn"
@@ -39,6 +40,11 @@ func (p *postgresErrorTransformer) fromGormError(err error) error {
 }
 
 func (p *postgresErrorTransformer) ToDataCatalogError(err error) error {
+	// First try the stdlib error handling
+	if database.IsPgErrorWithCode(err, uniqueConstraintViolationCode) {
+		return catalogErrors.NewDataCatalogErrorf(codes.AlreadyExists, uniqueConstraintViolation, err.Error())
+	}
+
 	if unwrappedErr := errors.Unwrap(err); unwrappedErr != nil {
 		err = unwrappedErr
 	}
