@@ -107,8 +107,6 @@ spec:
       kind: task
       name: download_files
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.folders.download_files" '
     n1:
       id: n1
@@ -131,8 +129,6 @@ spec:
       kind: task
       name: normalize_all_files
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.folders.normalize_all_files" '
     start-node:
       id: start-node

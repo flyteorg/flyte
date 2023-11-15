@@ -3,19 +3,18 @@ package nodes
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestToNodeExecutionEvent(t *testing.T) {

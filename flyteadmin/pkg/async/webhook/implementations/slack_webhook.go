@@ -7,14 +7,14 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	"github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/webhook/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const Slack = "slack"

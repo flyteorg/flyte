@@ -35,13 +35,13 @@ import (
 	runtime2 "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 var defaultCorsHeaders = []string{"Content-Type"}
@@ -79,6 +79,11 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
 	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
 		RequestIDInterceptor, auth.BlanketAuthorization, auth.ExecutionUserIdentifierInterceptor))
+
+	if cfg.GrpcConfig.EnableGrpcLatencyMetrics {
+		logger.Debugf(ctx, "enabling grpc histogram metrics")
+		grpcprometheus.EnableHandlingTimeHistogram()
+	}
 
 	// Not yet implemented for streaming
 	var chainedUnaryInterceptors grpc.UnaryServerInterceptor
@@ -129,6 +134,13 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	service.RegisterDataProxyServiceServer(grpcServer, plugins.Get[service.DataProxyServiceServer](pluginRegistry, plugins.PluginIDDataProxy))
 
 	service.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
+
+	additionalService := plugins.Get[common.RegisterAdditionalGRPCService](pluginRegistry, plugins.PluginIDAdditionalGRPCService)
+	if additionalService != nil {
+		if err := additionalService(ctx, grpcServer); err != nil {
+			return nil, err
+		}
+	}
 
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus("flyteadmin", grpc_health_v1.HealthCheckResponse_SERVING)

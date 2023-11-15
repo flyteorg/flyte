@@ -3,8 +3,9 @@ package gormimpl
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 func TestSortAsc(t *testing.T) {

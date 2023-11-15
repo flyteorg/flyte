@@ -7,23 +7,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	"github.com/NYTimes/gizmo/pubsub/pubsubtest"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/flyteorg/flyteadmin/pkg/async/webhook/mocks"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/webhook/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
-	repositoryMocks "github.com/flyteorg/flyteadmin/pkg/repositories/mocks"
+	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 )
 
 var (

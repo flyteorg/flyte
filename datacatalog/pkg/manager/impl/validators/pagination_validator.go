@@ -4,9 +4,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 // The token is a string that should be opaque to the client

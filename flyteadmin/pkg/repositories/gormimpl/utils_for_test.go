@@ -4,12 +4,12 @@ package gormimpl
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	mocket "github.com/Selvatico/go-mocket"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const project = "project"

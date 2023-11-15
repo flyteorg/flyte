@@ -4,17 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-
-	"github.com/stretchr/testify/assert"
-
-	"google.golang.org/protobuf/types/known/durationpb"
-
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func createNodeWithTask() *core.Node {
@@ -117,6 +114,30 @@ func TestBuildNodeSpec(t *testing.T) {
 		assert.NotNil(t, spec.Resources)
 		assert.NotNil(t, spec.Resources.Requests.Cpu())
 		assert.Equal(t, expectedCPU.Value(), spec.Resources.Requests.Cpu().Value())
+		assert.Nil(t, spec.GetExtendedResources())
+	})
+
+	t.Run("node with resource extensions overrides", func(t *testing.T) {
+		expectedGpuDevice := "nvidia-tesla-t4"
+		n.Node.Target = &core.Node_TaskNode{
+			TaskNode: &core.TaskNode{
+				Reference: &core.TaskNode_ReferenceId{
+					ReferenceId: &core.Identifier{Name: "ref_2"},
+				},
+				Overrides: &core.TaskNodeOverrides{
+					ExtendedResources: &core.ExtendedResources{
+						GpuAccelerator: &core.GPUAccelerator{
+							Device: "nvidia-tesla-t4",
+						},
+					},
+				},
+			},
+		}
+
+		spec := mustBuild(t, n, 1, errs.NewScope())
+		assert.NotNil(t, spec.GetExtendedResources())
+		assert.NotNil(t, spec.GetExtendedResources().GetGpuAccelerator())
+		assert.Equal(t, expectedGpuDevice, spec.GetExtendedResources().GetGpuAccelerator().GetDevice())
 	})
 
 	t.Run("LaunchPlanRef", func(t *testing.T) {

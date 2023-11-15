@@ -1,8 +1,9 @@
 package interfaces
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type ProcessorSystemMetrics struct {

@@ -264,14 +264,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto[] =
   " \001(\0132\024.flyteidl.admin.Sort\"B\n\026ProjectReg"
   "isterRequest\022(\n\007project\030\001 \001(\0132\027.flyteidl"
   ".admin.Project\"\031\n\027ProjectRegisterRespons"
-  "e\"\027\n\025ProjectUpdateResponseB7Z5github.com"
-  "/flyteorg/flyteidl/gen/pb-go/flyteidl/ad"
-  "minb\006proto3"
+  "e\"\027\n\025ProjectUpdateResponseB=Z;github.com"
+  "/flyteorg/flyte/flyteidl/gen/pb-go/flyte"
+  "idl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fproject_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fproject_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto,
-  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 731,
+  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 737,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fproject_2eproto() {

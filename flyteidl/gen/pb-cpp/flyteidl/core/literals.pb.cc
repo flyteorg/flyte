@@ -31,7 +31,7 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protob
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Error_flyteidl_2fcore_2ftypes_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_OutputReference_flyteidl_2fcore_2ftypes_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_SchemaType_flyteidl_2fcore_2ftypes_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_LiteralType_flyteidl_2fcore_2ftypes_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<5> scc_info_LiteralType_flyteidl_2fcore_2ftypes_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fduration_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Duration_google_2fprotobuf_2fduration_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fstruct_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ListValue_google_2fprotobuf_2fstruct_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2ftimestamp_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Timestamp_google_2fprotobuf_2ftimestamp_2eproto;
@@ -719,14 +719,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fliterals_2eproto[] =
   "\"C\n\007Binding\022\013\n\003var\030\001 \001(\t\022+\n\007binding\030\002 \001("
   "\0132\032.flyteidl.core.BindingData\"*\n\014KeyValu"
   "ePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\" \n\rRet"
-  "ryStrategy\022\017\n\007retries\030\005 \001(\rB6Z4github.co"
-  "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c"
-  "oreb\006proto3"
+  "ryStrategy\022\017\n\007retries\030\005 \001(\rB<Z:github.co"
+  "m/flyteorg/flyte/flyteidl/gen/pb-go/flyt"
+  "eidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fliterals_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fliterals_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fliterals_2eproto,
-  "flyteidl/core/literals.proto", &assign_descriptors_table_flyteidl_2fcore_2fliterals_2eproto, 2451,
+  "flyteidl/core/literals.proto", &assign_descriptors_table_flyteidl_2fcore_2fliterals_2eproto, 2457,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fliterals_2eproto() {

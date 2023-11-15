@@ -1,10 +1,11 @@
 package validators
 
 import (
+	"k8s.io/apimachinery/pkg/util/sets"
+
+	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	flyte "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func validateBranchInterface(w c.WorkflowBuilder, node c.NodeBuilder, errs errors.CompileErrors) (iface *flyte.TypedInterface, ok bool) {

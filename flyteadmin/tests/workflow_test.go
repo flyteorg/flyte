@@ -10,13 +10,12 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
-
 	"github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestCreateWorkflow(t *testing.T) {

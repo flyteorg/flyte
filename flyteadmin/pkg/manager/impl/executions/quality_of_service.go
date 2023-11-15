@@ -4,14 +4,15 @@ import (
 	"context"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/golang/protobuf/ptypes"
-	"google.golang.org/grpc/codes"
 )
 
 type QualityOfServiceSpec struct {
@@ -42,7 +43,7 @@ func (q qualityOfServiceAllocator) getQualityOfServiceFromDb(ctx context.Context
 		ResourceType: admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION,
 	})
 	if err != nil {
-		if _, ok := err.(errors.FlyteAdminError); !ok || err.(errors.FlyteAdminError).Code() != codes.NotFound {
+		if !errors.IsDoesNotExistError(err) {
 			logger.Warningf(ctx,
 				"Failed to fetch override values when assigning quality of service values for [%+v] with err: %v",
 				workflowIdentifier, err)

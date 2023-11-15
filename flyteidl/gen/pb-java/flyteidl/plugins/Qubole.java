@@ -2657,9 +2657,9 @@ public final class Qubole {
       "veJob\022\025\n\rcluster_label\030\001 \001(\t\022C\n\020query_co" +
       "llection\030\002 \001(\0132%.flyteidl.plugins.HiveQu" +
       "eryCollectionB\002\030\001\022\014\n\004tags\030\003 \003(\t\022*\n\005query" +
-      "\030\004 \001(\0132\033.flyteidl.plugins.HiveQueryB9Z7g" +
-      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
-      "yteidl/pluginsb\006proto3"
+      "\030\004 \001(\0132\033.flyteidl.plugins.HiveQueryB?Z=g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

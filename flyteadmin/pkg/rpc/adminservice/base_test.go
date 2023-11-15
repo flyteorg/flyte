@@ -4,11 +4,11 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func Test_interceptPanic(t *testing.T) {

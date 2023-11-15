@@ -3,12 +3,11 @@ package implementations
 import (
 	"context"
 
-	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // This event writer acts to asynchronously persist node execution events. As flytepropeller sends node

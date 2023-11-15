@@ -4,10 +4,11 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 func assertJoinExpression(t *testing.T, joinCondition models.ModelJoinCondition, sourceTableName string, joiningTableName string, joiningTableAlias string, expectedJoinStatement string) {

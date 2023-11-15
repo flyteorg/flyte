@@ -2770,9 +2770,9 @@ public final class Spark {
       "icksToken\030\010 \001(\t\022\032\n\022databricksInstance\030\t " +
       "\001(\t\0320\n\016SparkConfEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
       "lue\030\002 \001(\t:\0028\001\0321\n\017HadoopConfEntry\022\013\n\003key\030" +
-      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B9Z7github.com/f" +
-      "lyteorg/flyteidl/gen/pb-go/flyteidl/plug" +
-      "insb\006proto3"
+      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B?Z=github.com/f" +
+      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
+      "l/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

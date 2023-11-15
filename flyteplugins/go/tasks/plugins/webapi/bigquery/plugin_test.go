@@ -5,6 +5,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/api/bigquery/v2"
+	"google.golang.org/api/googleapi"
+	"k8s.io/apimachinery/pkg/util/rand"
+
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
@@ -13,15 +22,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/stretchr/testify/mock"
-	"k8s.io/apimachinery/pkg/util/rand"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/api/bigquery/v2"
-	"google.golang.org/api/googleapi"
 )
 
 func init() {

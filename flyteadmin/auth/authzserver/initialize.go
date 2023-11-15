@@ -3,14 +3,12 @@ package authzserver
 import (
 	"crypto/rsa"
 
-	"github.com/ory/fosite/handler/oauth2"
-
 	"github.com/ory/fosite"
+	"github.com/ory/fosite/compose"
+	"github.com/ory/fosite/handler/oauth2"
+	"github.com/ory/fosite/token/jwt"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
-
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/token/jwt"
 )
 
 // RegisterHandlers registers http endpoints for handling OAuth2 flow (/authorize,

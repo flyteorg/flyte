@@ -5,14 +5,16 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
+	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
-
 	"google.golang.org/grpc/grpclog"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -20,17 +22,13 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	flyteIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"google.golang.org/grpc"
 )
 
 type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
 
-type TaskType = string
-type SupportedTaskTypes []TaskType
 type Plugin struct {
 	metricScope     promutils.Scope
 	cfg             *Config
@@ -41,6 +39,7 @@ type Plugin struct {
 type ResourceWrapper struct {
 	State   admin.State
 	Outputs *flyteIdl.LiteralMap
+	Message string
 }
 
 type ResourceMetaWrapper struct {
@@ -112,16 +111,16 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		taskTemplate.GetContainer().Args = argTemplate
 	}
 
-	return &ResourceMetaWrapper{
+	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		Token:             "",
 		TaskType:          taskTemplate.Type,
-	}, &ResourceWrapper{State: admin.State_RUNNING}, nil
+	}, ResourceWrapper{State: admin.State_RUNNING}, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
-	metadata := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
+	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 
 	agent, err := getFinalAgent(metadata.TaskType, p.cfg)
 	if err != nil {
@@ -140,9 +139,10 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 
-	return &ResourceWrapper{
+	return ResourceWrapper{
 		State:   res.Resource.State,
 		Outputs: res.Resource.Outputs,
+		Message: res.Resource.Message,
 	}, nil
 }
 
@@ -169,10 +169,12 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 }
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
-	resource := taskCtx.Resource().(*ResourceWrapper)
+	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{}
 
 	switch resource.State {
+	case admin.State_PENDING:
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
@@ -190,7 +192,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.State)
 }
 
-func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource *ResourceWrapper) error {
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return err
@@ -298,10 +300,8 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func newAgentPlugin(supportedTaskTypes SupportedTaskTypes) webapi.PluginEntry {
-	if len(supportedTaskTypes) == 0 {
-		supportedTaskTypes = SupportedTaskTypes{"default_supported_task_type"}
-	}
+func newAgentPlugin() webapi.PluginEntry {
+	supportedTaskTypes := GetConfig().SupportedTaskTypes
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
@@ -317,9 +317,9 @@ func newAgentPlugin(supportedTaskTypes SupportedTaskTypes) webapi.PluginEntry {
 	}
 }
 
-func RegisterAgentPlugin(supportedTaskTypes SupportedTaskTypes) {
+func RegisterAgentPlugin() {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
 
-	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin(supportedTaskTypes))
+	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin())
 }

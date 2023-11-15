@@ -5,18 +5,18 @@ import (
 	"sort"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
-
-	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	kfplugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	v1 "k8s.io/api/core/v1"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
+	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 )
 
 const (
@@ -93,12 +93,12 @@ func GetMPIPhaseInfo(currentCondition commonOp.JobCondition, occurredAt time.Tim
 
 // GetLogs will return the logs for kubeflow job
 func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v1.ObjectMeta, hasMaster bool,
-	workersCount int32, psReplicasCount int32, chiefReplicasCount int32) ([]*core.TaskLog, error) {
+	workersCount int32, psReplicasCount int32, chiefReplicasCount int32, evaluatorReplicasCount int32) ([]*core.TaskLog, error) {
 	name := objectMeta.Name
 	namespace := objectMeta.Namespace
 
 	taskLogs := make([]*core.TaskLog, 0, 10)
-	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
 	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
 
@@ -120,14 +120,14 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	if taskType == PytorchTaskType && hasMaster {
 		masterTaskLog, masterErr := logPlugin.GetTaskLogs(
 			tasklog.Input{
-				PodName:                 name + "-master-0",
-				Namespace:               namespace,
-				LogName:                 "master",
-				PodRFC3339StartTime:     RFC3999StartTime,
-				PodRFC3339FinishTime:    RFC3999FinishTime,
-				PodUnixStartTime:        startTime,
-				PodUnixFinishTime:       finishTime,
-				TaskExecutionIdentifier: &taskExecID,
+				PodName:              name + "-master-0",
+				Namespace:            namespace,
+				LogName:              "master",
+				PodRFC3339StartTime:  RFC3999StartTime,
+				PodRFC3339FinishTime: RFC3999FinishTime,
+				PodUnixStartTime:     startTime,
+				PodUnixFinishTime:    finishTime,
+				TaskExecutionID:      taskExecID,
 			},
 		)
 		if masterErr != nil {
@@ -139,13 +139,13 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	// get all workers log
 	for workerIndex := int32(0); workerIndex < workersCount; workerIndex++ {
 		workerLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:                 name + fmt.Sprintf("-worker-%d", workerIndex),
-			Namespace:               namespace,
-			PodRFC3339StartTime:     RFC3999StartTime,
-			PodRFC3339FinishTime:    RFC3999FinishTime,
-			PodUnixStartTime:        startTime,
-			PodUnixFinishTime:       finishTime,
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:              name + fmt.Sprintf("-worker-%d", workerIndex),
+			Namespace:            namespace,
+			PodRFC3339StartTime:  RFC3999StartTime,
+			PodRFC3339FinishTime: RFC3999FinishTime,
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
+			TaskExecutionID:      taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -160,9 +160,9 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	// get all parameter servers logs
 	for psReplicaIndex := int32(0); psReplicaIndex < psReplicasCount; psReplicaIndex++ {
 		psReplicaLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:                 name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
-			Namespace:               namespace,
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:         name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
+			Namespace:       namespace,
+			TaskExecutionID: taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -172,14 +172,26 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	// get chief worker log, and the max number of chief worker is 1
 	if chiefReplicasCount != 0 {
 		chiefReplicaLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:                 name + fmt.Sprintf("-chiefReplica-%d", 0),
-			Namespace:               namespace,
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:         name + fmt.Sprintf("-chiefReplica-%d", 0),
+			Namespace:       namespace,
+			TaskExecutionID: taskExecID,
 		})
 		if err != nil {
 			return nil, err
 		}
 		taskLogs = append(taskLogs, chiefReplicaLog.TaskLogs...)
+	}
+	// get evaluator log, and the max number of evaluator is 1
+	if evaluatorReplicasCount != 0 {
+		evaluatorReplicasCount, err := logPlugin.GetTaskLogs(tasklog.Input{
+			PodName:         name + fmt.Sprintf("-evaluatorReplica-%d", 0),
+			Namespace:       namespace,
+			TaskExecutionID: taskExecID,
+		})
+		if err != nil {
+			return nil, err
+		}
+		taskLogs = append(taskLogs, evaluatorReplicasCount.TaskLogs...)
 	}
 
 	return taskLogs, nil

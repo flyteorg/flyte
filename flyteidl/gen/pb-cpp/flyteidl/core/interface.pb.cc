@@ -22,7 +22,7 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::pr
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Variable_flyteidl_2fcore_2finterface_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Parameter_flyteidl_2fcore_2finterface_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_LiteralType_flyteidl_2fcore_2ftypes_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<5> scc_info_LiteralType_flyteidl_2fcore_2ftypes_2eproto;
 namespace flyteidl {
 namespace core {
 class VariableDefaultTypeInternal {
@@ -275,13 +275,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2finterface_2eproto[] =
   "\0132+.flyteidl.core.ParameterMap.Parameter"
   "sEntry\032K\n\017ParametersEntry\022\013\n\003key\030\001 \001(\t\022\'"
   "\n\005value\030\002 \001(\0132\030.flyteidl.core.Parameter:"
-  "\0028\001B6Z4github.com/flyteorg/flyteidl/gen/"
-  "pb-go/flyteidl/coreb\006proto3"
+  "\0028\001B<Z:github.com/flyteorg/flyte/flyteid"
+  "l/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2finterface_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2finterface_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2finterface_2eproto,
-  "flyteidl/core/interface.proto", &assign_descriptors_table_flyteidl_2fcore_2finterface_2eproto, 787,
+  "flyteidl/core/interface.proto", &assign_descriptors_table_flyteidl_2fcore_2finterface_2eproto, 793,
 };
 
 void AddDescriptors_flyteidl_2fcore_2finterface_2eproto() {

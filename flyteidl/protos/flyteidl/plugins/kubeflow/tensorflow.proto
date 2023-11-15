@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.plugins.kubeflow;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
 
 import "flyteidl/core/tasks.proto";
 import "flyteidl/plugins/kubeflow/common.proto";
@@ -22,6 +22,9 @@ message DistributedTensorflowTrainingTask {
   // job, for example how to clean up resources and how long the job can stay
   // active.
   RunPolicy run_policy = 4;
+
+  // Evaluator replicas spec
+  DistributedTensorflowTrainingReplicaSpec evaluator_replicas = 5;
 }
 
 message DistributedTensorflowTrainingReplicaSpec {

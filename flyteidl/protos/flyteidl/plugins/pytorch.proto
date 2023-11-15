@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.plugins;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
 
 // Custom proto for torch elastic config for distributed training using 
 // https://github.com/kubeflow/training-operator/blob/master/pkg/apis/kubeflow.org/v1/pytorch_types.go

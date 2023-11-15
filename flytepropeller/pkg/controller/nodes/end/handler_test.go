@@ -5,24 +5,24 @@ import (
 	"fmt"
 	"testing"
 
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	regErrors "github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	mocks3 "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	flyteassert "github.com/flyteorg/flyte/flytepropeller/pkg/utils/assert"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var testScope = promutils.NewScope("end_test")

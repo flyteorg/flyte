@@ -10,12 +10,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func TestDownloadOptions_Download(t *testing.T) {

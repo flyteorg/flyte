@@ -6,25 +6,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/clients/go/datacatalog/mocks"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/golang/protobuf/ptypes"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/datacatalog/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
 func init() {

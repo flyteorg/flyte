@@ -3,12 +3,12 @@ package validators
 import (
 	"fmt"
 
-	"golang.org/x/exp/slices"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func containsBindingByVariableName(bindings []*core.Binding, name string) (found bool) {
@@ -184,7 +184,17 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	}
 
 	// sort inner types to ensure consistent union types are generated
-	slices.SortFunc(innerType, func(a, b *core.LiteralType) bool { return a.String() < b.String() })
+	slices.SortFunc(innerType, func(a, b *core.LiteralType) int {
+		aStr := a.String()
+		bStr := b.String()
+		if aStr < bStr {
+			return -1
+		} else if aStr > bStr {
+			return 1
+		}
+
+		return 0
+	})
 
 	return &core.LiteralType{
 		Type: &core.LiteralType_UnionType{

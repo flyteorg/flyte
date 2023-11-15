@@ -6,17 +6,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	listers "github.com/flyteorg/flyte/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/labels"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	listers "github.com/flyteorg/flyte/flytepropeller/pkg/client/listers/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
 var wfs = []*v1alpha1.FlyteWorkflow{

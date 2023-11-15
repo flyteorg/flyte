@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.event;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event";
 
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/compiler.proto";
@@ -110,6 +110,9 @@ message NodeExecutionEvent {
     // literal inputs are initially copied. The event however will not be sent until after the copy completes.
     // Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
     google.protobuf.Timestamp reported_at = 21;
+
+    // Indicates if this node is an ArrayNode.
+    bool is_array = 22;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched

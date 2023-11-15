@@ -5,17 +5,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func TestExtractCurrentCondition(t *testing.T) {
@@ -167,7 +167,7 @@ func TestGetLogs(t *testing.T) {
 		Name:      "test",
 		Namespace: "mpi-namespace",
 	}
-	jobLogs, err := GetLogs(taskCtx, MPITaskType, mpiJobObjectMeta, false, workers, launcher, 0)
+	jobLogs, err := GetLogs(taskCtx, MPITaskType, mpiJobObjectMeta, false, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=mpi-namespace", "mpi-namespace", "test"), jobLogs[0].Uri)
@@ -176,7 +176,7 @@ func TestGetLogs(t *testing.T) {
 		Name:      "test",
 		Namespace: "pytorch-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, workers, launcher, 0)
+	jobLogs, err = GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, workers, launcher, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-master-0/pod?namespace=pytorch-namespace", "pytorch-namespace", "test"), jobLogs[0].Uri)
@@ -186,7 +186,7 @@ func TestGetLogs(t *testing.T) {
 		Name:      "test",
 		Namespace: "tensorflow-namespace",
 	}
-	jobLogs, err = GetLogs(taskCtx, TensorflowTaskType, tensorflowJobObjectMeta, false, workers, launcher, 1)
+	jobLogs, err = GetLogs(taskCtx, TensorflowTaskType, tensorflowJobObjectMeta, false, workers, launcher, 1, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 3, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("k8s.com/#!/log/%s/%s-worker-0/pod?namespace=tensorflow-namespace", "tensorflow-namespace", "test"), jobLogs[0].Uri)
@@ -209,7 +209,7 @@ func TestGetLogsTemplateUri(t *testing.T) {
 			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
 		},
 	}
-	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0)
+	jobLogs, err := GetLogs(taskCtx, PytorchTaskType, pytorchJobObjectMeta, true, 1, 0, 0, 0)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(jobLogs))
 	assert.Equal(t, fmt.Sprintf("https://console.cloud.google.com/logs/query;query=resource.labels.pod_name=%s-master-0&timestamp>%s", "test", "2022-01-01T12:00:00Z"), jobLogs[0].Uri)

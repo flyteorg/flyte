@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package flyteidl.admin;
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
@@ -73,6 +73,8 @@ message Resource {
   // Structured dataset pointing to the query result table.
   // +optional
   core.LiteralMap outputs = 2;
+  // A descriptive message for the current state. e.g. waiting for cluster.
+  string message = 3;
 }
 
 // A message used to delete a task.

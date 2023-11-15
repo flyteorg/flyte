@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/deviceflow"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/pkce"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/clients/go/admin/deviceflow"
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -73,6 +73,8 @@ type Config struct {
 	DeviceFlowConfig deviceflow.Config `json:"deviceFlowConfig" pflag:",Config for Device authentication flow."`
 
 	Command []string `json:"command" pflag:",Command for external authentication token generation"`
+
+	ProxyCommand []string `json:"proxyCommand" pflag:",Command for external proxy-authorization token generation"`
 
 	// Set the gRPC service config formatted as a json string https://github.com/grpc/grpc/blob/master/doc/service_config.md
 	// eg. {"loadBalancingConfig": [{"round_robin":{}}], "methodConfig": [{"name":[{"service": "foo", "method": "bar"}, {"service": "baz"}], "timeout": "1.000000001s"}]}

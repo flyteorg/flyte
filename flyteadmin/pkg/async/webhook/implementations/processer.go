@@ -4,20 +4,20 @@ import (
 	"context"
 	"time"
 
-	"github.com/flyteorg/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyteadmin/pkg/manager/impl/util"
-	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/repositories/transformers"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 
 	"github.com/NYTimes/gizmo/pubsub"
-	"github.com/flyteorg/flyteadmin/pkg/async"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
-	webhookInterfaces "github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
-	"github.com/flyteorg/flytestdlib/logger"
-	"github.com/flyteorg/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	webhookInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/webhook/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type Processor struct {

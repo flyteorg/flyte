@@ -75,14 +75,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fpresto_2eproto[] =
   "\n\035flyteidl/plugins/presto.proto\022\020flyteid"
   "l.plugins\"X\n\013PrestoQuery\022\025\n\rrouting_grou"
   "p\030\001 \001(\t\022\017\n\007catalog\030\002 \001(\t\022\016\n\006schema\030\003 \001(\t"
-  "\022\021\n\tstatement\030\004 \001(\tB9Z7github.com/flyteo"
-  "rg/flyteidl/gen/pb-go/flyteidl/pluginsb\006"
-  "proto3"
+  "\022\021\n\tstatement\030\004 \001(\tB\?Z=github.com/flyteo"
+  "rg/flyte/flyteidl/gen/pb-go/flyteidl/plu"
+  "ginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fpresto_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fpresto_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fpresto_2eproto,
-  "flyteidl/plugins/presto.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpresto_2eproto, 206,
+  "flyteidl/plugins/presto.proto", &assign_descriptors_table_flyteidl_2fplugins_2fpresto_2eproto, 212,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fpresto_2eproto() {

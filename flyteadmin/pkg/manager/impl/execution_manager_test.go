@@ -9,12 +9,6 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -51,6 +45,12 @@ import (
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	workflowengineMocks "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var spec = testutils.GetExecutionRequest().Spec

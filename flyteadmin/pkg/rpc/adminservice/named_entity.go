@@ -3,10 +3,11 @@ package adminservice
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 func (m *AdminService) GetNamedEntity(ctx context.Context, request *admin.NamedEntityGetRequest) (*admin.NamedEntity, error) {

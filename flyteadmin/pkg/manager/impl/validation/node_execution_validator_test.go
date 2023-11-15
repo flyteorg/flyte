@@ -3,12 +3,11 @@ package validation
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 )
 
 var testExecutionID = core.WorkflowExecutionIdentifier{

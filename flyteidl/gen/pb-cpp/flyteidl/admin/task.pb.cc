@@ -22,7 +22,7 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2ftask_2eproto ::google::protob
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2ftask_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_Task_flyteidl_2fadmin_2ftask_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_CompiledTask_flyteidl_2fcore_2fcompiler_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2ftimestamp_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Timestamp_google_2fprotobuf_2ftimestamp_2eproto;
 namespace flyteidl {
 namespace admin {
@@ -244,14 +244,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2ftask_2eproto[] =
   "idl.admin.DescriptionEntity\"q\n\013TaskClosu"
   "re\0222\n\rcompiled_task\030\001 \001(\0132\033.flyteidl.cor"
   "e.CompiledTask\022.\n\ncreated_at\030\002 \001(\0132\032.goo"
-  "gle.protobuf.TimestampB7Z5github.com/fly"
-  "teorg/flyteidl/gen/pb-go/flyteidl/adminb"
-  "\006proto3"
+  "gle.protobuf.TimestampB=Z;github.com/fly"
+  "teorg/flyte/flyteidl/gen/pb-go/flyteidl/"
+  "adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2ftask_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2ftask_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2ftask_2eproto,
-  "flyteidl/admin/task.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_2eproto, 807,
+  "flyteidl/admin/task.proto", &assign_descriptors_table_flyteidl_2fadmin_2ftask_2eproto, 813,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2ftask_2eproto() {

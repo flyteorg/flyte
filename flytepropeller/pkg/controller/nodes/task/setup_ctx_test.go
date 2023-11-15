@@ -3,10 +3,11 @@ package task
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
 )
 
 type dummySetupCtx struct {

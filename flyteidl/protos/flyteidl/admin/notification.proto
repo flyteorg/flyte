@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.admin;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
 // Represents the Email object that is sent to a publisher/subscriber
 // to forward the notification.
@@ -24,4 +24,9 @@ message EmailMessage {
     // The content of the email body.
     // This populates the BODY field.
     string body = 4;
+}
+
+// Represents the content that will be sent to a webhook endpoint.
+message WebhookPayload {
+    string message = 1;
 }

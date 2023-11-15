@@ -5,25 +5,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/golang/protobuf/ptypes/wrappers"
+	"golang.org/x/time/rate"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"k8s.io/client-go/util/workqueue"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	evtErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
-
-	"github.com/golang/protobuf/ptypes/wrappers"
-
-	"golang.org/x/time/rate"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	"k8s.io/client-go/util/workqueue"
 )
 
 var isRecovery = true

@@ -106,6 +106,10 @@ System retry can be of two types:
    Recoverable vs. Non-Recoverable failures: Recoverable failures will be retried and counted against the task's retry count. Non-recoverable failures will just fail, i.e., the task isn’t retried irrespective of user/system retry configurations. All user exceptions are considered non-recoverable unless the exception is a subclass of FlyteRecoverableException.
 
 
+.. note::
+
+   `RFC 3902 <https://github.com/flyteorg/flyte/pull/3902>`_ implements an alternative, simplified retry behaviour with which both system and user retries are counted towards a single retry budget defined in the task decorator (thus, without a second retry budget defined in the platform configuration). The last retries are always performed on non-spot instances to guarantee completion. To activate this behaviour, set ``configmap.core.propeller.node-config.ignore-retry-cause`` to ``true`` in the helm values.
+
 **Timeouts**
   
 To ensure that the system is always making progress, tasks must be guaranteed to end gracefully/successfully. The system defines a default timeout period for the tasks. It is possible for task authors to define a timeout period, after which the task is marked as ``failure``. Note that a timed-out task will be retried if it has a retry strategy defined. The timeout can be handled in the `TaskMetadata <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__.

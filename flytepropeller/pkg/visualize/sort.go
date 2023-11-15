@@ -1,8 +1,9 @@
 package visualize
 
 import (
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/pkg/errors"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 type VisitStatus int8

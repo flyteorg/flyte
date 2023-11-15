@@ -3,8 +3,8 @@ package implementations
 import (
 	"testing"
 
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 )
 

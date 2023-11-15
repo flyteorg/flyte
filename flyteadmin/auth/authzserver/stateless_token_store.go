@@ -8,17 +8,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth"
-
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-	"k8s.io/apimachinery/pkg/util/sets"
-
+	"github.com/ory/fosite"
 	"github.com/ory/fosite/handler/oauth2"
 	oauth22 "github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/token/jwt"
-
-	"github.com/ory/fosite"
 	"github.com/ory/fosite/storage"
+	"github.com/ory/fosite/token/jwt"
+	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 )
 
 const (

@@ -424,6 +424,23 @@ func (m *TypeStructure) Validate() error {
 
 	// no validation rules for Tag
 
+	for key, val := range m.GetDataclassType() {
+		_ = val
+
+		// no validation rules for DataclassType[key]
+
+		if v, ok := interface{}(val).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TypeStructureValidationError{
+					field:  fmt.Sprintf("DataclassType[%v]", key),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 

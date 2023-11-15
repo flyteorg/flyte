@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 func TestTaskSpec(t *testing.T) {

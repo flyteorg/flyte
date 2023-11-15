@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func TestReadAll(t *testing.T) {

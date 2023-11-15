@@ -8,37 +8,27 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/rand"
-
 	"github.com/go-test/deep"
-
-	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"k8s.io/apimachinery/pkg/types"
-
-	"k8s.io/apimachinery/pkg/api/resource"
-
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/rand"
 
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	catalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
-
-	v1 "k8s.io/api/core/v1"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/stretchr/testify/mock"
-
-	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	coreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/stretchr/testify/assert"
-
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func createSampleContainerTask() *idlCore.Container {
@@ -92,7 +82,6 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 	outputWriter.OnGetOutputPath().Return(basePrefix + "/outputs.pb")
 	outputWriter.OnGetCheckpointPrefix().Return("/checkpoint")
 	outputWriter.OnGetPreviousCheckpointsPrefix().Return("/prev")
-	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil)
 
 	outputWriter.OnPutMatch(mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 		or := args.Get(1).(io.OutputReader)
@@ -147,6 +136,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 		},
 		RetryAttempt: 0,
 	})
+	tID.OnGetUniqueNodeID().Return("unique-node-id")
 
 	overrides := &coreMocks.TaskOverrides{}
 	overrides.OnGetConfig().Return(&v1.ConfigMap{Data: map[string]string{
@@ -156,6 +146,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 		Requests: map[v1.ResourceName]resource.Quantity{},
 		Limits:   map[v1.ResourceName]resource.Quantity{},
 	})
+	overrides.OnGetExtendedResources().Return(&idlCore.ExtendedResources{})
 
 	tMeta := &coreMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)

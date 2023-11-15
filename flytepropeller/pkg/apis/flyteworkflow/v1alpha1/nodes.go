@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/jsonpb"
 	typesv1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var marshaler = jsonpb.Marshaler{}
@@ -92,6 +93,30 @@ func (in *NodeMetadata) DeepCopyInto(out *NodeMetadata) {
 	// Once we figure out the autogenerate story we can replace this
 }
 
+type ExtendedResources struct {
+	*core.ExtendedResources
+}
+
+func (in *ExtendedResources) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := marshaler.Marshal(&buf, in.ExtendedResources); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+func (in *ExtendedResources) UnmarshalJSON(b []byte) error {
+	in.ExtendedResources = &core.ExtendedResources{}
+	return jsonpb.Unmarshal(bytes.NewReader(b), in.ExtendedResources)
+}
+
+func (in *ExtendedResources) DeepCopyInto(out *ExtendedResources) {
+	*out = *in
+	// We do not manipulate the object, so its ok
+	// Once we figure out the autogenerate story we can replace this
+}
+
 type NodeSpec struct {
 	ID            NodeID                        `json:"id"`
 	Name          string                        `json:"name,omitempty"`
@@ -134,6 +159,10 @@ type NodeSpec struct {
 	// If not specified, the pod will be dispatched by default scheduler.
 	// +optional
 	SchedulerName string `json:"schedulerName,omitempty" protobuf:"bytes,19,opt,name=schedulerName"`
+	// If specified, includes overrides for extended resources to allocate to the
+	// node.
+	// +optional
+	ExtendedResources *ExtendedResources `json:"extendedResources,omitempty" protobuf:"bytes,20,opt,name=extendedResources"`
 	// If specified, the pod's tolerations.
 	// +optional
 	Tolerations []typesv1.Toleration `json:"tolerations,omitempty" protobuf:"bytes,22,opt,name=tolerations"`
@@ -180,6 +209,13 @@ func (in *NodeSpec) GetConfig() *typesv1.ConfigMap {
 
 func (in *NodeSpec) GetResources() *typesv1.ResourceRequirements {
 	return in.Resources
+}
+
+func (in *NodeSpec) GetExtendedResources() *core.ExtendedResources {
+	if in.ExtendedResources == nil {
+		return nil
+	}
+	return in.ExtendedResources.ExtendedResources
 }
 
 func (in *NodeSpec) GetOutputAlias() []Alias {

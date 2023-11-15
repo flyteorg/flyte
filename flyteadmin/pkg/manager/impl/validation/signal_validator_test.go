@@ -5,16 +5,14 @@ import (
 	"errors"
 	"testing"
 
-	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/golang/protobuf/proto"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestValidateSignalGetOrCreateRequest(t *testing.T) {

@@ -5,10 +5,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/mitchellh/go-ps"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (

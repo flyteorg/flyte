@@ -15,16 +15,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/util/rand"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
+	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
-	adminMocks "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 // authMetadataServer is a fake AuthMetadataServer that takes in an AuthMetadataServer implementation (usually one
@@ -114,7 +115,8 @@ func newAuthMetadataServer(t testing.TB, port int, impl service.AuthMetadataServ
 func Test_newAuthInterceptor(t *testing.T) {
 	t.Run("Other Error", func(t *testing.T) {
 		f := NewPerRPCCredentialsFuture()
-		interceptor := NewAuthInterceptor(&Config{}, &mocks.TokenCache{}, f)
+		p := NewPerRPCCredentialsFuture()
+		interceptor := NewAuthInterceptor(&Config{}, &mocks.TokenCache{}, f, p)
 		otherError := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Canceled, "").Err()
 		}
@@ -146,11 +148,12 @@ func Test_newAuthInterceptor(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
+		p := NewPerRPCCredentialsFuture()
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, f, p)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Unauthenticated, "").Err()
 		}
@@ -177,11 +180,13 @@ func Test_newAuthInterceptor(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
+		p := NewPerRPCCredentialsFuture()
+
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, f, p)
 		authenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return nil
 		}
@@ -216,11 +221,13 @@ func Test_newAuthInterceptor(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
+		p := NewPerRPCCredentialsFuture()
+
 		interceptor := NewAuthInterceptor(&Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, f, p)
 		unauthenticated := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
 			return status.New(codes.Aborted, "").Err()
 		}
@@ -246,6 +253,8 @@ func TestMaterializeCredentials(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
+		p := NewPerRPCCredentialsFuture()
+
 		err = MaterializeCredentials(ctx, &Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
@@ -254,7 +263,7 @@ func TestMaterializeCredentials(t *testing.T) {
 			Scopes:                []string{"all"},
 			Audience:              "http://localhost:30081",
 			AuthorizationHeader:   "authorization",
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, f, p)
 		assert.NoError(t, err)
 	})
 	t.Run("Failed to fetch client metadata", func(t *testing.T) {
@@ -271,13 +280,119 @@ func TestMaterializeCredentials(t *testing.T) {
 		assert.NoError(t, err)
 
 		f := NewPerRPCCredentialsFuture()
+		p := NewPerRPCCredentialsFuture()
+
 		err = MaterializeCredentials(ctx, &Config{
 			Endpoint:              config.URL{URL: *u},
 			UseInsecureConnection: true,
 			AuthType:              AuthTypeClientSecret,
 			TokenURL:              fmt.Sprintf("http://localhost:%d/api/v1/token", port),
 			Scopes:                []string{"all"},
-		}, &mocks.TokenCache{}, f)
+		}, &mocks.TokenCache{}, f, p)
 		assert.EqualError(t, err, "failed to fetch client metadata. Error: rpc error: code = Unknown desc = expected err")
+	})
+}
+
+func TestNewProxyAuthInterceptor(t *testing.T) {
+	cfg := &Config{
+		ProxyCommand: []string{"echo", "test-token"},
+	}
+
+	p := NewPerRPCCredentialsFuture()
+
+	interceptor := NewProxyAuthInterceptor(cfg, p)
+
+	ctx := context.Background()
+	method := "/test.method"
+	req := "request"
+	reply := "reply"
+	cc := new(grpc.ClientConn)
+
+	errorInvoker := func(ctx context.Context, method string, req, reply interface{}, cc *grpc.ClientConn, opts ...grpc.CallOption) error {
+		return errors.New("test error")
+	}
+
+	// Call should return an error and trigger the interceptor to materialize proxy auth credentials
+	err := interceptor(ctx, method, req, reply, cc, errorInvoker)
+	assert.Error(t, err)
+
+	// Check if proxyCredentialsFuture contains a proxy auth header token
+	creds, err := p.Get().GetRequestMetadata(ctx, "")
+	assert.True(t, p.IsInitialized())
+	assert.NoError(t, err)
+	assert.Equal(t, "Bearer test-token", creds[ProxyAuthorizationHeader])
+}
+
+type testRoundTripper struct {
+	RoundTripFunc func(req *http.Request) (*http.Response, error)
+}
+
+func (t *testRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	return t.RoundTripFunc(req)
+}
+
+func TestSetHTTPClientContext(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("no proxy command and no proxy url", func(t *testing.T) {
+		cfg := &Config{}
+
+		newCtx := setHTTPClientContext(ctx, cfg, nil)
+
+		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
+		assert.True(t, ok)
+
+		transport, ok := httpClient.Transport.(*http.Transport)
+		assert.True(t, ok)
+		assert.Nil(t, transport.Proxy)
+	})
+
+	t.Run("proxy url", func(t *testing.T) {
+		cfg := &Config{
+			HTTPProxyURL: config.
+				URL{URL: url.URL{
+				Scheme: "http",
+				Host:   "localhost:8080",
+			}},
+		}
+		newCtx := setHTTPClientContext(ctx, cfg, nil)
+
+		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
+		assert.True(t, ok)
+
+		transport, ok := httpClient.Transport.(*http.Transport)
+		assert.True(t, ok)
+		assert.NotNil(t, transport.Proxy)
+	})
+
+	t.Run("proxy command adds proxy-authorization header", func(t *testing.T) {
+		cfg := &Config{
+			ProxyCommand: []string{"echo", "test-token-http-client"},
+		}
+
+		p := NewPerRPCCredentialsFuture()
+		err := MaterializeProxyAuthCredentials(ctx, cfg, p)
+		assert.NoError(t, err)
+
+		newCtx := setHTTPClientContext(ctx, cfg, p)
+
+		httpClient, ok := newCtx.Value(oauth2.HTTPClient).(*http.Client)
+		assert.True(t, ok)
+
+		pat, ok := httpClient.Transport.(*proxyAuthTransport)
+		assert.True(t, ok)
+
+		testRoundTripper := &testRoundTripper{
+			RoundTripFunc: func(req *http.Request) (*http.Response, error) {
+				// Check if the ProxyAuthorizationHeader is correctly set
+				assert.Equal(t, "Bearer test-token-http-client", req.Header.Get(ProxyAuthorizationHeader))
+				return &http.Response{StatusCode: http.StatusOK}, nil
+			},
+		}
+		pat.transport = testRoundTripper
+
+		req, _ := http.NewRequest("GET", "http://example.com", nil)
+		_, err = httpClient.Do(req)
+		assert.NoError(t, err)
 	})
 }

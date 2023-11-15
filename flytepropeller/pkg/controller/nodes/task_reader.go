@@ -3,8 +3,7 @@ package nodes
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 

@@ -7,19 +7,15 @@ import (
 	"sort"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/golang/protobuf/ptypes/timestamp"
-
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (

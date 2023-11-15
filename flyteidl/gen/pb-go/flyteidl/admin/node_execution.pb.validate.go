@@ -17,7 +17,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
-	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // ensure the imports are used
@@ -420,6 +420,8 @@ func (m *NodeExecutionMetaData) Validate() error {
 	// no validation rules for SpecNodeId
 
 	// no validation rules for IsDynamic
+
+	// no validation rules for IsArray
 
 	return nil
 }

@@ -5,16 +5,17 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeIFaceMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var workflowIdentifier = &core.Identifier{

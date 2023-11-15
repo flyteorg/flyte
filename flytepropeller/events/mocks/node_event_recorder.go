@@ -7,7 +7,7 @@ import (
 
 	config "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 
-	event "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	event "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 
 	mock "github.com/stretchr/testify/mock"
 )

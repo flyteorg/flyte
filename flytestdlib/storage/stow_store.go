@@ -11,13 +11,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/flyteorg/stow"
-	"github.com/flyteorg/stow/azure"
-	"github.com/flyteorg/stow/google"
-	"github.com/flyteorg/stow/local"
-	"github.com/flyteorg/stow/oracle"
-	"github.com/flyteorg/stow/s3"
-	"github.com/flyteorg/stow/swift"
 	errs "github.com/pkg/errors"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -25,6 +18,13 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/stow"
+	"github.com/flyteorg/stow/azure"
+	"github.com/flyteorg/stow/google"
+	"github.com/flyteorg/stow/local"
+	"github.com/flyteorg/stow/oracle"
+	"github.com/flyteorg/stow/s3"
+	"github.com/flyteorg/stow/swift"
 )
 
 const (
@@ -265,8 +265,8 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 	}
 
 	if GetConfig().Limits.GetLimitMegabytes != 0 {
-		if sizeMbs := sizeBytes / MiB; sizeMbs > GetConfig().Limits.GetLimitMegabytes {
-			return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %vmb > %vmb.", sizeMbs, GetConfig().Limits.GetLimitMegabytes)
+		if sizeBytes > GetConfig().Limits.GetLimitMegabytes*MiB {
+			return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %.6fmb > %vmb.", float64(sizeBytes)/float64(MiB), GetConfig().Limits.GetLimitMegabytes)
 		}
 	}
 
