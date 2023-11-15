@@ -15,7 +15,6 @@ import (
 
 // Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob.
 type EventTaskExecutionEvent struct {
-	// ID of the task. In combination with the retryAttempt this will indicate the task execution uniquely for a given parent node execution.
 	TaskId *CoreIdentifier `json:"task_id,omitempty"`
 	ParentNodeExecutionId *CoreNodeExecutionIdentifier `json:"parent_node_execution_id,omitempty"`
 	RetryAttempt int64 `json:"retry_attempt,omitempty"`

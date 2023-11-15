@@ -17925,7 +17925,6 @@
                  * @property {flyteidl.core.ILiteralMap|null} [outputData] CloudEventWorkflowExecution outputData
                  * @property {flyteidl.core.ITypedInterface|null} [outputInterface] CloudEventWorkflowExecution outputInterface
                  * @property {flyteidl.core.ILiteralMap|null} [inputData] CloudEventWorkflowExecution inputData
-                 * @property {google.protobuf.ITimestamp|null} [scheduledAt] CloudEventWorkflowExecution scheduledAt
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventWorkflowExecution artifactIds
                  * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventWorkflowExecution parentNodeExecution
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventWorkflowExecution referenceExecution
@@ -17979,14 +17978,6 @@
                  * @instance
                  */
                 CloudEventWorkflowExecution.prototype.inputData = null;
-    
-                /**
-                 * CloudEventWorkflowExecution scheduledAt.
-                 * @member {google.protobuf.ITimestamp|null|undefined} scheduledAt
-                 * @memberof flyteidl.event.CloudEventWorkflowExecution
-                 * @instance
-                 */
-                CloudEventWorkflowExecution.prototype.scheduledAt = null;
     
                 /**
                  * CloudEventWorkflowExecution artifactIds.
@@ -18052,8 +18043,6 @@
                         $root.flyteidl.core.TypedInterface.encode(message.outputInterface, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.inputData != null && message.hasOwnProperty("inputData"))
                         $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.scheduledAt != null && message.hasOwnProperty("scheduledAt"))
-                        $root.google.protobuf.Timestamp.encode(message.scheduledAt, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     if (message.artifactIds != null && message.artifactIds.length)
                         for (var i = 0; i < message.artifactIds.length; ++i)
                             $root.flyteidl.core.ArtifactID.encode(message.artifactIds[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
@@ -18095,9 +18084,6 @@
                             break;
                         case 4:
                             message.inputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
-                            break;
-                        case 5:
-                            message.scheduledAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
                             break;
                         case 6:
                             if (!(message.artifactIds && message.artifactIds.length))
@@ -18152,11 +18138,6 @@
                         if (error)
                             return "inputData." + error;
                     }
-                    if (message.scheduledAt != null && message.hasOwnProperty("scheduledAt")) {
-                        var error = $root.google.protobuf.Timestamp.verify(message.scheduledAt);
-                        if (error)
-                            return "scheduledAt." + error;
-                    }
                     if (message.artifactIds != null && message.hasOwnProperty("artifactIds")) {
                         if (!Array.isArray(message.artifactIds))
                             return "artifactIds: array expected";
@@ -18194,6 +18175,12 @@
                  * @memberof flyteidl.event
                  * @interface ICloudEventNodeExecution
                  * @property {flyteidl.event.INodeExecutionEvent|null} [rawEvent] CloudEventNodeExecution rawEvent
+                 * @property {flyteidl.core.IIdentifier|null} [taskId] CloudEventNodeExecution taskId
+                 * @property {number|null} [retryAttempt] CloudEventNodeExecution retryAttempt
+                 * @property {flyteidl.core.ILiteralMap|null} [outputData] CloudEventNodeExecution outputData
+                 * @property {flyteidl.core.ITypedInterface|null} [outputInterface] CloudEventNodeExecution outputInterface
+                 * @property {flyteidl.core.ILiteralMap|null} [inputData] CloudEventNodeExecution inputData
+                 * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventNodeExecution launchPlanId
                  */
     
                 /**
@@ -18218,6 +18205,54 @@
                  * @instance
                  */
                 CloudEventNodeExecution.prototype.rawEvent = null;
+    
+                /**
+                 * CloudEventNodeExecution taskId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} taskId
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.taskId = null;
+    
+                /**
+                 * CloudEventNodeExecution retryAttempt.
+                 * @member {number} retryAttempt
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.retryAttempt = 0;
+    
+                /**
+                 * CloudEventNodeExecution outputData.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} outputData
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.outputData = null;
+    
+                /**
+                 * CloudEventNodeExecution outputInterface.
+                 * @member {flyteidl.core.ITypedInterface|null|undefined} outputInterface
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.outputInterface = null;
+    
+                /**
+                 * CloudEventNodeExecution inputData.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} inputData
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.inputData = null;
+    
+                /**
+                 * CloudEventNodeExecution launchPlanId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} launchPlanId
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.launchPlanId = null;
     
                 /**
                  * Creates a new CloudEventNodeExecution instance using the specified properties.
@@ -18245,6 +18280,18 @@
                         writer = $Writer.create();
                     if (message.rawEvent != null && message.hasOwnProperty("rawEvent"))
                         $root.flyteidl.event.NodeExecutionEvent.encode(message.rawEvent, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.taskId != null && message.hasOwnProperty("taskId"))
+                        $root.flyteidl.core.Identifier.encode(message.taskId, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.retryAttempt != null && message.hasOwnProperty("retryAttempt"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.retryAttempt);
+                    if (message.outputData != null && message.hasOwnProperty("outputData"))
+                        $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.outputInterface != null && message.hasOwnProperty("outputInterface"))
+                        $root.flyteidl.core.TypedInterface.encode(message.outputInterface, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.inputData != null && message.hasOwnProperty("inputData"))
+                        $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
+                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -18268,6 +18315,24 @@
                         switch (tag >>> 3) {
                         case 1:
                             message.rawEvent = $root.flyteidl.event.NodeExecutionEvent.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.taskId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.retryAttempt = reader.uint32();
+                            break;
+                        case 4:
+                            message.outputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.outputInterface = $root.flyteidl.core.TypedInterface.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.inputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18293,6 +18358,34 @@
                         if (error)
                             return "rawEvent." + error;
                     }
+                    if (message.taskId != null && message.hasOwnProperty("taskId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.taskId);
+                        if (error)
+                            return "taskId." + error;
+                    }
+                    if (message.retryAttempt != null && message.hasOwnProperty("retryAttempt"))
+                        if (!$util.isInteger(message.retryAttempt))
+                            return "retryAttempt: integer expected";
+                    if (message.outputData != null && message.hasOwnProperty("outputData")) {
+                        var error = $root.flyteidl.core.LiteralMap.verify(message.outputData);
+                        if (error)
+                            return "outputData." + error;
+                    }
+                    if (message.outputInterface != null && message.hasOwnProperty("outputInterface")) {
+                        var error = $root.flyteidl.core.TypedInterface.verify(message.outputInterface);
+                        if (error)
+                            return "outputInterface." + error;
+                    }
+                    if (message.inputData != null && message.hasOwnProperty("inputData")) {
+                        var error = $root.flyteidl.core.LiteralMap.verify(message.inputData);
+                        if (error)
+                            return "inputData." + error;
+                    }
+                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.launchPlanId);
+                        if (error)
+                            return "launchPlanId." + error;
+                    }
                     return null;
                 };
     
@@ -18306,14 +18399,6 @@
                  * @memberof flyteidl.event
                  * @interface ICloudEventTaskExecution
                  * @property {flyteidl.event.ITaskExecutionEvent|null} [rawEvent] CloudEventTaskExecution rawEvent
-                 * @property {flyteidl.core.ILiteralMap|null} [outputData] CloudEventTaskExecution outputData
-                 * @property {flyteidl.core.ITypedInterface|null} [outputInterface] CloudEventTaskExecution outputInterface
-                 * @property {flyteidl.core.ILiteralMap|null} [inputData] CloudEventTaskExecution inputData
-                 * @property {google.protobuf.ITimestamp|null} [scheduledAt] CloudEventTaskExecution scheduledAt
-                 * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventTaskExecution artifactIds
-                 * @property {flyteidl.core.INodeExecutionIdentifier|null} [parentNodeExecution] CloudEventTaskExecution parentNodeExecution
-                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventTaskExecution referenceExecution
-                 * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventTaskExecution launchPlanId
                  */
     
                 /**
@@ -18325,7 +18410,6 @@
                  * @param {flyteidl.event.ICloudEventTaskExecution=} [properties] Properties to set
                  */
                 function CloudEventTaskExecution(properties) {
-                    this.artifactIds = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -18339,70 +18423,6 @@
                  * @instance
                  */
                 CloudEventTaskExecution.prototype.rawEvent = null;
-    
-                /**
-                 * CloudEventTaskExecution outputData.
-                 * @member {flyteidl.core.ILiteralMap|null|undefined} outputData
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.outputData = null;
-    
-                /**
-                 * CloudEventTaskExecution outputInterface.
-                 * @member {flyteidl.core.ITypedInterface|null|undefined} outputInterface
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.outputInterface = null;
-    
-                /**
-                 * CloudEventTaskExecution inputData.
-                 * @member {flyteidl.core.ILiteralMap|null|undefined} inputData
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.inputData = null;
-    
-                /**
-                 * CloudEventTaskExecution scheduledAt.
-                 * @member {google.protobuf.ITimestamp|null|undefined} scheduledAt
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.scheduledAt = null;
-    
-                /**
-                 * CloudEventTaskExecution artifactIds.
-                 * @member {Array.<flyteidl.core.IArtifactID>} artifactIds
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.artifactIds = $util.emptyArray;
-    
-                /**
-                 * CloudEventTaskExecution parentNodeExecution.
-                 * @member {flyteidl.core.INodeExecutionIdentifier|null|undefined} parentNodeExecution
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.parentNodeExecution = null;
-    
-                /**
-                 * CloudEventTaskExecution referenceExecution.
-                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} referenceExecution
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.referenceExecution = null;
-    
-                /**
-                 * CloudEventTaskExecution launchPlanId.
-                 * @member {flyteidl.core.IIdentifier|null|undefined} launchPlanId
-                 * @memberof flyteidl.event.CloudEventTaskExecution
-                 * @instance
-                 */
-                CloudEventTaskExecution.prototype.launchPlanId = null;
     
                 /**
                  * Creates a new CloudEventTaskExecution instance using the specified properties.
@@ -18430,23 +18450,6 @@
                         writer = $Writer.create();
                     if (message.rawEvent != null && message.hasOwnProperty("rawEvent"))
                         $root.flyteidl.event.TaskExecutionEvent.encode(message.rawEvent, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.outputData != null && message.hasOwnProperty("outputData"))
-                        $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.outputInterface != null && message.hasOwnProperty("outputInterface"))
-                        $root.flyteidl.core.TypedInterface.encode(message.outputInterface, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    if (message.inputData != null && message.hasOwnProperty("inputData"))
-                        $root.flyteidl.core.LiteralMap.encode(message.inputData, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.scheduledAt != null && message.hasOwnProperty("scheduledAt"))
-                        $root.google.protobuf.Timestamp.encode(message.scheduledAt, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-                    if (message.artifactIds != null && message.artifactIds.length)
-                        for (var i = 0; i < message.artifactIds.length; ++i)
-                            $root.flyteidl.core.ArtifactID.encode(message.artifactIds[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
-                    if (message.parentNodeExecution != null && message.hasOwnProperty("parentNodeExecution"))
-                        $root.flyteidl.core.NodeExecutionIdentifier.encode(message.parentNodeExecution, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
-                    if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
-                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
-                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
-                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -18471,32 +18474,6 @@
                         case 1:
                             message.rawEvent = $root.flyteidl.event.TaskExecutionEvent.decode(reader, reader.uint32());
                             break;
-                        case 2:
-                            message.outputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            message.outputInterface = $root.flyteidl.core.TypedInterface.decode(reader, reader.uint32());
-                            break;
-                        case 4:
-                            message.inputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
-                            break;
-                        case 5:
-                            message.scheduledAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
-                            break;
-                        case 6:
-                            if (!(message.artifactIds && message.artifactIds.length))
-                                message.artifactIds = [];
-                            message.artifactIds.push($root.flyteidl.core.ArtifactID.decode(reader, reader.uint32()));
-                            break;
-                        case 7:
-                            message.parentNodeExecution = $root.flyteidl.core.NodeExecutionIdentifier.decode(reader, reader.uint32());
-                            break;
-                        case 8:
-                            message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
-                            break;
-                        case 9:
-                            message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
-                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -18520,50 +18497,6 @@
                         var error = $root.flyteidl.event.TaskExecutionEvent.verify(message.rawEvent);
                         if (error)
                             return "rawEvent." + error;
-                    }
-                    if (message.outputData != null && message.hasOwnProperty("outputData")) {
-                        var error = $root.flyteidl.core.LiteralMap.verify(message.outputData);
-                        if (error)
-                            return "outputData." + error;
-                    }
-                    if (message.outputInterface != null && message.hasOwnProperty("outputInterface")) {
-                        var error = $root.flyteidl.core.TypedInterface.verify(message.outputInterface);
-                        if (error)
-                            return "outputInterface." + error;
-                    }
-                    if (message.inputData != null && message.hasOwnProperty("inputData")) {
-                        var error = $root.flyteidl.core.LiteralMap.verify(message.inputData);
-                        if (error)
-                            return "inputData." + error;
-                    }
-                    if (message.scheduledAt != null && message.hasOwnProperty("scheduledAt")) {
-                        var error = $root.google.protobuf.Timestamp.verify(message.scheduledAt);
-                        if (error)
-                            return "scheduledAt." + error;
-                    }
-                    if (message.artifactIds != null && message.hasOwnProperty("artifactIds")) {
-                        if (!Array.isArray(message.artifactIds))
-                            return "artifactIds: array expected";
-                        for (var i = 0; i < message.artifactIds.length; ++i) {
-                            var error = $root.flyteidl.core.ArtifactID.verify(message.artifactIds[i]);
-                            if (error)
-                                return "artifactIds." + error;
-                        }
-                    }
-                    if (message.parentNodeExecution != null && message.hasOwnProperty("parentNodeExecution")) {
-                        var error = $root.flyteidl.core.NodeExecutionIdentifier.verify(message.parentNodeExecution);
-                        if (error)
-                            return "parentNodeExecution." + error;
-                    }
-                    if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution")) {
-                        var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.referenceExecution);
-                        if (error)
-                            return "referenceExecution." + error;
-                    }
-                    if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId")) {
-                        var error = $root.flyteidl.core.Identifier.verify(message.launchPlanId);
-                        if (error)
-                            return "launchPlanId." + error;
                     }
                     return null;
                 };

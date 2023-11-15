@@ -84,16 +84,6 @@ func (m *CloudEventWorkflowExecution) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetScheduledAt()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventWorkflowExecutionValidationError{
-				field:  "ScheduledAt",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	for idx, item := range m.GetArtifactIds() {
 		_, _ = idx, item
 
@@ -217,6 +207,58 @@ func (m *CloudEventNodeExecution) Validate() error {
 		}
 	}
 
+	if v, ok := interface{}(m.GetTaskId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CloudEventNodeExecutionValidationError{
+				field:  "TaskId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for RetryAttempt
+
+	if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CloudEventNodeExecutionValidationError{
+				field:  "OutputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetOutputInterface()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CloudEventNodeExecutionValidationError{
+				field:  "OutputInterface",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CloudEventNodeExecutionValidationError{
+				field:  "InputData",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return CloudEventNodeExecutionValidationError{
+				field:  "LaunchPlanId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -288,91 +330,6 @@ func (m *CloudEventTaskExecution) Validate() error {
 		if err := v.Validate(); err != nil {
 			return CloudEventTaskExecutionValidationError{
 				field:  "RawEvent",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventTaskExecutionValidationError{
-				field:  "OutputData",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetOutputInterface()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventTaskExecutionValidationError{
-				field:  "OutputInterface",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventTaskExecutionValidationError{
-				field:  "InputData",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetScheduledAt()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventTaskExecutionValidationError{
-				field:  "ScheduledAt",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	for idx, item := range m.GetArtifactIds() {
-		_, _ = idx, item
-
-		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
-			if err := v.Validate(); err != nil {
-				return CloudEventTaskExecutionValidationError{
-					field:  fmt.Sprintf("ArtifactIds[%v]", idx),
-					reason: "embedded message failed validation",
-					cause:  err,
-				}
-			}
-		}
-
-	}
-
-	if v, ok := interface{}(m.GetParentNodeExecution()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventTaskExecutionValidationError{
-				field:  "ParentNodeExecution",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetReferenceExecution()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventTaskExecutionValidationError{
-				field:  "ReferenceExecution",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
-	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventTaskExecutionValidationError{
-				field:  "LaunchPlanId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

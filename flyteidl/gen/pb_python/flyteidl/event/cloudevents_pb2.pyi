@@ -12,12 +12,11 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class CloudEventWorkflowExecution(_message.Message):
-    __slots__ = ["raw_event", "output_data", "output_interface", "input_data", "scheduled_at", "artifact_ids", "parent_node_execution", "reference_execution", "launch_plan_id"]
+    __slots__ = ["raw_event", "output_data", "output_interface", "input_data", "artifact_ids", "parent_node_execution", "reference_execution", "launch_plan_id"]
     RAW_EVENT_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_INTERFACE_FIELD_NUMBER: _ClassVar[int]
     INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
-    SCHEDULED_AT_FIELD_NUMBER: _ClassVar[int]
     ARTIFACT_IDS_FIELD_NUMBER: _ClassVar[int]
     PARENT_NODE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
     REFERENCE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
@@ -26,40 +25,35 @@ class CloudEventWorkflowExecution(_message.Message):
     output_data: _literals_pb2.LiteralMap
     output_interface: _interface_pb2.TypedInterface
     input_data: _literals_pb2.LiteralMap
-    scheduled_at: _timestamp_pb2.Timestamp
     artifact_ids: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactID]
     parent_node_execution: _identifier_pb2.NodeExecutionIdentifier
     reference_execution: _identifier_pb2.WorkflowExecutionIdentifier
     launch_plan_id: _identifier_pb2.Identifier
-    def __init__(self, raw_event: _Optional[_Union[_event_pb2.WorkflowExecutionEvent, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., scheduled_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ..., parent_node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., reference_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
+    def __init__(self, raw_event: _Optional[_Union[_event_pb2.WorkflowExecutionEvent, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ..., parent_node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., reference_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
 
 class CloudEventNodeExecution(_message.Message):
-    __slots__ = ["raw_event"]
+    __slots__ = ["raw_event", "task_id", "retry_attempt", "output_data", "output_interface", "input_data", "launch_plan_id"]
     RAW_EVENT_FIELD_NUMBER: _ClassVar[int]
-    raw_event: _event_pb2.NodeExecutionEvent
-    def __init__(self, raw_event: _Optional[_Union[_event_pb2.NodeExecutionEvent, _Mapping]] = ...) -> None: ...
-
-class CloudEventTaskExecution(_message.Message):
-    __slots__ = ["raw_event", "output_data", "output_interface", "input_data", "scheduled_at", "artifact_ids", "parent_node_execution", "reference_execution", "launch_plan_id"]
-    RAW_EVENT_FIELD_NUMBER: _ClassVar[int]
+    TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    RETRY_ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_INTERFACE_FIELD_NUMBER: _ClassVar[int]
     INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
-    SCHEDULED_AT_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_IDS_FIELD_NUMBER: _ClassVar[int]
-    PARENT_NODE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
-    REFERENCE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
     LAUNCH_PLAN_ID_FIELD_NUMBER: _ClassVar[int]
-    raw_event: _event_pb2.TaskExecutionEvent
+    raw_event: _event_pb2.NodeExecutionEvent
+    task_id: _identifier_pb2.Identifier
+    retry_attempt: int
     output_data: _literals_pb2.LiteralMap
     output_interface: _interface_pb2.TypedInterface
     input_data: _literals_pb2.LiteralMap
-    scheduled_at: _timestamp_pb2.Timestamp
-    artifact_ids: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactID]
-    parent_node_execution: _identifier_pb2.NodeExecutionIdentifier
-    reference_execution: _identifier_pb2.WorkflowExecutionIdentifier
     launch_plan_id: _identifier_pb2.Identifier
-    def __init__(self, raw_event: _Optional[_Union[_event_pb2.TaskExecutionEvent, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., scheduled_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ..., parent_node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., reference_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
+    def __init__(self, raw_event: _Optional[_Union[_event_pb2.NodeExecutionEvent, _Mapping]] = ..., task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., output_interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
+
+class CloudEventTaskExecution(_message.Message):
+    __slots__ = ["raw_event"]
+    RAW_EVENT_FIELD_NUMBER: _ClassVar[int]
+    raw_event: _event_pb2.TaskExecutionEvent
+    def __init__(self, raw_event: _Optional[_Union[_event_pb2.TaskExecutionEvent, _Mapping]] = ...) -> None: ...
 
 class CloudEventExecutionStart(_message.Message):
     __slots__ = ["execution_id", "launch_plan_id", "workflow_id", "artifact_ids", "artifact_keys"]

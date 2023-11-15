@@ -12043,6 +12043,7 @@ public final class Event {
      * <pre>
      * ID of the task. In combination with the retryAttempt this will indicate
      * the task execution uniquely for a given parent node execution.
+     * need to copy
      * </pre>
      *
      * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -12052,6 +12053,7 @@ public final class Event {
      * <pre>
      * ID of the task. In combination with the retryAttempt this will indicate
      * the task execution uniquely for a given parent node execution.
+     * need to copy
      * </pre>
      *
      * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -12061,6 +12063,7 @@ public final class Event {
      * <pre>
      * ID of the task. In combination with the retryAttempt this will indicate
      * the task execution uniquely for a given parent node execution.
+     * need to copy
      * </pre>
      *
      * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -12098,6 +12101,7 @@ public final class Event {
     /**
      * <pre>
      * retry attempt number for this task, ie., 2 for the second attempt
+     * need to copy
      * </pre>
      *
      * <code>uint32 retry_attempt = 3;</code>
@@ -12884,6 +12888,7 @@ public final class Event {
      * <pre>
      * ID of the task. In combination with the retryAttempt this will indicate
      * the task execution uniquely for a given parent node execution.
+     * need to copy
      * </pre>
      *
      * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -12895,6 +12900,7 @@ public final class Event {
      * <pre>
      * ID of the task. In combination with the retryAttempt this will indicate
      * the task execution uniquely for a given parent node execution.
+     * need to copy
      * </pre>
      *
      * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -12906,6 +12912,7 @@ public final class Event {
      * <pre>
      * ID of the task. In combination with the retryAttempt this will indicate
      * the task execution uniquely for a given parent node execution.
+     * need to copy
      * </pre>
      *
      * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -12955,6 +12962,7 @@ public final class Event {
     /**
      * <pre>
      * retry attempt number for this task, ie., 2 for the second attempt
+     * need to copy
      * </pre>
      *
      * <code>uint32 retry_attempt = 3;</code>
@@ -14521,6 +14529,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14532,6 +14541,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14547,6 +14557,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14568,6 +14579,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14587,6 +14599,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14610,6 +14623,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14629,6 +14643,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14642,6 +14657,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14658,6 +14674,7 @@ public final class Event {
        * <pre>
        * ID of the task. In combination with the retryAttempt this will indicate
        * the task execution uniquely for a given parent node execution.
+       * need to copy
        * </pre>
        *
        * <code>.flyteidl.core.Identifier task_id = 1;</code>
@@ -14842,6 +14859,7 @@ public final class Event {
       /**
        * <pre>
        * retry attempt number for this task, ie., 2 for the second attempt
+       * need to copy
        * </pre>
        *
        * <code>uint32 retry_attempt = 3;</code>
@@ -14852,6 +14870,7 @@ public final class Event {
       /**
        * <pre>
        * retry attempt number for this task, ie., 2 for the second attempt
+       * need to copy
        * </pre>
        *
        * <code>uint32 retry_attempt = 3;</code>
@@ -14865,6 +14884,7 @@ public final class Event {
       /**
        * <pre>
        * retry attempt number for this task, ie., 2 for the second attempt
+       * need to copy
        * </pre>
        *
        * <code>uint32 retry_attempt = 3;</code>
