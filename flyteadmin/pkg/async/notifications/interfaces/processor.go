@@ -7,7 +7,7 @@ import (
 
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Exposes the common methods required for a subscriber.
