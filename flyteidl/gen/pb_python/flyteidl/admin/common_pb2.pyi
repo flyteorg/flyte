@@ -1,3 +1,4 @@
+from flyteidl.admin import notification_pb2 as _notification_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
@@ -164,6 +165,14 @@ class PagerDutyNotification(_message.Message):
     RECIPIENTS_EMAIL_FIELD_NUMBER: _ClassVar[int]
     recipients_email: _containers.RepeatedScalarFieldContainer[str]
     def __init__(self, recipients_email: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class WebhookNotification(_message.Message):
+    __slots__ = ["webhook_name", "message"]
+    WEBHOOK_NAME_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    webhook_name: str
+    message: _notification_pb2.WebhookMessage
+    def __init__(self, webhook_name: _Optional[str] = ..., message: _Optional[_Union[_notification_pb2.WebhookMessage, _Mapping]] = ...) -> None: ...
 
 class SlackNotification(_message.Message):
     __slots__ = ["recipients_email"]

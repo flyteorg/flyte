@@ -1225,6 +1225,85 @@ var _ interface {
 	ErrorName() string
 } = PagerDutyNotificationValidationError{}
 
+// Validate checks the field values on WebhookNotification with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *WebhookNotification) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for WebhookName
+
+	if v, ok := interface{}(m.GetMessage()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WebhookNotificationValidationError{
+				field:  "Message",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// WebhookNotificationValidationError is the validation error returned by
+// WebhookNotification.Validate if the designated constraints aren't met.
+type WebhookNotificationValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WebhookNotificationValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WebhookNotificationValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WebhookNotificationValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WebhookNotificationValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WebhookNotificationValidationError) ErrorName() string {
+	return "WebhookNotificationValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WebhookNotificationValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWebhookNotification.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WebhookNotificationValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WebhookNotificationValidationError{}
+
 // Validate checks the field values on SlackNotification with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.

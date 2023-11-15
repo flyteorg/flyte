@@ -27,6 +27,7 @@ message EmailMessage {
 }
 
 // Represents the content that will be sent to a webhook endpoint.
-message WebhookPayload {
-    string message = 1;
+message WebhookMessage {
+    // The content of webhook request.
+    string body = 1;
 }

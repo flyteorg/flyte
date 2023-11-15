@@ -22668,6 +22668,135 @@
                 return PagerDutyNotification;
             })();
     
+            admin.WebhookNotification = (function() {
+    
+                /**
+                 * Properties of a WebhookNotification.
+                 * @memberof flyteidl.admin
+                 * @interface IWebhookNotification
+                 * @property {string|null} [webhookName] WebhookNotification webhookName
+                 * @property {flyteidl.admin.IWebhookMessage|null} [message] WebhookNotification message
+                 */
+    
+                /**
+                 * Constructs a new WebhookNotification.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WebhookNotification.
+                 * @implements IWebhookNotification
+                 * @constructor
+                 * @param {flyteidl.admin.IWebhookNotification=} [properties] Properties to set
+                 */
+                function WebhookNotification(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WebhookNotification webhookName.
+                 * @member {string} webhookName
+                 * @memberof flyteidl.admin.WebhookNotification
+                 * @instance
+                 */
+                WebhookNotification.prototype.webhookName = "";
+    
+                /**
+                 * WebhookNotification message.
+                 * @member {flyteidl.admin.IWebhookMessage|null|undefined} message
+                 * @memberof flyteidl.admin.WebhookNotification
+                 * @instance
+                 */
+                WebhookNotification.prototype.message = null;
+    
+                /**
+                 * Creates a new WebhookNotification instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WebhookNotification
+                 * @static
+                 * @param {flyteidl.admin.IWebhookNotification=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WebhookNotification} WebhookNotification instance
+                 */
+                WebhookNotification.create = function create(properties) {
+                    return new WebhookNotification(properties);
+                };
+    
+                /**
+                 * Encodes the specified WebhookNotification message. Does not implicitly {@link flyteidl.admin.WebhookNotification.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WebhookNotification
+                 * @static
+                 * @param {flyteidl.admin.IWebhookNotification} message WebhookNotification message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WebhookNotification.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.webhookName != null && message.hasOwnProperty("webhookName"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.webhookName);
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        $root.flyteidl.admin.WebhookMessage.encode(message.message, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WebhookNotification message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WebhookNotification
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WebhookNotification} WebhookNotification
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WebhookNotification.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WebhookNotification();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.webhookName = reader.string();
+                            break;
+                        case 2:
+                            message.message = $root.flyteidl.admin.WebhookMessage.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WebhookNotification message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WebhookNotification
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WebhookNotification.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.webhookName != null && message.hasOwnProperty("webhookName"))
+                        if (!$util.isString(message.webhookName))
+                            return "webhookName: string expected";
+                    if (message.message != null && message.hasOwnProperty("message")) {
+                        var error = $root.flyteidl.admin.WebhookMessage.verify(message.message);
+                        if (error)
+                            return "message." + error;
+                    }
+                    return null;
+                };
+    
+                return WebhookNotification;
+            })();
+    
             admin.SlackNotification = (function() {
     
                 /**
@@ -23880,6 +24009,285 @@
                 };
     
                 return FlyteURLs;
+            })();
+    
+            admin.EmailMessage = (function() {
+    
+                /**
+                 * Properties of an EmailMessage.
+                 * @memberof flyteidl.admin
+                 * @interface IEmailMessage
+                 * @property {Array.<string>|null} [recipientsEmail] EmailMessage recipientsEmail
+                 * @property {string|null} [senderEmail] EmailMessage senderEmail
+                 * @property {string|null} [subjectLine] EmailMessage subjectLine
+                 * @property {string|null} [body] EmailMessage body
+                 */
+    
+                /**
+                 * Constructs a new EmailMessage.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an EmailMessage.
+                 * @implements IEmailMessage
+                 * @constructor
+                 * @param {flyteidl.admin.IEmailMessage=} [properties] Properties to set
+                 */
+                function EmailMessage(properties) {
+                    this.recipientsEmail = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * EmailMessage recipientsEmail.
+                 * @member {Array.<string>} recipientsEmail
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @instance
+                 */
+                EmailMessage.prototype.recipientsEmail = $util.emptyArray;
+    
+                /**
+                 * EmailMessage senderEmail.
+                 * @member {string} senderEmail
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @instance
+                 */
+                EmailMessage.prototype.senderEmail = "";
+    
+                /**
+                 * EmailMessage subjectLine.
+                 * @member {string} subjectLine
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @instance
+                 */
+                EmailMessage.prototype.subjectLine = "";
+    
+                /**
+                 * EmailMessage body.
+                 * @member {string} body
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @instance
+                 */
+                EmailMessage.prototype.body = "";
+    
+                /**
+                 * Creates a new EmailMessage instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @static
+                 * @param {flyteidl.admin.IEmailMessage=} [properties] Properties to set
+                 * @returns {flyteidl.admin.EmailMessage} EmailMessage instance
+                 */
+                EmailMessage.create = function create(properties) {
+                    return new EmailMessage(properties);
+                };
+    
+                /**
+                 * Encodes the specified EmailMessage message. Does not implicitly {@link flyteidl.admin.EmailMessage.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @static
+                 * @param {flyteidl.admin.IEmailMessage} message EmailMessage message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                EmailMessage.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.recipientsEmail != null && message.recipientsEmail.length)
+                        for (var i = 0; i < message.recipientsEmail.length; ++i)
+                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
+                    if (message.senderEmail != null && message.hasOwnProperty("senderEmail"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.senderEmail);
+                    if (message.subjectLine != null && message.hasOwnProperty("subjectLine"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.subjectLine);
+                    if (message.body != null && message.hasOwnProperty("body"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.body);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an EmailMessage message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.EmailMessage} EmailMessage
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                EmailMessage.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.EmailMessage();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.recipientsEmail && message.recipientsEmail.length))
+                                message.recipientsEmail = [];
+                            message.recipientsEmail.push(reader.string());
+                            break;
+                        case 2:
+                            message.senderEmail = reader.string();
+                            break;
+                        case 3:
+                            message.subjectLine = reader.string();
+                            break;
+                        case 4:
+                            message.body = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an EmailMessage message.
+                 * @function verify
+                 * @memberof flyteidl.admin.EmailMessage
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                EmailMessage.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.recipientsEmail != null && message.hasOwnProperty("recipientsEmail")) {
+                        if (!Array.isArray(message.recipientsEmail))
+                            return "recipientsEmail: array expected";
+                        for (var i = 0; i < message.recipientsEmail.length; ++i)
+                            if (!$util.isString(message.recipientsEmail[i]))
+                                return "recipientsEmail: string[] expected";
+                    }
+                    if (message.senderEmail != null && message.hasOwnProperty("senderEmail"))
+                        if (!$util.isString(message.senderEmail))
+                            return "senderEmail: string expected";
+                    if (message.subjectLine != null && message.hasOwnProperty("subjectLine"))
+                        if (!$util.isString(message.subjectLine))
+                            return "subjectLine: string expected";
+                    if (message.body != null && message.hasOwnProperty("body"))
+                        if (!$util.isString(message.body))
+                            return "body: string expected";
+                    return null;
+                };
+    
+                return EmailMessage;
+            })();
+    
+            admin.WebhookMessage = (function() {
+    
+                /**
+                 * Properties of a WebhookMessage.
+                 * @memberof flyteidl.admin
+                 * @interface IWebhookMessage
+                 * @property {string|null} [body] WebhookMessage body
+                 */
+    
+                /**
+                 * Constructs a new WebhookMessage.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WebhookMessage.
+                 * @implements IWebhookMessage
+                 * @constructor
+                 * @param {flyteidl.admin.IWebhookMessage=} [properties] Properties to set
+                 */
+                function WebhookMessage(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WebhookMessage body.
+                 * @member {string} body
+                 * @memberof flyteidl.admin.WebhookMessage
+                 * @instance
+                 */
+                WebhookMessage.prototype.body = "";
+    
+                /**
+                 * Creates a new WebhookMessage instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WebhookMessage
+                 * @static
+                 * @param {flyteidl.admin.IWebhookMessage=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WebhookMessage} WebhookMessage instance
+                 */
+                WebhookMessage.create = function create(properties) {
+                    return new WebhookMessage(properties);
+                };
+    
+                /**
+                 * Encodes the specified WebhookMessage message. Does not implicitly {@link flyteidl.admin.WebhookMessage.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WebhookMessage
+                 * @static
+                 * @param {flyteidl.admin.IWebhookMessage} message WebhookMessage message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WebhookMessage.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.body != null && message.hasOwnProperty("body"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.body);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WebhookMessage message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WebhookMessage
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WebhookMessage} WebhookMessage
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WebhookMessage.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WebhookMessage();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.body = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WebhookMessage message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WebhookMessage
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WebhookMessage.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.body != null && message.hasOwnProperty("body"))
+                        if (!$util.isString(message.body))
+                            return "body: string expected";
+                    return null;
+                };
+    
+                return WebhookMessage;
             })();
     
             admin.DescriptionEntity = (function() {
@@ -35902,175 +36310,6 @@
                 };
     
                 return NodeExecutionGetDataResponse;
-            })();
-    
-            admin.EmailMessage = (function() {
-    
-                /**
-                 * Properties of an EmailMessage.
-                 * @memberof flyteidl.admin
-                 * @interface IEmailMessage
-                 * @property {Array.<string>|null} [recipientsEmail] EmailMessage recipientsEmail
-                 * @property {string|null} [senderEmail] EmailMessage senderEmail
-                 * @property {string|null} [subjectLine] EmailMessage subjectLine
-                 * @property {string|null} [body] EmailMessage body
-                 */
-    
-                /**
-                 * Constructs a new EmailMessage.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents an EmailMessage.
-                 * @implements IEmailMessage
-                 * @constructor
-                 * @param {flyteidl.admin.IEmailMessage=} [properties] Properties to set
-                 */
-                function EmailMessage(properties) {
-                    this.recipientsEmail = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * EmailMessage recipientsEmail.
-                 * @member {Array.<string>} recipientsEmail
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @instance
-                 */
-                EmailMessage.prototype.recipientsEmail = $util.emptyArray;
-    
-                /**
-                 * EmailMessage senderEmail.
-                 * @member {string} senderEmail
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @instance
-                 */
-                EmailMessage.prototype.senderEmail = "";
-    
-                /**
-                 * EmailMessage subjectLine.
-                 * @member {string} subjectLine
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @instance
-                 */
-                EmailMessage.prototype.subjectLine = "";
-    
-                /**
-                 * EmailMessage body.
-                 * @member {string} body
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @instance
-                 */
-                EmailMessage.prototype.body = "";
-    
-                /**
-                 * Creates a new EmailMessage instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @static
-                 * @param {flyteidl.admin.IEmailMessage=} [properties] Properties to set
-                 * @returns {flyteidl.admin.EmailMessage} EmailMessage instance
-                 */
-                EmailMessage.create = function create(properties) {
-                    return new EmailMessage(properties);
-                };
-    
-                /**
-                 * Encodes the specified EmailMessage message. Does not implicitly {@link flyteidl.admin.EmailMessage.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @static
-                 * @param {flyteidl.admin.IEmailMessage} message EmailMessage message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                EmailMessage.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.recipientsEmail != null && message.recipientsEmail.length)
-                        for (var i = 0; i < message.recipientsEmail.length; ++i)
-                            writer.uint32(/* id 1, wireType 2 =*/10).string(message.recipientsEmail[i]);
-                    if (message.senderEmail != null && message.hasOwnProperty("senderEmail"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.senderEmail);
-                    if (message.subjectLine != null && message.hasOwnProperty("subjectLine"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.subjectLine);
-                    if (message.body != null && message.hasOwnProperty("body"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.body);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes an EmailMessage message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.EmailMessage} EmailMessage
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                EmailMessage.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.EmailMessage();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            if (!(message.recipientsEmail && message.recipientsEmail.length))
-                                message.recipientsEmail = [];
-                            message.recipientsEmail.push(reader.string());
-                            break;
-                        case 2:
-                            message.senderEmail = reader.string();
-                            break;
-                        case 3:
-                            message.subjectLine = reader.string();
-                            break;
-                        case 4:
-                            message.body = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies an EmailMessage message.
-                 * @function verify
-                 * @memberof flyteidl.admin.EmailMessage
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                EmailMessage.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.recipientsEmail != null && message.hasOwnProperty("recipientsEmail")) {
-                        if (!Array.isArray(message.recipientsEmail))
-                            return "recipientsEmail: array expected";
-                        for (var i = 0; i < message.recipientsEmail.length; ++i)
-                            if (!$util.isString(message.recipientsEmail[i]))
-                                return "recipientsEmail: string[] expected";
-                    }
-                    if (message.senderEmail != null && message.hasOwnProperty("senderEmail"))
-                        if (!$util.isString(message.senderEmail))
-                            return "senderEmail: string expected";
-                    if (message.subjectLine != null && message.hasOwnProperty("subjectLine"))
-                        if (!$util.isString(message.subjectLine))
-                            return "subjectLine: string expected";
-                    if (message.body != null && message.hasOwnProperty("body"))
-                        if (!$util.isString(message.body))
-                            return "body: string expected";
-                    return null;
-                };
-    
-                return EmailMessage;
             })();
     
             admin.Domain = (function() {

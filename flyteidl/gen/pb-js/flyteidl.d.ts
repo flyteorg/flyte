@@ -9345,6 +9345,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a WebhookNotification. */
+        interface IWebhookNotification {
+
+            /** WebhookNotification webhookName */
+            webhookName?: (string|null);
+
+            /** WebhookNotification message */
+            message?: (flyteidl.admin.IWebhookMessage|null);
+        }
+
+        /** Represents a WebhookNotification. */
+        class WebhookNotification implements IWebhookNotification {
+
+            /**
+             * Constructs a new WebhookNotification.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWebhookNotification);
+
+            /** WebhookNotification webhookName. */
+            public webhookName: string;
+
+            /** WebhookNotification message. */
+            public message?: (flyteidl.admin.IWebhookMessage|null);
+
+            /**
+             * Creates a new WebhookNotification instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WebhookNotification instance
+             */
+            public static create(properties?: flyteidl.admin.IWebhookNotification): flyteidl.admin.WebhookNotification;
+
+            /**
+             * Encodes the specified WebhookNotification message. Does not implicitly {@link flyteidl.admin.WebhookNotification.verify|verify} messages.
+             * @param message WebhookNotification message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWebhookNotification, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WebhookNotification message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WebhookNotification
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WebhookNotification;
+
+            /**
+             * Verifies a WebhookNotification message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a SlackNotification. */
         interface ISlackNotification {
 
@@ -9852,6 +9910,128 @@ export namespace flyteidl {
 
             /**
              * Verifies a FlyteURLs message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an EmailMessage. */
+        interface IEmailMessage {
+
+            /** EmailMessage recipientsEmail */
+            recipientsEmail?: (string[]|null);
+
+            /** EmailMessage senderEmail */
+            senderEmail?: (string|null);
+
+            /** EmailMessage subjectLine */
+            subjectLine?: (string|null);
+
+            /** EmailMessage body */
+            body?: (string|null);
+        }
+
+        /** Represents an EmailMessage. */
+        class EmailMessage implements IEmailMessage {
+
+            /**
+             * Constructs a new EmailMessage.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IEmailMessage);
+
+            /** EmailMessage recipientsEmail. */
+            public recipientsEmail: string[];
+
+            /** EmailMessage senderEmail. */
+            public senderEmail: string;
+
+            /** EmailMessage subjectLine. */
+            public subjectLine: string;
+
+            /** EmailMessage body. */
+            public body: string;
+
+            /**
+             * Creates a new EmailMessage instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EmailMessage instance
+             */
+            public static create(properties?: flyteidl.admin.IEmailMessage): flyteidl.admin.EmailMessage;
+
+            /**
+             * Encodes the specified EmailMessage message. Does not implicitly {@link flyteidl.admin.EmailMessage.verify|verify} messages.
+             * @param message EmailMessage message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IEmailMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EmailMessage message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EmailMessage
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.EmailMessage;
+
+            /**
+             * Verifies an EmailMessage message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WebhookMessage. */
+        interface IWebhookMessage {
+
+            /** WebhookMessage body */
+            body?: (string|null);
+        }
+
+        /** Represents a WebhookMessage. */
+        class WebhookMessage implements IWebhookMessage {
+
+            /**
+             * Constructs a new WebhookMessage.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWebhookMessage);
+
+            /** WebhookMessage body. */
+            public body: string;
+
+            /**
+             * Creates a new WebhookMessage instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WebhookMessage instance
+             */
+            public static create(properties?: flyteidl.admin.IWebhookMessage): flyteidl.admin.WebhookMessage;
+
+            /**
+             * Encodes the specified WebhookMessage message. Does not implicitly {@link flyteidl.admin.WebhookMessage.verify|verify} messages.
+             * @param message WebhookMessage message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWebhookMessage, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WebhookMessage message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WebhookMessage
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WebhookMessage;
+
+            /**
+             * Verifies a WebhookMessage message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -14876,76 +15056,6 @@ export namespace flyteidl {
 
             /**
              * Verifies a NodeExecutionGetDataResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an EmailMessage. */
-        interface IEmailMessage {
-
-            /** EmailMessage recipientsEmail */
-            recipientsEmail?: (string[]|null);
-
-            /** EmailMessage senderEmail */
-            senderEmail?: (string|null);
-
-            /** EmailMessage subjectLine */
-            subjectLine?: (string|null);
-
-            /** EmailMessage body */
-            body?: (string|null);
-        }
-
-        /** Represents an EmailMessage. */
-        class EmailMessage implements IEmailMessage {
-
-            /**
-             * Constructs a new EmailMessage.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IEmailMessage);
-
-            /** EmailMessage recipientsEmail. */
-            public recipientsEmail: string[];
-
-            /** EmailMessage senderEmail. */
-            public senderEmail: string;
-
-            /** EmailMessage subjectLine. */
-            public subjectLine: string;
-
-            /** EmailMessage body. */
-            public body: string;
-
-            /**
-             * Creates a new EmailMessage instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns EmailMessage instance
-             */
-            public static create(properties?: flyteidl.admin.IEmailMessage): flyteidl.admin.EmailMessage;
-
-            /**
-             * Encodes the specified EmailMessage message. Does not implicitly {@link flyteidl.admin.EmailMessage.verify|verify} messages.
-             * @param message EmailMessage message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IEmailMessage, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an EmailMessage message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns EmailMessage
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.EmailMessage;
-
-            /**
-             * Verifies an EmailMessage message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

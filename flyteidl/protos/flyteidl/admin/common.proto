@@ -3,6 +3,7 @@ syntax = "proto3";
 package flyteidl.admin;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
+import "flyteidl/admin/notification.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/literals.proto";
@@ -227,6 +228,16 @@ message PagerDutyNotification {
     // Currently, PagerDuty notifications leverage email to trigger a notification.
     // +required
     repeated string recipients_email = 1;
+}
+
+// Defines a webhook notification specification.
+message WebhookNotification {
+    // +required
+    // The webhook that is already registered to the flyteadmin.
+    string webhook_name = 1;
+    // The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+    // +optional
+    WebhookMessage message = 2;
 }
 
 // Defines a slack notification specification.

@@ -141,6 +141,38 @@ pub struct ClusterAssignment {
     #[prost(string, tag="3")]
     pub cluster_pool_name: ::prost::alloc::string::String,
 }
+/// Represents the Email object that is sent to a publisher/subscriber
+/// to forward the notification.
+/// Note: This is internal to Admin and doesn't need to be exposed to other components.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EmailMessage {
+    /// The list of email addresses to receive an email with the content populated in the other fields.
+    /// Currently, each email recipient will receive its own email.
+    /// This populates the TO field.
+    #[prost(string, repeated, tag="1")]
+    pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The email of the sender.
+    /// This populates the FROM field.
+    #[prost(string, tag="2")]
+    pub sender_email: ::prost::alloc::string::String,
+    /// The content of the subject line.
+    /// This populates the SUBJECT field.
+    #[prost(string, tag="3")]
+    pub subject_line: ::prost::alloc::string::String,
+    /// The content of the email body.
+    /// This populates the BODY field.
+    #[prost(string, tag="4")]
+    pub body: ::prost::alloc::string::String,
+}
+/// Represents the content that will be sent to a webhook endpoint.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WebhookMessage {
+    /// The content of webhook request.
+    #[prost(string, tag="1")]
+    pub body: ::prost::alloc::string::String,
+}
 /// Encapsulation of fields that identifies a Flyte resource.
 /// A Flyte resource can be a task, workflow or launch plan.
 /// A resource can internally have multiple versions and is uniquely identified
@@ -408,6 +440,19 @@ pub struct PagerDutyNotification {
     /// +required
     #[prost(string, repeated, tag="1")]
     pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+/// Defines a webhook notification specification.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WebhookNotification {
+    /// +required
+    /// The webhook that is already registered to the flyteadmin.
+    #[prost(string, tag="1")]
+    pub webhook_name: ::prost::alloc::string::String,
+    /// The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+    /// +optional
+    #[prost(message, optional, tag="2")]
+    pub message: ::core::option::Option<WebhookMessage>,
 }
 /// Defines a slack notification specification.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2127,30 +2172,6 @@ pub struct NodeExecutionGetDataResponse {
     pub dynamic_workflow: ::core::option::Option<DynamicWorkflowNodeMetadata>,
     #[prost(message, optional, tag="17")]
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
-}
-/// Represents the Email object that is sent to a publisher/subscriber
-/// to forward the notification.
-/// Note: This is internal to Admin and doesn't need to be exposed to other components.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EmailMessage {
-    /// The list of email addresses to receive an email with the content populated in the other fields.
-    /// Currently, each email recipient will receive its own email.
-    /// This populates the TO field.
-    #[prost(string, repeated, tag="1")]
-    pub recipients_email: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// The email of the sender.
-    /// This populates the FROM field.
-    #[prost(string, tag="2")]
-    pub sender_email: ::prost::alloc::string::String,
-    /// The content of the subject line.
-    /// This populates the SUBJECT field.
-    #[prost(string, tag="3")]
-    pub subject_line: ::prost::alloc::string::String,
-    /// The content of the email body.
-    /// This populates the BODY field.
-    #[prost(string, tag="4")]
-    pub body: ::prost::alloc::string::String,
 }
 /// Namespace within a project commonly used to differentiate between different service instances.
 /// e.g. "production", "development", etc.

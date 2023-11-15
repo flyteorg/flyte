@@ -41,7 +41,7 @@ struct TableStruct_flyteidl_2fadmin_2fnotification_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[1]
+  static const ::google::protobuf::internal::ParseTable schema[2]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -53,11 +53,15 @@ namespace admin {
 class EmailMessage;
 class EmailMessageDefaultTypeInternal;
 extern EmailMessageDefaultTypeInternal _EmailMessage_default_instance_;
+class WebhookMessage;
+class WebhookMessageDefaultTypeInternal;
+extern WebhookMessageDefaultTypeInternal _WebhookMessage_default_instance_;
 }  // namespace admin
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::admin::EmailMessage* Arena::CreateMaybeMessage<::flyteidl::admin::EmailMessage>(Arena*);
+template<> ::flyteidl::admin::WebhookMessage* Arena::CreateMaybeMessage<::flyteidl::admin::WebhookMessage>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -232,6 +236,126 @@ class EmailMessage final :
   ::google::protobuf::RepeatedPtrField<::std::string> recipients_email_;
   ::google::protobuf::internal::ArenaStringPtr sender_email_;
   ::google::protobuf::internal::ArenaStringPtr subject_line_;
+  ::google::protobuf::internal::ArenaStringPtr body_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fnotification_2eproto;
+};
+// -------------------------------------------------------------------
+
+class WebhookMessage final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.WebhookMessage) */ {
+ public:
+  WebhookMessage();
+  virtual ~WebhookMessage();
+
+  WebhookMessage(const WebhookMessage& from);
+
+  inline WebhookMessage& operator=(const WebhookMessage& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  WebhookMessage(WebhookMessage&& from) noexcept
+    : WebhookMessage() {
+    *this = ::std::move(from);
+  }
+
+  inline WebhookMessage& operator=(WebhookMessage&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const WebhookMessage& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const WebhookMessage* internal_default_instance() {
+    return reinterpret_cast<const WebhookMessage*>(
+               &_WebhookMessage_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  void Swap(WebhookMessage* other);
+  friend void swap(WebhookMessage& a, WebhookMessage& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline WebhookMessage* New() const final {
+    return CreateMaybeMessage<WebhookMessage>(nullptr);
+  }
+
+  WebhookMessage* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<WebhookMessage>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const WebhookMessage& from);
+  void MergeFrom(const WebhookMessage& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WebhookMessage* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string body = 1;
+  void clear_body();
+  static const int kBodyFieldNumber = 1;
+  const ::std::string& body() const;
+  void set_body(const ::std::string& value);
+  #if LANG_CXX11
+  void set_body(::std::string&& value);
+  #endif
+  void set_body(const char* value);
+  void set_body(const char* value, size_t size);
+  ::std::string* mutable_body();
+  ::std::string* release_body();
+  void set_allocated_body(::std::string* body);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.WebhookMessage)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr body_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fnotification_2eproto;
@@ -475,9 +599,68 @@ inline void EmailMessage::set_allocated_body(::std::string* body) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.EmailMessage.body)
 }
 
+// -------------------------------------------------------------------
+
+// WebhookMessage
+
+// string body = 1;
+inline void WebhookMessage::clear_body() {
+  body_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& WebhookMessage::body() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WebhookMessage.body)
+  return body_.GetNoArena();
+}
+inline void WebhookMessage::set_body(const ::std::string& value) {
+  
+  body_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.WebhookMessage.body)
+}
+#if LANG_CXX11
+inline void WebhookMessage::set_body(::std::string&& value) {
+  
+  body_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.WebhookMessage.body)
+}
+#endif
+inline void WebhookMessage::set_body(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  body_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.WebhookMessage.body)
+}
+inline void WebhookMessage::set_body(const char* value, size_t size) {
+  
+  body_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.WebhookMessage.body)
+}
+inline ::std::string* WebhookMessage::mutable_body() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WebhookMessage.body)
+  return body_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* WebhookMessage::release_body() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WebhookMessage.body)
+  
+  return body_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void WebhookMessage::set_allocated_body(::std::string* body) {
+  if (body != nullptr) {
+    
+  } else {
+    
+  }
+  body_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), body);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WebhookMessage.body)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

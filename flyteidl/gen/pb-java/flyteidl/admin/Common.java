@@ -14890,6 +14890,877 @@ public final class Common {
 
   }
 
+  public interface WebhookNotificationOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.WebhookNotification)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * +required
+     * The webhook that is already registered to the flyteadmin.
+     * </pre>
+     *
+     * <code>string webhook_name = 1;</code>
+     */
+    java.lang.String getWebhookName();
+    /**
+     * <pre>
+     * +required
+     * The webhook that is already registered to the flyteadmin.
+     * </pre>
+     *
+     * <code>string webhook_name = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getWebhookNameBytes();
+
+    /**
+     * <pre>
+     * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+     */
+    boolean hasMessage();
+    /**
+     * <pre>
+     * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+     */
+    flyteidl.admin.Notification.WebhookMessage getMessage();
+    /**
+     * <pre>
+     * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+     */
+    flyteidl.admin.Notification.WebhookMessageOrBuilder getMessageOrBuilder();
+  }
+  /**
+   * <pre>
+   * Defines a webhook notification specification.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.WebhookNotification}
+   */
+  public  static final class WebhookNotification extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.WebhookNotification)
+      WebhookNotificationOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use WebhookNotification.newBuilder() to construct.
+    private WebhookNotification(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private WebhookNotification() {
+      webhookName_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private WebhookNotification(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              webhookName_ = s;
+              break;
+            }
+            case 18: {
+              flyteidl.admin.Notification.WebhookMessage.Builder subBuilder = null;
+              if (message_ != null) {
+                subBuilder = message_.toBuilder();
+              }
+              message_ = input.readMessage(flyteidl.admin.Notification.WebhookMessage.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(message_);
+                message_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_WebhookNotification_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_WebhookNotification_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.Common.WebhookNotification.class, flyteidl.admin.Common.WebhookNotification.Builder.class);
+    }
+
+    public static final int WEBHOOK_NAME_FIELD_NUMBER = 1;
+    private volatile java.lang.Object webhookName_;
+    /**
+     * <pre>
+     * +required
+     * The webhook that is already registered to the flyteadmin.
+     * </pre>
+     *
+     * <code>string webhook_name = 1;</code>
+     */
+    public java.lang.String getWebhookName() {
+      java.lang.Object ref = webhookName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        webhookName_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * +required
+     * The webhook that is already registered to the flyteadmin.
+     * </pre>
+     *
+     * <code>string webhook_name = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getWebhookNameBytes() {
+      java.lang.Object ref = webhookName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        webhookName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 2;
+    private flyteidl.admin.Notification.WebhookMessage message_;
+    /**
+     * <pre>
+     * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+     */
+    public boolean hasMessage() {
+      return message_ != null;
+    }
+    /**
+     * <pre>
+     * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+     */
+    public flyteidl.admin.Notification.WebhookMessage getMessage() {
+      return message_ == null ? flyteidl.admin.Notification.WebhookMessage.getDefaultInstance() : message_;
+    }
+    /**
+     * <pre>
+     * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+     * +optional
+     * </pre>
+     *
+     * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+     */
+    public flyteidl.admin.Notification.WebhookMessageOrBuilder getMessageOrBuilder() {
+      return getMessage();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getWebhookNameBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, webhookName_);
+      }
+      if (message_ != null) {
+        output.writeMessage(2, getMessage());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getWebhookNameBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, webhookName_);
+      }
+      if (message_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getMessage());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.Common.WebhookNotification)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.Common.WebhookNotification other = (flyteidl.admin.Common.WebhookNotification) obj;
+
+      if (!getWebhookName()
+          .equals(other.getWebhookName())) return false;
+      if (hasMessage() != other.hasMessage()) return false;
+      if (hasMessage()) {
+        if (!getMessage()
+            .equals(other.getMessage())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + WEBHOOK_NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getWebhookName().hashCode();
+      if (hasMessage()) {
+        hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+        hash = (53 * hash) + getMessage().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.WebhookNotification parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.Common.WebhookNotification prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Defines a webhook notification specification.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.WebhookNotification}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.WebhookNotification)
+        flyteidl.admin.Common.WebhookNotificationOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_WebhookNotification_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_WebhookNotification_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.Common.WebhookNotification.class, flyteidl.admin.Common.WebhookNotification.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.Common.WebhookNotification.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        webhookName_ = "";
+
+        if (messageBuilder_ == null) {
+          message_ = null;
+        } else {
+          message_ = null;
+          messageBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_WebhookNotification_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.WebhookNotification getDefaultInstanceForType() {
+        return flyteidl.admin.Common.WebhookNotification.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.WebhookNotification build() {
+        flyteidl.admin.Common.WebhookNotification result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.WebhookNotification buildPartial() {
+        flyteidl.admin.Common.WebhookNotification result = new flyteidl.admin.Common.WebhookNotification(this);
+        result.webhookName_ = webhookName_;
+        if (messageBuilder_ == null) {
+          result.message_ = message_;
+        } else {
+          result.message_ = messageBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.Common.WebhookNotification) {
+          return mergeFrom((flyteidl.admin.Common.WebhookNotification)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.Common.WebhookNotification other) {
+        if (other == flyteidl.admin.Common.WebhookNotification.getDefaultInstance()) return this;
+        if (!other.getWebhookName().isEmpty()) {
+          webhookName_ = other.webhookName_;
+          onChanged();
+        }
+        if (other.hasMessage()) {
+          mergeMessage(other.getMessage());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.Common.WebhookNotification parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.Common.WebhookNotification) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object webhookName_ = "";
+      /**
+       * <pre>
+       * +required
+       * The webhook that is already registered to the flyteadmin.
+       * </pre>
+       *
+       * <code>string webhook_name = 1;</code>
+       */
+      public java.lang.String getWebhookName() {
+        java.lang.Object ref = webhookName_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          webhookName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * +required
+       * The webhook that is already registered to the flyteadmin.
+       * </pre>
+       *
+       * <code>string webhook_name = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getWebhookNameBytes() {
+        java.lang.Object ref = webhookName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          webhookName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * +required
+       * The webhook that is already registered to the flyteadmin.
+       * </pre>
+       *
+       * <code>string webhook_name = 1;</code>
+       */
+      public Builder setWebhookName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        webhookName_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * +required
+       * The webhook that is already registered to the flyteadmin.
+       * </pre>
+       *
+       * <code>string webhook_name = 1;</code>
+       */
+      public Builder clearWebhookName() {
+        
+        webhookName_ = getDefaultInstance().getWebhookName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * +required
+       * The webhook that is already registered to the flyteadmin.
+       * </pre>
+       *
+       * <code>string webhook_name = 1;</code>
+       */
+      public Builder setWebhookNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        webhookName_ = value;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.admin.Notification.WebhookMessage message_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Notification.WebhookMessage, flyteidl.admin.Notification.WebhookMessage.Builder, flyteidl.admin.Notification.WebhookMessageOrBuilder> messageBuilder_;
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public boolean hasMessage() {
+        return messageBuilder_ != null || message_ != null;
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public flyteidl.admin.Notification.WebhookMessage getMessage() {
+        if (messageBuilder_ == null) {
+          return message_ == null ? flyteidl.admin.Notification.WebhookMessage.getDefaultInstance() : message_;
+        } else {
+          return messageBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public Builder setMessage(flyteidl.admin.Notification.WebhookMessage value) {
+        if (messageBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          message_ = value;
+          onChanged();
+        } else {
+          messageBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public Builder setMessage(
+          flyteidl.admin.Notification.WebhookMessage.Builder builderForValue) {
+        if (messageBuilder_ == null) {
+          message_ = builderForValue.build();
+          onChanged();
+        } else {
+          messageBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public Builder mergeMessage(flyteidl.admin.Notification.WebhookMessage value) {
+        if (messageBuilder_ == null) {
+          if (message_ != null) {
+            message_ =
+              flyteidl.admin.Notification.WebhookMessage.newBuilder(message_).mergeFrom(value).buildPartial();
+          } else {
+            message_ = value;
+          }
+          onChanged();
+        } else {
+          messageBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public Builder clearMessage() {
+        if (messageBuilder_ == null) {
+          message_ = null;
+          onChanged();
+        } else {
+          message_ = null;
+          messageBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public flyteidl.admin.Notification.WebhookMessage.Builder getMessageBuilder() {
+        
+        onChanged();
+        return getMessageFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      public flyteidl.admin.Notification.WebhookMessageOrBuilder getMessageOrBuilder() {
+        if (messageBuilder_ != null) {
+          return messageBuilder_.getMessageOrBuilder();
+        } else {
+          return message_ == null ?
+              flyteidl.admin.Notification.WebhookMessage.getDefaultInstance() : message_;
+        }
+      }
+      /**
+       * <pre>
+       * The message to send to the webhook. if not specified, use default payload defined in flyteadmin.
+       * +optional
+       * </pre>
+       *
+       * <code>.flyteidl.admin.WebhookMessage message = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Notification.WebhookMessage, flyteidl.admin.Notification.WebhookMessage.Builder, flyteidl.admin.Notification.WebhookMessageOrBuilder> 
+          getMessageFieldBuilder() {
+        if (messageBuilder_ == null) {
+          messageBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Notification.WebhookMessage, flyteidl.admin.Notification.WebhookMessage.Builder, flyteidl.admin.Notification.WebhookMessageOrBuilder>(
+                  getMessage(),
+                  getParentForChildren(),
+                  isClean());
+          message_ = null;
+        }
+        return messageBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.WebhookNotification)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.WebhookNotification)
+    private static final flyteidl.admin.Common.WebhookNotification DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.Common.WebhookNotification();
+    }
+
+    public static flyteidl.admin.Common.WebhookNotification getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<WebhookNotification>
+        PARSER = new com.google.protobuf.AbstractParser<WebhookNotification>() {
+      @java.lang.Override
+      public WebhookNotification parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new WebhookNotification(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<WebhookNotification> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WebhookNotification> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.Common.WebhookNotification getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface SlackNotificationOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.SlackNotification)
       com.google.protobuf.MessageOrBuilder {
@@ -22555,6 +23426,11 @@ public final class Common {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_PagerDutyNotification_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_WebhookNotification_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_WebhookNotification_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_SlackNotification_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -22619,76 +23495,79 @@ public final class Common {
   static {
     java.lang.String[] descriptorData = {
       "\n\033flyteidl/admin/common.proto\022\016flyteidl." +
-      "admin\032\035flyteidl/core/execution.proto\032\036fl" +
-      "yteidl/core/identifier.proto\032\034flyteidl/c" +
-      "ore/literals.proto\032\037google/protobuf/time" +
-      "stamp.proto\"F\n\025NamedEntityIdentifier\022\017\n\007" +
-      "project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 " +
-      "\001(\t\"[\n\023NamedEntityMetadata\022\023\n\013descriptio" +
-      "n\030\001 \001(\t\022/\n\005state\030\002 \001(\0162 .flyteidl.admin." +
-      "NamedEntityState\"\253\001\n\013NamedEntity\0222\n\rreso" +
-      "urce_type\030\001 \001(\0162\033.flyteidl.core.Resource" +
-      "Type\0221\n\002id\030\002 \001(\0132%.flyteidl.admin.NamedE" +
-      "ntityIdentifier\0225\n\010metadata\030\003 \001(\0132#.flyt" +
-      "eidl.admin.NamedEntityMetadata\"r\n\004Sort\022\013" +
-      "\n\003key\030\001 \001(\t\0221\n\tdirection\030\002 \001(\0162\036.flyteid" +
-      "l.admin.Sort.Direction\"*\n\tDirection\022\016\n\nD" +
-      "ESCENDING\020\000\022\r\n\tASCENDING\020\001\"\231\001\n NamedEnti" +
-      "tyIdentifierListRequest\022\017\n\007project\030\001 \001(\t" +
-      "\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token" +
-      "\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin" +
-      ".Sort\022\017\n\007filters\030\006 \001(\t\"\303\001\n\026NamedEntityLi" +
-      "stRequest\0222\n\rresource_type\030\001 \001(\0162\033.flyte" +
-      "idl.core.ResourceType\022\017\n\007project\030\002 \001(\t\022\016" +
-      "\n\006domain\030\003 \001(\t\022\r\n\005limit\030\004 \001(\r\022\r\n\005token\030\005" +
-      " \001(\t\022%\n\007sort_by\030\006 \001(\0132\024.flyteidl.admin.S" +
-      "ort\022\017\n\007filters\030\007 \001(\t\"c\n\031NamedEntityIdent" +
-      "ifierList\0227\n\010entities\030\001 \003(\0132%.flyteidl.a" +
-      "dmin.NamedEntityIdentifier\022\r\n\005token\030\002 \001(" +
-      "\t\"O\n\017NamedEntityList\022-\n\010entities\030\001 \003(\0132\033" +
-      ".flyteidl.admin.NamedEntity\022\r\n\005token\030\002 \001" +
-      "(\t\"~\n\025NamedEntityGetRequest\0222\n\rresource_" +
+      "admin\032!flyteidl/admin/notification.proto" +
+      "\032\035flyteidl/core/execution.proto\032\036flyteid" +
+      "l/core/identifier.proto\032\034flyteidl/core/l" +
+      "iterals.proto\032\037google/protobuf/timestamp" +
+      ".proto\"F\n\025NamedEntityIdentifier\022\017\n\007proje" +
+      "ct\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\"[" +
+      "\n\023NamedEntityMetadata\022\023\n\013description\030\001 \001" +
+      "(\t\022/\n\005state\030\002 \001(\0162 .flyteidl.admin.Named" +
+      "EntityState\"\253\001\n\013NamedEntity\0222\n\rresource_" +
       "type\030\001 \001(\0162\033.flyteidl.core.ResourceType\022" +
       "1\n\002id\030\002 \001(\0132%.flyteidl.admin.NamedEntity" +
-      "Identifier\"\270\001\n\030NamedEntityUpdateRequest\022" +
-      "2\n\rresource_type\030\001 \001(\0162\033.flyteidl.core.R" +
-      "esourceType\0221\n\002id\030\002 \001(\0132%.flyteidl.admin" +
-      ".NamedEntityIdentifier\0225\n\010metadata\030\003 \001(\013" +
-      "2#.flyteidl.admin.NamedEntityMetadata\"\033\n" +
-      "\031NamedEntityUpdateResponse\"9\n\020ObjectGetR" +
-      "equest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Ident" +
-      "ifier\"\236\001\n\023ResourceListRequest\0221\n\002id\030\001 \001(" +
-      "\0132%.flyteidl.admin.NamedEntityIdentifier" +
-      "\022\r\n\005limit\030\002 \001(\r\022\r\n\005token\030\003 \001(\t\022\017\n\007filter" +
-      "s\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admi" +
-      "n.Sort\"-\n\021EmailNotification\022\030\n\020recipient" +
-      "s_email\030\001 \003(\t\"1\n\025PagerDutyNotification\022\030" +
-      "\n\020recipients_email\030\001 \003(\t\"-\n\021SlackNotific" +
-      "ation\022\030\n\020recipients_email\030\001 \003(\t\"\363\001\n\014Noti" +
-      "fication\0226\n\006phases\030\001 \003(\0162&.flyteidl.core" +
-      ".WorkflowExecution.Phase\0222\n\005email\030\002 \001(\0132" +
-      "!.flyteidl.admin.EmailNotificationH\000\022;\n\n" +
-      "pager_duty\030\003 \001(\0132%.flyteidl.admin.PagerD" +
-      "utyNotificationH\000\0222\n\005slack\030\004 \001(\0132!.flyte" +
-      "idl.admin.SlackNotificationH\000B\006\n\004type\")\n" +
-      "\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r\n\005bytes\030\002 \001(\003:\002\030\001" +
-      "\"k\n\006Labels\0222\n\006values\030\001 \003(\0132\".flyteidl.ad" +
-      "min.Labels.ValuesEntry\032-\n\013ValuesEntry\022\013\n" +
-      "\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"u\n\013Annotat" +
-      "ions\0227\n\006values\030\001 \003(\0132\'.flyteidl.admin.An" +
-      "notations.ValuesEntry\032-\n\013ValuesEntry\022\013\n\003" +
-      "key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"3\n\004Envs\022+\n\006" +
-      "values\030\001 \003(\0132\033.flyteidl.core.KeyValuePai" +
-      "r\"N\n\010AuthRole\022\032\n\022assumable_iam_role\030\001 \001(" +
-      "\t\022\"\n\032kubernetes_service_account\030\002 \001(\t:\002\030" +
-      "\001\"5\n\023RawOutputDataConfig\022\036\n\026output_locat" +
-      "ion_prefix\030\001 \001(\t\":\n\tFlyteURLs\022\016\n\006inputs\030" +
-      "\001 \001(\t\022\017\n\007outputs\030\002 \001(\t\022\014\n\004deck\030\003 \001(\t*\\\n\020" +
-      "NamedEntityState\022\027\n\023NAMED_ENTITY_ACTIVE\020" +
-      "\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001\022\024\n\020SYSTEM_G" +
-      "ENERATED\020\002B=Z;github.com/flyteorg/flyte/" +
-      "flyteidl/gen/pb-go/flyteidl/adminb\006proto" +
-      "3"
+      "Identifier\0225\n\010metadata\030\003 \001(\0132#.flyteidl." +
+      "admin.NamedEntityMetadata\"r\n\004Sort\022\013\n\003key" +
+      "\030\001 \001(\t\0221\n\tdirection\030\002 \001(\0162\036.flyteidl.adm" +
+      "in.Sort.Direction\"*\n\tDirection\022\016\n\nDESCEN" +
+      "DING\020\000\022\r\n\tASCENDING\020\001\"\231\001\n NamedEntityIde" +
+      "ntifierListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006d" +
+      "omain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(" +
+      "\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort" +
+      "\022\017\n\007filters\030\006 \001(\t\"\303\001\n\026NamedEntityListReq" +
+      "uest\0222\n\rresource_type\030\001 \001(\0162\033.flyteidl.c" +
+      "ore.ResourceType\022\017\n\007project\030\002 \001(\t\022\016\n\006dom" +
+      "ain\030\003 \001(\t\022\r\n\005limit\030\004 \001(\r\022\r\n\005token\030\005 \001(\t\022" +
+      "%\n\007sort_by\030\006 \001(\0132\024.flyteidl.admin.Sort\022\017" +
+      "\n\007filters\030\007 \001(\t\"c\n\031NamedEntityIdentifier" +
+      "List\0227\n\010entities\030\001 \003(\0132%.flyteidl.admin." +
+      "NamedEntityIdentifier\022\r\n\005token\030\002 \001(\t\"O\n\017" +
+      "NamedEntityList\022-\n\010entities\030\001 \003(\0132\033.flyt" +
+      "eidl.admin.NamedEntity\022\r\n\005token\030\002 \001(\t\"~\n" +
+      "\025NamedEntityGetRequest\0222\n\rresource_type\030" +
+      "\001 \001(\0162\033.flyteidl.core.ResourceType\0221\n\002id" +
+      "\030\002 \001(\0132%.flyteidl.admin.NamedEntityIdent" +
+      "ifier\"\270\001\n\030NamedEntityUpdateRequest\0222\n\rre" +
+      "source_type\030\001 \001(\0162\033.flyteidl.core.Resour" +
+      "ceType\0221\n\002id\030\002 \001(\0132%.flyteidl.admin.Name" +
+      "dEntityIdentifier\0225\n\010metadata\030\003 \001(\0132#.fl" +
+      "yteidl.admin.NamedEntityMetadata\"\033\n\031Name" +
+      "dEntityUpdateResponse\"9\n\020ObjectGetReques" +
+      "t\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
+      "\"\236\001\n\023ResourceListRequest\0221\n\002id\030\001 \001(\0132%.f" +
+      "lyteidl.admin.NamedEntityIdentifier\022\r\n\005l" +
+      "imit\030\002 \001(\r\022\r\n\005token\030\003 \001(\t\022\017\n\007filters\030\004 \001" +
+      "(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sor" +
+      "t\"-\n\021EmailNotification\022\030\n\020recipients_ema" +
+      "il\030\001 \003(\t\"1\n\025PagerDutyNotification\022\030\n\020rec" +
+      "ipients_email\030\001 \003(\t\"\\\n\023WebhookNotificati" +
+      "on\022\024\n\014webhook_name\030\001 \001(\t\022/\n\007message\030\002 \001(" +
+      "\0132\036.flyteidl.admin.WebhookMessage\"-\n\021Sla" +
+      "ckNotification\022\030\n\020recipients_email\030\001 \003(\t" +
+      "\"\363\001\n\014Notification\0226\n\006phases\030\001 \003(\0162&.flyt" +
+      "eidl.core.WorkflowExecution.Phase\0222\n\005ema" +
+      "il\030\002 \001(\0132!.flyteidl.admin.EmailNotificat" +
+      "ionH\000\022;\n\npager_duty\030\003 \001(\0132%.flyteidl.adm" +
+      "in.PagerDutyNotificationH\000\0222\n\005slack\030\004 \001(" +
+      "\0132!.flyteidl.admin.SlackNotificationH\000B\006" +
+      "\n\004type\")\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r\n\005bytes\030" +
+      "\002 \001(\003:\002\030\001\"k\n\006Labels\0222\n\006values\030\001 \003(\0132\".fl" +
+      "yteidl.admin.Labels.ValuesEntry\032-\n\013Value" +
+      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"u" +
+      "\n\013Annotations\0227\n\006values\030\001 \003(\0132\'.flyteidl" +
+      ".admin.Annotations.ValuesEntry\032-\n\013Values" +
+      "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"3\n" +
+      "\004Envs\022+\n\006values\030\001 \003(\0132\033.flyteidl.core.Ke" +
+      "yValuePair\"N\n\010AuthRole\022\032\n\022assumable_iam_" +
+      "role\030\001 \001(\t\022\"\n\032kubernetes_service_account" +
+      "\030\002 \001(\t:\002\030\001\"5\n\023RawOutputDataConfig\022\036\n\026out" +
+      "put_location_prefix\030\001 \001(\t\":\n\tFlyteURLs\022\016" +
+      "\n\006inputs\030\001 \001(\t\022\017\n\007outputs\030\002 \001(\t\022\014\n\004deck\030" +
+      "\003 \001(\t*\\\n\020NamedEntityState\022\027\n\023NAMED_ENTIT" +
+      "Y_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001\022\024\n" +
+      "\020SYSTEM_GENERATED\020\002B=Z;github.com/flyteo" +
+      "rg/flyte/flyteidl/gen/pb-go/flyteidl/adm" +
+      "inb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -22701,6 +23580,7 @@ public final class Common {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.admin.Notification.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
@@ -22796,26 +23676,32 @@ public final class Common {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_PagerDutyNotification_descriptor,
         new java.lang.String[] { "RecipientsEmail", });
-    internal_static_flyteidl_admin_SlackNotification_descriptor =
+    internal_static_flyteidl_admin_WebhookNotification_descriptor =
       getDescriptor().getMessageTypes().get(15);
+    internal_static_flyteidl_admin_WebhookNotification_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_WebhookNotification_descriptor,
+        new java.lang.String[] { "WebhookName", "Message", });
+    internal_static_flyteidl_admin_SlackNotification_descriptor =
+      getDescriptor().getMessageTypes().get(16);
     internal_static_flyteidl_admin_SlackNotification_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_SlackNotification_descriptor,
         new java.lang.String[] { "RecipientsEmail", });
     internal_static_flyteidl_admin_Notification_descriptor =
-      getDescriptor().getMessageTypes().get(16);
+      getDescriptor().getMessageTypes().get(17);
     internal_static_flyteidl_admin_Notification_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Notification_descriptor,
         new java.lang.String[] { "Phases", "Email", "PagerDuty", "Slack", "Type", });
     internal_static_flyteidl_admin_UrlBlob_descriptor =
-      getDescriptor().getMessageTypes().get(17);
+      getDescriptor().getMessageTypes().get(18);
     internal_static_flyteidl_admin_UrlBlob_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_UrlBlob_descriptor,
         new java.lang.String[] { "Url", "Bytes", });
     internal_static_flyteidl_admin_Labels_descriptor =
-      getDescriptor().getMessageTypes().get(18);
+      getDescriptor().getMessageTypes().get(19);
     internal_static_flyteidl_admin_Labels_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Labels_descriptor,
@@ -22827,7 +23713,7 @@ public final class Common {
         internal_static_flyteidl_admin_Labels_ValuesEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_admin_Annotations_descriptor =
-      getDescriptor().getMessageTypes().get(19);
+      getDescriptor().getMessageTypes().get(20);
     internal_static_flyteidl_admin_Annotations_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Annotations_descriptor,
@@ -22839,29 +23725,30 @@ public final class Common {
         internal_static_flyteidl_admin_Annotations_ValuesEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_admin_Envs_descriptor =
-      getDescriptor().getMessageTypes().get(20);
+      getDescriptor().getMessageTypes().get(21);
     internal_static_flyteidl_admin_Envs_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Envs_descriptor,
         new java.lang.String[] { "Values", });
     internal_static_flyteidl_admin_AuthRole_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_flyteidl_admin_AuthRole_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_AuthRole_descriptor,
         new java.lang.String[] { "AssumableIamRole", "KubernetesServiceAccount", });
     internal_static_flyteidl_admin_RawOutputDataConfig_descriptor =
-      getDescriptor().getMessageTypes().get(22);
+      getDescriptor().getMessageTypes().get(23);
     internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_RawOutputDataConfig_descriptor,
         new java.lang.String[] { "OutputLocationPrefix", });
     internal_static_flyteidl_admin_FlyteURLs_descriptor =
-      getDescriptor().getMessageTypes().get(23);
+      getDescriptor().getMessageTypes().get(24);
     internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_FlyteURLs_descriptor,
         new java.lang.String[] { "Inputs", "Outputs", "Deck", });
+    flyteidl.admin.Notification.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
