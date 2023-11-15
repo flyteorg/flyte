@@ -1320,13 +1320,14 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.Abort(ctx, h, nCtx, "node failing", false); err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
-		startedAt := nodeStatus.GetStartedAt().Time
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
-		c.metrics.FailureDuration.Observe(ctx, startedAt, nodeStatus.GetStoppedAt().Time)
+		nodeStartedAt := nodeStatus.GetStartedAt().Time
+		nodeError := nodeStatus.GetExecutionError()
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, metav1.Now(), nodeStatus.GetMessage(), nodeError)
+		c.metrics.FailureDuration.Observe(ctx, nodeStartedAt, nodeStatus.GetStoppedAt().Time)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
-		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
+		return interfaces.NodeStatusFailed(nodeError), nil
 	}
 
 	if currentPhase == v1alpha1.NodePhaseTimingOut {
@@ -1372,6 +1373,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 
 	if currentPhase == v1alpha1.NodePhaseFailed {
 		// This should never happen
+		// TODO: Probably should provide an error because failed nodes will not have an error. 
 		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
 	}
 
