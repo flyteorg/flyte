@@ -612,9 +612,9 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		n = metav1.Now()
 	}
 
-	if err != nil {
-		in.Error = &ExecutionError{err}
-	}
+	// if err != nil {
+	// 	in.Error = &ExecutionError{err}
+	// }
 
 	if p == NodePhaseQueued && in.QueuedAt == nil {
 		in.QueuedAt = &n
@@ -855,9 +855,9 @@ func (in *NodeStatus) Equals(other *NodeStatus) bool {
 }
 
 func (in *NodeStatus) GetExecutionError() *core.ExecutionError {
-	if in.Error != nil {
-		return in.Error.ExecutionError
-	}
+	// if in.Error != nil {
+	// 	return in.Error.ExecutionError
+	// }
 	return nil
 }
 
