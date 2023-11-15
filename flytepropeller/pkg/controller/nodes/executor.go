@@ -236,8 +236,13 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
-
-		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
+		nodeError := *nodeStatus.GetExecutionError()
+		fmt.Println("before modifying", nodeError)
+		status := interfaces.NodeStatusFailed(&nodeError)
+		nodeStatus.ClearErrorMessage()
+		fmt.Println("modified error", nodeStatus.GetExecutionError())
+		fmt.Println("after modifying", nodeError)
+		return status, nil
 	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
 		logger.Debugf(currentNodeCtx, "Node has timed out, traversing downstream.")
 		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
@@ -1336,7 +1341,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
-		return interfaces.NodeStatusFailed(&nodeError), nil
+		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
 	}
 
 	if currentPhase == v1alpha1.NodePhaseTimingOut {
