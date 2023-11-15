@@ -297,7 +297,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 				// If the failure policy allows other nodes to continue running, do not exit the loop,
 				// Keep track of the last failed state in the loop since it'll be the one to return.
 				// TODO: If multiple nodes fail (which this mode allows), consolidate/summarize failure states in one.
-				stateOnComplete = state
+				stateOnComplete = interfaces.NodeStatus{NodePhase: state.NodePhase, Err: &*state.Err}
 			} else {
 				return state, nil
 			}
