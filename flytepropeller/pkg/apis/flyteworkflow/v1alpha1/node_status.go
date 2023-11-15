@@ -477,6 +477,12 @@ func (in *NodeStatus) ClearArrayNodeStatus() {
 	in.SetDirty()
 }
 
+func (in *NodeStatus) ClearErrorMessage() {
+	if in.Error != nil {
+		in.Error.ClearMessage()
+	}
+}
+
 func (in *NodeStatus) GetLastUpdatedAt() *metav1.Time {
 	return in.LastUpdatedAt
 }
@@ -631,10 +637,10 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		if in.StoppedAt == nil {
 			in.StoppedAt = &n
 		}
-		// Clear most fields after reaching a terminal state. This keeps the CRD state small and avoid etcd size 
-		// limits. We keep phase and StoppedAt. StoppedAt is used to calculate transition latency between this 
+		// Clear most fields after reaching a terminal state. This keeps the CRD state small and avoid etcd size
+		// limits. We keep phase and StoppedAt. StoppedAt is used to calculate transition latency between this
 		// node and any downstream nodes and Phase is required for propeller to continue to downstream nodes.
-		in.Error.ClearMessage()
+		in.ClearErrorMessage()
 		in.QueuedAt = nil
 		in.StartedAt = nil
 		in.LastUpdatedAt = nil
@@ -645,8 +651,8 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		in.TaskNodeStatus = nil
 		in.WorkflowNodeStatus = nil
 	}
-	// For cases in which the node is either Succeeded or Skipped we clear the message. Potentially this will be useful 
-	// for other failed states. 
+	// For cases in which the node is either Succeeded or Skipped we clear the message. Potentially this will be useful
+	// for other failed states.
 	in.Message = ""
 	// if p == NodePhaseSucceeded || p == NodePhaseSkipped {
 	// }
