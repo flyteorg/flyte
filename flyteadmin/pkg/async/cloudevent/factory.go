@@ -2,12 +2,7 @@ package cloudevent
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flytestdlib/sandbox_utils"
 	"time"
-
-	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
-	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
@@ -21,9 +16,13 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/sandbox_utils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Repository, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, cloudEventsConfig runtimeInterfaces.CloudEventsConfig, remoteDataConfig runtimeInterfaces.RemoteDataConfig, scope promutils.Scope) interfaces.Publisher {
@@ -108,7 +107,8 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 
 	if cloudEventsConfig.CloudEventVersion == runtimeInterfaces.CloudEventVersionv2 {
 		return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, urlData, remoteDataConfig)
-	} else {
-		return cloudEventImplementations.NewCloudEventsPublisher(sender, scope, cloudEventsConfig.EventsPublisherConfig.EventTypes)
 	}
+
+	return cloudEventImplementations.NewCloudEventsPublisher(sender, scope, cloudEventsConfig.EventsPublisherConfig.EventTypes)
+
 }

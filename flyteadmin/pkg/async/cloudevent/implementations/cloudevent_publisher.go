@@ -4,35 +4,30 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-
 	"reflect"
 	"time"
 
-	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
-	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
-	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/golang/protobuf/jsonpb"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
-
 	cloudevents "github.com/cloudevents/sdk-go/v2"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const (
@@ -153,7 +148,15 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		Domain:  rawEvent.ExecutionId.Domain,
 		Name:    rawEvent.ExecutionId.Name,
 	})
+	if err != nil {
+		logger.Warningf(ctx, "couldn't find execution [%+v] for cloud event processing", rawEvent.ExecutionId)
+		return nil, err
+	}
 	ex, err := transformers.FromExecutionModel(ctx, executionModel, transformers.DefaultExecutionTransformerOptions)
+	if err != nil {
+		logger.Warningf(ctx, "couldn't transform execution [%+v] for cloud event processing", rawEvent.ExecutionId)
+		return nil, err
+	}
 	if ex.Closure.WorkflowId == nil {
 		logger.Warningf(ctx, "workflow id is nil for execution [%+v]", ex)
 		return nil, fmt.Errorf("workflow id is nil for execution [%+v]", ex)
@@ -164,6 +167,10 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		Name:    ex.Closure.WorkflowId.Name,
 		Version: ex.Closure.WorkflowId.Version,
 	})
+	if err != nil {
+		logger.Warningf(ctx, "couldn't find workflow [%+v] for cloud event processing", ex.Closure.WorkflowId)
+		return nil, err
+	}
 	var workflowInterface core.TypedInterface
 	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
 		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
@@ -349,6 +356,10 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 			return nil, err
 		}
 		task, err := transformers.FromTaskModel(taskModel)
+		if err != nil {
+			logger.Debugf(ctx, "Failed to transform task model with err %v", err)
+			return nil, err
+		}
 		typedInterface = task.Closure.CompiledTask.Template.Interface
 		taskExecID = lte.Id
 	}
@@ -425,6 +436,10 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(*e.ParentNodeExecutionId,
 			int(e.RetryAttempt))
 		finalMsg, err = c.TransformTaskExecutionEvent(ctx, e)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to transform task execution event with error: %v", err)
+			return err
+		}
 	case *admin.NodeExecutionEventRequest:
 		topic = "cloudevents.NodeExecution"
 		e := msgType.Event
@@ -434,6 +449,10 @@ func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationTy
 		eventID = fmt.Sprintf("%v.%v", executionID, phase)
 		eventSource = common.FlyteURLKeyFromNodeExecutionID(*msgType.Event.Id)
 		finalMsg, err = c.TransformNodeExecutionEvent(ctx, e)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to transform node execution event with error: %v", err)
+			return err
+		}
 	case *event.CloudEventExecutionStart:
 		topic = "cloudevents.ExecutionStart"
 		executionID = msgType.ExecutionId.String()

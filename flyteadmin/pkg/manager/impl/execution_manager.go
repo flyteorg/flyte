@@ -3,22 +3,10 @@ package impl
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"strconv"
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -26,10 +14,12 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/executions"
@@ -44,6 +34,16 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const childContainerQueueKey = "child_queue"
@@ -739,16 +739,16 @@ func (m *ExecutionManager) getStringFromInput(ctx context.Context, inputBinding 
 		if inputVal.GetScalar() == nil || inputVal.GetScalar().GetPrimitive() == nil {
 			return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input value [%+v]", inputVal)
 		}
-		var strVal = ""
+		var strVal string
 		p := inputVal.GetScalar().GetPrimitive()
 		switch p.GetValue().(type) {
 		case *core.Primitive_Integer:
-			strVal = fmt.Sprintf("%s", p.GetStringValue())
+			strVal = p.GetStringValue()
 		case *core.Primitive_Datetime:
 			t := time.Unix(p.GetDatetime().Seconds, int64(p.GetDatetime().Nanos))
 			strVal = t.Format("2006-01-02")
 		case *core.Primitive_StringValue:
-			strVal = fmt.Sprintf("%s", p.GetStringValue())
+			strVal = p.GetStringValue()
 		case *core.Primitive_FloatValue:
 			strVal = fmt.Sprintf("%.2f", p.GetFloatValue())
 		case *core.Primitive_Boolean:

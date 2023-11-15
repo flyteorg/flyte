@@ -4,10 +4,12 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func NewArtifactConnection(_ context.Context, cfg *Config, opts ...grpc.DialOption) (*grpc.ClientConn, error) {

@@ -1,10 +1,10 @@
 package interfaces
 
 import (
-	artifactsClient "github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
 
+	artifactsClient "github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/config"
