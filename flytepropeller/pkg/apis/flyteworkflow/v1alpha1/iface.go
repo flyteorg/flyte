@@ -46,6 +46,7 @@ const (
 	NodeKindWorkflow NodeKind = "workflow" // Either an inline workflow or a remote workflow definition
 	NodeKindGate     NodeKind = "gate"     // A Gate node with a condition
 	NodeKindArray    NodeKind = "array"    // An array node with a subtask Node
+	NodeKindFailure  NodeKind = "failure"  // A failure node with a subtask Node
 	NodeKindStart    NodeKind = "start"    // Start node is a special node
 	NodeKindEnd      NodeKind = "end"
 )

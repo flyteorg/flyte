@@ -187,8 +187,11 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 		return nil, !errs.HasErrors()
 	}
 
-	checkpoint := make([]*core.Node, 0, len(fg.Template.Nodes))
+	checkpoint := make([]*core.Node, 0, len(fg.Template.Nodes)) // nodes in the workflow + failure node
 	checkpoint = append(checkpoint, fg.Template.Nodes...)
+	//if fg.Template.FailureNode != nil {
+	//	checkpoint = append(checkpoint, fg.Template.FailureNode)
+	//}
 	fg.Template.Nodes = make([]*core.Node, 0, len(fg.Template.Nodes))
 	wf.GetCoreWorkflow().Connections = &core.ConnectionSet{
 		Downstream: make(map[string]*core.ConnectionSet_IdList),

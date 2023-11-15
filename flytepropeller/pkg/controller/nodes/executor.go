@@ -266,6 +266,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 			Kind:    core.ExecutionError_SYSTEM,
 		}), nil
 	}
+	logger.Debugf(ctx, "Downstream nodes [%v]", downstreamNodes)
 	if len(downstreamNodes) == 0 {
 		logger.Debugf(ctx, "No downstream nodes found. Complete.")
 		return interfaces.NodeStatusComplete, nil
