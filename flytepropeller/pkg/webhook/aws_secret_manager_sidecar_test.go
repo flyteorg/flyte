@@ -13,7 +13,7 @@ import (
 )
 
 func TestAWSSecretManagerInjector_Inject(t *testing.T) {
-	injector := NewAWSSecretManagerInjector(config.DefaultConfig.AWSSecretManagerConfig)
+	injector := NewAWSSecretManagerSidecarInjector(config.DefaultConfig.AWSSecretManagerConfig)
 	p := &corev1.Pod{
 		Spec: corev1.PodSpec{
 			Containers: []corev1.Container{},

@@ -24,6 +24,9 @@ type SecretsMutator struct {
 	injectors []SecretsInjector
 }
 
+type Injector interface {
+}
+
 type SecretsInjector interface {
 	Type() config.SecretManagerType
 	Inject(ctx context.Context, secrets *core.Secret, p *corev1.Pod) (newP *corev1.Pod, injected bool, err error)
@@ -41,6 +44,7 @@ func (s *SecretsMutator) Mutate(ctx context.Context, p *corev1.Pod) (newP *corev
 
 	for _, secret := range secrets {
 		for _, injector := range s.injectors {
+			logger.Infof(ctx, "Injector type : %v config.Type %v", injector.Type(), s.cfg.SecretManagerType)
 			if injector.Type() != config.SecretManagerTypeGlobal && injector.Type() != s.cfg.SecretManagerType {
 				logger.Infof(ctx, "Skipping SecretManager [%v] since it's not enabled.", injector.Type())
 				continue
@@ -64,15 +68,24 @@ func (s *SecretsMutator) Mutate(ctx context.Context, p *corev1.Pod) (newP *corev
 
 // NewSecretsMutator creates a new SecretsMutator with all available plugins. Depending on the selected plugins in the
 // config, only the global plugin and one other plugin can be enabled.
-func NewSecretsMutator(cfg *config.Config, _ promutils.Scope) *SecretsMutator {
+func NewSecretsMutator(ctx context.Context, cfg *config.Config, _ promutils.Scope) (*SecretsMutator, error) {
+	var embeddedSecretsManager AWSSecretManagerInjector
+	var err error
+	if cfg.EmbeddedSecretManagerConfig.Enabled {
+		embeddedSecretsManager, err = NewAWSSecretManagerInjector(ctx, cfg.EmbeddedSecretManagerConfig)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return &SecretsMutator{
 		cfg: cfg,
 		injectors: []SecretsInjector{
+			embeddedSecretsManager,
 			NewGlobalSecrets(secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())),
 			NewK8sSecretsInjector(),
-			NewAWSSecretManagerInjector(cfg.AWSSecretManagerConfig),
+			NewAWSSecretManagerSidecarInjector(cfg.AWSSecretManagerConfig),
 			NewGCPSecretManagerInjector(cfg.GCPSecretManagerConfig),
 			NewVaultSecretManagerInjector(cfg.VaultSecretManagerConfig),
 		},
-	}
+	}, nil
 }

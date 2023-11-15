@@ -4,6 +4,9 @@ go 1.19
 
 require (
 	github.com/DiSiqueira/GoTree v1.0.1-0.20180907134536-53a8e837f295
+	github.com/aws/aws-sdk-go-v2 v1.22.0
+	github.com/aws/aws-sdk-go-v2/config v1.2.0
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.22.0
 	github.com/benlaurie/objecthash v0.0.0-20180202135721-d1e3d6079fc1
 	github.com/fatih/color v1.13.0
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
@@ -58,14 +61,16 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d // indirect
 	github.com/aws/aws-sdk-go v1.44.2 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.2.0 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.0.0 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.3.0 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.2.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.4.0 // indirect
 	github.com/aws/aws-sdk-go-v2/service/athena v1.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.0.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.0.0 // indirect
-	github.com/aws/smithy-go v1.1.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.2.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.3.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.5.0 // indirect
+	github.com/aws/smithy-go v1.16.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
@@ -147,6 +152,7 @@ require (
 
 replace (
 	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
+	github.com/aws/aws-sdk-go-v2/internal/ini => github.com/aws/aws-sdk-go-v2/internal/ini v1.2.0
 	github.com/flyteorg/flyte/datacatalog => ../datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
 	github.com/flyteorg/flyte/flyteidl => ../flyteidl

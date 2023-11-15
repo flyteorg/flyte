@@ -20,7 +20,7 @@ var (
 		CertDir:           "/etc/webhook/certs",
 		LocalCert:         false,
 		ListenPort:        9443,
-		SecretManagerType: SecretManagerTypeK8s,
+		SecretManagerType: SecretManagerTypeEmbedded,
 		AWSSecretManagerConfig: AWSSecretManagerConfig{
 			SidecarImage: "docker.io/amazon/aws-secrets-manager-secret-sidecar:v0.1.4",
 			Resources: corev1.ResourceRequirements{
@@ -51,6 +51,15 @@ var (
 			Role:      "flyte",
 			KVVersion: KVVersion2,
 		},
+		EmbeddedSecretManagerConfig: EmbeddedSecretManagerConfig{
+			Enabled: true,
+			Type:    "AWS",
+			AWSConfig: AWSConfig{
+				Region:            "us-east-2",
+				MaxRetries:        5,
+				RateLimiterTokens: 20,
+			},
+		},
 	}
 
 	configSection = config.MustRegisterSection("webhook", DefaultConfig)
@@ -77,6 +86,11 @@ const (
 
 	// SecretManagerTypeVault defines a secret manager webhook that pulls secrets from Hashicorp Vault.
 	SecretManagerTypeVault
+
+	// SecretManagerTypeEmbedded defines an embedded secret manager webhook that pulls secrets from the configured secrets manager.
+	// Without using sidecar. This type directly calls into the secrets manager for the configured provider directly.
+	// Currently supported only for AWS.
+	SecretManagerTypeEmbedded
 )
 
 // Defines with KV Engine Version to use with VaultSecretManager - https://www.vaultproject.io/docs/secrets/kv#kv-secrets-engine
@@ -90,17 +104,30 @@ const (
 )
 
 type Config struct {
-	MetricsPrefix            string                   `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
-	CertDir                  string                   `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
-	LocalCert                bool                     `json:"localCert" pflag:",write certs locally. Defaults to false"`
-	ListenPort               int                      `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
-	ServiceName              string                   `json:"serviceName" pflag:",The name of the webhook service."`
-	ServicePort              int32                    `json:"servicePort" pflag:",The port on the service that hosting webhook."`
-	SecretName               string                   `json:"secretName" pflag:",Secret name to write generated certs to."`
-	SecretManagerType        SecretManagerType        `json:"secretManagerType" pflag:"-,Secret manager type to use if secrets are not found in global secrets."`
-	AWSSecretManagerConfig   AWSSecretManagerConfig   `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
-	GCPSecretManagerConfig   GCPSecretManagerConfig   `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
-	VaultSecretManagerConfig VaultSecretManagerConfig `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
+	MetricsPrefix               string                      `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
+	CertDir                     string                      `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
+	LocalCert                   bool                        `json:"localCert" pflag:",write certs locally. Defaults to false"`
+	ListenPort                  int                         `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
+	ServiceName                 string                      `json:"serviceName" pflag:",The name of the webhook service."`
+	ServicePort                 int32                       `json:"servicePort" pflag:",The port on the service that hosting webhook."`
+	SecretName                  string                      `json:"secretName" pflag:",Secret name to write generated certs to."`
+	SecretManagerType           SecretManagerType           `json:"secretManagerType" pflag:"-,Secret manager type to use if secrets are not found in global secrets."`
+	AWSSecretManagerConfig      AWSSecretManagerConfig      `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
+	GCPSecretManagerConfig      GCPSecretManagerConfig      `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
+	VaultSecretManagerConfig    VaultSecretManagerConfig    `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
+	EmbeddedSecretManagerConfig EmbeddedSecretManagerConfig `json:"embeddedSecretManagerConfig" pflag:",Embedded Secret Manager config without sidecar and which calls into the supported providers directly."`
+}
+
+type EmbeddedSecretManagerConfig struct {
+	Enabled   bool      `json:"enabled" pflag:",Enable secret manager service"`
+	Type      string    `json:"type" pflag:",Type of secret manager, allowed values aws only for now"`
+	AWSConfig AWSConfig `json:"awsConfig" pflag:",Config for AWS settings"`
+}
+
+type AWSConfig struct {
+	Region            string `json:"region" pflag:",AWS region"`
+	MaxRetries        int    `json:"maxRetries" pflag:",Max number of retries to attempt."`
+	RateLimiterTokens uint   `json:"rateLimiterTokens" pflag:"-,Number of tokens to use for rate limiter."`
 }
 
 type AWSSecretManagerConfig struct {

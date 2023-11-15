@@ -60,5 +60,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "awsSecretManager.sidecarImage"), DefaultConfig.AWSSecretManagerConfig.SidecarImage, "Specifies the sidecar docker image to use")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gcpSecretManager.sidecarImage"), DefaultConfig.GCPSecretManagerConfig.SidecarImage, "Specifies the sidecar docker image to use")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "vaultSecretManager.role"), DefaultConfig.VaultSecretManagerConfig.Role, "Specifies the vault role to use")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.enabled"), DefaultConfig.EmbeddedSecretManagerConfig.Enabled, "Enable secret manager service")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.type"), DefaultConfig.EmbeddedSecretManagerConfig.Type, "Type of secret manager,  allowed values aws only for now")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.awsConfig.region"), DefaultConfig.EmbeddedSecretManagerConfig.AWSConfig.Region, "AWS region")
+	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "embeddedSecretManagerConfig.awsConfig.maxRetries"), DefaultConfig.EmbeddedSecretManagerConfig.AWSConfig.MaxRetries, "Max number of retries to attempt.")
 	return cmdFlags
 }

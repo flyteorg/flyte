@@ -24,7 +24,26 @@ const (
 	PodNamespaceEnvVar = "POD_NAMESPACE"
 )
 
+type PropellerWebhook interface {
+	Test(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
+		defaultNamespace string, scope *promutils.Scope, mgr *manager.Manager)
+}
+
 func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
+	defaultNamespace string, scope *promutils.Scope, mgr *manager.Manager) error {
+	err := Test(ctx, propellerCfg, cfg,
+		defaultNamespace, scope, mgr)
+	if err != nil {
+		return err
+	}
+
+	logger.Infof(ctx, "Started propeller webhook")
+	<-ctx.Done()
+
+	return nil
+}
+
+func Test(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 	defaultNamespace string, scope *promutils.Scope, mgr *manager.Manager) error {
 	raw, err := json.Marshal(cfg)
 	if err != nil {
@@ -40,7 +59,10 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 
 	webhookScope := (*scope).NewSubScope("webhook")
 
-	secretsWebhook := NewPodMutator(cfg, webhookScope)
+	secretsWebhook, err := NewPodMutator(ctx, cfg, webhookScope)
+	if err != nil {
+		return err
+	}
 
 	// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
 	err = createMutationConfig(ctx, kubeClient, secretsWebhook, defaultNamespace)
@@ -52,11 +74,7 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to register webhook with manager. Error: %v", err)
 	}
-
-	logger.Infof(ctx, "Started propeller webhook")
-	<-ctx.Done()
-
-	return nil
+	return err
 }
 
 func createMutationConfig(ctx context.Context, kubeClient *kubernetes.Clientset, webhookObj *PodMutator, defaultNamespace string) error {
