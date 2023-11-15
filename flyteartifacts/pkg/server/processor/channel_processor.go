@@ -7,14 +7,14 @@ import (
 	"github.com/cloudevents/sdk-go/v2/event"
 	flyteEvents "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/sandbox_utils"
+	"github.com/flyteorg/flyte/flytestdlib/sandboxutils"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"time"
 )
 
 type SandboxCloudEventsReceiver struct {
-	subChan <-chan sandbox_utils.SandboxMessage
+	subChan <-chan sandboxutils.SandboxMessage
 	Handler EventsHandlerInterface
 }
 
@@ -33,7 +33,7 @@ func (p *SandboxCloudEventsReceiver) StartProcessing(ctx context.Context) {
 	logger.Warning(context.Background(), "Sandbox cloud event processor has stopped because context cancelled")
 }
 
-func (p *SandboxCloudEventsReceiver) handleMessage(ctx context.Context, sandboxMsg sandbox_utils.SandboxMessage) error {
+func (p *SandboxCloudEventsReceiver) handleMessage(ctx context.Context, sandboxMsg sandboxutils.SandboxMessage) error {
 	ce := &event.Event{}
 	err := pbcloudevents.Protobuf.Unmarshal(sandboxMsg.Raw, ce)
 	if err != nil {
@@ -112,6 +112,6 @@ func (p *SandboxCloudEventsReceiver) StopProcessing() error {
 func NewSandboxCloudEventProcessor(eventsHandler EventsHandlerInterface) *SandboxCloudEventsReceiver {
 	return &SandboxCloudEventsReceiver{
 		Handler: eventsHandler,
-		subChan: sandbox_utils.MsgChan,
+		subChan: sandboxutils.MsgChan,
 	}
 }

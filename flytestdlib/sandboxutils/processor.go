@@ -1,12 +1,14 @@
-package sandbox_utils
+package sandboxutils
 
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/golang/protobuf/proto"
 	"sync"
 	"time"
+
+	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var MsgChan chan SandboxMessage
