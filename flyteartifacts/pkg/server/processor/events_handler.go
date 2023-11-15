@@ -33,13 +33,14 @@ func (s *ServiceCallHandler) HandleEvent(ctx context.Context, cloudEvent *event2
 		return s.HandleEventTaskExec(ctx, source, msgType)
 	case *event.CloudEventNodeExecution:
 		logger.Debugf(ctx, "Handling CloudEventNodeExecution [%v]", msgType.RawEvent.Id)
-		return s.HandleEventNodeExec(ctx, msgType)
+		return s.HandleEventNodeExec(ctx, source, msgType)
 	default:
 		return fmt.Errorf("HandleEvent found unknown message type [%T]", msgType)
 	}
 }
 
 func (s *ServiceCallHandler) HandleEventExecStart(_ context.Context, _ *event.CloudEventExecutionStart) error {
+	// metric
 	return nil
 }
 
@@ -171,7 +172,7 @@ func getPartitionsAndTag(ctx context.Context, partialID core.ArtifactID, variabl
 	return partitions, tag, nil
 }
 
-func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source string, evt *event.CloudEventTaskExecution) error {
+func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, _ string, evt *event.CloudEventTaskExecution) error {
 
 	if evt.RawEvent.Phase != core.TaskExecution_SUCCEEDED {
 		logger.Debug(ctx, "Skipping non-successful task execution event")
@@ -179,10 +180,49 @@ func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source str
 	}
 	// metric
 
-	execID := evt.RawEvent.ParentNodeExecutionId.ExecutionId
-	if evt.GetOutputData().GetLiterals() == nil || len(evt.OutputData.Literals) == 0 {
-		logger.Debugf(ctx, "No output data to process for task event from [%v]: %s", execID, evt.RawEvent.TaskId.Name)
+	return nil
+}
+
+func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source string, evt *event.CloudEventNodeExecution) error {
+	if evt.RawEvent.Phase != core.NodeExecution_SUCCEEDED {
+		logger.Debug(ctx, "Skipping non-successful task execution event")
+		return nil
 	}
+	if evt.RawEvent.Id.NodeId == "end-node" {
+		logger.Debug(ctx, "Skipping end node for %s", evt.RawEvent.Id.ExecutionId.Name)
+		return nil
+	}
+	// metric
+
+	execID := evt.RawEvent.Id.ExecutionId
+	if evt.GetOutputData().GetLiterals() == nil || len(evt.OutputData.Literals) == 0 {
+		logger.Debugf(ctx, "No output data to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
+	}
+
+	if evt.OutputInterface == nil {
+		if evt.GetOutputData() != nil {
+			// metric this as error
+			logger.Errorf(ctx, "No output interface to process for task event from [%s] node %s, but output data is not nil", execID, evt.RawEvent.Id.NodeId)
+		}
+		logger.Debugf(ctx, "No output interface to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
+		return nil
+	}
+
+	if evt.RawEvent.GetTaskNodeMetadata() != nil {
+		if evt.RawEvent.GetTaskNodeMetadata().CacheStatus == core.CatalogCacheStatus_CACHE_HIT {
+			logger.Debugf(ctx, "Skipping cache hit for %s", evt.RawEvent.Id)
+			return nil
+		}
+	}
+	var taskExecID *core.TaskExecutionIdentifier
+	if taskExecID = evt.GetTaskExecId(); taskExecID == nil {
+		logger.Debugf(ctx, "No task execution id to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
+		return nil
+	}
+
+	// See note on the cloudevent_publisher side, we'll have to call one of the get data endpoints to get the actual data
+	// rather than reading them here. But read here for now.
+
 	// Iterate through the output interface. For any outputs that have an artifact ID specified, grab the
 	// output Literal and construct a Create request and call the service.
 	for varName, variable := range evt.OutputInterface.Outputs.Variables {
@@ -191,14 +231,8 @@ func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source str
 
 			output := evt.OutputData.Literals[varName]
 
-			taskExecID := core.TaskExecutionIdentifier{
-				TaskId:          evt.RawEvent.TaskId,
-				NodeExecutionId: evt.RawEvent.ParentNodeExecutionId,
-				RetryAttempt:    evt.RawEvent.RetryAttempt,
-			}
-
 			// Add a tracking tag to the Literal before saving.
-			version := fmt.Sprintf("%s/%s", source, varName)
+			version := fmt.Sprintf("%s/%d/%s", source, taskExecID.RetryAttempt, varName)
 			trackingTag := fmt.Sprintf("%s/%s/%s", execID.Project, execID.Domain, version)
 			if output.Metadata == nil {
 				output.Metadata = make(map[string]string, 1)
@@ -208,7 +242,7 @@ func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source str
 			spec := artifact.ArtifactSpec{
 				Value:         output,
 				Type:          evt.OutputInterface.Outputs.Variables[varName].Type,
-				TaskExecution: &taskExecID,
+				TaskExecution: taskExecID,
 				Execution:     execID,
 			}
 
@@ -253,11 +287,6 @@ func (s *ServiceCallHandler) HandleEventTaskExec(ctx context.Context, source str
 			logger.Debugf(ctx, "Created artifact id [%+v] for key %s", resp.Artifact.ArtifactId, varName)
 		}
 	}
-
-	return nil
-}
-
-func (s *ServiceCallHandler) HandleEventNodeExec(_ context.Context, _ *event.CloudEventNodeExecution) error {
 	return nil
 }
 
