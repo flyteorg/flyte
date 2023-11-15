@@ -5,13 +5,8 @@ import (
 	"fmt"
 	"runtime/debug"
 
-<<<<<<< HEAD
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/webhook"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-=======
-	"github.com/flyteorg/flyteadmin/pkg/async/webhook"
-
-	"github.com/flyteorg/flyteadmin/plugins"
->>>>>>> flyteadmin/webhook-v2
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
