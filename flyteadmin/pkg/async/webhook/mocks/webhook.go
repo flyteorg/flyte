@@ -5,9 +5,9 @@ package mocks
 import (
 	context "context"
 
-	admin "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
-	interfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
+	interfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 
 	mock "github.com/stretchr/testify/mock"
 )

@@ -3,8 +3,8 @@ package interfaces
 import (
 	"context"
 
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 //go:generate mockery -name=Webhook -output=../mocks -case=underscore
@@ -16,6 +16,6 @@ type Payload struct {
 // Webhook Defines the interface for Publishing execution event to other services, such as slack.
 type Webhook interface {
 	// Post The notificationType is inferred from the Notification object in the Execution Spec.
-	Post(ctx context.Context, payload admin.WebhookPayload) error
+	Post(ctx context.Context, payload admin.WebhookMessage) error
 	GetConfig() runtimeInterfaces.WebHookConfig
 }

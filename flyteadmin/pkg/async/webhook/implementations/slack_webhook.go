@@ -28,14 +28,14 @@ func (s *SlackWebhook) GetConfig() runtimeInterfaces.WebHookConfig {
 	return s.Config
 }
 
-func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookPayload) error {
+func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookMessage) error {
 	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
 	webhookURL, err := sm.Get(ctx, s.Config.URLSecretName)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get url from secret manager with error: %v", err)
 		return err
 	}
-	data := []byte(fmt.Sprintf("{'text': '%s'}", payload.Message))
+	data := []byte(fmt.Sprintf("{'text': '%s'}", payload.Body))
 	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create request to Slack webhook with error: %v", err)

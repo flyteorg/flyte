@@ -29,7 +29,7 @@ import (
 var (
 	mockWebhook     = mocks.MockWebhook{}
 	repo            = repositoryMocks.NewMockRepository()
-	testWebhook     = admin.WebhookPayload{Message: "hello world"}
+	testWebhook     = admin.WebhookMessage{Body: "hello world"}
 	workflowRequest = &admin.WorkflowExecutionEventRequest{
 		Event: &event.WorkflowExecutionEvent{
 			Phase: core.WorkflowExecution_FAILED,
@@ -69,8 +69,8 @@ func TestProcessor_StartProcessing(t *testing.T) {
 	initializeProcessor()
 	testSubscriber.JSONMessages = append(testSubscriber.JSONMessages, testSubscriberMessage)
 
-	sendWebhookValidationFunc := func(ctx context.Context, payload admin.WebhookPayload) error {
-		assert.Equal(t, payload.Message, testWebhook.Message)
+	sendWebhookValidationFunc := func(ctx context.Context, payload admin.WebhookMessage) error {
+		assert.Equal(t, payload.Body, testWebhook.Body)
 		return nil
 	}
 	mockWebhook.SetWebhookPostFunc(sendWebhookValidationFunc)
@@ -189,7 +189,7 @@ func TestProcessor_StartProcessingError(t *testing.T) {
 func TestProcessor_StartProcessingWebhookError(t *testing.T) {
 	initializeProcessor()
 	webhookError := errors.New("webhook error")
-	sendWebhookErrorFunc := func(ctx context.Context, payload admin.WebhookPayload) error {
+	sendWebhookErrorFunc := func(ctx context.Context, payload admin.WebhookMessage) error {
 		return webhookError
 	}
 	mockWebhook.SetWebhookPostFunc(sendWebhookErrorFunc)

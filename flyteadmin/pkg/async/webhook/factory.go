@@ -6,21 +6,21 @@ import (
 	"time"
 
 	gizmoGCP "github.com/NYTimes/gizmo/pubsub/gcp"
-	"github.com/flyteorg/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
-	repoInterfaces "github.com/flyteorg/flyteadmin/pkg/repositories/interfaces"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
-	"github.com/flyteorg/flyteadmin/pkg/async"
-	notificationsImplementations "github.com/flyteorg/flyteadmin/pkg/async/notifications/implementations"
-	"github.com/flyteorg/flyteadmin/pkg/async/notifications/interfaces"
-	"github.com/flyteorg/flyteadmin/pkg/async/webhook/implementations"
-	"github.com/flyteorg/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
+	notificationsImplementations "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/webhook/implementations"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 
-	webhookInterfaces "github.com/flyteorg/flyteadmin/pkg/async/webhook/interfaces"
-	runtimeInterfaces "github.com/flyteorg/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flytestdlib/promutils"
+	webhookInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/webhook/interfaces"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var enable64decoding = false

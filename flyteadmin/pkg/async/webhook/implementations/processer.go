@@ -37,7 +37,7 @@ func (p *Processor) StartProcessing() {
 }
 
 func (p *Processor) run() error {
-	var payload admin.WebhookPayload
+	var payload admin.WebhookMessage
 	var request admin.WorkflowExecutionEventRequest
 	var err error
 	var subject string
@@ -88,7 +88,7 @@ func (p *Processor) run() error {
 			continue
 		}
 
-		payload.Message = notifications.SubstituteParameters(p.webhook.GetConfig().Payload, request, adminExecution)
+		payload.Body = notifications.SubstituteParameters(p.webhook.GetConfig().Payload, request, adminExecution)
 		logger.Info(context.Background(), "Processor is sending message to webhook endpoint")
 		if err = p.webhook.Post(context.Background(), payload); err != nil {
 			p.SystemMetrics.MessageProcessorError.Inc()
