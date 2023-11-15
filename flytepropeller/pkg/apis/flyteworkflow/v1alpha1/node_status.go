@@ -477,6 +477,12 @@ func (in *NodeStatus) ClearArrayNodeStatus() {
 	in.SetDirty()
 }
 
+func (in *NodeStatus) ClearErrorMessage() {
+	if in.Error != nil {
+		in.Error.ClearMessage()
+	}
+}
+
 func (in *NodeStatus) GetLastUpdatedAt() *metav1.Time {
 	return in.LastUpdatedAt
 }
