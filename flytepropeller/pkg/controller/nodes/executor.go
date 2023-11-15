@@ -1336,7 +1336,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
-		return interfaces.NodeStatusFailed(nodeError), nil
+		return interfaces.NodeStatusFailed(&nodeError), nil
 	}
 
 	if currentPhase == v1alpha1.NodePhaseTimingOut {
