@@ -21,7 +21,7 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/sandbox_utils"
+	"github.com/flyteorg/flyte/flytestdlib/sandboxutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -92,7 +92,7 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 
 	case common.Sandbox:
 		var publisher pubsub.Publisher
-		publisher = sandbox_utils.NewCloudEventsPublisher()
+		publisher = sandboxutils.NewCloudEventsPublisher()
 		sender = &cloudEventImplementations.PubSubSender{
 			Pub: publisher,
 		}
