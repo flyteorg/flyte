@@ -477,10 +477,10 @@ func (in *NodeStatus) ClearArrayNodeStatus() {
 	in.SetDirty()
 }
 
-func (in *NodeStatus) ClearErrorMessage() {
-	if in.Error != nil {
-		in.Error.ClearMessage()
-	}
+func (in *NodeStatus) PopExecutionError() *core.ExecutionError {
+	executionError := in.GetExecutionError()
+	in.Error = nil
+	return executionError
 }
 
 func (in *NodeStatus) GetLastUpdatedAt() *metav1.Time {
@@ -640,7 +640,6 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		// Clear most fields after reaching a terminal state. This keeps the CRD state small and avoid etcd size
 		// limits. We keep phase and StoppedAt. StoppedAt is used to calculate transition latency between this
 		// node and any downstream nodes and Phase is required for propeller to continue to downstream nodes.
-		in.ClearErrorMessage()
 		in.QueuedAt = nil
 		in.StartedAt = nil
 		in.LastUpdatedAt = nil

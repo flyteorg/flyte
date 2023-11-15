@@ -619,6 +619,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			mockN0Status.OnGetPhase().Return(n0Phase)
 			mockN0Status.OnGetAttempts().Return(uint32(0))
 			mockN0Status.OnGetExecutionError().Return(nil)
+			mockN0Status.OnPopExecutionError().Return(&core.ExecutionError{Code: "code", Message: "message"})
 
 			mockN0Status.OnIsDirty().Return(false)
 			mockN0Status.OnGetParentTaskID().Return(nil)
@@ -733,6 +734,10 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			}, true, false, true, core.NodeExecution_FAILED},
 
 			{"failing->failed", v1alpha1.NodePhaseFailing, v1alpha1.NodePhaseFailed, interfaces.NodePhaseFailed, func() (handler.Transition, error) {
+				return handler.UnknownTransition, fmt.Errorf("error")
+			}, false, false, false, core.NodeExecution_FAILED},
+
+			{"failing->failed", v1alpha1.NodePhaseFailed, v1alpha1.NodePhaseFailed, interfaces.NodePhaseFailed, func() (handler.Transition, error) {
 				return handler.UnknownTransition, fmt.Errorf("error")
 			}, false, false, false, core.NodeExecution_FAILED},
 
