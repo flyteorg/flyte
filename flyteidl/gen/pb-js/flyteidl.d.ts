@@ -7426,9 +7426,6 @@ export namespace flyteidl {
             /** CloudEventWorkflowExecution artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
 
-            /** CloudEventWorkflowExecution parentNodeExecution */
-            parentNodeExecution?: (flyteidl.core.INodeExecutionIdentifier|null);
-
             /** CloudEventWorkflowExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
 
@@ -7459,9 +7456,6 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
-
-            /** CloudEventWorkflowExecution parentNodeExecution. */
-            public parentNodeExecution?: (flyteidl.core.INodeExecutionIdentifier|null);
 
             /** CloudEventWorkflowExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
@@ -7508,11 +7502,8 @@ export namespace flyteidl {
             /** CloudEventNodeExecution rawEvent */
             rawEvent?: (flyteidl.event.INodeExecutionEvent|null);
 
-            /** CloudEventNodeExecution taskId */
-            taskId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventNodeExecution retryAttempt */
-            retryAttempt?: (number|null);
+            /** CloudEventNodeExecution taskExecId */
+            taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
 
             /** CloudEventNodeExecution outputData */
             outputData?: (flyteidl.core.ILiteralMap|null);
@@ -7522,6 +7513,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution inputData */
             inputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** CloudEventNodeExecution artifactIds */
+            artifactIds?: (flyteidl.core.IArtifactID[]|null);
 
             /** CloudEventNodeExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
@@ -7539,11 +7533,8 @@ export namespace flyteidl {
             /** CloudEventNodeExecution rawEvent. */
             public rawEvent?: (flyteidl.event.INodeExecutionEvent|null);
 
-            /** CloudEventNodeExecution taskId. */
-            public taskId?: (flyteidl.core.IIdentifier|null);
-
-            /** CloudEventNodeExecution retryAttempt. */
-            public retryAttempt: number;
+            /** CloudEventNodeExecution taskExecId. */
+            public taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
 
             /** CloudEventNodeExecution outputData. */
             public outputData?: (flyteidl.core.ILiteralMap|null);
@@ -7553,6 +7544,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution inputData. */
             public inputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** CloudEventNodeExecution artifactIds. */
+            public artifactIds: flyteidl.core.IArtifactID[];
 
             /** CloudEventNodeExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);

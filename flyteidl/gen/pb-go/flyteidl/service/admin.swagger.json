@@ -7648,7 +7648,7 @@
       "properties": {
         "task_id": {
           "$ref": "#/definitions/coreIdentifier",
-          "title": "ID of the task. In combination with the retryAttempt this will indicate\nthe task execution uniquely for a given parent node execution.\nneed to copy"
+          "description": "ID of the task. In combination with the retryAttempt this will indicate\nthe task execution uniquely for a given parent node execution."
         },
         "parent_node_execution_id": {
           "$ref": "#/definitions/coreNodeExecutionIdentifier",
@@ -7657,7 +7657,7 @@
         "retry_attempt": {
           "type": "integer",
           "format": "int64",
-          "title": "retry attempt number for this task, ie., 2 for the second attempt\nneed to copy"
+          "title": "retry attempt number for this task, ie., 2 for the second attempt"
         },
         "phase": {
           "$ref": "#/definitions/coreTaskExecutionPhase",

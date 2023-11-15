@@ -170,7 +170,6 @@ message EventReason {
 message TaskExecutionEvent {
     // ID of the task. In combination with the retryAttempt this will indicate
     // the task execution uniquely for a given parent node execution.
-    // need to copy
     core.Identifier task_id = 1;
 
     // A task execution is always kicked off by a node execution, the event consumer
@@ -178,7 +177,6 @@ message TaskExecutionEvent {
     core.NodeExecutionIdentifier parent_node_execution_id = 2;
 
     // retry attempt number for this task, ie., 2 for the second attempt
-    // need to copy
     uint32 retry_attempt = 3;
 
     // Phase associated with the event

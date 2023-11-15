@@ -202,7 +202,6 @@ pub struct EventReason {
 pub struct TaskExecutionEvent {
     /// ID of the task. In combination with the retryAttempt this will indicate
     /// the task execution uniquely for a given parent node execution.
-    /// need to copy
     #[prost(message, optional, tag="1")]
     pub task_id: ::core::option::Option<super::core::Identifier>,
     /// A task execution is always kicked off by a node execution, the event consumer
@@ -210,7 +209,6 @@ pub struct TaskExecutionEvent {
     #[prost(message, optional, tag="2")]
     pub parent_node_execution_id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
     /// retry attempt number for this task, ie., 2 for the second attempt
-    /// need to copy
     #[prost(uint32, tag="3")]
     pub retry_attempt: u32,
     /// Phase associated with the event
@@ -402,16 +400,14 @@ pub struct CloudEventWorkflowExecution {
     pub input_data: ::core::option::Option<super::core::LiteralMap>,
     /// The following are ExecutionMetadata fields
     /// We can't have the ExecutionMetadata object directly because of import cycle
-    #[prost(message, repeated, tag="6")]
+    #[prost(message, repeated, tag="5")]
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
-    #[prost(message, optional, tag="7")]
-    pub parent_node_execution: ::core::option::Option<super::core::NodeExecutionIdentifier>,
-    #[prost(message, optional, tag="8")]
+    #[prost(message, optional, tag="6")]
     pub reference_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
     /// The ID of the LP that generated the execution that generated the Artifact.
     /// Here for provenance information.
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-    #[prost(message, optional, tag="9")]
+    #[prost(message, optional, tag="7")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -419,27 +415,25 @@ pub struct CloudEventWorkflowExecution {
 pub struct CloudEventNodeExecution {
     #[prost(message, optional, tag="1")]
     pub raw_event: ::core::option::Option<NodeExecutionEvent>,
-    /// ID of the task. In combination with the retryAttempt this will indicate
-    /// the task execution uniquely for a given parent node execution.
-    /// need to copy
+    /// The relevant task execution if applicable
     #[prost(message, optional, tag="2")]
-    pub task_id: ::core::option::Option<super::core::Identifier>,
-    /// retry attempt number for this task, ie., 2 for the second attempt
-    /// need to copy
-    #[prost(uint32, tag="3")]
-    pub retry_attempt: u32,
+    pub task_exec_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
     /// Hydrated output
-    #[prost(message, optional, tag="4")]
+    #[prost(message, optional, tag="3")]
     pub output_data: ::core::option::Option<super::core::LiteralMap>,
     /// The typed interface for the task that produced the event.
-    #[prost(message, optional, tag="5")]
+    #[prost(message, optional, tag="4")]
     pub output_interface: ::core::option::Option<super::core::TypedInterface>,
-    #[prost(message, optional, tag="6")]
+    #[prost(message, optional, tag="5")]
     pub input_data: ::core::option::Option<super::core::LiteralMap>,
+    /// The following are ExecutionMetadata fields
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(message, repeated, tag="6")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
     /// The ID of the LP that generated the execution that generated the Artifact.
     /// Here for provenance information.
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-    #[prost(message, optional, tag="9")]
+    #[prost(message, optional, tag="7")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

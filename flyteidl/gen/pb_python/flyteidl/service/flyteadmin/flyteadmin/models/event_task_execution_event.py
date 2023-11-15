@@ -156,6 +156,7 @@ class EventTaskExecutionEvent(object):
     def task_id(self):
         """Gets the task_id of this EventTaskExecutionEvent.  # noqa: E501
 
+        ID of the task. In combination with the retryAttempt this will indicate the task execution uniquely for a given parent node execution.  # noqa: E501
 
         :return: The task_id of this EventTaskExecutionEvent.  # noqa: E501
         :rtype: CoreIdentifier
@@ -166,6 +167,7 @@ class EventTaskExecutionEvent(object):
     def task_id(self, task_id):
         """Sets the task_id of this EventTaskExecutionEvent.
 
+        ID of the task. In combination with the retryAttempt this will indicate the task execution uniquely for a given parent node execution.  # noqa: E501
 
         :param task_id: The task_id of this EventTaskExecutionEvent.  # noqa: E501
         :type: CoreIdentifier

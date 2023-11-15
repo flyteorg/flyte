@@ -24,41 +24,37 @@ message CloudEventWorkflowExecution {
 
   // The following are ExecutionMetadata fields
   // We can't have the ExecutionMetadata object directly because of import cycle
-  repeated core.ArtifactID artifact_ids = 6;
-  core.NodeExecutionIdentifier parent_node_execution = 7;
-  core.WorkflowExecutionIdentifier reference_execution = 8;
+  repeated core.ArtifactID artifact_ids = 5;
+  core.WorkflowExecutionIdentifier reference_execution = 6;
 
   // The ID of the LP that generated the execution that generated the Artifact.
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-  core.Identifier launch_plan_id = 9;
+  core.Identifier launch_plan_id = 7;
 }
-
 
 message CloudEventNodeExecution {
   event.NodeExecutionEvent raw_event = 1;
 
-  // ID of the task. In combination with the retryAttempt this will indicate
-  // the task execution uniquely for a given parent node execution.
-  // need to copy
-  core.Identifier task_id = 2;
-
-  // retry attempt number for this task, ie., 2 for the second attempt
-  // need to copy
-  uint32 retry_attempt = 3;
+  // The relevant task execution if applicable
+  core.TaskExecutionIdentifier task_exec_id = 2;
 
   // Hydrated output
-  core.LiteralMap output_data = 4;
+  core.LiteralMap output_data = 3;
 
   // The typed interface for the task that produced the event.
-  core.TypedInterface output_interface = 5;
+  core.TypedInterface output_interface = 4;
 
-  core.LiteralMap input_data = 6;
+  core.LiteralMap input_data = 5;
+
+  // The following are ExecutionMetadata fields
+  // We can't have the ExecutionMetadata object directly because of import cycle
+  repeated core.ArtifactID artifact_ids = 6;
 
   // The ID of the LP that generated the execution that generated the Artifact.
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-  core.Identifier launch_plan_id = 9;
+  core.Identifier launch_plan_id = 7;
 }
 
 message CloudEventTaskExecution {

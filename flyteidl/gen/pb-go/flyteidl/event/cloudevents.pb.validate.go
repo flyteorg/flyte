@@ -99,16 +99,6 @@ func (m *CloudEventWorkflowExecution) Validate() error {
 
 	}
 
-	if v, ok := interface{}(m.GetParentNodeExecution()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return CloudEventWorkflowExecutionValidationError{
-				field:  "ParentNodeExecution",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if v, ok := interface{}(m.GetReferenceExecution()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CloudEventWorkflowExecutionValidationError{
@@ -207,17 +197,15 @@ func (m *CloudEventNodeExecution) Validate() error {
 		}
 	}
 
-	if v, ok := interface{}(m.GetTaskId()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetTaskExecId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CloudEventNodeExecutionValidationError{
-				field:  "TaskId",
+				field:  "TaskExecId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
-
-	// no validation rules for RetryAttempt
 
 	if v, ok := interface{}(m.GetOutputData()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -247,6 +235,21 @@ func (m *CloudEventNodeExecution) Validate() error {
 				cause:  err,
 			}
 		}
+	}
+
+	for idx, item := range m.GetArtifactIds() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CloudEventNodeExecutionValidationError{
+					field:  fmt.Sprintf("ArtifactIds[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {

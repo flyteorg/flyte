@@ -814,13 +814,11 @@ func (m *EventReason) GetOccurredAt() *timestamp.Timestamp {
 type TaskExecutionEvent struct {
 	// ID of the task. In combination with the retryAttempt this will indicate
 	// the task execution uniquely for a given parent node execution.
-	// need to copy
 	TaskId *core.Identifier `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	// A task execution is always kicked off by a node execution, the event consumer
 	// will use the parent_id to relate the task to it's parent node execution
 	ParentNodeExecutionId *core.NodeExecutionIdentifier `protobuf:"bytes,2,opt,name=parent_node_execution_id,json=parentNodeExecutionId,proto3" json:"parent_node_execution_id,omitempty"`
 	// retry attempt number for this task, ie., 2 for the second attempt
-	// need to copy
 	RetryAttempt uint32 `protobuf:"varint,3,opt,name=retry_attempt,json=retryAttempt,proto3" json:"retry_attempt,omitempty"`
 	// Phase associated with the event
 	Phase core.TaskExecution_Phase `protobuf:"varint,4,opt,name=phase,proto3,enum=flyteidl.core.TaskExecution_Phase" json:"phase,omitempty"`
