@@ -369,6 +369,7 @@ type ExecutableNodeStatus interface {
 	GetOutputDir() DataReference
 	GetMessage() string
 	GetExecutionError() *core.ExecutionError
+	PopExecutionError() *core.ExecutionError
 	GetAttempts() uint32
 	GetSystemFailures() uint32
 	GetWorkflowNodeStatus() ExecutableWorkflowNodeStatus
