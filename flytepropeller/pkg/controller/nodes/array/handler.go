@@ -320,6 +320,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// capture subNode error if exists
 			if nodeExecutionRequest.subNodeStatus.Error != nil {
 				subNodeFailureCollector.Collect(index, subNodeStatus.Error.Message)
+				subNodeStatus.Error = nil
 			}
 
 			// process events by copying from internal event recorder
