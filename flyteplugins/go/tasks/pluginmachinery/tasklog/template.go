@@ -34,6 +34,7 @@ type templateRegexes struct {
 	ExecutionName        *regexp.Regexp
 	ExecutionProject     *regexp.Regexp
 	ExecutionDomain      *regexp.Regexp
+	GeneratedName        *regexp.Regexp
 }
 
 func initDefaultRegexes() templateRegexes {
@@ -58,6 +59,7 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("executionName"),
 		MustCreateRegex("executionProject"),
 		MustCreateRegex("executionDomain"),
+		MustCreateRegex("generatedName"),
 	}
 }
 
@@ -122,6 +124,10 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 				input.TaskExecutionID.GetUniqueNodeID(),
 			},
 			TemplateVar{
+				defaultRegexes.GeneratedName,
+				input.TaskExecutionID.GetGeneratedName(),
+			},
+			TemplateVar{
 				defaultRegexes.TaskRetryAttempt,
 				strconv.FormatUint(uint64(taskExecutionIdentifier.RetryAttempt), 10),
 			},
@@ -172,55 +178,16 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 	return vars
 }
 
-// A simple log plugin that supports templates in urls to build the final log link.
-// See `defaultRegexes` for supported templates.
-type TemplateLogPlugin struct {
-	scheme        TemplateScheme
-	templateUris  []string
-	messageFormat core.TaskLog_MessageFormat
-}
-
-func (s TemplateLogPlugin) GetTaskLog(podName, podUID, namespace, containerName, containerID, logName string, podRFC3339StartTime string, podRFC3339FinishTime string, podUnixStartTime, podUnixFinishTime int64) (core.TaskLog, error) {
-	o, err := s.GetTaskLogs(Input{
-		LogName:              logName,
-		Namespace:            namespace,
-		PodName:              podName,
-		PodUID:               podUID,
-		ContainerName:        containerName,
-		ContainerID:          containerID,
-		PodRFC3339StartTime:  podRFC3339StartTime,
-		PodRFC3339FinishTime: podRFC3339FinishTime,
-		PodUnixStartTime:     podUnixStartTime,
-		PodUnixFinishTime:    podUnixFinishTime,
-	})
-
-	if err != nil || len(o.TaskLogs) == 0 {
-		return core.TaskLog{}, err
-	}
-
-	return *o.TaskLogs[0], nil
-}
-
-func (s TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
-	templateVars := input.templateVarsForScheme(s.scheme)
-	taskLogs := make([]*core.TaskLog, 0, len(s.templateUris))
-	for _, templateURI := range s.templateUris {
+func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
+	templateVars := input.templateVarsForScheme(p.Scheme)
+	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
+	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
 			Uri:           replaceAll(templateURI, templateVars),
-			Name:          input.LogName,
-			MessageFormat: s.messageFormat,
+			Name:          p.DisplayName + input.LogName,
+			MessageFormat: p.MessageFormat,
 		})
 	}
 
 	return Output{TaskLogs: taskLogs}, nil
-}
-
-// NewTemplateLogPlugin creates a template-based log plugin with the provided template Uri and message format.
-// See `defaultRegexes` for supported templates.
-func NewTemplateLogPlugin(scheme TemplateScheme, templateUris []string, messageFormat core.TaskLog_MessageFormat) TemplateLogPlugin {
-	return TemplateLogPlugin{
-		scheme:        scheme,
-		templateUris:  templateUris,
-		messageFormat: messageFormat,
-	}
 }

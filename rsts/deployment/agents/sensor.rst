@@ -1,22 +1,49 @@
-.. _deployment-agent-setup-bigquery:
+.. _deployment-agent-setup-sensor:
 
-Google BigQuery Agent
-======================
+Sensor Agent
+=================
 
-This guide provides an overview of setting up BigQuery agent in your Flyte deployment.
-Please note that the BigQuery agent requires Flyte deployment in the GCP cloud;
-it is not compatible with demo/AWS/Azure.
+Sensor enables users to continuously check for a file or a condition to be met periodically.
 
-Set up the GCP Flyte cluster
-----------------------------
+When the condition is met, the sensor will complete.
 
-* Ensure you have a functional Flyte cluster running in `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__.
-* Create a service account for BigQuery. For more details, refer to: https://cloud.google.com/bigquery/docs/quickstarts/quickstart-client-libraries.
-* Verify that you have the correct kubeconfig and have selected the appropriate Kubernetes context.
-* Confirm that you have the correct Flytectl configuration at ``~/.flyte/config.yaml``.
+This guide provides an overview of how to set up Sensor in your Flyte deployment.
+
+Spin up a cluster
+-----------------
+
+.. tabs::
+
+  .. group-tab:: Flyte binary
+
+    You can spin up a demo cluster using the following command:
+
+    .. code-block:: bash
+
+      flytectl demo start
+
+    Or install Flyte using the :ref:`flyte-binary helm chart <deployment-deployment-cloud-simple>`.
+
+  .. group-tab:: Flyte core
+
+    If you've installed Flyte using the
+    `flyte-core helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte-core>`__, please ensure:
+
+    * You have the correct kubeconfig and have selected the correct Kubernetes context.
+    * Confirm that you have the correct Flytectl configuration at ``~/.flyte/config.yaml``.
+
+.. note::
+
+  Add the Flyte chart repo to Helm if you're installing via the Helm charts.
+
+  .. code-block:: bash
+
+    helm repo add flyteorg https://flyteorg.github.io/flyte
 
 Specify agent configuration
 ----------------------------
+
+Enable the Sensor agent by adding the following config to the relevant YAML file(s):
 
 .. tabs::
 
@@ -41,12 +68,12 @@ Specify agent configuration
             default-for-task-types:
               - container: container
               - container_array: k8s-array
-              - bigquery_query_job_task: agent-service
+              - sensor: agent-service
         
         plugins:
           agent-service:
             supportedTaskTypes:
-            - bigquery_query_job_task
+            - sensor
 
     .. group-tab:: Flyte core
 
@@ -70,35 +97,51 @@ Specify agent configuration
                   container: container
                   sidecar: sidecar
                   container_array: k8s-array
-                  bigquery_query_job_task: agent-service
+                  sensor: agent-service
             plugins:
               agent-service:
                 supportedTaskTypes:
-                - bigquery_query_job_task
+                - sensor
 
-Ensure that the propeller has the correct service account for BigQuery.
 
-Upgrade the Flyte Helm release
-------------------------------
+Upgrade the deployment
+----------------------
 
 .. tabs::
 
   .. group-tab:: Flyte binary
 
-    .. code-block:: bash
+    .. tabs::
 
-      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
+      .. group-tab:: Demo cluster
 
-    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
-    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
-    and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
+        .. code-block:: bash
+
+          kubectl rollout restart deployment flyte-sandbox -n flyte
+
+      .. group-tab:: Helm chart
+
+        .. code-block:: bash
+
+          helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
+
+        Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+        ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+        and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
 
   .. group-tab:: Flyte core
 
-    .. code-block:: bash
+    .. code-block::
 
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
-
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
+
+Wait for the upgrade to complete.
+
+You can check the status of the deployment pods by running the following command:
+
+.. code-block::
+
+  kubectl get pods -n flyte
