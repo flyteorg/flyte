@@ -632,6 +632,7 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		if p == NodePhaseSucceeded || p == NodePhaseSkipped || !enableCRDebugMetadata {
 			// Clear most status related fields after reaching a terminal state. This keeps the CR state small to avoid
 			// etcd size limits. Importantly we keep Phase, StoppedAt and Error which will be needed further.
+			// Errors will still be needed but it will be cleaned up when possible because they can be very large. 
 			in.Message = ""
 			in.QueuedAt = nil
 			in.StartedAt = nil
