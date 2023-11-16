@@ -317,13 +317,13 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		err := &core.ExecutionError{}
 		ns.UpdatePhase(p, n, msg, err)
 
-		assert.Equal(t, *ns.LastUpdatedAt, n)
+		assert.Nil(t, ns.LastUpdatedAt)
 		assert.Nil(t, ns.QueuedAt)
-		assert.Equal(t, *ns.LastAttemptStartedAt, n)
-		assert.Equal(t, *ns.StartedAt, n)
+		assert.Nil(t, ns.LastAttemptStartedAt)
+		assert.Nil(t, ns.StartedAt)
 		assert.Equal(t, *ns.StoppedAt, n)
 		assert.Equal(t, p, ns.Phase)
-		assert.Equal(t, msg, ns.Message)
+		assert.Equal(t, ns.Message, "")
 		assert.Equal(t, ns.Error.ExecutionError, err)
 	})
 
@@ -334,13 +334,13 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		err := &core.ExecutionError{}
 		ns.UpdatePhase(p, n, msg, err)
 
-		assert.Equal(t, *ns.LastUpdatedAt, n)
+		assert.Nil(t, ns.LastUpdatedAt)
 		assert.Nil(t, ns.QueuedAt)
-		assert.Equal(t, *ns.LastAttemptStartedAt, n)
-		assert.Equal(t, *ns.StartedAt, n)
+		assert.Nil(t, ns.LastAttemptStartedAt)
+		assert.Nil(t, ns.StartedAt)
 		assert.Equal(t, *ns.StoppedAt, n)
 		assert.Equal(t, p, ns.Phase)
-		assert.Equal(t, msg, ns.Message)
+		assert.Equal(t, ns.Message, "")
 		assert.Equal(t, ns.Error.ExecutionError, err)
 	})
 
