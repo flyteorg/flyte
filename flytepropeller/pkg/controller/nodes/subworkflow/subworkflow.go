@@ -143,12 +143,18 @@ func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx interfaces.No
 
 func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	originalError := nCtx.NodeStateReader().GetWorkflowNodeState().Error
-	if subworkflow.GetOnFailureNode() != nil {
+	failureNode := subworkflow.GetOnFailureNode()
+	if failureNode != nil {
 		execContext, err := s.getExecutionContextForDownstream(nCtx)
 		if err != nil {
 			return handler.UnknownTransition, err
 		}
-		state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.GetOnFailureNode())
+		subNodeLookup := nCtx.ContextualNodeLookup()
+		// TODO: NodeStatus() is deprecated, how do we get the status of the failure node?
+		failureNodeStatus := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, failureNode.GetID())
+		failureNodeLookup := executors.NewFailureNodeLookup(subNodeLookup, failureNode, failureNodeStatus)
+
+		state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, failureNodeLookup, failureNodeLookup, failureNode)
 		if err != nil {
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 		}
