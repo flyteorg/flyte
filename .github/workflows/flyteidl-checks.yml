@@ -6,13 +6,9 @@ concurrency:
 
 on:
   pull_request:
-    paths:
-      - 'flyteidl/**'
   push:
     branches:
       - master
-    paths:
-      - 'flyteidl/**'
 env:
   GO_VERSION: "1.19"
 jobs:
