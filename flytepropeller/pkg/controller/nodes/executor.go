@@ -1278,7 +1278,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (interfaces.NodeStatus, error) {
 	nodeStatus := nCtx.NodeStatus()
 	logger.Debugf(ctx, "node failed with retryable failure, aborting and finalizing, message: %s", nodeStatus.GetMessage())
-	if err := c.Abort(ctx, h, nCtx, nodeStatus.GetMessage(), false); err != nil {
+	if err := c.Abort(ctx, h, nCtx, nodeStatus.GetExecutionError().GetMessage(), false); err != nil {
 		return interfaces.NodeStatusUndefined, err
 	}
 

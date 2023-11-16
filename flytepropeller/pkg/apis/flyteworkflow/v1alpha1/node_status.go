@@ -626,14 +626,12 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 			in.LastAttemptStartedAt = &n
 		}
 	} else if IsPhaseTerminal(p) {
-		// If we are in terminal phase then we will clear out all our fields as they are not required anymore
-		// Only thing required is stopped at and lastupdatedat time
 		if in.StoppedAt == nil {
 			in.StoppedAt = &n
 		}
-		// Clear most fields after reaching a terminal state. This keeps the CRD state small and avoid etcd size 
-		// limits. We keep phase and StoppedAt. StoppedAt is used to calculate transition latency between this 
-		// node and any downstream nodes and Phase is required for propeller to continue to downstream nodes.
+		// Clear most status related fields after reaching a terminal state. This keeps the CRD state small to avoid 
+		// etcd size limits. Importantly we keep Phase, StoppedAt and Error which will be needed further. 
+		in.Message = ""
 		in.QueuedAt = nil
 		in.StartedAt = nil
 		in.LastUpdatedAt = nil
@@ -644,11 +642,6 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		in.TaskNodeStatus = nil
 		in.WorkflowNodeStatus = nil
 	}
-	// For cases in which the node is either Succeeded or Skipped we clear the message. Potentially this will be useful 
-	// for other failed states. 
-	in.Message = ""
-	// if p == NodePhaseSucceeded || p == NodePhaseSkipped {
-	// }
 	in.SetDirty()
 }
 
