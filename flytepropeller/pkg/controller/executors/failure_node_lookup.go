@@ -6,41 +6,38 @@ import (
 )
 
 type FailureNodeLookup struct {
-	NodeSpec        *v1alpha1.NodeSpec
-	NodeStatus      v1alpha1.ExecutableNodeStatus
-	StartNode       v1alpha1.ExecutableNode
-	StartNodeStatus v1alpha1.ExecutableNodeStatus
+	NodeLookup
+	FailureNode       v1alpha1.ExecutableNode
+	FailureNodeStatus v1alpha1.ExecutableNodeStatus
 }
 
 func (f FailureNodeLookup) GetNode(nodeID v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool) {
 	if nodeID == v1alpha1.StartNodeID {
-		return f.StartNode, true
+		return f.NodeLookup.GetNode(nodeID)
 	}
-	return f.NodeSpec, true
+	return f.FailureNode, true
 }
 
 func (f FailureNodeLookup) GetNodeExecutionStatus(ctx context.Context, id v1alpha1.NodeID) v1alpha1.ExecutableNodeStatus {
 	if id == v1alpha1.StartNodeID {
-		return f.StartNodeStatus
+		return f.NodeLookup.GetNodeExecutionStatus(ctx, id)
 	}
-	return f.NodeStatus
+	return f.FailureNodeStatus
 }
 
 func (f FailureNodeLookup) ToNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
+	// The upstream node of the failure node is always the start node
 	return []v1alpha1.NodeID{v1alpha1.StartNodeID}, nil
 }
 
 func (f FailureNodeLookup) FromNode(id v1alpha1.NodeID) ([]v1alpha1.NodeID, error) {
-	return nil, nil
+	return []v1alpha1.NodeID{v1alpha1.EndNodeID}, nil
 }
 
-func NewFailureNodeLookup(nodeSpec *v1alpha1.NodeSpec, startNode v1alpha1.ExecutableNode, nodeStatusGetter v1alpha1.NodeStatusGetter) NodeLookup {
-	startNodeStatus := nodeStatusGetter.GetNodeExecutionStatus(context.TODO(), v1alpha1.StartNodeID)
-	errNodeStatus := nodeStatusGetter.GetNodeExecutionStatus(context.TODO(), nodeSpec.GetID())
+func NewFailureNodeLookup(nodeLookup NodeLookup, failureNode v1alpha1.ExecutableNode, failureNodeStatus v1alpha1.ExecutableNodeStatus) NodeLookup {
 	return FailureNodeLookup{
-		NodeSpec:        nodeSpec,
-		NodeStatus:      errNodeStatus,
-		StartNode:       startNode,
-		StartNodeStatus: startNodeStatus,
+		NodeLookup:        nodeLookup,
+		FailureNode:       failureNode,
+		FailureNodeStatus: failureNodeStatus,
 	}
 }

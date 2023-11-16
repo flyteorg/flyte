@@ -169,18 +169,14 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 
 func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	execErr := executionErrorOrDefault(w.GetExecutionStatus().GetExecutionError(), w.GetExecutionStatus().GetMessage())
-	errorNode := w.GetOnFailureNode()
-	logger.Infof(ctx, "Handling FailureNode [%v]", errorNode)
+	failureNode := w.GetOnFailureNode()
+	logger.Infof(ctx, "Handling FailureNode [%v]", failureNode.GetID())
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 
-	// TODO: GetNodeExecutionStatus doesn't work. How do we get the error node status from CRD
-	startNode, _ := w.GetNode(v1alpha1.StartNodeID)
-	failureNodeLookup := executors.NewFailureNodeLookup(errorNode.(*v1alpha1.NodeSpec), startNode, w.GetExecutionStatus())
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, errorNode)
-	logger.Infof(ctx, "FailureNode [%v] finished with state [%v]", errorNode, state)
-	logger.Infof(ctx, "FailureNode [%v] finished with error [%v]", errorNode, err)
+	failureNodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, failureNode.GetID())
+	failureNodeLookup := executors.NewFailureNodeLookup(w, failureNode, failureNodeStatus)
+	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, failureNode)
 	if err != nil {
-		logger.Infof(ctx, "test")
 		return StatusFailureNode(execErr), err
 	}
 
@@ -201,8 +197,6 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 		c.enqueueWorkflow(w.GetK8sWorkflowID().String())
 		return StatusFailureNode(execErr), nil
 	}
-
-	logger.Infof(ctx, "test2")
 
 	// If the failure node finished executing, transition to failed.
 	return StatusFailed(execErr), nil
