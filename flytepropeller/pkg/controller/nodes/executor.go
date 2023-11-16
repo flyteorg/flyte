@@ -236,7 +236,7 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
-		return interfaces.NodeStatusFailed(nodeStatus.PopExecutionError()), nil
+		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
 	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
 		logger.Debugf(currentNodeCtx, "Node has timed out, traversing downstream.")
 		_, err := c.handleDownstream(ctx, execContext, dag, nl, currentNode)
@@ -297,7 +297,8 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 				// If the failure policy allows other nodes to continue running, do not exit the loop,
 				// Keep track of the last failed state in the loop since it'll be the one to return.
 				// TODO: If multiple nodes fail (which this mode allows), consolidate/summarize failure states in one.
-				stateOnComplete = interfaces.NodeStatus{NodePhase: state.NodePhase, Err: &*state.Err}
+				stateOnComplete.ResetError()
+				stateOnComplete = state
 			} else {
 				return state, nil
 			}
