@@ -1157,40 +1157,6 @@ func (_m *ExecutableNodeStatus) IsDirty() bool {
 	return r0
 }
 
-type ExecutableNodeStatus_PopExecutionError struct {
-	*mock.Call
-}
-
-func (_m ExecutableNodeStatus_PopExecutionError) Return(_a0 *core.ExecutionError) *ExecutableNodeStatus_PopExecutionError {
-	return &ExecutableNodeStatus_PopExecutionError{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *ExecutableNodeStatus) OnPopExecutionError() *ExecutableNodeStatus_PopExecutionError {
-	c_call := _m.On("PopExecutionError")
-	return &ExecutableNodeStatus_PopExecutionError{Call: c_call}
-}
-
-func (_m *ExecutableNodeStatus) OnPopExecutionErrorMatch(matchers ...interface{}) *ExecutableNodeStatus_PopExecutionError {
-	c_call := _m.On("PopExecutionError", matchers...)
-	return &ExecutableNodeStatus_PopExecutionError{Call: c_call}
-}
-
-// PopExecutionError provides a mock function with given fields:
-func (_m *ExecutableNodeStatus) PopExecutionError() *core.ExecutionError {
-	ret := _m.Called()
-
-	var r0 *core.ExecutionError
-	if rf, ok := ret.Get(0).(func() *core.ExecutionError); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*core.ExecutionError)
-		}
-	}
-
-	return r0
-}
-
 // ResetDirty provides a mock function with given fields:
 func (_m *ExecutableNodeStatus) ResetDirty() {
 	_m.Called()

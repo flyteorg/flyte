@@ -236,6 +236,7 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
+		
 		return interfaces.NodeStatusFailed(nodeStatus.GetExecutionError()), nil
 	} else if nodePhase == v1alpha1.NodePhaseTimedOut {
 		logger.Debugf(currentNodeCtx, "Node has timed out, traversing downstream.")

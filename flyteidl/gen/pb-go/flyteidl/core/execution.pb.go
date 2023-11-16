@@ -407,10 +407,6 @@ func (m *ExecutionError) GetMessage() string {
 	return ""
 }
 
-func (m *ExecutionError) ClearMessage() {
-	m.Message = ""
-}
-
 func (m *ExecutionError) GetErrorUri() string {
 	if m != nil {
 		return m.ErrorUri
