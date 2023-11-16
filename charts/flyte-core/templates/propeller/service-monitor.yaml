@@ -10,10 +10,10 @@ metadata:
   {{- end }}
 spec:
   endpoints:
-    - interval: 60s
+    - interval: {{ .Values.flytepropeller.serviceMonitor.interval }}
       port: http-metrics
       path: /metrics
-      scrapeTimeout: 30s
+      scrapeTimeout: {{ .Values.flytepropeller.serviceMonitor.scrapeTimeout }}
   selector:
     matchLabels: {{ include "flytepropeller.selectorLabels" . | nindent 6 }}
 {{- end }}

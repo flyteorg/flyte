@@ -176,9 +176,11 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceAccount.create | bool | `true` | Should a service account be created for flyteadmin |
 | flyteadmin.serviceAccount.createClusterRole | bool | `true` | Should a ClusterRole be created for Flyteadmin |
 | flyteadmin.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
-| flyteadmin.serviceMonitor | object | `{"enabled":false,"labels":null}` | Settings for flyteadmin service monitor |
-| flyteadmin.serviceMonitor.enabled | bool | `false` | If enabled create the flyteadmin service monitor. |
-| flyteadmin.serviceMonitor.labels | string | `nil` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
+| flyteadmin.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Settings for flyteadmin service monitor |
+| flyteadmin.serviceMonitor.enabled | bool | `false` | If enabled create the flyteadmin service monitor |
+| flyteadmin.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
+| flyteadmin.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
+| flyteadmin.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
 | flyteagent.enabled | bool | `false` |  |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
@@ -220,9 +222,11 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to FlytePropeller pods |
 | flytepropeller.serviceAccount.create | bool | `true` | Should a service account be created for FlytePropeller |
 | flytepropeller.serviceAccount.imagePullSecrets | list | `[]` | ImagePullSecrets to automatically assign to the service account |
-| flytepropeller.serviceMonitor | object | `{"enabled":false,"labels":null}` | Settings for flytepropeller service monitor |
-| flytepropeller.serviceMonitor.enabled | bool | `false` | If enabled create the flyetepropeller service monitor. |
-| flytepropeller.serviceMonitor.labels | string | `nil` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
+| flytepropeller.serviceMonitor | object | `{"enabled":false,"interval":"60s","labels":{},"scrapeTimeout":"30s"}` | Settings for flytepropeller service monitor |
+| flytepropeller.serviceMonitor.enabled | bool | `false` | If enabled create the flyetepropeller service monitor |
+| flytepropeller.serviceMonitor.interval | string | `"60s"` | Sets the interval at which metrics will be scraped by prometheus |
+| flytepropeller.serviceMonitor.labels | object | `{}` | Sets the labels for the service monitor which are required by the prometheus to auto-detect the service monitor and start scrapping the metrics |
+| flytepropeller.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
 | flytepropeller.terminationMessagePolicy | string | `"FallbackToLogsOnError"` | Error reporting |
 | flytepropeller.tolerations | list | `[]` | tolerations for Flytepropeller deployment |
 | flytescheduler.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
