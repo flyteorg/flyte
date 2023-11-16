@@ -174,8 +174,9 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 
 	// TODO: GetNodeExecutionStatus doesn't work. How do we get the error node status from CRD
-	failureNodeLookup := executors.NewFailureNodeLookup(errorNode.(*v1alpha1.NodeSpec), w.GetNode(v1alpha1.StartNodeID), w.GetExecutionStatus())
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, failureNodeLookup, errorNode)
+	startNode, _ := w.GetNode(v1alpha1.StartNodeID)
+	failureNodeLookup := executors.NewFailureNodeLookup(errorNode.(*v1alpha1.NodeSpec), startNode, w.GetExecutionStatus())
+	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, failureNodeLookup, failureNodeLookup, errorNode)
 	logger.Infof(ctx, "FailureNode [%v] finished with state [%v]", errorNode, state)
 	logger.Infof(ctx, "FailureNode [%v] finished with error [%v]", errorNode, err)
 	if err != nil {
@@ -183,25 +184,25 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 		return StatusFailureNode(execErr), err
 	}
 
-	if state.HasFailed() {
-		logger.Infof(ctx, "test1 [%v]", state.Err)
+	switch state.NodePhase {
+	case interfaces.NodePhaseFailed:
 		return StatusFailed(state.Err), nil
-	}
-
-	if state.HasTimedOut() {
+	case interfaces.NodePhaseTimedOut:
 		return StatusFailed(&core.ExecutionError{
 			Kind:    core.ExecutionError_USER,
 			Code:    "TimedOut",
 			Message: "FailureNode Timed-out"}), nil
-	}
-
-	logger.Infof(ctx, "test2")
-
-	if state.PartiallyComplete() {
+	case interfaces.NodePhaseQueued:
+		fallthrough
+	case interfaces.NodePhaseRunning:
+		fallthrough
+	case interfaces.NodePhaseSuccess:
 		// Re-enqueue the workflow
 		c.enqueueWorkflow(w.GetK8sWorkflowID().String())
 		return StatusFailureNode(execErr), nil
 	}
+
+	logger.Infof(ctx, "test2")
 
 	// If the failure node finished executing, transition to failed.
 	return StatusFailed(execErr), nil
