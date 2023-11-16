@@ -8,6 +8,7 @@ from flyteidl.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl.core import interface_pb2 as _interface_pb2
 from flyteidl.event import cloudevents_pb2 as _cloudevents_pb2
 from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
@@ -15,17 +16,19 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Artifact(_message.Message):
-    __slots__ = ["artifact_id", "spec", "tags"]
+    __slots__ = ["artifact_id", "spec", "tags", "source"]
     ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     artifact_id: _artifact_id_pb2.ArtifactID
     spec: ArtifactSpec
     tags: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ...) -> None: ...
+    source: ArtifactSource
+    def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
 
 class CreateArtifactRequest(_message.Message):
-    __slots__ = ["artifact_key", "version", "spec", "partitions", "tag"]
+    __slots__ = ["artifact_key", "version", "spec", "partitions", "tag", "source"]
     class PartitionsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -38,32 +41,38 @@ class CreateArtifactRequest(_message.Message):
     SPEC_FIELD_NUMBER: _ClassVar[int]
     PARTITIONS_FIELD_NUMBER: _ClassVar[int]
     TAG_FIELD_NUMBER: _ClassVar[int]
+    SOURCE_FIELD_NUMBER: _ClassVar[int]
     artifact_key: _artifact_id_pb2.ArtifactKey
     version: str
     spec: ArtifactSpec
     partitions: _containers.ScalarMap[str, str]
     tag: str
-    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., version: _Optional[str] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., partitions: _Optional[_Mapping[str, str]] = ..., tag: _Optional[str] = ...) -> None: ...
+    source: ArtifactSource
+    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., version: _Optional[str] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., partitions: _Optional[_Mapping[str, str]] = ..., tag: _Optional[str] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
+
+class ArtifactSource(_message.Message):
+    __slots__ = ["task_execution", "node_execution", "principal"]
+    TASK_EXECUTION_FIELD_NUMBER: _ClassVar[int]
+    NODE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
+    PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
+    task_execution: _identifier_pb2.TaskExecutionIdentifier
+    node_execution: _identifier_pb2.NodeExecutionIdentifier
+    principal: str
+    def __init__(self, task_execution: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., principal: _Optional[str] = ...) -> None: ...
 
 class ArtifactSpec(_message.Message):
-    __slots__ = ["value", "type", "task_execution", "execution", "principal", "short_description", "user_metadata", "metadata_type"]
+    __slots__ = ["value", "type", "short_description", "user_metadata", "metadata_type"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
-    TASK_EXECUTION_FIELD_NUMBER: _ClassVar[int]
-    EXECUTION_FIELD_NUMBER: _ClassVar[int]
-    PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
     SHORT_DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     USER_METADATA_FIELD_NUMBER: _ClassVar[int]
     METADATA_TYPE_FIELD_NUMBER: _ClassVar[int]
     value: _literals_pb2.Literal
     type: _types_pb2.LiteralType
-    task_execution: _identifier_pb2.TaskExecutionIdentifier
-    execution: _identifier_pb2.WorkflowExecutionIdentifier
-    principal: str
     short_description: str
     user_metadata: _any_pb2.Any
     metadata_type: str
-    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., task_execution: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., principal: _Optional[str] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_any_pb2.Any, _Mapping]] = ..., metadata_type: _Optional[str] = ...) -> None: ...
+    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_any_pb2.Any, _Mapping]] = ..., metadata_type: _Optional[str] = ...) -> None: ...
 
 class CreateArtifactResponse(_message.Message):
     __slots__ = ["artifact"]
@@ -85,37 +94,55 @@ class GetArtifactResponse(_message.Message):
     artifact: Artifact
     def __init__(self, artifact: _Optional[_Union[Artifact, _Mapping]] = ...) -> None: ...
 
-class ListArtifactNamesRequest(_message.Message):
-    __slots__ = ["project", "domain"]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
-    DOMAIN_FIELD_NUMBER: _ClassVar[int]
-    project: str
-    domain: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ...) -> None: ...
-
-class ListArtifactNamesResponse(_message.Message):
-    __slots__ = ["artifact_keys"]
-    ARTIFACT_KEYS_FIELD_NUMBER: _ClassVar[int]
-    artifact_keys: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactKey]
-    def __init__(self, artifact_keys: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]]] = ...) -> None: ...
+class SearchOptions(_message.Message):
+    __slots__ = ["strict_partitions", "latest_by_key", "fetch_specs"]
+    STRICT_PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    LATEST_BY_KEY_FIELD_NUMBER: _ClassVar[int]
+    FETCH_SPECS_FIELD_NUMBER: _ClassVar[int]
+    strict_partitions: bool
+    latest_by_key: bool
+    fetch_specs: bool
+    def __init__(self, strict_partitions: bool = ..., latest_by_key: bool = ..., fetch_specs: bool = ...) -> None: ...
 
 class SearchArtifactsRequest(_message.Message):
-    __slots__ = ["artifact_key", "filters", "token", "limit"]
+    __slots__ = ["artifact_key", "partitions", "principal", "version", "options", "token", "limit"]
     ARTIFACT_KEY_FIELD_NUMBER: _ClassVar[int]
-    FILTERS_FIELD_NUMBER: _ClassVar[int]
+    PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    OPTIONS_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     artifact_key: _artifact_id_pb2.ArtifactKey
-    filters: str
+    partitions: _artifact_id_pb2.Partitions
+    principal: str
+    version: str
+    options: SearchOptions
     token: str
     limit: int
-    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., filters: _Optional[str] = ..., token: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
+    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., principal: _Optional[str] = ..., version: _Optional[str] = ..., options: _Optional[_Union[SearchOptions, _Mapping]] = ..., token: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
 
 class SearchArtifactsResponse(_message.Message):
-    __slots__ = ["artifacts"]
+    __slots__ = ["artifacts", "token"]
     ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
     artifacts: _containers.RepeatedCompositeFieldContainer[Artifact]
-    def __init__(self, artifacts: _Optional[_Iterable[_Union[Artifact, _Mapping]]] = ...) -> None: ...
+    token: str
+    def __init__(self, artifacts: _Optional[_Iterable[_Union[Artifact, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
+
+class FindByWorkflowExecRequest(_message.Message):
+    __slots__ = ["exec_id", "direction"]
+    class Direction(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        INPUTS: _ClassVar[FindByWorkflowExecRequest.Direction]
+        OUTPUTS: _ClassVar[FindByWorkflowExecRequest.Direction]
+    INPUTS: FindByWorkflowExecRequest.Direction
+    OUTPUTS: FindByWorkflowExecRequest.Direction
+    EXEC_ID_FIELD_NUMBER: _ClassVar[int]
+    DIRECTION_FIELD_NUMBER: _ClassVar[int]
+    exec_id: _identifier_pb2.WorkflowExecutionIdentifier
+    direction: FindByWorkflowExecRequest.Direction
+    def __init__(self, exec_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., direction: _Optional[_Union[FindByWorkflowExecRequest.Direction, str]] = ...) -> None: ...
 
 class AddTagRequest(_message.Message):
     __slots__ = ["artifact_id", "value", "overwrite"]

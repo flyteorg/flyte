@@ -348,6 +348,80 @@ func request_ArtifactRegistry_SearchArtifacts_1(ctx context.Context, marshaler r
 
 }
 
+var (
+	filter_ArtifactRegistry_FindByWorkflowExec_0 = &utilities.DoubleArray{Encoding: map[string]int{"exec_id": 0, "project": 1, "domain": 2, "name": 3, "direction": 4}, Base: []int{1, 1, 1, 2, 3, 4, 0, 0, 0, 0}, Check: []int{0, 1, 2, 2, 2, 1, 3, 4, 5, 6}}
+)
+
+func request_ArtifactRegistry_FindByWorkflowExec_0(ctx context.Context, marshaler runtime.Marshaler, client ArtifactRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq FindByWorkflowExecRequest
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		e   int32
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["exec_id.project"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exec_id.project")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "exec_id.project", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exec_id.project", err)
+	}
+
+	val, ok = pathParams["exec_id.domain"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exec_id.domain")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "exec_id.domain", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exec_id.domain", err)
+	}
+
+	val, ok = pathParams["exec_id.name"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "exec_id.name")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "exec_id.name", val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "exec_id.name", err)
+	}
+
+	val, ok = pathParams["direction"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "direction")
+	}
+
+	e, err = runtime.Enum(val, FindByWorkflowExecRequest_Direction_value)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "direction", err)
+	}
+
+	protoReq.Direction = FindByWorkflowExecRequest_Direction(e)
+
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ArtifactRegistry_FindByWorkflowExec_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.FindByWorkflowExec(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 // RegisterArtifactRegistryHandlerFromEndpoint is same as RegisterArtifactRegistryHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterArtifactRegistryHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
@@ -506,6 +580,26 @@ func RegisterArtifactRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 
 	})
 
+	mux.Handle("GET", pattern_ArtifactRegistry_FindByWorkflowExec_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_ArtifactRegistry_FindByWorkflowExec_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_ArtifactRegistry_FindByWorkflowExec_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
@@ -518,9 +612,11 @@ var (
 
 	pattern_ArtifactRegistry_GetArtifact_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"data", "v1", "artifact", "tag", "query.artifact_tag.artifact_key.project", "query.artifact_tag.artifact_key.domain", "query.artifact_tag.artifact_key.name"}, ""))
 
-	pattern_ArtifactRegistry_SearchArtifacts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"data", "v1", "query", "artifact_key.project", "artifact_key.domain", "artifact_key.name"}, ""))
+	pattern_ArtifactRegistry_SearchArtifacts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"data", "v1", "query", "s", "artifact_key.project", "artifact_key.domain", "artifact_key.name"}, ""))
 
 	pattern_ArtifactRegistry_SearchArtifacts_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"data", "v1", "query", "artifact_key.project", "artifact_key.domain"}, ""))
+
+	pattern_ArtifactRegistry_FindByWorkflowExec_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"data", "v1", "query", "e", "exec_id.project", "exec_id.domain", "exec_id.name", "direction"}, ""))
 )
 
 var (
@@ -535,4 +631,6 @@ var (
 	forward_ArtifactRegistry_SearchArtifacts_0 = runtime.ForwardResponseMessage
 
 	forward_ArtifactRegistry_SearchArtifacts_1 = runtime.ForwardResponseMessage
+
+	forward_ArtifactRegistry_FindByWorkflowExec_0 = runtime.ForwardResponseMessage
 )

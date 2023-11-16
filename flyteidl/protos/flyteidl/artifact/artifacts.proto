@@ -23,7 +23,7 @@ message Artifact {
   // references the tag field in ArtifactTag
   repeated string tags = 3;
 
-  // 4. and the source message should be added here instead
+  ArtifactSource source = 4;
 }
 
 message CreateArtifactRequest {
@@ -38,11 +38,23 @@ message CreateArtifactRequest {
 
   string tag = 5;
 
-  // 2. We should add the source field to this.
+  ArtifactSource source = 6;
 }
 
 // 1. Should add a new Source message that encapsulates all three of principal, task execution id, workflow execution id,
 // as well as the workflow and launch plan id responsible for the execution that generated the artifact (if not an upload)
+
+message ArtifactSource {
+  // 3. These fields should be removed.
+  // Outputs of tasks will have this.
+  core.TaskExecutionIdentifier task_execution = 1;
+
+  // Workflow outputs will have this.
+  core.NodeExecutionIdentifier node_execution = 2;
+
+  // Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
+  string principal = 3;
+}
 
 message ArtifactSpec {
   core.Literal value = 1;
@@ -52,22 +64,12 @@ message ArtifactSpec {
   // type to all Literals is a lot of work.
   core.LiteralType type = 2;
 
-  // 3. These fields should be removed.
-  // Outputs of tasks will have this.
-  core.TaskExecutionIdentifier task_execution = 5;
-
-  // Workflow outputs will have this.
-  core.WorkflowExecutionIdentifier execution = 6;
-
-  // Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
-  string principal = 7;
-
-  string short_description = 8;
+  string short_description = 3;
 
   // Additional user metadata
-  google.protobuf.Any user_metadata = 10;
+  google.protobuf.Any user_metadata = 4;
 
-  string metadata_type = 11;
+  string metadata_type = 5;
 }
 
 
@@ -86,25 +88,52 @@ message GetArtifactResponse {
   Artifact artifact = 1;
 }
 
-message ListArtifactNamesRequest {
-  string project = 1;
-  string domain = 2;
-}
+message SearchOptions {
+  // If true, this means a strict partition search. meaning if you don't specify the partition
+  // field, that will mean, non-partitioned, rather than any partition.
+  bool strict_partitions = 1;
 
-message ListArtifactNamesResponse {
-  repeated core.ArtifactKey artifact_keys = 1;
+  // If true, only one artifact per key will be returned. It will be the latest one by creation time.
+  bool latest_by_key = 2;
+
+  // If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
+  bool fetch_specs = 3;
 }
 
 message SearchArtifactsRequest {
   core.ArtifactKey artifact_key = 1;
 
-  string filters = 2;
-  string token = 3;
-  int32 limit = 4;
+  core.Partitions partitions = 2;
+
+  string principal = 3;
+  string version = 4;
+
+  SearchOptions options = 5;
+
+  string token = 6;
+  int32 limit = 7;
 }
 
 message SearchArtifactsResponse {
+  // If artifact specs are not requested, the resultant artifacts may be empty.
   repeated Artifact artifacts = 1;
+
+  // continuation token if relevant.
+  string token = 2;
+}
+
+message FindByWorkflowExecRequest {
+  core.WorkflowExecutionIdentifier exec_id = 1;
+
+  enum Direction {
+    INPUTS = 0;
+    OUTPUTS = 1;
+  }
+
+  Direction direction = 2;
+
+  // If set to true, actually fetch the artifact body. By default only the IDs are returned.
+  bool fetch_specs = 3;
 }
 
 // Aliases identify a particular version of an artifact. They are different than tags in that they
@@ -181,12 +210,40 @@ service ArtifactRegistry {
       additional_bindings {get: "/data/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
     };
 
-
   }
+
+  /*
+  message SearchArtifactsRequest {
+  core.ArtifactKey artifact_key = 1;
+
+  core.Partitions partitions = 2;
+
+  string principal = 3;
+  string version = 4;
+
+  SearchOptions options = 5;
+
+  string token = 6;
+  int32 limit = 7;
+}
+
+
+message FindByWorkflowExecRequest {
+  core.WorkflowExecutionIdentifier exec_id = 1;
+
+  enum Direction {
+    INPUTS = 0;
+    OUTPUTS = 1;
+  }
+
+  Direction direction = 2;
+
+
+   */
 
   rpc SearchArtifacts (SearchArtifactsRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
-      get: "/data/v1/query/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
+      get: "/data/v1/query/s/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
       additional_bindings {get: "/data/v1/query/{artifact_key.project}/{artifact_key.domain}"}
     };
   }
@@ -200,4 +257,11 @@ service ArtifactRegistry {
   rpc RegisterProducer(RegisterProducerRequest) returns (RegisterResponse) {}
 
   rpc RegisterConsumer(RegisterConsumerRequest) returns (RegisterResponse) {}
+
+  rpc FindByWorkflowExec (FindByWorkflowExecRequest) returns (SearchArtifactsResponse) {
+    option (google.api.http) = {
+      get: "/data/v1/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
+    };
+  }
 }
+

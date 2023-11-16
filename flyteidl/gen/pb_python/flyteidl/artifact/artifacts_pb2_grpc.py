@@ -54,6 +54,11 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.FromString,
                 )
+        self.FindByWorkflowExec = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec',
+                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
+                )
 
 
 class ArtifactRegistryServicer(object):
@@ -72,7 +77,35 @@ class ArtifactRegistryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def SearchArtifacts(self, request, context):
-        """Missing associated documentation comment in .proto file."""
+        """
+        message SearchArtifactsRequest {
+        core.ArtifactKey artifact_key = 1;
+
+        core.Partitions partitions = 2;
+
+        string principal = 3;
+        string version = 4;
+
+        SearchOptions options = 5;
+
+        string token = 6;
+        int32 limit = 7;
+        }
+
+
+        message FindByWorkflowExecRequest {
+        core.WorkflowExecutionIdentifier exec_id = 1;
+
+        enum Direction {
+        INPUTS = 0;
+        OUTPUTS = 1;
+        }
+
+        Direction direction = 2;
+
+
+
+        """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
@@ -102,6 +135,12 @@ class ArtifactRegistryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def RegisterConsumer(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def FindByWorkflowExec(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -149,6 +188,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.RegisterConsumer,
                     request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.FromString,
                     response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.SerializeToString,
+            ),
+            'FindByWorkflowExec': grpc.unary_unary_rpc_method_handler(
+                    servicer.FindByWorkflowExec,
+                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.FromString,
+                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -293,5 +337,22 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/RegisterConsumer',
             flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.SerializeToString,
             flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def FindByWorkflowExec(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec',
+            flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.SerializeToString,
+            flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

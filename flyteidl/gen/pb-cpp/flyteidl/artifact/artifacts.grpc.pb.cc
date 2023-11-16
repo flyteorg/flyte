@@ -28,6 +28,7 @@ static const char* ArtifactRegistry_method_names[] = {
   "/flyteidl.artifact.ArtifactRegistry/AddTag",
   "/flyteidl.artifact.ArtifactRegistry/RegisterProducer",
   "/flyteidl.artifact.ArtifactRegistry/RegisterConsumer",
+  "/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec",
 };
 
 std::unique_ptr< ArtifactRegistry::Stub> ArtifactRegistry::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -45,6 +46,7 @@ ArtifactRegistry::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& c
   , rpcmethod_AddTag_(ArtifactRegistry_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_RegisterProducer_(ArtifactRegistry_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_RegisterConsumer_(ArtifactRegistry_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_FindByWorkflowExec_(ArtifactRegistry_method_names[8], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status ArtifactRegistry::Stub::CreateArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::CreateArtifactRequest& request, ::flyteidl::artifact::CreateArtifactResponse* response) {
@@ -271,6 +273,34 @@ void ArtifactRegistry::Stub::experimental_async::RegisterConsumer(::grpc::Client
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::artifact::RegisterResponse>::Create(channel_.get(), cq, rpcmethod_RegisterConsumer_, context, request, false);
 }
 
+::grpc::Status ArtifactRegistry::Stub::FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::flyteidl::artifact::SearchArtifactsResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_FindByWorkflowExec_, context, request, response);
+}
+
+void ArtifactRegistry::Stub::experimental_async::FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_FindByWorkflowExec_, context, request, response, std::move(f));
+}
+
+void ArtifactRegistry::Stub::experimental_async::FindByWorkflowExec(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_FindByWorkflowExec_, context, request, response, std::move(f));
+}
+
+void ArtifactRegistry::Stub::experimental_async::FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_FindByWorkflowExec_, context, request, response, reactor);
+}
+
+void ArtifactRegistry::Stub::experimental_async::FindByWorkflowExec(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_FindByWorkflowExec_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* ArtifactRegistry::Stub::AsyncFindByWorkflowExecRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::artifact::SearchArtifactsResponse>::Create(channel_.get(), cq, rpcmethod_FindByWorkflowExec_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* ArtifactRegistry::Stub::PrepareAsyncFindByWorkflowExecRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::artifact::SearchArtifactsResponse>::Create(channel_.get(), cq, rpcmethod_FindByWorkflowExec_, context, request, false);
+}
+
 ArtifactRegistry::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       ArtifactRegistry_method_names[0],
@@ -312,6 +342,11 @@ ArtifactRegistry::Service::Service() {
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::RegisterConsumerRequest, ::flyteidl::artifact::RegisterResponse>(
           std::mem_fn(&ArtifactRegistry::Service::RegisterConsumer), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      ArtifactRegistry_method_names[8],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< ArtifactRegistry::Service, ::flyteidl::artifact::FindByWorkflowExecRequest, ::flyteidl::artifact::SearchArtifactsResponse>(
+          std::mem_fn(&ArtifactRegistry::Service::FindByWorkflowExec), this)));
 }
 
 ArtifactRegistry::Service::~Service() {
@@ -367,6 +402,13 @@ ArtifactRegistry::Service::~Service() {
 }
 
 ::grpc::Status ArtifactRegistry::Service::RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status ArtifactRegistry::Service::FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) {
   (void) context;
   (void) request;
   (void) response;
