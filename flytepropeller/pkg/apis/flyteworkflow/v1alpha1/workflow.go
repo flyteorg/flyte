@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
-
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -332,7 +330,6 @@ func (in *WorkflowSpec) GetOutputs() *OutputVarMap {
 }
 
 func (in *WorkflowSpec) GetNode(nodeID NodeID) (ExecutableNode, bool) {
-	fmt.Print("Getting node ", nodeID, " from ", in.Nodes)
 	n, ok := in.Nodes[nodeID]
 	return n, ok
 }

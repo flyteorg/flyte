@@ -1,8 +1,6 @@
 package k8s
 
 import (
-	"context"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"strings"
 
 	"github.com/go-test/deep"
@@ -35,9 +33,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
-		logger.Info(context.Background(), "kevin Looking up task", "taskID", taskID)
 		for _, t := range tasks {
-			logger.Infof(context.Background(), "kevin Comparing %v with %v", t.Template.Id.String(), taskID)
 			if t.Template.Id.String() == taskID {
 				task = t.Template
 				break

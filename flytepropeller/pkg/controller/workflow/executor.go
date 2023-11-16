@@ -225,7 +225,6 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 	}
 
 	errorNode := w.GetOnFailureNode()
-	logger.Infof(ctx, "Handling xxx FailureNode [%v]", errorNode)
 	if errorNode != nil {
 		return StatusFailureNode(execErr), nil
 	}
@@ -294,7 +293,7 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "", wfEvent.GetError())
 			wfEvent.OccurredAt = utils.GetProtoTime(nil)
 		case v1alpha1.WorkflowPhaseHandlingFailureNode:
-			// TODO: Add core.WorkflowPhaseHandlingFailureNode to proto
+			// TODO: Add core.WorkflowPhaseHandlingFailureNode to idl?
 			wfEvent.Phase = core.WorkflowExecution_FAILING
 			wfEvent.OutputResult = convertToExecutionError(toStatus.Err, previousError)
 			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseHandlingFailureNode, "", wfEvent.GetError())

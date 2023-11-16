@@ -261,7 +261,6 @@ func isAboveInterruptibleFailureThreshold(numFailures uint32, maxAttempts uint32
 
 func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
 	nl executors.NodeLookup, currentNodeID v1alpha1.NodeID) (interfaces.NodeExecutionContext, error) {
-	fmt.Printf("-------------- BuildNodeExecutionContext for node [%v] in execution [%v]\n", currentNodeID, executionContext.GetID())
 	n, ok := nl.GetNode(currentNodeID)
 	if !ok {
 		return nil, fmt.Errorf("failed to find node with ID [%s] in execution [%s]", currentNodeID, executionContext.GetID())
