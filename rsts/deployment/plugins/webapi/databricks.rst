@@ -57,9 +57,11 @@ To set up your Databricks account, follow these steps:
 Here's an example of your S3 bucket settings in your configmap.
 
 .. code-block:: bash
+
   kubectl edit configmap flyte-sandbox-config -n flyte 
 
 .. code-block:: bash
+
   TODO: ADD MORE DETAILS
   AWS_S3_ACCESS_KEY_ID: xxx
   AWS_S3_SECRET_ACCESS_KEY: xxx
@@ -69,6 +71,7 @@ Here's an example of your S3 bucket settings in your configmap.
 4. Enable custom containers on your Databricks cluster before you trigger the workflow.
 
 .. code-block:: bash
+
   curl -X PATCH -n \
   -H "Authorization: Bearer <your-personal-access-token>" \
   https://<databricks-instance>/api/2.0/workspace-conf \
@@ -86,7 +89,9 @@ for the Spark cluster. This profile enables the Spark job to access your data in
 Please follow all four steps specified in the documentation.
 
 Here's an example of your instance profile.
+
 .. code-block:: bash
+
   TODO: ADD MORE DETAILS
 
 6. Upload the following entrypoint.py file to either 
