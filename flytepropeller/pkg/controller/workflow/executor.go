@@ -224,8 +224,8 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 		return StatusFailing(execErr), err
 	}
 
-	errorNode := w.GetOnFailureNode()
-	if errorNode != nil {
+	failureNode := w.GetOnFailureNode()
+	if failureNode != nil {
 		return StatusFailureNode(execErr), nil
 	}
 
