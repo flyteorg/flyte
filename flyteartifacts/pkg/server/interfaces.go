@@ -22,7 +22,7 @@ type StorageInterface interface {
 
 	// DeleteTrigger(context.Context, models.Trigger) error
 
-	//SearchArtifacts(context.Context, artifact.SearchArtifactsRequest) ([]models.Artifact, error)
+	SearchArtifacts(context.Context, artifact.SearchArtifactsRequest) ([]models.Artifact, string, error)
 }
 
 type BlobStoreInterface interface {

@@ -16,10 +16,10 @@ type ArtifactKey struct {
 // The
 type WorkflowExecution struct {
 	gorm.Model
-	ExecutionProject string `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_proj;type:varchar(64)"`
-	ExecutionDomain  string `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_dom;type:varchar(64)"`
-	ExecutionName    string `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_name;type:varchar(255)"`
-	OutputArtifacts  []Artifact
+	ExecutionProject string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_proj;type:varchar(64)"`
+	ExecutionDomain  string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_dom;type:varchar(64)"`
+	ExecutionName    string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_name;type:varchar(255)"`
+	OutputArtifacts  []Artifact // i think this is only needed for lineage
 }
 
 type Artifact struct {

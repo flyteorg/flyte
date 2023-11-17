@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/lib"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -119,6 +120,7 @@ func (r *RDSStorage) handleArtifactIdGet(ctx context.Context, artifactID core.Ar
 		db = db.Where("version = ?", artifactID.Version)
 	}
 
+	// @eduardo - not actually sure if this is doing a strict match.
 	if artifactID.GetPartitions() != nil && len(artifactID.GetPartitions().GetValue()) > 0 {
 		partitionMap := PartitionsIdlToHstore(artifactID.GetPartitions())
 		db = db.Where("partitions = ?", partitionMap)
@@ -337,6 +339,45 @@ func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.Arti
 	}
 
 	return modelTriggers, nil
+}
+
+func (r *RDSStorage) SearchArtifacts(ctx context.Context, request artifact.SearchArtifactsRequest) ([]models.Artifact, string, error) {
+
+	var db = r.db.Model(&Artifact{})
+	if request.GetArtifactKey() != nil {
+		db = db.InnerJoins("ArtifactKey", r.db.Where(&request.ArtifactKey))
+	}
+
+	// @eduardo - this doesn't work, just copied from the handleArtifactIdGet function
+	// the goal is to make this not-srict, and make the handleArtifactIdGet one strict.
+	// so at least one (probably both honestly i dunno) of these are wrong. I don't know what is
+	// meant by partitions = ? in postgres terms.
+	if request.GetPartitions() != nil && len(request.GetPartitions().GetValue()) > 0 {
+		partitionMap := PartitionsIdlToHstore(request.GetPartitions())
+		db = db.Where("partitions = ?", partitionMap)
+	}
+
+	if request.Principal != "" {
+		db = db.Where("principal = ?", request.Principal)
+	}
+
+	if request.Version != "" {
+		db = db.Where("version = ?", request.Version)
+	}
+
+	var limit = 1
+	if request.Limit != 0 {
+		limit = int(request.Limit)
+	}
+	db.Order("created_at desc").Limit(limit)
+
+	var results []Artifact
+	db.Find(&results)
+
+	// maybe look at gormimpl/task_repo.go for example on handling offset.
+	// seems like gorm just handles it out of the box.
+
+	return nil, "", nil
 }
 
 func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {
