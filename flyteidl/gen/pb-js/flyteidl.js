@@ -17927,6 +17927,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [inputData] CloudEventWorkflowExecution inputData
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventWorkflowExecution artifactIds
                  * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [referenceExecution] CloudEventWorkflowExecution referenceExecution
+                 * @property {string|null} [principal] CloudEventWorkflowExecution principal
                  * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventWorkflowExecution launchPlanId
                  */
     
@@ -17995,6 +17996,14 @@
                 CloudEventWorkflowExecution.prototype.referenceExecution = null;
     
                 /**
+                 * CloudEventWorkflowExecution principal.
+                 * @member {string} principal
+                 * @memberof flyteidl.event.CloudEventWorkflowExecution
+                 * @instance
+                 */
+                CloudEventWorkflowExecution.prototype.principal = "";
+    
+                /**
                  * CloudEventWorkflowExecution launchPlanId.
                  * @member {flyteidl.core.IIdentifier|null|undefined} launchPlanId
                  * @memberof flyteidl.event.CloudEventWorkflowExecution
@@ -18039,8 +18048,10 @@
                             $root.flyteidl.core.ArtifactID.encode(message.artifactIds[i], writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     if (message.referenceExecution != null && message.hasOwnProperty("referenceExecution"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.referenceExecution, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        writer.uint32(/* id 7, wireType 2 =*/58).string(message.principal);
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
-                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     return writer;
                 };
     
@@ -18083,6 +18094,9 @@
                             message.referenceExecution = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
                             break;
                         case 7:
+                            message.principal = reader.string();
+                            break;
+                        case 8:
                             message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
@@ -18138,6 +18152,9 @@
                         if (error)
                             return "referenceExecution." + error;
                     }
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        if (!$util.isString(message.principal))
+                            return "principal: string expected";
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId")) {
                         var error = $root.flyteidl.core.Identifier.verify(message.launchPlanId);
                         if (error)
@@ -18161,6 +18178,7 @@
                  * @property {flyteidl.core.ITypedInterface|null} [outputInterface] CloudEventNodeExecution outputInterface
                  * @property {flyteidl.core.ILiteralMap|null} [inputData] CloudEventNodeExecution inputData
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventNodeExecution artifactIds
+                 * @property {string|null} [principal] CloudEventNodeExecution principal
                  * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventNodeExecution launchPlanId
                  */
     
@@ -18229,6 +18247,14 @@
                 CloudEventNodeExecution.prototype.artifactIds = $util.emptyArray;
     
                 /**
+                 * CloudEventNodeExecution principal.
+                 * @member {string} principal
+                 * @memberof flyteidl.event.CloudEventNodeExecution
+                 * @instance
+                 */
+                CloudEventNodeExecution.prototype.principal = "";
+    
+                /**
                  * CloudEventNodeExecution launchPlanId.
                  * @member {flyteidl.core.IIdentifier|null|undefined} launchPlanId
                  * @memberof flyteidl.event.CloudEventNodeExecution
@@ -18273,8 +18299,10 @@
                     if (message.artifactIds != null && message.artifactIds.length)
                         for (var i = 0; i < message.artifactIds.length; ++i)
                             $root.flyteidl.core.ArtifactID.encode(message.artifactIds[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        writer.uint32(/* id 7, wireType 2 =*/58).string(message.principal);
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId"))
-                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                        $root.flyteidl.core.Identifier.encode(message.launchPlanId, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
                     return writer;
                 };
     
@@ -18317,6 +18345,9 @@
                             message.artifactIds.push($root.flyteidl.core.ArtifactID.decode(reader, reader.uint32()));
                             break;
                         case 7:
+                            message.principal = reader.string();
+                            break;
+                        case 8:
                             message.launchPlanId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
                         default:
@@ -18372,6 +18403,9 @@
                                 return "artifactIds." + error;
                         }
                     }
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        if (!$util.isString(message.principal))
+                            return "principal: string expected";
                     if (message.launchPlanId != null && message.hasOwnProperty("launchPlanId")) {
                         var error = $root.flyteidl.core.Identifier.verify(message.launchPlanId);
                         if (error)
@@ -18506,6 +18540,7 @@
                  * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventExecutionStart workflowId
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventExecutionStart artifactIds
                  * @property {Array.<string>|null} [artifactKeys] CloudEventExecutionStart artifactKeys
+                 * @property {string|null} [principal] CloudEventExecutionStart principal
                  */
     
                 /**
@@ -18566,6 +18601,14 @@
                 CloudEventExecutionStart.prototype.artifactKeys = $util.emptyArray;
     
                 /**
+                 * CloudEventExecutionStart principal.
+                 * @member {string} principal
+                 * @memberof flyteidl.event.CloudEventExecutionStart
+                 * @instance
+                 */
+                CloudEventExecutionStart.prototype.principal = "";
+    
+                /**
                  * Creates a new CloudEventExecutionStart instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.CloudEventExecutionStart
@@ -18601,6 +18644,8 @@
                     if (message.artifactKeys != null && message.artifactKeys.length)
                         for (var i = 0; i < message.artifactKeys.length; ++i)
                             writer.uint32(/* id 5, wireType 2 =*/42).string(message.artifactKeys[i]);
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.principal);
                     return writer;
                 };
     
@@ -18640,6 +18685,9 @@
                             if (!(message.artifactKeys && message.artifactKeys.length))
                                 message.artifactKeys = [];
                             message.artifactKeys.push(reader.string());
+                            break;
+                        case 6:
+                            message.principal = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -18691,6 +18739,9 @@
                             if (!$util.isString(message.artifactKeys[i]))
                                 return "artifactKeys: string[] expected";
                     }
+                    if (message.principal != null && message.hasOwnProperty("principal"))
+                        if (!$util.isString(message.principal))
+                            return "principal: string expected";
                     return null;
                 };
     

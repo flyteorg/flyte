@@ -404,10 +404,12 @@ pub struct CloudEventWorkflowExecution {
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
     #[prost(message, optional, tag="6")]
     pub reference_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(string, tag="7")]
+    pub principal: ::prost::alloc::string::String,
     /// The ID of the LP that generated the execution that generated the Artifact.
     /// Here for provenance information.
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-    #[prost(message, optional, tag="7")]
+    #[prost(message, optional, tag="8")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -430,10 +432,12 @@ pub struct CloudEventNodeExecution {
     /// We can't have the ExecutionMetadata object directly because of import cycle
     #[prost(message, repeated, tag="6")]
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    #[prost(string, tag="7")]
+    pub principal: ::prost::alloc::string::String,
     /// The ID of the LP that generated the execution that generated the Artifact.
     /// Here for provenance information.
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-    #[prost(message, optional, tag="7")]
+    #[prost(message, optional, tag="8")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -460,5 +464,7 @@ pub struct CloudEventExecutionStart {
     /// Artifact keys found.
     #[prost(string, repeated, tag="5")]
     pub artifact_keys: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag="6")]
+    pub principal: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)

@@ -190,6 +190,20 @@ class CloudEventWorkflowExecution final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
       artifact_ids() const;
 
+  // string principal = 7;
+  void clear_principal();
+  static const int kPrincipalFieldNumber = 7;
+  const ::std::string& principal() const;
+  void set_principal(const ::std::string& value);
+  #if LANG_CXX11
+  void set_principal(::std::string&& value);
+  #endif
+  void set_principal(const char* value);
+  void set_principal(const char* value, size_t size);
+  ::std::string* mutable_principal();
+  ::std::string* release_principal();
+  void set_allocated_principal(::std::string* principal);
+
   // .flyteidl.event.WorkflowExecutionEvent raw_event = 1;
   bool has_raw_event() const;
   void clear_raw_event();
@@ -235,10 +249,10 @@ class CloudEventWorkflowExecution final :
   ::flyteidl::core::WorkflowExecutionIdentifier* mutable_reference_execution();
   void set_allocated_reference_execution(::flyteidl::core::WorkflowExecutionIdentifier* reference_execution);
 
-  // .flyteidl.core.Identifier launch_plan_id = 7;
+  // .flyteidl.core.Identifier launch_plan_id = 8;
   bool has_launch_plan_id() const;
   void clear_launch_plan_id();
-  static const int kLaunchPlanIdFieldNumber = 7;
+  static const int kLaunchPlanIdFieldNumber = 8;
   const ::flyteidl::core::Identifier& launch_plan_id() const;
   ::flyteidl::core::Identifier* release_launch_plan_id();
   ::flyteidl::core::Identifier* mutable_launch_plan_id();
@@ -250,6 +264,7 @@ class CloudEventWorkflowExecution final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > artifact_ids_;
+  ::google::protobuf::internal::ArenaStringPtr principal_;
   ::flyteidl::event::WorkflowExecutionEvent* raw_event_;
   ::flyteidl::core::LiteralMap* output_data_;
   ::flyteidl::core::TypedInterface* output_interface_;
@@ -368,6 +383,20 @@ class CloudEventNodeExecution final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
       artifact_ids() const;
 
+  // string principal = 7;
+  void clear_principal();
+  static const int kPrincipalFieldNumber = 7;
+  const ::std::string& principal() const;
+  void set_principal(const ::std::string& value);
+  #if LANG_CXX11
+  void set_principal(::std::string&& value);
+  #endif
+  void set_principal(const char* value);
+  void set_principal(const char* value, size_t size);
+  ::std::string* mutable_principal();
+  ::std::string* release_principal();
+  void set_allocated_principal(::std::string* principal);
+
   // .flyteidl.event.NodeExecutionEvent raw_event = 1;
   bool has_raw_event() const;
   void clear_raw_event();
@@ -413,10 +442,10 @@ class CloudEventNodeExecution final :
   ::flyteidl::core::LiteralMap* mutable_input_data();
   void set_allocated_input_data(::flyteidl::core::LiteralMap* input_data);
 
-  // .flyteidl.core.Identifier launch_plan_id = 7;
+  // .flyteidl.core.Identifier launch_plan_id = 8;
   bool has_launch_plan_id() const;
   void clear_launch_plan_id();
-  static const int kLaunchPlanIdFieldNumber = 7;
+  static const int kLaunchPlanIdFieldNumber = 8;
   const ::flyteidl::core::Identifier& launch_plan_id() const;
   ::flyteidl::core::Identifier* release_launch_plan_id();
   ::flyteidl::core::Identifier* mutable_launch_plan_id();
@@ -428,6 +457,7 @@ class CloudEventNodeExecution final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > artifact_ids_;
+  ::google::protobuf::internal::ArenaStringPtr principal_;
   ::flyteidl::event::NodeExecutionEvent* raw_event_;
   ::flyteidl::core::TaskExecutionIdentifier* task_exec_id_;
   ::flyteidl::core::LiteralMap* output_data_;
@@ -683,6 +713,20 @@ class CloudEventExecutionStart final :
   const ::google::protobuf::RepeatedPtrField<::std::string>& artifact_keys() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_artifact_keys();
 
+  // string principal = 6;
+  void clear_principal();
+  static const int kPrincipalFieldNumber = 6;
+  const ::std::string& principal() const;
+  void set_principal(const ::std::string& value);
+  #if LANG_CXX11
+  void set_principal(::std::string&& value);
+  #endif
+  void set_principal(const char* value);
+  void set_principal(const char* value, size_t size);
+  ::std::string* mutable_principal();
+  ::std::string* release_principal();
+  void set_allocated_principal(::std::string* principal);
+
   // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
   bool has_execution_id() const;
   void clear_execution_id();
@@ -717,6 +761,7 @@ class CloudEventExecutionStart final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > artifact_ids_;
   ::google::protobuf::RepeatedPtrField<::std::string> artifact_keys_;
+  ::google::protobuf::internal::ArenaStringPtr principal_;
   ::flyteidl::core::WorkflowExecutionIdentifier* execution_id_;
   ::flyteidl::core::Identifier* launch_plan_id_;
   ::flyteidl::core::Identifier* workflow_id_;
@@ -986,7 +1031,60 @@ inline void CloudEventWorkflowExecution::set_allocated_reference_execution(::fly
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventWorkflowExecution.reference_execution)
 }
 
-// .flyteidl.core.Identifier launch_plan_id = 7;
+// string principal = 7;
+inline void CloudEventWorkflowExecution::clear_principal() {
+  principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CloudEventWorkflowExecution::principal() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.CloudEventWorkflowExecution.principal)
+  return principal_.GetNoArena();
+}
+inline void CloudEventWorkflowExecution::set_principal(const ::std::string& value) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.event.CloudEventWorkflowExecution.principal)
+}
+#if LANG_CXX11
+inline void CloudEventWorkflowExecution::set_principal(::std::string&& value) {
+  
+  principal_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.event.CloudEventWorkflowExecution.principal)
+}
+#endif
+inline void CloudEventWorkflowExecution::set_principal(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.event.CloudEventWorkflowExecution.principal)
+}
+inline void CloudEventWorkflowExecution::set_principal(const char* value, size_t size) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.event.CloudEventWorkflowExecution.principal)
+}
+inline ::std::string* CloudEventWorkflowExecution::mutable_principal() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.CloudEventWorkflowExecution.principal)
+  return principal_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CloudEventWorkflowExecution::release_principal() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.CloudEventWorkflowExecution.principal)
+  
+  return principal_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CloudEventWorkflowExecution::set_allocated_principal(::std::string* principal) {
+  if (principal != nullptr) {
+    
+  } else {
+    
+  }
+  principal_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), principal);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventWorkflowExecution.principal)
+}
+
+// .flyteidl.core.Identifier launch_plan_id = 8;
 inline bool CloudEventWorkflowExecution::has_launch_plan_id() const {
   return this != internal_default_instance() && launch_plan_id_ != nullptr;
 }
@@ -1287,7 +1385,60 @@ CloudEventNodeExecution::artifact_ids() const {
   return artifact_ids_;
 }
 
-// .flyteidl.core.Identifier launch_plan_id = 7;
+// string principal = 7;
+inline void CloudEventNodeExecution::clear_principal() {
+  principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CloudEventNodeExecution::principal() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.CloudEventNodeExecution.principal)
+  return principal_.GetNoArena();
+}
+inline void CloudEventNodeExecution::set_principal(const ::std::string& value) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.event.CloudEventNodeExecution.principal)
+}
+#if LANG_CXX11
+inline void CloudEventNodeExecution::set_principal(::std::string&& value) {
+  
+  principal_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.event.CloudEventNodeExecution.principal)
+}
+#endif
+inline void CloudEventNodeExecution::set_principal(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.event.CloudEventNodeExecution.principal)
+}
+inline void CloudEventNodeExecution::set_principal(const char* value, size_t size) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.event.CloudEventNodeExecution.principal)
+}
+inline ::std::string* CloudEventNodeExecution::mutable_principal() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.CloudEventNodeExecution.principal)
+  return principal_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CloudEventNodeExecution::release_principal() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.CloudEventNodeExecution.principal)
+  
+  return principal_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CloudEventNodeExecution::set_allocated_principal(::std::string* principal) {
+  if (principal != nullptr) {
+    
+  } else {
+    
+  }
+  principal_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), principal);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventNodeExecution.principal)
+}
+
+// .flyteidl.core.Identifier launch_plan_id = 8;
 inline bool CloudEventNodeExecution::has_launch_plan_id() const {
   return this != internal_default_instance() && launch_plan_id_ != nullptr;
 }
@@ -1614,6 +1765,59 @@ inline ::google::protobuf::RepeatedPtrField<::std::string>*
 CloudEventExecutionStart::mutable_artifact_keys() {
   // @@protoc_insertion_point(field_mutable_list:flyteidl.event.CloudEventExecutionStart.artifact_keys)
   return &artifact_keys_;
+}
+
+// string principal = 6;
+inline void CloudEventExecutionStart::clear_principal() {
+  principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& CloudEventExecutionStart::principal() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.CloudEventExecutionStart.principal)
+  return principal_.GetNoArena();
+}
+inline void CloudEventExecutionStart::set_principal(const ::std::string& value) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.event.CloudEventExecutionStart.principal)
+}
+#if LANG_CXX11
+inline void CloudEventExecutionStart::set_principal(::std::string&& value) {
+  
+  principal_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.event.CloudEventExecutionStart.principal)
+}
+#endif
+inline void CloudEventExecutionStart::set_principal(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.event.CloudEventExecutionStart.principal)
+}
+inline void CloudEventExecutionStart::set_principal(const char* value, size_t size) {
+  
+  principal_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.event.CloudEventExecutionStart.principal)
+}
+inline ::std::string* CloudEventExecutionStart::mutable_principal() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.CloudEventExecutionStart.principal)
+  return principal_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* CloudEventExecutionStart::release_principal() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.CloudEventExecutionStart.principal)
+  
+  return principal_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void CloudEventExecutionStart::set_allocated_principal(::std::string* principal) {
+  if (principal != nullptr) {
+    
+  } else {
+    
+  }
+  principal_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), principal);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.CloudEventExecutionStart.principal)
 }
 
 #ifdef __GNUC__

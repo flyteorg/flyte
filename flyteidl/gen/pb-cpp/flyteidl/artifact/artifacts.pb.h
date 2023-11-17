@@ -653,9 +653,23 @@ class ArtifactSource final :
 
   // accessors -------------------------------------------------------
 
-  // string principal = 3;
+  // string node_id = 2;
+  void clear_node_id();
+  static const int kNodeIdFieldNumber = 2;
+  const ::std::string& node_id() const;
+  void set_node_id(const ::std::string& value);
+  #if LANG_CXX11
+  void set_node_id(::std::string&& value);
+  #endif
+  void set_node_id(const char* value);
+  void set_node_id(const char* value, size_t size);
+  ::std::string* mutable_node_id();
+  ::std::string* release_node_id();
+  void set_allocated_node_id(::std::string* node_id);
+
+  // string principal = 5;
   void clear_principal();
-  static const int kPrincipalFieldNumber = 3;
+  static const int kPrincipalFieldNumber = 5;
   const ::std::string& principal() const;
   void set_principal(const ::std::string& value);
   #if LANG_CXX11
@@ -667,32 +681,40 @@ class ArtifactSource final :
   ::std::string* release_principal();
   void set_allocated_principal(::std::string* principal);
 
-  // .flyteidl.core.TaskExecutionIdentifier task_execution = 1;
-  bool has_task_execution() const;
-  void clear_task_execution();
-  static const int kTaskExecutionFieldNumber = 1;
-  const ::flyteidl::core::TaskExecutionIdentifier& task_execution() const;
-  ::flyteidl::core::TaskExecutionIdentifier* release_task_execution();
-  ::flyteidl::core::TaskExecutionIdentifier* mutable_task_execution();
-  void set_allocated_task_execution(::flyteidl::core::TaskExecutionIdentifier* task_execution);
+  // .flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;
+  bool has_workflow_execution() const;
+  void clear_workflow_execution();
+  static const int kWorkflowExecutionFieldNumber = 1;
+  const ::flyteidl::core::WorkflowExecutionIdentifier& workflow_execution() const;
+  ::flyteidl::core::WorkflowExecutionIdentifier* release_workflow_execution();
+  ::flyteidl::core::WorkflowExecutionIdentifier* mutable_workflow_execution();
+  void set_allocated_workflow_execution(::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution);
 
-  // .flyteidl.core.NodeExecutionIdentifier node_execution = 2;
-  bool has_node_execution() const;
-  void clear_node_execution();
-  static const int kNodeExecutionFieldNumber = 2;
-  const ::flyteidl::core::NodeExecutionIdentifier& node_execution() const;
-  ::flyteidl::core::NodeExecutionIdentifier* release_node_execution();
-  ::flyteidl::core::NodeExecutionIdentifier* mutable_node_execution();
-  void set_allocated_node_execution(::flyteidl::core::NodeExecutionIdentifier* node_execution);
+  // .flyteidl.core.Identifier task_id = 3;
+  bool has_task_id() const;
+  void clear_task_id();
+  static const int kTaskIdFieldNumber = 3;
+  const ::flyteidl::core::Identifier& task_id() const;
+  ::flyteidl::core::Identifier* release_task_id();
+  ::flyteidl::core::Identifier* mutable_task_id();
+  void set_allocated_task_id(::flyteidl::core::Identifier* task_id);
+
+  // uint32 retry_attempt = 4;
+  void clear_retry_attempt();
+  static const int kRetryAttemptFieldNumber = 4;
+  ::google::protobuf::uint32 retry_attempt() const;
+  void set_retry_attempt(::google::protobuf::uint32 value);
 
   // @@protoc_insertion_point(class_scope:flyteidl.artifact.ArtifactSource)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr node_id_;
   ::google::protobuf::internal::ArenaStringPtr principal_;
-  ::flyteidl::core::TaskExecutionIdentifier* task_execution_;
-  ::flyteidl::core::NodeExecutionIdentifier* node_execution_;
+  ::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution_;
+  ::flyteidl::core::Identifier* task_id_;
+  ::google::protobuf::uint32 retry_attempt_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifact_2fartifacts_2eproto;
 };
@@ -1797,6 +1819,12 @@ class FindByWorkflowExecRequest final :
   ::flyteidl::artifact::FindByWorkflowExecRequest_Direction direction() const;
   void set_direction(::flyteidl::artifact::FindByWorkflowExecRequest_Direction value);
 
+  // bool fetch_specs = 3;
+  void clear_fetch_specs();
+  static const int kFetchSpecsFieldNumber = 3;
+  bool fetch_specs() const;
+  void set_fetch_specs(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.artifact.FindByWorkflowExecRequest)
  private:
   class HasBitSetters;
@@ -1804,6 +1832,7 @@ class FindByWorkflowExecRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::core::WorkflowExecutionIdentifier* exec_id_;
   int direction_;
+  bool fetch_specs_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifact_2fartifacts_2eproto;
 };
@@ -3848,97 +3877,164 @@ inline void CreateArtifactRequest::set_allocated_source(::flyteidl::artifact::Ar
 
 // ArtifactSource
 
-// .flyteidl.core.TaskExecutionIdentifier task_execution = 1;
-inline bool ArtifactSource::has_task_execution() const {
-  return this != internal_default_instance() && task_execution_ != nullptr;
+// .flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;
+inline bool ArtifactSource::has_workflow_execution() const {
+  return this != internal_default_instance() && workflow_execution_ != nullptr;
 }
-inline const ::flyteidl::core::TaskExecutionIdentifier& ArtifactSource::task_execution() const {
-  const ::flyteidl::core::TaskExecutionIdentifier* p = task_execution_;
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSource.task_execution)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::TaskExecutionIdentifier*>(
-      &::flyteidl::core::_TaskExecutionIdentifier_default_instance_);
+inline const ::flyteidl::core::WorkflowExecutionIdentifier& ArtifactSource::workflow_execution() const {
+  const ::flyteidl::core::WorkflowExecutionIdentifier* p = workflow_execution_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSource.workflow_execution)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      &::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
 }
-inline ::flyteidl::core::TaskExecutionIdentifier* ArtifactSource::release_task_execution() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSource.task_execution)
+inline ::flyteidl::core::WorkflowExecutionIdentifier* ArtifactSource::release_workflow_execution() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSource.workflow_execution)
   
-  ::flyteidl::core::TaskExecutionIdentifier* temp = task_execution_;
-  task_execution_ = nullptr;
+  ::flyteidl::core::WorkflowExecutionIdentifier* temp = workflow_execution_;
+  workflow_execution_ = nullptr;
   return temp;
 }
-inline ::flyteidl::core::TaskExecutionIdentifier* ArtifactSource::mutable_task_execution() {
+inline ::flyteidl::core::WorkflowExecutionIdentifier* ArtifactSource::mutable_workflow_execution() {
   
-  if (task_execution_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::TaskExecutionIdentifier>(GetArenaNoVirtual());
-    task_execution_ = p;
+  if (workflow_execution_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::WorkflowExecutionIdentifier>(GetArenaNoVirtual());
+    workflow_execution_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSource.task_execution)
-  return task_execution_;
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSource.workflow_execution)
+  return workflow_execution_;
 }
-inline void ArtifactSource::set_allocated_task_execution(::flyteidl::core::TaskExecutionIdentifier* task_execution) {
+inline void ArtifactSource::set_allocated_workflow_execution(::flyteidl::core::WorkflowExecutionIdentifier* workflow_execution) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(task_execution_);
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(workflow_execution_);
   }
-  if (task_execution) {
+  if (workflow_execution) {
     ::google::protobuf::Arena* submessage_arena = nullptr;
     if (message_arena != submessage_arena) {
-      task_execution = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, task_execution, submessage_arena);
+      workflow_execution = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, workflow_execution, submessage_arena);
     }
     
   } else {
     
   }
-  task_execution_ = task_execution;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSource.task_execution)
+  workflow_execution_ = workflow_execution;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSource.workflow_execution)
 }
 
-// .flyteidl.core.NodeExecutionIdentifier node_execution = 2;
-inline bool ArtifactSource::has_node_execution() const {
-  return this != internal_default_instance() && node_execution_ != nullptr;
+// string node_id = 2;
+inline void ArtifactSource::clear_node_id() {
+  node_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::flyteidl::core::NodeExecutionIdentifier& ArtifactSource::node_execution() const {
-  const ::flyteidl::core::NodeExecutionIdentifier* p = node_execution_;
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSource.node_execution)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::NodeExecutionIdentifier*>(
-      &::flyteidl::core::_NodeExecutionIdentifier_default_instance_);
+inline const ::std::string& ArtifactSource::node_id() const {
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSource.node_id)
+  return node_id_.GetNoArena();
 }
-inline ::flyteidl::core::NodeExecutionIdentifier* ArtifactSource::release_node_execution() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSource.node_execution)
+inline void ArtifactSource::set_node_id(const ::std::string& value) {
   
-  ::flyteidl::core::NodeExecutionIdentifier* temp = node_execution_;
-  node_execution_ = nullptr;
+  node_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.artifact.ArtifactSource.node_id)
+}
+#if LANG_CXX11
+inline void ArtifactSource::set_node_id(::std::string&& value) {
+  
+  node_id_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.artifact.ArtifactSource.node_id)
+}
+#endif
+inline void ArtifactSource::set_node_id(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  node_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.artifact.ArtifactSource.node_id)
+}
+inline void ArtifactSource::set_node_id(const char* value, size_t size) {
+  
+  node_id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.artifact.ArtifactSource.node_id)
+}
+inline ::std::string* ArtifactSource::mutable_node_id() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSource.node_id)
+  return node_id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ArtifactSource::release_node_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSource.node_id)
+  
+  return node_id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ArtifactSource::set_allocated_node_id(::std::string* node_id) {
+  if (node_id != nullptr) {
+    
+  } else {
+    
+  }
+  node_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), node_id);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSource.node_id)
+}
+
+// .flyteidl.core.Identifier task_id = 3;
+inline bool ArtifactSource::has_task_id() const {
+  return this != internal_default_instance() && task_id_ != nullptr;
+}
+inline const ::flyteidl::core::Identifier& ArtifactSource::task_id() const {
+  const ::flyteidl::core::Identifier* p = task_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSource.task_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
+      &::flyteidl::core::_Identifier_default_instance_);
+}
+inline ::flyteidl::core::Identifier* ArtifactSource::release_task_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSource.task_id)
+  
+  ::flyteidl::core::Identifier* temp = task_id_;
+  task_id_ = nullptr;
   return temp;
 }
-inline ::flyteidl::core::NodeExecutionIdentifier* ArtifactSource::mutable_node_execution() {
+inline ::flyteidl::core::Identifier* ArtifactSource::mutable_task_id() {
   
-  if (node_execution_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::NodeExecutionIdentifier>(GetArenaNoVirtual());
-    node_execution_ = p;
+  if (task_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
+    task_id_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSource.node_execution)
-  return node_execution_;
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSource.task_id)
+  return task_id_;
 }
-inline void ArtifactSource::set_allocated_node_execution(::flyteidl::core::NodeExecutionIdentifier* node_execution) {
+inline void ArtifactSource::set_allocated_task_id(::flyteidl::core::Identifier* task_id) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(node_execution_);
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(task_id_);
   }
-  if (node_execution) {
+  if (task_id) {
     ::google::protobuf::Arena* submessage_arena = nullptr;
     if (message_arena != submessage_arena) {
-      node_execution = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, node_execution, submessage_arena);
+      task_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, task_id, submessage_arena);
     }
     
   } else {
     
   }
-  node_execution_ = node_execution;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSource.node_execution)
+  task_id_ = task_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSource.task_id)
 }
 
-// string principal = 3;
+// uint32 retry_attempt = 4;
+inline void ArtifactSource::clear_retry_attempt() {
+  retry_attempt_ = 0u;
+}
+inline ::google::protobuf::uint32 ArtifactSource::retry_attempt() const {
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSource.retry_attempt)
+  return retry_attempt_;
+}
+inline void ArtifactSource::set_retry_attempt(::google::protobuf::uint32 value) {
+  
+  retry_attempt_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.artifact.ArtifactSource.retry_attempt)
+}
+
+// string principal = 5;
 inline void ArtifactSource::clear_principal() {
   principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4921,6 +5017,20 @@ inline void FindByWorkflowExecRequest::set_direction(::flyteidl::artifact::FindB
   
   direction_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.artifact.FindByWorkflowExecRequest.direction)
+}
+
+// bool fetch_specs = 3;
+inline void FindByWorkflowExecRequest::clear_fetch_specs() {
+  fetch_specs_ = false;
+}
+inline bool FindByWorkflowExecRequest::fetch_specs() const {
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.FindByWorkflowExecRequest.fetch_specs)
+  return fetch_specs_;
+}
+inline void FindByWorkflowExecRequest::set_fetch_specs(bool value) {
+  
+  fetch_specs_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.artifact.FindByWorkflowExecRequest.fetch_specs)
 }
 
 // -------------------------------------------------------------------

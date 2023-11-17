@@ -62,34 +62,6 @@ class ArtifactRegistry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::GetArtifactResponse>> PrepareAsyncGetArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::GetArtifactResponse>>(PrepareAsyncGetArtifactRaw(context, request, cq));
     }
-    //
-    // message SearchArtifactsRequest {
-    // core.ArtifactKey artifact_key = 1;
-    //
-    // core.Partitions partitions = 2;
-    //
-    // string principal = 3;
-    // string version = 4;
-    //
-    // SearchOptions options = 5;
-    //
-    // string token = 6;
-    // int32 limit = 7;
-    // }
-    //
-    //
-    // message FindByWorkflowExecRequest {
-    // core.WorkflowExecutionIdentifier exec_id = 1;
-    //
-    // enum Direction {
-    // INPUTS = 0;
-    // OUTPUTS = 1;
-    // }
-    //
-    // Direction direction = 2;
-    //
-    //
-    //
     virtual ::grpc::Status SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::flyteidl::artifact::SearchArtifactsResponse* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>> AsyncSearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>>(AsyncSearchArtifactsRaw(context, request, cq));
@@ -150,34 +122,6 @@ class ArtifactRegistry final {
       virtual void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::GetArtifactResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetArtifact(::grpc::ClientContext* context, const ::flyteidl::artifact::GetArtifactRequest* request, ::flyteidl::artifact::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetArtifact(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::GetArtifactResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      //
-      // message SearchArtifactsRequest {
-      // core.ArtifactKey artifact_key = 1;
-      //
-      // core.Partitions partitions = 2;
-      //
-      // string principal = 3;
-      // string version = 4;
-      //
-      // SearchOptions options = 5;
-      //
-      // string token = 6;
-      // int32 limit = 7;
-      // }
-      //
-      //
-      // message FindByWorkflowExecRequest {
-      // core.WorkflowExecutionIdentifier exec_id = 1;
-      //
-      // enum Direction {
-      // INPUTS = 0;
-      // OUTPUTS = 1;
-      // }
-      //
-      // Direction direction = 2;
-      //
-      //
-      //
       virtual void SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void SearchArtifacts(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void SearchArtifacts(::grpc::ClientContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -380,34 +324,6 @@ class ArtifactRegistry final {
     virtual ~Service();
     virtual ::grpc::Status CreateArtifact(::grpc::ServerContext* context, const ::flyteidl::artifact::CreateArtifactRequest* request, ::flyteidl::artifact::CreateArtifactResponse* response);
     virtual ::grpc::Status GetArtifact(::grpc::ServerContext* context, const ::flyteidl::artifact::GetArtifactRequest* request, ::flyteidl::artifact::GetArtifactResponse* response);
-    //
-    // message SearchArtifactsRequest {
-    // core.ArtifactKey artifact_key = 1;
-    //
-    // core.Partitions partitions = 2;
-    //
-    // string principal = 3;
-    // string version = 4;
-    //
-    // SearchOptions options = 5;
-    //
-    // string token = 6;
-    // int32 limit = 7;
-    // }
-    //
-    //
-    // message FindByWorkflowExecRequest {
-    // core.WorkflowExecutionIdentifier exec_id = 1;
-    //
-    // enum Direction {
-    // INPUTS = 0;
-    // OUTPUTS = 1;
-    // }
-    //
-    // Direction direction = 2;
-    //
-    //
-    //
     virtual ::grpc::Status SearchArtifacts(::grpc::ServerContext* context, const ::flyteidl::artifact::SearchArtifactsRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response);
     virtual ::grpc::Status CreateTrigger(::grpc::ServerContext* context, const ::flyteidl::artifact::CreateTriggerRequest* request, ::flyteidl::artifact::CreateTriggerResponse* response);
     virtual ::grpc::Status DeleteTrigger(::grpc::ServerContext* context, const ::flyteidl::artifact::DeleteTriggerRequest* request, ::flyteidl::artifact::DeleteTriggerResponse* response);

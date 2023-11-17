@@ -241,25 +241,29 @@ func (m *ArtifactSource) Validate() error {
 		return nil
 	}
 
-	if v, ok := interface{}(m.GetTaskExecution()).(interface{ Validate() error }); ok {
+	if v, ok := interface{}(m.GetWorkflowExecution()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ArtifactSourceValidationError{
-				field:  "TaskExecution",
+				field:  "WorkflowExecution",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
 
-	if v, ok := interface{}(m.GetNodeExecution()).(interface{ Validate() error }); ok {
+	// no validation rules for NodeId
+
+	if v, ok := interface{}(m.GetTaskId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return ArtifactSourceValidationError{
-				field:  "NodeExecution",
+				field:  "TaskId",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}
 		}
 	}
+
+	// no validation rules for RetryAttempt
 
 	// no validation rules for Principal
 
@@ -931,6 +935,8 @@ func (m *FindByWorkflowExecRequest) Validate() error {
 	}
 
 	// no validation rules for Direction
+
+	// no validation rules for FetchSpecs
 
 	return nil
 }

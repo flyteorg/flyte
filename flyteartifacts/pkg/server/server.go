@@ -71,6 +71,9 @@ func (a *ArtifactService) RegisterConsumer(ctx context.Context, req *artifact.Re
 	return a.Service.RegisterConsumer(ctx, req)
 }
 
+func (a *ArtifactService) FindByWorkflowExec(ctx context.Context, req *artifact.FindByWorkflowExecRequest) (*artifact.SearchArtifactsResponse, error) {
+	return a.Service.FindByWorkflowExec(ctx, req)
+}
 func (a *ArtifactService) runProcessor(ctx context.Context) {
 	for {
 		select {

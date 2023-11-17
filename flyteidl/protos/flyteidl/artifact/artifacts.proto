@@ -41,19 +41,14 @@ message CreateArtifactRequest {
   ArtifactSource source = 6;
 }
 
-// 1. Should add a new Source message that encapsulates all three of principal, task execution id, workflow execution id,
-// as well as the workflow and launch plan id responsible for the execution that generated the artifact (if not an upload)
-
 message ArtifactSource {
-  // 3. These fields should be removed.
-  // Outputs of tasks will have this.
-  core.TaskExecutionIdentifier task_execution = 1;
-
-  // Workflow outputs will have this.
-  core.NodeExecutionIdentifier node_execution = 2;
+  core.WorkflowExecutionIdentifier workflow_execution = 1;
+  string node_id = 2;
+  core.Identifier task_id = 3;
+  uint32 retry_attempt = 4;
 
   // Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
-  string principal = 3;
+  string principal = 5;
 }
 
 message ArtifactSpec {
@@ -198,9 +193,7 @@ message CloudEventRequest {
 message CloudEventResponse {}
 
 service ArtifactRegistry {
-  rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {
-
-  }
+  rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {}
 
   rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {
     option (google.api.http) = {
@@ -209,37 +202,7 @@ service ArtifactRegistry {
       additional_bindings {get: "/data/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
       additional_bindings {get: "/data/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
     };
-
   }
-
-  /*
-  message SearchArtifactsRequest {
-  core.ArtifactKey artifact_key = 1;
-
-  core.Partitions partitions = 2;
-
-  string principal = 3;
-  string version = 4;
-
-  SearchOptions options = 5;
-
-  string token = 6;
-  int32 limit = 7;
-}
-
-
-message FindByWorkflowExecRequest {
-  core.WorkflowExecutionIdentifier exec_id = 1;
-
-  enum Direction {
-    INPUTS = 0;
-    OUTPUTS = 1;
-  }
-
-  Direction direction = 2;
-
-
-   */
 
   rpc SearchArtifacts (SearchArtifactsRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
@@ -264,4 +227,3 @@ message FindByWorkflowExecRequest {
     };
   }
 }
-

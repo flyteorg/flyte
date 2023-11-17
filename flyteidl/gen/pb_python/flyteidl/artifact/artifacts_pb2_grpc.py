@@ -77,35 +77,7 @@ class ArtifactRegistryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def SearchArtifacts(self, request, context):
-        """
-        message SearchArtifactsRequest {
-        core.ArtifactKey artifact_key = 1;
-
-        core.Partitions partitions = 2;
-
-        string principal = 3;
-        string version = 4;
-
-        SearchOptions options = 5;
-
-        string token = 6;
-        int32 limit = 7;
-        }
-
-
-        message FindByWorkflowExecRequest {
-        core.WorkflowExecutionIdentifier exec_id = 1;
-
-        enum Direction {
-        INPUTS = 0;
-        OUTPUTS = 1;
-        }
-
-        Direction direction = 2;
-
-
-
-        """
+        """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')

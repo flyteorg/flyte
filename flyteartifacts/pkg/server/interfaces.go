@@ -21,6 +21,8 @@ type StorageInterface interface {
 	GetTriggersByArtifactKey(ctx context.Context, key core.ArtifactKey) ([]models.Trigger, error)
 
 	// DeleteTrigger(context.Context, models.Trigger) error
+
+	//SearchArtifacts(context.Context, artifact.SearchArtifactsRequest) ([]models.Artifact, error)
 }
 
 type BlobStoreInterface interface {

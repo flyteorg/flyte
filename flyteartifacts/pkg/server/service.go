@@ -21,7 +21,7 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 		return nil, nil
 	}
 
-	artifactObj, err := models.CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
+	artifactObj, err := models.CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Source)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to validate Create request: %v", err)
 		return nil, err
@@ -118,6 +118,13 @@ func (c *CoreService) SearchArtifacts(ctx context.Context, request *artifact.Sea
 		return nil, err
 	}
 	fmt.Println(triggers)
+	return &artifact.SearchArtifactsResponse{}, nil
+}
+
+func (c *CoreService) FindByWorkflowExec(ctx context.Context, request *artifact.FindByWorkflowExecRequest) (*artifact.SearchArtifactsResponse, error) {
+	// This is demo test code, will be deleted.
+	logger.Infof(ctx, "FindByWorkflowExecRequest: %+v", request)
+
 	return &artifact.SearchArtifactsResponse{}, nil
 }
 

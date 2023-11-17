@@ -51,14 +51,18 @@ class CreateArtifactRequest(_message.Message):
     def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., version: _Optional[str] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., partitions: _Optional[_Mapping[str, str]] = ..., tag: _Optional[str] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
 
 class ArtifactSource(_message.Message):
-    __slots__ = ["task_execution", "node_execution", "principal"]
-    TASK_EXECUTION_FIELD_NUMBER: _ClassVar[int]
-    NODE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["workflow_execution", "node_id", "task_id", "retry_attempt", "principal"]
+    WORKFLOW_EXECUTION_FIELD_NUMBER: _ClassVar[int]
+    NODE_ID_FIELD_NUMBER: _ClassVar[int]
+    TASK_ID_FIELD_NUMBER: _ClassVar[int]
+    RETRY_ATTEMPT_FIELD_NUMBER: _ClassVar[int]
     PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
-    task_execution: _identifier_pb2.TaskExecutionIdentifier
-    node_execution: _identifier_pb2.NodeExecutionIdentifier
+    workflow_execution: _identifier_pb2.WorkflowExecutionIdentifier
+    node_id: str
+    task_id: _identifier_pb2.Identifier
+    retry_attempt: int
     principal: str
-    def __init__(self, task_execution: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., principal: _Optional[str] = ...) -> None: ...
+    def __init__(self, workflow_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., node_id: _Optional[str] = ..., task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., principal: _Optional[str] = ...) -> None: ...
 
 class ArtifactSpec(_message.Message):
     __slots__ = ["value", "type", "short_description", "user_metadata", "metadata_type"]
@@ -131,7 +135,7 @@ class SearchArtifactsResponse(_message.Message):
     def __init__(self, artifacts: _Optional[_Iterable[_Union[Artifact, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class FindByWorkflowExecRequest(_message.Message):
-    __slots__ = ["exec_id", "direction"]
+    __slots__ = ["exec_id", "direction", "fetch_specs"]
     class Direction(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         INPUTS: _ClassVar[FindByWorkflowExecRequest.Direction]
@@ -140,9 +144,11 @@ class FindByWorkflowExecRequest(_message.Message):
     OUTPUTS: FindByWorkflowExecRequest.Direction
     EXEC_ID_FIELD_NUMBER: _ClassVar[int]
     DIRECTION_FIELD_NUMBER: _ClassVar[int]
+    FETCH_SPECS_FIELD_NUMBER: _ClassVar[int]
     exec_id: _identifier_pb2.WorkflowExecutionIdentifier
     direction: FindByWorkflowExecRequest.Direction
-    def __init__(self, exec_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., direction: _Optional[_Union[FindByWorkflowExecRequest.Direction, str]] = ...) -> None: ...
+    fetch_specs: bool
+    def __init__(self, exec_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., direction: _Optional[_Union[FindByWorkflowExecRequest.Direction, str]] = ..., fetch_specs: bool = ...) -> None: ...
 
 class AddTagRequest(_message.Message):
     __slots__ = ["artifact_id", "value", "overwrite"]

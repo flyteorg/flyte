@@ -7429,6 +7429,9 @@ export namespace flyteidl {
             /** CloudEventWorkflowExecution referenceExecution */
             referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
 
+            /** CloudEventWorkflowExecution principal */
+            principal?: (string|null);
+
             /** CloudEventWorkflowExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
         }
@@ -7459,6 +7462,9 @@ export namespace flyteidl {
 
             /** CloudEventWorkflowExecution referenceExecution. */
             public referenceExecution?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CloudEventWorkflowExecution principal. */
+            public principal: string;
 
             /** CloudEventWorkflowExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
@@ -7517,6 +7523,9 @@ export namespace flyteidl {
             /** CloudEventNodeExecution artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
 
+            /** CloudEventNodeExecution principal */
+            principal?: (string|null);
+
             /** CloudEventNodeExecution launchPlanId */
             launchPlanId?: (flyteidl.core.IIdentifier|null);
         }
@@ -7547,6 +7556,9 @@ export namespace flyteidl {
 
             /** CloudEventNodeExecution artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
+
+            /** CloudEventNodeExecution principal. */
+            public principal: string;
 
             /** CloudEventNodeExecution launchPlanId. */
             public launchPlanId?: (flyteidl.core.IIdentifier|null);
@@ -7653,6 +7665,9 @@ export namespace flyteidl {
 
             /** CloudEventExecutionStart artifactKeys */
             artifactKeys?: (string[]|null);
+
+            /** CloudEventExecutionStart principal */
+            principal?: (string|null);
         }
 
         /** Represents a CloudEventExecutionStart. */
@@ -7678,6 +7693,9 @@ export namespace flyteidl {
 
             /** CloudEventExecutionStart artifactKeys. */
             public artifactKeys: string[];
+
+            /** CloudEventExecutionStart principal. */
+            public principal: string;
 
             /**
              * Creates a new CloudEventExecutionStart instance using the specified properties.

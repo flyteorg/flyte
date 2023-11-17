@@ -29,21 +29,19 @@ pub struct CreateArtifactRequest {
     #[prost(message, optional, tag="6")]
     pub source: ::core::option::Option<ArtifactSource>,
 }
-// 1. Should add a new Source message that encapsulates all three of principal, task execution id, workflow execution id,
-// as well as the workflow and launch plan id responsible for the execution that generated the artifact (if not an upload)
-
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactSource {
-    /// 3. These fields should be removed.
-    /// Outputs of tasks will have this.
     #[prost(message, optional, tag="1")]
-    pub task_execution: ::core::option::Option<super::core::TaskExecutionIdentifier>,
-    /// Workflow outputs will have this.
-    #[prost(message, optional, tag="2")]
-    pub node_execution: ::core::option::Option<super::core::NodeExecutionIdentifier>,
+    pub workflow_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(string, tag="2")]
+    pub node_id: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub task_id: ::core::option::Option<super::core::Identifier>,
+    #[prost(uint32, tag="4")]
+    pub retry_attempt: u32,
     /// Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
-    #[prost(string, tag="3")]
+    #[prost(string, tag="5")]
     pub principal: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -134,6 +132,9 @@ pub struct FindByWorkflowExecRequest {
     pub exec_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
     #[prost(enumeration="find_by_workflow_exec_request::Direction", tag="2")]
     pub direction: i32,
+    /// If set to true, actually fetch the artifact body. By default only the IDs are returned.
+    #[prost(bool, tag="3")]
+    pub fetch_specs: bool,
 }
 /// Nested message and enum types in `FindByWorkflowExecRequest`.
 pub mod find_by_workflow_exec_request {

@@ -2915,64 +2915,52 @@ public final class Artifacts {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <pre>
-     * 3. These fields should be removed.
-     * Outputs of tasks will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
      */
-    boolean hasTaskExecution();
+    boolean hasWorkflowExecution();
     /**
-     * <pre>
-     * 3. These fields should be removed.
-     * Outputs of tasks will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
      */
-    flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecution();
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getWorkflowExecution();
     /**
-     * <pre>
-     * 3. These fields should be removed.
-     * Outputs of tasks will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
      */
-    flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionOrBuilder();
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getWorkflowExecutionOrBuilder();
 
     /**
-     * <pre>
-     * Workflow outputs will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+     * <code>string node_id = 2;</code>
      */
-    boolean hasNodeExecution();
+    java.lang.String getNodeId();
     /**
-     * <pre>
-     * Workflow outputs will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+     * <code>string node_id = 2;</code>
      */
-    flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier getNodeExecution();
+    com.google.protobuf.ByteString
+        getNodeIdBytes();
+
     /**
-     * <pre>
-     * Workflow outputs will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+     * <code>.flyteidl.core.Identifier task_id = 3;</code>
      */
-    flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder getNodeExecutionOrBuilder();
+    boolean hasTaskId();
+    /**
+     * <code>.flyteidl.core.Identifier task_id = 3;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.Identifier getTaskId();
+    /**
+     * <code>.flyteidl.core.Identifier task_id = 3;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getTaskIdOrBuilder();
+
+    /**
+     * <code>uint32 retry_attempt = 4;</code>
+     */
+    int getRetryAttempt();
 
     /**
      * <pre>
      * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
      * </pre>
      *
-     * <code>string principal = 3;</code>
+     * <code>string principal = 5;</code>
      */
     java.lang.String getPrincipal();
     /**
@@ -2980,7 +2968,7 @@ public final class Artifacts {
      * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
      * </pre>
      *
-     * <code>string principal = 3;</code>
+     * <code>string principal = 5;</code>
      */
     com.google.protobuf.ByteString
         getPrincipalBytes();
@@ -2998,6 +2986,7 @@ public final class Artifacts {
       super(builder);
     }
     private ArtifactSource() {
+      nodeId_ = "";
       principal_ = "";
     }
 
@@ -3026,32 +3015,43 @@ public final class Artifacts {
               done = true;
               break;
             case 10: {
-              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder subBuilder = null;
-              if (taskExecution_ != null) {
-                subBuilder = taskExecution_.toBuilder();
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder subBuilder = null;
+              if (workflowExecution_ != null) {
+                subBuilder = workflowExecution_.toBuilder();
               }
-              taskExecution_ = input.readMessage(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.parser(), extensionRegistry);
+              workflowExecution_ = input.readMessage(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(taskExecution_);
-                taskExecution_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(workflowExecution_);
+                workflowExecution_ = subBuilder.buildPartial();
               }
 
               break;
             }
             case 18: {
-              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder subBuilder = null;
-              if (nodeExecution_ != null) {
-                subBuilder = nodeExecution_.toBuilder();
+              java.lang.String s = input.readStringRequireUtf8();
+
+              nodeId_ = s;
+              break;
+            }
+            case 26: {
+              flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
+              if (taskId_ != null) {
+                subBuilder = taskId_.toBuilder();
               }
-              nodeExecution_ = input.readMessage(flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.parser(), extensionRegistry);
+              taskId_ = input.readMessage(flyteidl.core.IdentifierOuterClass.Identifier.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(nodeExecution_);
-                nodeExecution_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(taskId_);
+                taskId_ = subBuilder.buildPartial();
               }
 
               break;
             }
-            case 26: {
+            case 32: {
+
+              retryAttempt_ = input.readUInt32();
+              break;
+            }
+            case 42: {
               java.lang.String s = input.readStringRequireUtf8();
 
               principal_ = s;
@@ -3089,83 +3089,99 @@ public final class Artifacts {
               flyteidl.artifact.Artifacts.ArtifactSource.class, flyteidl.artifact.Artifacts.ArtifactSource.Builder.class);
     }
 
-    public static final int TASK_EXECUTION_FIELD_NUMBER = 1;
-    private flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier taskExecution_;
+    public static final int WORKFLOW_EXECUTION_FIELD_NUMBER = 1;
+    private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier workflowExecution_;
     /**
-     * <pre>
-     * 3. These fields should be removed.
-     * Outputs of tasks will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
      */
-    public boolean hasTaskExecution() {
-      return taskExecution_ != null;
+    public boolean hasWorkflowExecution() {
+      return workflowExecution_ != null;
     }
     /**
-     * <pre>
-     * 3. These fields should be removed.
-     * Outputs of tasks will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
      */
-    public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecution() {
-      return taskExecution_ == null ? flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance() : taskExecution_;
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getWorkflowExecution() {
+      return workflowExecution_ == null ? flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : workflowExecution_;
     }
     /**
-     * <pre>
-     * 3. These fields should be removed.
-     * Outputs of tasks will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
      */
-    public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionOrBuilder() {
-      return getTaskExecution();
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getWorkflowExecutionOrBuilder() {
+      return getWorkflowExecution();
     }
 
-    public static final int NODE_EXECUTION_FIELD_NUMBER = 2;
-    private flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier nodeExecution_;
+    public static final int NODE_ID_FIELD_NUMBER = 2;
+    private volatile java.lang.Object nodeId_;
     /**
-     * <pre>
-     * Workflow outputs will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+     * <code>string node_id = 2;</code>
      */
-    public boolean hasNodeExecution() {
-      return nodeExecution_ != null;
+    public java.lang.String getNodeId() {
+      java.lang.Object ref = nodeId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        nodeId_ = s;
+        return s;
+      }
     }
     /**
-     * <pre>
-     * Workflow outputs will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+     * <code>string node_id = 2;</code>
      */
-    public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier getNodeExecution() {
-      return nodeExecution_ == null ? flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.getDefaultInstance() : nodeExecution_;
-    }
-    /**
-     * <pre>
-     * Workflow outputs will have this.
-     * </pre>
-     *
-     * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
-     */
-    public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder getNodeExecutionOrBuilder() {
-      return getNodeExecution();
+    public com.google.protobuf.ByteString
+        getNodeIdBytes() {
+      java.lang.Object ref = nodeId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        nodeId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
-    public static final int PRINCIPAL_FIELD_NUMBER = 3;
+    public static final int TASK_ID_FIELD_NUMBER = 3;
+    private flyteidl.core.IdentifierOuterClass.Identifier taskId_;
+    /**
+     * <code>.flyteidl.core.Identifier task_id = 3;</code>
+     */
+    public boolean hasTaskId() {
+      return taskId_ != null;
+    }
+    /**
+     * <code>.flyteidl.core.Identifier task_id = 3;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.Identifier getTaskId() {
+      return taskId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : taskId_;
+    }
+    /**
+     * <code>.flyteidl.core.Identifier task_id = 3;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getTaskIdOrBuilder() {
+      return getTaskId();
+    }
+
+    public static final int RETRY_ATTEMPT_FIELD_NUMBER = 4;
+    private int retryAttempt_;
+    /**
+     * <code>uint32 retry_attempt = 4;</code>
+     */
+    public int getRetryAttempt() {
+      return retryAttempt_;
+    }
+
+    public static final int PRINCIPAL_FIELD_NUMBER = 5;
     private volatile java.lang.Object principal_;
     /**
      * <pre>
      * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
      * </pre>
      *
-     * <code>string principal = 3;</code>
+     * <code>string principal = 5;</code>
      */
     public java.lang.String getPrincipal() {
       java.lang.Object ref = principal_;
@@ -3184,7 +3200,7 @@ public final class Artifacts {
      * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
      * </pre>
      *
-     * <code>string principal = 3;</code>
+     * <code>string principal = 5;</code>
      */
     public com.google.protobuf.ByteString
         getPrincipalBytes() {
@@ -3214,14 +3230,20 @@ public final class Artifacts {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (taskExecution_ != null) {
-        output.writeMessage(1, getTaskExecution());
+      if (workflowExecution_ != null) {
+        output.writeMessage(1, getWorkflowExecution());
       }
-      if (nodeExecution_ != null) {
-        output.writeMessage(2, getNodeExecution());
+      if (!getNodeIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, nodeId_);
+      }
+      if (taskId_ != null) {
+        output.writeMessage(3, getTaskId());
+      }
+      if (retryAttempt_ != 0) {
+        output.writeUInt32(4, retryAttempt_);
       }
       if (!getPrincipalBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, principal_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, principal_);
       }
       unknownFields.writeTo(output);
     }
@@ -3232,16 +3254,23 @@ public final class Artifacts {
       if (size != -1) return size;
 
       size = 0;
-      if (taskExecution_ != null) {
+      if (workflowExecution_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getTaskExecution());
+          .computeMessageSize(1, getWorkflowExecution());
       }
-      if (nodeExecution_ != null) {
+      if (!getNodeIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, nodeId_);
+      }
+      if (taskId_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getNodeExecution());
+          .computeMessageSize(3, getTaskId());
+      }
+      if (retryAttempt_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(4, retryAttempt_);
       }
       if (!getPrincipalBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, principal_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, principal_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3258,16 +3287,20 @@ public final class Artifacts {
       }
       flyteidl.artifact.Artifacts.ArtifactSource other = (flyteidl.artifact.Artifacts.ArtifactSource) obj;
 
-      if (hasTaskExecution() != other.hasTaskExecution()) return false;
-      if (hasTaskExecution()) {
-        if (!getTaskExecution()
-            .equals(other.getTaskExecution())) return false;
+      if (hasWorkflowExecution() != other.hasWorkflowExecution()) return false;
+      if (hasWorkflowExecution()) {
+        if (!getWorkflowExecution()
+            .equals(other.getWorkflowExecution())) return false;
       }
-      if (hasNodeExecution() != other.hasNodeExecution()) return false;
-      if (hasNodeExecution()) {
-        if (!getNodeExecution()
-            .equals(other.getNodeExecution())) return false;
+      if (!getNodeId()
+          .equals(other.getNodeId())) return false;
+      if (hasTaskId() != other.hasTaskId()) return false;
+      if (hasTaskId()) {
+        if (!getTaskId()
+            .equals(other.getTaskId())) return false;
       }
+      if (getRetryAttempt()
+          != other.getRetryAttempt()) return false;
       if (!getPrincipal()
           .equals(other.getPrincipal())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
@@ -3281,14 +3314,18 @@ public final class Artifacts {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasTaskExecution()) {
-        hash = (37 * hash) + TASK_EXECUTION_FIELD_NUMBER;
-        hash = (53 * hash) + getTaskExecution().hashCode();
+      if (hasWorkflowExecution()) {
+        hash = (37 * hash) + WORKFLOW_EXECUTION_FIELD_NUMBER;
+        hash = (53 * hash) + getWorkflowExecution().hashCode();
       }
-      if (hasNodeExecution()) {
-        hash = (37 * hash) + NODE_EXECUTION_FIELD_NUMBER;
-        hash = (53 * hash) + getNodeExecution().hashCode();
+      hash = (37 * hash) + NODE_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getNodeId().hashCode();
+      if (hasTaskId()) {
+        hash = (37 * hash) + TASK_ID_FIELD_NUMBER;
+        hash = (53 * hash) + getTaskId().hashCode();
       }
+      hash = (37 * hash) + RETRY_ATTEMPT_FIELD_NUMBER;
+      hash = (53 * hash) + getRetryAttempt();
       hash = (37 * hash) + PRINCIPAL_FIELD_NUMBER;
       hash = (53 * hash) + getPrincipal().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -3424,18 +3461,22 @@ public final class Artifacts {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (taskExecutionBuilder_ == null) {
-          taskExecution_ = null;
+        if (workflowExecutionBuilder_ == null) {
+          workflowExecution_ = null;
         } else {
-          taskExecution_ = null;
-          taskExecutionBuilder_ = null;
+          workflowExecution_ = null;
+          workflowExecutionBuilder_ = null;
         }
-        if (nodeExecutionBuilder_ == null) {
-          nodeExecution_ = null;
+        nodeId_ = "";
+
+        if (taskIdBuilder_ == null) {
+          taskId_ = null;
         } else {
-          nodeExecution_ = null;
-          nodeExecutionBuilder_ = null;
+          taskId_ = null;
+          taskIdBuilder_ = null;
         }
+        retryAttempt_ = 0;
+
         principal_ = "";
 
         return this;
@@ -3464,16 +3505,18 @@ public final class Artifacts {
       @java.lang.Override
       public flyteidl.artifact.Artifacts.ArtifactSource buildPartial() {
         flyteidl.artifact.Artifacts.ArtifactSource result = new flyteidl.artifact.Artifacts.ArtifactSource(this);
-        if (taskExecutionBuilder_ == null) {
-          result.taskExecution_ = taskExecution_;
+        if (workflowExecutionBuilder_ == null) {
+          result.workflowExecution_ = workflowExecution_;
         } else {
-          result.taskExecution_ = taskExecutionBuilder_.build();
+          result.workflowExecution_ = workflowExecutionBuilder_.build();
         }
-        if (nodeExecutionBuilder_ == null) {
-          result.nodeExecution_ = nodeExecution_;
+        result.nodeId_ = nodeId_;
+        if (taskIdBuilder_ == null) {
+          result.taskId_ = taskId_;
         } else {
-          result.nodeExecution_ = nodeExecutionBuilder_.build();
+          result.taskId_ = taskIdBuilder_.build();
         }
+        result.retryAttempt_ = retryAttempt_;
         result.principal_ = principal_;
         onBuilt();
         return result;
@@ -3523,11 +3566,18 @@ public final class Artifacts {
 
       public Builder mergeFrom(flyteidl.artifact.Artifacts.ArtifactSource other) {
         if (other == flyteidl.artifact.Artifacts.ArtifactSource.getDefaultInstance()) return this;
-        if (other.hasTaskExecution()) {
-          mergeTaskExecution(other.getTaskExecution());
+        if (other.hasWorkflowExecution()) {
+          mergeWorkflowExecution(other.getWorkflowExecution());
         }
-        if (other.hasNodeExecution()) {
-          mergeNodeExecution(other.getNodeExecution());
+        if (!other.getNodeId().isEmpty()) {
+          nodeId_ = other.nodeId_;
+          onChanged();
+        }
+        if (other.hasTaskId()) {
+          mergeTaskId(other.getTaskId());
+        }
+        if (other.getRetryAttempt() != 0) {
+          setRetryAttempt(other.getRetryAttempt());
         }
         if (!other.getPrincipal().isEmpty()) {
           principal_ = other.principal_;
@@ -3562,319 +3612,333 @@ public final class Artifacts {
         return this;
       }
 
-      private flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier taskExecution_;
+      private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier workflowExecution_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder> taskExecutionBuilder_;
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> workflowExecutionBuilder_;
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public boolean hasTaskExecution() {
-        return taskExecutionBuilder_ != null || taskExecution_ != null;
+      public boolean hasWorkflowExecution() {
+        return workflowExecutionBuilder_ != null || workflowExecution_ != null;
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier getTaskExecution() {
-        if (taskExecutionBuilder_ == null) {
-          return taskExecution_ == null ? flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance() : taskExecution_;
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getWorkflowExecution() {
+        if (workflowExecutionBuilder_ == null) {
+          return workflowExecution_ == null ? flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : workflowExecution_;
         } else {
-          return taskExecutionBuilder_.getMessage();
+          return workflowExecutionBuilder_.getMessage();
         }
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public Builder setTaskExecution(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier value) {
-        if (taskExecutionBuilder_ == null) {
+      public Builder setWorkflowExecution(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (workflowExecutionBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          taskExecution_ = value;
+          workflowExecution_ = value;
           onChanged();
         } else {
-          taskExecutionBuilder_.setMessage(value);
+          workflowExecutionBuilder_.setMessage(value);
         }
 
         return this;
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public Builder setTaskExecution(
-          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder builderForValue) {
-        if (taskExecutionBuilder_ == null) {
-          taskExecution_ = builderForValue.build();
+      public Builder setWorkflowExecution(
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder builderForValue) {
+        if (workflowExecutionBuilder_ == null) {
+          workflowExecution_ = builderForValue.build();
           onChanged();
         } else {
-          taskExecutionBuilder_.setMessage(builderForValue.build());
+          workflowExecutionBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public Builder mergeTaskExecution(flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier value) {
-        if (taskExecutionBuilder_ == null) {
-          if (taskExecution_ != null) {
-            taskExecution_ =
-              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.newBuilder(taskExecution_).mergeFrom(value).buildPartial();
+      public Builder mergeWorkflowExecution(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (workflowExecutionBuilder_ == null) {
+          if (workflowExecution_ != null) {
+            workflowExecution_ =
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.newBuilder(workflowExecution_).mergeFrom(value).buildPartial();
           } else {
-            taskExecution_ = value;
+            workflowExecution_ = value;
           }
           onChanged();
         } else {
-          taskExecutionBuilder_.mergeFrom(value);
+          workflowExecutionBuilder_.mergeFrom(value);
         }
 
         return this;
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public Builder clearTaskExecution() {
-        if (taskExecutionBuilder_ == null) {
-          taskExecution_ = null;
+      public Builder clearWorkflowExecution() {
+        if (workflowExecutionBuilder_ == null) {
+          workflowExecution_ = null;
           onChanged();
         } else {
-          taskExecution_ = null;
-          taskExecutionBuilder_ = null;
+          workflowExecution_ = null;
+          workflowExecutionBuilder_ = null;
         }
 
         return this;
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder getTaskExecutionBuilder() {
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder getWorkflowExecutionBuilder() {
         
         onChanged();
-        return getTaskExecutionFieldBuilder().getBuilder();
+        return getWorkflowExecutionFieldBuilder().getBuilder();
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
-      public flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder getTaskExecutionOrBuilder() {
-        if (taskExecutionBuilder_ != null) {
-          return taskExecutionBuilder_.getMessageOrBuilder();
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getWorkflowExecutionOrBuilder() {
+        if (workflowExecutionBuilder_ != null) {
+          return workflowExecutionBuilder_.getMessageOrBuilder();
         } else {
-          return taskExecution_ == null ?
-              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.getDefaultInstance() : taskExecution_;
+          return workflowExecution_ == null ?
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : workflowExecution_;
         }
       }
       /**
-       * <pre>
-       * 3. These fields should be removed.
-       * Outputs of tasks will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.TaskExecutionIdentifier task_execution = 1;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier workflow_execution = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder> 
-          getTaskExecutionFieldBuilder() {
-        if (taskExecutionBuilder_ == null) {
-          taskExecutionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.TaskExecutionIdentifierOrBuilder>(
-                  getTaskExecution(),
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> 
+          getWorkflowExecutionFieldBuilder() {
+        if (workflowExecutionBuilder_ == null) {
+          workflowExecutionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder>(
+                  getWorkflowExecution(),
                   getParentForChildren(),
                   isClean());
-          taskExecution_ = null;
+          workflowExecution_ = null;
         }
-        return taskExecutionBuilder_;
+        return workflowExecutionBuilder_;
       }
 
-      private flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier nodeExecution_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder> nodeExecutionBuilder_;
+      private java.lang.Object nodeId_ = "";
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>string node_id = 2;</code>
        */
-      public boolean hasNodeExecution() {
-        return nodeExecutionBuilder_ != null || nodeExecution_ != null;
-      }
-      /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
-       */
-      public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier getNodeExecution() {
-        if (nodeExecutionBuilder_ == null) {
-          return nodeExecution_ == null ? flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.getDefaultInstance() : nodeExecution_;
+      public java.lang.String getNodeId() {
+        java.lang.Object ref = nodeId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          nodeId_ = s;
+          return s;
         } else {
-          return nodeExecutionBuilder_.getMessage();
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>string node_id = 2;</code>
        */
-      public Builder setNodeExecution(flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier value) {
-        if (nodeExecutionBuilder_ == null) {
+      public com.google.protobuf.ByteString
+          getNodeIdBytes() {
+        java.lang.Object ref = nodeId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          nodeId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string node_id = 2;</code>
+       */
+      public Builder setNodeId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        nodeId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string node_id = 2;</code>
+       */
+      public Builder clearNodeId() {
+        
+        nodeId_ = getDefaultInstance().getNodeId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string node_id = 2;</code>
+       */
+      public Builder setNodeIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        nodeId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.Identifier taskId_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> taskIdBuilder_;
+      /**
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
+       */
+      public boolean hasTaskId() {
+        return taskIdBuilder_ != null || taskId_ != null;
+      }
+      /**
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier getTaskId() {
+        if (taskIdBuilder_ == null) {
+          return taskId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : taskId_;
+        } else {
+          return taskIdBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
+       */
+      public Builder setTaskId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (taskIdBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          nodeExecution_ = value;
+          taskId_ = value;
           onChanged();
         } else {
-          nodeExecutionBuilder_.setMessage(value);
+          taskIdBuilder_.setMessage(value);
         }
 
         return this;
       }
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
        */
-      public Builder setNodeExecution(
-          flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder builderForValue) {
-        if (nodeExecutionBuilder_ == null) {
-          nodeExecution_ = builderForValue.build();
+      public Builder setTaskId(
+          flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
+        if (taskIdBuilder_ == null) {
+          taskId_ = builderForValue.build();
           onChanged();
         } else {
-          nodeExecutionBuilder_.setMessage(builderForValue.build());
+          taskIdBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
       }
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
        */
-      public Builder mergeNodeExecution(flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier value) {
-        if (nodeExecutionBuilder_ == null) {
-          if (nodeExecution_ != null) {
-            nodeExecution_ =
-              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.newBuilder(nodeExecution_).mergeFrom(value).buildPartial();
+      public Builder mergeTaskId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (taskIdBuilder_ == null) {
+          if (taskId_ != null) {
+            taskId_ =
+              flyteidl.core.IdentifierOuterClass.Identifier.newBuilder(taskId_).mergeFrom(value).buildPartial();
           } else {
-            nodeExecution_ = value;
+            taskId_ = value;
           }
           onChanged();
         } else {
-          nodeExecutionBuilder_.mergeFrom(value);
+          taskIdBuilder_.mergeFrom(value);
         }
 
         return this;
       }
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
        */
-      public Builder clearNodeExecution() {
-        if (nodeExecutionBuilder_ == null) {
-          nodeExecution_ = null;
+      public Builder clearTaskId() {
+        if (taskIdBuilder_ == null) {
+          taskId_ = null;
           onChanged();
         } else {
-          nodeExecution_ = null;
-          nodeExecutionBuilder_ = null;
+          taskId_ = null;
+          taskIdBuilder_ = null;
         }
 
         return this;
       }
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
        */
-      public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder getNodeExecutionBuilder() {
+      public flyteidl.core.IdentifierOuterClass.Identifier.Builder getTaskIdBuilder() {
         
         onChanged();
-        return getNodeExecutionFieldBuilder().getBuilder();
+        return getTaskIdFieldBuilder().getBuilder();
       }
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
        */
-      public flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder getNodeExecutionOrBuilder() {
-        if (nodeExecutionBuilder_ != null) {
-          return nodeExecutionBuilder_.getMessageOrBuilder();
+      public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getTaskIdOrBuilder() {
+        if (taskIdBuilder_ != null) {
+          return taskIdBuilder_.getMessageOrBuilder();
         } else {
-          return nodeExecution_ == null ?
-              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.getDefaultInstance() : nodeExecution_;
+          return taskId_ == null ?
+              flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : taskId_;
         }
       }
       /**
-       * <pre>
-       * Workflow outputs will have this.
-       * </pre>
-       *
-       * <code>.flyteidl.core.NodeExecutionIdentifier node_execution = 2;</code>
+       * <code>.flyteidl.core.Identifier task_id = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder> 
-          getNodeExecutionFieldBuilder() {
-        if (nodeExecutionBuilder_ == null) {
-          nodeExecutionBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.NodeExecutionIdentifierOrBuilder>(
-                  getNodeExecution(),
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
+          getTaskIdFieldBuilder() {
+        if (taskIdBuilder_ == null) {
+          taskIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder>(
+                  getTaskId(),
                   getParentForChildren(),
                   isClean());
-          nodeExecution_ = null;
+          taskId_ = null;
         }
-        return nodeExecutionBuilder_;
+        return taskIdBuilder_;
+      }
+
+      private int retryAttempt_ ;
+      /**
+       * <code>uint32 retry_attempt = 4;</code>
+       */
+      public int getRetryAttempt() {
+        return retryAttempt_;
+      }
+      /**
+       * <code>uint32 retry_attempt = 4;</code>
+       */
+      public Builder setRetryAttempt(int value) {
+        
+        retryAttempt_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>uint32 retry_attempt = 4;</code>
+       */
+      public Builder clearRetryAttempt() {
+        
+        retryAttempt_ = 0;
+        onChanged();
+        return this;
       }
 
       private java.lang.Object principal_ = "";
@@ -3883,7 +3947,7 @@ public final class Artifacts {
        * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
        * </pre>
        *
-       * <code>string principal = 3;</code>
+       * <code>string principal = 5;</code>
        */
       public java.lang.String getPrincipal() {
         java.lang.Object ref = principal_;
@@ -3902,7 +3966,7 @@ public final class Artifacts {
        * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
        * </pre>
        *
-       * <code>string principal = 3;</code>
+       * <code>string principal = 5;</code>
        */
       public com.google.protobuf.ByteString
           getPrincipalBytes() {
@@ -3922,7 +3986,7 @@ public final class Artifacts {
        * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
        * </pre>
        *
-       * <code>string principal = 3;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder setPrincipal(
           java.lang.String value) {
@@ -3939,7 +4003,7 @@ public final class Artifacts {
        * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
        * </pre>
        *
-       * <code>string principal = 3;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder clearPrincipal() {
         
@@ -3952,7 +4016,7 @@ public final class Artifacts {
        * Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
        * </pre>
        *
-       * <code>string principal = 3;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder setPrincipalBytes(
           com.google.protobuf.ByteString value) {
@@ -10564,6 +10628,15 @@ public final class Artifacts {
      * <code>.flyteidl.artifact.FindByWorkflowExecRequest.Direction direction = 2;</code>
      */
     flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction getDirection();
+
+    /**
+     * <pre>
+     * If set to true, actually fetch the artifact body. By default only the IDs are returned.
+     * </pre>
+     *
+     * <code>bool fetch_specs = 3;</code>
+     */
+    boolean getFetchSpecs();
   }
   /**
    * Protobuf type {@code flyteidl.artifact.FindByWorkflowExecRequest}
@@ -10622,6 +10695,11 @@ public final class Artifacts {
               int rawValue = input.readEnum();
 
               direction_ = rawValue;
+              break;
+            }
+            case 24: {
+
+              fetchSpecs_ = input.readBool();
               break;
             }
             default: {
@@ -10792,6 +10870,19 @@ public final class Artifacts {
       return result == null ? flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction.UNRECOGNIZED : result;
     }
 
+    public static final int FETCH_SPECS_FIELD_NUMBER = 3;
+    private boolean fetchSpecs_;
+    /**
+     * <pre>
+     * If set to true, actually fetch the artifact body. By default only the IDs are returned.
+     * </pre>
+     *
+     * <code>bool fetch_specs = 3;</code>
+     */
+    public boolean getFetchSpecs() {
+      return fetchSpecs_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10812,6 +10903,9 @@ public final class Artifacts {
       if (direction_ != flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction.INPUTS.getNumber()) {
         output.writeEnum(2, direction_);
       }
+      if (fetchSpecs_ != false) {
+        output.writeBool(3, fetchSpecs_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10828,6 +10922,10 @@ public final class Artifacts {
       if (direction_ != flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction.INPUTS.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, direction_);
+      }
+      if (fetchSpecs_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, fetchSpecs_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -10850,6 +10948,8 @@ public final class Artifacts {
             .equals(other.getExecId())) return false;
       }
       if (direction_ != other.direction_) return false;
+      if (getFetchSpecs()
+          != other.getFetchSpecs()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -10867,6 +10967,9 @@ public final class Artifacts {
       }
       hash = (37 * hash) + DIRECTION_FIELD_NUMBER;
       hash = (53 * hash) + direction_;
+      hash = (37 * hash) + FETCH_SPECS_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getFetchSpecs());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -11008,6 +11111,8 @@ public final class Artifacts {
         }
         direction_ = 0;
 
+        fetchSpecs_ = false;
+
         return this;
       }
 
@@ -11040,6 +11145,7 @@ public final class Artifacts {
           result.execId_ = execIdBuilder_.build();
         }
         result.direction_ = direction_;
+        result.fetchSpecs_ = fetchSpecs_;
         onBuilt();
         return result;
       }
@@ -11093,6 +11199,9 @@ public final class Artifacts {
         }
         if (other.direction_ != 0) {
           setDirectionValue(other.getDirectionValue());
+        }
+        if (other.getFetchSpecs() != false) {
+          setFetchSpecs(other.getFetchSpecs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -11281,6 +11390,44 @@ public final class Artifacts {
       public Builder clearDirection() {
         
         direction_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private boolean fetchSpecs_ ;
+      /**
+       * <pre>
+       * If set to true, actually fetch the artifact body. By default only the IDs are returned.
+       * </pre>
+       *
+       * <code>bool fetch_specs = 3;</code>
+       */
+      public boolean getFetchSpecs() {
+        return fetchSpecs_;
+      }
+      /**
+       * <pre>
+       * If set to true, actually fetch the artifact body. By default only the IDs are returned.
+       * </pre>
+       *
+       * <code>bool fetch_specs = 3;</code>
+       */
+      public Builder setFetchSpecs(boolean value) {
+        
+        fetchSpecs_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If set to true, actually fetch the artifact body. By default only the IDs are returned.
+       * </pre>
+       *
+       * <code>bool fetch_specs = 3;</code>
+       */
+      public Builder clearFetchSpecs() {
+        
+        fetchSpecs_ = false;
         onChanged();
         return this;
       }
@@ -20024,107 +20171,108 @@ public final class Artifacts {
       "ifact.CreateArtifactRequest.PartitionsEn" +
       "try\022\013\n\003tag\030\005 \001(\t\0221\n\006source\030\006 \001(\0132!.flyte" +
       "idl.artifact.ArtifactSource\0321\n\017Partition" +
-      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\243" +
-      "\001\n\016ArtifactSource\022>\n\016task_execution\030\001 \001(" +
-      "\0132&.flyteidl.core.TaskExecutionIdentifie" +
-      "r\022>\n\016node_execution\030\002 \001(\0132&.flyteidl.cor" +
-      "e.NodeExecutionIdentifier\022\021\n\tprincipal\030\003" +
-      " \001(\t\"\276\001\n\014ArtifactSpec\022%\n\005value\030\001 \001(\0132\026.f" +
-      "lyteidl.core.Literal\022(\n\004type\030\002 \001(\0132\032.fly" +
-      "teidl.core.LiteralType\022\031\n\021short_descript" +
-      "ion\030\003 \001(\t\022+\n\ruser_metadata\030\004 \001(\0132\024.googl" +
-      "e.protobuf.Any\022\025\n\rmetadata_type\030\005 \001(\t\"G\n" +
-      "\026CreateArtifactResponse\022-\n\010artifact\030\001 \001(" +
-      "\0132\033.flyteidl.artifact.Artifact\"R\n\022GetArt" +
-      "ifactRequest\022+\n\005query\030\001 \001(\0132\034.flyteidl.c" +
-      "ore.ArtifactQuery\022\017\n\007details\030\002 \001(\010\"D\n\023Ge" +
-      "tArtifactResponse\022-\n\010artifact\030\001 \001(\0132\033.fl" +
-      "yteidl.artifact.Artifact\"V\n\rSearchOption" +
-      "s\022\031\n\021strict_partitions\030\001 \001(\010\022\025\n\rlatest_b" +
-      "y_key\030\002 \001(\010\022\023\n\013fetch_specs\030\003 \001(\010\"\356\001\n\026Sea" +
-      "rchArtifactsRequest\0220\n\014artifact_key\030\001 \001(" +
-      "\0132\032.flyteidl.core.ArtifactKey\022-\n\npartiti" +
-      "ons\030\002 \001(\0132\031.flyteidl.core.Partitions\022\021\n\t" +
-      "principal\030\003 \001(\t\022\017\n\007version\030\004 \001(\t\0221\n\007opti" +
-      "ons\030\005 \001(\0132 .flyteidl.artifact.SearchOpti" +
-      "ons\022\r\n\005token\030\006 \001(\t\022\r\n\005limit\030\007 \001(\005\"X\n\027Sea" +
-      "rchArtifactsResponse\022.\n\tartifacts\030\001 \003(\0132" +
-      "\033.flyteidl.artifact.Artifact\022\r\n\005token\030\002 " +
-      "\001(\t\"\311\001\n\031FindByWorkflowExecRequest\022;\n\007exe" +
-      "c_id\030\001 \001(\0132*.flyteidl.core.WorkflowExecu" +
-      "tionIdentifier\022I\n\tdirection\030\002 \001(\01626.flyt" +
-      "eidl.artifact.FindByWorkflowExecRequest." +
-      "Direction\"$\n\tDirection\022\n\n\006INPUTS\020\000\022\013\n\007OU" +
-      "TPUTS\020\001\"a\n\rAddTagRequest\022.\n\013artifact_id\030" +
-      "\001 \001(\0132\031.flyteidl.core.ArtifactID\022\r\n\005valu" +
-      "e\030\002 \001(\t\022\021\n\toverwrite\030\003 \001(\010\"\020\n\016AddTagResp" +
-      "onse\"O\n\024CreateTriggerRequest\0227\n\023trigger_" +
-      "launch_plan\030\001 \001(\0132\032.flyteidl.admin.Launc" +
-      "hPlan\"\027\n\025CreateTriggerResponse\"E\n\024Delete" +
-      "TriggerRequest\022-\n\ntrigger_id\030\001 \001(\0132\031.fly" +
-      "teidl.core.Identifier\"\027\n\025DeleteTriggerRe" +
-      "sponse\"m\n\020ArtifactProducer\022,\n\tentity_id\030" +
-      "\001 \001(\0132\031.flyteidl.core.Identifier\022+\n\007outp" +
-      "uts\030\002 \001(\0132\032.flyteidl.core.VariableMap\"Q\n" +
-      "\027RegisterProducerRequest\0226\n\tproducers\030\001 " +
-      "\003(\0132#.flyteidl.artifact.ArtifactProducer" +
-      "\"m\n\020ArtifactConsumer\022,\n\tentity_id\030\001 \001(\0132" +
-      "\031.flyteidl.core.Identifier\022+\n\006inputs\030\002 \001" +
-      "(\0132\033.flyteidl.core.ParameterMap\"Q\n\027Regis" +
-      "terConsumerRequest\0226\n\tconsumers\030\001 \003(\0132#." +
-      "flyteidl.artifact.ArtifactConsumer\"\022\n\020Re" +
-      "gisterResponse\"\377\001\n\021CloudEventRequest\022O\n\030" +
-      "workflow_execution_event\030\001 \001(\0132+.flyteid" +
-      "l.event.CloudEventWorkflowExecutionH\000\022G\n" +
-      "\024task_execution_event\030\002 \001(\0132\'.flyteidl.e" +
-      "vent.CloudEventTaskExecutionH\000\022G\n\024node_e" +
-      "xecution_event\030\003 \001(\0132\'.flyteidl.event.Cl" +
-      "oudEventNodeExecutionH\000B\007\n\005event\"\024\n\022Clou" +
-      "dEventResponse2\206\r\n\020ArtifactRegistry\022g\n\016C" +
-      "reateArtifact\022(.flyteidl.artifact.Create" +
-      "ArtifactRequest\032).flyteidl.artifact.Crea" +
-      "teArtifactResponse\"\000\022\315\004\n\013GetArtifact\022%.f" +
-      "lyteidl.artifact.GetArtifactRequest\032&.fl" +
-      "yteidl.artifact.GetArtifactResponse\"\356\003\202\323" +
-      "\344\223\002\347\003\022\022/data/v1/artifactsZ\252\001\022\247\001/data/v1/" +
-      "artifact/id/{query.artifact_id.artifact_" +
-      "key.project}/{query.artifact_id.artifact" +
-      "_key.domain}/{query.artifact_id.artifact" +
-      "_key.name}/{query.artifact_id.version}Z\216" +
-      "\001\022\213\001/data/v1/artifact/id/{query.artifact" +
-      "_id.artifact_key.project}/{query.artifac" +
-      "t_id.artifact_key.domain}/{query.artifac" +
-      "t_id.artifact_key.name}Z\222\001\022\217\001/data/v1/ar" +
-      "tifact/tag/{query.artifact_tag.artifact_" +
-      "key.project}/{query.artifact_tag.artifac" +
-      "t_key.domain}/{query.artifact_tag.artifa" +
-      "ct_key.name}\022\204\002\n\017SearchArtifacts\022).flyte" +
-      "idl.artifact.SearchArtifactsRequest\032*.fl" +
-      "yteidl.artifact.SearchArtifactsResponse\"" +
-      "\231\001\202\323\344\223\002\222\001\022Q/data/v1/query/s/{artifact_ke" +
-      "y.project}/{artifact_key.domain}/{artifa" +
-      "ct_key.name}Z=\022;/data/v1/query/{artifact" +
-      "_key.project}/{artifact_key.domain}\022d\n\rC" +
-      "reateTrigger\022\'.flyteidl.artifact.CreateT" +
-      "riggerRequest\032(.flyteidl.artifact.Create" +
-      "TriggerResponse\"\000\022d\n\rDeleteTrigger\022\'.fly" +
-      "teidl.artifact.DeleteTriggerRequest\032(.fl" +
-      "yteidl.artifact.DeleteTriggerResponse\"\000\022" +
-      "O\n\006AddTag\022 .flyteidl.artifact.AddTagRequ" +
-      "est\032!.flyteidl.artifact.AddTagResponse\"\000" +
-      "\022e\n\020RegisterProducer\022*.flyteidl.artifact" +
-      ".RegisterProducerRequest\032#.flyteidl.arti" +
-      "fact.RegisterResponse\"\000\022e\n\020RegisterConsu" +
-      "mer\022*.flyteidl.artifact.RegisterConsumer" +
-      "Request\032#.flyteidl.artifact.RegisterResp" +
-      "onse\"\000\022\306\001\n\022FindByWorkflowExec\022,.flyteidl" +
-      ".artifact.FindByWorkflowExecRequest\032*.fl" +
-      "yteidl.artifact.SearchArtifactsResponse\"" +
-      "V\202\323\344\223\002P\022N/data/v1/query/e/{exec_id.proje" +
-      "ct}/{exec_id.domain}/{exec_id.name}/{dir" +
-      "ection}B@Z>github.com/flyteorg/flyte/fly" +
-      "teidl/gen/pb-go/flyteidl/artifactb\006proto" +
-      "3"
+      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\277" +
+      "\001\n\016ArtifactSource\022F\n\022workflow_execution\030" +
+      "\001 \001(\0132*.flyteidl.core.WorkflowExecutionI" +
+      "dentifier\022\017\n\007node_id\030\002 \001(\t\022*\n\007task_id\030\003 " +
+      "\001(\0132\031.flyteidl.core.Identifier\022\025\n\rretry_" +
+      "attempt\030\004 \001(\r\022\021\n\tprincipal\030\005 \001(\t\"\276\001\n\014Art" +
+      "ifactSpec\022%\n\005value\030\001 \001(\0132\026.flyteidl.core" +
+      ".Literal\022(\n\004type\030\002 \001(\0132\032.flyteidl.core.L" +
+      "iteralType\022\031\n\021short_description\030\003 \001(\t\022+\n" +
+      "\ruser_metadata\030\004 \001(\0132\024.google.protobuf.A" +
+      "ny\022\025\n\rmetadata_type\030\005 \001(\t\"G\n\026CreateArtif" +
+      "actResponse\022-\n\010artifact\030\001 \001(\0132\033.flyteidl" +
+      ".artifact.Artifact\"R\n\022GetArtifactRequest" +
+      "\022+\n\005query\030\001 \001(\0132\034.flyteidl.core.Artifact" +
+      "Query\022\017\n\007details\030\002 \001(\010\"D\n\023GetArtifactRes" +
+      "ponse\022-\n\010artifact\030\001 \001(\0132\033.flyteidl.artif" +
+      "act.Artifact\"V\n\rSearchOptions\022\031\n\021strict_" +
+      "partitions\030\001 \001(\010\022\025\n\rlatest_by_key\030\002 \001(\010\022" +
+      "\023\n\013fetch_specs\030\003 \001(\010\"\356\001\n\026SearchArtifacts" +
+      "Request\0220\n\014artifact_key\030\001 \001(\0132\032.flyteidl" +
+      ".core.ArtifactKey\022-\n\npartitions\030\002 \001(\0132\031." +
+      "flyteidl.core.Partitions\022\021\n\tprincipal\030\003 " +
+      "\001(\t\022\017\n\007version\030\004 \001(\t\0221\n\007options\030\005 \001(\0132 ." +
+      "flyteidl.artifact.SearchOptions\022\r\n\005token" +
+      "\030\006 \001(\t\022\r\n\005limit\030\007 \001(\005\"X\n\027SearchArtifacts" +
+      "Response\022.\n\tartifacts\030\001 \003(\0132\033.flyteidl.a" +
+      "rtifact.Artifact\022\r\n\005token\030\002 \001(\t\"\336\001\n\031Find" +
+      "ByWorkflowExecRequest\022;\n\007exec_id\030\001 \001(\0132*" +
+      ".flyteidl.core.WorkflowExecutionIdentifi" +
+      "er\022I\n\tdirection\030\002 \001(\01626.flyteidl.artifac" +
+      "t.FindByWorkflowExecRequest.Direction\022\023\n" +
+      "\013fetch_specs\030\003 \001(\010\"$\n\tDirection\022\n\n\006INPUT" +
+      "S\020\000\022\013\n\007OUTPUTS\020\001\"a\n\rAddTagRequest\022.\n\013art" +
+      "ifact_id\030\001 \001(\0132\031.flyteidl.core.ArtifactI" +
+      "D\022\r\n\005value\030\002 \001(\t\022\021\n\toverwrite\030\003 \001(\010\"\020\n\016A" +
+      "ddTagResponse\"O\n\024CreateTriggerRequest\0227\n" +
+      "\023trigger_launch_plan\030\001 \001(\0132\032.flyteidl.ad" +
+      "min.LaunchPlan\"\027\n\025CreateTriggerResponse\"" +
+      "E\n\024DeleteTriggerRequest\022-\n\ntrigger_id\030\001 " +
+      "\001(\0132\031.flyteidl.core.Identifier\"\027\n\025Delete" +
+      "TriggerResponse\"m\n\020ArtifactProducer\022,\n\te" +
+      "ntity_id\030\001 \001(\0132\031.flyteidl.core.Identifie" +
+      "r\022+\n\007outputs\030\002 \001(\0132\032.flyteidl.core.Varia" +
+      "bleMap\"Q\n\027RegisterProducerRequest\0226\n\tpro" +
+      "ducers\030\001 \003(\0132#.flyteidl.artifact.Artifac" +
+      "tProducer\"m\n\020ArtifactConsumer\022,\n\tentity_" +
+      "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022+\n\006i" +
+      "nputs\030\002 \001(\0132\033.flyteidl.core.ParameterMap" +
+      "\"Q\n\027RegisterConsumerRequest\0226\n\tconsumers" +
+      "\030\001 \003(\0132#.flyteidl.artifact.ArtifactConsu" +
+      "mer\"\022\n\020RegisterResponse\"\377\001\n\021CloudEventRe" +
+      "quest\022O\n\030workflow_execution_event\030\001 \001(\0132" +
+      "+.flyteidl.event.CloudEventWorkflowExecu" +
+      "tionH\000\022G\n\024task_execution_event\030\002 \001(\0132\'.f" +
+      "lyteidl.event.CloudEventTaskExecutionH\000\022" +
+      "G\n\024node_execution_event\030\003 \001(\0132\'.flyteidl" +
+      ".event.CloudEventNodeExecutionH\000B\007\n\005even" +
+      "t\"\024\n\022CloudEventResponse2\206\r\n\020ArtifactRegi" +
+      "stry\022g\n\016CreateArtifact\022(.flyteidl.artifa" +
+      "ct.CreateArtifactRequest\032).flyteidl.arti" +
+      "fact.CreateArtifactResponse\"\000\022\315\004\n\013GetArt" +
+      "ifact\022%.flyteidl.artifact.GetArtifactReq" +
+      "uest\032&.flyteidl.artifact.GetArtifactResp" +
+      "onse\"\356\003\202\323\344\223\002\347\003\022\022/data/v1/artifactsZ\252\001\022\247\001" +
+      "/data/v1/artifact/id/{query.artifact_id." +
+      "artifact_key.project}/{query.artifact_id" +
+      ".artifact_key.domain}/{query.artifact_id" +
+      ".artifact_key.name}/{query.artifact_id.v" +
+      "ersion}Z\216\001\022\213\001/data/v1/artifact/id/{query" +
+      ".artifact_id.artifact_key.project}/{quer" +
+      "y.artifact_id.artifact_key.domain}/{quer" +
+      "y.artifact_id.artifact_key.name}Z\222\001\022\217\001/d" +
+      "ata/v1/artifact/tag/{query.artifact_tag." +
+      "artifact_key.project}/{query.artifact_ta" +
+      "g.artifact_key.domain}/{query.artifact_t" +
+      "ag.artifact_key.name}\022\204\002\n\017SearchArtifact" +
+      "s\022).flyteidl.artifact.SearchArtifactsReq" +
+      "uest\032*.flyteidl.artifact.SearchArtifacts" +
+      "Response\"\231\001\202\323\344\223\002\222\001\022Q/data/v1/query/s/{ar" +
+      "tifact_key.project}/{artifact_key.domain" +
+      "}/{artifact_key.name}Z=\022;/data/v1/query/" +
+      "{artifact_key.project}/{artifact_key.dom" +
+      "ain}\022d\n\rCreateTrigger\022\'.flyteidl.artifac" +
+      "t.CreateTriggerRequest\032(.flyteidl.artifa" +
+      "ct.CreateTriggerResponse\"\000\022d\n\rDeleteTrig" +
+      "ger\022\'.flyteidl.artifact.DeleteTriggerReq" +
+      "uest\032(.flyteidl.artifact.DeleteTriggerRe" +
+      "sponse\"\000\022O\n\006AddTag\022 .flyteidl.artifact.A" +
+      "ddTagRequest\032!.flyteidl.artifact.AddTagR" +
+      "esponse\"\000\022e\n\020RegisterProducer\022*.flyteidl" +
+      ".artifact.RegisterProducerRequest\032#.flyt" +
+      "eidl.artifact.RegisterResponse\"\000\022e\n\020Regi" +
+      "sterConsumer\022*.flyteidl.artifact.Registe" +
+      "rConsumerRequest\032#.flyteidl.artifact.Reg" +
+      "isterResponse\"\000\022\306\001\n\022FindByWorkflowExec\022," +
+      ".flyteidl.artifact.FindByWorkflowExecReq" +
+      "uest\032*.flyteidl.artifact.SearchArtifacts" +
+      "Response\"V\202\323\344\223\002P\022N/data/v1/query/e/{exec" +
+      "_id.project}/{exec_id.domain}/{exec_id.n" +
+      "ame}/{direction}B@Z>github.com/flyteorg/" +
+      "flyte/flyteidl/gen/pb-go/flyteidl/artifa" +
+      "ctb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20170,7 +20318,7 @@ public final class Artifacts {
     internal_static_flyteidl_artifact_ArtifactSource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_artifact_ArtifactSource_descriptor,
-        new java.lang.String[] { "TaskExecution", "NodeExecution", "Principal", });
+        new java.lang.String[] { "WorkflowExecution", "NodeId", "TaskId", "RetryAttempt", "Principal", });
     internal_static_flyteidl_artifact_ArtifactSpec_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_artifact_ArtifactSpec_fieldAccessorTable = new
@@ -20218,7 +20366,7 @@ public final class Artifacts {
     internal_static_flyteidl_artifact_FindByWorkflowExecRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_artifact_FindByWorkflowExecRequest_descriptor,
-        new java.lang.String[] { "ExecId", "Direction", });
+        new java.lang.String[] { "ExecId", "Direction", "FetchSpecs", });
     internal_static_flyteidl_artifact_AddTagRequest_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_artifact_AddTagRequest_fieldAccessorTable = new

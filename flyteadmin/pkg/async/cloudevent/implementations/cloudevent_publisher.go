@@ -216,6 +216,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		InputData:          inputs,
 		ArtifactIds:        spec.GetMetadata().GetArtifactIds(),
 		ReferenceExecution: spec.GetMetadata().GetReferenceExecution(),
+		Principal:          spec.GetMetadata().Principal,
 		LaunchPlanId:       spec.LaunchPlan,
 	}, nil
 }
@@ -371,6 +372,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		OutputInterface: typedInterface,
 		InputData:       inputs,
 		ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
+		Principal:       spec.GetMetadata().Principal,
 		LaunchPlanId:    spec.LaunchPlan,
 	}, nil
 }

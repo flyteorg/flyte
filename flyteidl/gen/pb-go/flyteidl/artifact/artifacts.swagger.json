@@ -512,6 +512,14 @@
               "INPUTS",
               "OUTPUTS"
             ]
+          },
+          {
+            "name": "fetch_specs",
+            "description": "If set to true, actually fetch the artifact body. By default only the IDs are returned.",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
           }
         ],
         "tags": [
@@ -1154,13 +1162,18 @@
     "artifactArtifactSource": {
       "type": "object",
       "properties": {
-        "task_execution": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "description": "3. These fields should be removed.\nOutputs of tasks will have this."
+        "workflow_execution": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
         },
-        "node_execution": {
-          "$ref": "#/definitions/coreNodeExecutionIdentifier",
-          "description": "Workflow outputs will have this."
+        "node_id": {
+          "type": "string"
+        },
+        "task_id": {
+          "$ref": "#/definitions/coreIdentifier"
+        },
+        "retry_attempt": {
+          "type": "integer",
+          "format": "int64"
         },
         "principal": {
           "type": "string",
@@ -1595,18 +1608,6 @@
       },
       "description": "Defines a strong type to allow type checking between interfaces."
     },
-    "coreNodeExecutionIdentifier": {
-      "type": "object",
-      "properties": {
-        "node_id": {
-          "type": "string"
-        },
-        "execution_id": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
-        }
-      },
-      "description": "Encapsulation of fields that identify a Flyte node execution entity."
-    },
     "coreOAuth2Client": {
       "type": "object",
       "properties": {
@@ -1932,22 +1933,6 @@
           "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
         }
       }
-    },
-    "coreTaskExecutionIdentifier": {
-      "type": "object",
-      "properties": {
-        "task_id": {
-          "$ref": "#/definitions/coreIdentifier"
-        },
-        "node_execution_id": {
-          "$ref": "#/definitions/coreNodeExecutionIdentifier"
-        },
-        "retry_attempt": {
-          "type": "integer",
-          "format": "int64"
-        }
-      },
-      "description": "Encapsulation of fields that identify a Flyte task execution entity."
     },
     "coreTypeAnnotation": {
       "type": "object",

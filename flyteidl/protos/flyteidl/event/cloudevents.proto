@@ -26,11 +26,12 @@ message CloudEventWorkflowExecution {
   // We can't have the ExecutionMetadata object directly because of import cycle
   repeated core.ArtifactID artifact_ids = 5;
   core.WorkflowExecutionIdentifier reference_execution = 6;
+  string principal = 7;
 
   // The ID of the LP that generated the execution that generated the Artifact.
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-  core.Identifier launch_plan_id = 7;
+  core.Identifier launch_plan_id = 8;
 }
 
 message CloudEventNodeExecution {
@@ -50,11 +51,12 @@ message CloudEventNodeExecution {
   // The following are ExecutionMetadata fields
   // We can't have the ExecutionMetadata object directly because of import cycle
   repeated core.ArtifactID artifact_ids = 6;
+  string principal = 7;
 
   // The ID of the LP that generated the execution that generated the Artifact.
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-  core.Identifier launch_plan_id = 7;
+  core.Identifier launch_plan_id = 8;
 }
 
 message CloudEventTaskExecution {
@@ -75,4 +77,6 @@ message CloudEventExecutionStart {
 
   // Artifact keys found.
   repeated string artifact_keys = 5;
+
+  string principal = 6;
 }

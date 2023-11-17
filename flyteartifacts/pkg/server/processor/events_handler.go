@@ -71,10 +71,15 @@ func (s *ServiceCallHandler) HandleEventWorkflowExec(ctx context.Context, source
 			}
 			output.Metadata[lib.ArtifactKey] = trackingTag
 
+			aSrc := &artifact.ArtifactSource{
+				WorkflowExecution: execID,
+				NodeId:            "end-node",
+				Principal:         evt.Principal,
+			}
+
 			spec := artifact.ArtifactSpec{
-				Value:     output,
-				Type:      evt.OutputInterface.Outputs.Variables[varName].Type,
-				Execution: execID,
+				Value: output,
+				Type:  evt.OutputInterface.Outputs.Variables[varName].Type,
 			}
 
 			partitions, tag, err := getPartitionsAndTag(
@@ -99,6 +104,7 @@ func (s *ServiceCallHandler) HandleEventWorkflowExec(ctx context.Context, source
 				Spec:        &spec,
 				Partitions:  partitions,
 				Tag:         tag,
+				Source:      aSrc,
 			}
 
 			resp, err := s.service.CreateArtifact(ctx, &req)
@@ -217,7 +223,6 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 	var taskExecID *core.TaskExecutionIdentifier
 	if taskExecID = evt.GetTaskExecId(); taskExecID == nil {
 		logger.Debugf(ctx, "No task execution id to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
-		return nil
 	}
 
 	// See note on the cloudevent_publisher side, we'll have to call one of the get data endpoints to get the actual data
@@ -239,11 +244,20 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 			}
 			output.Metadata[lib.ArtifactKey] = trackingTag
 
+			aSrc := &artifact.ArtifactSource{
+				WorkflowExecution: execID,
+				NodeId:            evt.RawEvent.Id.NodeId,
+				Principal:         evt.Principal,
+			}
+
+			if taskExecID != nil {
+				aSrc.RetryAttempt = taskExecID.RetryAttempt
+				aSrc.TaskId = taskExecID.TaskId
+			}
+
 			spec := artifact.ArtifactSpec{
-				Value:         output,
-				Type:          evt.OutputInterface.Outputs.Variables[varName].Type,
-				TaskExecution: taskExecID,
-				Execution:     execID,
+				Value: output,
+				Type:  evt.OutputInterface.Outputs.Variables[varName].Type,
 			}
 
 			partitions, tag, err := getPartitionsAndTag(
@@ -268,6 +282,7 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 				Spec:        &spec,
 				Partitions:  partitions,
 				Tag:         tag,
+				Source:      aSrc,
 			}
 
 			resp, err := s.service.CreateArtifact(ctx, &req)

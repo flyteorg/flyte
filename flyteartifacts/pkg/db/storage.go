@@ -50,12 +50,29 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 		}
 		gormModel.ArtifactKeyID = extantKey.ID
 		gormModel.ArtifactKey = ArtifactKey{} // zero out the artifact key
+
+		if serviceModel.GetSource().GetWorkflowExecution() != nil {
+			var extantWfExec WorkflowExecution
+			we := WorkflowExecution{
+				ExecutionProject: serviceModel.Artifact.ArtifactId.ArtifactKey.Project,
+				ExecutionDomain:  serviceModel.Artifact.ArtifactId.ArtifactKey.Domain,
+				ExecutionName:    serviceModel.Source.WorkflowExecution.Name,
+			}
+			tx.FirstOrCreate(&extantWfExec, we)
+			if err := tx.Error; err != nil {
+				logger.Errorf(ctx, "Failed to firstorcreate wf exec: %+v", err)
+				return err
+			}
+			gormModel.WorkflowExecutionID = extantWfExec.ID
+			gormModel.WorkflowExecution = WorkflowExecution{} // zero out the workflow execution
+		}
+
 		tx.Create(&gormModel)
 		if tx.Error != nil {
 			logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
 			return tx.Error
 		}
-		getSaved := tx.Preload("ArtifactKey").First(&gormModel, "id = ?", gormModel.ID)
+		getSaved := tx.Preload("ArtifactKey").Preload("WorkflowExecution").First(&gormModel, "id = ?", gormModel.ID)
 		if getSaved.Error != nil {
 			logger.Errorf(ctx, "Failed to find artifact that was just saved: %+v", getSaved.Error)
 			return getSaved.Error
@@ -97,7 +114,7 @@ func (r *RDSStorage) handleArtifactIdGet(ctx context.Context, artifactID core.Ar
 		Domain:  artifactID.ArtifactKey.Domain,
 		Name:    artifactID.ArtifactKey.Name,
 	}
-	db := r.db.Model(&Artifact{}).InnerJoins("ArtifactKey", r.db.Where(&ak))
+	db := r.db.Model(&Artifact{}).InnerJoins("ArtifactKey", r.db.Where(&ak)).Joins("WorkflowExecution")
 	if artifactID.Version != "" {
 		db = db.Where("version = ?", artifactID.Version)
 	}
