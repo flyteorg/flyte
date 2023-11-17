@@ -103,14 +103,26 @@ func TestPlugin(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
-	t.Run("test getClientFunc", func(t *testing.T) {
-		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
+	t.Run("test getAsyncClientFunc", func(t *testing.T) {
+		client, err := getAsyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 	})
 
-	t.Run("test getClientFunc more config", func(t *testing.T) {
-		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
+	t.Run("test getSyncClientFunc", func(t *testing.T) {
+		client, err := getSyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
+		assert.NoError(t, err)
+		assert.NotNil(t, client)
+	})
+
+	t.Run("test getAsyncClientFunc more config", func(t *testing.T) {
+		client, err := getAsyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
+		assert.NoError(t, err)
+		assert.NotNil(t, client)
+	})
+
+	t.Run("test getSyncClientFunc more config", func(t *testing.T) {
+		client, err := getSyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 	})
@@ -119,12 +131,12 @@ func TestPlugin(t *testing.T) {
 		connectionCache := make(map[*Agent]*grpc.ClientConn)
 		agent := &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}
 
-		client, err := getClientFunc(context.Background(), agent, connectionCache)
+		client, err := getAsyncClientFunc(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 		assert.NotNil(t, client, connectionCache[agent])
 
-		cachedClient, err := getClientFunc(context.Background(), agent, connectionCache)
+		cachedClient, err := getAsyncClientFunc(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, cachedClient)
 		assert.Equal(t, client, cachedClient)

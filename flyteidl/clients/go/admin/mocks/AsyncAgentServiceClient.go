@@ -113,54 +113,6 @@ func (_m *AsyncAgentServiceClient) DeleteTask(ctx context.Context, in *admin.Del
 	return r0, r1
 }
 
-type AsyncAgentServiceClient_DoTask struct {
-	*mock.Call
-}
-
-func (_m AsyncAgentServiceClient_DoTask) Return(_a0 *admin.DoTaskResponse, _a1 error) *AsyncAgentServiceClient_DoTask {
-	return &AsyncAgentServiceClient_DoTask{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *AsyncAgentServiceClient) OnDoTask(ctx context.Context, in *admin.DoTaskRequest, opts ...grpc.CallOption) *AsyncAgentServiceClient_DoTask {
-	c_call := _m.On("DoTask", ctx, in, opts)
-	return &AsyncAgentServiceClient_DoTask{Call: c_call}
-}
-
-func (_m *AsyncAgentServiceClient) OnDoTaskMatch(matchers ...interface{}) *AsyncAgentServiceClient_DoTask {
-	c_call := _m.On("DoTask", matchers...)
-	return &AsyncAgentServiceClient_DoTask{Call: c_call}
-}
-
-// DoTask provides a mock function with given fields: ctx, in, opts
-func (_m *AsyncAgentServiceClient) DoTask(ctx context.Context, in *admin.DoTaskRequest, opts ...grpc.CallOption) (*admin.DoTaskResponse, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, in)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	var r0 *admin.DoTaskResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.DoTaskRequest, ...grpc.CallOption) *admin.DoTaskResponse); ok {
-		r0 = rf(ctx, in, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.DoTaskResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.DoTaskRequest, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, in, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type AsyncAgentServiceClient_GetTask struct {
 	*mock.Call
 }

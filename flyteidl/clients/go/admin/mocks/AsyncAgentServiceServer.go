@@ -97,47 +97,6 @@ func (_m *AsyncAgentServiceServer) DeleteTask(_a0 context.Context, _a1 *admin.De
 	return r0, r1
 }
 
-type AsyncAgentServiceServer_DoTask struct {
-	*mock.Call
-}
-
-func (_m AsyncAgentServiceServer_DoTask) Return(_a0 *admin.DoTaskResponse, _a1 error) *AsyncAgentServiceServer_DoTask {
-	return &AsyncAgentServiceServer_DoTask{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *AsyncAgentServiceServer) OnDoTask(_a0 context.Context, _a1 *admin.DoTaskRequest) *AsyncAgentServiceServer_DoTask {
-	c_call := _m.On("DoTask", _a0, _a1)
-	return &AsyncAgentServiceServer_DoTask{Call: c_call}
-}
-
-func (_m *AsyncAgentServiceServer) OnDoTaskMatch(matchers ...interface{}) *AsyncAgentServiceServer_DoTask {
-	c_call := _m.On("DoTask", matchers...)
-	return &AsyncAgentServiceServer_DoTask{Call: c_call}
-}
-
-// DoTask provides a mock function with given fields: _a0, _a1
-func (_m *AsyncAgentServiceServer) DoTask(_a0 context.Context, _a1 *admin.DoTaskRequest) (*admin.DoTaskResponse, error) {
-	ret := _m.Called(_a0, _a1)
-
-	var r0 *admin.DoTaskResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.DoTaskRequest) *admin.DoTaskResponse); ok {
-		r0 = rf(_a0, _a1)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.DoTaskResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.DoTaskRequest) error); ok {
-		r1 = rf(_a0, _a1)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type AsyncAgentServiceServer_GetTask struct {
 	*mock.Call
 }

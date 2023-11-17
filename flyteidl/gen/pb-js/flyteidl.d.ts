@@ -19820,20 +19820,6 @@ export namespace flyteidl {
              * @returns Promise
              */
             public deleteTask(request: flyteidl.admin.IDeleteTaskRequest): Promise<flyteidl.admin.DeleteTaskResponse>;
-
-            /**
-             * Calls DoTask.
-             * @param request DoTaskRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and DoTaskResponse
-             */
-            public doTask(request: flyteidl.admin.IDoTaskRequest, callback: flyteidl.service.AsyncAgentService.DoTaskCallback): void;
-
-            /**
-             * Calls DoTask.
-             * @param request DoTaskRequest message or plain object
-             * @returns Promise
-             */
-            public doTask(request: flyteidl.admin.IDoTaskRequest): Promise<flyteidl.admin.DoTaskResponse>;
         }
 
         namespace AsyncAgentService {
@@ -19858,9 +19844,47 @@ export namespace flyteidl {
              * @param [response] DeleteTaskResponse
              */
             type DeleteTaskCallback = (error: (Error|null), response?: flyteidl.admin.DeleteTaskResponse) => void;
+        }
+
+        /** Represents a SyncAgentService */
+        class SyncAgentService extends $protobuf.rpc.Service {
 
             /**
-             * Callback as used by {@link flyteidl.service.AsyncAgentService#doTask}.
+             * Constructs a new SyncAgentService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new SyncAgentService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): SyncAgentService;
+
+            /**
+             * Calls DoTask.
+             * @param request DoTaskRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and DoTaskResponse
+             */
+            public doTask(request: flyteidl.admin.IDoTaskRequest, callback: flyteidl.service.SyncAgentService.DoTaskCallback): void;
+
+            /**
+             * Calls DoTask.
+             * @param request DoTaskRequest message or plain object
+             * @returns Promise
+             */
+            public doTask(request: flyteidl.admin.IDoTaskRequest): Promise<flyteidl.admin.DoTaskResponse>;
+        }
+
+        namespace SyncAgentService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.SyncAgentService#doTask}.
              * @param error Error, if any
              * @param [response] DoTaskResponse
              */

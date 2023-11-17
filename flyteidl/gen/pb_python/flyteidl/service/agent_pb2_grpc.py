@@ -30,11 +30,6 @@ class AsyncAgentServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
                 )
-        self.DoTask = channel.unary_unary(
-                '/flyteidl.service.AsyncAgentService/DoTask',
-                request_serializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.FromString,
-                )
 
 
 class AsyncAgentServiceServicer(object):
@@ -62,13 +57,6 @@ class AsyncAgentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def DoTask(self, request, context):
-        """Do a job and get response from the agent server.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
 
 def add_AsyncAgentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -86,11 +74,6 @@ def add_AsyncAgentServiceServicer_to_server(servicer, server):
                     servicer.DeleteTask,
                     request_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.SerializeToString,
-            ),
-            'DoTask': grpc.unary_unary_rpc_method_handler(
-                    servicer.DoTask,
-                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.FromString,
-                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -154,6 +137,51 @@ class AsyncAgentService(object):
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
+
+class SyncAgentServiceStub(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def __init__(self, channel):
+        """Constructor.
+
+        Args:
+            channel: A grpc.Channel.
+        """
+        self.DoTask = channel.unary_unary(
+                '/flyteidl.service.SyncAgentService/DoTask',
+                request_serializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.FromString,
+                )
+
+
+class SyncAgentServiceServicer(object):
+    """Missing associated documentation comment in .proto file."""
+
+    def DoTask(self, request, context):
+        """Do a job and get response from the agent server.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+
+def add_SyncAgentServiceServicer_to_server(servicer, server):
+    rpc_method_handlers = {
+            'DoTask': grpc.unary_unary_rpc_method_handler(
+                    servicer.DoTask,
+                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.SerializeToString,
+            ),
+    }
+    generic_handler = grpc.method_handlers_generic_handler(
+            'flyteidl.service.SyncAgentService', rpc_method_handlers)
+    server.add_generic_rpc_handlers((generic_handler,))
+
+
+ # This class is part of an EXPERIMENTAL API.
+class SyncAgentService(object):
+    """Missing associated documentation comment in .proto file."""
+
     @staticmethod
     def DoTask(request,
             target,
@@ -165,7 +193,7 @@ class AsyncAgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/DoTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.SyncAgentService/DoTask',
             flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.FromString,
             options, channel_credentials,

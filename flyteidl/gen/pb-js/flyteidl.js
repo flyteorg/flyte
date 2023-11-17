@@ -46398,9 +46398,44 @@
                  * @variation 2
                  */
     
+                return AsyncAgentService;
+            })();
+    
+            service.SyncAgentService = (function() {
+    
                 /**
-                 * Callback as used by {@link flyteidl.service.AsyncAgentService#doTask}.
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * Constructs a new SyncAgentService service.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a SyncAgentService
+                 * @extends $protobuf.rpc.Service
+                 * @constructor
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 */
+                function SyncAgentService(rpcImpl, requestDelimited, responseDelimited) {
+                    $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+                }
+    
+                (SyncAgentService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = SyncAgentService;
+    
+                /**
+                 * Creates new SyncAgentService service using the specified rpc implementation.
+                 * @function create
+                 * @memberof flyteidl.service.SyncAgentService
+                 * @static
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 * @returns {SyncAgentService} RPC service. Useful where requests and/or responses are streamed.
+                 */
+                SyncAgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                    return new this(rpcImpl, requestDelimited, responseDelimited);
+                };
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.SyncAgentService#doTask}.
+                 * @memberof flyteidl.service.SyncAgentService
                  * @typedef DoTaskCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
@@ -46410,28 +46445,28 @@
                 /**
                  * Calls DoTask.
                  * @function doTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.SyncAgentService
                  * @instance
                  * @param {flyteidl.admin.IDoTaskRequest} request DoTaskRequest message or plain object
-                 * @param {flyteidl.service.AsyncAgentService.DoTaskCallback} callback Node-style callback called with the error, if any, and DoTaskResponse
+                 * @param {flyteidl.service.SyncAgentService.DoTaskCallback} callback Node-style callback called with the error, if any, and DoTaskResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AsyncAgentService.prototype.doTask = function doTask(request, callback) {
+                Object.defineProperty(SyncAgentService.prototype.doTask = function doTask(request, callback) {
                     return this.rpcCall(doTask, $root.flyteidl.admin.DoTaskRequest, $root.flyteidl.admin.DoTaskResponse, request, callback);
                 }, "name", { value: "DoTask" });
     
                 /**
                  * Calls DoTask.
                  * @function doTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.SyncAgentService
                  * @instance
                  * @param {flyteidl.admin.IDoTaskRequest} request DoTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.DoTaskResponse>} Promise
                  * @variation 2
                  */
     
-                return AsyncAgentService;
+                return SyncAgentService;
             })();
     
             service.OAuth2MetadataRequest = (function() {
