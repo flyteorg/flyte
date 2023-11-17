@@ -570,6 +570,12 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		}
 		if pluginTrns.IsPreviouslyObserved() {
 			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
+			logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+
+			// This is a hack to ensure that we do not re-evaluate the same node again in the same round.
+			if err := nCtx.NodeStateWriter().PutTaskNodeState(ts); err != nil {
+				return handler.UnknownTransition, err
+			}
 			return pluginTrns.FinalTransition(ctx)
 		}
 	}
