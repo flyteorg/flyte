@@ -72,16 +72,14 @@ Here's an example of your S3 bucket settings in your configmap.
 
 .. code-block:: bash
 
-  curl -X PATCH -n \
-  -H "Authorization: Bearer <your-personal-access-token>" \
-  https://<databricks-instance>/api/2.0/workspace-conf \
-  -d '{
-    "enableDcs": "true"
-    }'
+   curl -X PATCH -n \
+   -H "Authorization: Bearer <your-personal-access-token>" \
+   https://<databricks-instance>/api/2.0/workspace-conf \
+   -d '{
+       "enableDcs": "true"
+       }'
 
-Here's the `custom containers 
-  <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__
-  reference.
+Here's the `custom containers <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__ reference.
 
 5. Create an `instance profile 
 <https://docs.databricks.com/administration-guide/cloud-configurations/aws/instance-profiles.html>`__ 
