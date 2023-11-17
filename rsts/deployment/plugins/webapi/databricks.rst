@@ -54,12 +54,42 @@ To set up your Databricks account, follow these steps:
   <https://docs.aws.amazon.com/powershell/latest/userguide/pstools-appendix-sign-up.html>`__
   to generate access and secret keys, which can be used to access your preferred S3 bucket.
 
-Create an `instance profile 
+Here's an example of your S3 bucket settings in your configmap.
+
+.. code-block:: bash
+  kubectl edit configmap flyte-sandbox-config -n flyte 
+
+.. code-block:: bash
+  TODO: ADD MORE DETAILS
+  AWS_S3_ACCESS_KEY_ID: xxx
+  AWS_S3_SECRET_ACCESS_KEY: xxx
+  AWS_S3_REGION_NAME: xxx
+  AWS_S3_ENDPOINT_URL: xxx
+
+4. Enable custom containers on your Databricks cluster before you trigger the workflow.
+
+.. code-block:: bash
+  curl -X PATCH -n \
+  -H "Authorization: Bearer <your-personal-access-token>" \
+  https://<databricks-instance>/api/2.0/workspace-conf \
+  -d '{
+    "enableDcs": "true"
+    }'
+
+Here's the `custom containers 
+  <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__
+  reference.
+
+5. Create an `instance profile 
 <https://docs.databricks.com/administration-guide/cloud-configurations/aws/instance-profiles.html>`__ 
 for the Spark cluster. This profile enables the Spark job to access your data in the S3 bucket.
 Please follow all four steps specified in the documentation.
 
-Upload the following entrypoint.py file to either 
+Here's an example of your instance profile.
+.. code-block:: bash
+  TODO: ADD MORE DETAILS
+
+6. Upload the following entrypoint.py file to either 
 `DBFS <https://docs.databricks.com/archive/legacy/data-tab.html>`__ 
 (the final path can be ``dbfs:///FileStore/tables/entrypoint.py``) or S3. 
 This file will be executed by the Spark driver node, overriding the default command in the 
