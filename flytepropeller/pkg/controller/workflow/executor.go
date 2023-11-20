@@ -144,7 +144,11 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 			Message: "Start node not found"}), nil
 	}
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
+	err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
+	if err != nil {
+		return StatusRunning, err
+	}
+	state, err := execcontext.Wait()
 	if err != nil {
 		return StatusRunning, err
 	}
@@ -171,7 +175,10 @@ func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.Fl
 	execErr := executionErrorOrDefault(w.GetExecutionStatus().GetExecutionError(), w.GetExecutionStatus().GetMessage())
 	errorNode := w.GetOnFailureNode()
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
-	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, errorNode)
+	if err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, errorNode); err != nil {
+		return StatusFailureNode(execErr), err
+	}
+	state, err := execcontext.Wait()
 	if err != nil {
 		return StatusFailureNode(execErr), err
 	}
