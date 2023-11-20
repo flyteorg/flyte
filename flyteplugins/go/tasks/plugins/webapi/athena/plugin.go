@@ -3,6 +3,7 @@ package athena
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	awsSdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -177,12 +178,19 @@ func (p Plugin) Status(ctx context.Context, tCtx webapi.StatusContext) (phase co
 
 func createTaskInfo(queryID string, cfg awsSdk.Config) *core.TaskInfo {
 	timeNow := time.Now()
+	var consoleURL string
+	if strings.Contains(cfg.Region, "gov") {
+		consoleURL = "console.amazonaws-us-gov.com"
+	} else {
+		consoleURL = "console.aws.amazon.com"
+	}
 	return &core.TaskInfo{
 		OccurredAt: &timeNow,
 		Logs: []*idlCore.TaskLog{
 			{
-				Uri: fmt.Sprintf("https://%v.console.aws.amazon.com/athena/home?force&region=%v#query/history/%v",
+				Uri: fmt.Sprintf("https://%v.%v/athena/home?force&region=%v#query/history/%v",
 					cfg.Region,
+					consoleURL,
 					cfg.Region,
 					queryID),
 				Name: "Athena Query Console",
