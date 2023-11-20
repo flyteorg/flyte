@@ -668,8 +668,6 @@ func (m *SearchOptions) Validate() error {
 
 	// no validation rules for LatestByKey
 
-	// no validation rules for FetchSpecs
-
 	return nil
 }
 

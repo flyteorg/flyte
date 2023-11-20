@@ -99,14 +99,12 @@ class GetArtifactResponse(_message.Message):
     def __init__(self, artifact: _Optional[_Union[Artifact, _Mapping]] = ...) -> None: ...
 
 class SearchOptions(_message.Message):
-    __slots__ = ["strict_partitions", "latest_by_key", "fetch_specs"]
+    __slots__ = ["strict_partitions", "latest_by_key"]
     STRICT_PARTITIONS_FIELD_NUMBER: _ClassVar[int]
     LATEST_BY_KEY_FIELD_NUMBER: _ClassVar[int]
-    FETCH_SPECS_FIELD_NUMBER: _ClassVar[int]
     strict_partitions: bool
     latest_by_key: bool
-    fetch_specs: bool
-    def __init__(self, strict_partitions: bool = ..., latest_by_key: bool = ..., fetch_specs: bool = ...) -> None: ...
+    def __init__(self, strict_partitions: bool = ..., latest_by_key: bool = ...) -> None: ...
 
 class SearchArtifactsRequest(_message.Message):
     __slots__ = ["artifact_key", "partitions", "principal", "version", "options", "token", "limit"]

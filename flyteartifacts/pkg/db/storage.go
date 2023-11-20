@@ -15,6 +15,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 // RDSStorage should implement StorageInterface
@@ -176,8 +177,27 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 	dbTrigger := ServiceToGormTrigger(trigger)
 	// TODO: Add a check to ensure that the artifact IDs that the trigger is triggering on are unique if more than one.
 
-	// Check to see if the trigger key already exists. Create if not
+	// The first transaction just saves artifact keys, in case there are no artifacts
+	// yet in the database that the trigger depends on.
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, ak := range dbTrigger.RunsOn {
+			var extantKey ArtifactKey
+			tx.FirstOrCreate(&extantKey, ak)
+			if err := tx.Error; err != nil {
+				logger.Errorf(ctx, "Failed to firstorcreate key: %+v", err)
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to pre-save artifact keys [%s]: %+v", trigger.Name, err)
+		return models.Trigger{}, err
+	}
+
+	// Check to see if the trigger key already exists. Create if not
+	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var extantKey TriggerKey
 
 		tx.FirstOrCreate(&extantKey, dbTrigger.TriggerKey)
@@ -198,7 +218,7 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 		}
 
 		var artifactKeys []ArtifactKey
-		// should we use tx here?
+
 		db := r.db.Model(&ArtifactKey{}).Where(&dbTrigger.RunsOn).Find(&artifactKeys)
 		if db.Error != nil {
 			logger.Errorf(ctx, "Error %v", db.Error)
@@ -343,18 +363,47 @@ func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.Arti
 
 func (r *RDSStorage) SearchArtifacts(ctx context.Context, request artifact.SearchArtifactsRequest) ([]models.Artifact, string, error) {
 
-	var db = r.db.Model(&Artifact{})
-	if request.GetArtifactKey() != nil {
-		db = db.InnerJoins("ArtifactKey", r.db.Where(&request.ArtifactKey))
+	var offset = 0
+	var err error
+	if request.GetToken() != "" {
+		offset, err = strconv.Atoi(request.GetToken())
+		if err != nil {
+			logger.Errorf(ctx, "Failed to convert offset to int: %+v", err)
+			return nil, "", err
+		}
 	}
 
-	// @eduardo - this doesn't work, just copied from the handleArtifactIdGet function
-	// the goal is to make this not-srict, and make the handleArtifactIdGet one strict.
-	// so at least one (probably both honestly i dunno) of these are wrong. I don't know what is
-	// meant by partitions = ? in postgres terms.
-	if request.GetPartitions() != nil && len(request.GetPartitions().GetValue()) > 0 {
-		partitionMap := PartitionsIdlToHstore(request.GetPartitions())
-		db = db.Where("partitions = ?", partitionMap)
+	var db *gorm.DB
+	if request.GetOptions() != nil && request.GetOptions().LatestByKey {
+		db = r.db.Select(`distinct on ("ArtifactKey"."project", "ArtifactKey"."domain", "ArtifactKey"."name") "artifacts".*`).Model(&Artifact{})
+	} else {
+		db = r.db.Model(&Artifact{})
+	}
+
+	if request.GetArtifactKey() != nil {
+		gormAk := ArtifactKey{
+			Project: request.GetArtifactKey().Project,
+			Domain:  request.GetArtifactKey().Domain,
+			Name:    request.GetArtifactKey().Name,
+		}
+		db = db.InnerJoins("ArtifactKey", r.db.Where(&gormAk))
+	}
+
+	if request.GetOptions() != nil && request.GetOptions().StrictPartitions {
+		// strict means if partitions is not specified, then partitions is set to empty
+		if request.GetPartitions() != nil && len(request.GetPartitions().GetValue()) > 0 {
+			partitionMap := PartitionsIdlToHstore(request.GetPartitions())
+			db = db.Where("partitions = ?", partitionMap)
+		} else {
+			db = db.Where("partitions is null or partitions = ''")
+		}
+	} else {
+		// make this not-strict, and make the handleArtifactIdGet one strict.
+		// this should be what the @> comparison does.
+		if request.GetPartitions() != nil && len(request.GetPartitions().GetValue()) > 0 {
+			partitionMap := PartitionsIdlToHstore(request.GetPartitions())
+			db = db.Where("partitions @> ?", partitionMap)
+		}
 	}
 
 	if request.Principal != "" {
@@ -365,19 +414,34 @@ func (r *RDSStorage) SearchArtifacts(ctx context.Context, request artifact.Searc
 		db = db.Where("version = ?", request.Version)
 	}
 
-	var limit = 1
+	var limit = 10
 	if request.Limit != 0 {
 		limit = int(request.Limit)
 	}
-	db.Order("created_at desc").Limit(limit)
+	if request.GetOptions() != nil && request.GetOptions().LatestByKey {
+		db.Order(`"ArtifactKey"."project", "ArtifactKey"."domain", "ArtifactKey"."name", created_at desc`)
+	} else {
+		db.Order("created_at desc")
+	}
 
 	var results []Artifact
-	db.Find(&results)
+	db.Limit(limit).Offset(offset).Find(&results)
 
-	// maybe look at gormimpl/task_repo.go for example on handling offset.
-	// seems like gorm just handles it out of the box.
+	if len(results) == 0 {
+		logger.Debugf(ctx, "No artifacts found for query: %+v", request)
+		return nil, "", nil
+	}
+	var res = make([]models.Artifact, len(results))
+	for i, ga := range results {
+		a, err := GormToServiceModel(ga)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to convert %v: %+v", ga, err)
+			return nil, "", err
+		}
+		res[i] = a
+	}
 
-	return nil, "", nil
+	return res, fmt.Sprintf("%d", offset+len(res)), nil
 }
 
 func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {

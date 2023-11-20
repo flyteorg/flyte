@@ -1344,12 +1344,6 @@ class SearchOptions final :
   bool latest_by_key() const;
   void set_latest_by_key(bool value);
 
-  // bool fetch_specs = 3;
-  void clear_fetch_specs();
-  static const int kFetchSpecsFieldNumber = 3;
-  bool fetch_specs() const;
-  void set_fetch_specs(bool value);
-
   // @@protoc_insertion_point(class_scope:flyteidl.artifact.SearchOptions)
  private:
   class HasBitSetters;
@@ -1357,7 +1351,6 @@ class SearchOptions final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   bool strict_partitions_;
   bool latest_by_key_;
-  bool fetch_specs_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifact_2fartifacts_2eproto;
 };
@@ -4535,20 +4528,6 @@ inline void SearchOptions::set_latest_by_key(bool value) {
   
   latest_by_key_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.artifact.SearchOptions.latest_by_key)
-}
-
-// bool fetch_specs = 3;
-inline void SearchOptions::clear_fetch_specs() {
-  fetch_specs_ = false;
-}
-inline bool SearchOptions::fetch_specs() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.SearchOptions.fetch_specs)
-  return fetch_specs_;
-}
-inline void SearchOptions::set_fetch_specs(bool value) {
-  
-  fetch_specs_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.artifact.SearchOptions.fetch_specs)
 }
 
 // -------------------------------------------------------------------

@@ -90,9 +90,6 @@ message SearchOptions {
 
   // If true, only one artifact per key will be returned. It will be the latest one by creation time.
   bool latest_by_key = 2;
-
-  // If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
-  bool fetch_specs = 3;
 }
 
 message SearchArtifactsRequest {

@@ -56,9 +56,15 @@ var Migrations = []*gormigrate.Migration{
 
 				Principal string `gorm:"type:varchar(256)"`
 			}
-			return tx.AutoMigrate(
+			err := tx.AutoMigrate(
 				&ArtifactKey{}, &Artifact{},
 			)
+			if err != nil {
+				return err
+			}
+
+			tx.Exec("CREATE INDEX idx_gin_artifact_partitions ON artifacts USING GIN (partitions)")
+			return tx.Error
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Migrator().DropTable(

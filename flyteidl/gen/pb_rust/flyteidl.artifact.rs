@@ -93,9 +93,6 @@ pub struct SearchOptions {
     /// If true, only one artifact per key will be returned. It will be the latest one by creation time.
     #[prost(bool, tag="2")]
     pub latest_by_key: bool,
-    /// If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
-    #[prost(bool, tag="3")]
-    pub fetch_specs: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

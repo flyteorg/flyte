@@ -587,14 +587,6 @@
             "format": "boolean"
           },
           {
-            "name": "options.fetch_specs",
-            "description": "If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
             "name": "token",
             "in": "query",
             "required": false,
@@ -667,14 +659,6 @@
           {
             "name": "options.latest_by_key",
             "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "options.fetch_specs",
-            "description": "If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.",
             "in": "query",
             "required": false,
             "type": "boolean",
@@ -1264,11 +1248,6 @@
           "type": "boolean",
           "format": "boolean",
           "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time."
-        },
-        "fetch_specs": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint."
         }
       }
     },

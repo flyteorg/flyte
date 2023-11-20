@@ -7423,15 +7423,6 @@ public final class Artifacts {
      * <code>bool latest_by_key = 2;</code>
      */
     boolean getLatestByKey();
-
-    /**
-     * <pre>
-     * If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
-     * </pre>
-     *
-     * <code>bool fetch_specs = 3;</code>
-     */
-    boolean getFetchSpecs();
   }
   /**
    * Protobuf type {@code flyteidl.artifact.SearchOptions}
@@ -7480,11 +7471,6 @@ public final class Artifacts {
             case 16: {
 
               latestByKey_ = input.readBool();
-              break;
-            }
-            case 24: {
-
-              fetchSpecs_ = input.readBool();
               break;
             }
             default: {
@@ -7546,19 +7532,6 @@ public final class Artifacts {
       return latestByKey_;
     }
 
-    public static final int FETCH_SPECS_FIELD_NUMBER = 3;
-    private boolean fetchSpecs_;
-    /**
-     * <pre>
-     * If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
-     * </pre>
-     *
-     * <code>bool fetch_specs = 3;</code>
-     */
-    public boolean getFetchSpecs() {
-      return fetchSpecs_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -7579,9 +7552,6 @@ public final class Artifacts {
       if (latestByKey_ != false) {
         output.writeBool(2, latestByKey_);
       }
-      if (fetchSpecs_ != false) {
-        output.writeBool(3, fetchSpecs_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -7598,10 +7568,6 @@ public final class Artifacts {
       if (latestByKey_ != false) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(2, latestByKey_);
-      }
-      if (fetchSpecs_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, fetchSpecs_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -7622,8 +7588,6 @@ public final class Artifacts {
           != other.getStrictPartitions()) return false;
       if (getLatestByKey()
           != other.getLatestByKey()) return false;
-      if (getFetchSpecs()
-          != other.getFetchSpecs()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -7641,9 +7605,6 @@ public final class Artifacts {
       hash = (37 * hash) + LATEST_BY_KEY_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getLatestByKey());
-      hash = (37 * hash) + FETCH_SPECS_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getFetchSpecs());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -7781,8 +7742,6 @@ public final class Artifacts {
 
         latestByKey_ = false;
 
-        fetchSpecs_ = false;
-
         return this;
       }
 
@@ -7811,7 +7770,6 @@ public final class Artifacts {
         flyteidl.artifact.Artifacts.SearchOptions result = new flyteidl.artifact.Artifacts.SearchOptions(this);
         result.strictPartitions_ = strictPartitions_;
         result.latestByKey_ = latestByKey_;
-        result.fetchSpecs_ = fetchSpecs_;
         onBuilt();
         return result;
       }
@@ -7865,9 +7823,6 @@ public final class Artifacts {
         }
         if (other.getLatestByKey() != false) {
           setLatestByKey(other.getLatestByKey());
-        }
-        if (other.getFetchSpecs() != false) {
-          setFetchSpecs(other.getFetchSpecs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -7973,44 +7928,6 @@ public final class Artifacts {
       public Builder clearLatestByKey() {
         
         latestByKey_ = false;
-        onChanged();
-        return this;
-      }
-
-      private boolean fetchSpecs_ ;
-      /**
-       * <pre>
-       * If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
-       * </pre>
-       *
-       * <code>bool fetch_specs = 3;</code>
-       */
-      public boolean getFetchSpecs() {
-        return fetchSpecs_;
-      }
-      /**
-       * <pre>
-       * If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
-       * </pre>
-       *
-       * <code>bool fetch_specs = 3;</code>
-       */
-      public Builder setFetchSpecs(boolean value) {
-        
-        fetchSpecs_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * If true, the artifact specs will be returned as well. If not, you'll have to make additional calls to the get endpoint.
-       * </pre>
-       *
-       * <code>bool fetch_specs = 3;</code>
-       */
-      public Builder clearFetchSpecs() {
-        
-        fetchSpecs_ = false;
         onChanged();
         return this;
       }
@@ -20187,92 +20104,91 @@ public final class Artifacts {
       "\022+\n\005query\030\001 \001(\0132\034.flyteidl.core.Artifact" +
       "Query\022\017\n\007details\030\002 \001(\010\"D\n\023GetArtifactRes" +
       "ponse\022-\n\010artifact\030\001 \001(\0132\033.flyteidl.artif" +
-      "act.Artifact\"V\n\rSearchOptions\022\031\n\021strict_" +
-      "partitions\030\001 \001(\010\022\025\n\rlatest_by_key\030\002 \001(\010\022" +
-      "\023\n\013fetch_specs\030\003 \001(\010\"\356\001\n\026SearchArtifacts" +
-      "Request\0220\n\014artifact_key\030\001 \001(\0132\032.flyteidl" +
-      ".core.ArtifactKey\022-\n\npartitions\030\002 \001(\0132\031." +
-      "flyteidl.core.Partitions\022\021\n\tprincipal\030\003 " +
-      "\001(\t\022\017\n\007version\030\004 \001(\t\0221\n\007options\030\005 \001(\0132 ." +
-      "flyteidl.artifact.SearchOptions\022\r\n\005token" +
-      "\030\006 \001(\t\022\r\n\005limit\030\007 \001(\005\"X\n\027SearchArtifacts" +
-      "Response\022.\n\tartifacts\030\001 \003(\0132\033.flyteidl.a" +
-      "rtifact.Artifact\022\r\n\005token\030\002 \001(\t\"\336\001\n\031Find" +
-      "ByWorkflowExecRequest\022;\n\007exec_id\030\001 \001(\0132*" +
-      ".flyteidl.core.WorkflowExecutionIdentifi" +
-      "er\022I\n\tdirection\030\002 \001(\01626.flyteidl.artifac" +
-      "t.FindByWorkflowExecRequest.Direction\022\023\n" +
-      "\013fetch_specs\030\003 \001(\010\"$\n\tDirection\022\n\n\006INPUT" +
-      "S\020\000\022\013\n\007OUTPUTS\020\001\"a\n\rAddTagRequest\022.\n\013art" +
-      "ifact_id\030\001 \001(\0132\031.flyteidl.core.ArtifactI" +
-      "D\022\r\n\005value\030\002 \001(\t\022\021\n\toverwrite\030\003 \001(\010\"\020\n\016A" +
-      "ddTagResponse\"O\n\024CreateTriggerRequest\0227\n" +
-      "\023trigger_launch_plan\030\001 \001(\0132\032.flyteidl.ad" +
-      "min.LaunchPlan\"\027\n\025CreateTriggerResponse\"" +
-      "E\n\024DeleteTriggerRequest\022-\n\ntrigger_id\030\001 " +
-      "\001(\0132\031.flyteidl.core.Identifier\"\027\n\025Delete" +
-      "TriggerResponse\"m\n\020ArtifactProducer\022,\n\te" +
-      "ntity_id\030\001 \001(\0132\031.flyteidl.core.Identifie" +
-      "r\022+\n\007outputs\030\002 \001(\0132\032.flyteidl.core.Varia" +
-      "bleMap\"Q\n\027RegisterProducerRequest\0226\n\tpro" +
-      "ducers\030\001 \003(\0132#.flyteidl.artifact.Artifac" +
-      "tProducer\"m\n\020ArtifactConsumer\022,\n\tentity_" +
-      "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022+\n\006i" +
-      "nputs\030\002 \001(\0132\033.flyteidl.core.ParameterMap" +
-      "\"Q\n\027RegisterConsumerRequest\0226\n\tconsumers" +
-      "\030\001 \003(\0132#.flyteidl.artifact.ArtifactConsu" +
-      "mer\"\022\n\020RegisterResponse\"\377\001\n\021CloudEventRe" +
-      "quest\022O\n\030workflow_execution_event\030\001 \001(\0132" +
-      "+.flyteidl.event.CloudEventWorkflowExecu" +
-      "tionH\000\022G\n\024task_execution_event\030\002 \001(\0132\'.f" +
-      "lyteidl.event.CloudEventTaskExecutionH\000\022" +
-      "G\n\024node_execution_event\030\003 \001(\0132\'.flyteidl" +
-      ".event.CloudEventNodeExecutionH\000B\007\n\005even" +
-      "t\"\024\n\022CloudEventResponse2\206\r\n\020ArtifactRegi" +
-      "stry\022g\n\016CreateArtifact\022(.flyteidl.artifa" +
-      "ct.CreateArtifactRequest\032).flyteidl.arti" +
-      "fact.CreateArtifactResponse\"\000\022\315\004\n\013GetArt" +
-      "ifact\022%.flyteidl.artifact.GetArtifactReq" +
-      "uest\032&.flyteidl.artifact.GetArtifactResp" +
-      "onse\"\356\003\202\323\344\223\002\347\003\022\022/data/v1/artifactsZ\252\001\022\247\001" +
-      "/data/v1/artifact/id/{query.artifact_id." +
-      "artifact_key.project}/{query.artifact_id" +
-      ".artifact_key.domain}/{query.artifact_id" +
-      ".artifact_key.name}/{query.artifact_id.v" +
-      "ersion}Z\216\001\022\213\001/data/v1/artifact/id/{query" +
-      ".artifact_id.artifact_key.project}/{quer" +
-      "y.artifact_id.artifact_key.domain}/{quer" +
-      "y.artifact_id.artifact_key.name}Z\222\001\022\217\001/d" +
-      "ata/v1/artifact/tag/{query.artifact_tag." +
-      "artifact_key.project}/{query.artifact_ta" +
-      "g.artifact_key.domain}/{query.artifact_t" +
-      "ag.artifact_key.name}\022\204\002\n\017SearchArtifact" +
-      "s\022).flyteidl.artifact.SearchArtifactsReq" +
-      "uest\032*.flyteidl.artifact.SearchArtifacts" +
-      "Response\"\231\001\202\323\344\223\002\222\001\022Q/data/v1/query/s/{ar" +
-      "tifact_key.project}/{artifact_key.domain" +
-      "}/{artifact_key.name}Z=\022;/data/v1/query/" +
-      "{artifact_key.project}/{artifact_key.dom" +
-      "ain}\022d\n\rCreateTrigger\022\'.flyteidl.artifac" +
-      "t.CreateTriggerRequest\032(.flyteidl.artifa" +
-      "ct.CreateTriggerResponse\"\000\022d\n\rDeleteTrig" +
-      "ger\022\'.flyteidl.artifact.DeleteTriggerReq" +
-      "uest\032(.flyteidl.artifact.DeleteTriggerRe" +
-      "sponse\"\000\022O\n\006AddTag\022 .flyteidl.artifact.A" +
-      "ddTagRequest\032!.flyteidl.artifact.AddTagR" +
-      "esponse\"\000\022e\n\020RegisterProducer\022*.flyteidl" +
-      ".artifact.RegisterProducerRequest\032#.flyt" +
-      "eidl.artifact.RegisterResponse\"\000\022e\n\020Regi" +
-      "sterConsumer\022*.flyteidl.artifact.Registe" +
-      "rConsumerRequest\032#.flyteidl.artifact.Reg" +
-      "isterResponse\"\000\022\306\001\n\022FindByWorkflowExec\022," +
-      ".flyteidl.artifact.FindByWorkflowExecReq" +
-      "uest\032*.flyteidl.artifact.SearchArtifacts" +
-      "Response\"V\202\323\344\223\002P\022N/data/v1/query/e/{exec" +
-      "_id.project}/{exec_id.domain}/{exec_id.n" +
-      "ame}/{direction}B@Z>github.com/flyteorg/" +
-      "flyte/flyteidl/gen/pb-go/flyteidl/artifa" +
-      "ctb\006proto3"
+      "act.Artifact\"A\n\rSearchOptions\022\031\n\021strict_" +
+      "partitions\030\001 \001(\010\022\025\n\rlatest_by_key\030\002 \001(\010\"" +
+      "\356\001\n\026SearchArtifactsRequest\0220\n\014artifact_k" +
+      "ey\030\001 \001(\0132\032.flyteidl.core.ArtifactKey\022-\n\n" +
+      "partitions\030\002 \001(\0132\031.flyteidl.core.Partiti" +
+      "ons\022\021\n\tprincipal\030\003 \001(\t\022\017\n\007version\030\004 \001(\t\022" +
+      "1\n\007options\030\005 \001(\0132 .flyteidl.artifact.Sea" +
+      "rchOptions\022\r\n\005token\030\006 \001(\t\022\r\n\005limit\030\007 \001(\005" +
+      "\"X\n\027SearchArtifactsResponse\022.\n\tartifacts" +
+      "\030\001 \003(\0132\033.flyteidl.artifact.Artifact\022\r\n\005t" +
+      "oken\030\002 \001(\t\"\336\001\n\031FindByWorkflowExecRequest" +
+      "\022;\n\007exec_id\030\001 \001(\0132*.flyteidl.core.Workfl" +
+      "owExecutionIdentifier\022I\n\tdirection\030\002 \001(\016" +
+      "26.flyteidl.artifact.FindByWorkflowExecR" +
+      "equest.Direction\022\023\n\013fetch_specs\030\003 \001(\010\"$\n" +
+      "\tDirection\022\n\n\006INPUTS\020\000\022\013\n\007OUTPUTS\020\001\"a\n\rA" +
+      "ddTagRequest\022.\n\013artifact_id\030\001 \001(\0132\031.flyt" +
+      "eidl.core.ArtifactID\022\r\n\005value\030\002 \001(\t\022\021\n\to" +
+      "verwrite\030\003 \001(\010\"\020\n\016AddTagResponse\"O\n\024Crea" +
+      "teTriggerRequest\0227\n\023trigger_launch_plan\030" +
+      "\001 \001(\0132\032.flyteidl.admin.LaunchPlan\"\027\n\025Cre" +
+      "ateTriggerResponse\"E\n\024DeleteTriggerReque" +
+      "st\022-\n\ntrigger_id\030\001 \001(\0132\031.flyteidl.core.I" +
+      "dentifier\"\027\n\025DeleteTriggerResponse\"m\n\020Ar" +
+      "tifactProducer\022,\n\tentity_id\030\001 \001(\0132\031.flyt" +
+      "eidl.core.Identifier\022+\n\007outputs\030\002 \001(\0132\032." +
+      "flyteidl.core.VariableMap\"Q\n\027RegisterPro" +
+      "ducerRequest\0226\n\tproducers\030\001 \003(\0132#.flytei" +
+      "dl.artifact.ArtifactProducer\"m\n\020Artifact" +
+      "Consumer\022,\n\tentity_id\030\001 \001(\0132\031.flyteidl.c" +
+      "ore.Identifier\022+\n\006inputs\030\002 \001(\0132\033.flyteid" +
+      "l.core.ParameterMap\"Q\n\027RegisterConsumerR" +
+      "equest\0226\n\tconsumers\030\001 \003(\0132#.flyteidl.art" +
+      "ifact.ArtifactConsumer\"\022\n\020RegisterRespon" +
+      "se\"\377\001\n\021CloudEventRequest\022O\n\030workflow_exe" +
+      "cution_event\030\001 \001(\0132+.flyteidl.event.Clou" +
+      "dEventWorkflowExecutionH\000\022G\n\024task_execut" +
+      "ion_event\030\002 \001(\0132\'.flyteidl.event.CloudEv" +
+      "entTaskExecutionH\000\022G\n\024node_execution_eve" +
+      "nt\030\003 \001(\0132\'.flyteidl.event.CloudEventNode" +
+      "ExecutionH\000B\007\n\005event\"\024\n\022CloudEventRespon" +
+      "se2\206\r\n\020ArtifactRegistry\022g\n\016CreateArtifac" +
+      "t\022(.flyteidl.artifact.CreateArtifactRequ" +
+      "est\032).flyteidl.artifact.CreateArtifactRe" +
+      "sponse\"\000\022\315\004\n\013GetArtifact\022%.flyteidl.arti" +
+      "fact.GetArtifactRequest\032&.flyteidl.artif" +
+      "act.GetArtifactResponse\"\356\003\202\323\344\223\002\347\003\022\022/data" +
+      "/v1/artifactsZ\252\001\022\247\001/data/v1/artifact/id/" +
+      "{query.artifact_id.artifact_key.project}" +
+      "/{query.artifact_id.artifact_key.domain}" +
+      "/{query.artifact_id.artifact_key.name}/{" +
+      "query.artifact_id.version}Z\216\001\022\213\001/data/v1" +
+      "/artifact/id/{query.artifact_id.artifact" +
+      "_key.project}/{query.artifact_id.artifac" +
+      "t_key.domain}/{query.artifact_id.artifac" +
+      "t_key.name}Z\222\001\022\217\001/data/v1/artifact/tag/{" +
+      "query.artifact_tag.artifact_key.project}" +
+      "/{query.artifact_tag.artifact_key.domain" +
+      "}/{query.artifact_tag.artifact_key.name}" +
+      "\022\204\002\n\017SearchArtifacts\022).flyteidl.artifact" +
+      ".SearchArtifactsRequest\032*.flyteidl.artif" +
+      "act.SearchArtifactsResponse\"\231\001\202\323\344\223\002\222\001\022Q/" +
+      "data/v1/query/s/{artifact_key.project}/{" +
+      "artifact_key.domain}/{artifact_key.name}" +
+      "Z=\022;/data/v1/query/{artifact_key.project" +
+      "}/{artifact_key.domain}\022d\n\rCreateTrigger" +
+      "\022\'.flyteidl.artifact.CreateTriggerReques" +
+      "t\032(.flyteidl.artifact.CreateTriggerRespo" +
+      "nse\"\000\022d\n\rDeleteTrigger\022\'.flyteidl.artifa" +
+      "ct.DeleteTriggerRequest\032(.flyteidl.artif" +
+      "act.DeleteTriggerResponse\"\000\022O\n\006AddTag\022 ." +
+      "flyteidl.artifact.AddTagRequest\032!.flytei" +
+      "dl.artifact.AddTagResponse\"\000\022e\n\020Register" +
+      "Producer\022*.flyteidl.artifact.RegisterPro" +
+      "ducerRequest\032#.flyteidl.artifact.Registe" +
+      "rResponse\"\000\022e\n\020RegisterConsumer\022*.flytei" +
+      "dl.artifact.RegisterConsumerRequest\032#.fl" +
+      "yteidl.artifact.RegisterResponse\"\000\022\306\001\n\022F" +
+      "indByWorkflowExec\022,.flyteidl.artifact.Fi" +
+      "ndByWorkflowExecRequest\032*.flyteidl.artif" +
+      "act.SearchArtifactsResponse\"V\202\323\344\223\002P\022N/da" +
+      "ta/v1/query/e/{exec_id.project}/{exec_id" +
+      ".domain}/{exec_id.name}/{direction}B@Z>g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/artifactb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20348,7 +20264,7 @@ public final class Artifacts {
     internal_static_flyteidl_artifact_SearchOptions_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_artifact_SearchOptions_descriptor,
-        new java.lang.String[] { "StrictPartitions", "LatestByKey", "FetchSpecs", });
+        new java.lang.String[] { "StrictPartitions", "LatestByKey", });
     internal_static_flyteidl_artifact_SearchArtifactsRequest_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_artifact_SearchArtifactsRequest_fieldAccessorTable = new

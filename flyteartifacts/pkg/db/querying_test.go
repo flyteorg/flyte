@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
@@ -111,5 +112,120 @@ func TestQuery2_Create(t *testing.T) {
 	assert.NoError(t, err)
 
 	//mock.ExpectQuery("SELECT")
+	mock.ExpectClose()
+}
+
+func TestQuery3_Find(t *testing.T) {
+	ctx := context.Background()
+
+	mockDb, mock, rds := getMockRds(t)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+
+	p := models.PartitionsToIdl(map[string]string{"region": "LAX"})
+
+	s := artifact.SearchArtifactsRequest{
+		ArtifactKey: &core.ArtifactKey{
+			Domain: "development",
+		},
+		Partitions: p,
+		Principal:  "",
+		Version:    "",
+		Options:    nil,
+	}
+
+	res, ct, err := rds.SearchArtifacts(ctx, s)
+	assert.NoError(t, err)
+
+	fmt.Println(res, ct)
+
+	s = artifact.SearchArtifactsRequest{
+		ArtifactKey: &core.ArtifactKey{
+			Domain: "development",
+		},
+		Partitions: p,
+		Principal:  "",
+		Version:    "",
+		Options: &artifact.SearchOptions{
+			StrictPartitions: true,
+		},
+	}
+
+	res, ct, err = rds.SearchArtifacts(ctx, s)
+	assert.NoError(t, err)
+
+	s = artifact.SearchArtifactsRequest{
+		ArtifactKey: &core.ArtifactKey{
+			Domain: "development",
+		},
+		Principal: "abc",
+		Version:   "vxyz",
+		Options: &artifact.SearchOptions{
+			StrictPartitions: true,
+		},
+	}
+
+	res, ct, err = rds.SearchArtifacts(ctx, s)
+	assert.NoError(t, err)
+
+	fmt.Println(res, ct)
+
+	mock.ExpectClose()
+}
+
+func TestQuery4_Find(t *testing.T) {
+	ctx := context.Background()
+
+	mockDb, mock, rds := getMockRds(t)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+
+	s := artifact.SearchArtifactsRequest{
+		ArtifactKey: &core.ArtifactKey{
+			Domain: "development",
+		},
+		Principal: "",
+		Version:   "",
+		Options:   nil,
+	}
+
+	res, ct, err := rds.SearchArtifacts(ctx, s)
+	assert.NoError(t, err)
+
+	fmt.Println(res, ct)
+
+	mock.ExpectClose()
+}
+
+func TestQuery5_Find(t *testing.T) {
+	ctx := context.Background()
+
+	mockDb, mock, rds := getMockRds(t)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+
+	s := artifact.SearchArtifactsRequest{
+		ArtifactKey: &core.ArtifactKey{
+			Domain: "development",
+		},
+		Principal: "",
+		Version:   "",
+		Token:     "1",
+		Options: &artifact.SearchOptions{
+			LatestByKey: true,
+		},
+	}
+
+	res, ct, err := rds.SearchArtifacts(ctx, s)
+	assert.NoError(t, err)
+
+	fmt.Println(res, ct)
+
 	mock.ExpectClose()
 }

@@ -66,7 +66,8 @@ func ServiceToGormModel(serviceModel models.Artifact) (Artifact, error) {
 		MetadataType:          serviceModel.Artifact.Spec.MetadataType,
 		OffloadedUserMetadata: serviceModel.OffloadedMetadata,
 	}
-	if serviceModel.GetSource().GetWorkflowExecution() == nil {
+
+	if serviceModel.Artifact.GetSource().GetWorkflowExecution() != nil {
 		// artifact and execution project/domains are always the same.
 		// Note the service model will not have workflow execution if it was an upload
 		wfExec := WorkflowExecution{
