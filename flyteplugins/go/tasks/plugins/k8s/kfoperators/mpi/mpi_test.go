@@ -604,9 +604,11 @@ func TestBuildResourceMPIV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "250Mi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "500Mi"},
 				},
 			},
 			Command: launcherCommand,
@@ -616,9 +618,11 @@ func TestBuildResourceMPIV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 				},
 			},
 			Command: workerCommand,
@@ -628,19 +632,23 @@ func TestBuildResourceMPIV1(t *testing.T) {
 
 	launcherResourceRequirements := &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("250m"),
+			corev1.ResourceCPU:    resource.MustParse("250m"),
+			corev1.ResourceMemory: resource.MustParse("250Mi"),
 		},
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("500m"),
+			corev1.ResourceCPU:    resource.MustParse("500m"),
+			corev1.ResourceMemory: resource.MustParse("500Mi"),
 		},
 	}
 
 	workerResourceRequirements := &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("1024m"),
+			corev1.ResourceCPU:    resource.MustParse("1024m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
 		},
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("2048m"),
+			corev1.ResourceCPU:    resource.MustParse("2048m"),
+			corev1.ResourceMemory: resource.MustParse("2Gi"),
 		},
 	}
 
@@ -673,9 +681,11 @@ func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 				},
 			},
 			Command: []string{"/usr/sbin/sshd", "/.sshd_config"},
@@ -685,10 +695,12 @@ func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
 
 	workerResourceRequirements := &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("1024m"),
+			corev1.ResourceCPU:    resource.MustParse("1024m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
 		},
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("2048m"),
+			corev1.ResourceCPU:    resource.MustParse("2048m"),
+			corev1.ResourceMemory: resource.MustParse("2Gi"),
 		},
 	}
 
