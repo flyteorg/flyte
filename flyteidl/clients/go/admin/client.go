@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"google.golang.org/grpc/resolver/manual"
 
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -151,6 +152,8 @@ func NewAdminConnection(ctx context.Context, cfg *Config, proxyCredentialsFuture
 		opts = append(opts, grpc.WithTransportCredentials(creds))
 	}
 
+	r := manual.NewBuilderWithScheme("dns")
+	opts = append(opts, grpc.WithResolvers(r))
 	opts = append(opts, GetAdditionalAdminClientConfigOptions(cfg)...)
 
 	if cfg.ProxyCommand != nil && len(cfg.ProxyCommand) > 0 {
