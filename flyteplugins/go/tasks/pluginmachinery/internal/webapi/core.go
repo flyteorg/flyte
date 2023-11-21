@@ -29,7 +29,6 @@ const (
 	maxBurst           = 10000
 	minQPS             = 1
 	maxQPS             = 100000
-	syncPlugin         = "sync_plugin"
 )
 
 type CorePlugin struct {
@@ -136,17 +135,15 @@ func (c CorePlugin) asyncHandle(ctx context.Context, tCtx core.TaskExecutionCont
 }
 
 func (c CorePlugin) useSyncPlugin(taskTemplate *flyteIdlCore.TaskTemplate) bool {
-	// Use the sync plugin to execute the task if the task template has the sync plugin flavor.
-	// Assume the plugin is an async plugin if not explicitly specified as sync.
+	// Use the sync plugin to execute the task if the task template set is_sync_plugin as True.
+	// Assume the plugin is an async plugin by default.
 	// This helps maintain backward compatibility with existing implementations that
 	// expect an async plugin by default, thereby avoiding breaking changes.
 	metadata := taskTemplate.GetMetadata()
 	if metadata != nil {
 		runtime := metadata.GetRuntime()
 		if runtime != nil {
-			if runtime.GetFlavor() == syncPlugin {
-				return true
-			}
+			return runtime.GetIsSyncPlugin()
 		}
 	}
 
@@ -158,6 +155,7 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	if err != nil {
 		return core.UnknownTransition, err
 	}
+
 	var phase core.Transition
 	if c.useSyncPlugin(taskTemplate) {
 		phase, err = c.syncHandle(ctx, tCtx)
