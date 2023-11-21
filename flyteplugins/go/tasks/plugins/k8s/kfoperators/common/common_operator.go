@@ -28,12 +28,6 @@ const (
 	PytorchTaskType    = "pytorch"
 )
 
-type ReplicaEntry struct {
-	PodSpec       *v1.PodSpec
-	ReplicaNum    int32
-	RestartPolicy commonOp.RestartPolicy
-}
-
 // ExtractCurrentCondition will return the first job condition for tensorflow/pytorch
 func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.JobCondition, error) {
 	if jobConditions != nil {
@@ -293,4 +287,65 @@ func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext
 		},
 		RestartPolicy: commonOp.RestartPolicyNever,
 	}, nil
+}
+
+type kfDistributedReplicaSpec interface {
+	GetReplicas() int32
+	GetImage() string
+	GetResources() *core.Resources
+	GetRestartPolicy() kfplugins.RestartPolicy
+}
+
+type allowsCommandOverride interface {
+	GetCommand() []string
+}
+
+func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs kfDistributedReplicaSpec, primaryContainerName string, isMaster bool) (*commonOp.ReplicaSpec, error) {
+	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
+	// Master should always run as non-interruptible
+	if isMaster {
+		taskCtxOptions = append(taskCtxOptions, flytek8s.WithInterruptible(false))
+	}
+	if rs != nil && rs.GetResources() != nil {
+		resources, err := flytek8s.ToK8sResourceRequirements(rs.GetResources())
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
+		}
+		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
+	}
+	newTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, taskCtxOptions...)
+	replicaSpec, err := ToReplicaSpec(ctx, newTaskCtx, primaryContainerName)
+	if err != nil {
+		return nil, err
+	}
+
+	// Master should have a single replica
+	if isMaster {
+		replicas := int32(1)
+		replicaSpec.Replicas = &replicas
+	}
+
+	if rs != nil {
+		var command []string
+		if v, ok := rs.(allowsCommandOverride); ok {
+			command = v.GetCommand()
+		}
+		if err := OverrideContainerSpec(
+			&replicaSpec.Template.Spec,
+			primaryContainerName,
+			rs.GetImage(),
+			command,
+		); err != nil {
+			return nil, err
+		}
+
+		replicaSpec.RestartPolicy = ParseRestartPolicy(rs.GetRestartPolicy())
+
+		if !isMaster {
+			replicas := rs.GetReplicas()
+			replicaSpec.Replicas = &replicas
+		}
+	}
+
+	return replicaSpec, nil
 }

@@ -16,7 +16,6 @@ import (
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -41,40 +40,6 @@ func (tensorflowOperatorResourceHandler) BuildIdentityResource(ctx context.Conte
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 	}, nil
-}
-
-func toReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs *kfplugins.DistributedTensorflowTrainingReplicaSpec) (*commonOp.ReplicaSpec, error) {
-	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	if rs != nil && rs.GetResources() != nil {
-		resources, err := flytek8s.ToK8sResourceRequirements(rs.GetResources())
-		if err != nil {
-			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
-		}
-		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
-	}
-	newTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, taskCtxOptions...)
-	replicaSpec, err := common.ToReplicaSpec(ctx, newTaskCtx, kubeflowv1.TFJobDefaultContainerName)
-	if err != nil {
-		return nil, err
-	}
-
-	if rs != nil {
-		if err := common.OverrideContainerSpec(
-			&replicaSpec.Template.Spec,
-			kubeflowv1.TFJobDefaultContainerName,
-			rs.GetImage(),
-			nil,
-		); err != nil {
-			return nil, err
-		}
-
-		replicaSpec.RestartPolicy = common.ParseRestartPolicy(rs.GetRestartPolicy())
-
-		replicas := rs.GetReplicas()
-		replicaSpec.Replicas = &replicas
-	}
-
-	return replicaSpec, nil
 }
 
 // Defines a func to create the full resource object that will be posted to k8s.
@@ -133,7 +98,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			kubeflowv1.TFJobReplicaTypeEval:   kfTensorflowTaskExtraArgs.GetEvaluatorReplicas(),
 		}
 		for t, cfg := range replicaSpecCfgMap {
-			rs, err := toReplicaSpecWithOverrides(ctx, taskCtx, cfg)
+			rs, err := common.ToReplicaSpecWithOverrides(ctx, taskCtx, cfg, kubeflowv1.TFJobDefaultContainerName, false)
 			if err != nil {
 				return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create replica spec: [%v]", err.Error())
 			}

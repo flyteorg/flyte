@@ -16,7 +16,6 @@ import (
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -41,52 +40,6 @@ func (pytorchOperatorResourceHandler) BuildIdentityResource(ctx context.Context,
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 	}, nil
-}
-
-func toReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs *kfplugins.DistributedPyTorchTrainingReplicaSpec, isMaster bool) (*commonOp.ReplicaSpec, error) {
-	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	// Master should always run as non-interruptible
-	if isMaster {
-		taskCtxOptions = append(taskCtxOptions, flytek8s.WithInterruptible(false))
-	}
-	if rs != nil && rs.GetResources() != nil {
-		resources, err := flytek8s.ToK8sResourceRequirements(rs.GetResources())
-		if err != nil {
-			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
-		}
-		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
-	}
-	newTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, taskCtxOptions...)
-	replicaSpec, err := common.ToReplicaSpec(ctx, newTaskCtx, kubeflowv1.PytorchJobDefaultContainerName)
-	if err != nil {
-		return nil, err
-	}
-
-	// Master should have a single replica
-	if isMaster {
-		replicas := int32(1)
-		replicaSpec.Replicas = &replicas
-	}
-
-	if rs != nil {
-		if err := common.OverrideContainerSpec(
-			&replicaSpec.Template.Spec,
-			kubeflowv1.PytorchJobDefaultContainerName,
-			rs.GetImage(),
-			nil,
-		); err != nil {
-			return nil, err
-		}
-
-		replicaSpec.RestartPolicy = common.ParseRestartPolicy(rs.GetRestartPolicy())
-
-		if !isMaster {
-			replicas := rs.GetReplicas()
-			replicaSpec.Replicas = &replicas
-		}
-	}
-
-	return replicaSpec, nil
 }
 
 // Defines a func to create the full resource object that will be posted to k8s.
@@ -136,12 +89,12 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		masterReplicaSpec, err = toReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetMasterReplicas(), true)
+		masterReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetMasterReplicas(), kubeflowv1.PytorchJobDefaultContainerName, true)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create master replica spec: [%v]", err.Error())
 		}
 
-		workerReplicaSpec, err = toReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetWorkerReplicas(), false)
+		workerReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfPytorchTaskExtraArgs.GetWorkerReplicas(), kubeflowv1.PytorchJobDefaultContainerName, false)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create worker replica spec: [%v]", err.Error())
 		}

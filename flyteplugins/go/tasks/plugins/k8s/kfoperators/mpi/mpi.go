@@ -17,7 +17,6 @@ import (
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
@@ -44,52 +43,6 @@ func (mpiOperatorResourceHandler) BuildIdentityResource(ctx context.Context, tas
 			APIVersion: kubeflowv1.SchemeGroupVersion.String(),
 		},
 	}, nil
-}
-
-func toReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs *kfplugins.DistributedMPITrainingReplicaSpec, isLauncher bool) (*commonOp.ReplicaSpec, error) {
-	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	// Launcher should always run as non-interruptible
-	if isLauncher {
-		taskCtxOptions = append(taskCtxOptions, flytek8s.WithInterruptible(false))
-	}
-	if rs != nil && rs.GetResources() != nil {
-		resources, err := flytek8s.ToK8sResourceRequirements(rs.GetResources())
-		if err != nil {
-			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
-		}
-		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
-	}
-	newTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, taskCtxOptions...)
-	replicaSpec, err := common.ToReplicaSpec(ctx, newTaskCtx, kubeflowv1.MPIJobDefaultContainerName)
-	if err != nil {
-		return nil, err
-	}
-
-	// Launcher should have a single replica
-	if isLauncher {
-		replicas := int32(1)
-		replicaSpec.Replicas = &replicas
-	}
-
-	if rs != nil {
-		if err := common.OverrideContainerSpec(
-			&replicaSpec.Template.Spec,
-			kubeflowv1.MPIJobDefaultContainerName,
-			rs.GetImage(),
-			rs.GetCommand(),
-		); err != nil {
-			return nil, err
-		}
-
-		replicaSpec.RestartPolicy = common.ParseRestartPolicy(rs.GetRestartPolicy())
-
-		if !isLauncher {
-			replicas := rs.GetReplicas()
-			replicaSpec.Replicas = &replicas
-		}
-	}
-
-	return replicaSpec, nil
 }
 
 // Defines a func to create the full resource object that will be posted to k8s.
@@ -148,12 +101,12 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		launcherReplicaSpec, err = toReplicaSpecWithOverrides(ctx, taskCtx, kfMPITaskExtraArgs.GetLauncherReplicas(), true)
+		launcherReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfMPITaskExtraArgs.GetLauncherReplicas(), kubeflowv1.MPIJobDefaultContainerName, true)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create launcher replica spec: [%v]", err.Error())
 		}
 
-		workerReplicaSpec, err = toReplicaSpecWithOverrides(ctx, taskCtx, kfMPITaskExtraArgs.GetWorkerReplicas(), false)
+		workerReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfMPITaskExtraArgs.GetWorkerReplicas(), kubeflowv1.MPIJobDefaultContainerName, false)
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create worker replica spec: [%v]", err.Error())
 		}
