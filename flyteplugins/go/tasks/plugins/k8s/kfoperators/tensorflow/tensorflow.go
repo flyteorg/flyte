@@ -98,13 +98,16 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			kubeflowv1.TFJobReplicaTypeEval:   kfTensorflowTaskExtraArgs.GetEvaluatorReplicas(),
 		}
 		for t, cfg := range replicaSpecCfgMap {
+			// Short circuit if replica set has no replicas to avoid unnecessarily
+			// generating pod specs
+			if cfg.GetReplicas() <= 0 {
+				continue
+			}
 			rs, err := common.ToReplicaSpecWithOverrides(ctx, taskCtx, cfg, kubeflowv1.TFJobDefaultContainerName, false)
 			if err != nil {
 				return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create replica spec: [%v]", err.Error())
 			}
-			if rs != nil && *rs.Replicas > 0 {
-				replicaSpecMap[t] = rs
-			}
+			replicaSpecMap[t] = rs
 		}
 
 		if kfTensorflowTaskExtraArgs.GetRunPolicy() != nil {
