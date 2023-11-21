@@ -110,6 +110,17 @@ flyteadmin:
   # -- Sets priorityClassName for flyteadmin pod(s).
   priorityClassName: ""
 
+  # -- Settings for flyteadmin service monitor
+  serviceMonitor:
+    # -- If enabled create the flyteadmin service monitor
+    enabled: false
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
 #
 # FLYTESCHEDULER SETTINGS
 #
@@ -290,6 +301,22 @@ flytepropeller:
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: ""
 
+  # -- Settings for flytepropeller service
+  service:
+    # -- If enabled create the flytepropeller service
+    enabled: false
+
+  # -- Settings for flytepropeller service monitor
+  serviceMonitor:
+    # -- If enabled create the flyetepropeller service monitor
+    enabled: false
+    # -- Sets the labels for the service monitor which are required by the
+    # prometheus to auto-detect the service monitor and start scrapping the metrics
+    labels: {}
+    # -- Sets the interval at which metrics will be scraped by prometheus
+    interval: 60s
+    # -- Sets the timeout after which request to scrape metrics will time out
+    scrapeTimeout: 30s
 #
 # FLYTECONSOLE SETTINGS
 #
