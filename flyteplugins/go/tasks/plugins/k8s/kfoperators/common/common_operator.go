@@ -18,8 +18,8 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 const (
@@ -284,7 +284,7 @@ func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext
 	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
-	replicas := int32(1)
+	replicas := int32(0)
 	return &commonOp.ReplicaSpec{
 		Replicas: &replicas,
 		Template: v1.PodTemplateSpec{

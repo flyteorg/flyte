@@ -641,10 +641,12 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 			},
@@ -654,9 +656,11 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 				},
 			},
 		},
@@ -695,19 +699,23 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 		kubeflowv1.TFJobReplicaTypeWorker: {
 			Requests: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("1024m"),
+				corev1.ResourceMemory:      resource.MustParse("1Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 			Limits: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("2048m"),
+				corev1.ResourceMemory:      resource.MustParse("2Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 		},
 		kubeflowv1.TFJobReplicaTypePS: {
 			Requests: corev1.ResourceList{
-				corev1.ResourceCPU: resource.MustParse("250m"),
+				corev1.ResourceCPU:    resource.MustParse("250m"),
+				corev1.ResourceMemory: resource.MustParse("1Gi"),
 			},
 			Limits: corev1.ResourceList{
-				corev1.ResourceCPU: resource.MustParse("500m"),
+				corev1.ResourceCPU:    resource.MustParse("500m"),
+				corev1.ResourceMemory: resource.MustParse("2Gi"),
 			},
 		},
 		kubeflowv1.TFJobReplicaTypeEval: {
@@ -761,10 +769,12 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 			},
@@ -775,10 +785,12 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 		kubeflowv1.TFJobReplicaTypeWorker: {
 			Requests: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("1024m"),
+				corev1.ResourceMemory:      resource.MustParse("1Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 			Limits: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("2048m"),
+				corev1.ResourceMemory:      resource.MustParse("2Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 		},

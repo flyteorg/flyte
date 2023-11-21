@@ -48,6 +48,7 @@ func (mpiOperatorResourceHandler) BuildIdentityResource(ctx context.Context, tas
 
 func toReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs *kfplugins.DistributedMPITrainingReplicaSpec, isLauncher bool) (*commonOp.ReplicaSpec, error) {
 	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
+	// Launcher should always run as non-interruptible
 	if isLauncher {
 		taskCtxOptions = append(taskCtxOptions, flytek8s.WithInterruptible(false))
 	}
@@ -63,16 +64,23 @@ func toReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	if err != nil {
 		return nil, err
 	}
+
+	// Launcher should have a single replica
+	if isLauncher {
+		replicas := int32(1)
+		replicaSpec.Replicas = &replicas
+	}
+
 	if rs != nil {
-		err = common.OverrideContainerSpec(
+		if err := common.OverrideContainerSpec(
 			&replicaSpec.Template.Spec,
 			kubeflowv1.MPIJobDefaultContainerName,
 			rs.GetImage(),
 			rs.GetCommand(),
-		)
-		if err != nil {
+		); err != nil {
 			return nil, err
 		}
+
 		replicaSpec.RestartPolicy = common.ParseRestartPolicy(rs.GetRestartPolicy())
 
 		if !isLauncher {
