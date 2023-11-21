@@ -281,12 +281,11 @@ func getFinalAgent(taskType string, cfg *Config) (*Agent, error) {
 	return &cfg.DefaultAgent, nil
 }
 
-func getAsyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (*grpc.ClientConn, error) {
 	conn, ok := connectionCache[agent]
 	if ok {
-		return service.NewAsyncAgentServiceClient(conn), nil
+		return conn, nil
 	}
-
 	var opts []grpc.DialOption
 
 	if agent.Insecure {
@@ -325,53 +324,25 @@ func getAsyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*
 			}
 		}()
 	}()
+
+	return conn, nil
+}
+
+func getAsyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	conn, err := getGrpcConnection(ctx, agent, connectionCache)
+	if err != nil {
+		return nil, err
+	}
+
 	return service.NewAsyncAgentServiceClient(conn), nil
 }
 
 func getSyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.SyncAgentServiceClient, error) {
-	conn, ok := connectionCache[agent]
-	if ok {
-		return service.NewSyncAgentServiceClient(conn), nil
-	}
-
-	var opts []grpc.DialOption
-
-	if agent.Insecure {
-		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	} else {
-		pool, err := x509.SystemCertPool()
-		if err != nil {
-			return nil, err
-		}
-
-		creds := credentials.NewClientTLSFromCert(pool, "")
-		opts = append(opts, grpc.WithTransportCredentials(creds))
-	}
-
-	if len(agent.DefaultServiceConfig) != 0 {
-		opts = append(opts, grpc.WithDefaultServiceConfig(agent.DefaultServiceConfig))
-	}
-
-	var err error
-	conn, err = grpc.Dial(agent.Endpoint, opts...)
+	conn, err := getGrpcConnection(ctx, agent, connectionCache)
 	if err != nil {
 		return nil, err
 	}
-	connectionCache[agent] = conn
-	defer func() {
-		if err != nil {
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", agent, cerr)
-			}
-			return
-		}
-		go func() {
-			<-ctx.Done()
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", agent, cerr)
-			}
-		}()
-	}()
+
 	return service.NewSyncAgentServiceClient(conn), nil
 }
 

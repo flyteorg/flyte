@@ -70,7 +70,7 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 func (c CorePlugin) toSyncPlugin() (webapi.SyncPlugin, error) {
 	plugin, ok := c.p.(webapi.SyncPlugin)
 	if !ok {
-		return nil, fmt.Errorf("Core plugin does not implement the sync plugin interface")
+		return nil, fmt.Errorf("core plugin does not implement the sync plugin interface")
 	}
 	return plugin, nil
 }
@@ -78,7 +78,7 @@ func (c CorePlugin) toSyncPlugin() (webapi.SyncPlugin, error) {
 func (c CorePlugin) toAsyncPlugin() (webapi.AsyncPlugin, error) {
 	plugin, ok := c.p.(webapi.AsyncPlugin)
 	if !ok {
-		return nil, fmt.Errorf("Core plugin does not implement the async plugin interface")
+		return nil, fmt.Errorf("core plugin does not implement the async plugin interface")
 	}
 	return plugin, nil
 }
@@ -91,11 +91,6 @@ func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionConte
 
 	phaseInfo, err := plugin.Do(ctx, tCtx)
 	if err != nil {
-		taskTemplate, err := tCtx.TaskReader().Read(ctx)
-		if err != nil {
-			return core.UnknownTransition, err
-		}
-		logger.Errorf(ctx, "failed to run [%v] task with err: [%v]", taskTemplate.GetType(), err)
 		return core.UnknownTransition, err
 	}
 
@@ -165,6 +160,11 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	}
 
 	if c.useSyncPlugin(taskTemplate) {
+		phase, err := c.syncHandle(ctx, tCtx)
+		if err != nil {
+			logger.Errorf(ctx, "failed to run [%v] task with err: [%v]", taskTemplate.GetType(), err)
+			return phase, err
+		}
 		return c.syncHandle(ctx, tCtx)
 	}
 
