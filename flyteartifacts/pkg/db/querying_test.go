@@ -229,3 +229,122 @@ func TestQuery5_Find(t *testing.T) {
 
 	mock.ExpectClose()
 }
+
+func TestLineage1_Input(t *testing.T) {
+	ctx := context.Background()
+
+	mockDb, mock, rds := getMockRds(t)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+
+	r := artifact.FindByWorkflowExecRequest{
+		ExecId: &core.WorkflowExecutionIdentifier{
+			Project: "pr",
+			Domain:  "do",
+			Name:    "nnn",
+		},
+		Direction: 0,
+	}
+
+	res, err := rds.FindByWorkflowExec(ctx, &r)
+	assert.NoError(t, err)
+
+	fmt.Println(res)
+
+	mock.ExpectClose()
+}
+
+func TestLineage2_Output(t *testing.T) {
+	ctx := context.Background()
+
+	mockDb, mock, rds := getMockRds(t)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+
+	r := artifact.FindByWorkflowExecRequest{
+		ExecId: &core.WorkflowExecutionIdentifier{
+			Project: "pr",
+			Domain:  "do",
+			Name:    "nnn",
+		},
+		Direction: 1,
+	}
+
+	res, err := rds.FindByWorkflowExec(ctx, &r)
+	assert.NoError(t, err)
+
+	fmt.Println(res)
+
+	mock.ExpectClose()
+}
+
+func TestLineage3_Set(t *testing.T) {
+	ctx := context.Background()
+
+	mockDb, mock, rds := getMockRds(t)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+
+	ak := core.ArtifactKey{
+		Project: "pr",
+		Domain:  "do",
+		Name:    "nnn",
+	}
+	ids := []*core.ArtifactID{
+		{
+			ArtifactKey: &ak,
+			Version:     "v1",
+		},
+		{
+			ArtifactKey: &ak,
+			Version:     "v2",
+		},
+	}
+
+	r := artifact.ExecutionInputsRequest{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: "pr",
+			Domain:  "do",
+			Name:    "nnn",
+		},
+		Inputs: ids,
+	}
+	mock.ExpectBegin()
+	err := rds.SetExecutionInputs(ctx, &r)
+	assert.NoError(t, err)
+	mock.ExpectClose()
+}
+
+func TestLineagedd3_Set(t *testing.T) {
+	mockDb, mock, rds := getMockRds(t)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+	defer func(mockDb *sql.DB) {
+		err := mockDb.Close()
+		assert.NoError(t, err)
+	}(mockDb)
+
+	type Language struct {
+		gorm.Model
+		Name string //`gorm:"uniqueIndex:idx_lang_name"`
+	}
+	type User struct {
+		gorm.Model
+		Name      string
+		Languages []Language `gorm:"many2many:user_languages;"`
+	}
+	var userLanguages []Language
+	var dbUser User
+	err := rds.db.Model(&dbUser).Where("name = ?", "chinese").Association("Languages").Find(&userLanguages)
+
+	assert.NoError(t, err)
+	mock.ExpectClose()
+}

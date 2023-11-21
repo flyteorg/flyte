@@ -19,14 +19,14 @@ type WorkflowExecution struct {
 	ExecutionProject string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_proj;type:varchar(64)"`
 	ExecutionDomain  string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_dom;type:varchar(64)"`
 	ExecutionName    string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_name;type:varchar(255)"`
-	OutputArtifacts  []Artifact // i think this is only needed for lineage
+	InputArtifacts   []Artifact `gorm:"many2many:execution_inputs;"`
 }
 
 type Artifact struct {
 	gorm.Model
-	ArtifactKeyID uint
+	ArtifactKeyID uint          `gorm:"not null;uniqueIndex:idx_artifact_version"`
 	ArtifactKey   ArtifactKey   `gorm:"foreignKey:ArtifactKeyID;references:ID"`
-	Version       string        `gorm:"not null;type:varchar(255);index:idx_artifact_version"`
+	Version       string        `gorm:"not null;type:varchar(255);uniqueIndex:idx_artifact_version"`
 	Partitions    pgtype.Hstore `gorm:"type:hstore;index:idx_artifact_partitions"`
 
 	LiteralType  []byte `gorm:"not null"`
@@ -36,7 +36,7 @@ type Artifact struct {
 	MetadataType          string `gorm:"type:varchar(64)"`
 	OffloadedUserMetadata string `gorm:"type:varchar(255)"`
 
-	WorkflowExecutionID uint
+	WorkflowExecutionID uint              `gorm:"index:idx_artifact_wf_exec_id"`
 	WorkflowExecution   WorkflowExecution `gorm:"foreignKey:WorkflowExecutionID;references:ID"`
 	NodeID              string            `gorm:"type:varchar(128)"`
 

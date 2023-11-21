@@ -701,6 +701,7 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 }
 
 // ExtractArtifactKeys pulls out artifact keys from Literals for lineage
+// todo: rename this function to be less confusing
 func (m *ExecutionManager) ExtractArtifactKeys(input *core.Literal) []string {
 	var artifactKeys []string
 
@@ -713,7 +714,6 @@ func (m *ExecutionManager) ExtractArtifactKeys(input *core.Literal) []string {
 		}
 	}
 	if input.GetCollection() != nil {
-		// TODO: Make recursive
 		for _, v := range input.GetCollection().Literals {
 			mapKeys := m.ExtractArtifactKeys(v)
 			artifactKeys = append(artifactKeys, mapKeys...)
@@ -1218,6 +1218,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 // publishExecutionStart is an event that Admin publishes for artifact lineage.
 func (m *ExecutionManager) publishExecutionStart(ctx context.Context, executionID core.WorkflowExecutionIdentifier,
 	launchPlanID *core.Identifier, workflowID *core.Identifier, inputArtifactKeys []string, usedArtifactIDs []*core.ArtifactID) {
+
 	if len(inputArtifactKeys) > 0 || len(usedArtifactIDs) > 0 {
 		logger.Debugf(ctx, "Sending execution start event for execution [%+v] with input artifact keys [%+v] and used artifact ids [%+v]", executionID, inputArtifactKeys, usedArtifactIDs)
 

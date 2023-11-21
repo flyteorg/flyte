@@ -214,16 +214,14 @@ class RegisterResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class CloudEventRequest(_message.Message):
-    __slots__ = ["workflow_execution_event", "task_execution_event", "node_execution_event"]
-    WORKFLOW_EXECUTION_EVENT_FIELD_NUMBER: _ClassVar[int]
-    TASK_EXECUTION_EVENT_FIELD_NUMBER: _ClassVar[int]
-    NODE_EXECUTION_EVENT_FIELD_NUMBER: _ClassVar[int]
-    workflow_execution_event: _cloudevents_pb2.CloudEventWorkflowExecution
-    task_execution_event: _cloudevents_pb2.CloudEventTaskExecution
-    node_execution_event: _cloudevents_pb2.CloudEventNodeExecution
-    def __init__(self, workflow_execution_event: _Optional[_Union[_cloudevents_pb2.CloudEventWorkflowExecution, _Mapping]] = ..., task_execution_event: _Optional[_Union[_cloudevents_pb2.CloudEventTaskExecution, _Mapping]] = ..., node_execution_event: _Optional[_Union[_cloudevents_pb2.CloudEventNodeExecution, _Mapping]] = ...) -> None: ...
+class ExecutionInputsRequest(_message.Message):
+    __slots__ = ["execution_id", "inputs"]
+    EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    execution_id: _identifier_pb2.WorkflowExecutionIdentifier
+    inputs: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactID]
+    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., inputs: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ...) -> None: ...
 
-class CloudEventResponse(_message.Message):
+class ExecutionInputsResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...

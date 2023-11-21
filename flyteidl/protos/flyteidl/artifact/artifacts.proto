@@ -123,9 +123,6 @@ message FindByWorkflowExecRequest {
   }
 
   Direction direction = 2;
-
-  // If set to true, actually fetch the artifact body. By default only the IDs are returned.
-  bool fetch_specs = 3;
 }
 
 // Aliases identify a particular version of an artifact. They are different than tags in that they
@@ -179,15 +176,14 @@ message RegisterConsumerRequest {
 
 message RegisterResponse {}
 
-message CloudEventRequest {
-  oneof event {
-    event.CloudEventWorkflowExecution workflow_execution_event = 1;
-    event.CloudEventTaskExecution task_execution_event = 2;
-    event.CloudEventNodeExecution node_execution_event = 3;
-  }
+message ExecutionInputsRequest {
+  core.WorkflowExecutionIdentifier execution_id = 1;
+
+  // can make this a map in the future, currently no need.
+  repeated core.ArtifactID inputs = 2;
 }
 
-message CloudEventResponse {}
+message ExecutionInputsResponse {}
 
 service ArtifactRegistry {
   rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {}
@@ -218,9 +214,12 @@ service ArtifactRegistry {
 
   rpc RegisterConsumer(RegisterConsumerRequest) returns (RegisterResponse) {}
 
+  rpc SetExecutionInputs(ExecutionInputsRequest) returns (ExecutionInputsResponse) {}
+
   rpc FindByWorkflowExec (FindByWorkflowExecRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
       get: "/data/v1/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
     };
   }
+
 }

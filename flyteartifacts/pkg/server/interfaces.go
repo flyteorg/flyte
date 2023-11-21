@@ -23,6 +23,10 @@ type StorageInterface interface {
 	// DeleteTrigger(context.Context, models.Trigger) error
 
 	SearchArtifacts(context.Context, artifact.SearchArtifactsRequest) ([]models.Artifact, string, error)
+
+	SetExecutionInputs(ctx context.Context, req *artifact.ExecutionInputsRequest) error
+
+	FindByWorkflowExec(ctx context.Context, request *artifact.FindByWorkflowExecRequest) ([]models.Artifact, error)
 }
 
 type BlobStoreInterface interface {

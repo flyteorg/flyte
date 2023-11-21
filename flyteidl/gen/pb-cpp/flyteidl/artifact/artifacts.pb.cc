@@ -34,9 +34,6 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::pr
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_VariableMap_flyteidl_2fcore_2finterface_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<5> scc_info_LiteralType_flyteidl_2fcore_2ftypes_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fcloudevents_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_CloudEventTaskExecution_flyteidl_2fevent_2fcloudevents_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fcloudevents_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_CloudEventNodeExecution_flyteidl_2fevent_2fcloudevents_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fcloudevents_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_CloudEventWorkflowExecution_flyteidl_2fevent_2fcloudevents_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fany_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Any_google_2fprotobuf_2fany_2eproto;
 namespace flyteidl {
 namespace artifact {
@@ -132,17 +129,14 @@ class RegisterResponseDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<RegisterResponse> _instance;
 } _RegisterResponse_default_instance_;
-class CloudEventRequestDefaultTypeInternal {
+class ExecutionInputsRequestDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<CloudEventRequest> _instance;
-  const ::flyteidl::event::CloudEventWorkflowExecution* workflow_execution_event_;
-  const ::flyteidl::event::CloudEventTaskExecution* task_execution_event_;
-  const ::flyteidl::event::CloudEventNodeExecution* node_execution_event_;
-} _CloudEventRequest_default_instance_;
-class CloudEventResponseDefaultTypeInternal {
+  ::google::protobuf::internal::ExplicitlyConstructed<ExecutionInputsRequest> _instance;
+} _ExecutionInputsRequest_default_instance_;
+class ExecutionInputsResponseDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<CloudEventResponse> _instance;
-} _CloudEventResponse_default_instance_;
+  ::google::protobuf::internal::ExplicitlyConstructed<ExecutionInputsResponse> _instance;
+} _ExecutionInputsResponse_default_instance_;
 }  // namespace artifact
 }  // namespace flyteidl
 static void InitDefaultsArtifact_flyteidl_2fartifact_2fartifacts_2eproto() {
@@ -495,36 +489,35 @@ static void InitDefaultsRegisterResponse_flyteidl_2fartifact_2fartifacts_2eproto
 ::google::protobuf::internal::SCCInfo<0> scc_info_RegisterResponse_flyteidl_2fartifact_2fartifacts_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsRegisterResponse_flyteidl_2fartifact_2fartifacts_2eproto}, {}};
 
-static void InitDefaultsCloudEventRequest_flyteidl_2fartifact_2fartifacts_2eproto() {
+static void InitDefaultsExecutionInputsRequest_flyteidl_2fartifact_2fartifacts_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::flyteidl::artifact::_CloudEventRequest_default_instance_;
-    new (ptr) ::flyteidl::artifact::CloudEventRequest();
+    void* ptr = &::flyteidl::artifact::_ExecutionInputsRequest_default_instance_;
+    new (ptr) ::flyteidl::artifact::ExecutionInputsRequest();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::flyteidl::artifact::CloudEventRequest::InitAsDefaultInstance();
+  ::flyteidl::artifact::ExecutionInputsRequest::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<3> scc_info_CloudEventRequest_flyteidl_2fartifact_2fartifacts_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsCloudEventRequest_flyteidl_2fartifact_2fartifacts_2eproto}, {
-      &scc_info_CloudEventWorkflowExecution_flyteidl_2fevent_2fcloudevents_2eproto.base,
-      &scc_info_CloudEventTaskExecution_flyteidl_2fevent_2fcloudevents_2eproto.base,
-      &scc_info_CloudEventNodeExecution_flyteidl_2fevent_2fcloudevents_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_ExecutionInputsRequest_flyteidl_2fartifact_2fartifacts_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsExecutionInputsRequest_flyteidl_2fartifact_2fartifacts_2eproto}, {
+      &scc_info_WorkflowExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto.base,
+      &scc_info_ArtifactID_flyteidl_2fcore_2fartifact_5fid_2eproto.base,}};
 
-static void InitDefaultsCloudEventResponse_flyteidl_2fartifact_2fartifacts_2eproto() {
+static void InitDefaultsExecutionInputsResponse_flyteidl_2fartifact_2fartifacts_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::flyteidl::artifact::_CloudEventResponse_default_instance_;
-    new (ptr) ::flyteidl::artifact::CloudEventResponse();
+    void* ptr = &::flyteidl::artifact::_ExecutionInputsResponse_default_instance_;
+    new (ptr) ::flyteidl::artifact::ExecutionInputsResponse();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::flyteidl::artifact::CloudEventResponse::InitAsDefaultInstance();
+  ::flyteidl::artifact::ExecutionInputsResponse::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_CloudEventResponse_flyteidl_2fartifact_2fartifacts_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCloudEventResponse_flyteidl_2fartifact_2fartifacts_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionInputsResponse_flyteidl_2fartifact_2fartifacts_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsExecutionInputsResponse_flyteidl_2fartifact_2fartifacts_2eproto}, {}};
 
 void InitDefaults_flyteidl_2fartifact_2fartifacts_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_Artifact_flyteidl_2fartifact_2fartifacts_2eproto.base);
@@ -550,8 +543,8 @@ void InitDefaults_flyteidl_2fartifact_2fartifacts_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ArtifactConsumer_flyteidl_2fartifact_2fartifacts_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_RegisterConsumerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_RegisterResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_CloudEventRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_CloudEventResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_ExecutionInputsRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_ExecutionInputsResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
 }
 
 ::google::protobuf::Metadata file_level_metadata_flyteidl_2fartifact_2fartifacts_2eproto[25];
@@ -728,16 +721,14 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fartifact_2fartifacts_2ep
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::CloudEventRequest, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::ExecutionInputsRequest, _internal_metadata_),
   ~0u,  // no _extensions_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::CloudEventRequest, _oneof_case_[0]),
+  ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  offsetof(::flyteidl::artifact::CloudEventRequestDefaultTypeInternal, workflow_execution_event_),
-  offsetof(::flyteidl::artifact::CloudEventRequestDefaultTypeInternal, task_execution_event_),
-  offsetof(::flyteidl::artifact::CloudEventRequestDefaultTypeInternal, node_execution_event_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::CloudEventRequest, event_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::ExecutionInputsRequest, execution_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::ExecutionInputsRequest, inputs_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::CloudEventResponse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::ExecutionInputsResponse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
@@ -766,8 +757,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 150, -1, sizeof(::flyteidl::artifact::ArtifactConsumer)},
   { 157, -1, sizeof(::flyteidl::artifact::RegisterConsumerRequest)},
   { 163, -1, sizeof(::flyteidl::artifact::RegisterResponse)},
-  { 168, -1, sizeof(::flyteidl::artifact::CloudEventRequest)},
-  { 177, -1, sizeof(::flyteidl::artifact::CloudEventResponse)},
+  { 168, -1, sizeof(::flyteidl::artifact::ExecutionInputsRequest)},
+  { 175, -1, sizeof(::flyteidl::artifact::ExecutionInputsResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -794,8 +785,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_ArtifactConsumer_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_RegisterConsumerRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_RegisterResponse_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_CloudEventRequest_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_CloudEventResponse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_ExecutionInputsRequest_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_ExecutionInputsResponse_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto = {
@@ -875,62 +866,62 @@ const char descriptor_table_protodef_flyteidl_2fartifact_2fartifacts_2eproto[] =
   "l.core.ParameterMap\"Q\n\027RegisterConsumerR"
   "equest\0226\n\tconsumers\030\001 \003(\0132#.flyteidl.art"
   "ifact.ArtifactConsumer\"\022\n\020RegisterRespon"
-  "se\"\377\001\n\021CloudEventRequest\022O\n\030workflow_exe"
-  "cution_event\030\001 \001(\0132+.flyteidl.event.Clou"
-  "dEventWorkflowExecutionH\000\022G\n\024task_execut"
-  "ion_event\030\002 \001(\0132\'.flyteidl.event.CloudEv"
-  "entTaskExecutionH\000\022G\n\024node_execution_eve"
-  "nt\030\003 \001(\0132\'.flyteidl.event.CloudEventNode"
-  "ExecutionH\000B\007\n\005event\"\024\n\022CloudEventRespon"
-  "se2\206\r\n\020ArtifactRegistry\022g\n\016CreateArtifac"
-  "t\022(.flyteidl.artifact.CreateArtifactRequ"
-  "est\032).flyteidl.artifact.CreateArtifactRe"
-  "sponse\"\000\022\315\004\n\013GetArtifact\022%.flyteidl.arti"
-  "fact.GetArtifactRequest\032&.flyteidl.artif"
-  "act.GetArtifactResponse\"\356\003\202\323\344\223\002\347\003\022\022/data"
-  "/v1/artifactsZ\252\001\022\247\001/data/v1/artifact/id/"
-  "{query.artifact_id.artifact_key.project}"
-  "/{query.artifact_id.artifact_key.domain}"
-  "/{query.artifact_id.artifact_key.name}/{"
-  "query.artifact_id.version}Z\216\001\022\213\001/data/v1"
-  "/artifact/id/{query.artifact_id.artifact"
-  "_key.project}/{query.artifact_id.artifac"
-  "t_key.domain}/{query.artifact_id.artifac"
-  "t_key.name}Z\222\001\022\217\001/data/v1/artifact/tag/{"
-  "query.artifact_tag.artifact_key.project}"
-  "/{query.artifact_tag.artifact_key.domain"
-  "}/{query.artifact_tag.artifact_key.name}"
-  "\022\204\002\n\017SearchArtifacts\022).flyteidl.artifact"
-  ".SearchArtifactsRequest\032*.flyteidl.artif"
-  "act.SearchArtifactsResponse\"\231\001\202\323\344\223\002\222\001\022Q/"
-  "data/v1/query/s/{artifact_key.project}/{"
-  "artifact_key.domain}/{artifact_key.name}"
-  "Z=\022;/data/v1/query/{artifact_key.project"
-  "}/{artifact_key.domain}\022d\n\rCreateTrigger"
-  "\022\'.flyteidl.artifact.CreateTriggerReques"
-  "t\032(.flyteidl.artifact.CreateTriggerRespo"
-  "nse\"\000\022d\n\rDeleteTrigger\022\'.flyteidl.artifa"
-  "ct.DeleteTriggerRequest\032(.flyteidl.artif"
-  "act.DeleteTriggerResponse\"\000\022O\n\006AddTag\022 ."
-  "flyteidl.artifact.AddTagRequest\032!.flytei"
-  "dl.artifact.AddTagResponse\"\000\022e\n\020Register"
-  "Producer\022*.flyteidl.artifact.RegisterPro"
-  "ducerRequest\032#.flyteidl.artifact.Registe"
-  "rResponse\"\000\022e\n\020RegisterConsumer\022*.flytei"
-  "dl.artifact.RegisterConsumerRequest\032#.fl"
-  "yteidl.artifact.RegisterResponse\"\000\022\306\001\n\022F"
-  "indByWorkflowExec\022,.flyteidl.artifact.Fi"
-  "ndByWorkflowExecRequest\032*.flyteidl.artif"
-  "act.SearchArtifactsResponse\"V\202\323\344\223\002P\022N/da"
-  "ta/v1/query/e/{exec_id.project}/{exec_id"
-  ".domain}/{exec_id.name}/{direction}B@Z>g"
-  "ithub.com/flyteorg/flyte/flyteidl/gen/pb"
-  "-go/flyteidl/artifactb\006proto3"
+  "se\"\205\001\n\026ExecutionInputsRequest\022@\n\014executi"
+  "on_id\030\001 \001(\0132*.flyteidl.core.WorkflowExec"
+  "utionIdentifier\022)\n\006inputs\030\002 \003(\0132\031.flytei"
+  "dl.core.ArtifactID\"\031\n\027ExecutionInputsRes"
+  "ponse2\365\r\n\020ArtifactRegistry\022g\n\016CreateArti"
+  "fact\022(.flyteidl.artifact.CreateArtifactR"
+  "equest\032).flyteidl.artifact.CreateArtifac"
+  "tResponse\"\000\022\315\004\n\013GetArtifact\022%.flyteidl.a"
+  "rtifact.GetArtifactRequest\032&.flyteidl.ar"
+  "tifact.GetArtifactResponse\"\356\003\202\323\344\223\002\347\003\022\022/d"
+  "ata/v1/artifactsZ\252\001\022\247\001/data/v1/artifact/"
+  "id/{query.artifact_id.artifact_key.proje"
+  "ct}/{query.artifact_id.artifact_key.doma"
+  "in}/{query.artifact_id.artifact_key.name"
+  "}/{query.artifact_id.version}Z\216\001\022\213\001/data"
+  "/v1/artifact/id/{query.artifact_id.artif"
+  "act_key.project}/{query.artifact_id.arti"
+  "fact_key.domain}/{query.artifact_id.arti"
+  "fact_key.name}Z\222\001\022\217\001/data/v1/artifact/ta"
+  "g/{query.artifact_tag.artifact_key.proje"
+  "ct}/{query.artifact_tag.artifact_key.dom"
+  "ain}/{query.artifact_tag.artifact_key.na"
+  "me}\022\204\002\n\017SearchArtifacts\022).flyteidl.artif"
+  "act.SearchArtifactsRequest\032*.flyteidl.ar"
+  "tifact.SearchArtifactsResponse\"\231\001\202\323\344\223\002\222\001"
+  "\022Q/data/v1/query/s/{artifact_key.project"
+  "}/{artifact_key.domain}/{artifact_key.na"
+  "me}Z=\022;/data/v1/query/{artifact_key.proj"
+  "ect}/{artifact_key.domain}\022d\n\rCreateTrig"
+  "ger\022\'.flyteidl.artifact.CreateTriggerReq"
+  "uest\032(.flyteidl.artifact.CreateTriggerRe"
+  "sponse\"\000\022d\n\rDeleteTrigger\022\'.flyteidl.art"
+  "ifact.DeleteTriggerRequest\032(.flyteidl.ar"
+  "tifact.DeleteTriggerResponse\"\000\022O\n\006AddTag"
+  "\022 .flyteidl.artifact.AddTagRequest\032!.fly"
+  "teidl.artifact.AddTagResponse\"\000\022e\n\020Regis"
+  "terProducer\022*.flyteidl.artifact.Register"
+  "ProducerRequest\032#.flyteidl.artifact.Regi"
+  "sterResponse\"\000\022e\n\020RegisterConsumer\022*.fly"
+  "teidl.artifact.RegisterConsumerRequest\032#"
+  ".flyteidl.artifact.RegisterResponse\"\000\022m\n"
+  "\022SetExecutionInputs\022).flyteidl.artifact."
+  "ExecutionInputsRequest\032*.flyteidl.artifa"
+  "ct.ExecutionInputsResponse\"\000\022\306\001\n\022FindByW"
+  "orkflowExec\022,.flyteidl.artifact.FindByWo"
+  "rkflowExecRequest\032*.flyteidl.artifact.Se"
+  "archArtifactsResponse\"V\202\323\344\223\002P\022N/data/v1/"
+  "query/e/{exec_id.project}/{exec_id.domai"
+  "n}/{exec_id.name}/{direction}B@Z>github."
+  "com/flyteorg/flyte/flyteidl/gen/pb-go/fl"
+  "yteidl/artifactb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fartifact_2fartifacts_2eproto = {
   false, InitDefaults_flyteidl_2fartifact_2fartifacts_2eproto, 
   descriptor_table_protodef_flyteidl_2fartifact_2fartifacts_2eproto,
-  "flyteidl/artifact/artifacts.proto", &assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto, 4829,
+  "flyteidl/artifact/artifacts.proto", &assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto, 4823,
 };
 
 void AddDescriptors_flyteidl_2fartifact_2fartifacts_2eproto() {
@@ -9194,192 +9185,93 @@ void RegisterResponse::InternalSwap(RegisterResponse* other) {
 
 // ===================================================================
 
-void CloudEventRequest::InitAsDefaultInstance() {
-  ::flyteidl::artifact::_CloudEventRequest_default_instance_.workflow_execution_event_ = const_cast< ::flyteidl::event::CloudEventWorkflowExecution*>(
-      ::flyteidl::event::CloudEventWorkflowExecution::internal_default_instance());
-  ::flyteidl::artifact::_CloudEventRequest_default_instance_.task_execution_event_ = const_cast< ::flyteidl::event::CloudEventTaskExecution*>(
-      ::flyteidl::event::CloudEventTaskExecution::internal_default_instance());
-  ::flyteidl::artifact::_CloudEventRequest_default_instance_.node_execution_event_ = const_cast< ::flyteidl::event::CloudEventNodeExecution*>(
-      ::flyteidl::event::CloudEventNodeExecution::internal_default_instance());
+void ExecutionInputsRequest::InitAsDefaultInstance() {
+  ::flyteidl::artifact::_ExecutionInputsRequest_default_instance_._instance.get_mutable()->execution_id_ = const_cast< ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      ::flyteidl::core::WorkflowExecutionIdentifier::internal_default_instance());
 }
-class CloudEventRequest::HasBitSetters {
+class ExecutionInputsRequest::HasBitSetters {
  public:
-  static const ::flyteidl::event::CloudEventWorkflowExecution& workflow_execution_event(const CloudEventRequest* msg);
-  static const ::flyteidl::event::CloudEventTaskExecution& task_execution_event(const CloudEventRequest* msg);
-  static const ::flyteidl::event::CloudEventNodeExecution& node_execution_event(const CloudEventRequest* msg);
+  static const ::flyteidl::core::WorkflowExecutionIdentifier& execution_id(const ExecutionInputsRequest* msg);
 };
 
-const ::flyteidl::event::CloudEventWorkflowExecution&
-CloudEventRequest::HasBitSetters::workflow_execution_event(const CloudEventRequest* msg) {
-  return *msg->event_.workflow_execution_event_;
+const ::flyteidl::core::WorkflowExecutionIdentifier&
+ExecutionInputsRequest::HasBitSetters::execution_id(const ExecutionInputsRequest* msg) {
+  return *msg->execution_id_;
 }
-const ::flyteidl::event::CloudEventTaskExecution&
-CloudEventRequest::HasBitSetters::task_execution_event(const CloudEventRequest* msg) {
-  return *msg->event_.task_execution_event_;
-}
-const ::flyteidl::event::CloudEventNodeExecution&
-CloudEventRequest::HasBitSetters::node_execution_event(const CloudEventRequest* msg) {
-  return *msg->event_.node_execution_event_;
-}
-void CloudEventRequest::set_allocated_workflow_execution_event(::flyteidl::event::CloudEventWorkflowExecution* workflow_execution_event) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  clear_event();
-  if (workflow_execution_event) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      workflow_execution_event = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, workflow_execution_event, submessage_arena);
-    }
-    set_has_workflow_execution_event();
-    event_.workflow_execution_event_ = workflow_execution_event;
+void ExecutionInputsRequest::clear_execution_id() {
+  if (GetArenaNoVirtual() == nullptr && execution_id_ != nullptr) {
+    delete execution_id_;
   }
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.CloudEventRequest.workflow_execution_event)
+  execution_id_ = nullptr;
 }
-void CloudEventRequest::clear_workflow_execution_event() {
-  if (has_workflow_execution_event()) {
-    delete event_.workflow_execution_event_;
-    clear_has_event();
-  }
-}
-void CloudEventRequest::set_allocated_task_execution_event(::flyteidl::event::CloudEventTaskExecution* task_execution_event) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  clear_event();
-  if (task_execution_event) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      task_execution_event = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, task_execution_event, submessage_arena);
-    }
-    set_has_task_execution_event();
-    event_.task_execution_event_ = task_execution_event;
-  }
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.CloudEventRequest.task_execution_event)
-}
-void CloudEventRequest::clear_task_execution_event() {
-  if (has_task_execution_event()) {
-    delete event_.task_execution_event_;
-    clear_has_event();
-  }
-}
-void CloudEventRequest::set_allocated_node_execution_event(::flyteidl::event::CloudEventNodeExecution* node_execution_event) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  clear_event();
-  if (node_execution_event) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      node_execution_event = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, node_execution_event, submessage_arena);
-    }
-    set_has_node_execution_event();
-    event_.node_execution_event_ = node_execution_event;
-  }
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.CloudEventRequest.node_execution_event)
-}
-void CloudEventRequest::clear_node_execution_event() {
-  if (has_node_execution_event()) {
-    delete event_.node_execution_event_;
-    clear_has_event();
-  }
+void ExecutionInputsRequest::clear_inputs() {
+  inputs_.Clear();
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int CloudEventRequest::kWorkflowExecutionEventFieldNumber;
-const int CloudEventRequest::kTaskExecutionEventFieldNumber;
-const int CloudEventRequest::kNodeExecutionEventFieldNumber;
+const int ExecutionInputsRequest::kExecutionIdFieldNumber;
+const int ExecutionInputsRequest::kInputsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-CloudEventRequest::CloudEventRequest()
+ExecutionInputsRequest::ExecutionInputsRequest()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(constructor:flyteidl.artifact.ExecutionInputsRequest)
 }
-CloudEventRequest::CloudEventRequest(const CloudEventRequest& from)
+ExecutionInputsRequest::ExecutionInputsRequest(const ExecutionInputsRequest& from)
   : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
+      _internal_metadata_(nullptr),
+      inputs_(from.inputs_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  clear_has_event();
-  switch (from.event_case()) {
-    case kWorkflowExecutionEvent: {
-      mutable_workflow_execution_event()->::flyteidl::event::CloudEventWorkflowExecution::MergeFrom(from.workflow_execution_event());
-      break;
-    }
-    case kTaskExecutionEvent: {
-      mutable_task_execution_event()->::flyteidl::event::CloudEventTaskExecution::MergeFrom(from.task_execution_event());
-      break;
-    }
-    case kNodeExecutionEvent: {
-      mutable_node_execution_event()->::flyteidl::event::CloudEventNodeExecution::MergeFrom(from.node_execution_event());
-      break;
-    }
-    case EVENT_NOT_SET: {
-      break;
-    }
+  if (from.has_execution_id()) {
+    execution_id_ = new ::flyteidl::core::WorkflowExecutionIdentifier(*from.execution_id_);
+  } else {
+    execution_id_ = nullptr;
   }
-  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.ExecutionInputsRequest)
 }
 
-void CloudEventRequest::SharedCtor() {
+void ExecutionInputsRequest::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
-      &scc_info_CloudEventRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
-  clear_has_event();
+      &scc_info_ExecutionInputsRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
+  execution_id_ = nullptr;
 }
 
-CloudEventRequest::~CloudEventRequest() {
-  // @@protoc_insertion_point(destructor:flyteidl.artifact.CloudEventRequest)
+ExecutionInputsRequest::~ExecutionInputsRequest() {
+  // @@protoc_insertion_point(destructor:flyteidl.artifact.ExecutionInputsRequest)
   SharedDtor();
 }
 
-void CloudEventRequest::SharedDtor() {
-  if (has_event()) {
-    clear_event();
-  }
+void ExecutionInputsRequest::SharedDtor() {
+  if (this != internal_default_instance()) delete execution_id_;
 }
 
-void CloudEventRequest::SetCachedSize(int size) const {
+void ExecutionInputsRequest::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const CloudEventRequest& CloudEventRequest::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_CloudEventRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
+const ExecutionInputsRequest& ExecutionInputsRequest::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_ExecutionInputsRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void CloudEventRequest::clear_event() {
-// @@protoc_insertion_point(one_of_clear_start:flyteidl.artifact.CloudEventRequest)
-  switch (event_case()) {
-    case kWorkflowExecutionEvent: {
-      delete event_.workflow_execution_event_;
-      break;
-    }
-    case kTaskExecutionEvent: {
-      delete event_.task_execution_event_;
-      break;
-    }
-    case kNodeExecutionEvent: {
-      delete event_.node_execution_event_;
-      break;
-    }
-    case EVENT_NOT_SET: {
-      break;
-    }
-  }
-  _oneof_case_[0] = EVENT_NOT_SET;
-}
-
-
-void CloudEventRequest::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.CloudEventRequest)
+void ExecutionInputsRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.ExecutionInputsRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  clear_event();
+  inputs_.Clear();
+  if (GetArenaNoVirtual() == nullptr && execution_id_ != nullptr) {
+    delete execution_id_;
+  }
+  execution_id_ = nullptr;
   _internal_metadata_.Clear();
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* CloudEventRequest::_InternalParse(const char* begin, const char* end, void* object,
+const char* ExecutionInputsRequest::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<CloudEventRequest*>(object);
+  auto msg = static_cast<ExecutionInputsRequest*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -9389,43 +9281,33 @@ const char* CloudEventRequest::_InternalParse(const char* begin, const char* end
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.event.CloudEventWorkflowExecution workflow_execution_event = 1;
+      // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::flyteidl::event::CloudEventWorkflowExecution::_InternalParse;
-        object = msg->mutable_workflow_execution_event();
+        parser_till_end = ::flyteidl::core::WorkflowExecutionIdentifier::_InternalParse;
+        object = msg->mutable_execution_id();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
-      // .flyteidl.event.CloudEventTaskExecution task_execution_event = 2;
+      // repeated .flyteidl.core.ArtifactID inputs = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::flyteidl::event::CloudEventTaskExecution::_InternalParse;
-        object = msg->mutable_task_execution_event();
-        if (size > end - ptr) goto len_delim_till_end;
-        ptr += size;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-            {parser_till_end, object}, ptr - size, ptr));
-        break;
-      }
-      // .flyteidl.event.CloudEventNodeExecution node_execution_event = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::flyteidl::event::CloudEventNodeExecution::_InternalParse;
-        object = msg->mutable_node_execution_event();
-        if (size > end - ptr) goto len_delim_till_end;
-        ptr += size;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-            {parser_till_end, object}, ptr - size, ptr));
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::flyteidl::core::ArtifactID::_InternalParse;
+          object = msg->add_inputs();
+          if (size > end - ptr) goto len_delim_till_end;
+          ptr += size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+              {parser_till_end, object}, ptr - size, ptr));
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
         break;
       }
       default: {
@@ -9448,43 +9330,32 @@ len_delim_till_end:
                                {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool CloudEventRequest::MergePartialFromCodedStream(
+bool ExecutionInputsRequest::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(parse_start:flyteidl.artifact.ExecutionInputsRequest)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.event.CloudEventWorkflowExecution workflow_execution_event = 1;
+      // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_workflow_execution_event()));
+               input, mutable_execution_id()));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // .flyteidl.event.CloudEventTaskExecution task_execution_event = 2;
+      // repeated .flyteidl.core.ArtifactID inputs = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_task_execution_event()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .flyteidl.event.CloudEventNodeExecution node_execution_event = 3;
-      case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_node_execution_event()));
+                input, add_inputs()));
         } else {
           goto handle_unusual;
         }
@@ -9503,83 +9374,74 @@ bool CloudEventRequest::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(parse_success:flyteidl.artifact.ExecutionInputsRequest)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.ExecutionInputsRequest)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void CloudEventRequest::SerializeWithCachedSizes(
+void ExecutionInputsRequest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.ExecutionInputsRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.event.CloudEventWorkflowExecution workflow_execution_event = 1;
-  if (has_workflow_execution_event()) {
+  // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
+  if (this->has_execution_id()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, HasBitSetters::workflow_execution_event(this), output);
+      1, HasBitSetters::execution_id(this), output);
   }
 
-  // .flyteidl.event.CloudEventTaskExecution task_execution_event = 2;
-  if (has_task_execution_event()) {
+  // repeated .flyteidl.core.ArtifactID inputs = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->inputs_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, HasBitSetters::task_execution_event(this), output);
-  }
-
-  // .flyteidl.event.CloudEventNodeExecution node_execution_event = 3;
-  if (has_node_execution_event()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, HasBitSetters::node_execution_event(this), output);
+      2,
+      this->inputs(static_cast<int>(i)),
+      output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.ExecutionInputsRequest)
 }
 
-::google::protobuf::uint8* CloudEventRequest::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ExecutionInputsRequest::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.ExecutionInputsRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.event.CloudEventWorkflowExecution workflow_execution_event = 1;
-  if (has_workflow_execution_event()) {
+  // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
+  if (this->has_execution_id()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        1, HasBitSetters::workflow_execution_event(this), target);
+        1, HasBitSetters::execution_id(this), target);
   }
 
-  // .flyteidl.event.CloudEventTaskExecution task_execution_event = 2;
-  if (has_task_execution_event()) {
+  // repeated .flyteidl.core.ArtifactID inputs = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->inputs_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, HasBitSetters::task_execution_event(this), target);
-  }
-
-  // .flyteidl.event.CloudEventNodeExecution node_execution_event = 3;
-  if (has_node_execution_event()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        3, HasBitSetters::node_execution_event(this), target);
+        2, this->inputs(static_cast<int>(i)), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.ExecutionInputsRequest)
   return target;
 }
 
-size_t CloudEventRequest::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.CloudEventRequest)
+size_t ExecutionInputsRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.ExecutionInputsRequest)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -9591,108 +9453,87 @@ size_t CloudEventRequest::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  switch (event_case()) {
-    // .flyteidl.event.CloudEventWorkflowExecution workflow_execution_event = 1;
-    case kWorkflowExecutionEvent: {
-      total_size += 1 +
+  // repeated .flyteidl.core.ArtifactID inputs = 2;
+  {
+    unsigned int count = static_cast<unsigned int>(this->inputs_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          *event_.workflow_execution_event_);
-      break;
-    }
-    // .flyteidl.event.CloudEventTaskExecution task_execution_event = 2;
-    case kTaskExecutionEvent: {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          *event_.task_execution_event_);
-      break;
-    }
-    // .flyteidl.event.CloudEventNodeExecution node_execution_event = 3;
-    case kNodeExecutionEvent: {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          *event_.node_execution_event_);
-      break;
-    }
-    case EVENT_NOT_SET: {
-      break;
+          this->inputs(static_cast<int>(i)));
     }
   }
+
+  // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
+  if (this->has_execution_id()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *execution_id_);
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
 }
 
-void CloudEventRequest::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.CloudEventRequest)
+void ExecutionInputsRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.ExecutionInputsRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  const CloudEventRequest* source =
-      ::google::protobuf::DynamicCastToGenerated<CloudEventRequest>(
+  const ExecutionInputsRequest* source =
+      ::google::protobuf::DynamicCastToGenerated<ExecutionInputsRequest>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.ExecutionInputsRequest)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.ExecutionInputsRequest)
     MergeFrom(*source);
   }
 }
 
-void CloudEventRequest::MergeFrom(const CloudEventRequest& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.CloudEventRequest)
+void ExecutionInputsRequest::MergeFrom(const ExecutionInputsRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.ExecutionInputsRequest)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  switch (from.event_case()) {
-    case kWorkflowExecutionEvent: {
-      mutable_workflow_execution_event()->::flyteidl::event::CloudEventWorkflowExecution::MergeFrom(from.workflow_execution_event());
-      break;
-    }
-    case kTaskExecutionEvent: {
-      mutable_task_execution_event()->::flyteidl::event::CloudEventTaskExecution::MergeFrom(from.task_execution_event());
-      break;
-    }
-    case kNodeExecutionEvent: {
-      mutable_node_execution_event()->::flyteidl::event::CloudEventNodeExecution::MergeFrom(from.node_execution_event());
-      break;
-    }
-    case EVENT_NOT_SET: {
-      break;
-    }
+  inputs_.MergeFrom(from.inputs_);
+  if (from.has_execution_id()) {
+    mutable_execution_id()->::flyteidl::core::WorkflowExecutionIdentifier::MergeFrom(from.execution_id());
   }
 }
 
-void CloudEventRequest::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.CloudEventRequest)
+void ExecutionInputsRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.ExecutionInputsRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void CloudEventRequest::CopyFrom(const CloudEventRequest& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.CloudEventRequest)
+void ExecutionInputsRequest::CopyFrom(const ExecutionInputsRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.ExecutionInputsRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool CloudEventRequest::IsInitialized() const {
+bool ExecutionInputsRequest::IsInitialized() const {
   return true;
 }
 
-void CloudEventRequest::Swap(CloudEventRequest* other) {
+void ExecutionInputsRequest::Swap(ExecutionInputsRequest* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void CloudEventRequest::InternalSwap(CloudEventRequest* other) {
+void ExecutionInputsRequest::InternalSwap(ExecutionInputsRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  swap(event_, other->event_);
-  swap(_oneof_case_[0], other->_oneof_case_[0]);
+  CastToBase(&inputs_)->InternalSwap(CastToBase(&other->inputs_));
+  swap(execution_id_, other->execution_id_);
 }
 
-::google::protobuf::Metadata CloudEventRequest::GetMetadata() const {
+::google::protobuf::Metadata ExecutionInputsRequest::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto);
   return ::file_level_metadata_flyteidl_2fartifact_2fartifacts_2eproto[kIndexInFileMessages];
 }
@@ -9700,49 +9541,49 @@ void CloudEventRequest::InternalSwap(CloudEventRequest* other) {
 
 // ===================================================================
 
-void CloudEventResponse::InitAsDefaultInstance() {
+void ExecutionInputsResponse::InitAsDefaultInstance() {
 }
-class CloudEventResponse::HasBitSetters {
+class ExecutionInputsResponse::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-CloudEventResponse::CloudEventResponse()
+ExecutionInputsResponse::ExecutionInputsResponse()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(constructor:flyteidl.artifact.ExecutionInputsResponse)
 }
-CloudEventResponse::CloudEventResponse(const CloudEventResponse& from)
+ExecutionInputsResponse::ExecutionInputsResponse(const ExecutionInputsResponse& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.ExecutionInputsResponse)
 }
 
-void CloudEventResponse::SharedCtor() {
+void ExecutionInputsResponse::SharedCtor() {
 }
 
-CloudEventResponse::~CloudEventResponse() {
-  // @@protoc_insertion_point(destructor:flyteidl.artifact.CloudEventResponse)
+ExecutionInputsResponse::~ExecutionInputsResponse() {
+  // @@protoc_insertion_point(destructor:flyteidl.artifact.ExecutionInputsResponse)
   SharedDtor();
 }
 
-void CloudEventResponse::SharedDtor() {
+void ExecutionInputsResponse::SharedDtor() {
 }
 
-void CloudEventResponse::SetCachedSize(int size) const {
+void ExecutionInputsResponse::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const CloudEventResponse& CloudEventResponse::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_CloudEventResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
+const ExecutionInputsResponse& ExecutionInputsResponse::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_ExecutionInputsResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void CloudEventResponse::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.CloudEventResponse)
+void ExecutionInputsResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.ExecutionInputsResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -9751,9 +9592,9 @@ void CloudEventResponse::Clear() {
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* CloudEventResponse::_InternalParse(const char* begin, const char* end, void* object,
+const char* ExecutionInputsResponse::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<CloudEventResponse*>(object);
+  auto msg = static_cast<ExecutionInputsResponse*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -9779,11 +9620,11 @@ const char* CloudEventResponse::_InternalParse(const char* begin, const char* en
   return ptr;
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool CloudEventResponse::MergePartialFromCodedStream(
+bool ExecutionInputsResponse::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(parse_start:flyteidl.artifact.ExecutionInputsResponse)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -9796,18 +9637,18 @@ bool CloudEventResponse::MergePartialFromCodedStream(
           input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
-  // @@protoc_insertion_point(parse_success:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(parse_success:flyteidl.artifact.ExecutionInputsResponse)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.ExecutionInputsResponse)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void CloudEventResponse::SerializeWithCachedSizes(
+void ExecutionInputsResponse::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.ExecutionInputsResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -9815,12 +9656,12 @@ void CloudEventResponse::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.ExecutionInputsResponse)
 }
 
-::google::protobuf::uint8* CloudEventResponse::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* ExecutionInputsResponse::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.ExecutionInputsResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -9828,12 +9669,12 @@ void CloudEventResponse::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.ExecutionInputsResponse)
   return target;
 }
 
-size_t CloudEventResponse::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.CloudEventResponse)
+size_t ExecutionInputsResponse::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.ExecutionInputsResponse)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -9850,23 +9691,23 @@ size_t CloudEventResponse::ByteSizeLong() const {
   return total_size;
 }
 
-void CloudEventResponse::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.CloudEventResponse)
+void ExecutionInputsResponse::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.ExecutionInputsResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  const CloudEventResponse* source =
-      ::google::protobuf::DynamicCastToGenerated<CloudEventResponse>(
+  const ExecutionInputsResponse* source =
+      ::google::protobuf::DynamicCastToGenerated<ExecutionInputsResponse>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.ExecutionInputsResponse)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.ExecutionInputsResponse)
     MergeFrom(*source);
   }
 }
 
-void CloudEventResponse::MergeFrom(const CloudEventResponse& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.CloudEventResponse)
+void ExecutionInputsResponse::MergeFrom(const ExecutionInputsResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.ExecutionInputsResponse)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -9874,34 +9715,34 @@ void CloudEventResponse::MergeFrom(const CloudEventResponse& from) {
 
 }
 
-void CloudEventResponse::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.CloudEventResponse)
+void ExecutionInputsResponse::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.ExecutionInputsResponse)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void CloudEventResponse::CopyFrom(const CloudEventResponse& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.CloudEventResponse)
+void ExecutionInputsResponse::CopyFrom(const ExecutionInputsResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.ExecutionInputsResponse)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool CloudEventResponse::IsInitialized() const {
+bool ExecutionInputsResponse::IsInitialized() const {
   return true;
 }
 
-void CloudEventResponse::Swap(CloudEventResponse* other) {
+void ExecutionInputsResponse::Swap(ExecutionInputsResponse* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void CloudEventResponse::InternalSwap(CloudEventResponse* other) {
+void ExecutionInputsResponse::InternalSwap(ExecutionInputsResponse* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
-::google::protobuf::Metadata CloudEventResponse::GetMetadata() const {
+::google::protobuf::Metadata ExecutionInputsResponse::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto);
   return ::file_level_metadata_flyteidl_2fartifact_2fartifacts_2eproto[kIndexInFileMessages];
 }
@@ -9981,11 +9822,11 @@ template<> PROTOBUF_NOINLINE ::flyteidl::artifact::RegisterConsumerRequest* Aren
 template<> PROTOBUF_NOINLINE ::flyteidl::artifact::RegisterResponse* Arena::CreateMaybeMessage< ::flyteidl::artifact::RegisterResponse >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::artifact::RegisterResponse >(arena);
 }
-template<> PROTOBUF_NOINLINE ::flyteidl::artifact::CloudEventRequest* Arena::CreateMaybeMessage< ::flyteidl::artifact::CloudEventRequest >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::artifact::CloudEventRequest >(arena);
+template<> PROTOBUF_NOINLINE ::flyteidl::artifact::ExecutionInputsRequest* Arena::CreateMaybeMessage< ::flyteidl::artifact::ExecutionInputsRequest >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::artifact::ExecutionInputsRequest >(arena);
 }
-template<> PROTOBUF_NOINLINE ::flyteidl::artifact::CloudEventResponse* Arena::CreateMaybeMessage< ::flyteidl::artifact::CloudEventResponse >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::artifact::CloudEventResponse >(arena);
+template<> PROTOBUF_NOINLINE ::flyteidl::artifact::ExecutionInputsResponse* Arena::CreateMaybeMessage< ::flyteidl::artifact::ExecutionInputsResponse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::artifact::ExecutionInputsResponse >(arena);
 }
 }  // namespace protobuf
 }  // namespace google

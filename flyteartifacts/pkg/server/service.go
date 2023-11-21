@@ -17,6 +17,8 @@ type CoreService struct {
 }
 
 func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
+
+	// todo: gatepr _ua tracking bit to be installed
 	if request == nil {
 		return nil, nil
 	}
@@ -129,10 +131,29 @@ func (c *CoreService) SearchArtifacts(ctx context.Context, request *artifact.Sea
 	}, nil
 }
 
+func (c *CoreService) SetExecutionInputs(ctx context.Context, req *artifact.ExecutionInputsRequest) (*artifact.ExecutionInputsResponse, error) {
+	err := c.Storage.SetExecutionInputs(ctx, req)
+
+	return &artifact.ExecutionInputsResponse{}, err
+}
+
 func (c *CoreService) FindByWorkflowExec(ctx context.Context, request *artifact.FindByWorkflowExecRequest) (*artifact.SearchArtifactsResponse, error) {
 	logger.Infof(ctx, "FindByWorkflowExecRequest: %+v", request)
 
-	return &artifact.SearchArtifactsResponse{}, nil
+	res, err := c.Storage.FindByWorkflowExec(ctx, request)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to find artifacts by workflow execution: %v", err)
+		return nil, err
+	}
+	var as []*artifact.Artifact
+	for _, m := range res {
+		as = append(as, &m.Artifact)
+	}
+	resp := artifact.SearchArtifactsResponse{
+		Artifacts: as,
+	}
+
+	return &resp, nil
 }
 
 func NewCoreService(storage StorageInterface, blobStore BlobStoreInterface, _ promutils.Scope) CoreService {

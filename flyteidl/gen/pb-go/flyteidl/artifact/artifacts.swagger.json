@@ -1201,6 +1201,9 @@
     "artifactDeleteTriggerResponse": {
       "type": "object"
     },
+    "artifactExecutionInputsResponse": {
+      "type": "object"
+    },
     "artifactFindByWorkflowExecRequestDirection": {
       "type": "string",
       "enum": [

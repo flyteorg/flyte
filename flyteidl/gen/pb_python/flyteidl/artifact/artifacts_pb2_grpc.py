@@ -54,6 +54,11 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.FromString,
                 )
+        self.SetExecutionInputs = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/SetExecutionInputs',
+                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.ExecutionInputsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.ExecutionInputsResponse.FromString,
+                )
         self.FindByWorkflowExec = channel.unary_unary(
                 '/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec',
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.SerializeToString,
@@ -112,6 +117,12 @@ class ArtifactRegistryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def SetExecutionInputs(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def FindByWorkflowExec(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -160,6 +171,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.RegisterConsumer,
                     request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.FromString,
                     response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.SerializeToString,
+            ),
+            'SetExecutionInputs': grpc.unary_unary_rpc_method_handler(
+                    servicer.SetExecutionInputs,
+                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.ExecutionInputsRequest.FromString,
+                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.ExecutionInputsResponse.SerializeToString,
             ),
             'FindByWorkflowExec': grpc.unary_unary_rpc_method_handler(
                     servicer.FindByWorkflowExec,
@@ -309,6 +325,23 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/RegisterConsumer',
             flyteidl_dot_artifact_dot_artifacts__pb2.RegisterConsumerRequest.SerializeToString,
             flyteidl_dot_artifact_dot_artifacts__pb2.RegisterResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def SetExecutionInputs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/SetExecutionInputs',
+            flyteidl_dot_artifact_dot_artifacts__pb2.ExecutionInputsRequest.SerializeToString,
+            flyteidl_dot_artifact_dot_artifacts__pb2.ExecutionInputsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

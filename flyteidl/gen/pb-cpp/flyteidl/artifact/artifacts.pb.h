@@ -84,12 +84,6 @@ extern ArtifactSourceDefaultTypeInternal _ArtifactSource_default_instance_;
 class ArtifactSpec;
 class ArtifactSpecDefaultTypeInternal;
 extern ArtifactSpecDefaultTypeInternal _ArtifactSpec_default_instance_;
-class CloudEventRequest;
-class CloudEventRequestDefaultTypeInternal;
-extern CloudEventRequestDefaultTypeInternal _CloudEventRequest_default_instance_;
-class CloudEventResponse;
-class CloudEventResponseDefaultTypeInternal;
-extern CloudEventResponseDefaultTypeInternal _CloudEventResponse_default_instance_;
 class CreateArtifactRequest;
 class CreateArtifactRequestDefaultTypeInternal;
 extern CreateArtifactRequestDefaultTypeInternal _CreateArtifactRequest_default_instance_;
@@ -111,6 +105,12 @@ extern DeleteTriggerRequestDefaultTypeInternal _DeleteTriggerRequest_default_ins
 class DeleteTriggerResponse;
 class DeleteTriggerResponseDefaultTypeInternal;
 extern DeleteTriggerResponseDefaultTypeInternal _DeleteTriggerResponse_default_instance_;
+class ExecutionInputsRequest;
+class ExecutionInputsRequestDefaultTypeInternal;
+extern ExecutionInputsRequestDefaultTypeInternal _ExecutionInputsRequest_default_instance_;
+class ExecutionInputsResponse;
+class ExecutionInputsResponseDefaultTypeInternal;
+extern ExecutionInputsResponseDefaultTypeInternal _ExecutionInputsResponse_default_instance_;
 class FindByWorkflowExecRequest;
 class FindByWorkflowExecRequestDefaultTypeInternal;
 extern FindByWorkflowExecRequestDefaultTypeInternal _FindByWorkflowExecRequest_default_instance_;
@@ -149,8 +149,6 @@ template<> ::flyteidl::artifact::ArtifactConsumer* Arena::CreateMaybeMessage<::f
 template<> ::flyteidl::artifact::ArtifactProducer* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactProducer>(Arena*);
 template<> ::flyteidl::artifact::ArtifactSource* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactSource>(Arena*);
 template<> ::flyteidl::artifact::ArtifactSpec* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactSpec>(Arena*);
-template<> ::flyteidl::artifact::CloudEventRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::CloudEventRequest>(Arena*);
-template<> ::flyteidl::artifact::CloudEventResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::CloudEventResponse>(Arena*);
 template<> ::flyteidl::artifact::CreateArtifactRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::CreateArtifactRequest>(Arena*);
 template<> ::flyteidl::artifact::CreateArtifactRequest_PartitionsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::artifact::CreateArtifactRequest_PartitionsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::artifact::CreateArtifactResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::CreateArtifactResponse>(Arena*);
@@ -158,6 +156,8 @@ template<> ::flyteidl::artifact::CreateTriggerRequest* Arena::CreateMaybeMessage
 template<> ::flyteidl::artifact::CreateTriggerResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::CreateTriggerResponse>(Arena*);
 template<> ::flyteidl::artifact::DeleteTriggerRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::DeleteTriggerRequest>(Arena*);
 template<> ::flyteidl::artifact::DeleteTriggerResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::DeleteTriggerResponse>(Arena*);
+template<> ::flyteidl::artifact::ExecutionInputsRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::ExecutionInputsRequest>(Arena*);
+template<> ::flyteidl::artifact::ExecutionInputsResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::ExecutionInputsResponse>(Arena*);
 template<> ::flyteidl::artifact::FindByWorkflowExecRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::FindByWorkflowExecRequest>(Arena*);
 template<> ::flyteidl::artifact::GetArtifactRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::GetArtifactRequest>(Arena*);
 template<> ::flyteidl::artifact::GetArtifactResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::GetArtifactResponse>(Arena*);
@@ -3104,25 +3104,25 @@ class RegisterResponse final :
 };
 // -------------------------------------------------------------------
 
-class CloudEventRequest final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.CloudEventRequest) */ {
+class ExecutionInputsRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.ExecutionInputsRequest) */ {
  public:
-  CloudEventRequest();
-  virtual ~CloudEventRequest();
+  ExecutionInputsRequest();
+  virtual ~ExecutionInputsRequest();
 
-  CloudEventRequest(const CloudEventRequest& from);
+  ExecutionInputsRequest(const ExecutionInputsRequest& from);
 
-  inline CloudEventRequest& operator=(const CloudEventRequest& from) {
+  inline ExecutionInputsRequest& operator=(const ExecutionInputsRequest& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  CloudEventRequest(CloudEventRequest&& from) noexcept
-    : CloudEventRequest() {
+  ExecutionInputsRequest(ExecutionInputsRequest&& from) noexcept
+    : ExecutionInputsRequest() {
     *this = ::std::move(from);
   }
 
-  inline CloudEventRequest& operator=(CloudEventRequest&& from) noexcept {
+  inline ExecutionInputsRequest& operator=(ExecutionInputsRequest&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -3134,41 +3134,34 @@ class CloudEventRequest final :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const CloudEventRequest& default_instance();
-
-  enum EventCase {
-    kWorkflowExecutionEvent = 1,
-    kTaskExecutionEvent = 2,
-    kNodeExecutionEvent = 3,
-    EVENT_NOT_SET = 0,
-  };
+  static const ExecutionInputsRequest& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const CloudEventRequest* internal_default_instance() {
-    return reinterpret_cast<const CloudEventRequest*>(
-               &_CloudEventRequest_default_instance_);
+  static inline const ExecutionInputsRequest* internal_default_instance() {
+    return reinterpret_cast<const ExecutionInputsRequest*>(
+               &_ExecutionInputsRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     23;
 
-  void Swap(CloudEventRequest* other);
-  friend void swap(CloudEventRequest& a, CloudEventRequest& b) {
+  void Swap(ExecutionInputsRequest* other);
+  friend void swap(ExecutionInputsRequest& a, ExecutionInputsRequest& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline CloudEventRequest* New() const final {
-    return CreateMaybeMessage<CloudEventRequest>(nullptr);
+  inline ExecutionInputsRequest* New() const final {
+    return CreateMaybeMessage<ExecutionInputsRequest>(nullptr);
   }
 
-  CloudEventRequest* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<CloudEventRequest>(arena);
+  ExecutionInputsRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ExecutionInputsRequest>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const CloudEventRequest& from);
-  void MergeFrom(const CloudEventRequest& from);
+  void CopyFrom(const ExecutionInputsRequest& from);
+  void MergeFrom(const ExecutionInputsRequest& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -3190,7 +3183,7 @@ class CloudEventRequest final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(CloudEventRequest* other);
+  void InternalSwap(ExecutionInputsRequest* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -3206,78 +3199,58 @@ class CloudEventRequest final :
 
   // accessors -------------------------------------------------------
 
-  // .flyteidl.event.CloudEventWorkflowExecution workflow_execution_event = 1;
-  bool has_workflow_execution_event() const;
-  void clear_workflow_execution_event();
-  static const int kWorkflowExecutionEventFieldNumber = 1;
-  const ::flyteidl::event::CloudEventWorkflowExecution& workflow_execution_event() const;
-  ::flyteidl::event::CloudEventWorkflowExecution* release_workflow_execution_event();
-  ::flyteidl::event::CloudEventWorkflowExecution* mutable_workflow_execution_event();
-  void set_allocated_workflow_execution_event(::flyteidl::event::CloudEventWorkflowExecution* workflow_execution_event);
+  // repeated .flyteidl.core.ArtifactID inputs = 2;
+  int inputs_size() const;
+  void clear_inputs();
+  static const int kInputsFieldNumber = 2;
+  ::flyteidl::core::ArtifactID* mutable_inputs(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
+      mutable_inputs();
+  const ::flyteidl::core::ArtifactID& inputs(int index) const;
+  ::flyteidl::core::ArtifactID* add_inputs();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
+      inputs() const;
 
-  // .flyteidl.event.CloudEventTaskExecution task_execution_event = 2;
-  bool has_task_execution_event() const;
-  void clear_task_execution_event();
-  static const int kTaskExecutionEventFieldNumber = 2;
-  const ::flyteidl::event::CloudEventTaskExecution& task_execution_event() const;
-  ::flyteidl::event::CloudEventTaskExecution* release_task_execution_event();
-  ::flyteidl::event::CloudEventTaskExecution* mutable_task_execution_event();
-  void set_allocated_task_execution_event(::flyteidl::event::CloudEventTaskExecution* task_execution_event);
+  // .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
+  bool has_execution_id() const;
+  void clear_execution_id();
+  static const int kExecutionIdFieldNumber = 1;
+  const ::flyteidl::core::WorkflowExecutionIdentifier& execution_id() const;
+  ::flyteidl::core::WorkflowExecutionIdentifier* release_execution_id();
+  ::flyteidl::core::WorkflowExecutionIdentifier* mutable_execution_id();
+  void set_allocated_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* execution_id);
 
-  // .flyteidl.event.CloudEventNodeExecution node_execution_event = 3;
-  bool has_node_execution_event() const;
-  void clear_node_execution_event();
-  static const int kNodeExecutionEventFieldNumber = 3;
-  const ::flyteidl::event::CloudEventNodeExecution& node_execution_event() const;
-  ::flyteidl::event::CloudEventNodeExecution* release_node_execution_event();
-  ::flyteidl::event::CloudEventNodeExecution* mutable_node_execution_event();
-  void set_allocated_node_execution_event(::flyteidl::event::CloudEventNodeExecution* node_execution_event);
-
-  void clear_event();
-  EventCase event_case() const;
-  // @@protoc_insertion_point(class_scope:flyteidl.artifact.CloudEventRequest)
+  // @@protoc_insertion_point(class_scope:flyteidl.artifact.ExecutionInputsRequest)
  private:
   class HasBitSetters;
-  void set_has_workflow_execution_event();
-  void set_has_task_execution_event();
-  void set_has_node_execution_event();
-
-  inline bool has_event() const;
-  inline void clear_has_event();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  union EventUnion {
-    EventUnion() {}
-    ::flyteidl::event::CloudEventWorkflowExecution* workflow_execution_event_;
-    ::flyteidl::event::CloudEventTaskExecution* task_execution_event_;
-    ::flyteidl::event::CloudEventNodeExecution* node_execution_event_;
-  } event_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > inputs_;
+  ::flyteidl::core::WorkflowExecutionIdentifier* execution_id_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
-
   friend struct ::TableStruct_flyteidl_2fartifact_2fartifacts_2eproto;
 };
 // -------------------------------------------------------------------
 
-class CloudEventResponse final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.CloudEventResponse) */ {
+class ExecutionInputsResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.ExecutionInputsResponse) */ {
  public:
-  CloudEventResponse();
-  virtual ~CloudEventResponse();
+  ExecutionInputsResponse();
+  virtual ~ExecutionInputsResponse();
 
-  CloudEventResponse(const CloudEventResponse& from);
+  ExecutionInputsResponse(const ExecutionInputsResponse& from);
 
-  inline CloudEventResponse& operator=(const CloudEventResponse& from) {
+  inline ExecutionInputsResponse& operator=(const ExecutionInputsResponse& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  CloudEventResponse(CloudEventResponse&& from) noexcept
-    : CloudEventResponse() {
+  ExecutionInputsResponse(ExecutionInputsResponse&& from) noexcept
+    : ExecutionInputsResponse() {
     *this = ::std::move(from);
   }
 
-  inline CloudEventResponse& operator=(CloudEventResponse&& from) noexcept {
+  inline ExecutionInputsResponse& operator=(ExecutionInputsResponse&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -3289,34 +3262,34 @@ class CloudEventResponse final :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const CloudEventResponse& default_instance();
+  static const ExecutionInputsResponse& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const CloudEventResponse* internal_default_instance() {
-    return reinterpret_cast<const CloudEventResponse*>(
-               &_CloudEventResponse_default_instance_);
+  static inline const ExecutionInputsResponse* internal_default_instance() {
+    return reinterpret_cast<const ExecutionInputsResponse*>(
+               &_ExecutionInputsResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     24;
 
-  void Swap(CloudEventResponse* other);
-  friend void swap(CloudEventResponse& a, CloudEventResponse& b) {
+  void Swap(ExecutionInputsResponse* other);
+  friend void swap(ExecutionInputsResponse& a, ExecutionInputsResponse& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline CloudEventResponse* New() const final {
-    return CreateMaybeMessage<CloudEventResponse>(nullptr);
+  inline ExecutionInputsResponse* New() const final {
+    return CreateMaybeMessage<ExecutionInputsResponse>(nullptr);
   }
 
-  CloudEventResponse* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<CloudEventResponse>(arena);
+  ExecutionInputsResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ExecutionInputsResponse>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const CloudEventResponse& from);
-  void MergeFrom(const CloudEventResponse& from);
+  void CopyFrom(const ExecutionInputsResponse& from);
+  void MergeFrom(const ExecutionInputsResponse& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -3338,7 +3311,7 @@ class CloudEventResponse final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(CloudEventResponse* other);
+  void InternalSwap(ExecutionInputsResponse* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -3354,7 +3327,7 @@ class CloudEventResponse final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:flyteidl.artifact.CloudEventResponse)
+  // @@protoc_insertion_point(class_scope:flyteidl.artifact.ExecutionInputsResponse)
  private:
   class HasBitSetters;
 
@@ -5500,125 +5473,83 @@ RegisterConsumerRequest::consumers() const {
 
 // -------------------------------------------------------------------
 
-// CloudEventRequest
+// ExecutionInputsRequest
 
-// .flyteidl.event.CloudEventWorkflowExecution workflow_execution_event = 1;
-inline bool CloudEventRequest::has_workflow_execution_event() const {
-  return event_case() == kWorkflowExecutionEvent;
+// .flyteidl.core.WorkflowExecutionIdentifier execution_id = 1;
+inline bool ExecutionInputsRequest::has_execution_id() const {
+  return this != internal_default_instance() && execution_id_ != nullptr;
 }
-inline void CloudEventRequest::set_has_workflow_execution_event() {
-  _oneof_case_[0] = kWorkflowExecutionEvent;
+inline const ::flyteidl::core::WorkflowExecutionIdentifier& ExecutionInputsRequest::execution_id() const {
+  const ::flyteidl::core::WorkflowExecutionIdentifier* p = execution_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ExecutionInputsRequest.execution_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::WorkflowExecutionIdentifier*>(
+      &::flyteidl::core::_WorkflowExecutionIdentifier_default_instance_);
 }
-inline ::flyteidl::event::CloudEventWorkflowExecution* CloudEventRequest::release_workflow_execution_event() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.CloudEventRequest.workflow_execution_event)
-  if (has_workflow_execution_event()) {
-    clear_has_event();
-      ::flyteidl::event::CloudEventWorkflowExecution* temp = event_.workflow_execution_event_;
-    event_.workflow_execution_event_ = nullptr;
-    return temp;
+inline ::flyteidl::core::WorkflowExecutionIdentifier* ExecutionInputsRequest::release_execution_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ExecutionInputsRequest.execution_id)
+  
+  ::flyteidl::core::WorkflowExecutionIdentifier* temp = execution_id_;
+  execution_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::WorkflowExecutionIdentifier* ExecutionInputsRequest::mutable_execution_id() {
+  
+  if (execution_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::WorkflowExecutionIdentifier>(GetArenaNoVirtual());
+    execution_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ExecutionInputsRequest.execution_id)
+  return execution_id_;
+}
+inline void ExecutionInputsRequest::set_allocated_execution_id(::flyteidl::core::WorkflowExecutionIdentifier* execution_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(execution_id_);
+  }
+  if (execution_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      execution_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, execution_id, submessage_arena);
+    }
+    
   } else {
-    return nullptr;
+    
   }
-}
-inline const ::flyteidl::event::CloudEventWorkflowExecution& CloudEventRequest::workflow_execution_event() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.CloudEventRequest.workflow_execution_event)
-  return has_workflow_execution_event()
-      ? *event_.workflow_execution_event_
-      : *reinterpret_cast< ::flyteidl::event::CloudEventWorkflowExecution*>(&::flyteidl::event::_CloudEventWorkflowExecution_default_instance_);
-}
-inline ::flyteidl::event::CloudEventWorkflowExecution* CloudEventRequest::mutable_workflow_execution_event() {
-  if (!has_workflow_execution_event()) {
-    clear_event();
-    set_has_workflow_execution_event();
-    event_.workflow_execution_event_ = CreateMaybeMessage< ::flyteidl::event::CloudEventWorkflowExecution >(
-        GetArenaNoVirtual());
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.CloudEventRequest.workflow_execution_event)
-  return event_.workflow_execution_event_;
+  execution_id_ = execution_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ExecutionInputsRequest.execution_id)
 }
 
-// .flyteidl.event.CloudEventTaskExecution task_execution_event = 2;
-inline bool CloudEventRequest::has_task_execution_event() const {
-  return event_case() == kTaskExecutionEvent;
+// repeated .flyteidl.core.ArtifactID inputs = 2;
+inline int ExecutionInputsRequest::inputs_size() const {
+  return inputs_.size();
 }
-inline void CloudEventRequest::set_has_task_execution_event() {
-  _oneof_case_[0] = kTaskExecutionEvent;
+inline ::flyteidl::core::ArtifactID* ExecutionInputsRequest::mutable_inputs(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ExecutionInputsRequest.inputs)
+  return inputs_.Mutable(index);
 }
-inline ::flyteidl::event::CloudEventTaskExecution* CloudEventRequest::release_task_execution_event() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.CloudEventRequest.task_execution_event)
-  if (has_task_execution_event()) {
-    clear_has_event();
-      ::flyteidl::event::CloudEventTaskExecution* temp = event_.task_execution_event_;
-    event_.task_execution_event_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
+ExecutionInputsRequest::mutable_inputs() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.artifact.ExecutionInputsRequest.inputs)
+  return &inputs_;
 }
-inline const ::flyteidl::event::CloudEventTaskExecution& CloudEventRequest::task_execution_event() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.CloudEventRequest.task_execution_event)
-  return has_task_execution_event()
-      ? *event_.task_execution_event_
-      : *reinterpret_cast< ::flyteidl::event::CloudEventTaskExecution*>(&::flyteidl::event::_CloudEventTaskExecution_default_instance_);
+inline const ::flyteidl::core::ArtifactID& ExecutionInputsRequest::inputs(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ExecutionInputsRequest.inputs)
+  return inputs_.Get(index);
 }
-inline ::flyteidl::event::CloudEventTaskExecution* CloudEventRequest::mutable_task_execution_event() {
-  if (!has_task_execution_event()) {
-    clear_event();
-    set_has_task_execution_event();
-    event_.task_execution_event_ = CreateMaybeMessage< ::flyteidl::event::CloudEventTaskExecution >(
-        GetArenaNoVirtual());
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.CloudEventRequest.task_execution_event)
-  return event_.task_execution_event_;
+inline ::flyteidl::core::ArtifactID* ExecutionInputsRequest::add_inputs() {
+  // @@protoc_insertion_point(field_add:flyteidl.artifact.ExecutionInputsRequest.inputs)
+  return inputs_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
+ExecutionInputsRequest::inputs() const {
+  // @@protoc_insertion_point(field_list:flyteidl.artifact.ExecutionInputsRequest.inputs)
+  return inputs_;
 }
 
-// .flyteidl.event.CloudEventNodeExecution node_execution_event = 3;
-inline bool CloudEventRequest::has_node_execution_event() const {
-  return event_case() == kNodeExecutionEvent;
-}
-inline void CloudEventRequest::set_has_node_execution_event() {
-  _oneof_case_[0] = kNodeExecutionEvent;
-}
-inline ::flyteidl::event::CloudEventNodeExecution* CloudEventRequest::release_node_execution_event() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.CloudEventRequest.node_execution_event)
-  if (has_node_execution_event()) {
-    clear_has_event();
-      ::flyteidl::event::CloudEventNodeExecution* temp = event_.node_execution_event_;
-    event_.node_execution_event_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::flyteidl::event::CloudEventNodeExecution& CloudEventRequest::node_execution_event() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.CloudEventRequest.node_execution_event)
-  return has_node_execution_event()
-      ? *event_.node_execution_event_
-      : *reinterpret_cast< ::flyteidl::event::CloudEventNodeExecution*>(&::flyteidl::event::_CloudEventNodeExecution_default_instance_);
-}
-inline ::flyteidl::event::CloudEventNodeExecution* CloudEventRequest::mutable_node_execution_event() {
-  if (!has_node_execution_event()) {
-    clear_event();
-    set_has_node_execution_event();
-    event_.node_execution_event_ = CreateMaybeMessage< ::flyteidl::event::CloudEventNodeExecution >(
-        GetArenaNoVirtual());
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.CloudEventRequest.node_execution_event)
-  return event_.node_execution_event_;
-}
-
-inline bool CloudEventRequest::has_event() const {
-  return event_case() != EVENT_NOT_SET;
-}
-inline void CloudEventRequest::clear_has_event() {
-  _oneof_case_[0] = EVENT_NOT_SET;
-}
-inline CloudEventRequest::EventCase CloudEventRequest::event_case() const {
-  return CloudEventRequest::EventCase(_oneof_case_[0]);
-}
 // -------------------------------------------------------------------
 
-// CloudEventResponse
+// ExecutionInputsResponse
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop

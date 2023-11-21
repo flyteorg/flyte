@@ -237,25 +237,15 @@ pub struct RegisterResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CloudEventRequest {
-    #[prost(oneof="cloud_event_request::Event", tags="1, 2, 3")]
-    pub event: ::core::option::Option<cloud_event_request::Event>,
-}
-/// Nested message and enum types in `CloudEventRequest`.
-pub mod cloud_event_request {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Event {
-        #[prost(message, tag="1")]
-        WorkflowExecutionEvent(super::super::event::CloudEventWorkflowExecution),
-        #[prost(message, tag="2")]
-        TaskExecutionEvent(super::super::event::CloudEventTaskExecution),
-        #[prost(message, tag="3")]
-        NodeExecutionEvent(super::super::event::CloudEventNodeExecution),
-    }
+pub struct ExecutionInputsRequest {
+    #[prost(message, optional, tag="1")]
+    pub execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    /// can make this a map in the future, currently no need.
+    #[prost(message, repeated, tag="2")]
+    pub inputs: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CloudEventResponse {
+pub struct ExecutionInputsResponse {
 }
 // @@protoc_insertion_point(module)

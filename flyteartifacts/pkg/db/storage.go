@@ -444,6 +444,107 @@ func (r *RDSStorage) SearchArtifacts(ctx context.Context, request artifact.Searc
 	return res, fmt.Sprintf("%d", offset+len(res)), nil
 }
 
+func (r *RDSStorage) SetExecutionInputs(ctx context.Context, req *artifact.ExecutionInputsRequest) error {
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+
+		var newInputs = make([]Artifact, len(req.GetInputs()))
+		for i, a := range req.GetInputs() {
+			if a.Version == "" {
+				return fmt.Errorf("version must be specified for artifact %v", a.ArtifactKey)
+			}
+			ak := ArtifactKey{
+				Project: a.ArtifactKey.Project,
+				Domain:  a.ArtifactKey.Domain,
+				Name:    a.ArtifactKey.Name,
+			}
+			var dbArtifact Artifact
+			r.db.Model(&Artifact{}).InnerJoins("ArtifactKey", r.db.Where(&ak)).Where("version = ?", a.Version).First(&dbArtifact)
+			newInputs[i] = dbArtifact
+		}
+		we := WorkflowExecution{
+			ExecutionProject: req.ExecutionId.Project,
+			ExecutionDomain:  req.ExecutionId.Domain,
+			ExecutionName:    req.ExecutionId.Name,
+		}
+		var dbWe WorkflowExecution
+		// Create the execution if it doesn't exist. When we hit this part, we're keeping track of what artifacts
+		// an execution used as inputs. We need to create because the execution itself might otherwise never exist
+		// in the artifact db if it doesn't itself produce artifacts.
+		tx.FirstOrCreate(&dbWe, we)
+		if err := tx.Error; err != nil {
+			logger.Errorf(ctx, "Failed to firstorcreate workflow exec %v: %+v", we, err)
+			return err
+		}
+
+		err := tx.Model(&dbWe).Association("InputArtifacts").Append(&newInputs)
+
+		if err != nil {
+			logger.Errorf(ctx, "Failed to update input artifacts: %+v", err)
+			return err
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+func (r *RDSStorage) findWorkflowInputs(ctx context.Context, we WorkflowExecution) ([]Artifact, error) {
+	var usedAsInputs []Artifact
+	var dbWe WorkflowExecution
+	err := r.db.Preload("InputArtifacts").Where(we).First(&dbWe).Error
+	if err != nil {
+		logger.Errorf(ctx, "The requested workflow execution %v does not exist: %+v", we, err)
+		return nil, err
+	}
+	err = r.db.Model(&dbWe).Association("InputArtifacts").Find(&usedAsInputs)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to find artifacts used as inputs for workflow execution %v: %+v", we, err)
+		return nil, err
+	}
+	return usedAsInputs, nil
+}
+
+func (r *RDSStorage) FindByWorkflowExec(ctx context.Context, request *artifact.FindByWorkflowExecRequest) ([]models.Artifact, error) {
+	we := WorkflowExecution{
+		ExecutionProject: request.ExecId.Project,
+		ExecutionDomain:  request.ExecId.Domain,
+		ExecutionName:    request.ExecId.Name,
+	}
+	var artifacts []Artifact
+	var err error
+	if request.Direction == artifact.FindByWorkflowExecRequest_INPUTS {
+		// What are the artifacts that this workflow execution used as inputs?
+		artifacts, err = r.findWorkflowInputs(ctx, we)
+	} else {
+		// What artifacts were produced as outputs by this workflow execution?
+		db := r.db.Model(&Artifact{}).InnerJoins("WorkflowExecution", r.db.Where(&we))
+		db.Order("created_at desc").Find(&artifacts)
+		err = db.Error
+	}
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to find artifacts for workflow execution: %+v", err)
+		return nil, err
+	}
+
+	if len(artifacts) == 0 {
+		logger.Debugf(ctx, "No artifacts found for workflow execution: %+v", request)
+		return nil, nil
+	}
+	var res = make([]models.Artifact, len(artifacts))
+	for i, ga := range artifacts {
+		a, err := GormToServiceModel(ga)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to convert %v: %+v", ga, err)
+			return nil, err
+		}
+		res[i] = a
+	}
+
+	return res, nil
+}
+
 func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {
 	dbCfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration).ArtifactDatabaseConfig
 	logConfig := logger.GetConfig()

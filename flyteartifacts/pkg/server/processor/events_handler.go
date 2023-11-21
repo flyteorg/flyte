@@ -39,8 +39,21 @@ func (s *ServiceCallHandler) HandleEvent(ctx context.Context, cloudEvent *event2
 	}
 }
 
-func (s *ServiceCallHandler) HandleEventExecStart(_ context.Context, _ *event.CloudEventExecutionStart) error {
-	// metric
+func (s *ServiceCallHandler) HandleEventExecStart(ctx context.Context, evt *event.CloudEventExecutionStart) error {
+
+	if len(evt.ArtifactIds) > 0 {
+		// metric
+		req := &artifact.ExecutionInputsRequest{
+			ExecutionId: evt.ExecutionId,
+			Inputs:      evt.ArtifactIds,
+		}
+		_, err := s.service.SetExecutionInputs(ctx, req)
+		if err != nil {
+			logger.Errorf(ctx, "failed to set execution inputs for [%v] with error: %v", evt.ExecutionId, err)
+			return err
+		}
+	}
+
 	return nil
 }
 
