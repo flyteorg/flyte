@@ -17,11 +17,13 @@ type CoreService struct {
 }
 
 func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
+
+	// todo: gatepr _ua tracking bit to be installed
 	if request == nil {
 		return nil, nil
 	}
 
-	artifactObj, err := models.CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Spec.Principal)
+	artifactObj, err := models.CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Source)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to validate Create request: %v", err)
 		return nil, err
@@ -110,15 +112,48 @@ func (c *CoreService) RegisterConsumer(ctx context.Context, request *artifact.Re
 }
 
 func (c *CoreService) SearchArtifacts(ctx context.Context, request *artifact.SearchArtifactsRequest) (*artifact.SearchArtifactsResponse, error) {
-	// This is demo test code, will be deleted.
 	logger.Infof(ctx, "SearchArtifactsRequest: %+v", request)
-	triggers, err := c.Storage.GetTriggersByArtifactKey(ctx, *request.ArtifactKey)
+	found, continuationToken, err := c.Storage.SearchArtifacts(ctx, *request)
 	if err != nil {
-		logger.Errorf(ctx, "delete me Failed to get triggers by artifact key [%+v]: %v", request.ArtifactKey, err)
+		logger.Errorf(ctx, "Failed search  [%+v]: %v", request, err)
 		return nil, err
 	}
-	fmt.Println(triggers)
-	return &artifact.SearchArtifactsResponse{}, nil
+	if len(found) == 0 {
+		return &artifact.SearchArtifactsResponse{}, fmt.Errorf("no artifacts found")
+	}
+	var as []*artifact.Artifact
+	for _, m := range found {
+		as = append(as, &m.Artifact)
+	}
+	return &artifact.SearchArtifactsResponse{
+		Artifacts: as,
+		Token:     continuationToken,
+	}, nil
+}
+
+func (c *CoreService) SetExecutionInputs(ctx context.Context, req *artifact.ExecutionInputsRequest) (*artifact.ExecutionInputsResponse, error) {
+	err := c.Storage.SetExecutionInputs(ctx, req)
+
+	return &artifact.ExecutionInputsResponse{}, err
+}
+
+func (c *CoreService) FindByWorkflowExec(ctx context.Context, request *artifact.FindByWorkflowExecRequest) (*artifact.SearchArtifactsResponse, error) {
+	logger.Infof(ctx, "FindByWorkflowExecRequest: %+v", request)
+
+	res, err := c.Storage.FindByWorkflowExec(ctx, request)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to find artifacts by workflow execution: %v", err)
+		return nil, err
+	}
+	var as []*artifact.Artifact
+	for _, m := range res {
+		as = append(as, &m.Artifact)
+	}
+	resp := artifact.SearchArtifactsResponse{
+		Artifacts: as,
+	}
+
+	return &resp, nil
 }
 
 func NewCoreService(storage StorageInterface, blobStore BlobStoreInterface, _ promutils.Scope) CoreService {

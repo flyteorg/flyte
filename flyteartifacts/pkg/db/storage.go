@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/lib"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -14,6 +15,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"strconv"
 )
 
 // RDSStorage should implement StorageInterface
@@ -50,12 +52,29 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 		}
 		gormModel.ArtifactKeyID = extantKey.ID
 		gormModel.ArtifactKey = ArtifactKey{} // zero out the artifact key
+
+		if serviceModel.GetSource().GetWorkflowExecution() != nil {
+			var extantWfExec WorkflowExecution
+			we := WorkflowExecution{
+				ExecutionProject: serviceModel.Artifact.ArtifactId.ArtifactKey.Project,
+				ExecutionDomain:  serviceModel.Artifact.ArtifactId.ArtifactKey.Domain,
+				ExecutionName:    serviceModel.Source.WorkflowExecution.Name,
+			}
+			tx.FirstOrCreate(&extantWfExec, we)
+			if err := tx.Error; err != nil {
+				logger.Errorf(ctx, "Failed to firstorcreate wf exec: %+v", err)
+				return err
+			}
+			gormModel.WorkflowExecutionID = extantWfExec.ID
+			gormModel.WorkflowExecution = WorkflowExecution{} // zero out the workflow execution
+		}
+
 		tx.Create(&gormModel)
 		if tx.Error != nil {
 			logger.Errorf(ctx, "Failed to create artifact %+v", tx.Error)
 			return tx.Error
 		}
-		getSaved := tx.Preload("ArtifactKey").First(&gormModel, "id = ?", gormModel.ID)
+		getSaved := tx.Preload("ArtifactKey").Preload("WorkflowExecution").First(&gormModel, "id = ?", gormModel.ID)
 		if getSaved.Error != nil {
 			logger.Errorf(ctx, "Failed to find artifact that was just saved: %+v", getSaved.Error)
 			return getSaved.Error
@@ -97,11 +116,12 @@ func (r *RDSStorage) handleArtifactIdGet(ctx context.Context, artifactID core.Ar
 		Domain:  artifactID.ArtifactKey.Domain,
 		Name:    artifactID.ArtifactKey.Name,
 	}
-	db := r.db.Model(&Artifact{}).InnerJoins("ArtifactKey", r.db.Where(&ak))
+	db := r.db.Model(&Artifact{}).InnerJoins("ArtifactKey", r.db.Where(&ak)).Joins("WorkflowExecution")
 	if artifactID.Version != "" {
 		db = db.Where("version = ?", artifactID.Version)
 	}
 
+	// @eduardo - not actually sure if this is doing a strict match.
 	if artifactID.GetPartitions() != nil && len(artifactID.GetPartitions().GetValue()) > 0 {
 		partitionMap := PartitionsIdlToHstore(artifactID.GetPartitions())
 		db = db.Where("partitions = ?", partitionMap)
@@ -157,8 +177,27 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 	dbTrigger := ServiceToGormTrigger(trigger)
 	// TODO: Add a check to ensure that the artifact IDs that the trigger is triggering on are unique if more than one.
 
-	// Check to see if the trigger key already exists. Create if not
+	// The first transaction just saves artifact keys, in case there are no artifacts
+	// yet in the database that the trigger depends on.
 	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, ak := range dbTrigger.RunsOn {
+			var extantKey ArtifactKey
+			tx.FirstOrCreate(&extantKey, ak)
+			if err := tx.Error; err != nil {
+				logger.Errorf(ctx, "Failed to firstorcreate key: %+v", err)
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to pre-save artifact keys [%s]: %+v", trigger.Name, err)
+		return models.Trigger{}, err
+	}
+
+	// Check to see if the trigger key already exists. Create if not
+	err = r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		var extantKey TriggerKey
 
 		tx.FirstOrCreate(&extantKey, dbTrigger.TriggerKey)
@@ -179,7 +218,7 @@ func (r *RDSStorage) CreateTrigger(ctx context.Context, trigger models.Trigger) 
 		}
 
 		var artifactKeys []ArtifactKey
-		// should we use tx here?
+
 		db := r.db.Model(&ArtifactKey{}).Where(&dbTrigger.RunsOn).Find(&artifactKeys)
 		if db.Error != nil {
 			logger.Errorf(ctx, "Error %v", db.Error)
@@ -320,6 +359,190 @@ func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.Arti
 	}
 
 	return modelTriggers, nil
+}
+
+func (r *RDSStorage) SearchArtifacts(ctx context.Context, request artifact.SearchArtifactsRequest) ([]models.Artifact, string, error) {
+
+	var offset = 0
+	var err error
+	if request.GetToken() != "" {
+		offset, err = strconv.Atoi(request.GetToken())
+		if err != nil {
+			logger.Errorf(ctx, "Failed to convert offset to int: %+v", err)
+			return nil, "", err
+		}
+	}
+
+	var db *gorm.DB
+	if request.GetOptions() != nil && request.GetOptions().LatestByKey {
+		db = r.db.Select(`distinct on ("ArtifactKey"."project", "ArtifactKey"."domain", "ArtifactKey"."name") "artifacts".*`).Model(&Artifact{})
+	} else {
+		db = r.db.Model(&Artifact{})
+	}
+
+	if request.GetArtifactKey() != nil {
+		gormAk := ArtifactKey{
+			Project: request.GetArtifactKey().Project,
+			Domain:  request.GetArtifactKey().Domain,
+			Name:    request.GetArtifactKey().Name,
+		}
+		db = db.InnerJoins("ArtifactKey", r.db.Where(&gormAk))
+	}
+
+	if request.GetOptions() != nil && request.GetOptions().StrictPartitions {
+		// strict means if partitions is not specified, then partitions is set to empty
+		if request.GetPartitions() != nil && len(request.GetPartitions().GetValue()) > 0 {
+			partitionMap := PartitionsIdlToHstore(request.GetPartitions())
+			db = db.Where("partitions = ?", partitionMap)
+		} else {
+			db = db.Where("partitions is null or partitions = ''")
+		}
+	} else {
+		// make this not-strict, and make the handleArtifactIdGet one strict.
+		// this should be what the @> comparison does.
+		if request.GetPartitions() != nil && len(request.GetPartitions().GetValue()) > 0 {
+			partitionMap := PartitionsIdlToHstore(request.GetPartitions())
+			db = db.Where("partitions @> ?", partitionMap)
+		}
+	}
+
+	if request.Principal != "" {
+		db = db.Where("principal = ?", request.Principal)
+	}
+
+	if request.Version != "" {
+		db = db.Where("version = ?", request.Version)
+	}
+
+	var limit = 10
+	if request.Limit != 0 {
+		limit = int(request.Limit)
+	}
+	if request.GetOptions() != nil && request.GetOptions().LatestByKey {
+		db.Order(`"ArtifactKey"."project", "ArtifactKey"."domain", "ArtifactKey"."name", created_at desc`)
+	} else {
+		db.Order("created_at desc")
+	}
+
+	var results []Artifact
+	db.Limit(limit).Offset(offset).Find(&results)
+
+	if len(results) == 0 {
+		logger.Debugf(ctx, "No artifacts found for query: %+v", request)
+		return nil, "", nil
+	}
+	var res = make([]models.Artifact, len(results))
+	for i, ga := range results {
+		a, err := GormToServiceModel(ga)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to convert %v: %+v", ga, err)
+			return nil, "", err
+		}
+		res[i] = a
+	}
+
+	return res, fmt.Sprintf("%d", offset+len(res)), nil
+}
+
+func (r *RDSStorage) SetExecutionInputs(ctx context.Context, req *artifact.ExecutionInputsRequest) error {
+	err := r.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+
+		var newInputs = make([]Artifact, len(req.GetInputs()))
+		for i, a := range req.GetInputs() {
+			if a.Version == "" {
+				return fmt.Errorf("version must be specified for artifact %v", a.ArtifactKey)
+			}
+			ak := ArtifactKey{
+				Project: a.ArtifactKey.Project,
+				Domain:  a.ArtifactKey.Domain,
+				Name:    a.ArtifactKey.Name,
+			}
+			var dbArtifact Artifact
+			r.db.Model(&Artifact{}).InnerJoins("ArtifactKey", r.db.Where(&ak)).Where("version = ?", a.Version).First(&dbArtifact)
+			newInputs[i] = dbArtifact
+		}
+		we := WorkflowExecution{
+			ExecutionProject: req.ExecutionId.Project,
+			ExecutionDomain:  req.ExecutionId.Domain,
+			ExecutionName:    req.ExecutionId.Name,
+		}
+		var dbWe WorkflowExecution
+		// Create the execution if it doesn't exist. When we hit this part, we're keeping track of what artifacts
+		// an execution used as inputs. We need to create because the execution itself might otherwise never exist
+		// in the artifact db if it doesn't itself produce artifacts.
+		tx.FirstOrCreate(&dbWe, we)
+		if err := tx.Error; err != nil {
+			logger.Errorf(ctx, "Failed to firstorcreate workflow exec %v: %+v", we, err)
+			return err
+		}
+
+		err := tx.Model(&dbWe).Association("InputArtifacts").Append(&newInputs)
+
+		if err != nil {
+			logger.Errorf(ctx, "Failed to update input artifacts: %+v", err)
+			return err
+		}
+
+		return nil
+	})
+
+	return err
+}
+
+func (r *RDSStorage) findWorkflowInputs(ctx context.Context, we WorkflowExecution) ([]Artifact, error) {
+	var usedAsInputs []Artifact
+	var dbWe WorkflowExecution
+	err := r.db.Preload("InputArtifacts").Where(we).First(&dbWe).Error
+	if err != nil {
+		logger.Errorf(ctx, "The requested workflow execution %v does not exist: %+v", we, err)
+		return nil, err
+	}
+	err = r.db.Model(&dbWe).Association("InputArtifacts").Find(&usedAsInputs)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to find artifacts used as inputs for workflow execution %v: %+v", we, err)
+		return nil, err
+	}
+	return usedAsInputs, nil
+}
+
+func (r *RDSStorage) FindByWorkflowExec(ctx context.Context, request *artifact.FindByWorkflowExecRequest) ([]models.Artifact, error) {
+	we := WorkflowExecution{
+		ExecutionProject: request.ExecId.Project,
+		ExecutionDomain:  request.ExecId.Domain,
+		ExecutionName:    request.ExecId.Name,
+	}
+	var artifacts []Artifact
+	var err error
+	if request.Direction == artifact.FindByWorkflowExecRequest_INPUTS {
+		// What are the artifacts that this workflow execution used as inputs?
+		artifacts, err = r.findWorkflowInputs(ctx, we)
+	} else {
+		// What artifacts were produced as outputs by this workflow execution?
+		db := r.db.Model(&Artifact{}).InnerJoins("WorkflowExecution", r.db.Where(&we))
+		db.Order("created_at desc").Find(&artifacts)
+		err = db.Error
+	}
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to find artifacts for workflow execution: %+v", err)
+		return nil, err
+	}
+
+	if len(artifacts) == 0 {
+		logger.Debugf(ctx, "No artifacts found for workflow execution: %+v", request)
+		return nil, nil
+	}
+	var res = make([]models.Artifact, len(artifacts))
+	for i, ga := range artifacts {
+		a, err := GormToServiceModel(ga)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to convert %v: %+v", ga, err)
+			return nil, err
+		}
+		res[i] = a
+	}
+
+	return res, nil
 }
 
 func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {

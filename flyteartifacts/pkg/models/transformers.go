@@ -10,7 +10,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, principal string) (Artifact, error) {
+func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, spec *artifact.ArtifactSpec, version string, partitions map[string]string, tag string, source *artifact.ArtifactSource) (Artifact, error) {
 	if key == nil || spec == nil {
 		return Artifact{}, fmt.Errorf("key and spec cannot be nil")
 	}
@@ -21,7 +21,7 @@ func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, 
 		return Artifact{}, fmt.Errorf("spec type and value cannot be nil")
 	}
 
-	ex := spec.Execution
+	ex := source.GetWorkflowExecution()
 	if ex == nil {
 		return Artifact{}, fmt.Errorf("spec execution cannot be nil")
 	}
@@ -38,8 +38,9 @@ func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, 
 			},
 			Version: version,
 		},
-		Spec: spec,
-		Tags: []string{tag},
+		Spec:   spec,
+		Tags:   []string{tag},
+		Source: source,
 	}
 
 	if partitions != nil {
@@ -48,9 +49,7 @@ func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, 
 			Partitions: cp,
 		}
 	}
-	if principal != "" {
-		a.Spec.Principal = principal
-	}
+
 	ltBytes, err := proto.Marshal(spec.Type)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to marshal type for artifact: %+v@%s, err: %v", key, version, err)

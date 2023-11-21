@@ -65,16 +65,31 @@ func ServiceToGormModel(serviceModel models.Artifact) (Artifact, error) {
 		Description:           serviceModel.Artifact.Spec.ShortDescription,
 		MetadataType:          serviceModel.Artifact.Spec.MetadataType,
 		OffloadedUserMetadata: serviceModel.OffloadedMetadata,
-
-		ExecutionName: serviceModel.Artifact.Spec.Execution.Name,
 	}
 
-	if serviceModel.Artifact.Spec.TaskExecution != nil {
-		ga.TaskProject = serviceModel.Artifact.Spec.TaskExecution.TaskId.Project
-		ga.TaskDomain = serviceModel.Artifact.Spec.TaskExecution.TaskId.Domain
-		ga.TaskName = serviceModel.Artifact.Spec.TaskExecution.TaskId.Name
-		ga.TaskVersion = serviceModel.Artifact.Spec.TaskExecution.TaskId.Version
-		ga.RetryAttempt = &serviceModel.Artifact.Spec.TaskExecution.RetryAttempt
+	if serviceModel.Artifact.GetSource().GetWorkflowExecution() != nil {
+		// artifact and execution project/domains are always the same.
+		// Note the service model will not have workflow execution if it was an upload
+		wfExec := WorkflowExecution{
+			ExecutionProject: serviceModel.Artifact.ArtifactId.ArtifactKey.Project,
+			ExecutionDomain:  serviceModel.Artifact.ArtifactId.ArtifactKey.Domain,
+			ExecutionName:    serviceModel.Source.WorkflowExecution.Name,
+		}
+		ga.WorkflowExecution = wfExec
+		ga.NodeID = serviceModel.Source.NodeId
+	}
+	if serviceModel.GetSource() != nil {
+		ga.Principal = serviceModel.GetSource().GetPrincipal()
+	}
+
+	if serviceModel.GetSource().GetTaskId() != nil {
+		// If task id is there, so should the retry attempt
+		retry := serviceModel.GetSource().GetRetryAttempt()
+		ga.RetryAttempt = &retry
+		ga.TaskProject = serviceModel.GetSource().GetTaskId().Project
+		ga.TaskDomain = serviceModel.GetSource().GetTaskId().Domain
+		ga.TaskName = serviceModel.GetSource().GetTaskId().Name
+		ga.TaskVersion = serviceModel.GetSource().GetTaskId().Version
 	}
 
 	return ga, nil
@@ -102,15 +117,8 @@ func GormToServiceModel(ga Artifact) (models.Artifact, error) {
 			Version: ga.Version,
 		},
 		Spec: &artifact.ArtifactSpec{
-			Value:         lit,
-			Type:          lt,
-			TaskExecution: nil,
-			Execution: &core.WorkflowExecutionIdentifier{
-				Project: ga.ArtifactKey.Project,
-				Domain:  ga.ArtifactKey.Domain,
-				Name:    ga.ExecutionName,
-			},
-			Principal:        "",
+			Value:            lit,
+			Type:             lt,
 			ShortDescription: ga.Description,
 			UserMetadata:     nil,
 			MetadataType:     ga.MetadataType,
@@ -121,6 +129,31 @@ func GormToServiceModel(ga Artifact) (models.Artifact, error) {
 	if p != nil {
 		a.ArtifactId.Dimensions = &core.ArtifactID_Partitions{Partitions: p}
 	}
+	aSrc := artifact.ArtifactSource{
+		NodeId:    ga.NodeID,
+		Principal: ga.Principal,
+	}
+	if ga.RetryAttempt != nil {
+		aSrc.RetryAttempt = *ga.RetryAttempt
+	}
+	if ga.WorkflowExecutionID != 0 {
+		execID := &core.WorkflowExecutionIdentifier{
+			Project: ga.ArtifactKey.Project,
+			Domain:  ga.ArtifactKey.Domain,
+			Name:    ga.WorkflowExecution.ExecutionName,
+		}
+		aSrc.WorkflowExecution = execID
+	}
+	if ga.TaskProject != "" {
+		aSrc.TaskId = &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      ga.TaskProject,
+			Domain:       ga.TaskDomain,
+			Name:         ga.TaskName,
+			Version:      ga.TaskVersion,
+		}
+	}
+	a.Source = &aSrc
 
 	return models.Artifact{
 		Artifact:          a,

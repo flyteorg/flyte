@@ -12,11 +12,21 @@ type ArtifactKey struct {
 	Name    string `gorm:"uniqueIndex:idx_pdn;index:idx_name;type:varchar(255)"`
 }
 
+// WorkflowExecution - The Project/Domain is assumed to always be the same as the Artifact.
+// The
+type WorkflowExecution struct {
+	gorm.Model
+	ExecutionProject string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_proj;type:varchar(64)"`
+	ExecutionDomain  string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_dom;type:varchar(64)"`
+	ExecutionName    string     `gorm:"uniqueIndex:idx_we_pdn;index:idx_we_name;type:varchar(255)"`
+	InputArtifacts   []Artifact `gorm:"many2many:execution_inputs;"`
+}
+
 type Artifact struct {
 	gorm.Model
-	ArtifactKeyID uint
+	ArtifactKeyID uint          `gorm:"not null;uniqueIndex:idx_artifact_version"`
 	ArtifactKey   ArtifactKey   `gorm:"foreignKey:ArtifactKeyID;references:ID"`
-	Version       string        `gorm:"not null;type:varchar(255);index:idx_artifact_version"`
+	Version       string        `gorm:"not null;type:varchar(255);uniqueIndex:idx_artifact_version"`
 	Partitions    pgtype.Hstore `gorm:"type:hstore;index:idx_artifact_partitions"`
 
 	LiteralType  []byte `gorm:"not null"`
@@ -26,8 +36,10 @@ type Artifact struct {
 	MetadataType          string `gorm:"type:varchar(64)"`
 	OffloadedUserMetadata string `gorm:"type:varchar(255)"`
 
-	// Project/Domain assumed to always be the same as the Artifact
-	ExecutionName   string `gorm:"type:varchar(255)"`
+	WorkflowExecutionID uint              `gorm:"index:idx_artifact_wf_exec_id"`
+	WorkflowExecution   WorkflowExecution `gorm:"foreignKey:WorkflowExecutionID;references:ID"`
+	NodeID              string            `gorm:"type:varchar(128)"`
+
 	WorkflowProject string `gorm:"type:varchar(64)"`
 	WorkflowDomain  string `gorm:"type:varchar(64)"`
 	WorkflowName    string `gorm:"type:varchar(255)"`
@@ -36,10 +48,11 @@ type Artifact struct {
 	TaskDomain      string `gorm:"type:varchar(64)"`
 	TaskName        string `gorm:"type:varchar(255)"`
 	TaskVersion     string `gorm:"type:varchar(255)"`
-	NodeID          string `gorm:"type:varchar(64)"`
 	// See Admin migration for note.
 	// Here nullable in the case of workflow output.
 	RetryAttempt *uint32
+
+	Principal string `gorm:"type:varchar(256)"`
 }
 
 type TriggerKey struct {

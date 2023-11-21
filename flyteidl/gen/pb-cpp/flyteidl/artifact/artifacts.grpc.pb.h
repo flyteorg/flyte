@@ -104,6 +104,20 @@ class ArtifactRegistry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>> PrepareAsyncRegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>>(PrepareAsyncRegisterConsumerRaw(context, request, cq));
     }
+    virtual ::grpc::Status SetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::flyteidl::artifact::ExecutionInputsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::ExecutionInputsResponse>> AsyncSetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::ExecutionInputsResponse>>(AsyncSetExecutionInputsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::ExecutionInputsResponse>> PrepareAsyncSetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::ExecutionInputsResponse>>(PrepareAsyncSetExecutionInputsRaw(context, request, cq));
+    }
+    virtual ::grpc::Status FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::flyteidl::artifact::SearchArtifactsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>> AsyncFindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>>(AsyncFindByWorkflowExecRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>> PrepareAsyncFindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>>(PrepareAsyncFindByWorkflowExecRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -139,6 +153,14 @@ class ArtifactRegistry final {
       virtual void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void RegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void SetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SetExecutionInputs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::ExecutionInputsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void SetExecutionInputs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::ExecutionInputsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void FindByWorkflowExec(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void FindByWorkflowExec(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
@@ -158,6 +180,10 @@ class ArtifactRegistry final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterProducerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterProducerRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>* AsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::ExecutionInputsResponse>* AsyncSetExecutionInputsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::ExecutionInputsResponse>* PrepareAsyncSetExecutionInputsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>* AsyncFindByWorkflowExecRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::artifact::SearchArtifactsResponse>* PrepareAsyncFindByWorkflowExecRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -218,6 +244,20 @@ class ArtifactRegistry final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>> PrepareAsyncRegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>>(PrepareAsyncRegisterConsumerRaw(context, request, cq));
     }
+    ::grpc::Status SetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::flyteidl::artifact::ExecutionInputsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::ExecutionInputsResponse>> AsyncSetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::ExecutionInputsResponse>>(AsyncSetExecutionInputsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::ExecutionInputsResponse>> PrepareAsyncSetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::ExecutionInputsResponse>>(PrepareAsyncSetExecutionInputsRaw(context, request, cq));
+    }
+    ::grpc::Status FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::flyteidl::artifact::SearchArtifactsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>> AsyncFindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>>(AsyncFindByWorkflowExecRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>> PrepareAsyncFindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>>(PrepareAsyncFindByWorkflowExecRaw(context, request, cq));
+    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -253,6 +293,14 @@ class ArtifactRegistry final {
       void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, std::function<void(::grpc::Status)>) override;
       void RegisterConsumer(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void RegisterConsumer(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void SetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response, std::function<void(::grpc::Status)>) override;
+      void SetExecutionInputs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::ExecutionInputsResponse* response, std::function<void(::grpc::Status)>) override;
+      void SetExecutionInputs(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void SetExecutionInputs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::ExecutionInputsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) override;
+      void FindByWorkflowExec(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, std::function<void(::grpc::Status)>) override;
+      void FindByWorkflowExec(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void FindByWorkflowExec(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -280,6 +328,10 @@ class ArtifactRegistry final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterProducerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterProducerRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>* AsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::RegisterResponse>* PrepareAsyncRegisterConsumerRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::RegisterConsumerRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::ExecutionInputsResponse>* AsyncSetExecutionInputsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::ExecutionInputsResponse>* PrepareAsyncSetExecutionInputsRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::ExecutionInputsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* AsyncFindByWorkflowExecRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::artifact::SearchArtifactsResponse>* PrepareAsyncFindByWorkflowExecRaw(::grpc::ClientContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_CreateArtifact_;
     const ::grpc::internal::RpcMethod rpcmethod_GetArtifact_;
     const ::grpc::internal::RpcMethod rpcmethod_SearchArtifacts_;
@@ -288,6 +340,8 @@ class ArtifactRegistry final {
     const ::grpc::internal::RpcMethod rpcmethod_AddTag_;
     const ::grpc::internal::RpcMethod rpcmethod_RegisterProducer_;
     const ::grpc::internal::RpcMethod rpcmethod_RegisterConsumer_;
+    const ::grpc::internal::RpcMethod rpcmethod_SetExecutionInputs_;
+    const ::grpc::internal::RpcMethod rpcmethod_FindByWorkflowExec_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -303,6 +357,8 @@ class ArtifactRegistry final {
     virtual ::grpc::Status AddTag(::grpc::ServerContext* context, const ::flyteidl::artifact::AddTagRequest* request, ::flyteidl::artifact::AddTagResponse* response);
     virtual ::grpc::Status RegisterProducer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterProducerRequest* request, ::flyteidl::artifact::RegisterResponse* response);
     virtual ::grpc::Status RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response);
+    virtual ::grpc::Status SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response);
+    virtual ::grpc::Status FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_CreateArtifact : public BaseClass {
@@ -464,7 +520,47 @@ class ArtifactRegistry final {
       ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_SearchArtifacts<WithAsyncMethod_CreateTrigger<WithAsyncMethod_DeleteTrigger<WithAsyncMethod_AddTag<WithAsyncMethod_RegisterProducer<WithAsyncMethod_RegisterConsumer<Service > > > > > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_SetExecutionInputs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_SetExecutionInputs() {
+      ::grpc::Service::MarkMethodAsync(8);
+    }
+    ~WithAsyncMethod_SetExecutionInputs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestSetExecutionInputs(::grpc::ServerContext* context, ::flyteidl::artifact::ExecutionInputsRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::ExecutionInputsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_FindByWorkflowExec : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_FindByWorkflowExec() {
+      ::grpc::Service::MarkMethodAsync(9);
+    }
+    ~WithAsyncMethod_FindByWorkflowExec() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestFindByWorkflowExec(::grpc::ServerContext* context, ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::artifact::SearchArtifactsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_CreateArtifact<WithAsyncMethod_GetArtifact<WithAsyncMethod_SearchArtifacts<WithAsyncMethod_CreateTrigger<WithAsyncMethod_DeleteTrigger<WithAsyncMethod_AddTag<WithAsyncMethod_RegisterProducer<WithAsyncMethod_RegisterConsumer<WithAsyncMethod_SetExecutionInputs<WithAsyncMethod_FindByWorkflowExec<Service > > > > > > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateArtifact : public BaseClass {
    private:
@@ -713,7 +809,69 @@ class ArtifactRegistry final {
     }
     virtual void RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_SearchArtifacts<ExperimentalWithCallbackMethod_CreateTrigger<ExperimentalWithCallbackMethod_DeleteTrigger<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_RegisterProducer<ExperimentalWithCallbackMethod_RegisterConsumer<Service > > > > > > > > ExperimentalCallbackService;
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_SetExecutionInputs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_SetExecutionInputs() {
+      ::grpc::Service::experimental().MarkMethodCallback(8,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::ExecutionInputsRequest, ::flyteidl::artifact::ExecutionInputsResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::artifact::ExecutionInputsRequest* request,
+                 ::flyteidl::artifact::ExecutionInputsResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->SetExecutionInputs(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_SetExecutionInputs(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::ExecutionInputsRequest, ::flyteidl::artifact::ExecutionInputsResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::ExecutionInputsRequest, ::flyteidl::artifact::ExecutionInputsResponse>*>(
+          ::grpc::Service::experimental().GetHandler(8))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_SetExecutionInputs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_FindByWorkflowExec : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_FindByWorkflowExec() {
+      ::grpc::Service::experimental().MarkMethodCallback(9,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::FindByWorkflowExecRequest, ::flyteidl::artifact::SearchArtifactsResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::artifact::FindByWorkflowExecRequest* request,
+                 ::flyteidl::artifact::SearchArtifactsResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->FindByWorkflowExec(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_FindByWorkflowExec(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::artifact::FindByWorkflowExecRequest, ::flyteidl::artifact::SearchArtifactsResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::artifact::FindByWorkflowExecRequest, ::flyteidl::artifact::SearchArtifactsResponse>*>(
+          ::grpc::Service::experimental().GetHandler(9))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_FindByWorkflowExec() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  typedef ExperimentalWithCallbackMethod_CreateArtifact<ExperimentalWithCallbackMethod_GetArtifact<ExperimentalWithCallbackMethod_SearchArtifacts<ExperimentalWithCallbackMethod_CreateTrigger<ExperimentalWithCallbackMethod_DeleteTrigger<ExperimentalWithCallbackMethod_AddTag<ExperimentalWithCallbackMethod_RegisterProducer<ExperimentalWithCallbackMethod_RegisterConsumer<ExperimentalWithCallbackMethod_SetExecutionInputs<ExperimentalWithCallbackMethod_FindByWorkflowExec<Service > > > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateArtifact : public BaseClass {
    private:
@@ -846,6 +1004,40 @@ class ArtifactRegistry final {
     }
     // disable synchronous version of this method
     ::grpc::Status RegisterConsumer(::grpc::ServerContext* context, const ::flyteidl::artifact::RegisterConsumerRequest* request, ::flyteidl::artifact::RegisterResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_SetExecutionInputs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_SetExecutionInputs() {
+      ::grpc::Service::MarkMethodGeneric(8);
+    }
+    ~WithGenericMethod_SetExecutionInputs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_FindByWorkflowExec : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_FindByWorkflowExec() {
+      ::grpc::Service::MarkMethodGeneric(9);
+    }
+    ~WithGenericMethod_FindByWorkflowExec() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1008,6 +1200,46 @@ class ArtifactRegistry final {
     }
     void RequestRegisterConsumer(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_SetExecutionInputs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_SetExecutionInputs() {
+      ::grpc::Service::MarkMethodRaw(8);
+    }
+    ~WithRawMethod_SetExecutionInputs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestSetExecutionInputs(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_FindByWorkflowExec : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_FindByWorkflowExec() {
+      ::grpc::Service::MarkMethodRaw(9);
+    }
+    ~WithRawMethod_FindByWorkflowExec() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestFindByWorkflowExec(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1211,6 +1443,56 @@ class ArtifactRegistry final {
     virtual void RegisterConsumer(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_SetExecutionInputs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_SetExecutionInputs() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(8,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->SetExecutionInputs(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_SetExecutionInputs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void SetExecutionInputs(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_FindByWorkflowExec : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_FindByWorkflowExec() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(9,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->FindByWorkflowExec(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_FindByWorkflowExec() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void FindByWorkflowExec(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_CreateArtifact : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
@@ -1370,9 +1652,49 @@ class ArtifactRegistry final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedRegisterConsumer(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::RegisterConsumerRequest,::flyteidl::artifact::RegisterResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_SetExecutionInputs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_SetExecutionInputs() {
+      ::grpc::Service::MarkMethodStreamed(8,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::ExecutionInputsRequest, ::flyteidl::artifact::ExecutionInputsResponse>(std::bind(&WithStreamedUnaryMethod_SetExecutionInputs<BaseClass>::StreamedSetExecutionInputs, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_SetExecutionInputs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status SetExecutionInputs(::grpc::ServerContext* context, const ::flyteidl::artifact::ExecutionInputsRequest* request, ::flyteidl::artifact::ExecutionInputsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedSetExecutionInputs(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::ExecutionInputsRequest,::flyteidl::artifact::ExecutionInputsResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_FindByWorkflowExec : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_FindByWorkflowExec() {
+      ::grpc::Service::MarkMethodStreamed(9,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::artifact::FindByWorkflowExecRequest, ::flyteidl::artifact::SearchArtifactsResponse>(std::bind(&WithStreamedUnaryMethod_FindByWorkflowExec<BaseClass>::StreamedFindByWorkflowExec, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_FindByWorkflowExec() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status FindByWorkflowExec(::grpc::ServerContext* context, const ::flyteidl::artifact::FindByWorkflowExecRequest* request, ::flyteidl::artifact::SearchArtifactsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedFindByWorkflowExec(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::artifact::FindByWorkflowExecRequest,::flyteidl::artifact::SearchArtifactsResponse>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<WithStreamedUnaryMethod_SetExecutionInputs<WithStreamedUnaryMethod_FindByWorkflowExec<Service > > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<Service > > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_CreateArtifact<WithStreamedUnaryMethod_GetArtifact<WithStreamedUnaryMethod_SearchArtifacts<WithStreamedUnaryMethod_CreateTrigger<WithStreamedUnaryMethod_DeleteTrigger<WithStreamedUnaryMethod_AddTag<WithStreamedUnaryMethod_RegisterProducer<WithStreamedUnaryMethod_RegisterConsumer<WithStreamedUnaryMethod_SetExecutionInputs<WithStreamedUnaryMethod_FindByWorkflowExec<Service > > > > > > > > > > StreamedService;
 };
 
 }  // namespace artifact

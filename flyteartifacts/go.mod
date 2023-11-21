@@ -3,6 +3,7 @@ module github.com/flyteorg/flyte/flyteartifacts
 go 1.19
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/NYTimes/gizmo v1.3.6
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.14.0
 	github.com/cloudevents/sdk-go/v2 v2.14.0
@@ -21,6 +22,7 @@ require (
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.56.1
 	google.golang.org/protobuf v1.30.0
+	gorm.io/driver/postgres v1.5.3
 	gorm.io/gorm v1.25.5
 )
 
@@ -61,7 +63,11 @@ require (
 	github.com/googleapis/gax-go/v2 v2.7.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
+	github.com/jackc/pgconn v1.14.1 // indirect
+	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgproto3/v2 v2.3.2 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
@@ -105,7 +111,6 @@ require (
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/postgres v1.5.3 // indirect
 	gorm.io/driver/sqlite v1.5.4 // indirect
 	k8s.io/apimachinery v0.24.1 // indirect
 	k8s.io/client-go v0.24.1 // indirect

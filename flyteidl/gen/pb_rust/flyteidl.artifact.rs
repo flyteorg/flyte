@@ -9,6 +9,8 @@ pub struct Artifact {
     /// references the tag field in ArtifactTag
     #[prost(string, repeated, tag="3")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(message, optional, tag="4")]
+    pub source: ::core::option::Option<ArtifactSource>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -24,10 +26,24 @@ pub struct CreateArtifactRequest {
     pub partitions: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     #[prost(string, tag="5")]
     pub tag: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="6")]
+    pub source: ::core::option::Option<ArtifactSource>,
 }
-// 1. Should add a new Source message that encapsulates all three of principal, task execution id, workflow execution id,
-// as well as the workflow and launch plan id responsible for the execution that generated the artifact (if not an upload)
-
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactSource {
+    #[prost(message, optional, tag="1")]
+    pub workflow_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(string, tag="2")]
+    pub node_id: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub task_id: ::core::option::Option<super::core::Identifier>,
+    #[prost(uint32, tag="4")]
+    pub retry_attempt: u32,
+    /// Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
+    #[prost(string, tag="5")]
+    pub principal: ::prost::alloc::string::String,
+}
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactSpec {
@@ -38,22 +54,12 @@ pub struct ArtifactSpec {
     /// type to all Literals is a lot of work.
     #[prost(message, optional, tag="2")]
     pub r#type: ::core::option::Option<super::core::LiteralType>,
-    /// 3. These fields should be removed.
-    /// Outputs of tasks will have this.
-    #[prost(message, optional, tag="5")]
-    pub task_execution: ::core::option::Option<super::core::TaskExecutionIdentifier>,
-    /// Workflow outputs will have this.
-    #[prost(message, optional, tag="6")]
-    pub execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
-    /// Uploads, either from the UI or from the CLI, or FlyteRemote, will have this.
-    #[prost(string, tag="7")]
-    pub principal: ::prost::alloc::string::String,
-    #[prost(string, tag="8")]
+    #[prost(string, tag="3")]
     pub short_description: ::prost::alloc::string::String,
     /// Additional user metadata
-    #[prost(message, optional, tag="10")]
+    #[prost(message, optional, tag="4")]
     pub user_metadata: ::core::option::Option<::prost_types::Any>,
-    #[prost(string, tag="11")]
+    #[prost(string, tag="5")]
     pub metadata_type: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -79,35 +85,82 @@ pub struct GetArtifactResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListArtifactNamesRequest {
-    #[prost(string, tag="1")]
-    pub project: ::prost::alloc::string::String,
-    #[prost(string, tag="2")]
-    pub domain: ::prost::alloc::string::String,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ListArtifactNamesResponse {
-    #[prost(message, repeated, tag="1")]
-    pub artifact_keys: ::prost::alloc::vec::Vec<super::core::ArtifactKey>,
+pub struct SearchOptions {
+    /// If true, this means a strict partition search. meaning if you don't specify the partition
+    /// field, that will mean, non-partitioned, rather than any partition.
+    #[prost(bool, tag="1")]
+    pub strict_partitions: bool,
+    /// If true, only one artifact per key will be returned. It will be the latest one by creation time.
+    #[prost(bool, tag="2")]
+    pub latest_by_key: bool,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SearchArtifactsRequest {
     #[prost(message, optional, tag="1")]
     pub artifact_key: ::core::option::Option<super::core::ArtifactKey>,
-    #[prost(string, tag="2")]
-    pub filters: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="2")]
+    pub partitions: ::core::option::Option<super::core::Partitions>,
     #[prost(string, tag="3")]
+    pub principal: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub version: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="5")]
+    pub options: ::core::option::Option<SearchOptions>,
+    #[prost(string, tag="6")]
     pub token: ::prost::alloc::string::String,
-    #[prost(int32, tag="4")]
+    #[prost(int32, tag="7")]
     pub limit: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct SearchArtifactsResponse {
+    /// If artifact specs are not requested, the resultant artifacts may be empty.
     #[prost(message, repeated, tag="1")]
     pub artifacts: ::prost::alloc::vec::Vec<Artifact>,
+    /// continuation token if relevant.
+    #[prost(string, tag="2")]
+    pub token: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FindByWorkflowExecRequest {
+    #[prost(message, optional, tag="1")]
+    pub exec_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(enumeration="find_by_workflow_exec_request::Direction", tag="2")]
+    pub direction: i32,
+    /// If set to true, actually fetch the artifact body. By default only the IDs are returned.
+    #[prost(bool, tag="3")]
+    pub fetch_specs: bool,
+}
+/// Nested message and enum types in `FindByWorkflowExecRequest`.
+pub mod find_by_workflow_exec_request {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Direction {
+        Inputs = 0,
+        Outputs = 1,
+    }
+    impl Direction {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Direction::Inputs => "INPUTS",
+                Direction::Outputs => "OUTPUTS",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "INPUTS" => Some(Self::Inputs),
+                "OUTPUTS" => Some(Self::Outputs),
+                _ => None,
+            }
+        }
+    }
 }
 /// Aliases identify a particular version of an artifact. They are different than tags in that they
 /// have to be unique for a given artifact project/domain/name. That is, for a given project/domain/name/kind,
@@ -184,25 +237,15 @@ pub struct RegisterResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CloudEventRequest {
-    #[prost(oneof="cloud_event_request::Event", tags="1, 2, 3")]
-    pub event: ::core::option::Option<cloud_event_request::Event>,
-}
-/// Nested message and enum types in `CloudEventRequest`.
-pub mod cloud_event_request {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Event {
-        #[prost(message, tag="1")]
-        WorkflowExecutionEvent(super::super::event::CloudEventWorkflowExecution),
-        #[prost(message, tag="2")]
-        TaskExecutionEvent(super::super::event::CloudEventTaskExecution),
-        #[prost(message, tag="3")]
-        NodeExecutionEvent(super::super::event::CloudEventNodeExecution),
-    }
+pub struct ExecutionInputsRequest {
+    #[prost(message, optional, tag="1")]
+    pub execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    /// can make this a map in the future, currently no need.
+    #[prost(message, repeated, tag="2")]
+    pub inputs: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CloudEventResponse {
+pub struct ExecutionInputsResponse {
 }
 // @@protoc_insertion_point(module)

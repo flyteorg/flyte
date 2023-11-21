@@ -470,6 +470,141 @@
         ]
       }
     },
+    "/data/v1/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}": {
+      "get": {
+        "operationId": "FindByWorkflowExec",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactSearchArtifactsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "exec_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exec_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "exec_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "direction",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "INPUTS",
+              "OUTPUTS"
+            ]
+          },
+          {
+            "name": "fetch_specs",
+            "description": "If set to true, actually fetch the artifact body. By default only the IDs are returned.",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
+    "/data/v1/query/s/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}": {
+      "get": {
+        "operationId": "SearchArtifacts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactSearchArtifactsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "artifact_key.project",
+            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_key.domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_key.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "principal",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "options.strict_partitions",
+            "description": "If true, this means a strict partition search. meaning if you don't specify the partition\nfield, that will mean, non-partitioned, rather than any partition.",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "options.latest_by_key",
+            "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time.",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
     "/data/v1/query/{artifact_key.project}/{artifact_key.domain}": {
       "get": {
         "operationId": "SearchArtifacts2",
@@ -502,66 +637,32 @@
             "type": "string"
           },
           {
-            "name": "filters",
+            "name": "principal",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "token",
+            "name": "version",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "limit",
+            "name": "options.strict_partitions",
+            "description": "If true, this means a strict partition search. meaning if you don't specify the partition\nfield, that will mean, non-partitioned, rather than any partition.",
             "in": "query",
             "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "ArtifactRegistry"
-        ]
-      }
-    },
-    "/data/v1/query/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}": {
-      "get": {
-        "operationId": "SearchArtifacts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/artifactSearchArtifactsResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "path",
-            "required": true,
-            "type": "string"
+            "type": "boolean",
+            "format": "boolean"
           },
           {
-            "name": "artifact_key.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "artifact_key.name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "filters",
+            "name": "options.latest_by_key",
+            "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time.",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "boolean",
+            "format": "boolean"
           },
           {
             "name": "token",
@@ -1012,6 +1113,9 @@
             "type": "string"
           },
           "title": "references the tag field in ArtifactTag"
+        },
+        "source": {
+          "$ref": "#/definitions/artifactArtifactSource"
         }
       }
     },
@@ -1039,6 +1143,28 @@
         }
       }
     },
+    "artifactArtifactSource": {
+      "type": "object",
+      "properties": {
+        "workflow_execution": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+        },
+        "node_id": {
+          "type": "string"
+        },
+        "task_id": {
+          "$ref": "#/definitions/coreIdentifier"
+        },
+        "retry_attempt": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "principal": {
+          "type": "string",
+          "description": "Uploads, either from the UI or from the CLI, or FlyteRemote, will have this."
+        }
+      }
+    },
     "artifactArtifactSpec": {
       "type": "object",
       "properties": {
@@ -1048,18 +1174,6 @@
         "type": {
           "$ref": "#/definitions/coreLiteralType",
           "description": "This type will not form part of the artifact key, so for user-named artifacts, if the user changes the type, but\nforgets to change the name, that is okay. And the reason why this is a separate field is because adding the\ntype to all Literals is a lot of work."
-        },
-        "task_execution": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "description": "3. These fields should be removed.\nOutputs of tasks will have this."
-        },
-        "execution": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
-          "description": "Workflow outputs will have this."
-        },
-        "principal": {
-          "type": "string",
-          "description": "Uploads, either from the UI or from the CLI, or FlyteRemote, will have this."
         },
         "short_description": {
           "type": "string"
@@ -1087,6 +1201,17 @@
     "artifactDeleteTriggerResponse": {
       "type": "object"
     },
+    "artifactExecutionInputsResponse": {
+      "type": "object"
+    },
+    "artifactFindByWorkflowExecRequestDirection": {
+      "type": "string",
+      "enum": [
+        "INPUTS",
+        "OUTPUTS"
+      ],
+      "default": "INPUTS"
+    },
     "artifactGetArtifactResponse": {
       "type": "object",
       "properties": {
@@ -1105,7 +1230,27 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/artifactArtifact"
-          }
+          },
+          "description": "If artifact specs are not requested, the resultant artifacts may be empty."
+        },
+        "token": {
+          "type": "string",
+          "description": "continuation token if relevant."
+        }
+      }
+    },
+    "artifactSearchOptions": {
+      "type": "object",
+      "properties": {
+        "strict_partitions": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "If true, this means a strict partition search. meaning if you don't specify the partition\nfield, that will mean, non-partitioned, rather than any partition."
+        },
+        "latest_by_key": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time."
         }
       }
     },
@@ -1445,18 +1590,6 @@
       },
       "description": "Defines a strong type to allow type checking between interfaces."
     },
-    "coreNodeExecutionIdentifier": {
-      "type": "object",
-      "properties": {
-        "node_id": {
-          "type": "string"
-        },
-        "execution_id": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
-        }
-      },
-      "description": "Encapsulation of fields that identify a Flyte node execution entity."
-    },
     "coreOAuth2Client": {
       "type": "object",
       "properties": {
@@ -1782,22 +1915,6 @@
           "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
         }
       }
-    },
-    "coreTaskExecutionIdentifier": {
-      "type": "object",
-      "properties": {
-        "task_id": {
-          "$ref": "#/definitions/coreIdentifier"
-        },
-        "node_execution_id": {
-          "$ref": "#/definitions/coreNodeExecutionIdentifier"
-        },
-        "retry_attempt": {
-          "type": "integer",
-          "format": "int64"
-        }
-      },
-      "description": "Encapsulation of fields that identify a Flyte task execution entity."
     },
     "coreTypeAnnotation": {
       "type": "object",

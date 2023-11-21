@@ -53,27 +53,25 @@ func TestBasicWrite(t *testing.T) {
 		Domain:  "unit",
 		Name:    "artfname 10",
 	}
-	spec := &artifact.ArtifactSpec{
-		Value: lit,
-		Type:  lt,
-		TaskExecution: &core.TaskExecutionIdentifier{
-			TaskId: &core.Identifier{
-				ResourceType: core.ResourceType_TASK,
-				Project:      "demotst",
-				Domain:       "unit",
-				Name:         "testtaskname 2",
-				Version:      "testtaskversion",
-			},
-			NodeExecutionId: &core.NodeExecutionIdentifier{
-				NodeId: "testnodeid",
-			},
-		},
-		Execution: &core.WorkflowExecutionIdentifier{
+	source := &artifact.ArtifactSource{
+		WorkflowExecution: &core.WorkflowExecutionIdentifier{
 			Project: "demotst",
 			Domain:  "unit",
 			Name:    "exectest1",
 		},
-		Principal:        "userone",
+		Principal: "userone",
+		NodeId:    "testnodeid",
+		TaskId: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "demotst",
+			Domain:       "unit",
+			Name:         "testtaskname 2",
+			Version:      "testtaskversion",
+		},
+	}
+	spec := &artifact.ArtifactSpec{
+		Value:            lit,
+		Type:             lt,
 		ShortDescription: "",
 		UserMetadata:     nil,
 		MetadataType:     "",
@@ -84,7 +82,7 @@ func TestBasicWrite(t *testing.T) {
 	}
 
 	// Create one
-	am, err := models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/1", partitions, "tag", "principal")
+	am, err := models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/1", partitions, "tag", source)
 	assert.NoError(t, err)
 
 	newModel, err := rds.CreateArtifact(ctx, am)
@@ -92,7 +90,7 @@ func TestBasicWrite(t *testing.T) {
 	fmt.Println(newModel)
 
 	// Create another
-	am, err = models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/2", partitions, "tag", "principal")
+	am, err = models.CreateArtifactModelFromRequest(ctx, ak, spec, "abc123/1/n0/2", partitions, "tag", source)
 	assert.NoError(t, err)
 
 	newModel, err = rds.CreateArtifact(ctx, am)

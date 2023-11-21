@@ -109,6 +109,8 @@ func (m *CloudEventWorkflowExecution) Validate() error {
 		}
 	}
 
+	// no validation rules for Principal
+
 	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return CloudEventWorkflowExecutionValidationError{
@@ -251,6 +253,8 @@ func (m *CloudEventNodeExecution) Validate() error {
 		}
 
 	}
+
+	// no validation rules for Principal
 
 	if v, ok := interface{}(m.GetLaunchPlanId()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
@@ -450,6 +454,8 @@ func (m *CloudEventExecutionStart) Validate() error {
 		}
 
 	}
+
+	// no validation rules for Principal
 
 	return nil
 }

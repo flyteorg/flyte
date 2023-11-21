@@ -133,13 +133,23 @@ public final class Cloudevents {
     flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getReferenceExecutionOrBuilder();
 
     /**
+     * <code>string principal = 7;</code>
+     */
+    java.lang.String getPrincipal();
+    /**
+     * <code>string principal = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getPrincipalBytes();
+
+    /**
      * <pre>
      * The ID of the LP that generated the execution that generated the Artifact.
      * Here for provenance information.
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     boolean hasLaunchPlanId();
     /**
@@ -149,7 +159,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId();
     /**
@@ -159,7 +169,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder();
   }
@@ -182,6 +192,7 @@ public final class Cloudevents {
     }
     private CloudEventWorkflowExecution() {
       artifactIds_ = java.util.Collections.emptyList();
+      principal_ = "";
     }
 
     @java.lang.Override
@@ -283,6 +294,12 @@ public final class Cloudevents {
               break;
             }
             case 58: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              principal_ = s;
+              break;
+            }
+            case 66: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (launchPlanId_ != null) {
                 subBuilder = launchPlanId_.toBuilder();
@@ -496,7 +513,41 @@ public final class Cloudevents {
       return getReferenceExecution();
     }
 
-    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 7;
+    public static final int PRINCIPAL_FIELD_NUMBER = 7;
+    private volatile java.lang.Object principal_;
+    /**
+     * <code>string principal = 7;</code>
+     */
+    public java.lang.String getPrincipal() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        principal_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string principal = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPrincipalBytes() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        principal_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 8;
     private flyteidl.core.IdentifierOuterClass.Identifier launchPlanId_;
     /**
      * <pre>
@@ -505,7 +556,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     public boolean hasLaunchPlanId() {
       return launchPlanId_ != null;
@@ -517,7 +568,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
       return launchPlanId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : launchPlanId_;
@@ -529,7 +580,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
       return getLaunchPlanId();
@@ -567,8 +618,11 @@ public final class Cloudevents {
       if (referenceExecution_ != null) {
         output.writeMessage(6, getReferenceExecution());
       }
+      if (!getPrincipalBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, principal_);
+      }
       if (launchPlanId_ != null) {
-        output.writeMessage(7, getLaunchPlanId());
+        output.writeMessage(8, getLaunchPlanId());
       }
       unknownFields.writeTo(output);
     }
@@ -603,9 +657,12 @@ public final class Cloudevents {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, getReferenceExecution());
       }
+      if (!getPrincipalBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, principal_);
+      }
       if (launchPlanId_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, getLaunchPlanId());
+          .computeMessageSize(8, getLaunchPlanId());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -649,6 +706,8 @@ public final class Cloudevents {
         if (!getReferenceExecution()
             .equals(other.getReferenceExecution())) return false;
       }
+      if (!getPrincipal()
+          .equals(other.getPrincipal())) return false;
       if (hasLaunchPlanId() != other.hasLaunchPlanId()) return false;
       if (hasLaunchPlanId()) {
         if (!getLaunchPlanId()
@@ -689,6 +748,8 @@ public final class Cloudevents {
         hash = (37 * hash) + REFERENCE_EXECUTION_FIELD_NUMBER;
         hash = (53 * hash) + getReferenceExecution().hashCode();
       }
+      hash = (37 * hash) + PRINCIPAL_FIELD_NUMBER;
+      hash = (53 * hash) + getPrincipal().hashCode();
       if (hasLaunchPlanId()) {
         hash = (37 * hash) + LAUNCH_PLAN_ID_FIELD_NUMBER;
         hash = (53 * hash) + getLaunchPlanId().hashCode();
@@ -868,6 +929,8 @@ public final class Cloudevents {
           referenceExecution_ = null;
           referenceExecutionBuilder_ = null;
         }
+        principal_ = "";
+
         if (launchPlanIdBuilder_ == null) {
           launchPlanId_ = null;
         } else {
@@ -936,6 +999,7 @@ public final class Cloudevents {
         } else {
           result.referenceExecution_ = referenceExecutionBuilder_.build();
         }
+        result.principal_ = principal_;
         if (launchPlanIdBuilder_ == null) {
           result.launchPlanId_ = launchPlanId_;
         } else {
@@ -1030,6 +1094,10 @@ public final class Cloudevents {
         }
         if (other.hasReferenceExecution()) {
           mergeReferenceExecution(other.getReferenceExecution());
+        }
+        if (!other.getPrincipal().isEmpty()) {
+          principal_ = other.principal_;
+          onChanged();
         }
         if (other.hasLaunchPlanId()) {
           mergeLaunchPlanId(other.getLaunchPlanId());
@@ -1979,6 +2047,75 @@ public final class Cloudevents {
         return referenceExecutionBuilder_;
       }
 
+      private java.lang.Object principal_ = "";
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public java.lang.String getPrincipal() {
+        java.lang.Object ref = principal_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          principal_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPrincipalBytes() {
+        java.lang.Object ref = principal_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          principal_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public Builder setPrincipal(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        principal_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public Builder clearPrincipal() {
+        
+        principal_ = getDefaultInstance().getPrincipal();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public Builder setPrincipalBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        principal_ = value;
+        onChanged();
+        return this;
+      }
+
       private flyteidl.core.IdentifierOuterClass.Identifier launchPlanId_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> launchPlanIdBuilder_;
@@ -1989,7 +2126,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public boolean hasLaunchPlanId() {
         return launchPlanIdBuilder_ != null || launchPlanId_ != null;
@@ -2001,7 +2138,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -2017,7 +2154,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder setLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -2039,7 +2176,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder setLaunchPlanId(
           flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
@@ -2059,7 +2196,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder mergeLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -2083,7 +2220,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder clearLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -2103,7 +2240,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier.Builder getLaunchPlanIdBuilder() {
         
@@ -2117,7 +2254,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
         if (launchPlanIdBuilder_ != null) {
@@ -2134,7 +2271,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
@@ -2357,13 +2494,23 @@ public final class Cloudevents {
         int index);
 
     /**
+     * <code>string principal = 7;</code>
+     */
+    java.lang.String getPrincipal();
+    /**
+     * <code>string principal = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getPrincipalBytes();
+
+    /**
      * <pre>
      * The ID of the LP that generated the execution that generated the Artifact.
      * Here for provenance information.
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     boolean hasLaunchPlanId();
     /**
@@ -2373,7 +2520,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId();
     /**
@@ -2383,7 +2530,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder();
   }
@@ -2401,6 +2548,7 @@ public final class Cloudevents {
     }
     private CloudEventNodeExecution() {
       artifactIds_ = java.util.Collections.emptyList();
+      principal_ = "";
     }
 
     @java.lang.Override
@@ -2502,6 +2650,12 @@ public final class Cloudevents {
               break;
             }
             case 58: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              principal_ = s;
+              break;
+            }
+            case 66: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (launchPlanId_ != null) {
                 subBuilder = launchPlanId_.toBuilder();
@@ -2751,7 +2905,41 @@ public final class Cloudevents {
       return artifactIds_.get(index);
     }
 
-    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 7;
+    public static final int PRINCIPAL_FIELD_NUMBER = 7;
+    private volatile java.lang.Object principal_;
+    /**
+     * <code>string principal = 7;</code>
+     */
+    public java.lang.String getPrincipal() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        principal_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string principal = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPrincipalBytes() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        principal_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 8;
     private flyteidl.core.IdentifierOuterClass.Identifier launchPlanId_;
     /**
      * <pre>
@@ -2760,7 +2948,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     public boolean hasLaunchPlanId() {
       return launchPlanId_ != null;
@@ -2772,7 +2960,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
       return launchPlanId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : launchPlanId_;
@@ -2784,7 +2972,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
      */
     public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
       return getLaunchPlanId();
@@ -2822,8 +3010,11 @@ public final class Cloudevents {
       for (int i = 0; i < artifactIds_.size(); i++) {
         output.writeMessage(6, artifactIds_.get(i));
       }
+      if (!getPrincipalBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, principal_);
+      }
       if (launchPlanId_ != null) {
-        output.writeMessage(7, getLaunchPlanId());
+        output.writeMessage(8, getLaunchPlanId());
       }
       unknownFields.writeTo(output);
     }
@@ -2858,9 +3049,12 @@ public final class Cloudevents {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(6, artifactIds_.get(i));
       }
+      if (!getPrincipalBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, principal_);
+      }
       if (launchPlanId_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, getLaunchPlanId());
+          .computeMessageSize(8, getLaunchPlanId());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2904,6 +3098,8 @@ public final class Cloudevents {
       }
       if (!getArtifactIdsList()
           .equals(other.getArtifactIdsList())) return false;
+      if (!getPrincipal()
+          .equals(other.getPrincipal())) return false;
       if (hasLaunchPlanId() != other.hasLaunchPlanId()) return false;
       if (hasLaunchPlanId()) {
         if (!getLaunchPlanId()
@@ -2944,6 +3140,8 @@ public final class Cloudevents {
         hash = (37 * hash) + ARTIFACT_IDS_FIELD_NUMBER;
         hash = (53 * hash) + getArtifactIdsList().hashCode();
       }
+      hash = (37 * hash) + PRINCIPAL_FIELD_NUMBER;
+      hash = (53 * hash) + getPrincipal().hashCode();
       if (hasLaunchPlanId()) {
         hash = (37 * hash) + LAUNCH_PLAN_ID_FIELD_NUMBER;
         hash = (53 * hash) + getLaunchPlanId().hashCode();
@@ -3118,6 +3316,8 @@ public final class Cloudevents {
         } else {
           artifactIdsBuilder_.clear();
         }
+        principal_ = "";
+
         if (launchPlanIdBuilder_ == null) {
           launchPlanId_ = null;
         } else {
@@ -3186,6 +3386,7 @@ public final class Cloudevents {
         } else {
           result.artifactIds_ = artifactIdsBuilder_.build();
         }
+        result.principal_ = principal_;
         if (launchPlanIdBuilder_ == null) {
           result.launchPlanId_ = launchPlanId_;
         } else {
@@ -3280,6 +3481,10 @@ public final class Cloudevents {
               artifactIdsBuilder_.addAllMessages(other.artifactIds_);
             }
           }
+        }
+        if (!other.getPrincipal().isEmpty()) {
+          principal_ = other.principal_;
+          onChanged();
         }
         if (other.hasLaunchPlanId()) {
           mergeLaunchPlanId(other.getLaunchPlanId());
@@ -4337,6 +4542,75 @@ public final class Cloudevents {
         return artifactIdsBuilder_;
       }
 
+      private java.lang.Object principal_ = "";
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public java.lang.String getPrincipal() {
+        java.lang.Object ref = principal_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          principal_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPrincipalBytes() {
+        java.lang.Object ref = principal_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          principal_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public Builder setPrincipal(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        principal_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public Builder clearPrincipal() {
+        
+        principal_ = getDefaultInstance().getPrincipal();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string principal = 7;</code>
+       */
+      public Builder setPrincipalBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        principal_ = value;
+        onChanged();
+        return this;
+      }
+
       private flyteidl.core.IdentifierOuterClass.Identifier launchPlanId_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> launchPlanIdBuilder_;
@@ -4347,7 +4621,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public boolean hasLaunchPlanId() {
         return launchPlanIdBuilder_ != null || launchPlanId_ != null;
@@ -4359,7 +4633,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -4375,7 +4649,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder setLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -4397,7 +4671,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder setLaunchPlanId(
           flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
@@ -4417,7 +4691,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder mergeLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -4441,7 +4715,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public Builder clearLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -4461,7 +4735,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier.Builder getLaunchPlanIdBuilder() {
         
@@ -4475,7 +4749,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
         if (launchPlanIdBuilder_ != null) {
@@ -4492,7 +4766,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 7;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
@@ -5311,6 +5585,16 @@ public final class Cloudevents {
      */
     com.google.protobuf.ByteString
         getArtifactKeysBytes(int index);
+
+    /**
+     * <code>string principal = 6;</code>
+     */
+    java.lang.String getPrincipal();
+    /**
+     * <code>string principal = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getPrincipalBytes();
   }
   /**
    * <pre>
@@ -5331,6 +5615,7 @@ public final class Cloudevents {
     private CloudEventExecutionStart() {
       artifactIds_ = java.util.Collections.emptyList();
       artifactKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      principal_ = "";
     }
 
     @java.lang.Override
@@ -5412,6 +5697,12 @@ public final class Cloudevents {
                 mutable_bitField0_ |= 0x00000010;
               }
               artifactKeys_.add(s);
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              principal_ = s;
               break;
             }
             default: {
@@ -5640,6 +5931,40 @@ public final class Cloudevents {
       return artifactKeys_.getByteString(index);
     }
 
+    public static final int PRINCIPAL_FIELD_NUMBER = 6;
+    private volatile java.lang.Object principal_;
+    /**
+     * <code>string principal = 6;</code>
+     */
+    public java.lang.String getPrincipal() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        principal_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string principal = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPrincipalBytes() {
+      java.lang.Object ref = principal_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        principal_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5668,6 +5993,9 @@ public final class Cloudevents {
       }
       for (int i = 0; i < artifactKeys_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, artifactKeys_.getRaw(i));
+      }
+      if (!getPrincipalBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, principal_);
       }
       unknownFields.writeTo(output);
     }
@@ -5701,6 +6029,9 @@ public final class Cloudevents {
         }
         size += dataSize;
         size += 1 * getArtifactKeysList().size();
+      }
+      if (!getPrincipalBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, principal_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5736,6 +6067,8 @@ public final class Cloudevents {
           .equals(other.getArtifactIdsList())) return false;
       if (!getArtifactKeysList()
           .equals(other.getArtifactKeysList())) return false;
+      if (!getPrincipal()
+          .equals(other.getPrincipal())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5767,6 +6100,8 @@ public final class Cloudevents {
         hash = (37 * hash) + ARTIFACT_KEYS_FIELD_NUMBER;
         hash = (53 * hash) + getArtifactKeysList().hashCode();
       }
+      hash = (37 * hash) + PRINCIPAL_FIELD_NUMBER;
+      hash = (53 * hash) + getPrincipal().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -5931,6 +6266,8 @@ public final class Cloudevents {
         }
         artifactKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000010);
+        principal_ = "";
+
         return this;
       }
 
@@ -5988,6 +6325,7 @@ public final class Cloudevents {
           bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.artifactKeys_ = artifactKeys_;
+        result.principal_ = principal_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -6080,6 +6418,10 @@ public final class Cloudevents {
             ensureArtifactKeysIsMutable();
             artifactKeys_.addAll(other.artifactKeys_);
           }
+          onChanged();
+        }
+        if (!other.getPrincipal().isEmpty()) {
+          principal_ = other.principal_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -6976,6 +7318,75 @@ public final class Cloudevents {
         onChanged();
         return this;
       }
+
+      private java.lang.Object principal_ = "";
+      /**
+       * <code>string principal = 6;</code>
+       */
+      public java.lang.String getPrincipal() {
+        java.lang.Object ref = principal_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          principal_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string principal = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPrincipalBytes() {
+        java.lang.Object ref = principal_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          principal_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string principal = 6;</code>
+       */
+      public Builder setPrincipal(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        principal_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string principal = 6;</code>
+       */
+      public Builder clearPrincipal() {
+        
+        principal_ = getDefaultInstance().getPrincipal();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string principal = 6;</code>
+       */
+      public Builder setPrincipalBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        principal_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -7063,7 +7474,7 @@ public final class Cloudevents {
       "flyteidl/core/literals.proto\032\035flyteidl/c" +
       "ore/interface.proto\032\037flyteidl/core/artif" +
       "act_id.proto\032\036flyteidl/core/identifier.p" +
-      "roto\032\037google/protobuf/timestamp.proto\"\235\003" +
+      "roto\032\037google/protobuf/timestamp.proto\"\260\003" +
       "\n\033CloudEventWorkflowExecution\0229\n\traw_eve" +
       "nt\030\001 \001(\0132&.flyteidl.event.WorkflowExecut" +
       "ionEvent\022.\n\013output_data\030\002 \001(\0132\031.flyteidl" +
@@ -7073,28 +7484,30 @@ public final class Cloudevents {
       "\022/\n\014artifact_ids\030\005 \003(\0132\031.flyteidl.core.A" +
       "rtifactID\022G\n\023reference_execution\030\006 \001(\0132*" +
       ".flyteidl.core.WorkflowExecutionIdentifi" +
-      "er\0221\n\016launch_plan_id\030\007 \001(\0132\031.flyteidl.co" +
-      "re.Identifier\"\212\003\n\027CloudEventNodeExecutio" +
-      "n\0225\n\traw_event\030\001 \001(\0132\".flyteidl.event.No" +
-      "deExecutionEvent\022<\n\014task_exec_id\030\002 \001(\0132&" +
-      ".flyteidl.core.TaskExecutionIdentifier\022." +
-      "\n\013output_data\030\003 \001(\0132\031.flyteidl.core.Lite" +
-      "ralMap\0227\n\020output_interface\030\004 \001(\0132\035.flyte" +
-      "idl.core.TypedInterface\022-\n\ninput_data\030\005 " +
-      "\001(\0132\031.flyteidl.core.LiteralMap\022/\n\014artifa" +
-      "ct_ids\030\006 \003(\0132\031.flyteidl.core.ArtifactID\022" +
-      "1\n\016launch_plan_id\030\007 \001(\0132\031.flyteidl.core." +
-      "Identifier\"P\n\027CloudEventTaskExecution\0225\n" +
-      "\traw_event\030\001 \001(\0132\".flyteidl.event.TaskEx" +
-      "ecutionEvent\"\207\002\n\030CloudEventExecutionStar" +
-      "t\022@\n\014execution_id\030\001 \001(\0132*.flyteidl.core." +
-      "WorkflowExecutionIdentifier\0221\n\016launch_pl" +
-      "an_id\030\002 \001(\0132\031.flyteidl.core.Identifier\022." +
-      "\n\013workflow_id\030\003 \001(\0132\031.flyteidl.core.Iden" +
-      "tifier\022/\n\014artifact_ids\030\004 \003(\0132\031.flyteidl." +
-      "core.ArtifactID\022\025\n\rartifact_keys\030\005 \003(\tB=" +
-      "Z;github.com/flyteorg/flyte/flyteidl/gen" +
-      "/pb-go/flyteidl/eventb\006proto3"
+      "er\022\021\n\tprincipal\030\007 \001(\t\0221\n\016launch_plan_id\030" +
+      "\010 \001(\0132\031.flyteidl.core.Identifier\"\235\003\n\027Clo" +
+      "udEventNodeExecution\0225\n\traw_event\030\001 \001(\0132" +
+      "\".flyteidl.event.NodeExecutionEvent\022<\n\014t" +
+      "ask_exec_id\030\002 \001(\0132&.flyteidl.core.TaskEx" +
+      "ecutionIdentifier\022.\n\013output_data\030\003 \001(\0132\031" +
+      ".flyteidl.core.LiteralMap\0227\n\020output_inte" +
+      "rface\030\004 \001(\0132\035.flyteidl.core.TypedInterfa" +
+      "ce\022-\n\ninput_data\030\005 \001(\0132\031.flyteidl.core.L" +
+      "iteralMap\022/\n\014artifact_ids\030\006 \003(\0132\031.flytei" +
+      "dl.core.ArtifactID\022\021\n\tprincipal\030\007 \001(\t\0221\n" +
+      "\016launch_plan_id\030\010 \001(\0132\031.flyteidl.core.Id" +
+      "entifier\"P\n\027CloudEventTaskExecution\0225\n\tr" +
+      "aw_event\030\001 \001(\0132\".flyteidl.event.TaskExec" +
+      "utionEvent\"\232\002\n\030CloudEventExecutionStart\022" +
+      "@\n\014execution_id\030\001 \001(\0132*.flyteidl.core.Wo" +
+      "rkflowExecutionIdentifier\0221\n\016launch_plan" +
+      "_id\030\002 \001(\0132\031.flyteidl.core.Identifier\022.\n\013" +
+      "workflow_id\030\003 \001(\0132\031.flyteidl.core.Identi" +
+      "fier\022/\n\014artifact_ids\030\004 \003(\0132\031.flyteidl.co" +
+      "re.ArtifactID\022\025\n\rartifact_keys\030\005 \003(\t\022\021\n\t" +
+      "principal\030\006 \001(\tB=Z;github.com/flyteorg/f" +
+      "lyte/flyteidl/gen/pb-go/flyteidl/eventb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7119,13 +7532,13 @@ public final class Cloudevents {
     internal_static_flyteidl_event_CloudEventWorkflowExecution_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventWorkflowExecution_descriptor,
-        new java.lang.String[] { "RawEvent", "OutputData", "OutputInterface", "InputData", "ArtifactIds", "ReferenceExecution", "LaunchPlanId", });
+        new java.lang.String[] { "RawEvent", "OutputData", "OutputInterface", "InputData", "ArtifactIds", "ReferenceExecution", "Principal", "LaunchPlanId", });
     internal_static_flyteidl_event_CloudEventNodeExecution_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_event_CloudEventNodeExecution_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventNodeExecution_descriptor,
-        new java.lang.String[] { "RawEvent", "TaskExecId", "OutputData", "OutputInterface", "InputData", "ArtifactIds", "LaunchPlanId", });
+        new java.lang.String[] { "RawEvent", "TaskExecId", "OutputData", "OutputInterface", "InputData", "ArtifactIds", "Principal", "LaunchPlanId", });
     internal_static_flyteidl_event_CloudEventTaskExecution_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_event_CloudEventTaskExecution_fieldAccessorTable = new
@@ -7137,7 +7550,7 @@ public final class Cloudevents {
     internal_static_flyteidl_event_CloudEventExecutionStart_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventExecutionStart_descriptor,
-        new java.lang.String[] { "ExecutionId", "LaunchPlanId", "WorkflowId", "ArtifactIds", "ArtifactKeys", });
+        new java.lang.String[] { "ExecutionId", "LaunchPlanId", "WorkflowId", "ArtifactIds", "ArtifactKeys", "Principal", });
     flyteidl.event.Event.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
