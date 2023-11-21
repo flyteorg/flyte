@@ -158,17 +158,17 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	if err != nil {
 		return core.UnknownTransition, err
 	}
-
+	var phase core.Transition
 	if c.useSyncPlugin(taskTemplate) {
-		phase, err := c.syncHandle(ctx, tCtx)
-		if err != nil {
-			logger.Errorf(ctx, "failed to run [%v] task with err: [%v]", taskTemplate.GetType(), err)
-			return phase, err
-		}
-		return c.syncHandle(ctx, tCtx)
+		phase, err = c.syncHandle(ctx, tCtx)
+	} else {
+		phase, err = c.asyncHandle(ctx, tCtx)
+	}
+	if err != nil {
+		logger.Errorf(ctx, "failed to run [%v] task with err: [%v]", taskTemplate.GetType(), err)
 	}
 
-	return c.asyncHandle(ctx, tCtx)
+	return phase, err
 }
 
 func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
