@@ -339,12 +339,6 @@ func TestBuildResourceMPIForWrongInput(t *testing.T) {
 	_, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
 	assert.Error(t, err)
 
-	mpiObj = dummyMPICustomObj(1, 0, 1)
-	taskTemplate = dummyMPITaskTemplate(mpiID2, mpiObj)
-
-	_, err = mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
-	assert.Error(t, err)
-
 	mpiObj = dummyMPICustomObj(1, 1, 1)
 	taskTemplate = dummyMPITaskTemplate(mpiID2, mpiObj)
 
@@ -561,8 +555,8 @@ func TestReplicaCounts(t *testing.T) {
 		contains             []mpiOp.ReplicaType
 		notContains          []mpiOp.ReplicaType
 	}{
-		{"NoWorkers", 0, 1, true, nil, nil},
-		{"NoLaunchers", 1, 0, true, nil, nil},
+		{"NoWorkers", 1, 0, true, nil, nil},
+		{"Minimum One Launcher", 0, 1, false, []mpiOp.ReplicaType{kubeflowv1.MPIJobReplicaTypeLauncher, kubeflowv1.MPIJobReplicaTypeWorker}, []mpiOp.ReplicaType{}},
 		{"Works", 1, 1, false, []mpiOp.ReplicaType{kubeflowv1.MPIJobReplicaTypeLauncher, kubeflowv1.MPIJobReplicaTypeWorker}, []mpiOp.ReplicaType{}},
 	} {
 		t.Run(test.name, func(t *testing.T) {
