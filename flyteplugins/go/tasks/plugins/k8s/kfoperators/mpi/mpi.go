@@ -71,12 +71,17 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		if err != nil {
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create replica spec: [%v]", err.Error())
 		}
+		launcherReplicaSpec = replicaSpec.DeepCopy()
+		// TODO (jeev): Is this even a valid configuration. Can there be more than 1
+		// launcher? TaskTypeVersion 1 does not support overriding this value.
+		launcherReplicas := mpiTaskExtraArgs.GetNumLauncherReplicas()
+		if launcherReplicas < 1 {
+			launcherReplicas = 1
+		}
+		launcherReplicaSpec.Replicas = &launcherReplicas
 		workerReplicaSpec = replicaSpec.DeepCopy()
 		workerReplicas := mpiTaskExtraArgs.GetNumWorkers()
 		workerReplicaSpec.Replicas = &workerReplicas
-		launcherReplicaSpec = replicaSpec.DeepCopy()
-		launcherReplicas := mpiTaskExtraArgs.GetNumLauncherReplicas()
-		launcherReplicaSpec.Replicas = &launcherReplicas
 		slots = mpiTaskExtraArgs.GetSlots()
 
 		// V1 requires passing worker command as template config parameter
