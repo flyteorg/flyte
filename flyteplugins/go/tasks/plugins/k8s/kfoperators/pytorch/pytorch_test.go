@@ -840,6 +840,66 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 	assert.Nil(t, pytorchJob.Spec.ElasticPolicy)
 }
 
+func TestBuildResourcePytorchV1ResourceTolerations(t *testing.T) {
+	gpuToleration := corev1.Toleration{
+		Key:      "nvidia.com/gpu",
+		Value:    "present",
+		Operator: corev1.TolerationOpEqual,
+		Effect:   corev1.TaintEffectNoSchedule,
+	}
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
+		GpuResourceName: flytek8s.ResourceNvidiaGPU,
+		ResourceTolerations: map[corev1.ResourceName][]corev1.Toleration{
+			flytek8s.ResourceNvidiaGPU: {gpuToleration},
+		},
+	}))
+
+	taskConfig := &kfplugins.DistributedPyTorchTrainingTask{
+		MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "250Mi"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "500Mi"},
+				},
+			},
+		},
+		WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+			Replicas: 100,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
+					{Name: core.Resources_GPU, Value: "1"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
+					{Name: core.Resources_GPU, Value: "1"},
+				},
+			},
+		},
+	}
+
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+	taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)
+	taskTemplate.TaskTypeVersion = 1
+
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+
+	pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
+	assert.True(t, ok)
+
+	assert.NotContains(t, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Template.Spec.Tolerations, gpuToleration)
+	assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
+}
+
 func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
 	taskConfig := &kfplugins.DistributedPyTorchTrainingTask{
 		WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
