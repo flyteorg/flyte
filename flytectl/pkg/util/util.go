@@ -93,7 +93,7 @@ func PrintDemoStartMessage(flyteConsolePort int, kubeconfigLocation string, dryR
 		fmt.Printf("	export KUBECONFIG=%v \n", kubeconfig)
 	}
 	fmt.Printf("%s Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000\n", emoji.Whale)
-	fmt.Printf("%s The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console\n", emoji.OpenFileFolder)
+	fmt.Printf("%s The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console, default credentials - username: minio, password: miniostorage\n", emoji.OpenFileFolder)
 }
 
 // PrintSandboxStartMessage will print sandbox start success message
