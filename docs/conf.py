@@ -296,9 +296,34 @@ nb_execution_excludepatterns = [
     "examples/**/*",
 ]
 
+
+# Pattern for removing intersphinx references from source files.
+# This should handle cases like:
+#
+# - :ref:`cookbook:label` -> :ref:`label`
+# - :ref:`Text <cookbook:label>` -> :ref:`Text <label>`
+INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
+INTERSPHINX_REFS_REPLACE = r"\1"
+
+# Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
+PROTO_REF_PATTERN = r"([:<])(protos/docs)"
+PROTO_REF_REPLACE = r"\1/protos/docs"
+
 import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
+    "source_regex_replace": {
+       INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
+        r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
+        r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
+        r"<flytesnacks/examples": r"</flytesnacks/examples",
+        r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
+        r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
+        r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
+        r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
+        r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
+        PROTO_REF_PATTERN: PROTO_REF_REPLACE,
+    }
 }
 
 import_projects = [
@@ -380,6 +405,15 @@ class CustomWarningSuppressor(logging.Filter):
 
         if msg.strip().startswith(filter_out):
             return False
+
+        if (
+            msg.startswith("document isn't included in any toctree")
+            and record.location == "_tags/tagsindex"
+        ):
+            # ignore this warning, since we don't want the side nav to be
+            # cluttered with the tags index page.
+            return False
+
         return True
 
 

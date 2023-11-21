@@ -294,6 +294,18 @@ Command for external authentication token generation
   []
   
 
+proxyCommand ([]string)
+------------------------------------------------------------------------------------------------------------------------
+
+Command for external proxy-authorization token generation
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
 defaultServiceConfig (string)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -733,8 +745,14 @@ agent-service (`agent.Config`_)
 
 .. code-block:: yaml
 
-  defaultGrpcEndpoint: dns:///flyte-agent.flyte.svc.cluster.local:80
-  endpointForTaskTypes: null
+  agentForTaskTypes: null
+  agents: null
+  defaultAgent:
+    defaultServiceConfig: ""
+    defaultTimeout: 10s
+    endpoint: dns:///flyteagent.flyte.svc.cluster.local:80
+    insecure: true
+    timeouts: null
   resourceConstraints:
     NamespaceScopeResourceConstraint:
       Value: 50
@@ -928,7 +946,11 @@ k8s (`config.K8sPluginConfig`_)
   default-tolerations: null
   delete-resource-on-finalize: false
   enable-host-networking-pod: null
+  gpu-device-node-label: k8s.amazonaws.com/accelerator
+  gpu-partition-size-node-label: k8s.amazonaws.com/gpu-partition-size
   gpu-resource-name: nvidia.com/gpu
+  gpu-unpartitioned-node-selector-requirement: null
+  gpu-unpartitioned-toleration: null
   image-pull-backoff-grace-period: 3m0s
   inject-finalizer: false
   interruptible-node-selector: null
@@ -937,6 +959,7 @@ k8s (`config.K8sPluginConfig`_)
   non-interruptible-node-selector-requirement: null
   resource-tolerations: null
   scheduler-name: ""
+  send-object-events: false
   
 
 k8s-array (`k8s.Config`_)
@@ -986,6 +1009,16 @@ k8s-array (`k8s.Config`_)
     primaryLabel: ""
   scheduler: ""
   tolerations: null
+  
+
+kf-operator (`common.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  timeout: 1m0s
   
 
 logs (`logs.LogConfig`_)
@@ -1042,8 +1075,30 @@ ray (`ray.Config`_)
 .. code-block:: yaml
 
   dashboardHost: 0.0.0.0
+  defaults:
+    headNode:
+      ipAddress: $MY_POD_IP
+      startParameters:
+        disable-usage-stats: "true"
+    workerNode:
+      ipAddress: $MY_POD_IP
+      startParameters:
+        disable-usage-stats: "true"
+  enableUsageStats: false
   includeDashboard: true
-  nodeIPAddress: $MY_POD_IP
+  logs:
+    cloudwatch-enabled: false
+    cloudwatch-log-group: ""
+    cloudwatch-region: ""
+    cloudwatch-template-uri: ""
+    gcp-project: ""
+    kubernetes-enabled: false
+    kubernetes-template-uri: ""
+    kubernetes-url: ""
+    stackdriver-enabled: false
+    stackdriver-logresourcename: ""
+    stackdriver-template-uri: ""
+    templates: null
   remoteClusterConfig:
     auth:
       caCertPath: ""
@@ -1213,19 +1268,35 @@ resourceConstraints (`core.ResourceConstraintsSpec`_)
     Value: 100
   
 
-defaultGrpcEndpoint (string)
+defaultAgent (`agent.Agent`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-The default grpc endpoint of agent service.
+The default agent.
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  dns:///flyte-agent.flyte.svc.cluster.local:80
+  defaultServiceConfig: ""
+  defaultTimeout: 10s
+  endpoint: dns:///flyteagent.flyte.svc.cluster.local:80
+  insecure: true
+  timeouts: null
   
 
-endpointForTaskTypes (map[string]string)
+agents (map[string]*agent.Agent)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The agents.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+agentForTaskTypes (map[string]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -1244,6 +1315,59 @@ supportedTaskTypes ([]string)
 
   - task_type_1
   - task_type_2
+  
+
+agent.Agent
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  dns:///flyteagent.flyte.svc.cluster.local:80
+  
+
+insecure (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "true"
+  
+
+defaultServiceConfig (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+timeouts (map[string]config.Duration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+defaultTimeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  10s
   
 
 core.ResourceConstraintsSpec
@@ -1809,6 +1933,19 @@ Maximum number of entries to keep in the index.
   "10000"
   
 
+common.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  1m0s
+  
+
 config.Config
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2199,6 +2336,46 @@ image-pull-backoff-grace-period (`config.Duration`_)
   3m0s
   
 
+gpu-device-node-label (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  k8s.amazonaws.com/accelerator
+  
+
+gpu-partition-size-node-label (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  k8s.amazonaws.com/gpu-partition-size
+  
+
+gpu-unpartitioned-node-selector-requirement (v1.NodeSelectorRequirement)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+gpu-unpartitioned-toleration (v1.Toleration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 gpu-resource-name (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2271,6 +2448,18 @@ Frequency of resyncing default pod templates
 .. code-block:: yaml
 
   30s
+  
+
+send-object-events (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+If true, will send k8s object events in TaskExecutionEvent updates.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.FlyteCoPilotConfig
@@ -3213,7 +3402,7 @@ nodeIPAddress (string)
 
 .. code-block:: yaml
 
-  $MY_POD_IP
+  ""
   
 
 remoteClusterConfig (`k8s.ClusterConfig`_)
@@ -3231,6 +3420,106 @@ Configuration of remote K8s cluster for ray jobs
   enabled: false
   endpoint: ""
   name: ""
+  
+
+logs (`logs.LogConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  cloudwatch-enabled: false
+  cloudwatch-log-group: ""
+  cloudwatch-region: ""
+  cloudwatch-template-uri: ""
+  gcp-project: ""
+  kubernetes-enabled: false
+  kubernetes-template-uri: ""
+  kubernetes-url: ""
+  stackdriver-enabled: false
+  stackdriver-logresourcename: ""
+  stackdriver-template-uri: ""
+  templates: null
+  
+
+defaults (`ray.DefaultConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  headNode:
+    ipAddress: $MY_POD_IP
+    startParameters:
+      disable-usage-stats: "true"
+  workerNode:
+    ipAddress: $MY_POD_IP
+    startParameters:
+      disable-usage-stats: "true"
+  
+
+enableUsageStats (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+ray.DefaultConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+headNode (`ray.NodeConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ipAddress: $MY_POD_IP
+  startParameters:
+    disable-usage-stats: "true"
+  
+
+workerNode (`ray.NodeConfig`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ipAddress: $MY_POD_IP
+  startParameters:
+    disable-usage-stats: "true"
+  
+
+ray.NodeConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+startParameters (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  disable-usage-stats: "true"
+  
+
+ipAddress (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  $MY_POD_IP
   
 
 snowflake.Config
@@ -3794,7 +4083,9 @@ config for a workflow node
     node-active-deadline: 0s
     node-execution-deadline: 0s
     workflow-active-deadline: 0s
-  interruptible-failure-threshold: 1
+  default-max-attempts: 1
+  ignore-retry-cause: false
+  interruptible-failure-threshold: -1
   max-node-retries-system-failures: 3
   
 
@@ -3917,6 +4208,18 @@ Enable creation of the FlyteWorkflow CRD on startup
 .. code-block:: yaml
 
   "false"
+  
+
+array-node-event-version (int)
+------------------------------------------------------------------------------------------------------------------------
+
+ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 admin-launcher (`launchplan.AdminConfig`_)
@@ -4377,16 +4680,40 @@ Maximum number of retries per node for node failure due to infra issues
   "3"
   
 
-interruptible-failure-threshold (int64)
+interruptible-failure-threshold (int32)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-number of failures for a node to be still considered interruptible'
+number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "-1"
+  
+
+default-max-attempts (int32)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default maximum number of attempts for a node
 
 **Default Value**: 
 
 .. code-block:: yaml
 
   "1"
+  
+
+ignore-retry-cause (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Ignore retry cause and count all attempts toward a node's max attempts
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.DefaultDeadlines

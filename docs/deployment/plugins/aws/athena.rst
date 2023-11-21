@@ -1,93 +1,87 @@
 .. _deployment-plugin-setup-aws-athena:
 
-Athena Plugin Setup
--------------------
+Athena Plugin
+=============
 
-This guide gives an overview of how to set up Athena in your Flyte deployment. Athena plugin needs Flyte deployment in AWS cloud; sandbox/GCP/Azure wouldn't work.
+This guide provides an overview of setting up Athena in your Flyte deployment.
 
-Setup the AWS Flyte cluster
-===========================
+.. note::
+  Please note that the Athena plugin requires a Flyte deployment in the AWS cloud; it won't work with demo/GCP/Azure.
+
+Set up the AWS Flyte cluster
+----------------------------
+
+1. Ensure you have a functional Flyte cluster up and running in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__
+2. Verify that you possess the correct ``kubeconfig`` and have selected the appropriate Kubernetes context
+3. Double-check that your ``~/.flyte/config.yaml`` file contains the correct Flytectl configuration
+
+Specify plugin configuration
+----------------------------
 
 .. tabs::
 
-   .. tab:: AWS cluster setup
+  .. group-tab:: Flyte binary
 
-     * Make sure you have up and running flyte cluster in `AWS <https://docs.flyte.org/en/latest/deployment/aws/index.html#deployment-aws>`__
-     * Make sure you have correct kubeconfig and selected the correct kubernetes context
-     * make sure you have the correct FlyteCTL config at ~/.flyte/config.yaml
+    Edit the relevant YAML file to specify the plugin.
 
+    .. code-block:: yaml
+      :emphasize-lines: 7,11
 
-Specify Plugin Configuration
-======================================
+      tasks:
+        task-plugins:
+          enabled-plugins:
+            - container
+            - sidecar
+            - k8s-array
+            - athena
+          default-for-task-types:
+            - container: container
+            - container_array: k8s-array
+            - athena: athena
 
-Create a file named ``values-override.yaml`` and add the following config to it.
-Please make sure that the propeller has the correct service account for Athena.
+  .. group-tab:: Flyte core
 
-.. code-block:: yaml
+    Create a file named ``values-override.yaml`` and include the following configuration:
 
-    configmap:
-      enabled_plugins:
-        # -- Tasks specific configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#GetConfig)
-        tasks:
-          # -- Plugins configuration, [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/task/config#TaskPluginConfig)
-          task-plugins:
-            # -- [Enabled Plugins](https://pkg.go.dev/github.com/flyteorg/flyteplugins/go/tasks/config#Config). Enable sagemaker*, athena if you install the backend
-            # plugins
-            enabled-plugins:
-              - container
-              - sidecar
-              - k8s-array
-              - athena
-            default-for-task-types:
-              container: container
-              sidecar: sidecar
-              container_array: k8s-array
-              athena: athena
+    .. code-block:: yaml
+
+        configmap:
+          enabled_plugins:
+            tasks:
+              task-plugins:
+                enabled-plugins:
+                  - container
+                  - sidecar
+                  - k8s-array
+                  - athena
+                default-for-task-types:
+                  container: container
+                  sidecar: sidecar
+                  container_array: k8s-array
+                  athena: athena
+
+Ensure that the propeller has the correct service account for Athena.
 
 Upgrade the Flyte Helm release
-==============================
-
-.. prompt:: bash $
-
-   helm upgrade -n flyte -f values-override.yaml flyteorg/flyte-core
-
-
-Register the Athena plugin example
-==================================
-
-.. code-block:: bash
-
-  flytectl register files https://github.com/flyteorg/flytesnacks/releases/download/v0.2.226/snacks-cookbook-integrations-aws-athena.tar.gz --archive -p flytesnacks -d development
-
-
-Launch an execution
-===================
+------------------------------
 
 .. tabs::
 
-   .. tab:: Flyte Console
-   
-     * Navigate to Flyte Console's UI (e.g. `sandbox <http://localhost:30081/console>`_) and find the workflow.
-     * Click on `Launch` to open up the launch form.
-     * Submit the form.
-   
-   .. tab:: Flytectl
-   
-     Retrieve an execution form in the form of a YAML file:
-   
-     .. prompt:: bash $
-   
-        flytectl get launchplan \
-            --config ~/.flyte/flytectl.yaml \
-            --project flytesnacks \
-            --domain development \
-            athena.athena.full_athena_wf 
-            --latest \
-            --execFile exec_spec.yaml
-      
-     Launch! 🚀
-   
-     .. prompt:: bash $
-   
-        flytectl --config ~/.flyte/flytectl.yaml create execution \
-            -p <project> -d <domain> --execFile ./exec_spec.yaml
+  .. group-tab:: Flyte binary
+
+    .. code-block:: bash
+
+      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+    and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
+
+  .. group-tab:: Flyte core
+
+    .. code-block:: bash
+    
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
+
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).

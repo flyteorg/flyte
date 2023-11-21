@@ -15,6 +15,8 @@ plugins, authentication, performance tuning, and maintaining Flyte as a producti
   - Walkthroughs for deploying Flyte, from the most basic to a fully-featured, multi-cluster production system.
 * - {ref}`🔌 Plugin Setup <deployment-plugin-setup>`
   - Enable backend plugins to extend Flyte's capabilities, such as hooks for K8s, AWS, GCP, and Web API services.
+* - {ref}`🤖 Agent Setup <deployment-agent-setup>`
+  - Enable backend plugins to extend Flyte's capabilities, such as hooks for K8s, AWS, GCP, and Web API services.
 * - {ref}`🎛 Cluster Configuration <deployment-configuration>`
   - How to configure the various components of your cluster.
 * - {ref}`📖 Configuration Reference <deployment-configuration-generated>`

@@ -157,7 +157,7 @@ Integrations <integrations>
 :name: deploymenttoc
 :hidden:
 
-Getting Started <deployment/index>
+Get Started with Deployment <deployment/index>
 deployment/deployment/index
 deployment/plugins/index
 deployment/configuration/index
@@ -213,13 +213,4 @@ community/troubleshoot
 concepts/basics
 concepts/control_plane
 concepts/architecture
-```
-
-```{toctree}
-:caption: Tags
-:maxdepth: -1
-:name: tags
-:hidden:
-
-Pages by Tag <_tags/tagsindex>
 ```

@@ -1,10 +1,10 @@
-.. _deployment-plugin-setup-gcp-bigquery:
+.. _deployment-agent-setup-bigquery:
 
-Google BigQuery Plugin
+Google BigQuery Agent
 ======================
 
-This guide provides an overview of setting up BigQuery in your Flyte deployment.
-Please note that the BigQuery plugin requires Flyte deployment in the GCP cloud;
+This guide provides an overview of setting up BigQuery agent in your Flyte deployment.
+Please note that the BigQuery agent requires Flyte deployment in the GCP cloud;
 it is not compatible with demo/AWS/Azure.
 
 Set up the GCP Flyte cluster
@@ -15,14 +15,14 @@ Set up the GCP Flyte cluster
 * Verify that you have the correct kubeconfig and have selected the appropriate Kubernetes context.
 * Confirm that you have the correct Flytectl configuration at ``~/.flyte/config.yaml``.
 
-Specify plugin configuration
+Specify agent configuration
 ----------------------------
 
 .. tabs::
 
   .. group-tab:: Flyte binary
 
-    Edit the relevant YAML file to specify the plugin.
+    Edit the relevant YAML file to specify the agent.
 
     .. code-block:: yaml
       :emphasize-lines: 7,11
@@ -37,7 +37,7 @@ Specify plugin configuration
           default-for-task-types:
             - container: container
             - container_array: k8s-array
-            - bigquery_query_job_task: bigquery
+            - bigquery_query_job_task: agent-service
 
   .. group-tab:: Flyte core
 
@@ -61,7 +61,7 @@ Specify plugin configuration
                   container: container
                   sidecar: sidecar
                   container_array: k8s-array
-                  bigquery_query_job_task: bigquery
+                  bigquery_query_job_task: agent-service
 
 Ensure that the propeller has the correct service account for BigQuery.
 
@@ -83,8 +83,9 @@ Upgrade the Flyte Helm release
   .. group-tab:: Flyte core
 
     .. code-block:: bash
-    
+
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
