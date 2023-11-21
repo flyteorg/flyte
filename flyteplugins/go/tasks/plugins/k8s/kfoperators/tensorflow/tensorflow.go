@@ -116,7 +116,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}
 
-	if v, ok := replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker]; !ok || *v.Replicas == 0 {
+	if v, ok := replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker]; !ok || *v.Replicas <= 0 {
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
 

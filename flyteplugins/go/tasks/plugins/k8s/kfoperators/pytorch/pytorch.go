@@ -112,7 +112,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}
 
-	if *workerReplicaSpec.Replicas == 0 {
+	if *workerReplicaSpec.Replicas <= 0 {
 		return nil, fmt.Errorf("number of worker should be more then 0")
 	}
 
