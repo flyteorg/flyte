@@ -3,7 +3,8 @@ import re
 import shutil
 import subprocess
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from functools import partial
 from pathlib import Path
 from typing import Optional, List, Union
 
@@ -18,6 +19,7 @@ __version__ = "0.0.0"
 class ImportProjectsConfig:
     clone_dir: str
     flytekit_api_dir: str
+    source_regex_replace: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -88,51 +90,72 @@ def import_projects(app: Sphinx, config: Config):
     update_sys_path_for_flytekit(import_projects_config)
 
 
-# should handle cases like:
-# - :ref:`cookbook:label` -> :ref:`label`
-# - :ref:`Text <cookbook:label>` -> :ref:`Text <label>`
-INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
-
-PROTO_REF_GOOGLE = "ref_google"
-
-
-def remove_intersphinx_refs_in_files(app: Sphinx, docname: str, source: List[str]):
-    """
-    This removes intersphinx refs from source files since we're building the
-    docs in one place.
-    """
+def replace_refs_in_files(patt: str, repl: str, app: Sphinx, docname: str, source: List[str]):
     text = source[0]
 
-    if re.search(INTERSPHINX_REFS_PATTERN, text):
-        text = re.sub(INTERSPHINX_REFS_PATTERN, r"\1", text)
+    if re.search(patt, text):
+        text = re.sub(patt, repl, text)
 
     # replace source file
     source[0] = text
 
 
-def remove_intersphinx_in_docstrings(
-    app: Sphinx, what: str, name: str, obj: str, options: dict, lines: List[str],
+def replace_refs_in_docstrings(
+    patt: str, repl: str, app: Sphinx, what: str, name: str, obj: str, options: dict, lines: List[str],
 ):
-    """
-    This removes intersphinx refs from docstrings since we're building the
-    docs in one place.
-    """
     replace = {}
     for i, text in enumerate(lines):
-        if re.search(INTERSPHINX_REFS_PATTERN, text):
-            text = re.sub(INTERSPHINX_REFS_PATTERN, r"\1", text)
+        if re.search(patt, text):
+            text = re.sub(patt, repl, text)
             replace[i] = text
 
     for i, text in replace.items():
         lines[i] = text
 
 
+# Pattern for removing intersphinx references from source files.
+# This should handle cases like:
+#
+# - :ref:`cookbook:label` -> :ref:`label`
+# - :ref:`Text <cookbook:label>` -> :ref:`Text <label>`
+INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
+INTERSPHINX_REFS_REPLACE = r"\1"
+
+# Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
+PROTO_REF_PATTERN = r"([:<])(protos/docs)"
+PROTO_REF_REPLACE = r"\1/protos/docs"
+
+
+REPLACE_PATTERNS = {
+    INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
+    r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
+    r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
+    r"<flytesnacks/examples": r"</flytesnacks/examples",
+    r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
+    r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
+    r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
+    r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
+    r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
+    PROTO_REF_PATTERN: PROTO_REF_REPLACE,
+}
+
 def setup(app: Sphinx) -> dict:
     app.add_config_value("import_projects_config", None, False)
     app.add_config_value("import_projects", None, False)
     app.connect("config-inited", import_projects, priority=1)
-    app.connect("source-read", remove_intersphinx_refs_in_files)
-    app.connect("autodoc-process-docstring", remove_intersphinx_in_docstrings)
+
+    for i, (patt, repl) in enumerate(REPLACE_PATTERNS.items()):
+        app.connect(
+            "source-read",
+            partial(replace_refs_in_files, patt, repl),
+            priority=i,
+        )
+        app.connect(
+            "autodoc-process-docstring",
+            partial(replace_refs_in_docstrings, patt, repl),
+            priority=i,
+        )
+
     return {
         "version": __version__,
         "parallel_read_safe": True,
