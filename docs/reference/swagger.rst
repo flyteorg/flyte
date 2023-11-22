@@ -1,8 +1,8 @@
 .. _reference-swagger:
 
-################
-Swagger API Docs
-################
+#############################
+Flyte API Playground: Swagger
+#############################
 
 .. tags:: Basic
 

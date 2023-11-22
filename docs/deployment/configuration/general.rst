@@ -46,14 +46,14 @@ To customize resources for project-domain attributes, define a ``tra.yaml`` file
 
 .. code-block:: yaml
 
+    project: flyteexamples
+    domain: development
     defaults:
         cpu: "1"
         memory: 150Mi
     limits:
         cpu: "2"
         memory: 450Mi
-    project: flyteexamples
-    domain: development
 
 Update the task resource attributes for a project-domain combination:
 
@@ -105,11 +105,11 @@ Define an attributes file, ``cra.yaml``:
 
 .. code-block:: yaml
 
+    domain: development
+    project: flyteexamples
     attributes:
         projectQuotaCpu: "1000"
         projectQuotaMemory: 5Ti
-    domain: development
-    project: flyteexamples
 
 To ensure that the overrides reflect in the Kubernetes namespace
 ``flyteexamples-development`` (that is, the namespace has a resource quota of
@@ -245,7 +245,7 @@ Hierarchy
 *********
 
 Increasing specificity defines how matchable resource attributes get applied.
-The available configurations, in order of decreasing specifity are:
+The available configurations, in order of decreasing specificity are:
 
 #. Domain, Project, Workflow name, and LaunchPlan
 
