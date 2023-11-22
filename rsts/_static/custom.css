@@ -1,0 +1,33 @@
+.getting-started-panels div.card-body {
+    padding: 0;
+}
+
+.getting-started-panels a.btn-primary {
+    color: white !important;
+    background-color: var(--color-link);
+    border-color: var(--color-link);
+}
+
+.getting-started-panels a.btn-outline-primary {
+    color: white !important;
+    background-color: var(--color-link);
+    opacity: 0.5;
+    border-color: var(--color-link);
+}
+
+html .tabbed-set > label {
+    color: var(--color-foreground-border);
+}
+
+html .tabbed-set > input:checked + label {
+    border-color: var(--color-link);
+    color: var(--color-link);
+}
+
+html .tabbed-set > label:hover {
+    color: var(--color-link);
+}
+
+html .tabbed-content {
+    box-shadow: 0 -.0625rem var(--color-background-border),0 .0625rem var(--color-background-border);
+}
