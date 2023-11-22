@@ -99,63 +99,17 @@ To support new use-cases, developers can create their own plugins and bundle the
 Component Code Architecture
 ===========================
 
-.. panels::
-  :container: container-lg pb-4
-  :column: col-lg-12 p-2
-  :body: text-center
-
-  .. link-button:: flytepropeller-architecture
-     :type: ref
-     :text: FlytePropeller
-     :classes: btn-block stretched-link
-
-  ---
-
-  .. link-button:: native-scheduler-architecture
-     :type: ref
-     :text: Flyte Native Scheduler
-     :classes: btn-block stretched-link
+- :ref:`FlytePropeller <flytepropeller-architecture>`
+- :ref:`Flyte Native Scheduler <native-scheduler-architecture>`
 
 Component Code References
 =========================
 
-.. panels::
-  :container: container-lg pb-4
-  :column: col-lg-12 p-2
-  :body: text-center
-
-  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin
-     :type: url
-     :text: FlyteAdmin
-     :classes: btn-block stretched-link
-
-  ---
-
-  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller
-     :type: url
-     :text: FlytePropeller
-     :classes: btn-block stretched-link
-
-  ---
-
-  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/datacatalog
-     :type: url
-     :text: DataCatalog
-     :classes: btn-block stretched-link
-
-  ---
-
-  .. link-button:: https://pkg.go.dev/mod/github.com/flyteorg/flyteplugins
-     :type: url
-     :text: FlytePlugins
-     :classes: btn-block stretched-link
-
-  ---
-
-  .. link-button:: https://pkg.go.dev/github.com/flyteorg/flyteadmin/scheduler
-     :type: url
-     :text: Flyte Native Scheduler
-     :classes: btn-block stretched-link
+- `FlyteAdmin <https://pkg.go.dev/mod/github.com/flyteorg/flyteadmin>`__
+- `FlytePropeller <https://pkg.go.dev/mod/github.com/flyteorg/flytepropeller>`__
+- `DataCatalog <https://pkg.go.dev/mod/github.com/flyteorg/datacatalog>`__
+- `FlytePlugins <https://pkg.go.dev/mod/github.com/flyteorg/flyteplugins>`__
+- `Flyte Native Scheduler <https://pkg.go.dev/github.com/flyteorg/flyteadmin/scheduler>`__
 
 
 .. toctree::

@@ -159,6 +159,7 @@ Integrations <integrations>
 Get Started with Deployment <deployment/index>
 deployment/deployment/index
 deployment/plugins/index
+deployment/agents/index
 deployment/configuration/index
 deployment/configuration/generated/index
 deployment/security/index
