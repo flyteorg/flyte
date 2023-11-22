@@ -151,8 +151,8 @@ exclude_patterns = [
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_favicon = "images/flyte_circle_gradient_1_4x4.png"
-html_logo = "images/logo-flyte-docs.png"
+html_favicon = "images/favicon-flyte-docs.png"
+html_logo = "images/favicon-flyte-docs.png"
 html_theme = "furo"
 html_title = "Flyte"
 
