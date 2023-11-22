@@ -57,6 +57,10 @@ install-piptools: ## Install pip-tools
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
 
+.PHONY: monodoc-requirements.txt
+monodocs-requirements.txt: monodocs-requirements.in install-piptools
+	$(call PIP_COMPILE,monodocs-requirements.in)
+
 .PHONY: stats
 stats:
 	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller_dashboard.py
