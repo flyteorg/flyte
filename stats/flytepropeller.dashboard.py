@@ -15,7 +15,6 @@ DATASOURCE = "${%s}" % DATASOURCE_NAME
 
 
 class FlytePropeller(object):
-
     @staticmethod
     def create_free_workers() -> Graph:
         return Graph(
@@ -23,8 +22,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='sum(flyte:propeller:all:free_workers_count) by (kubernetes_pod_name)',
-                    refId='A',
+                    expr="sum(flyte:propeller:all:free_workers_count) by (kubernetes_pod_name)",
+                    refId="A",
                 ),
             ],
             yAxes=YAxes(
@@ -40,8 +39,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:round:raw_ms[{interval}m])) by (wf)',
-                    refId='A',
+                    expr=f"sum(rate(flyte:propeller:all:round:raw_ms[{interval}m])) by (wf)",
+                    refId="A",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -54,8 +53,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:round:raw_unlabeled_ms[{interval}m])) by (quantile)',
-                    refId='A',
+                    expr=f"sum(rate(flyte:propeller:all:round:raw_unlabeled_ms[{interval}m])) by (quantile)",
+                    refId="A",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -68,8 +67,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))',
-                    refId='A',
+                    expr="sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+                    refId="A",
                 ),
             ],
             yAxes=YAxes(
@@ -85,8 +84,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='avg(flyte:propeller:all:round:streak_length_unlabeled)',
-                    refId='A',
+                    expr="avg(flyte:propeller:all:round:streak_length_unlabeled)",
+                    refId="A",
                 ),
             ],
             yAxes=YAxes(
@@ -102,8 +101,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='sum(deriv(flyte:propeller:all:round:system_error_unlabeled[5m]))',
-                    refId='A',
+                    expr="sum(deriv(flyte:propeller:all:round:system_error_unlabeled[5m]))",
+                    refId="A",
                 ),
             ],
             yAxes=YAxes(
@@ -119,8 +118,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr='sum(rate(flyte:propeller:all:round:abort_error[5m]))',
-                    refId='A',
+                    expr="sum(rate(flyte:propeller:all:round:abort_error[5m]))",
+                    refId="A",
                 ),
             ],
             yAxes=YAxes(
@@ -136,8 +135,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(flyte:propeller:all:collector:flyteworkflow) by (project)',
-                    refId='A',
+                    expr=f"sum(flyte:propeller:all:collector:flyteworkflow) by (project)",
+                    refId="A",
                 ),
             ],
             yAxes=YAxes(
@@ -174,11 +173,11 @@ class FlytePropeller(object):
             targets=[
                 Target(
                     expr='{__name__=~"flyte:propeller:all:node:plugin:.*_failure_unlabeled"}',
-                    refId='A',
+                    refId="A",
                 ),
                 Target(
                     expr='{__name__=~"flyte:propeller:all:node:plugin:.*_success_unlabeled"}',
-                    refId='B',
+                    refId="B",
                 ),
             ],
             yAxes=YAxes(
@@ -194,8 +193,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(flyte:propeller:all:node:node_exec_latency_us) by (quantile, wf) / 1000',
-                    refId='A',
+                    expr=f"sum(flyte:propeller:all:node:node_exec_latency_us) by (quantile, wf) / 1000",
+                    refId="A",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -208,12 +207,12 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(flyte:propeller:all:node:event_recording:success_duration_ms) by (quantile, wf)',
-                    refId='A',
+                    expr=f"sum(flyte:propeller:all:node:event_recording:success_duration_ms) by (quantile, wf)",
+                    refId="A",
                 ),
                 Target(
-                    expr=f'sum(flyte:propeller:all:node:event_recording:failure_duration_ms) by (quantile, wf)',
-                    refId='B',
+                    expr=f"sum(flyte:propeller:all:node:event_recording:failure_duration_ms) by (quantile, wf)",
+                    refId="B",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -226,8 +225,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(flyte:propeller:all:node:node_input_latency_ms) by (quantile, wf)',
-                    refId='A',
+                    expr=f"sum(flyte:propeller:all:node:node_input_latency_ms) by (quantile, wf)",
+                    refId="A",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -241,29 +240,29 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:metastore:head_failure_unlabeled[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:metastore:head_failure_unlabeled[5m]))",
                     legendFormat="head-failure",
-                    refId='A',
+                    refId="A",
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:metastore:bad_container_unlabeled[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:metastore:bad_container_unlabeled[5m]))",
                     legendFormat="bad-container",
-                    refId='B',
+                    refId="B",
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:metastore:bad_key_unlabeled[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:metastore:bad_key_unlabeled[5m]))",
                     legendFormat="bad-key",
-                    refId='C',
+                    refId="C",
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:metastore:read_failure_unlabeled[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:metastore:read_failure_unlabeled[5m]))",
                     legendFormat="read-failure",
-                    refId='D',
+                    refId="D",
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:metastore:write_failure_unlabeled[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:metastore:write_failure_unlabeled[5m]))",
                     legendFormat="write-failure",
-                    refId='E',
+                    refId="E",
                 ),
             ],
             yAxes=YAxes(
@@ -282,8 +281,8 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'(sum(rate(flyte:propeller:all:metastore:cache_hit[{interval}m])) * 100) / (sum(rate(flyte:propeller:all:metastore:cache_miss[{interval}m])) + sum(rate(flyte:propeller:all:metastore:cache_hit[{interval}m])))',
-                    refId='A',
+                    expr=f"(sum(rate(flyte:propeller:all:metastore:cache_hit[{interval}m])) * 100) / (sum(rate(flyte:propeller:all:metastore:cache_miss[{interval}m])) + sum(rate(flyte:propeller:all:metastore:cache_hit[{interval}m])))",
+                    refId="A",
                 ),
             ],
             yAxes=single_y_axis(format=PERCENT_FORMAT),
@@ -300,8 +299,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(flyte:propeller:all:metastore:copy:overall_unlabeled_ms) by (quantile)',
-                            refId='A',
+                            expr=f"sum(flyte:propeller:all:metastore:copy:overall_unlabeled_ms) by (quantile)",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -311,8 +310,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:metastore:write_ms) by (quantile, wf)',
-                            refId='A',
+                            expr="sum(flyte:propeller:all:metastore:write_ms) by (quantile, wf)",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -322,8 +321,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:metastore:read_open_ms) by (quantile, wf)',
-                            refId='A',
+                            expr="sum(flyte:propeller:all:metastore:read_open_ms) by (quantile, wf)",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -333,8 +332,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:metastore:head_ms) by (quantile, wf)',
-                            refId='A',
+                            expr="sum(flyte:propeller:all:metastore:head_ms) by (quantile, wf)",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -344,20 +343,19 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(flyte:propeller:all:metastore:proto_fetch_ms) by (quantile, wf)',
+                            expr="sum(flyte:propeller:all:metastore:proto_fetch_ms) by (quantile, wf)",
                             legendFormat="proto-fetch",
-                            refId='A',
+                            refId="A",
                         ),
-
                         Target(
-                            expr='sum(flyte:propeller:all:metastore:remote_fetch_ms) by (quantile, wf)',
+                            expr="sum(flyte:propeller:all:metastore:remote_fetch_ms) by (quantile, wf)",
                             legendFormat="remote-fetch",
-                            refId='B',
+                            refId="B",
                         ),
                     ],
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
                 ),
-            ]
+            ],
         )
 
     @staticmethod
@@ -367,15 +365,14 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_hit[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:admin_launcher:cache_hit[5m]))",
                     legendFormat="hit",
-                    refId='A',
+                    refId="A",
                 ),
-
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:admin_launcher:cache_miss[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:admin_launcher:cache_miss[5m]))",
                     legendFormat="miss",
-                    refId='B',
+                    refId="B",
                 ),
             ],
             yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -389,8 +386,8 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(flyte:propeller:all:node:build_dynamic_workflow_us) by (quantile, wf) / 1000',
-                        refId='A',
+                        expr=f"sum(flyte:propeller:all:node:build_dynamic_workflow_us) by (quantile, wf) / 1000",
+                        refId="A",
                     ),
                 ],
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -400,8 +397,8 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf)',
-                        refId='A',
+                        expr=f"sum(rate(flyte:propeller:all:node:build_dynamic_workflow_us_count[5m])) by (wf)",
+                        refId="A",
                     ),
                 ],
                 yAxes=single_y_axis(format=NO_FORMAT),
@@ -416,8 +413,8 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(flyte:propeller:all:task:event_recording:success_duration_ms) by (quantile, wf)',
-                        refId='A',
+                        expr=f"sum(flyte:propeller:all:task:event_recording:success_duration_ms) by (quantile, wf)",
+                        refId="A",
                     ),
                 ],
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -427,14 +424,14 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf)',
+                        expr=f"sum(rate(flyte:propeller:all:task:event_recording:success_duration_ms_count[5m])) by (wf)",
                         legendFormat="success wf",
-                        refId='A',
+                        refId="A",
                     ),
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf)',
+                        expr=f"sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf)",
                         legendFormat="failure",
-                        refId='B',
+                        refId="B",
                     ),
                 ],
                 yAxes=single_y_axis(format=NO_FORMAT),
@@ -449,8 +446,8 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(flyte:propeller:all:node:event_recording:success_duration_ms) by (quantile, wf)',
-                        refId='A',
+                        expr=f"sum(flyte:propeller:all:node:event_recording:success_duration_ms) by (quantile, wf)",
+                        refId="A",
                     ),
                 ],
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -460,14 +457,14 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf)',
+                        expr=f"sum(rate(flyte:propeller:all:node:event_recording:success_duration_ms_count[5m])) by (wf)",
                         legendFormat="success",
-                        refId='A',
+                        refId="A",
                     ),
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf)',
+                        expr=f"sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf)",
                         legendFormat="failure",
-                        refId='B',
+                        refId="B",
                     ),
                 ],
                 yAxes=single_y_axis(format=NO_FORMAT),
@@ -482,8 +479,8 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(flyte:propeller:all:workflow:event_recording:success_duration_ms) by (quantile, wf)',
-                        refId='A',
+                        expr=f"sum(flyte:propeller:all:workflow:event_recording:success_duration_ms) by (quantile, wf)",
+                        refId="A",
                     ),
                 ],
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -493,14 +490,14 @@ class FlytePropeller(object):
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:success_duration_ms_count[5m])) by (wf)',
+                        expr=f"sum(rate(flyte:propeller:all:workflow:event_recording:success_duration_ms_count[5m])) by (wf)",
                         legendFormat="success",
-                        refId='A',
+                        refId="A",
                     ),
                     Target(
-                        expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count[5m])) by (wf)',
+                        expr=f"sum(rate(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count[5m])) by (wf)",
                         legendFormat="failure",
-                        refId='B',
+                        refId="B",
                     ),
                 ],
                 yAxes=single_y_axis(format=NO_FORMAT),
@@ -518,8 +515,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(flyte:propeller:all:wf_update_latency_ms) by (quantile)',
-                            refId='A',
+                            expr=f"sum(flyte:propeller:all:wf_update_latency_ms) by (quantile)",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
@@ -529,8 +526,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(rate(flyte:propeller:all:wf_update_latency_ms_count[5m]))',
-                            refId='A',
+                            expr=f"sum(rate(flyte:propeller:all:wf_update_latency_ms_count[5m]))",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=NO_FORMAT),
@@ -540,8 +537,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(rate(flyte:propeller:all:wf_update_conflict[5m]))',
-                            refId='A',
+                            expr=f"sum(rate(flyte:propeller:all:wf_update_conflict[5m]))",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=NO_FORMAT),
@@ -551,13 +548,14 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr=f'sum(rate(flyte:propeller:all:wf_update_failed[5m]))',
-                            refId='A',
+                            expr=f"sum(rate(flyte:propeller:all:wf_update_failed[5m]))",
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=NO_FORMAT),
                 ),
-            ])
+            ],
+        )
 
     @staticmethod
     def perf_metrics(collapse: bool) -> Row:
@@ -591,19 +589,19 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:node:perma_system_error_duration_unlabeled_ms_count[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:node:perma_system_error_duration_unlabeled_ms_count[5m]))",
                     legendFormat="system error",
-                    refId='A',
+                    refId="A",
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:node:perma_user_error_duration_unlabeled_ms[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:node:perma_user_error_duration_unlabeled_ms[5m]))",
                     legendFormat="user error",
-                    refId='B',
+                    refId="B",
                 ),
                 Target(
-                    expr=f'sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m]))',
+                    expr=f"sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m]))",
                     legendFormat="user error",
-                    refId='C',
+                    refId="C",
                 ),
             ],
             yAxes=single_y_axis(format=NO_FORMAT),
@@ -612,17 +610,16 @@ class FlytePropeller(object):
     @staticmethod
     def workqueue_rate(metric: str, title: str) -> Graph:
         return Graph(
-                title=title,
-                dataSource=DATASOURCE,
-                targets=[
-                    Target(
-                        expr=f'sum(rate({metric}[5m]))',
-                        refId='A',
-                    ),
-                ],
-                yAxes=single_y_axis(format=SHORT_FORMAT),
-            )
-        
+            title=title,
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr=f"sum(rate({metric}[5m]))",
+                    refId="A",
+                ),
+            ],
+            yAxes=single_y_axis(format=SHORT_FORMAT),
+        )
 
     @staticmethod
     def queue_metrics(collapse: bool) -> Row:
@@ -631,12 +628,12 @@ class FlytePropeller(object):
             collapse=collapse,
             panels=[
                 Graph(
-                    title="WF Adds to main queue",
+                    title="Add rate to queue",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(workqueue_adds_total{name="flyte:propeller:all:main"}[5m]))',
-                            refId='A',
+                            expr='sum(rate(workqueue_adds_total{name=~"flyte:propeller.*"}[5m]))',
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=SHORT_FORMAT),
@@ -646,19 +643,19 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(workqueue_depth{name="flyte:propeller:all:main"})',
-                            refId='A',
+                            expr='sum(workqueue_depth{name=~"flyte:propeller.*"})',
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 Graph(
-                    title="Item retries",
+                    title="Item retries rate",
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(workqueue_retries_total{name="flyte:propeller:all:main"}[5m]))',
-                            refId='A',
+                            expr='sum(rate(workqueue_retries_total{name="flyte:propeller.*"}[5m]))',
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=SHORT_FORMAT),
@@ -668,8 +665,8 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='workqueue_unfinished_work_seconds{name="flyte:propeller:all:main"}',
-                            refId='A',
+                            expr='workqueue_unfinished_work_seconds{name="flyte:propeller.*"}',
+                            refId="A",
                         ),
                     ],
                     yAxes=single_y_axis(format=SECONDS_FORMAT),
@@ -709,6 +706,53 @@ class FlytePropeller(object):
         )
 
     @staticmethod
+    def workflow_latency_per_wf(latency_type: str) -> typing.List[Graph]:
+        return [
+            Graph(
+                title=f"{latency_type.capitalize()} Latency per workflow",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f"sum(flyte:propeller:all:node:{latency_type}_latency_ms) by (wf)",
+                        refId="A",
+                    ),
+                ],
+                yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+            ),
+            Graph(
+                title=f"{latency_type.capitalize()} Latency by quantile",
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f"sum(flyte:propeller:all:node:{latency_type}_latency_unlabeled_ms) by (quantile)",
+                        refId="A",
+                    ),
+                ],
+                yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+            ),
+        ]
+
+    @staticmethod
+    def workflow_latencies(collapse) -> Row:
+        return Row(
+            title="Workflow latencies",
+            collapse=collapse,
+            panels=[
+                panel
+                for panels in [
+                    FlytePropeller.workflow_latency_per_wf(latency_type)
+                    for latency_type in [
+                        "acceptance",
+                        "transition",
+                        "queueing",
+                        "completion",
+                    ]
+                ]
+                for panel in panels
+            ],
+        )
+
+    @staticmethod
     def create_all_rows(interval: int = 5) -> typing.List[Row]:
         return [
             FlytePropeller.core_metrics(interval, False),
@@ -718,6 +762,7 @@ class FlytePropeller(object):
             FlytePropeller.perf_metrics(True),
             FlytePropeller.wf_store_latency(False),
             FlytePropeller.queue_metrics(True),
+            FlytePropeller.workflow_latencies(False),
         ]
 
 
