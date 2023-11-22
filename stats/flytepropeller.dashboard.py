@@ -630,25 +630,50 @@ class FlytePropeller(object):
             title="FlytePropeller Queue metrics",
             collapse=collapse,
             panels=[
-                FlytePropeller.workqueue_rate(metric=metric, title=title)
-                for title, metric in [
-                    (
-                        "WF Adds to main queue",
-                        'workqueue_adds_total{name="flyte:propeller:all:main"}',
-                    ),
-                    (
-                        "Unprocessed Queue depth",
-                        'workqueue_depth{name="flyte:propeller:all:main"}',
-                    ),
-                    (
-                        "Item retries",
-                        'workqueue_retries_total{name="flyte:propeller:all:main"}',
-                    ),
-                    (
-                        "Seconds of unfinished work in progress",
-                        'workqueue_unfinished_work_seconds{name="flyte:propeller:all:main"}',
-                    ),
-                ]
+                Graph(
+                    title="WF Adds to main queue",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='sum(rate(workqueue_adds_total{name="flyte:propeller:all:main"}[5m]))',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="Unprocessed Queue depth",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='sum(workqueue_depth{name="flyte:propeller:all:main"})',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="Item retries",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='sum(rate(workqueue_retries_total{name="flyte:propeller:all:main"}[5m]))',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="Seconds of unfinished work in progress",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr='workqueue_unfinished_work_seconds{name="flyte:propeller:all:main"}',
+                            refId='A',
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SECONDS_FORMAT),
+                ),
             ],
         )
 
