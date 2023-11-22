@@ -5293,6 +5293,9 @@ export namespace flyteidl {
 
             /** RuntimeMetadata flavor */
             flavor?: (string|null);
+
+            /** RuntimeMetadata isSyncPlugin */
+            isSyncPlugin?: (boolean|null);
         }
 
         /** Represents a RuntimeMetadata. */
@@ -5312,6 +5315,9 @@ export namespace flyteidl {
 
             /** RuntimeMetadata flavor. */
             public flavor: string;
+
+            /** RuntimeMetadata isSyncPlugin. */
+            public isSyncPlugin: boolean;
 
             /**
              * Creates a new RuntimeMetadata instance using the specified properties.

@@ -12614,6 +12614,7 @@
                  * @property {flyteidl.core.RuntimeMetadata.RuntimeType|null} [type] RuntimeMetadata type
                  * @property {string|null} [version] RuntimeMetadata version
                  * @property {string|null} [flavor] RuntimeMetadata flavor
+                 * @property {boolean|null} [isSyncPlugin] RuntimeMetadata isSyncPlugin
                  */
     
                 /**
@@ -12656,6 +12657,14 @@
                 RuntimeMetadata.prototype.flavor = "";
     
                 /**
+                 * RuntimeMetadata isSyncPlugin.
+                 * @member {boolean} isSyncPlugin
+                 * @memberof flyteidl.core.RuntimeMetadata
+                 * @instance
+                 */
+                RuntimeMetadata.prototype.isSyncPlugin = false;
+    
+                /**
                  * Creates a new RuntimeMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.RuntimeMetadata
@@ -12685,6 +12694,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
                     if (message.flavor != null && message.hasOwnProperty("flavor"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.flavor);
+                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isSyncPlugin);
                     return writer;
                 };
     
@@ -12714,6 +12725,9 @@
                             break;
                         case 3:
                             message.flavor = reader.string();
+                            break;
+                        case 4:
+                            message.isSyncPlugin = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12748,6 +12762,9 @@
                     if (message.flavor != null && message.hasOwnProperty("flavor"))
                         if (!$util.isString(message.flavor))
                             return "flavor: string expected";
+                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
+                        if (typeof message.isSyncPlugin !== "boolean")
+                            return "isSyncPlugin: boolean expected";
                     return null;
                 };
     

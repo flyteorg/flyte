@@ -298,6 +298,8 @@ func (m *RuntimeMetadata) Validate() error {
 
 	// no validation rules for Flavor
 
+	// no validation rules for IsSyncPlugin
+
 	return nil
 }
 

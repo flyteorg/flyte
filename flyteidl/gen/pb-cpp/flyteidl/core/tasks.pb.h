@@ -1032,6 +1032,12 @@ class RuntimeMetadata final :
   ::flyteidl::core::RuntimeMetadata_RuntimeType type() const;
   void set_type(::flyteidl::core::RuntimeMetadata_RuntimeType value);
 
+  // bool is_sync_plugin = 4;
+  void clear_is_sync_plugin();
+  static const int kIsSyncPluginFieldNumber = 4;
+  bool is_sync_plugin() const;
+  void set_is_sync_plugin(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.RuntimeMetadata)
  private:
   class HasBitSetters;
@@ -1040,6 +1046,7 @@ class RuntimeMetadata final :
   ::google::protobuf::internal::ArenaStringPtr version_;
   ::google::protobuf::internal::ArenaStringPtr flavor_;
   int type_;
+  bool is_sync_plugin_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
 };
@@ -3307,6 +3314,20 @@ inline void RuntimeMetadata::set_allocated_flavor(::std::string* flavor) {
   }
   flavor_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), flavor);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.RuntimeMetadata.flavor)
+}
+
+// bool is_sync_plugin = 4;
+inline void RuntimeMetadata::clear_is_sync_plugin() {
+  is_sync_plugin_ = false;
+}
+inline bool RuntimeMetadata::is_sync_plugin() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.RuntimeMetadata.is_sync_plugin)
+  return is_sync_plugin_;
+}
+inline void RuntimeMetadata::set_is_sync_plugin(bool value) {
+  
+  is_sync_plugin_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.RuntimeMetadata.is_sync_plugin)
 }
 
 // -------------------------------------------------------------------

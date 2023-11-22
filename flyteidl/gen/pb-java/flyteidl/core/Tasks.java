@@ -4015,7 +4015,7 @@ public final class Tasks {
 
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
@@ -4023,13 +4023,22 @@ public final class Tasks {
     java.lang.String getFlavor();
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
      */
     com.google.protobuf.ByteString
         getFlavorBytes();
+
+    /**
+     * <pre>
+     *+optional It can be used to decide use sync plugin or async plugin during runtime.
+     * </pre>
+     *
+     * <code>bool is_sync_plugin = 4;</code>
+     */
+    boolean getIsSyncPlugin();
   }
   /**
    * <pre>
@@ -4093,6 +4102,11 @@ public final class Tasks {
               java.lang.String s = input.readStringRequireUtf8();
 
               flavor_ = s;
+              break;
+            }
+            case 32: {
+
+              isSyncPlugin_ = input.readBool();
               break;
             }
             default: {
@@ -4298,7 +4312,7 @@ public final class Tasks {
     private volatile java.lang.Object flavor_;
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
@@ -4317,7 +4331,7 @@ public final class Tasks {
     }
     /**
      * <pre>
-     *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+     *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
      * </pre>
      *
      * <code>string flavor = 3;</code>
@@ -4334,6 +4348,19 @@ public final class Tasks {
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int IS_SYNC_PLUGIN_FIELD_NUMBER = 4;
+    private boolean isSyncPlugin_;
+    /**
+     * <pre>
+     *+optional It can be used to decide use sync plugin or async plugin during runtime.
+     * </pre>
+     *
+     * <code>bool is_sync_plugin = 4;</code>
+     */
+    public boolean getIsSyncPlugin() {
+      return isSyncPlugin_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -4359,6 +4386,9 @@ public final class Tasks {
       if (!getFlavorBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, flavor_);
       }
+      if (isSyncPlugin_ != false) {
+        output.writeBool(4, isSyncPlugin_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -4377,6 +4407,10 @@ public final class Tasks {
       }
       if (!getFlavorBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, flavor_);
+      }
+      if (isSyncPlugin_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(4, isSyncPlugin_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4398,6 +4432,8 @@ public final class Tasks {
           .equals(other.getVersion())) return false;
       if (!getFlavor()
           .equals(other.getFlavor())) return false;
+      if (getIsSyncPlugin()
+          != other.getIsSyncPlugin()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -4415,6 +4451,9 @@ public final class Tasks {
       hash = (53 * hash) + getVersion().hashCode();
       hash = (37 * hash) + FLAVOR_FIELD_NUMBER;
       hash = (53 * hash) + getFlavor().hashCode();
+      hash = (37 * hash) + IS_SYNC_PLUGIN_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getIsSyncPlugin());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4558,6 +4597,8 @@ public final class Tasks {
 
         flavor_ = "";
 
+        isSyncPlugin_ = false;
+
         return this;
       }
 
@@ -4587,6 +4628,7 @@ public final class Tasks {
         result.type_ = type_;
         result.version_ = version_;
         result.flavor_ = flavor_;
+        result.isSyncPlugin_ = isSyncPlugin_;
         onBuilt();
         return result;
       }
@@ -4645,6 +4687,9 @@ public final class Tasks {
         if (!other.getFlavor().isEmpty()) {
           flavor_ = other.flavor_;
           onChanged();
+        }
+        if (other.getIsSyncPlugin() != false) {
+          setIsSyncPlugin(other.getIsSyncPlugin());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4837,7 +4882,7 @@ public final class Tasks {
       private java.lang.Object flavor_ = "";
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4856,7 +4901,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4876,7 +4921,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4893,7 +4938,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4906,7 +4951,7 @@ public final class Tasks {
       }
       /**
        * <pre>
-       *+optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).
+       *+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
        * </pre>
        *
        * <code>string flavor = 3;</code>
@@ -4919,6 +4964,44 @@ public final class Tasks {
   checkByteStringIsUtf8(value);
         
         flavor_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean isSyncPlugin_ ;
+      /**
+       * <pre>
+       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       * </pre>
+       *
+       * <code>bool is_sync_plugin = 4;</code>
+       */
+      public boolean getIsSyncPlugin() {
+        return isSyncPlugin_;
+      }
+      /**
+       * <pre>
+       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       * </pre>
+       *
+       * <code>bool is_sync_plugin = 4;</code>
+       */
+      public Builder setIsSyncPlugin(boolean value) {
+        
+        isSyncPlugin_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       * </pre>
+       *
+       * <code>bool is_sync_plugin = 4;</code>
+       */
+      public Builder clearIsSyncPlugin() {
+        
+        isSyncPlugin_ = false;
         onChanged();
         return this;
       }
@@ -20636,77 +20719,78 @@ public final class Tasks {
       "rtition_size\030\003 \001(\tH\000B\026\n\024partition_size_v" +
       "alue\"K\n\021ExtendedResources\0226\n\017gpu_acceler" +
       "ator\030\001 \001(\0132\035.flyteidl.core.GPUAccelerato" +
-      "r\"\225\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.fl" +
+      "r\"\255\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.fl" +
       "yteidl.core.RuntimeMetadata.RuntimeType\022" +
-      "\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\"\'\n\013Runt" +
-      "imeType\022\t\n\005OTHER\020\000\022\r\n\tFLYTE_SDK\020\001\"\316\003\n\014Ta" +
-      "skMetadata\022\024\n\014discoverable\030\001 \001(\010\022/\n\007runt" +
-      "ime\030\002 \001(\0132\036.flyteidl.core.RuntimeMetadat" +
-      "a\022*\n\007timeout\030\004 \001(\0132\031.google.protobuf.Dur" +
-      "ation\022-\n\007retries\030\005 \001(\0132\034.flyteidl.core.R" +
-      "etryStrategy\022\031\n\021discovery_version\030\006 \001(\t\022" +
-      " \n\030deprecated_error_message\030\007 \001(\t\022\027\n\rint" +
-      "erruptible\030\010 \001(\010H\000\022\032\n\022cache_serializable" +
-      "\030\t \001(\010\022\026\n\016generates_deck\030\n \001(\010\0223\n\004tags\030\013" +
-      " \003(\0132%.flyteidl.core.TaskMetadata.TagsEn" +
-      "try\022\031\n\021pod_template_name\030\014 \001(\t\032+\n\tTagsEn" +
-      "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\025\n\023i" +
-      "nterruptible_value\"\316\004\n\014TaskTemplate\022%\n\002i" +
-      "d\030\001 \001(\0132\031.flyteidl.core.Identifier\022\014\n\004ty" +
-      "pe\030\002 \001(\t\022-\n\010metadata\030\003 \001(\0132\033.flyteidl.co" +
-      "re.TaskMetadata\0220\n\tinterface\030\004 \001(\0132\035.fly" +
-      "teidl.core.TypedInterface\022\'\n\006custom\030\005 \001(" +
-      "\0132\027.google.protobuf.Struct\022-\n\tcontainer\030" +
-      "\006 \001(\0132\030.flyteidl.core.ContainerH\000\022(\n\007k8s" +
-      "_pod\030\021 \001(\0132\025.flyteidl.core.K8sPodH\000\022!\n\003s" +
-      "ql\030\022 \001(\0132\022.flyteidl.core.SqlH\000\022\031\n\021task_t" +
-      "ype_version\030\007 \001(\005\0228\n\020security_context\030\010 " +
-      "\001(\0132\036.flyteidl.core.SecurityContext\022<\n\022e" +
-      "xtended_resources\030\t \001(\0132 .flyteidl.core." +
-      "ExtendedResources\0227\n\006config\030\020 \003(\0132\'.flyt" +
-      "eidl.core.TaskTemplate.ConfigEntry\032-\n\013Co" +
-      "nfigEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028" +
-      "\001B\010\n\006target\"\'\n\rContainerPort\022\026\n\016containe" +
-      "r_port\030\001 \001(\r\"\255\003\n\tContainer\022\r\n\005image\030\001 \001(" +
-      "\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\treso" +
-      "urces\030\004 \001(\0132\030.flyteidl.core.Resources\022(\n" +
-      "\003env\030\005 \003(\0132\033.flyteidl.core.KeyValuePair\022" +
-      "/\n\006config\030\006 \003(\0132\033.flyteidl.core.KeyValue" +
-      "PairB\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core." +
-      "ContainerPort\0225\n\013data_config\030\t \001(\0132 .fly" +
-      "teidl.core.DataLoadingConfig\022;\n\014architec" +
-      "ture\030\n \001(\0162%.flyteidl.core.Container.Arc" +
-      "hitecture\"I\n\014Architecture\022\013\n\007UNKNOWN\020\000\022\t" +
-      "\n\005AMD64\020\001\022\t\n\005ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006ARM_" +
-      "V7\020\004\"\233\002\n\nIOStrategy\022=\n\rdownload_mode\030\001 \001" +
-      "(\0162&.flyteidl.core.IOStrategy.DownloadMo" +
-      "de\0229\n\013upload_mode\030\002 \001(\0162$.flyteidl.core." +
-      "IOStrategy.UploadMode\"L\n\014DownloadMode\022\022\n" +
-      "\016DOWNLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023" +
-      "\n\017DO_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPL" +
-      "OAD_ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NO" +
-      "T_UPLOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enab" +
-      "led\030\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_" +
-      "path\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flyteidl.co" +
-      "re.DataLoadingConfig.LiteralMapFormat\022.\n" +
-      "\013io_strategy\030\005 \001(\0132\031.flyteidl.core.IOStr" +
-      "ategy\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004Y" +
-      "AML\020\001\022\t\n\005PROTO\020\002\"\236\001\n\006K8sPod\0222\n\010metadata\030" +
-      "\001 \001(\0132 .flyteidl.core.K8sObjectMetadata\022" +
-      ")\n\010pod_spec\030\002 \001(\0132\027.google.protobuf.Stru" +
-      "ct\0225\n\013data_config\030\003 \001(\0132 .flyteidl.core." +
-      "DataLoadingConfig\"\374\001\n\021K8sObjectMetadata\022" +
-      "<\n\006labels\030\001 \003(\0132,.flyteidl.core.K8sObjec" +
-      "tMetadata.LabelsEntry\022F\n\013annotations\030\002 \003" +
-      "(\01321.flyteidl.core.K8sObjectMetadata.Ann" +
-      "otationsEntry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(" +
-      "\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry" +
-      "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022" +
-      "\021\n\tstatement\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.fl" +
-      "yteidl.core.Sql.Dialect\"7\n\007Dialect\022\r\n\tUN" +
-      "DEFINED\020\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003" +
-      "B<Z:github.com/flyteorg/flyte/flyteidl/g" +
-      "en/pb-go/flyteidl/coreb\006proto3"
+      "\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\022\026\n\016is_s" +
+      "ync_plugin\030\004 \001(\010\"\'\n\013RuntimeType\022\t\n\005OTHER" +
+      "\020\000\022\r\n\tFLYTE_SDK\020\001\"\316\003\n\014TaskMetadata\022\024\n\014di" +
+      "scoverable\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyt" +
+      "eidl.core.RuntimeMetadata\022*\n\007timeout\030\004 \001" +
+      "(\0132\031.google.protobuf.Duration\022-\n\007retries" +
+      "\030\005 \001(\0132\034.flyteidl.core.RetryStrategy\022\031\n\021" +
+      "discovery_version\030\006 \001(\t\022 \n\030deprecated_er" +
+      "ror_message\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010" +
+      "H\000\022\032\n\022cache_serializable\030\t \001(\010\022\026\n\016genera" +
+      "tes_deck\030\n \001(\010\0223\n\004tags\030\013 \003(\0132%.flyteidl." +
+      "core.TaskMetadata.TagsEntry\022\031\n\021pod_templ" +
+      "ate_name\030\014 \001(\t\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t" +
+      "\022\r\n\005value\030\002 \001(\t:\0028\001B\025\n\023interruptible_val" +
+      "ue\"\316\004\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei" +
+      "dl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010meta" +
+      "data\030\003 \001(\0132\033.flyteidl.core.TaskMetadata\022" +
+      "0\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Typed" +
+      "Interface\022\'\n\006custom\030\005 \001(\0132\027.google.proto" +
+      "buf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl" +
+      ".core.ContainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.fly" +
+      "teidl.core.K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.flyte" +
+      "idl.core.SqlH\000\022\031\n\021task_type_version\030\007 \001(" +
+      "\005\0228\n\020security_context\030\010 \001(\0132\036.flyteidl.c" +
+      "ore.SecurityContext\022<\n\022extended_resource" +
+      "s\030\t \001(\0132 .flyteidl.core.ExtendedResource" +
+      "s\0227\n\006config\030\020 \003(\0132\'.flyteidl.core.TaskTe" +
+      "mplate.ConfigEntry\032-\n\013ConfigEntry\022\013\n\003key" +
+      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'\n\rC" +
+      "ontainerPort\022\026\n\016container_port\030\001 \001(\r\"\255\003\n" +
+      "\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003" +
+      "(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.fl" +
+      "yteidl.core.Resources\022(\n\003env\030\005 \003(\0132\033.fly" +
+      "teidl.core.KeyValuePair\022/\n\006config\030\006 \003(\0132" +
+      "\033.flyteidl.core.KeyValuePairB\002\030\001\022+\n\005port" +
+      "s\030\007 \003(\0132\034.flyteidl.core.ContainerPort\0225\n" +
+      "\013data_config\030\t \001(\0132 .flyteidl.core.DataL" +
+      "oadingConfig\022;\n\014architecture\030\n \001(\0162%.fly" +
+      "teidl.core.Container.Architecture\"I\n\014Arc" +
+      "hitecture\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64\020\001\022\t\n\005ARM" +
+      "64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002\n\nIOStrat" +
+      "egy\022=\n\rdownload_mode\030\001 \001(\0162&.flyteidl.co" +
+      "re.IOStrategy.DownloadMode\0229\n\013upload_mod" +
+      "e\030\002 \001(\0162$.flyteidl.core.IOStrategy.Uploa" +
+      "dMode\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020" +
+      "\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOA" +
+      "D\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n" +
+      "\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021D" +
+      "ataLoadingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninp" +
+      "ut_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006fo" +
+      "rmat\030\004 \001(\01621.flyteidl.core.DataLoadingCo" +
+      "nfig.LiteralMapFormat\022.\n\013io_strategy\030\005 \001" +
+      "(\0132\031.flyteidl.core.IOStrategy\"1\n\020Literal" +
+      "MapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002" +
+      "\"\236\001\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 .flyteidl" +
+      ".core.K8sObjectMetadata\022)\n\010pod_spec\030\002 \001(" +
+      "\0132\027.google.protobuf.Struct\0225\n\013data_confi" +
+      "g\030\003 \001(\0132 .flyteidl.core.DataLoadingConfi" +
+      "g\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001 \003(\0132" +
+      ",.flyteidl.core.K8sObjectMetadata.Labels" +
+      "Entry\022F\n\013annotations\030\002 \003(\01321.flyteidl.co" +
+      "re.K8sObjectMetadata.AnnotationsEntry\032-\n" +
+      "\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
+      ":\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
+      "\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatement\030\001 \001" +
+      "(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.core.Sql." +
+      "Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010\n\004ANS" +
+      "I\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B<Z:github.com/f" +
+      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
+      "l/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20755,7 +20839,7 @@ public final class Tasks {
     internal_static_flyteidl_core_RuntimeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_RuntimeMetadata_descriptor,
-        new java.lang.String[] { "Type", "Version", "Flavor", });
+        new java.lang.String[] { "Type", "Version", "Flavor", "IsSyncPlugin", });
     internal_static_flyteidl_core_TaskMetadata_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable = new

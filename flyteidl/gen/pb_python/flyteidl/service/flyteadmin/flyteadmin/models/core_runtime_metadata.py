@@ -35,21 +35,24 @@ class CoreRuntimeMetadata(object):
     swagger_types = {
         'type': 'RuntimeMetadataRuntimeType',
         'version': 'str',
-        'flavor': 'str'
+        'flavor': 'str',
+        'is_sync_plugin': 'bool'
     }
 
     attribute_map = {
         'type': 'type',
         'version': 'version',
-        'flavor': 'flavor'
+        'flavor': 'flavor',
+        'is_sync_plugin': 'is_sync_plugin'
     }
 
-    def __init__(self, type=None, version=None, flavor=None):  # noqa: E501
+    def __init__(self, type=None, version=None, flavor=None, is_sync_plugin=None):  # noqa: E501
         """CoreRuntimeMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._type = None
         self._version = None
         self._flavor = None
+        self._is_sync_plugin = None
         self.discriminator = None
 
         if type is not None:
@@ -58,6 +61,8 @@ class CoreRuntimeMetadata(object):
             self.version = version
         if flavor is not None:
             self.flavor = flavor
+        if is_sync_plugin is not None:
+            self.is_sync_plugin = is_sync_plugin
 
     @property
     def type(self):
@@ -109,7 +114,7 @@ class CoreRuntimeMetadata(object):
     def flavor(self):
         """Gets the flavor of this CoreRuntimeMetadata.  # noqa: E501
 
-        +optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).  # noqa: E501
+        +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).  # noqa: E501
 
         :return: The flavor of this CoreRuntimeMetadata.  # noqa: E501
         :rtype: str
@@ -120,13 +125,36 @@ class CoreRuntimeMetadata(object):
     def flavor(self, flavor):
         """Sets the flavor of this CoreRuntimeMetadata.
 
-        +optional It can be used to provide extra information about the plugin type (e.g. async plugin, sync plugin... etc.).  # noqa: E501
+        +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).  # noqa: E501
 
         :param flavor: The flavor of this CoreRuntimeMetadata.  # noqa: E501
         :type: str
         """
 
         self._flavor = flavor
+
+    @property
+    def is_sync_plugin(self):
+        """Gets the is_sync_plugin of this CoreRuntimeMetadata.  # noqa: E501
+
+        +optional It can be used to decide use sync plugin or async plugin during runtime.  # noqa: E501
+
+        :return: The is_sync_plugin of this CoreRuntimeMetadata.  # noqa: E501
+        :rtype: bool
+        """
+        return self._is_sync_plugin
+
+    @is_sync_plugin.setter
+    def is_sync_plugin(self, is_sync_plugin):
+        """Sets the is_sync_plugin of this CoreRuntimeMetadata.
+
+        +optional It can be used to decide use sync plugin or async plugin during runtime.  # noqa: E501
+
+        :param is_sync_plugin: The is_sync_plugin of this CoreRuntimeMetadata.  # noqa: E501
+        :type: bool
+        """
+
+        self._is_sync_plugin = is_sync_plugin
 
     def to_dict(self):
         """Returns the model properties as a dict"""

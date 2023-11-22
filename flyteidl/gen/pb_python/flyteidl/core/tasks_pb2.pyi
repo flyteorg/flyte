@@ -58,7 +58,7 @@ class ExtendedResources(_message.Message):
     def __init__(self, gpu_accelerator: _Optional[_Union[GPUAccelerator, _Mapping]] = ...) -> None: ...
 
 class RuntimeMetadata(_message.Message):
-    __slots__ = ["type", "version", "flavor"]
+    __slots__ = ["type", "version", "flavor", "is_sync_plugin"]
     class RuntimeType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         OTHER: _ClassVar[RuntimeMetadata.RuntimeType]
@@ -68,10 +68,12 @@ class RuntimeMetadata(_message.Message):
     TYPE_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     FLAVOR_FIELD_NUMBER: _ClassVar[int]
+    IS_SYNC_PLUGIN_FIELD_NUMBER: _ClassVar[int]
     type: RuntimeMetadata.RuntimeType
     version: str
     flavor: str
-    def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ...) -> None: ...
+    is_sync_plugin: bool
+    def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ..., is_sync_plugin: bool = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
     __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "generates_deck", "tags", "pod_template_name"]

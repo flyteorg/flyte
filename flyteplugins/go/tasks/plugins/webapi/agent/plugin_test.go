@@ -30,7 +30,7 @@ func TestDo(t *testing.T) {
 		Type: "api_task",
 		Metadata: &flyteIdlCore.TaskMetadata{
 			Runtime: &flyteIdlCore.RuntimeMetadata{
-				Flavor: "sync_plugin",
+				IsSyncPlugin: true,
 			},
 		},
 	}
