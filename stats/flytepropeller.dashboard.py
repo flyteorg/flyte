@@ -707,24 +707,25 @@ class FlytePropeller(object):
 
     @staticmethod
     def workflow_latency_per_wf(latency_type: str) -> typing.List[Graph]:
+        latency_name = latency_type.replace(":", " ").capitalize()
         return [
             Graph(
-                title=f"{latency_type.capitalize()} Latency per workflow",
+                title=f"{latency_name} latency per workflow",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f"sum(flyte:propeller:all:node:{latency_type}_latency_ms) by (wf)",
+                        expr=f"sum(flyte:propeller:all:{latency_type}_latency_ms) by (wf)",
                         refId="A",
                     ),
                 ],
                 yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
             ),
             Graph(
-                title=f"{latency_type.capitalize()} Latency by quantile",
+                title=f"{latency_name} latency by quantile",
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr=f"sum(flyte:propeller:all:node:{latency_type}_latency_unlabeled_ms) by (quantile)",
+                        expr=f"sum(flyte:propeller:all:{latency_type}_latency_unlabeled_ms) by (quantile)",
                         refId="A",
                     ),
                 ],
@@ -742,10 +743,10 @@ class FlytePropeller(object):
                 for panels in [
                     FlytePropeller.workflow_latency_per_wf(latency_type)
                     for latency_type in [
-                        "acceptance",
-                        "transition",
-                        "queueing",
-                        "completion",
+                        "node:acceptance",
+                        "node:transition",
+                        "node:queueing",
+                        "workflow:completion",
                     ]
                 ]
                 for panel in panels
