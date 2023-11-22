@@ -95,7 +95,7 @@ fqdn==1.5.1               # via jsonschema
 frozendict==2.3.8         # via vaex-core
 frozenlist==1.4.0         # via aiohttp, aiosignal, ray
 fsspec[http]==2023.9.2    # via -r common-requirements.in, adlfs, dask, datasets, flytekit, gcsfs, huggingface-hub, modin, s3fs, torch
-furo @ git+https://github.com/flyteorg/furo@main  # via -r common-requirements.in, -r monodocs-requirements.in
+furo @ git+https://github.com/flyteorg/furo@main  # via -r monodocs-requirements.in
 future==0.18.3            # via vaex-core
 gast==0.5.4               # via tensorflow-macos
 gcsfs==2023.9.2           # via flytekit
