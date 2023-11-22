@@ -153,7 +153,7 @@ class FlytePropeller(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr="sum by(instance) (rate(flyte:propeller:all:wf_enqueue[5m])",
+                    expr="sum by(instance) (rate(flyte:propeller:all:wf_enqueue[5m]))",
                     refId="A",
                 ),
             ],
