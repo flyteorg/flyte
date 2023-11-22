@@ -31,7 +31,9 @@ func TestHandle(t *testing.T) {
 		Type: "api_task",
 		Metadata: &flyteIdlCore.TaskMetadata{
 			Runtime: &flyteIdlCore.RuntimeMetadata{
-				IsSyncPlugin: true,
+				PluginMetadata: &flyteIdlCore.PluginMetadata{
+					IsSyncPlugin: true,
+				},
 			},
 		},
 	}

@@ -12614,7 +12614,7 @@
                  * @property {flyteidl.core.RuntimeMetadata.RuntimeType|null} [type] RuntimeMetadata type
                  * @property {string|null} [version] RuntimeMetadata version
                  * @property {string|null} [flavor] RuntimeMetadata flavor
-                 * @property {boolean|null} [isSyncPlugin] RuntimeMetadata isSyncPlugin
+                 * @property {flyteidl.core.IPluginMetadata|null} [pluginMetadata] RuntimeMetadata pluginMetadata
                  */
     
                 /**
@@ -12657,12 +12657,12 @@
                 RuntimeMetadata.prototype.flavor = "";
     
                 /**
-                 * RuntimeMetadata isSyncPlugin.
-                 * @member {boolean} isSyncPlugin
+                 * RuntimeMetadata pluginMetadata.
+                 * @member {flyteidl.core.IPluginMetadata|null|undefined} pluginMetadata
                  * @memberof flyteidl.core.RuntimeMetadata
                  * @instance
                  */
-                RuntimeMetadata.prototype.isSyncPlugin = false;
+                RuntimeMetadata.prototype.pluginMetadata = null;
     
                 /**
                  * Creates a new RuntimeMetadata instance using the specified properties.
@@ -12694,8 +12694,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
                     if (message.flavor != null && message.hasOwnProperty("flavor"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.flavor);
-                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
-                        writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isSyncPlugin);
+                    if (message.pluginMetadata != null && message.hasOwnProperty("pluginMetadata"))
+                        $root.flyteidl.core.PluginMetadata.encode(message.pluginMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12727,7 +12727,7 @@
                             message.flavor = reader.string();
                             break;
                         case 4:
-                            message.isSyncPlugin = reader.bool();
+                            message.pluginMetadata = $root.flyteidl.core.PluginMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12762,9 +12762,11 @@
                     if (message.flavor != null && message.hasOwnProperty("flavor"))
                         if (!$util.isString(message.flavor))
                             return "flavor: string expected";
-                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
-                        if (typeof message.isSyncPlugin !== "boolean")
-                            return "isSyncPlugin: boolean expected";
+                    if (message.pluginMetadata != null && message.hasOwnProperty("pluginMetadata")) {
+                        var error = $root.flyteidl.core.PluginMetadata.verify(message.pluginMetadata);
+                        if (error)
+                            return "pluginMetadata." + error;
+                    }
                     return null;
                 };
     
@@ -12783,6 +12785,116 @@
                 })();
     
                 return RuntimeMetadata;
+            })();
+    
+            core.PluginMetadata = (function() {
+    
+                /**
+                 * Properties of a PluginMetadata.
+                 * @memberof flyteidl.core
+                 * @interface IPluginMetadata
+                 * @property {boolean|null} [isSyncPlugin] PluginMetadata isSyncPlugin
+                 */
+    
+                /**
+                 * Constructs a new PluginMetadata.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a PluginMetadata.
+                 * @implements IPluginMetadata
+                 * @constructor
+                 * @param {flyteidl.core.IPluginMetadata=} [properties] Properties to set
+                 */
+                function PluginMetadata(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * PluginMetadata isSyncPlugin.
+                 * @member {boolean} isSyncPlugin
+                 * @memberof flyteidl.core.PluginMetadata
+                 * @instance
+                 */
+                PluginMetadata.prototype.isSyncPlugin = false;
+    
+                /**
+                 * Creates a new PluginMetadata instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.PluginMetadata
+                 * @static
+                 * @param {flyteidl.core.IPluginMetadata=} [properties] Properties to set
+                 * @returns {flyteidl.core.PluginMetadata} PluginMetadata instance
+                 */
+                PluginMetadata.create = function create(properties) {
+                    return new PluginMetadata(properties);
+                };
+    
+                /**
+                 * Encodes the specified PluginMetadata message. Does not implicitly {@link flyteidl.core.PluginMetadata.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.PluginMetadata
+                 * @static
+                 * @param {flyteidl.core.IPluginMetadata} message PluginMetadata message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                PluginMetadata.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).bool(message.isSyncPlugin);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a PluginMetadata message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.PluginMetadata
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.PluginMetadata} PluginMetadata
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                PluginMetadata.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.PluginMetadata();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.isSyncPlugin = reader.bool();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a PluginMetadata message.
+                 * @function verify
+                 * @memberof flyteidl.core.PluginMetadata
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                PluginMetadata.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
+                        if (typeof message.isSyncPlugin !== "boolean")
+                            return "isSyncPlugin: boolean expected";
+                    return null;
+                };
+    
+                return PluginMetadata;
             })();
     
             core.TaskMetadata = (function() {

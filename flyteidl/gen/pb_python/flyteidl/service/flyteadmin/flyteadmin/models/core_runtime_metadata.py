@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_plugin_metadata import CorePluginMetadata  # noqa: F401,E501
 from flyteadmin.models.runtime_metadata_runtime_type import RuntimeMetadataRuntimeType  # noqa: F401,E501
 
 
@@ -36,23 +37,23 @@ class CoreRuntimeMetadata(object):
         'type': 'RuntimeMetadataRuntimeType',
         'version': 'str',
         'flavor': 'str',
-        'is_sync_plugin': 'bool'
+        'plugin_metadata': 'CorePluginMetadata'
     }
 
     attribute_map = {
         'type': 'type',
         'version': 'version',
         'flavor': 'flavor',
-        'is_sync_plugin': 'is_sync_plugin'
+        'plugin_metadata': 'plugin_metadata'
     }
 
-    def __init__(self, type=None, version=None, flavor=None, is_sync_plugin=None):  # noqa: E501
+    def __init__(self, type=None, version=None, flavor=None, plugin_metadata=None):  # noqa: E501
         """CoreRuntimeMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._type = None
         self._version = None
         self._flavor = None
-        self._is_sync_plugin = None
+        self._plugin_metadata = None
         self.discriminator = None
 
         if type is not None:
@@ -61,8 +62,8 @@ class CoreRuntimeMetadata(object):
             self.version = version
         if flavor is not None:
             self.flavor = flavor
-        if is_sync_plugin is not None:
-            self.is_sync_plugin = is_sync_plugin
+        if plugin_metadata is not None:
+            self.plugin_metadata = plugin_metadata
 
     @property
     def type(self):
@@ -134,27 +135,27 @@ class CoreRuntimeMetadata(object):
         self._flavor = flavor
 
     @property
-    def is_sync_plugin(self):
-        """Gets the is_sync_plugin of this CoreRuntimeMetadata.  # noqa: E501
+    def plugin_metadata(self):
+        """Gets the plugin_metadata of this CoreRuntimeMetadata.  # noqa: E501
 
-        +optional It can be used to decide use sync plugin or async plugin during runtime.  # noqa: E501
+        +optional It can be used to provide extra information for the plugin.  # noqa: E501
 
-        :return: The is_sync_plugin of this CoreRuntimeMetadata.  # noqa: E501
-        :rtype: bool
+        :return: The plugin_metadata of this CoreRuntimeMetadata.  # noqa: E501
+        :rtype: CorePluginMetadata
         """
-        return self._is_sync_plugin
+        return self._plugin_metadata
 
-    @is_sync_plugin.setter
-    def is_sync_plugin(self, is_sync_plugin):
-        """Sets the is_sync_plugin of this CoreRuntimeMetadata.
+    @plugin_metadata.setter
+    def plugin_metadata(self, plugin_metadata):
+        """Sets the plugin_metadata of this CoreRuntimeMetadata.
 
-        +optional It can be used to decide use sync plugin or async plugin during runtime.  # noqa: E501
+        +optional It can be used to provide extra information for the plugin.  # noqa: E501
 
-        :param is_sync_plugin: The is_sync_plugin of this CoreRuntimeMetadata.  # noqa: E501
-        :type: bool
+        :param plugin_metadata: The plugin_metadata of this CoreRuntimeMetadata.  # noqa: E501
+        :type: CorePluginMetadata
         """
 
-        self._is_sync_plugin = is_sync_plugin
+        self._plugin_metadata = plugin_metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""

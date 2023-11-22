@@ -4033,12 +4033,28 @@ public final class Tasks {
 
     /**
      * <pre>
-     *+optional It can be used to decide use sync plugin or async plugin during runtime.
+     *+optional It can be used to provide extra information for the plugin.
      * </pre>
      *
-     * <code>bool is_sync_plugin = 4;</code>
+     * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
      */
-    boolean getIsSyncPlugin();
+    boolean hasPluginMetadata();
+    /**
+     * <pre>
+     *+optional It can be used to provide extra information for the plugin.
+     * </pre>
+     *
+     * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+     */
+    flyteidl.core.Tasks.PluginMetadata getPluginMetadata();
+    /**
+     * <pre>
+     *+optional It can be used to provide extra information for the plugin.
+     * </pre>
+     *
+     * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+     */
+    flyteidl.core.Tasks.PluginMetadataOrBuilder getPluginMetadataOrBuilder();
   }
   /**
    * <pre>
@@ -4104,9 +4120,17 @@ public final class Tasks {
               flavor_ = s;
               break;
             }
-            case 32: {
+            case 34: {
+              flyteidl.core.Tasks.PluginMetadata.Builder subBuilder = null;
+              if (pluginMetadata_ != null) {
+                subBuilder = pluginMetadata_.toBuilder();
+              }
+              pluginMetadata_ = input.readMessage(flyteidl.core.Tasks.PluginMetadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(pluginMetadata_);
+                pluginMetadata_ = subBuilder.buildPartial();
+              }
 
-              isSyncPlugin_ = input.readBool();
               break;
             }
             default: {
@@ -4350,17 +4374,37 @@ public final class Tasks {
       }
     }
 
-    public static final int IS_SYNC_PLUGIN_FIELD_NUMBER = 4;
-    private boolean isSyncPlugin_;
+    public static final int PLUGIN_METADATA_FIELD_NUMBER = 4;
+    private flyteidl.core.Tasks.PluginMetadata pluginMetadata_;
     /**
      * <pre>
-     *+optional It can be used to decide use sync plugin or async plugin during runtime.
+     *+optional It can be used to provide extra information for the plugin.
      * </pre>
      *
-     * <code>bool is_sync_plugin = 4;</code>
+     * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
      */
-    public boolean getIsSyncPlugin() {
-      return isSyncPlugin_;
+    public boolean hasPluginMetadata() {
+      return pluginMetadata_ != null;
+    }
+    /**
+     * <pre>
+     *+optional It can be used to provide extra information for the plugin.
+     * </pre>
+     *
+     * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+     */
+    public flyteidl.core.Tasks.PluginMetadata getPluginMetadata() {
+      return pluginMetadata_ == null ? flyteidl.core.Tasks.PluginMetadata.getDefaultInstance() : pluginMetadata_;
+    }
+    /**
+     * <pre>
+     *+optional It can be used to provide extra information for the plugin.
+     * </pre>
+     *
+     * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+     */
+    public flyteidl.core.Tasks.PluginMetadataOrBuilder getPluginMetadataOrBuilder() {
+      return getPluginMetadata();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -4386,8 +4430,8 @@ public final class Tasks {
       if (!getFlavorBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, flavor_);
       }
-      if (isSyncPlugin_ != false) {
-        output.writeBool(4, isSyncPlugin_);
+      if (pluginMetadata_ != null) {
+        output.writeMessage(4, getPluginMetadata());
       }
       unknownFields.writeTo(output);
     }
@@ -4408,9 +4452,9 @@ public final class Tasks {
       if (!getFlavorBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, flavor_);
       }
-      if (isSyncPlugin_ != false) {
+      if (pluginMetadata_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(4, isSyncPlugin_);
+          .computeMessageSize(4, getPluginMetadata());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -4432,8 +4476,11 @@ public final class Tasks {
           .equals(other.getVersion())) return false;
       if (!getFlavor()
           .equals(other.getFlavor())) return false;
-      if (getIsSyncPlugin()
-          != other.getIsSyncPlugin()) return false;
+      if (hasPluginMetadata() != other.hasPluginMetadata()) return false;
+      if (hasPluginMetadata()) {
+        if (!getPluginMetadata()
+            .equals(other.getPluginMetadata())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -4451,9 +4498,10 @@ public final class Tasks {
       hash = (53 * hash) + getVersion().hashCode();
       hash = (37 * hash) + FLAVOR_FIELD_NUMBER;
       hash = (53 * hash) + getFlavor().hashCode();
-      hash = (37 * hash) + IS_SYNC_PLUGIN_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getIsSyncPlugin());
+      if (hasPluginMetadata()) {
+        hash = (37 * hash) + PLUGIN_METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getPluginMetadata().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4597,8 +4645,12 @@ public final class Tasks {
 
         flavor_ = "";
 
-        isSyncPlugin_ = false;
-
+        if (pluginMetadataBuilder_ == null) {
+          pluginMetadata_ = null;
+        } else {
+          pluginMetadata_ = null;
+          pluginMetadataBuilder_ = null;
+        }
         return this;
       }
 
@@ -4628,7 +4680,11 @@ public final class Tasks {
         result.type_ = type_;
         result.version_ = version_;
         result.flavor_ = flavor_;
-        result.isSyncPlugin_ = isSyncPlugin_;
+        if (pluginMetadataBuilder_ == null) {
+          result.pluginMetadata_ = pluginMetadata_;
+        } else {
+          result.pluginMetadata_ = pluginMetadataBuilder_.build();
+        }
         onBuilt();
         return result;
       }
@@ -4688,8 +4744,8 @@ public final class Tasks {
           flavor_ = other.flavor_;
           onChanged();
         }
-        if (other.getIsSyncPlugin() != false) {
-          setIsSyncPlugin(other.getIsSyncPlugin());
+        if (other.hasPluginMetadata()) {
+          mergePluginMetadata(other.getPluginMetadata());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4968,42 +5024,157 @@ public final class Tasks {
         return this;
       }
 
-      private boolean isSyncPlugin_ ;
+      private flyteidl.core.Tasks.PluginMetadata pluginMetadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.PluginMetadata, flyteidl.core.Tasks.PluginMetadata.Builder, flyteidl.core.Tasks.PluginMetadataOrBuilder> pluginMetadataBuilder_;
       /**
        * <pre>
-       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       *+optional It can be used to provide extra information for the plugin.
        * </pre>
        *
-       * <code>bool is_sync_plugin = 4;</code>
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
        */
-      public boolean getIsSyncPlugin() {
-        return isSyncPlugin_;
+      public boolean hasPluginMetadata() {
+        return pluginMetadataBuilder_ != null || pluginMetadata_ != null;
       }
       /**
        * <pre>
-       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       *+optional It can be used to provide extra information for the plugin.
        * </pre>
        *
-       * <code>bool is_sync_plugin = 4;</code>
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
        */
-      public Builder setIsSyncPlugin(boolean value) {
-        
-        isSyncPlugin_ = value;
-        onChanged();
+      public flyteidl.core.Tasks.PluginMetadata getPluginMetadata() {
+        if (pluginMetadataBuilder_ == null) {
+          return pluginMetadata_ == null ? flyteidl.core.Tasks.PluginMetadata.getDefaultInstance() : pluginMetadata_;
+        } else {
+          return pluginMetadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       *+optional It can be used to provide extra information for the plugin.
+       * </pre>
+       *
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+       */
+      public Builder setPluginMetadata(flyteidl.core.Tasks.PluginMetadata value) {
+        if (pluginMetadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          pluginMetadata_ = value;
+          onChanged();
+        } else {
+          pluginMetadataBuilder_.setMessage(value);
+        }
+
         return this;
       }
       /**
        * <pre>
-       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       *+optional It can be used to provide extra information for the plugin.
        * </pre>
        *
-       * <code>bool is_sync_plugin = 4;</code>
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
        */
-      public Builder clearIsSyncPlugin() {
-        
-        isSyncPlugin_ = false;
-        onChanged();
+      public Builder setPluginMetadata(
+          flyteidl.core.Tasks.PluginMetadata.Builder builderForValue) {
+        if (pluginMetadataBuilder_ == null) {
+          pluginMetadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          pluginMetadataBuilder_.setMessage(builderForValue.build());
+        }
+
         return this;
+      }
+      /**
+       * <pre>
+       *+optional It can be used to provide extra information for the plugin.
+       * </pre>
+       *
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+       */
+      public Builder mergePluginMetadata(flyteidl.core.Tasks.PluginMetadata value) {
+        if (pluginMetadataBuilder_ == null) {
+          if (pluginMetadata_ != null) {
+            pluginMetadata_ =
+              flyteidl.core.Tasks.PluginMetadata.newBuilder(pluginMetadata_).mergeFrom(value).buildPartial();
+          } else {
+            pluginMetadata_ = value;
+          }
+          onChanged();
+        } else {
+          pluginMetadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *+optional It can be used to provide extra information for the plugin.
+       * </pre>
+       *
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+       */
+      public Builder clearPluginMetadata() {
+        if (pluginMetadataBuilder_ == null) {
+          pluginMetadata_ = null;
+          onChanged();
+        } else {
+          pluginMetadata_ = null;
+          pluginMetadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       *+optional It can be used to provide extra information for the plugin.
+       * </pre>
+       *
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+       */
+      public flyteidl.core.Tasks.PluginMetadata.Builder getPluginMetadataBuilder() {
+        
+        onChanged();
+        return getPluginMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       *+optional It can be used to provide extra information for the plugin.
+       * </pre>
+       *
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+       */
+      public flyteidl.core.Tasks.PluginMetadataOrBuilder getPluginMetadataOrBuilder() {
+        if (pluginMetadataBuilder_ != null) {
+          return pluginMetadataBuilder_.getMessageOrBuilder();
+        } else {
+          return pluginMetadata_ == null ?
+              flyteidl.core.Tasks.PluginMetadata.getDefaultInstance() : pluginMetadata_;
+        }
+      }
+      /**
+       * <pre>
+       *+optional It can be used to provide extra information for the plugin.
+       * </pre>
+       *
+       * <code>.flyteidl.core.PluginMetadata plugin_metadata = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.PluginMetadata, flyteidl.core.Tasks.PluginMetadata.Builder, flyteidl.core.Tasks.PluginMetadataOrBuilder> 
+          getPluginMetadataFieldBuilder() {
+        if (pluginMetadataBuilder_ == null) {
+          pluginMetadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.PluginMetadata, flyteidl.core.Tasks.PluginMetadata.Builder, flyteidl.core.Tasks.PluginMetadataOrBuilder>(
+                  getPluginMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          pluginMetadata_ = null;
+        }
+        return pluginMetadataBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -5053,6 +5224,501 @@ public final class Tasks {
 
     @java.lang.Override
     public flyteidl.core.Tasks.RuntimeMetadata getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface PluginMetadataOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.PluginMetadata)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     *+optional It can be used to decide use sync plugin or async plugin during runtime.
+     * </pre>
+     *
+     * <code>bool is_sync_plugin = 1;</code>
+     */
+    boolean getIsSyncPlugin();
+  }
+  /**
+   * Protobuf type {@code flyteidl.core.PluginMetadata}
+   */
+  public  static final class PluginMetadata extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.PluginMetadata)
+      PluginMetadataOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use PluginMetadata.newBuilder() to construct.
+    private PluginMetadata(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private PluginMetadata() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PluginMetadata(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+
+              isSyncPlugin_ = input.readBool();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_PluginMetadata_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_PluginMetadata_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Tasks.PluginMetadata.class, flyteidl.core.Tasks.PluginMetadata.Builder.class);
+    }
+
+    public static final int IS_SYNC_PLUGIN_FIELD_NUMBER = 1;
+    private boolean isSyncPlugin_;
+    /**
+     * <pre>
+     *+optional It can be used to decide use sync plugin or async plugin during runtime.
+     * </pre>
+     *
+     * <code>bool is_sync_plugin = 1;</code>
+     */
+    public boolean getIsSyncPlugin() {
+      return isSyncPlugin_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (isSyncPlugin_ != false) {
+        output.writeBool(1, isSyncPlugin_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (isSyncPlugin_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, isSyncPlugin_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Tasks.PluginMetadata)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Tasks.PluginMetadata other = (flyteidl.core.Tasks.PluginMetadata) obj;
+
+      if (getIsSyncPlugin()
+          != other.getIsSyncPlugin()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + IS_SYNC_PLUGIN_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getIsSyncPlugin());
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.PluginMetadata parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Tasks.PluginMetadata prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.core.PluginMetadata}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.PluginMetadata)
+        flyteidl.core.Tasks.PluginMetadataOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_PluginMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_PluginMetadata_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Tasks.PluginMetadata.class, flyteidl.core.Tasks.PluginMetadata.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Tasks.PluginMetadata.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        isSyncPlugin_ = false;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_PluginMetadata_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.PluginMetadata getDefaultInstanceForType() {
+        return flyteidl.core.Tasks.PluginMetadata.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.PluginMetadata build() {
+        flyteidl.core.Tasks.PluginMetadata result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.PluginMetadata buildPartial() {
+        flyteidl.core.Tasks.PluginMetadata result = new flyteidl.core.Tasks.PluginMetadata(this);
+        result.isSyncPlugin_ = isSyncPlugin_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Tasks.PluginMetadata) {
+          return mergeFrom((flyteidl.core.Tasks.PluginMetadata)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Tasks.PluginMetadata other) {
+        if (other == flyteidl.core.Tasks.PluginMetadata.getDefaultInstance()) return this;
+        if (other.getIsSyncPlugin() != false) {
+          setIsSyncPlugin(other.getIsSyncPlugin());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Tasks.PluginMetadata parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Tasks.PluginMetadata) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private boolean isSyncPlugin_ ;
+      /**
+       * <pre>
+       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       * </pre>
+       *
+       * <code>bool is_sync_plugin = 1;</code>
+       */
+      public boolean getIsSyncPlugin() {
+        return isSyncPlugin_;
+      }
+      /**
+       * <pre>
+       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       * </pre>
+       *
+       * <code>bool is_sync_plugin = 1;</code>
+       */
+      public Builder setIsSyncPlugin(boolean value) {
+        
+        isSyncPlugin_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *+optional It can be used to decide use sync plugin or async plugin during runtime.
+       * </pre>
+       *
+       * <code>bool is_sync_plugin = 1;</code>
+       */
+      public Builder clearIsSyncPlugin() {
+        
+        isSyncPlugin_ = false;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.PluginMetadata)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.PluginMetadata)
+    private static final flyteidl.core.Tasks.PluginMetadata DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Tasks.PluginMetadata();
+    }
+
+    public static flyteidl.core.Tasks.PluginMetadata getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<PluginMetadata>
+        PARSER = new com.google.protobuf.AbstractParser<PluginMetadata>() {
+      @java.lang.Override
+      public PluginMetadata parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PluginMetadata(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<PluginMetadata> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PluginMetadata> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Tasks.PluginMetadata getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -20628,6 +21294,11 @@ public final class Tasks {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_RuntimeMetadata_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_PluginMetadata_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_PluginMetadata_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_TaskMetadata_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -20719,78 +21390,80 @@ public final class Tasks {
       "rtition_size\030\003 \001(\tH\000B\026\n\024partition_size_v" +
       "alue\"K\n\021ExtendedResources\0226\n\017gpu_acceler" +
       "ator\030\001 \001(\0132\035.flyteidl.core.GPUAccelerato" +
-      "r\"\255\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.fl" +
+      "r\"\315\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.fl" +
       "yteidl.core.RuntimeMetadata.RuntimeType\022" +
-      "\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\022\026\n\016is_s" +
-      "ync_plugin\030\004 \001(\010\"\'\n\013RuntimeType\022\t\n\005OTHER" +
-      "\020\000\022\r\n\tFLYTE_SDK\020\001\"\316\003\n\014TaskMetadata\022\024\n\014di" +
-      "scoverable\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyt" +
-      "eidl.core.RuntimeMetadata\022*\n\007timeout\030\004 \001" +
-      "(\0132\031.google.protobuf.Duration\022-\n\007retries" +
-      "\030\005 \001(\0132\034.flyteidl.core.RetryStrategy\022\031\n\021" +
-      "discovery_version\030\006 \001(\t\022 \n\030deprecated_er" +
-      "ror_message\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010" +
-      "H\000\022\032\n\022cache_serializable\030\t \001(\010\022\026\n\016genera" +
-      "tes_deck\030\n \001(\010\0223\n\004tags\030\013 \003(\0132%.flyteidl." +
-      "core.TaskMetadata.TagsEntry\022\031\n\021pod_templ" +
-      "ate_name\030\014 \001(\t\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t" +
-      "\022\r\n\005value\030\002 \001(\t:\0028\001B\025\n\023interruptible_val" +
-      "ue\"\316\004\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flytei" +
-      "dl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010meta" +
-      "data\030\003 \001(\0132\033.flyteidl.core.TaskMetadata\022" +
-      "0\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Typed" +
-      "Interface\022\'\n\006custom\030\005 \001(\0132\027.google.proto" +
-      "buf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl" +
-      ".core.ContainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.fly" +
-      "teidl.core.K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.flyte" +
-      "idl.core.SqlH\000\022\031\n\021task_type_version\030\007 \001(" +
-      "\005\0228\n\020security_context\030\010 \001(\0132\036.flyteidl.c" +
-      "ore.SecurityContext\022<\n\022extended_resource" +
-      "s\030\t \001(\0132 .flyteidl.core.ExtendedResource" +
-      "s\0227\n\006config\030\020 \003(\0132\'.flyteidl.core.TaskTe" +
-      "mplate.ConfigEntry\032-\n\013ConfigEntry\022\013\n\003key" +
-      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'\n\rC" +
-      "ontainerPort\022\026\n\016container_port\030\001 \001(\r\"\255\003\n" +
-      "\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003" +
-      "(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.fl" +
-      "yteidl.core.Resources\022(\n\003env\030\005 \003(\0132\033.fly" +
-      "teidl.core.KeyValuePair\022/\n\006config\030\006 \003(\0132" +
-      "\033.flyteidl.core.KeyValuePairB\002\030\001\022+\n\005port" +
-      "s\030\007 \003(\0132\034.flyteidl.core.ContainerPort\0225\n" +
-      "\013data_config\030\t \001(\0132 .flyteidl.core.DataL" +
-      "oadingConfig\022;\n\014architecture\030\n \001(\0162%.fly" +
-      "teidl.core.Container.Architecture\"I\n\014Arc" +
-      "hitecture\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64\020\001\022\t\n\005ARM" +
-      "64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002\n\nIOStrat" +
-      "egy\022=\n\rdownload_mode\030\001 \001(\0162&.flyteidl.co" +
-      "re.IOStrategy.DownloadMode\0229\n\013upload_mod" +
-      "e\030\002 \001(\0162$.flyteidl.core.IOStrategy.Uploa" +
-      "dMode\"L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020" +
-      "\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOA" +
-      "D\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n" +
-      "\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021D" +
-      "ataLoadingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninp" +
-      "ut_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006fo" +
-      "rmat\030\004 \001(\01621.flyteidl.core.DataLoadingCo" +
-      "nfig.LiteralMapFormat\022.\n\013io_strategy\030\005 \001" +
-      "(\0132\031.flyteidl.core.IOStrategy\"1\n\020Literal" +
-      "MapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002" +
-      "\"\236\001\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 .flyteidl" +
-      ".core.K8sObjectMetadata\022)\n\010pod_spec\030\002 \001(" +
-      "\0132\027.google.protobuf.Struct\0225\n\013data_confi" +
-      "g\030\003 \001(\0132 .flyteidl.core.DataLoadingConfi" +
-      "g\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001 \003(\0132" +
-      ",.flyteidl.core.K8sObjectMetadata.Labels" +
-      "Entry\022F\n\013annotations\030\002 \003(\01321.flyteidl.co" +
-      "re.K8sObjectMetadata.AnnotationsEntry\032-\n" +
-      "\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t" +
-      ":\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-      "\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatement\030\001 \001" +
-      "(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.core.Sql." +
-      "Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010\n\004ANS" +
-      "I\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B<Z:github.com/f" +
-      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
-      "l/coreb\006proto3"
+      "\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\0226\n\017plug" +
+      "in_metadata\030\004 \001(\0132\035.flyteidl.core.Plugin" +
+      "Metadata\"\'\n\013RuntimeType\022\t\n\005OTHER\020\000\022\r\n\tFL" +
+      "YTE_SDK\020\001\"(\n\016PluginMetadata\022\026\n\016is_sync_p" +
+      "lugin\030\001 \001(\010\"\316\003\n\014TaskMetadata\022\024\n\014discover" +
+      "able\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyteidl.c" +
+      "ore.RuntimeMetadata\022*\n\007timeout\030\004 \001(\0132\031.g" +
+      "oogle.protobuf.Duration\022-\n\007retries\030\005 \001(\013" +
+      "2\034.flyteidl.core.RetryStrategy\022\031\n\021discov" +
+      "ery_version\030\006 \001(\t\022 \n\030deprecated_error_me" +
+      "ssage\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000\022\032\n\022" +
+      "cache_serializable\030\t \001(\010\022\026\n\016generates_de" +
+      "ck\030\n \001(\010\0223\n\004tags\030\013 \003(\0132%.flyteidl.core.T" +
+      "askMetadata.TagsEntry\022\031\n\021pod_template_na" +
+      "me\030\014 \001(\t\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
+      "lue\030\002 \001(\t:\0028\001B\025\n\023interruptible_value\"\316\004\n" +
+      "\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.cor" +
+      "e.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003" +
+      " \001(\0132\033.flyteidl.core.TaskMetadata\0220\n\tint" +
+      "erface\030\004 \001(\0132\035.flyteidl.core.TypedInterf" +
+      "ace\022\'\n\006custom\030\005 \001(\0132\027.google.protobuf.St" +
+      "ruct\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core." +
+      "ContainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.flyteidl." +
+      "core.K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.flyteidl.co" +
+      "re.SqlH\000\022\031\n\021task_type_version\030\007 \001(\005\0228\n\020s" +
+      "ecurity_context\030\010 \001(\0132\036.flyteidl.core.Se" +
+      "curityContext\022<\n\022extended_resources\030\t \001(" +
+      "\0132 .flyteidl.core.ExtendedResources\0227\n\006c" +
+      "onfig\030\020 \003(\0132\'.flyteidl.core.TaskTemplate" +
+      ".ConfigEntry\032-\n\013ConfigEntry\022\013\n\003key\030\001 \001(\t" +
+      "\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006target\"\'\n\rContain" +
+      "erPort\022\026\n\016container_port\030\001 \001(\r\"\255\003\n\tConta" +
+      "iner\022\r\n\005image\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004" +
+      "args\030\003 \003(\t\022+\n\tresources\030\004 \001(\0132\030.flyteidl" +
+      ".core.Resources\022(\n\003env\030\005 \003(\0132\033.flyteidl." +
+      "core.KeyValuePair\022/\n\006config\030\006 \003(\0132\033.flyt" +
+      "eidl.core.KeyValuePairB\002\030\001\022+\n\005ports\030\007 \003(" +
+      "\0132\034.flyteidl.core.ContainerPort\0225\n\013data_" +
+      "config\030\t \001(\0132 .flyteidl.core.DataLoading" +
+      "Config\022;\n\014architecture\030\n \001(\0162%.flyteidl." +
+      "core.Container.Architecture\"I\n\014Architect" +
+      "ure\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64\020\001\022\t\n\005ARM64\020\002\022\n" +
+      "\n\006ARM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002\n\nIOStrategy\022=\n" +
+      "\rdownload_mode\030\001 \001(\0162&.flyteidl.core.IOS" +
+      "trategy.DownloadMode\0229\n\013upload_mode\030\002 \001(" +
+      "\0162$.flyteidl.core.IOStrategy.UploadMode\"" +
+      "L\n\014DownloadMode\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017D" +
+      "OWNLOAD_STREAM\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E\n" +
+      "\nUploadMode\022\022\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLOA" +
+      "D_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD\020\002\"\363\001\n\021DataLoa" +
+      "dingConfig\022\017\n\007enabled\030\001 \001(\010\022\022\n\ninput_pat" +
+      "h\030\002 \001(\t\022\023\n\013output_path\030\003 \001(\t\022A\n\006format\030\004" +
+      " \001(\01621.flyteidl.core.DataLoadingConfig.L" +
+      "iteralMapFormat\022.\n\013io_strategy\030\005 \001(\0132\031.f" +
+      "lyteidl.core.IOStrategy\"1\n\020LiteralMapFor" +
+      "mat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"\236\001\n\006K" +
+      "8sPod\0222\n\010metadata\030\001 \001(\0132 .flyteidl.core." +
+      "K8sObjectMetadata\022)\n\010pod_spec\030\002 \001(\0132\027.go" +
+      "ogle.protobuf.Struct\0225\n\013data_config\030\003 \001(" +
+      "\0132 .flyteidl.core.DataLoadingConfig\"\374\001\n\021" +
+      "K8sObjectMetadata\022<\n\006labels\030\001 \003(\0132,.flyt" +
+      "eidl.core.K8sObjectMetadata.LabelsEntry\022" +
+      "F\n\013annotations\030\002 \003(\01321.flyteidl.core.K8s" +
+      "ObjectMetadata.AnnotationsEntry\032-\n\013Label" +
+      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322" +
+      "\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value" +
+      "\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatement\030\001 \001(\t\022+\n\007" +
+      "dialect\030\002 \001(\0162\032.flyteidl.core.Sql.Dialec" +
+      "t\"7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010\n\004ANSI\020\001\022\010\n" +
+      "\004HIVE\020\002\022\t\n\005OTHER\020\003B<Z:github.com/flyteor" +
+      "g/flyte/flyteidl/gen/pb-go/flyteidl/core" +
+      "b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20839,9 +21512,15 @@ public final class Tasks {
     internal_static_flyteidl_core_RuntimeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_RuntimeMetadata_descriptor,
-        new java.lang.String[] { "Type", "Version", "Flavor", "IsSyncPlugin", });
-    internal_static_flyteidl_core_TaskMetadata_descriptor =
+        new java.lang.String[] { "Type", "Version", "Flavor", "PluginMetadata", });
+    internal_static_flyteidl_core_PluginMetadata_descriptor =
       getDescriptor().getMessageTypes().get(4);
+    internal_static_flyteidl_core_PluginMetadata_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_PluginMetadata_descriptor,
+        new java.lang.String[] { "IsSyncPlugin", });
+    internal_static_flyteidl_core_TaskMetadata_descriptor =
+      getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskMetadata_descriptor,
@@ -20853,7 +21532,7 @@ public final class Tasks {
         internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_TaskTemplate_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskTemplate_descriptor,
@@ -20865,37 +21544,37 @@ public final class Tasks {
         internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_ContainerPort_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_core_ContainerPort_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ContainerPort_descriptor,
         new java.lang.String[] { "ContainerPort", });
     internal_static_flyteidl_core_Container_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_core_Container_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Container_descriptor,
         new java.lang.String[] { "Image", "Command", "Args", "Resources", "Env", "Config", "Ports", "DataConfig", "Architecture", });
     internal_static_flyteidl_core_IOStrategy_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_core_IOStrategy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_IOStrategy_descriptor,
         new java.lang.String[] { "DownloadMode", "UploadMode", });
     internal_static_flyteidl_core_DataLoadingConfig_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_core_DataLoadingConfig_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_DataLoadingConfig_descriptor,
         new java.lang.String[] { "Enabled", "InputPath", "OutputPath", "Format", "IoStrategy", });
     internal_static_flyteidl_core_K8sPod_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_core_K8sPod_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_K8sPod_descriptor,
         new java.lang.String[] { "Metadata", "PodSpec", "DataConfig", });
     internal_static_flyteidl_core_K8sObjectMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_K8sObjectMetadata_descriptor,
@@ -20913,7 +21592,7 @@ public final class Tasks {
         internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_Sql_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_core_Sql_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Sql_descriptor,

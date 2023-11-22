@@ -143,7 +143,10 @@ func (c CorePlugin) useSyncPlugin(taskTemplate *flyteIdlCore.TaskTemplate) bool 
 	if metadata != nil {
 		runtime := metadata.GetRuntime()
 		if runtime != nil {
-			return runtime.GetIsSyncPlugin()
+			pluginMetadata := runtime.GetPluginMetadata()
+			if pluginMetadata != nil {
+				return pluginMetadata.GetIsSyncPlugin()
+			}
 		}
 	}
 

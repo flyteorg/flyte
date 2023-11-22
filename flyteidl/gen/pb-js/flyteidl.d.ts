@@ -5294,8 +5294,8 @@ export namespace flyteidl {
             /** RuntimeMetadata flavor */
             flavor?: (string|null);
 
-            /** RuntimeMetadata isSyncPlugin */
-            isSyncPlugin?: (boolean|null);
+            /** RuntimeMetadata pluginMetadata */
+            pluginMetadata?: (flyteidl.core.IPluginMetadata|null);
         }
 
         /** Represents a RuntimeMetadata. */
@@ -5316,8 +5316,8 @@ export namespace flyteidl {
             /** RuntimeMetadata flavor. */
             public flavor: string;
 
-            /** RuntimeMetadata isSyncPlugin. */
-            public isSyncPlugin: boolean;
+            /** RuntimeMetadata pluginMetadata. */
+            public pluginMetadata?: (flyteidl.core.IPluginMetadata|null);
 
             /**
              * Creates a new RuntimeMetadata instance using the specified properties.
@@ -5359,6 +5359,58 @@ export namespace flyteidl {
                 OTHER = 0,
                 FLYTE_SDK = 1
             }
+        }
+
+        /** Properties of a PluginMetadata. */
+        interface IPluginMetadata {
+
+            /** PluginMetadata isSyncPlugin */
+            isSyncPlugin?: (boolean|null);
+        }
+
+        /** Represents a PluginMetadata. */
+        class PluginMetadata implements IPluginMetadata {
+
+            /**
+             * Constructs a new PluginMetadata.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IPluginMetadata);
+
+            /** PluginMetadata isSyncPlugin. */
+            public isSyncPlugin: boolean;
+
+            /**
+             * Creates a new PluginMetadata instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns PluginMetadata instance
+             */
+            public static create(properties?: flyteidl.core.IPluginMetadata): flyteidl.core.PluginMetadata;
+
+            /**
+             * Encodes the specified PluginMetadata message. Does not implicitly {@link flyteidl.core.PluginMetadata.verify|verify} messages.
+             * @param message PluginMetadata message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IPluginMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a PluginMetadata message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns PluginMetadata
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.PluginMetadata;
+
+            /**
+             * Verifies a PluginMetadata message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
         }
 
         /** Properties of a TaskMetadata. */
