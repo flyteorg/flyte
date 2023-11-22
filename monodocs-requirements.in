@@ -1,2 +1,2 @@
 -r common-requirements.in
-git+https://github.com/flyteorg/furo@main
+furo
