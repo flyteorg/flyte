@@ -54,6 +54,7 @@ func (g *GoCronScheduler) GetTimedFuncWithSchedule() TimedFuncWithSchedule {
 func (g *GoCronScheduler) BootStrapSchedulesFromSnapShot(ctx context.Context, schedules []models.SchedulableEntity,
 	snapshot snapshoter.Snapshot) {
 	for _, s := range schedules {
+		s := s
 		if *s.Active {
 			funcRef := g.GetTimedFuncWithSchedule()
 			nameOfSchedule := identifier.GetScheduleName(ctx, s)
