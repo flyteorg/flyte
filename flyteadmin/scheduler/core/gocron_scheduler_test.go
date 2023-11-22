@@ -378,12 +378,12 @@ func TestGoCronScheduler_BootStrapSchedulesFromSnapShot(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			g.BootStrapSchedulesFromSnapShot(context.Background(), tt.schedules, tt.snapshoter)
 			g.jobStore.Range(func(key, value interface{}) bool {
-				jobId := key.(string)
+				jobID := key.(string)
 				job := value.(*GoCronJob)
 				if !*job.schedule.Active {
 					return true
 				}
-				assert.Equal(t, job.catchupFromTime, tt.expectedCatchUpTimes[jobId])
+				assert.Equal(t, job.catchupFromTime, tt.expectedCatchUpTimes[jobID])
 				return true
 			})
 			for _, schedule := range tt.schedules {
