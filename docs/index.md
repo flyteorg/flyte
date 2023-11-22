@@ -4,7 +4,7 @@
 .. raw:: html
 
    <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;">
-   Highly scalable and flexible workflow orchestration for prototyping and production
+   The infinitely scalable and flexible workflow orchestration platform that unifies data, ML and analytics stacks.
    </p>
 
 .. image:: https://img.shields.io/badge/Graduate%20Project-Linux%20Foundation-purple?style=for-the-badge
@@ -45,9 +45,9 @@
 
 .. |br| raw:: html
 
-   <br />
+   <br>
+   <br>
 
-`Tags <_tags/tagsindex.html>`__
 ```
 
 [Flyte](https://github.com/flyteorg/flyte) is an open-source, Kubernetes-native
@@ -69,7 +69,8 @@ and ML Engineers in the industry use Flyte to create:
 
 The following guides will take you through Flyte, whether you want to write
 workflows, deploy the Flyte platform to your K8s cluster, or extend and
-contribute its architecture and design.
+contribute its architecture and design. You can also access the
+{ref}`docs pages by tag <tagoverview>`.
 
 ```{list-table}
 :header-rows: 0
@@ -107,8 +108,6 @@ Below are the API reference to the different components of Flyte:
   - Flyte's command-line interface for interacting with a Flyte cluster.
 * - {doc}`FlyteIDL <reference_flyteidl>`
   - Flyte's core specification language.
-* - {doc}`FlyteAdmin <protos/docs/service/service>`
-  - The protocol for communicating with Flyte's Admin service.
 ```
 
 ## Get Help
@@ -175,7 +174,6 @@ reference/swagger
 flytekit <reference_flytekit>
 flytectl <reference_flytectl>
 flyteidl <reference_flyteidl>
-flyteadmin <protos/docs/service/service>
 ```
 
 ```{toctree}

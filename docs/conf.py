@@ -139,6 +139,8 @@ exclude_patterns = [
     "protos/boilerplate/**",
     "protos/tmp/**",
     "protos/gen/**",
+    "protos/docs/**/index.rst",
+    "protos/index.rst",
     "api/flytekit/_templates/**",
     "api/flytekit/index.rst",
     "reference/index.rst",
@@ -150,7 +152,7 @@ exclude_patterns = [
 # a list of builtin themes.
 #
 html_favicon = "images/flyte_circle_gradient_1_4x4.png"
-html_logo = "images/flyte_circle_gradient_1_4x4.png"
+html_logo = "images/logo-flyte-docs.png"
 html_theme = "furo"
 html_title = "Flyte"
 
@@ -296,7 +298,6 @@ nb_execution_excludepatterns = [
     "examples/**/*",
 ]
 
-
 # Pattern for removing intersphinx references from source files.
 # This should handle cases like:
 #
@@ -309,21 +310,27 @@ INTERSPHINX_REFS_REPLACE = r"\1"
 PROTO_REF_PATTERN = r"([:<])(protos/docs)"
 PROTO_REF_REPLACE = r"\1/protos/docs"
 
+# These patterns are used to replace values in source files that are imported
+# from other repos.
+REPLACE_PATTERNS = {
+    r"<flytectl:index>": r"</flytectl_overview>",
+    INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
+    r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
+    r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
+    r"<flytesnacks/examples": r"</flytesnacks/examples",
+    r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
+    r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
+    r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
+    r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
+    r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
+    PROTO_REF_PATTERN: PROTO_REF_REPLACE,
+    r"/protos/docs/service/index": r"/protos/docs/service/service",
+}
+
 import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
-    "source_regex_replace": {
-       INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
-        r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
-        r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
-        r"<flytesnacks/examples": r"</flytesnacks/examples",
-        r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
-        r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
-        r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
-        r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
-        r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
-        PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-    }
+    "source_regex_mapping": REPLACE_PATTERNS,
 }
 
 import_projects = [
@@ -407,7 +414,7 @@ class CustomWarningSuppressor(logging.Filter):
             return False
 
         if (
-            msg.startswith("document isn't included in any toctree")
+            msg.strip().startswith("document isn't included in any toctree")
             and record.location == "_tags/tagsindex"
         ):
             # ignore this warning, since we don't want the side nav to be

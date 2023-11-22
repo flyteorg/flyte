@@ -72,16 +72,19 @@ h6 {
 }
 
 .sidebar-brand-text {
-  text-align: center;
-  font-weight: 600;
+  display: none;
 }
 
 .sidebar-container {
   width: 20em;
 }
 
+.sidebar-logo-container {
+  margin: 30px 0 20px 0 !important;
+}
+
 .sidebar-logo {
-  max-width: 25%;
+  max-width: 50%;
 }
 
 .sidebar-tree i.fa {
@@ -100,9 +103,9 @@ h6 {
   color: #696969;
 }
 
-.sidebar-tree .reference.external:after {
+/* .sidebar-tree .reference.external:after {
   content: none;
-}
+} */
 
 .sphx-glr-thumbnails {
   display: block;

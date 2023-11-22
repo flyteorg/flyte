@@ -1,8 +1,7 @@
 # Flytekit API Reference
 
 ```{toctree}
-:maxdepth: -1
-:caption: Contents
+:maxdepth: 2
 
 api/flytekit/design/index
 api/flytekit/flytekit

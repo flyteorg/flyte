@@ -19,7 +19,7 @@ __version__ = "0.0.0"
 class ImportProjectsConfig:
     clone_dir: str
     flytekit_api_dir: str
-    source_regex_replace: dict = field(default_factory=dict)
+    source_regex_mapping: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -89,6 +89,19 @@ def import_projects(app: Sphinx, config: Config):
     # add flytekit and plugins to path so that API reference can build
     update_sys_path_for_flytekit(import_projects_config)
 
+    # add functions to clean up source and docstring refs
+    for i, (patt, repl) in enumerate(import_projects_config.source_regex_mapping.items()):
+        app.connect(
+            "source-read",
+            partial(replace_refs_in_files, patt, repl),
+            priority=i,
+        )
+        app.connect(
+            "autodoc-process-docstring",
+            partial(replace_refs_in_docstrings, patt, repl),
+            priority=i,
+        )
+
 
 def replace_refs_in_files(patt: str, repl: str, app: Sphinx, docname: str, source: List[str]):
     text = source[0]
@@ -113,48 +126,10 @@ def replace_refs_in_docstrings(
         lines[i] = text
 
 
-# Pattern for removing intersphinx references from source files.
-# This should handle cases like:
-#
-# - :ref:`cookbook:label` -> :ref:`label`
-# - :ref:`Text <cookbook:label>` -> :ref:`Text <label>`
-INTERSPHINX_REFS_PATTERN = r"([`<])(flyte:|flytekit:|flytectl:|flyteidl:|cookbook:|idl:)"
-INTERSPHINX_REFS_REPLACE = r"\1"
-
-# Pattern for replacing all ref/doc labels that point to protos/docs with /protos/docs
-PROTO_REF_PATTERN = r"([:<])(protos/docs)"
-PROTO_REF_REPLACE = r"\1/protos/docs"
-
-
-REPLACE_PATTERNS = {
-    INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
-    r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
-    r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
-    r"<flytesnacks/examples": r"</flytesnacks/examples",
-    r"<auto_examples/basics/index>": r"</flytesnacks/examples/basics/index>",
-    r"<deploy-sandbox-local>": r"<deployment-deployment-sandbox>",
-    r"<deployment/configuration/general:configurable resource types>": r"<deployment-configuration-general>",
-    r"<_tags/DistributedComputing>": r"</_tags/DistributedComputing>",
-    r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
-    PROTO_REF_PATTERN: PROTO_REF_REPLACE,
-}
-
 def setup(app: Sphinx) -> dict:
     app.add_config_value("import_projects_config", None, False)
     app.add_config_value("import_projects", None, False)
-    app.connect("config-inited", import_projects, priority=1)
-
-    for i, (patt, repl) in enumerate(REPLACE_PATTERNS.items()):
-        app.connect(
-            "source-read",
-            partial(replace_refs_in_files, patt, repl),
-            priority=i,
-        )
-        app.connect(
-            "autodoc-process-docstring",
-            partial(replace_refs_in_docstrings, patt, repl),
-            priority=i,
-        )
+    app.connect("config-inited", import_projects, priority=0)
 
     return {
         "version": __version__,
