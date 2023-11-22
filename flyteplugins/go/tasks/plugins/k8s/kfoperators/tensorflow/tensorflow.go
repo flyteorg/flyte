@@ -217,7 +217,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	return job, nil
 }
 
-func getReplicaCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, replicaType commonOp.ReplicaType) *int32 {
+func getReplicasCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, replicaType commonOp.ReplicaType) *int32 {
 	if spec, ok := specs[replicaType]; ok && spec.Replicas != nil {
 		return spec.Replicas
 	}
@@ -231,10 +231,10 @@ func getReplicaCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, repli
 func (tensorflowOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
 	app := resource.(*kubeflowv1.TFJob)
 
-	workersCount := getReplicaCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeWorker)
-	psReplicasCount := getReplicaCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypePS)
-	chiefCount := getReplicaCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeChief)
-	evaluatorReplicasCount := getReplicaCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeEval)
+	workersCount := getReplicasCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeWorker)
+	psReplicasCount := getReplicasCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypePS)
+	chiefCount := getReplicasCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeChief)
+	evaluatorReplicasCount := getReplicasCount(app.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeEval)
 
 	taskLogs, err := common.GetLogs(pluginContext, common.TensorflowTaskType, app.ObjectMeta, false,
 		*workersCount, *psReplicasCount, *chiefCount, *evaluatorReplicasCount)
