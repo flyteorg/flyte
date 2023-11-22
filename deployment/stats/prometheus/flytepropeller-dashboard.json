@@ -4542,7 +4542,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(workqueue_adds_total{name=~\"flyte:propeller.*\"}[5m]))",
+              "expr": "sum(rate(workqueue_adds_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4550,7 +4550,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(workqueue_adds_total{name=~\"flyte:propeller.*\"}[5m]))",
+              "query": "sum(rate(workqueue_adds_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -4669,7 +4669,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(workqueue_depth{name=~\"flyte:propeller.*\"})",
+              "expr": "sum(workqueue_depth{name=~\"flyte:propeller.*\"}) by (name)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4677,7 +4677,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(workqueue_depth{name=~\"flyte:propeller.*\"})",
+              "query": "sum(workqueue_depth{name=~\"flyte:propeller.*\"}) by (name)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -4796,7 +4796,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(workqueue_retries_total{name=\"flyte:propeller.*\"}[5m]))",
+              "expr": "sum(rate(workqueue_retries_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4804,7 +4804,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(workqueue_retries_total{name=\"flyte:propeller.*\"}[5m]))",
+              "query": "sum(rate(workqueue_retries_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -4923,7 +4923,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "workqueue_unfinished_work_seconds{name=\"flyte:propeller.*\"}",
+              "expr": "sum(workqueue_unfinished_work_seconds{name=~\"flyte:propeller.*\"}) by (name)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -4931,7 +4931,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "workqueue_unfinished_work_seconds{name=\"flyte:propeller.*\"}",
+              "query": "sum(workqueue_unfinished_work_seconds{name=~\"flyte:propeller.*\"}) by (name)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -5060,7 +5060,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:propeller:all:node:acceptance_latency_ms) by (wf)",
+              "expr": "sum(flyte:propeller:all:workflow:acceptance_latency_ms) by (wf)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -5068,7 +5068,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:propeller:all:node:acceptance_latency_ms) by (wf)",
+              "query": "sum(flyte:propeller:all:workflow:acceptance_latency_ms) by (wf)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -5077,7 +5077,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Node acceptance latency per workflow",
+          "title": "Workflow acceptance latency per workflow",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -5187,7 +5187,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(flyte:propeller:all:node:acceptance_latency_unlabeled_ms) by (quantile)",
+              "expr": "sum(flyte:propeller:all:workflow:acceptance_latency_unlabeled_ms) by (quantile)",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -5195,7 +5195,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(flyte:propeller:all:node:acceptance_latency_unlabeled_ms) by (quantile)",
+              "query": "sum(flyte:propeller:all:workflow:acceptance_latency_unlabeled_ms) by (quantile)",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -5204,7 +5204,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Node acceptance latency by quantile",
+          "title": "Workflow acceptance latency by quantile",
           "tooltip": {
             "msResolution": true,
             "shared": true,

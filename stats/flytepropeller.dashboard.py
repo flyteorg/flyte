@@ -608,20 +608,6 @@ class FlytePropeller(object):
         )
 
     @staticmethod
-    def workqueue_rate(metric: str, title: str) -> Graph:
-        return Graph(
-            title=title,
-            dataSource=DATASOURCE,
-            targets=[
-                Target(
-                    expr=f"sum(rate({metric}[5m]))",
-                    refId="A",
-                ),
-            ],
-            yAxes=single_y_axis(format=SHORT_FORMAT),
-        )
-
-    @staticmethod
     def queue_metrics(collapse: bool) -> Row:
         return Row(
             title="FlytePropeller Queue metrics",
@@ -632,7 +618,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(workqueue_adds_total{name=~"flyte:propeller.*"}[5m]))',
+                            expr='sum(rate(workqueue_adds_total{name=~"flyte:propeller.*"}[5m])) by (name)',
                             refId="A",
                         ),
                     ],
@@ -643,7 +629,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(workqueue_depth{name=~"flyte:propeller.*"})',
+                            expr='sum(workqueue_depth{name=~"flyte:propeller.*"}) by (name)',
                             refId="A",
                         ),
                     ],
@@ -654,7 +640,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(workqueue_retries_total{name="flyte:propeller.*"}[5m]))',
+                            expr='sum(rate(workqueue_retries_total{name=~"flyte:propeller.*"}[5m])) by (name)',
                             refId="A",
                         ),
                     ],
@@ -665,7 +651,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='workqueue_unfinished_work_seconds{name="flyte:propeller.*"}',
+                            expr='sum(workqueue_unfinished_work_seconds{name=~"flyte:propeller.*"}) by (name)',
                             refId="A",
                         ),
                     ],
@@ -743,7 +729,7 @@ class FlytePropeller(object):
                 for panels in [
                     FlytePropeller.workflow_latency_per_wf(latency_type)
                     for latency_type in [
-                        "node:acceptance",
+                        "workflow:acceptance",
                         "node:transition",
                         "node:queueing",
                         "workflow:completion",
