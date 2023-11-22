@@ -704,6 +704,7 @@ class FlytePropeller(object):
                 FlytePropeller.round_latency_per_wf(interval),
                 FlytePropeller.round_panic(),
                 FlytePropeller.workflows_per_project(),
+                FlytePropeller.enqueued_workflows(),
             ],
         )
 
