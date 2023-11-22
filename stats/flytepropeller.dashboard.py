@@ -1,10 +1,9 @@
 import typing
 
-from grafanalib.core import (
-    Dashboard, Graph, Gauge, Stat,
-    OPS_FORMAT, Row, SHORT_FORMAT, single_y_axis, Target, YAxes, YAxis, MILLISECONDS_FORMAT, DataSourceInput,
-    PERCENT_FORMAT, NO_FORMAT, SECONDS_FORMAT
-)
+from grafanalib.core import (MILLISECONDS_FORMAT, NO_FORMAT, OPS_FORMAT,
+                             PERCENT_FORMAT, SECONDS_FORMAT, SHORT_FORMAT,
+                             Dashboard, DataSourceInput, Gauge, Graph, Row,
+                             Stat, Target, YAxes, YAxis, single_y_axis)
 
 # ------------------------------
 # For Gostats we recommend using
@@ -610,80 +609,48 @@ class FlytePropeller(object):
             yAxes=single_y_axis(format=NO_FORMAT),
         )
 
-    # @staticmethod
-    # def queue_metrics(collapse: bool) -> Row:
-    #     return Row(
-    #         title="FlytePropeller Queue metrics",
-    #         collapse=collapse,
-    #         panels=[
-    #             Graph(
-    #                 title="WF Adds to main queue",
-    #                 dataSource=DATASOURCE,
-    #                 targets=[
-    #                     Target(
-    #                         expr=f'sum(rate(flyte:propeller:all:main_adds[5m]))',
-    #                         refId='A',
-    #                     ),
-    #                 ],
-    #                 yAxes=single_y_axis(format=SHORT_FORMAT),
-    #             ),
-    #             Graph(
-    #                 title="Unprocessed Queue depth",
-    #                 dataSource=DATASOURCE,
-    #                 targets=[
-    #                     Target(
-    #                         expr=f'sum(rate(flyte:propeller:all:main_depth[5m]))',
-    #                         refId='A',
-    #                     ),
-    #                 ],
-    #                 yAxes=single_y_axis(format=SHORT_FORMAT),
-    #             ),
-    #             Graph(
-    #                 title="Item retries",
-    #                 dataSource=DATASOURCE,
-    #                 targets=[
-    #                     Target(
-    #                         expr=f'sum(rate(flyte:propeller:all:main_retries[5m]))',
-    #                         refId='A',
-    #                     ),
-    #                 ],
-    #                 yAxes=single_y_axis(format=SHORT_FORMAT),
-    #             ),
-    #             Graph(
-    #                 title="Seconds of unfinished work in progress",
-    #                 dataSource=DATASOURCE,
-    #                 targets=[
-    #                     Target(
-    #                         expr=f'flyte:propeller:all:main_unfinished_work_s',
-    #                         refId='A',
-    #                     ),
-    #                 ],
-    #                 yAxes=single_y_axis(format=SECONDS_FORMAT),
-    #             ),
-    #             Graph(
-    #                 title="Workqueue work average duration",
-    #                 dataSource=DATASOURCE,
-    #                 targets=[
-    #                     Target(
-    #                         expr=f'sum(rate(flyte:propeller:all:main_work_duration_us_sum[5m]) / rate(flyte:propeller:all:main_work_duration_us_count[5m]))',
-    #                         refId='A',
-    #                     ),
-    #                 ],
-    #                 yAxes=single_y_axis(format=SECONDS_FORMAT),
-    #             ),
-    #             Graph(
-    #                 title="Duration for which an item stays in queue - avg",
-    #                 dataSource=DATASOURCE,
-    #                 targets=[
-    #                     Target(
-    #                         expr=f'sum(rate(flyte:propeller:all:main_queue_latency_us_sum[5m]) / rate(flyte:propeller:all:main_queue_latency_us_count[5m]))',
-    #                         refId='A',
-    #                     ),
-    #                 ],
-    #                 yAxes=single_y_axis(format=SECONDS_FORMAT),
-    #             ),
-    #         ],
-    #     )
+    @staticmethod
+    def workqueue_rate(metric: str, title: str) -> Graph:
+        return Graph(
+                title=title,
+                dataSource=DATASOURCE,
+                targets=[
+                    Target(
+                        expr=f'sum(rate({metric}[5m]))',
+                        refId='A',
+                    ),
+                ],
+                yAxes=single_y_axis(format=SHORT_FORMAT),
+            )
+        
+
+    @staticmethod
+    def queue_metrics(collapse: bool) -> Row:
+        return Row(
+            title="FlytePropeller Queue metrics",
+            collapse=collapse,
+            panels=[
+                FlytePropeller.workqueue_rate(metric=metric, title=title)
+                for title, metric in [
+                    (
+                        "WF Adds to main queue",
+                        'workqueue_adds_total{name="flyte:propeller:all:main"}',
+                    ),
+                    (
+                        "Unprocessed Queue depth",
+                        'workqueue_depth{name="flyte:propeller:all:main"}',
+                    ),
+                    (
+                        "Item retries",
+                        'workqueue_retries_total{name="flyte:propeller:all:main"}',
+                    ),
+                    (
+                        "Seconds of unfinished work in progress",
+                        'workqueue_unfinished_work_seconds{name="flyte:propeller:all:main"}',
+                    ),
+                ]
+            ],
+        )
 
     @staticmethod
     def node_metrics(collapse: bool) -> Row:
