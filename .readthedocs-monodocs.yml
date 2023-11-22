@@ -11,7 +11,7 @@ build:
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
-  configuration: rsts/conf.py
+  configuration: docs/conf.py
 
 # Optionally set the version of Python and requirements required to build your docs
 python:
