@@ -39,7 +39,7 @@ type LaunchPlanManager struct {
 	config           runtimeInterfaces.Configuration
 	scheduler        scheduleInterfaces.EventScheduler
 	metrics          launchPlanMetrics
-	artifactRegistry artifacts.ArtifactRegistry
+	artifactRegistry *artifacts.ArtifactRegistry
 }
 
 func getLaunchPlanContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -90,6 +90,11 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	// The presence of this field indicates that this is a trigger launch plan
 	// Return true and send this request over to the artifact registry instead
 	if launchPlan.Spec.GetEntityMetadata() != nil && launchPlan.Spec.GetEntityMetadata().GetLaunchConditions() != nil {
+		// TODO: Artifact feature gate, remove when ready
+		if m.artifactRegistry.GetClient() == nil {
+			logger.Debugf(ctx, "artifact feature not enabled, skipping launch plan %v", launchPlan.Id)
+			return &admin.LaunchPlanCreateResponse{}, nil
+		}
 		err := m.artifactRegistry.RegisterTrigger(ctx, &launchPlan)
 		if err != nil {
 			return nil, err
@@ -123,14 +128,17 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	}
 	m.metrics.SpecSizeBytes.Observe(float64(len(launchPlanModel.Spec)))
 	m.metrics.ClosureSizeBytes.Observe(float64(len(launchPlanModel.Closure)))
-	go func() {
-		ceCtx := context.TODO()
-		if launchPlan.Spec.DefaultInputs == nil {
-			logger.Debugf(ceCtx, "Insufficient fields to submit launchplan interface %v", launchPlan.Id)
-			return
-		}
-		m.artifactRegistry.RegisterArtifactConsumer(ceCtx, launchPlan.Id, *launchPlan.Spec.DefaultInputs)
-	}()
+	// TODO: Artifact feature gate, remove when ready
+	if m.artifactRegistry.GetClient() != nil {
+		go func() {
+			ceCtx := context.TODO()
+			if launchPlan.Spec.DefaultInputs == nil {
+				logger.Debugf(ceCtx, "Insufficient fields to submit launchplan interface %v", launchPlan.Id)
+				return
+			}
+			m.artifactRegistry.RegisterArtifactConsumer(ceCtx, launchPlan.Id, *launchPlan.Spec.DefaultInputs)
+		}()
+	}
 
 	return &admin.LaunchPlanCreateResponse{}, nil
 }
@@ -566,7 +574,7 @@ func NewLaunchPlanManager(
 	config runtimeInterfaces.Configuration,
 	scheduler scheduleInterfaces.EventScheduler,
 	scope promutils.Scope,
-	artifactRegistry artifacts.ArtifactRegistry) interfaces.LaunchPlanInterface {
+	artifactRegistry *artifacts.ArtifactRegistry) interfaces.LaunchPlanInterface {
 
 	metrics := launchPlanMetrics{
 		Scope: scope,

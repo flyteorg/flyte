@@ -49,6 +49,10 @@ type PostgresConfig struct {
 	Debug        bool   `json:"debug" pflag:" Whether or not to start the database connection with debug mode enabled."`
 }
 
+type FeatureGates struct {
+	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
+}
+
 // ApplicationConfig is the base configuration to start admin
 type ApplicationConfig struct {
 	// The RoleName key inserted as an annotation (https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
@@ -98,6 +102,8 @@ type ApplicationConfig struct {
 
 	// Environment variables to be set for the execution.
 	Envs map[string]string `json:"envs,omitempty"`
+
+	FeatureGates FeatureGates `json:"featureGates" pflag:",Enable experimental features."`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -225,23 +231,6 @@ type KafkaConfig struct {
 	Version string `json:"version"`
 	// kafka broker addresses
 	Brokers []string `json:"brokers"`
-}
-
-// RedisConfig is basically a subset of the client options in the Redis library
-type RedisConfig struct {
-	// host:port address.
-	Addr string `json:"addr"`
-	// Use the specified Username to authenticate the current connection
-	// with one of the connections defined in the ACL list when connecting
-	// to a Redis 6.0 instance, or greater, that is using the Redis ACL system.
-	Username string `json:"username"`
-	// Optional password. Must match the password specified in the
-	// requirepass server configuration option (if connecting to a Redis 5.0 instance, or lower),
-	// or the User Password when connecting to a Redis 6.0 instance, or greater,
-	// that is using the Redis ACL system.
-	Password string `json:"password"`
-	// Database to be selected after connecting to the server.
-	DB int `json:"db"`
 }
 
 // This section holds configuration for the event scheduler used to schedule workflow executions.
@@ -555,7 +544,6 @@ type CloudEventsConfig struct {
 	AWSConfig   AWSConfig   `json:"aws"`
 	GCPConfig   GCPConfig   `json:"gcp"`
 	KafkaConfig KafkaConfig `json:"kafka"`
-	RedisConfig RedisConfig `json:"redis"`
 	// Publish events to a pubsub tops
 	EventsPublisherConfig EventsPublisherConfig `json:"eventsPublisher"`
 	// Number of times to attempt recreating a notifications processor client should there be any disruptions.

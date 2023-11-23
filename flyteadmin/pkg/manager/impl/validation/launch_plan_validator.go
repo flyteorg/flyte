@@ -38,8 +38,14 @@ func ValidateLaunchPlan(ctx context.Context,
 	if err := validateLiteralMap(request.Spec.FixedInputs, shared.FixedInputs); err != nil {
 		return err
 	}
-	if err := validateParameterMap(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
-		return err
+	if config.GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		if err := validateParameterMapAllowArtifacts(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
+			return err
+		}
+	} else {
+		if err := validateParameterMapDisableArtifacts(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
+			return err
+		}
 	}
 	expectedInputs, err := checkAndFetchExpectedInputForLaunchPlan(workflowInterface.GetInputs(), request.Spec.FixedInputs, request.Spec.DefaultInputs)
 	if err != nil {
