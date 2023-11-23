@@ -3,6 +3,8 @@ package artifacts
 import (
 	"context"
 	"fmt"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+
 	"google.golang.org/grpc"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -76,8 +78,16 @@ func (a *ArtifactRegistry) GetClient() artifact.ArtifactRegistryClient {
 	return a.client
 }
 
-func NewArtifactRegistry(ctx context.Context, config *Config, opts ...grpc.DialOption) *ArtifactRegistry {
+func NewArtifactRegistry(ctx context.Context, _ *Config, _ ...grpc.DialOption) *ArtifactRegistry {
+	cfg := admin2.GetConfig(ctx)
+	clients, err := admin2.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create Artifact client")
+		// too many calls to this function to update, just panic for now.
+		panic(err)
+	}
+
 	return &ArtifactRegistry{
-		client: InitializeArtifactClient(ctx, config, opts...),
+		client: clients.ArtifactServiceClient(),
 	}
 }

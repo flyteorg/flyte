@@ -3,8 +3,14 @@
 # gatepr: revert the local dir to reflect home.
 #   paths were changed to personal to ensure settings didn't get lost.
 admin:
-  endpoint: localhost:8089
+  # This endpoint is used by flytepropeller to talk to admin
+  # and artifacts to talk to admin,
+  # and _also_, admin to talk to artifacts
+  endpoint: localhost:30080
   insecure: true
+flyteadmin:
+  featureGates:
+    enableArtifacts: true
 
 catalog-cache:
   endpoint: localhost:8081
@@ -84,11 +90,6 @@ cloudEvents:
   enable: true
   cloudEventVersion: v2
   type: sandbox
-# For admin to find artifacts service
-artifacts:
-  host: localhost
-  port: 30080
-  insecure: true
 # For artifact service itself
 artifactsServer:
   artifactBlobStoreConfig:
