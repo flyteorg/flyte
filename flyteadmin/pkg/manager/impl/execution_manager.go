@@ -1011,13 +1011,13 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		// Also send in the inputsForQueryTemplating for two reasons, so we don't run queries for things we don't need to
 		// and so we can fill in template args.
 		// ArtifactIDs are also returned for lineage purposes.
-		resolvedExpectedInputs, usedArtifactIDs, err := m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating)
+		lpExpectedInputs, usedArtifactIDs, err = m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating)
 		if err != nil {
 			logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
 			return nil, nil, err
 		}
 
-		logger.Debugf(ctx, "Resolved launch plan closure expected inputs from [%+v] to [%+v]", launchPlan.Closure.ExpectedInputs, resolvedExpectedInputs)
+		logger.Debugf(ctx, "Resolved launch plan closure expected inputs from [%+v] to [%+v]", launchPlan.Closure.ExpectedInputs, lpExpectedInputs)
 		logger.Debugf(ctx, "Found artifact keys: %v", artifactTrackers)
 		logger.Debugf(ctx, "Found artifact IDs: %v", usedArtifactIDs)
 
