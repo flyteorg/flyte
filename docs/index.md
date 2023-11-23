@@ -4,7 +4,7 @@
 .. raw:: html
 
    <p style="color: #808080; font-weight: 350; font-size: 25px; padding-top: 10px; padding-bottom: 10px;">
-   The infinitely scalable and flexible workflow orchestration platform that unifies data, ML and analytics stacks.
+   The highly scalable and flexible workflow orchestrator that unifies data, ML and analytics.
    </p>
 
 .. image:: https://img.shields.io/badge/Graduate%20Project-Linux%20Foundation-purple?style=for-the-badge
