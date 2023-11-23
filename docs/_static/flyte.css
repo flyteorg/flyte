@@ -20,6 +20,7 @@ h6 {
   text-transform: none;
   margin-bottom: 12px;
   margin-left: 16px;
+  margin-top: 30px;
 }
 
 .sidebar-tree li.current-page > a.current {
