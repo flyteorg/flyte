@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func TestCreateddExecution(t *testing.T) {
+func TestResolveNotWorking(t *testing.T) {
 
 	execManager := NewExecutionManager(nil, nil, nil, nil, mockScope.NewTestScope(), mockScope.NewTestScope(), nil, nil, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil)).(*ExecutionManager)
 
