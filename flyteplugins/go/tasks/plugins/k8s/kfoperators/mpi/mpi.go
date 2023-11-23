@@ -126,10 +126,10 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 	}
 
 	if *workerReplicaSpec.Replicas <= 0 {
-		return nil, fmt.Errorf("number of worker should be more then 0")
+		return nil, fmt.Errorf("number of workers must be greater than 0")
 	}
 	if *launcherReplicaSpec.Replicas <= 0 {
-		return nil, fmt.Errorf("number of launch worker should be more then 0")
+		return nil, fmt.Errorf("number of launchers must be greater than 0")
 	}
 
 	jobSpec := kubeflowv1.MPIJobSpec{

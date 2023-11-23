@@ -113,7 +113,7 @@ func (pytorchOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx
 	}
 
 	if *workerReplicaSpec.Replicas <= 0 {
-		return nil, fmt.Errorf("number of worker should be more then 0")
+		return nil, fmt.Errorf("number of workers must be greater than 0")
 	}
 
 	jobSpec := kubeflowv1.PyTorchJobSpec{

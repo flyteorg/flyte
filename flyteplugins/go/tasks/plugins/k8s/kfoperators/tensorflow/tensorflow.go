@@ -120,7 +120,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 	}
 
 	if v, ok := replicaSpecMap[kubeflowv1.TFJobReplicaTypeWorker]; !ok || *v.Replicas <= 0 {
-		return nil, fmt.Errorf("number of worker should be more then 0")
+		return nil, fmt.Errorf("number of workers must be greater than 0")
 	}
 
 	jobSpec := kubeflowv1.TFJobSpec{
