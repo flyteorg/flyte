@@ -32,6 +32,7 @@ jobs:
         component:
           - datacatalog
           - flyteadmin
+          - flyteartifacts
           # TODO(monorepo): Enable lint flytecopilot
           # - flytecopilot
           - flyteidl
@@ -69,6 +70,7 @@ jobs:
         component:
           - datacatalog
           - flyteadmin
+          - flyteartifacts
           - flytecopilot
           - flytepropeller
     name: Docker Build Images
@@ -112,6 +114,7 @@ jobs:
         component:
           - datacatalog
           - flyteadmin
+          - flyteartifacts
           - flytecopilot
           - flytepropeller
     uses: ./.github/workflows/go_generate.yml

@@ -1,0 +1,8 @@
+# This is an (incomplete) configure file for the artifact service, here just as an example.
+#artifactsServer:
+#  database:
+#    postgres:
+#      dbname: your pg db
+#logger:
+#  level: 5
+#  show-source: true

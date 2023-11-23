@@ -1,0 +1,15 @@
+artifactsServer:
+  artifactBlobStoreConfig:
+    type: stow
+    stow:
+      kind: s3
+      config:
+        disable_ssl: true
+        v2_signing: true
+        endpoint: http://localhost:30002
+        auth_type: accesskey
+        access_key_id: minio
+        secret_key: miniostorage
+logger:
+  level: 5
+  show-source: true

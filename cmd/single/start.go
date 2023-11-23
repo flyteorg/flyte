@@ -2,6 +2,10 @@ package single
 
 import (
 	"context"
+	sharedCmd "github.com/flyteorg/flyte/flyteartifacts/cmd/shared"
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
+	artifactsServer "github.com/flyteorg/flyte/flyteartifacts/pkg/server"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"net/http"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -59,6 +63,40 @@ func startClusterResourceController(ctx context.Context) error {
 	clusterResourceController.Run()
 	logger.Infof(ctx, "ClusterResourceController started running successfully")
 	return nil
+}
+
+func startArtifact(ctx context.Context, cfg Artifacts) error {
+	if cfg.Disabled {
+		logger.Infof(ctx, "Artifacts server is disabled. Skipping...")
+		return nil
+	}
+	// Roughly copies main/NewMigrateCmd
+	logger.Infof(ctx, "Artifacts: running database migrations if any...")
+	migs := artifactsServer.GetMigrations(ctx)
+	initializationSql := "create extension if not exists hstore;"
+	dbConfig := artifactsServer.GetDbConfig()
+	err := database.Migrate(context.Background(), dbConfig, migs, initializationSql)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to run Artifacts database migrations. Error: %v", err)
+		return err
+	}
+
+	g, childCtx := errgroup.WithContext(ctx)
+
+	// Rough copy of NewServeCmd
+	g.Go(func() error {
+		cfg := configuration.GetApplicationConfig()
+		serverCfg := &cfg.ArtifactServerConfig
+		err := sharedCmd.ServeGateway(childCtx, "artifacts", serverCfg, artifactsServer.GrpcRegistrationHook,
+			artifactsServer.HttpRegistrationHook)
+		if err != nil {
+			logger.Errorf(childCtx, "Failed to start Artifacts server. Error: %v", err)
+			return err
+		}
+		return nil
+	})
+
+	return g.Wait()
 }
 
 func startAdmin(ctx context.Context, cfg Admin) error {
@@ -197,6 +235,16 @@ var startCmd = &cobra.Command{
 				if err != nil {
 					logger.Panicf(childCtx, "Failed to start Admin, err: %v", err)
 					return err
+				}
+				return nil
+			})
+		}
+
+		if !cfg.Artifact.Disabled {
+			g.Go(func() error {
+				err := startArtifact(childCtx, cfg.Artifact)
+				if err != nil {
+					logger.Panicf(childCtx, "Failed to start Artifacts server, err: %v", err)
 				}
 				return nil
 			})
