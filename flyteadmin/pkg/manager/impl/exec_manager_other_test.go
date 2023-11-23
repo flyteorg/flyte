@@ -12,8 +12,9 @@ import (
 )
 
 func TestResolveNotWorking(t *testing.T) {
+	mockConfig := getMockExecutionsConfigProvider()
 
-	execManager := NewExecutionManager(nil, nil, nil, nil, mockScope.NewTestScope(), mockScope.NewTestScope(), nil, nil, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil)).(*ExecutionManager)
+	execManager := NewExecutionManager(nil, nil, mockConfig, nil, mockScope.NewTestScope(), mockScope.NewTestScope(), nil, nil, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil)).(*ExecutionManager)
 
 	pm, artifactIDs, err := execManager.ResolveParameterMapArtifacts(context.Background(), nil, nil)
 	assert.Nil(t, err)
