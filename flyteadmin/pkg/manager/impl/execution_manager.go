@@ -94,7 +94,7 @@ type ExecutionManager struct {
 	cloudEventPublisher       notificationInterfaces.Publisher
 	dbEventWriter             eventWriter.WorkflowExecutionEventWriter
 	pluginRegistry            *plugins.Registry
-	artifactRegistry          artifacts.ArtifactRegistry
+	artifactRegistry          *artifacts.ArtifactRegistry
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -872,10 +872,10 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 }
 
 // ResolveParameterMapArtifacts will go through the parameter map, and resolve any artifact queries.
-func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, inputsForQueryTemplating map[string]*core.Literal) (*core.ParameterMap, map[string]*core.ArtifactID, error) {
+func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inputs *core.ParameterMap, inputsForQueryTemplating map[string]*core.Literal) (*core.ParameterMap, []*core.ArtifactID, error) {
 
 	// only top level replace for now. Need to make this recursive
-	var artifactIDs = make(map[string]*core.ArtifactID)
+	var artifactIDs []*core.ArtifactID
 	if inputs == nil {
 		return nil, artifactIDs, nil
 	}
@@ -911,7 +911,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 			if err != nil {
 				return nil, nil, err
 			}
-			artifactIDs[k] = resp.Artifact.GetArtifactId()
+			artifactIDs = append(artifactIDs, resp.Artifact.GetArtifactId())
 			logger.Debugf(ctx, "Resolved query for [%s] to [%+v]", k, resp.Artifact.ArtifactId)
 			outputs[k] = &core.Parameter{
 				Var:      v.Var,
@@ -931,7 +931,7 @@ func (m *ExecutionManager) ResolveParameterMapArtifacts(ctx context.Context, inp
 			if err != nil {
 				return nil, nil, err
 			}
-			artifactIDs[k] = v.GetArtifactId()
+			artifactIDs = append(artifactIDs, v.GetArtifactId())
 			logger.Debugf(ctx, "Using specified artifactID for [%+v] for [%s]", v.GetArtifactId(), k)
 			outputs[k] = &core.Parameter{
 				Var:      v.Var,
@@ -974,60 +974,69 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 
-	// Literals may have an artifact key in the metadata field. This is something the artifact service should have
-	// added. Pull these back out so we can keep track of them for lineage purposes. Use a dummy wrapper object for
-	// easier recursion.
-	requestInputMap := &core.Literal{
-		Value: &core.Literal_Map{Map: request.Inputs},
-	}
-	fixedInputMap := &core.Literal{
-		Value: &core.Literal_Map{Map: launchPlan.Spec.FixedInputs},
-	}
-	requestInputArtifactKeys := m.ExtractArtifactKeys(requestInputMap)
-	fixedInputArtifactKeys := m.ExtractArtifactKeys(fixedInputMap)
-	requestInputArtifactKeys = append(requestInputArtifactKeys, fixedInputArtifactKeys...)
+	// TODO: Artifact feature gate, remove when ready
+	var lpExpectedInputs *core.ParameterMap
+	var artifactTrackers []string
+	var usedArtifactIDs []*core.ArtifactID
+	if m.artifactRegistry.GetClient() != nil {
+		// Literals may have an artifact key in the metadata field. This is something the artifact service should have
+		// added. Pull these back out so we can keep track of them for lineage purposes. Use a dummy wrapper object for
+		// easier recursion.
+		requestInputMap := &core.Literal{
+			Value: &core.Literal_Map{Map: request.Inputs},
+		}
+		fixedInputMap := &core.Literal{
+			Value: &core.Literal_Map{Map: launchPlan.Spec.FixedInputs},
+		}
+		artifactTrackers = m.ExtractArtifactKeys(requestInputMap)
+		fixedInputArtifactKeys := m.ExtractArtifactKeys(fixedInputMap)
+		artifactTrackers = append(artifactTrackers, fixedInputArtifactKeys...)
 
-	// Put together the inputs that we've already resolved so that the artifact querying bit can fill them in.
-	// This is to support artifact queries that depend on other inputs using the {{ .inputs.var }} construct.
-	var inputsForQueryTemplating = make(map[string]*core.Literal)
-	if request.Inputs != nil {
-		for k, v := range request.Inputs.Literals {
+		// Put together the inputs that we've already resolved so that the artifact querying bit can fill them in.
+		// This is to support artifact queries that depend on other inputs using the {{ .inputs.var }} construct.
+		var inputsForQueryTemplating = make(map[string]*core.Literal)
+		if request.Inputs != nil {
+			for k, v := range request.Inputs.Literals {
+				inputsForQueryTemplating[k] = v
+			}
+		}
+		for k, v := range launchPlan.Spec.FixedInputs.Literals {
 			inputsForQueryTemplating[k] = v
 		}
-	}
-	for k, v := range launchPlan.Spec.FixedInputs.Literals {
-		inputsForQueryTemplating[k] = v
-	}
-	logger.Debugf(ctx, "Inputs for query templating: [%+v]", inputsForQueryTemplating)
+		logger.Debugf(ctx, "Inputs for query templating: [%+v]", inputsForQueryTemplating)
 
-	// Resolve artifact queries
-	//   Within the launch plan, the artifact will be in the Parameter map, and can come in form of an ArtifactID,
-	//     or as an ArtifactQuery.
-	// Also send in the inputsForQueryTemplating for two reasons, so we don't run queries for things we don't need to
-	// and so we can fill in template args.
-	// ArtifactIDs are also returned for lineage purposes.
-	resolvedExpectedInputs, usedArtifactIDs, err := m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating)
-	if err != nil {
-		logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
-		return nil, nil, err
-	}
+		// Resolve artifact queries
+		//   Within the launch plan, the artifact will be in the Parameter map, and can come in form of an ArtifactID,
+		//     or as an ArtifactQuery.
+		// Also send in the inputsForQueryTemplating for two reasons, so we don't run queries for things we don't need to
+		// and so we can fill in template args.
+		// ArtifactIDs are also returned for lineage purposes.
+		resolvedExpectedInputs, usedArtifactIDs, err := m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating)
+		if err != nil {
+			logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
+			return nil, nil, err
+		}
 
-	logger.Debugf(ctx, "Resolved launch plan closure expected inputs from [%+v] to [%+v]", launchPlan.Closure.ExpectedInputs, resolvedExpectedInputs)
-	logger.Debugf(ctx, "Found artifact keys: %v", requestInputArtifactKeys)
-	logger.Debugf(ctx, "Found artifact IDs: %v", usedArtifactIDs)
+		logger.Debugf(ctx, "Resolved launch plan closure expected inputs from [%+v] to [%+v]", launchPlan.Closure.ExpectedInputs, resolvedExpectedInputs)
+		logger.Debugf(ctx, "Found artifact keys: %v", artifactTrackers)
+		logger.Debugf(ctx, "Found artifact IDs: %v", usedArtifactIDs)
+
+	} else {
+		lpExpectedInputs = launchPlan.Closure.ExpectedInputs
+	}
 
 	// Artifacts retrieved will need to be stored somewhere to ensure that we can re-emit events if necessary
 	// in the future, and also to make sure that relaunch and recover can use it if necessary.
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
 		request.Inputs,
 		launchPlan.Spec.FixedInputs,
-		resolvedExpectedInputs,
+		lpExpectedInputs,
 	)
 
 	if err != nil {
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
-			request.Inputs, launchPlan.Spec.FixedInputs, resolvedExpectedInputs, err)
+			request.Inputs, launchPlan.Spec.FixedInputs, lpExpectedInputs, err)
 		return nil, nil, err
 	}
 
@@ -1061,13 +1070,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
-	// Construct a list of the values and save to request spec metadata.
-	// Avoids going through the model creation step.
-	artifactIDs := make([]*core.ArtifactID, 0, len(usedArtifactIDs))
-	for _, value := range usedArtifactIDs {
-		artifactIDs = append(artifactIDs, value)
-	}
-	requestSpec.Metadata.ArtifactIds = artifactIDs
+	requestSpec.Metadata.ArtifactIds = usedArtifactIDs
 
 	// Get the node and parent execution (if any) that launched this execution
 	var parentNodeExecutionID uint
@@ -1185,7 +1188,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
-	m.publishExecutionStart(ctx, workflowExecutionID, request.Spec.LaunchPlan, workflow.Id, requestInputArtifactKeys, requestSpec.Metadata.ArtifactIds)
+	// Publish of event is also gated on the artifact client being available, even though it's not directly required.
+	// TODO: Artifact feature gate, remove when ready
+	if m.artifactRegistry.GetClient() != nil {
+		m.publishExecutionStart(ctx, workflowExecutionID, request.Spec.LaunchPlan, workflow.Id, artifactTrackers, usedArtifactIDs)
+	}
 
 	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
@@ -1958,7 +1965,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
-	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry artifacts.ArtifactRegistry) interfaces.ExecutionInterface {
+	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry *artifacts.ArtifactRegistry) interfaces.ExecutionInterface {
 
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)

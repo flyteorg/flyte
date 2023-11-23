@@ -43,7 +43,7 @@ type TaskManager struct {
 	compiler         workflowengine.Compiler
 	metrics          taskMetrics
 	resourceManager  interfaces.ResourceInterface
-	artifactRegistry artifacts.ArtifactRegistry
+	artifactRegistry *artifacts.ArtifactRegistry
 }
 
 func getTaskContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -133,15 +133,18 @@ func (t *TaskManager) CreateTask(
 			contextWithRuntimeMeta, common.RuntimeVersionKey, finalizedRequest.Spec.Template.Metadata.Runtime.Version)
 		t.metrics.Registered.Inc(contextWithRuntimeMeta)
 	}
-	tIfaceCopy := proto.Clone(finalizedRequest.Spec.Template.Interface).(*core.TypedInterface)
-	go func() {
-		ceCtx := context.TODO()
-		if finalizedRequest.Spec.Template.Interface == nil {
-			logger.Debugf(ceCtx, "Task [%+v] has no interface, skipping registration", finalizedRequest.Id)
-			return
-		}
-		t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
-	}()
+	// TODO: Artifact feature gate, remove when ready
+	if t.artifactRegistry.GetClient() != nil {
+		tIfaceCopy := proto.Clone(finalizedRequest.Spec.Template.Interface).(*core.TypedInterface)
+		go func() {
+			ceCtx := context.TODO()
+			if finalizedRequest.Spec.Template.Interface == nil {
+				logger.Debugf(ceCtx, "Task [%+v] has no interface, skipping registration", finalizedRequest.Id)
+				return
+			}
+			t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
+		}()
+	}
 
 	return &admin.TaskCreateResponse{}, nil
 }
@@ -274,7 +277,7 @@ func NewTaskManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration, compiler workflowengine.Compiler,
 	scope promutils.Scope,
-	artifactRegistry artifacts.ArtifactRegistry) interfaces.TaskInterface {
+	artifactRegistry *artifacts.ArtifactRegistry) interfaces.TaskInterface {
 
 	metrics := taskMetrics{
 		Scope:            scope,

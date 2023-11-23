@@ -3,7 +3,6 @@ package artifacts
 import (
 	"context"
 	"fmt"
-
 	"google.golang.org/grpc"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -18,10 +17,11 @@ type ArtifactRegistry struct {
 }
 
 func (a *ArtifactRegistry) RegisterArtifactProducer(ctx context.Context, id *core.Identifier, ti core.TypedInterface) {
-	if a.client == nil {
+	if a == nil || a.client == nil {
 		logger.Debugf(ctx, "Artifact client not configured, skipping registration for task [%+v]", id)
 		return
 	}
+
 	ap := &artifact.ArtifactProducer{
 		EntityId: id,
 		Outputs:  ti.Outputs,
@@ -36,7 +36,7 @@ func (a *ArtifactRegistry) RegisterArtifactProducer(ctx context.Context, id *cor
 }
 
 func (a *ArtifactRegistry) RegisterArtifactConsumer(ctx context.Context, id *core.Identifier, pm core.ParameterMap) {
-	if a.client == nil {
+	if a == nil || a.client == nil {
 		logger.Debugf(ctx, "Artifact client not configured, skipping registration for consumer [%+v]", id)
 		return
 	}
@@ -54,7 +54,7 @@ func (a *ArtifactRegistry) RegisterArtifactConsumer(ctx context.Context, id *cor
 }
 
 func (a *ArtifactRegistry) RegisterTrigger(ctx context.Context, plan *admin.LaunchPlan) error {
-	if a.client == nil {
+	if a == nil || a.client == nil {
 		logger.Debugf(ctx, "Artifact client not configured, skipping trigger [%+v]", plan)
 		return fmt.Errorf("artifact client not configured")
 	}
@@ -70,11 +70,14 @@ func (a *ArtifactRegistry) RegisterTrigger(ctx context.Context, plan *admin.Laun
 }
 
 func (a *ArtifactRegistry) GetClient() artifact.ArtifactRegistryClient {
+	if a == nil {
+		return nil
+	}
 	return a.client
 }
 
-func NewArtifactRegistry(ctx context.Context, config *Config, opts ...grpc.DialOption) ArtifactRegistry {
-	return ArtifactRegistry{
+func NewArtifactRegistry(ctx context.Context, config *Config, opts ...grpc.DialOption) *ArtifactRegistry {
+	return &ArtifactRegistry{
 		client: InitializeArtifactClient(ctx, config, opts...),
 	}
 }

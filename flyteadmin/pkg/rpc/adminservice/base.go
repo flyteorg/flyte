@@ -43,7 +43,7 @@ type AdminService struct {
 	DescriptionEntityManager interfaces.DescriptionEntityInterface
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
-	Artifacts                artifacts.ArtifactRegistry
+	Artifacts                *artifacts.ArtifactRegistry
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -113,7 +113,12 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	eventScheduler := workflowScheduler.GetEventScheduler()
 
-	artifactRegistry := artifacts.NewArtifactRegistry(ctx, configuration.ApplicationConfiguration().GetArtifactsConfig())
+	var artifactRegistry *artifacts.ArtifactRegistry
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		artifactRegistry = artifacts.NewArtifactRegistry(ctx, configuration.ApplicationConfiguration().GetArtifactsConfig())
+	} else {
+		artifactRegistry = nil
+	}
 
 	launchPlanManager := manager.NewLaunchPlanManager(
 		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"), artifactRegistry)

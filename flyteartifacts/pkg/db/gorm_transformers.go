@@ -105,8 +105,6 @@ func GormToServiceModel(ga Artifact) (models.Artifact, error) {
 		return models.Artifact{}, err
 	}
 
-	// gatepr: principal is missing still - can be added following discussion on source object.
-	// taskexecution and additional source information to be added when resolved.
 	a := artifact.Artifact{
 		ArtifactId: &core.ArtifactID{
 			ArtifactKey: &core.ArtifactKey{
