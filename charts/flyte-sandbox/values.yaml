@@ -47,14 +47,6 @@ flyte-binary:
           ephemeralStorage: 0
           gpu: 0
           memory: 0
-      cloudEvents:
-        enable: true
-        cloudEventVersion: v2
-        type: sandbox
-      artifacts:
-        host: localhost
-        port: 50051
-        insecure: true
       storage:
         signedURL:
           stowConfigOverride:
