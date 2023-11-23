@@ -710,3 +710,17 @@ func TestBuildResourceMPIV1WithOnlyWorkerReplica(t *testing.T) {
 	assert.Equal(t, testArgs, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Containers[0].Args)
 	assert.Equal(t, workerCommand, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Containers[0].Args)
 }
+
+func TestGetReplicaCount(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+	tfObj := dummyMPICustomObj(1, 1, 0)
+	taskTemplate := dummyMPITaskTemplate("the job", tfObj)
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+	MPIJob, ok := resource.(*kubeflowv1.MPIJob)
+	assert.True(t, ok)
+
+	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker))
+	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher))
+}

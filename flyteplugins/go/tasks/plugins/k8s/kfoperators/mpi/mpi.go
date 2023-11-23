@@ -206,8 +206,8 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
 	}
 
-	numWorkers = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas
-	numLauncherReplicas = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas
+	numWorkers = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker)
+	numLauncherReplicas = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher)
 
 	taskLogs, err := common.GetLogs(pluginContext, common.MPITaskType, app.ObjectMeta, false,
 		*numWorkers, *numLauncherReplicas, 0, 0)
