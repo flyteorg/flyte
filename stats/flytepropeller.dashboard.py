@@ -720,7 +720,7 @@ class FlytePropeller(object):
         ]
 
     @staticmethod
-    def workflow_latencies(collapse) -> Row:
+    def workflow_latencies(collapse: bool) -> Row:
         return Row(
             title="Workflow latencies",
             collapse=collapse,
@@ -738,6 +738,37 @@ class FlytePropeller(object):
                 for panel in panels
             ],
         )
+    
+    @staticmethod
+    def informers(collapse: bool) -> Row:
+        return Row(
+            title="Informer stats",
+            collapse=collapse,
+            panels=[
+                Graph(
+                    title=f"Update events from informer",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(rate(flyte:propeller:all:node:container:container:informer_update[5m]))",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title=f"Update events dropped becacuse they have the same resource version",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(rate(flyte:propeller:all:node:container:container:informer_update_dropped[5m]))",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+            ],
+        )
 
     @staticmethod
     def create_all_rows(interval: int = 5) -> typing.List[Row]:
@@ -750,6 +781,7 @@ class FlytePropeller(object):
             FlytePropeller.wf_store_latency(False),
             FlytePropeller.queue_metrics(True),
             FlytePropeller.workflow_latencies(False),
+            FlytePropeller.informers(False),
         ]
 
 
