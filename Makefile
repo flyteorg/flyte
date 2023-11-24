@@ -97,6 +97,6 @@ setup_local_dev: ## Sets up k3d cluster with Flyte dependencies for local develo
 .PHONY: build_native_flyte
 build_native_flyte: FLYTECONSOLE_VERSION := latest
 build_native_flyte:
-	docker build \
+	docker build --platform linux/arm64 \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
-	--tag flyte-binary:native .
+	--tag pingsutw/flyte-binary:t1 .
