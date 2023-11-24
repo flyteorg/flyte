@@ -218,13 +218,11 @@ func (p Plugin) sendRequest(method string, databricksJob map[string]interface{},
 	}
 	defer resp.Body.Close()
 
-	logger.Errorf(context.Background(), "resp.Body [%v]", resp)
 	// Parse the response body
 	responseBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	logger.Errorf(context.Background(), "responseBody [%v]", string(responseBody))
 	var data map[string]interface{}
 	err = json.Unmarshal(responseBody, &data)
 	if err != nil {
@@ -248,12 +246,9 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	lifeCycleState := resource.LifeCycleState
 	resultState := resource.ResultState
 
-	logger.Errorf(context.Background(), "lifeCycleStateeeee [%v]", lifeCycleState)
 	taskInfo := createTaskInfo(exec.RunID, jobID, exec.DatabricksInstance)
 	switch lifeCycleState {
 	// Job response format. https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runlifecyclestate
-	case "":
-		return core.PhaseInfoQueued(time.Now(), core.DefaultPhaseVersion, "job queued"), nil
 	case "PENDING":
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
 	case "RUNNING":
