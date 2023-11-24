@@ -149,8 +149,8 @@ func TestEndToEnd(t *testing.T) {
 		tCtx.OnInputReader().Return(inputReader)
 
 		trns, err := plugin.Handle(context.Background(), tCtx)
-		assert.Error(t, err)
-		assert.Equal(t, trns.Info().Phase(), core.PhaseUndefined)
+		assert.Nil(t, err)
+		assert.Equal(t, trns.Info().Phase(), core.PhasePermanentFailure)
 		err = plugin.Abort(context.Background(), tCtx)
 		assert.Nil(t, err)
 	})
@@ -167,8 +167,8 @@ func TestEndToEnd(t *testing.T) {
 		assert.NoError(t, err)
 
 		trns, err := plugin.Handle(context.Background(), tCtx)
-		assert.Error(t, err)
-		assert.Equal(t, trns.Info().Phase(), core.PhaseUndefined)
+		assert.Nil(t, err)
+		assert.Equal(t, trns.Info().Phase(), core.PhasePermanentFailure)
 	})
 
 	t.Run("failed to read inputs", func(t *testing.T) {
@@ -188,8 +188,8 @@ func TestEndToEnd(t *testing.T) {
 		assert.NoError(t, err)
 
 		trns, err := plugin.Handle(context.Background(), tCtx)
-		assert.Error(t, err)
-		assert.Equal(t, trns.Info().Phase(), core.PhaseUndefined)
+		assert.Nil(t, err)
+		assert.Equal(t, trns.Info().Phase(), core.PhasePermanentFailure)
 	})
 }
 

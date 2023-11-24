@@ -133,6 +133,9 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, err
 	}
 
+	if _, ok := data["run_id"]; !ok {
+		return nil, nil, errors.Errorf("CorruptedPluginState", "can't get the run_id")
+	}
 	runID := fmt.Sprintf("%.0f", data["run_id"])
 
 	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token}, nil, nil
@@ -144,14 +147,21 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	if err != nil {
 		return nil, err
 	}
-	if res == nil || res["state"] == nil {
+	if _, ok := res["state"]; !ok {
 		return nil, errors.Errorf("CorruptedPluginState", "can't get the job state")
 	}
 	jobState := res["state"].(map[string]interface{})
-	message := fmt.Sprintf("%s", jobState["state_message"])
 	jobID := fmt.Sprintf("%.0f", res["job_id"])
+	message := fmt.Sprintf("%s", jobState["state_message"])
 	lifeCycleState := fmt.Sprintf("%s", jobState["life_cycle_state"])
-	resultState := fmt.Sprintf("%s", jobState["result_state"])
+	var resultState string
+	if _, ok := jobState["result_state"]; !ok {
+		// The result_state is not available until the job is finished.
+		// https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runresultstate
+		resultState = ""
+	} else {
+		resultState = fmt.Sprintf("%s", jobState["result_state"])
+	}
 	return ResourceWrapper{
 		JobID:          jobID,
 		LifeCycleState: lifeCycleState,
