@@ -6767,7 +6767,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ms",
+              "format": "short",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -6894,7 +6894,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ms",
+              "format": "short",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -7021,7 +7021,7 @@
           "yaxes": [
             {
               "decimals": null,
-              "format": "ms",
+              "format": "short",
               "label": null,
               "logBase": 1,
               "max": null,
