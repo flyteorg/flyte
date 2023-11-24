@@ -816,7 +816,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 Graph(
                     title="Evict workflows rate",
@@ -827,7 +827,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
                 Graph(
                     title="Workflow redundant updates rate",
@@ -838,7 +838,7 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
                 ),
             ],
         )
