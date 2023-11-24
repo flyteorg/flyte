@@ -93,11 +93,29 @@ class FlytePropeller(object):
                 YAxis(format=SHORT_FORMAT),
             ),
         )
+    
+    @staticmethod
+    def skipped_rounds() -> Graph:
+        return Graph(
+            title="Round skip rate",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr="sum(flyte:propeller:all:round:skipped)",
+                    refId="A",
+                ),
+            ],
+            yAxes=YAxes(
+                YAxis(format=OPS_FORMAT),
+                YAxis(format=SHORT_FORMAT),
+            ),
+        )
+    
 
     @staticmethod
     def system_errors() -> Graph:
         return Graph(
-            title="System errors",
+            title="Round system errors",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -114,7 +132,7 @@ class FlytePropeller(object):
     @staticmethod
     def abort_errors() -> Graph:
         return Graph(
-            title="System errors",
+            title="Round abort errors",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -693,10 +711,12 @@ class FlytePropeller(object):
                 FlytePropeller.create_free_workers(),
                 FlytePropeller.abort_errors(),
                 FlytePropeller.system_errors(),
+                FlytePropeller.round_panic(),
+                FlytePropeller.skipped_rounds(),
+                FlytePropeller.streak_length(),
                 FlytePropeller.plugin_success_vs_failures(),
                 FlytePropeller.round_latency(interval),
                 FlytePropeller.round_latency_per_wf(interval),
-                FlytePropeller.round_panic(),
                 FlytePropeller.workflows_per_project(),
                 FlytePropeller.enqueued_workflows(),
             ],

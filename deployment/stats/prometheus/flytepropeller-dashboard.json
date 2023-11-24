@@ -240,7 +240,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "System errors",
+          "title": "Round abort errors",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -367,7 +367,7 @@
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "System errors",
+          "title": "Round system errors",
           "tooltip": {
             "msResolution": true,
             "shared": true,
@@ -435,6 +435,387 @@
           "height": null,
           "hideTimeOverride": false,
           "id": 4,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Round panic",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 5,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "sum(flyte:propeller:all:round:skipped)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "sum(flyte:propeller:all:round:skipped)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Round skip rate",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 6,
+          "interval": null,
+          "isNew": true,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": false,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sideWidth": null,
+            "sort": null,
+            "sortDesc": false,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 2,
+          "links": [],
+          "maxDataPoints": 100,
+          "maxPerRow": null,
+          "minSpan": null,
+          "nullPointMode": "connected",
+          "options": {
+            "alertThreshold": true,
+            "dataLinks": []
+          },
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "repeat": null,
+          "repeatDirection": null,
+          "seriesOverrides": [],
+          "span": 2,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "datasource": null,
+              "expr": "avg(flyte:propeller:all:round:streak_length_unlabeled)",
+              "format": "time_series",
+              "hide": false,
+              "instant": false,
+              "interval": "",
+              "intervalFactor": 2,
+              "legendFormat": "",
+              "metric": "",
+              "query": "avg(flyte:propeller:all:round:streak_length_unlabeled)",
+              "refId": "A",
+              "step": 10,
+              "target": ""
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Avg streak length",
+          "tooltip": {
+            "msResolution": true,
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "transformations": [],
+          "transparent": false,
+          "type": "graph",
+          "xaxis": {
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "ops",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": null,
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": 0
+          }
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "cacheTimeout": null,
+          "datasource": "${DS_PROM}",
+          "description": null,
+          "editable": true,
+          "error": false,
+          "fieldConfig": {
+            "defaults": {
+              "thresholds": {
+                "mode": "absolute",
+                "steps": []
+              }
+            }
+          },
+          "fill": 1,
+          "grid": {
+            "threshold1": null,
+            "threshold1Color": "rgba(216, 200, 27, 0.27)",
+            "threshold2": null,
+            "threshold2Color": "rgba(234, 112, 112, 0.22)"
+          },
+          "gridPos": null,
+          "height": null,
+          "hideTimeOverride": false,
+          "id": 7,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -576,7 +957,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 5,
+          "id": 8,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -703,7 +1084,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 6,
+          "id": 9,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -830,134 +1211,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 7,
-          "interval": null,
-          "isNew": true,
-          "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "sideWidth": null,
-            "sort": null,
-            "sortDesc": false,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 2,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "nullPointMode": "connected",
-          "options": {
-            "alertThreshold": true,
-            "dataLinks": []
-          },
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "repeat": null,
-          "repeatDirection": null,
-          "seriesOverrides": [],
-          "span": 2,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
-              "format": "time_series",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "",
-              "metric": "",
-              "query": "sum(rate(flyte:propeller:all:round:panic_unlabeled[5m]))",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Round panic",
-          "tooltip": {
-            "msResolution": true,
-            "shared": true,
-            "sort": 0,
-            "value_type": "cumulative"
-          },
-          "transformations": [],
-          "transparent": false,
-          "type": "graph",
-          "xaxis": {
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": null,
-              "format": "ops",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "decimals": null,
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": 0
-          }
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": []
-              }
-            }
-          },
-          "fill": 1,
-          "grid": {
-            "threshold1": null,
-            "threshold1Color": "rgba(216, 200, 27, 0.27)",
-            "threshold2": null,
-            "threshold2Color": "rgba(234, 112, 112, 0.22)"
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 8,
+          "id": 10,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1084,7 +1338,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 9,
+          "id": 11,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1221,7 +1475,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 10,
+          "id": 12,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1348,7 +1602,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 11,
+          "id": 13,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1545,7 +1799,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 12,
+          "id": 14,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1672,7 +1926,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 13,
+          "id": 15,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1799,7 +2053,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 14,
+          "id": 16,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -1926,7 +2180,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 15,
+          "id": 17,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2053,7 +2307,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 16,
+          "id": 18,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2205,7 +2459,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 17,
+          "id": 19,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2332,7 +2586,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 18,
+          "id": 20,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2459,7 +2713,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 19,
+          "id": 21,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2601,7 +2855,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 20,
+          "id": 22,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2768,7 +3022,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 21,
+          "id": 23,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -2895,7 +3149,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 22,
+          "id": 24,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3037,7 +3291,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 23,
+          "id": 25,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3164,7 +3418,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 24,
+          "id": 26,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3306,7 +3560,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 25,
+          "id": 27,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3433,7 +3687,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 26,
+          "id": 28,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3575,7 +3829,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 27,
+          "id": 29,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3702,7 +3956,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 28,
+          "id": 30,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3829,7 +4083,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 29,
+          "id": 31,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -3981,7 +4235,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 30,
+          "id": 32,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4108,7 +4362,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 31,
+          "id": 33,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4235,7 +4489,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 32,
+          "id": 34,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4362,7 +4616,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 33,
+          "id": 35,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4489,7 +4743,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 34,
+          "id": 36,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4626,7 +4880,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 35,
+          "id": 37,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4753,7 +5007,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 36,
+          "id": 38,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -4880,7 +5134,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 37,
+          "id": 39,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5007,7 +5261,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 38,
+          "id": 40,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5144,7 +5398,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 39,
+          "id": 41,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5271,7 +5525,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 40,
+          "id": 42,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5398,7 +5652,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 41,
+          "id": 43,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5525,7 +5779,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 42,
+          "id": 44,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5652,7 +5906,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 43,
+          "id": 45,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5779,7 +6033,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 44,
+          "id": 46,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5906,7 +6160,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 45,
+          "id": 47,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6033,7 +6287,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 46,
+          "id": 48,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6170,7 +6424,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 47,
+          "id": 49,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6297,7 +6551,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 48,
+          "id": 50,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6434,7 +6688,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 49,
+          "id": 51,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6561,7 +6815,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 50,
+          "id": 52,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6688,7 +6942,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 51,
+          "id": 53,
           "interval": null,
           "isNew": true,
           "legend": {
