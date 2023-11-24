@@ -554,6 +554,17 @@ class FlytePropeller(object):
                     ],
                     yAxes=single_y_axis(format=NO_FORMAT),
                 ),
+                Graph(
+                    title="etcD write too large",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(rate(flyte:propeller:all:wf_too_large[5m]))",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=NO_FORMAT),
+                ),
             ],
         )
 
@@ -738,11 +749,11 @@ class FlytePropeller(object):
                 for panel in panels
             ],
         )
-    
+
     @staticmethod
-    def informers(collapse: bool) -> Row:
+    def k8s_pod_informers(collapse: bool) -> Row:
         return Row(
-            title="Informer stats",
+            title="K8s Pod Informer stats",
             collapse=collapse,
             panels=[
                 Graph(
@@ -771,6 +782,48 @@ class FlytePropeller(object):
         )
 
     @staticmethod
+    def workflowstore(collapse: bool) -> Row:
+        return Row(
+            title="Workflow store",
+            collapse=collapse,
+            panels=[
+                Graph(
+                    title="Stale workflows rate",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(rate(flyte:propeller:all:wf_stale_unlabeled[5m])) by (quantile)",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                ),
+                Graph(
+                    title="Evict workflows rate",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(rate(flyte:propeller:all:wf_stale_unlabeled[5m])) by (quantile)",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                ),
+                Graph(
+                    title="Workflow redundant updates rate",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(rate(flyte:propeller:all:wf_redundant_unlabeled[5m])) by (quantile)",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+                ),
+            ],
+        )
+
+    @staticmethod
     def create_all_rows(interval: int = 5) -> typing.List[Row]:
         return [
             FlytePropeller.core_metrics(interval, False),
@@ -781,7 +834,8 @@ class FlytePropeller(object):
             FlytePropeller.wf_store_latency(False),
             FlytePropeller.queue_metrics(True),
             FlytePropeller.workflow_latencies(False),
-            FlytePropeller.informers(False),
+            FlytePropeller.k8s_pod_informers(False),
+            FlytePropeller.workflowstore(False),
         ]
 
 
