@@ -156,7 +156,7 @@ Integrations <integrations>
 :name: deploymenttoc
 :hidden:
 
-Get Started with Deployment <deployment/index>
+Getting Started <deployment/index>
 deployment/deployment/index
 deployment/plugins/index
 deployment/agents/index
@@ -209,7 +209,7 @@ community/troubleshoot
 :name: divedeeptoc
 :hidden:
 
-concepts/basics
+Main Concepts <concepts/basics>
 concepts/control_plane
 concepts/architecture
 ```

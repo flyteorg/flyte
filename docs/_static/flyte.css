@@ -75,6 +75,7 @@ h6 {
 .sidebar-brand {
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 }
 
 .sidebar-brand-text {
@@ -86,12 +87,10 @@ h6 {
   width: 20em;
 }
 
-.sidebar-logo-container {
-  width: 40%;
-}
-
 .sidebar-logo {
-  max-width: 50%;
+  max-width: 60px;
+  margin: 0 15px 0 0;
+  float: right;
 }
 
 .sidebar-tree i.fa {
