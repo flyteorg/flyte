@@ -126,7 +126,12 @@ Edit the IAM role that created the Databricks deployment
 `DBFS <https://docs.databricks.com/archive/legacy/data-tab.html>`__ 
 (the final path will be ``dbfs:///FileStore/tables/entrypoint.py``) or S3.
 This file will be executed by the Spark driver node, overriding the default command of the
-`dbx <https://docs.databricks.com/dev-tools/dbx.html>`__ job.
+`Databricks <https://docs.databricks.com/dev-tools/dbx.html>`__ job. This entrypoint file will
+
+1. Download the inputs from S3 to the local filesystem.
+2. Execute the spark task.
+3. Upload the outputs from the local filesystem to S3 for the downstream tasks to consume.
+
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/plugins/databricks/dbfs.png
     :alt: A screenshot of dbfs.
