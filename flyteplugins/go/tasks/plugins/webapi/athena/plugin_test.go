@@ -23,7 +23,6 @@ func TestCreateTaskInfo(t *testing.T) {
 	assert.Equal(t, taskInfo.ExternalResources[0].ExternalID, "query_id")
 }
 
-
 func TestCreateTaskInfoGovAWS(t *testing.T) {
 	taskInfo := createTaskInfo("query_id", awsSdk.Config{
 		Region: "us-gov-east-1",

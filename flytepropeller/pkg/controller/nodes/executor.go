@@ -47,6 +47,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	errors2 "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -1296,6 +1297,9 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 }
 
 func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructure, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (interfaces.NodeStatus, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/handleNode")
+	defer span.End()
+
 	logger.Debugf(ctx, "Handling Node [%s]", nCtx.NodeID())
 	defer logger.Debugf(ctx, "Completed node [%s]", nCtx.NodeID())
 
