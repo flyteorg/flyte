@@ -11,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	flytestdconfig "github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -59,7 +60,9 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 		// start timer to enqueue owner once task sleep duration has elapsed
 		go func() {
 			time.Sleep(echoConfig.SleepDuration.Duration)
-			e.enqueueOwner(tCtx.TaskExecutionMetadata().GetOwnerID())
+			if err := e.enqueueOwner(tCtx.TaskExecutionMetadata().GetOwnerID()); err != nil {
+				logger.Warnf(ctx, "failed to enqueue owner [%s]: %v", tCtx.TaskExecutionMetadata().GetOwnerID(), err)
+			}
 		}()
 	}
 
@@ -137,9 +140,9 @@ func compileInputToOutputVariableMappings(ctx context.Context, tCtx core.TaskExe
 
 	inputToOutputVariableMappings := make(map[string]string)
 	outputVariableNameUsed := make(map[string]struct{})
-	for inputVariableName, _ := range inputs {
+	for inputVariableName := range inputs {
 		firstCastableOutputName := ""
-		for outputVariableName, _ := range outputs {
+		for outputVariableName := range outputs {
 			// TODO - need to check if types are castable to support multiple values
 			if _, ok := outputVariableNameUsed[outputVariableName]; !ok {
 				firstCastableOutputName = outputVariableName
@@ -163,7 +166,7 @@ func init() {
 		core.PluginEntry{
 			ID:                  echoTaskType,
 			RegisteredTaskTypes: []core.TaskType{echoTaskType},
-			LoadPlugin:          func(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
+			LoadPlugin: func(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 				return &EchoPlugin{
 					enqueueOwner:   iCtx.EnqueueOwner(),
 					taskStartTimes: make(map[string]time.Time),
