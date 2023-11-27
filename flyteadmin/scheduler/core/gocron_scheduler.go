@@ -54,6 +54,8 @@ func (g *GoCronScheduler) GetTimedFuncWithSchedule() TimedFuncWithSchedule {
 func (g *GoCronScheduler) BootStrapSchedulesFromSnapShot(ctx context.Context, schedules []models.SchedulableEntity,
 	snapshot snapshoter.Snapshot) {
 	for _, s := range schedules {
+		// Copy the object to save to a new pointer since the pointer is saved later
+		// Issue due to https://github.com/golang/go/discussions/56010
 		schedule := s
 		if *s.Active {
 			funcRef := g.GetTimedFuncWithSchedule()
