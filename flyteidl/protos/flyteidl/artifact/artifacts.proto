@@ -13,7 +13,6 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/interface.proto";
 import "flyteidl/event/cloudevents.proto";
-// TODO remove me
 
 message Artifact {
   core.ArtifactID artifact_id = 1;

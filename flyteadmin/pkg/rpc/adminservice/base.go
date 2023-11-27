@@ -3,6 +3,7 @@ package adminservice
 import (
 	"context"
 	"fmt"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"runtime/debug"
 
 	"github.com/golang/protobuf/proto"
@@ -115,9 +116,8 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	var artifactRegistry *artifacts.ArtifactRegistry
 	if configuration.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
-		artifactRegistry = artifacts.NewArtifactRegistry(ctx, configuration.ApplicationConfiguration().GetArtifactsConfig())
-	} else {
-		artifactRegistry = nil
+		adminClientCfg := admin2.GetConfig(ctx)
+		artifactRegistry = artifacts.NewArtifactRegistry(ctx, adminClientCfg)
 	}
 
 	launchPlanManager := manager.NewLaunchPlanManager(
