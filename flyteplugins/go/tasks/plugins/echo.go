@@ -29,11 +29,12 @@ var (
 )
 
 type EchoPluginConfig struct {
-	// TODO @hamersaw - docs
-	SleepDuration flytestdconfig.Duration `json:"sleep-duration" pflag:"-,TODO"`
+	// SleepDuration indicates the amount of time before transitioning to success
+	SleepDuration flytestdconfig.Duration `json:"sleep-duration" pflag:"-,Indicates the amount of time before transitioning to success"`
 }
 
 type EchoPlugin struct {
+	enqueueOwner   core.EnqueueOwner
 	taskStartTimes map[string]time.Time
 }
 
@@ -46,6 +47,8 @@ func (e *EchoPlugin) GetProperties() core.PluginProperties {
 }
 
 func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
+	echoConfig := EchoPluginConfigSection.GetConfig().(*EchoPluginConfig)
+
 	var startTime time.Time
 	var exists bool
 	taskExecutionID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName()
@@ -53,12 +56,13 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 		startTime = time.Now()
 		e.taskStartTimes[taskExecutionID] = startTime
 
-		/*if _, err := compileInputToOutputVariableMappings(ctx, tCtx); err != nil {
-			return core.UnknownTransition, err
-		}*/
+		// start timer to enqueue owner once task sleep duration has elapsed
+		go func() {
+			time.Sleep(echoConfig.SleepDuration.Duration)
+			e.enqueueOwner(tCtx.TaskExecutionMetadata().GetOwnerID())
+		}()
 	}
 
-	echoConfig := EchoPluginConfigSection.GetConfig().(*EchoPluginConfig)
 	if time.Since(startTime) >= echoConfig.SleepDuration.Duration {
 		// copy inputs to outputs
 		inputToOutputVariableMappings, err := compileInputToOutputVariableMappings(ctx, tCtx)
@@ -66,7 +70,6 @@ func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext)
 			return core.UnknownTransition, err
 		}
 
-		fmt.Printf("HAMERSAW %v\n", inputToOutputVariableMappings)
 		if len(inputToOutputVariableMappings) > 0 {
 			inputLiterals, err := tCtx.InputReader().Get(ctx)
 			if err != nil {
@@ -162,6 +165,7 @@ func init() {
 			RegisteredTaskTypes: []core.TaskType{echoTaskType},
 			LoadPlugin:          func(ctx context.Context, iCtx core.SetupContext) (core.Plugin, error) {
 				return &EchoPlugin{
+					enqueueOwner:   iCtx.EnqueueOwner(),
 					taskStartTimes: make(map[string]time.Time),
 				}, nil
 			},
