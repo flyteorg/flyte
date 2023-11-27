@@ -5,7 +5,10 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"golang.org/x/time/rate"
+	"google.golang.org/grpc"
 
 	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -14,6 +17,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -126,7 +130,14 @@ func IDFromMessage(message proto.Message) ([]byte, error) {
 
 func initializeAdminClientFromConfig(ctx context.Context) (client service.AdminServiceClient, err error) {
 	cfg := admin2.GetConfig(ctx)
-	clients, err := admin2.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminClientTracer)
+	opt := grpc.WithUnaryInterceptor(
+		otelgrpc.UnaryClientInterceptor(
+			otelgrpc.WithTracerProvider(tracerProvider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
+		),
+	)
+	clients, err := admin2.NewClientsetBuilder().WithDialOptions(opt).WithConfig(cfg).Build(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize clientset. Error: %w", err)
 	}
