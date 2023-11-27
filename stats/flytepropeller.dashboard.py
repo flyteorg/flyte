@@ -802,6 +802,59 @@ class FlytePropeller(object):
         )
 
     @staticmethod
+    def workflow_garbage_collection(collapse: bool) -> Row:
+        return Row(
+            title="Workflow garbage collection",
+            collapse=collapse,
+            panels=[
+                Graph(
+                    title="Namespace successful garbage collections",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(flyte:propeller:all:gc_success)",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="Namespace failed garbage collections",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(flyte:propeller:all:gc_failure)",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="Total completed garbage collection rounds",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(flyte:propeller:all:gc_latency_ms_count)",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=SHORT_FORMAT),
+                ),
+                Graph(
+                    title="Average garbage collection round duration",
+                    dataSource=DATASOURCE,
+                    targets=[
+                        Target(
+                            expr=f"sum(flyte:propeller:all:gc_latency_ms_sum) / sum(flyte:propeller:all:gc_latency_ms_count)",
+                            refId="A",
+                        ),
+                    ],
+                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),                
+                ),
+            ],
+        )
+    
+    @staticmethod
     def workflowstore(collapse: bool) -> Row:
         return Row(
             title="Workflow store",
@@ -856,6 +909,7 @@ class FlytePropeller(object):
             FlytePropeller.workflow_latencies(False),
             FlytePropeller.k8s_pod_informers(False),
             FlytePropeller.workflowstore(False),
+            FlytePropeller.workflow_garbage_collection(False),
         ]
 
 
