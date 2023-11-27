@@ -619,56 +619,6 @@ func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 	assert.Nil(t, response)
 }
 
-func TestCreateExecution_CreateExecutionModelError(t *testing.T) {
-	repository := getMockRepositoryForExecTest()
-	setDefaultLpCallbackForExecTest(repository)
-	mockExecutor := workflowengineMocks.WorkflowExecutor{}
-	mockExecutor.OnExecuteMatch(mock.Anything, mock.Anything, mock.Anything).Return(workflowengineInterfaces.ExecutionResponse{}, nil)
-	mockExecutor.OnID().Return("customMockExecutor")
-	r := plugins.NewRegistry()
-	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-
-	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
-	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
-		core.QualityOfService_HIGH: {
-			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
-		},
-		core.QualityOfService_MEDIUM: {
-			QueueingBudget: ptypes.DurationProto(20 * time.Minute),
-		},
-		core.QualityOfService_LOW: {
-			QueueingBudget: ptypes.DurationProto(30 * time.Minute),
-		},
-	})
-
-	qosProvider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
-		"domain": core.QualityOfService_HIGH,
-	})
-
-	mockConfig := getMockExecutionsConfigProvider()
-	mockConfig.(*runtimeMocks.MockConfigurationProvider).AddQualityOfServiceConfiguration(qosProvider)
-
-	request := testutils.GetExecutionRequest()
-	request.Spec.Metadata = &admin.ExecutionMetadata{
-		Principal: "unused - populated from authenticated context",
-	}
-	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
-
-	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
-	assert.NoError(t, err)
-	ctx := identity.WithContext(context.Background())
-	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
-	clockMock := clock.NewMock()
-	execManager.(*ExecutionManager)._clock = clockMock
-	clockMock.Set(time.Unix(253402300801, 0)) // date after 10000-01-01
-	expectedErr := flyteAdminErrors.NewFlyteAdminError(codes.Internal, "failed to serialize execution created at time")
-
-	response, err := execManager.CreateExecution(ctx, request, requestedAt)
-
-	assert.Equal(t, expectedErr, err)
-	assert.Empty(t, response)
-}
-
 func TestCreateExecutionPropellerFailure(t *testing.T) {
 	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	repository := getMockRepositoryForExecTest()

@@ -74,10 +74,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	if err != nil {
 		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to serialize execution spec: %v", err)
 	}
-	createdAt, err := ptypes.TimestampProto(input.CreatedAt)
-	if err != nil {
-		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "failed to serialize execution created at time")
-	}
+	createdAt := timestamppb.New(input.CreatedAt)
 	closure := admin.ExecutionClosure{
 		Phase:         input.Phase,
 		CreatedAt:     createdAt,
