@@ -4,9 +4,14 @@ set -ex
 
 echo "Generating Helm"
 
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+HELM_SKIP_INSTALL=${HELM_SKIP_INSTALL:-false}
+
+if [ "${HELM_SKIP_INSTALL}" != "true" ]; then
+    curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+fi
 
 helm version
+
 # All the values files to be built
 DEPLOYMENT_CORE=${1:-eks gcp}
 

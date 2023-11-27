@@ -1682,6 +1682,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 			secondaryContainer,
 		}, info)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().Code)
 		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().Message)
 	})
 }

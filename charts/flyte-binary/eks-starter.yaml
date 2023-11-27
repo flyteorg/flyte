@@ -1,8 +1,9 @@
 configuration:
   database:
+    username: <DB_USERNAME>
     password: <DB_PASSWORD>
     host: <RDS_HOST_DNS>
-    dbname: app  # what is this? why not flyteadmin or flyte?
+    dbname: flyteadmin (<INITAL_DB>)
   storage:
     metadataContainer: <BUCKET_NAME>
     userDataContainer: <USER_DATA_BUCKET_NAME>
