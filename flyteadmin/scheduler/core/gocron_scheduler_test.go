@@ -296,3 +296,99 @@ func TestCatchUpAllSchedule(t *testing.T) {
 	catchupSuccess := g.CatchupAll(ctx, toTime)
 	assert.True(t, catchupSuccess)
 }
+
+func TestGoCronScheduler_BootStrapSchedulesFromSnapShot(t *testing.T) {
+	g := setupWithSchedules(t, "testing", []models.SchedulableEntity{}, true)
+	True := true
+	False := false
+	scheduleActive1 := models.SchedulableEntity{
+		BaseModel: adminModels.BaseModel{
+			UpdatedAt: time.Date(1000, time.October, 19, 10, 0, 0, 0, time.UTC),
+		},
+		SchedulableEntityKey: models.SchedulableEntityKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "schedule_active_1",
+			Version: "version1",
+		},
+		CronExpression: "0 19 * * *",
+		Active:         &True,
+	}
+	scheduleActive2 := models.SchedulableEntity{
+		BaseModel: adminModels.BaseModel{
+			UpdatedAt: time.Date(2000, time.November, 19, 10, 0, 0, 0, time.UTC),
+		},
+		SchedulableEntityKey: models.SchedulableEntityKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "schedule_active_2",
+			Version: "version1",
+		},
+		CronExpression: "0 19 * * *",
+		Active:         &True,
+	}
+	scheduleInactive := models.SchedulableEntity{
+		BaseModel: adminModels.BaseModel{
+			UpdatedAt: time.Date(3000, time.December, 19, 10, 0, 0, 0, time.UTC),
+		},
+		SchedulableEntityKey: models.SchedulableEntityKey{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "cron3",
+			Version: "version1",
+		},
+		CronExpression: "0 19 * * *",
+		Active:         &False,
+	}
+
+	schedule1SnapshotTime := time.Date(5000, time.December, 19, 10, 0, 0, 0, time.UTC)
+	schedule2SnapshotTime := time.Date(6000, time.December, 19, 10, 0, 0, 0, time.UTC)
+	tests := []struct {
+		name                 string
+		schedules            []models.SchedulableEntity
+		snapshoter           snapshoter.Snapshot
+		expectedCatchUpTimes map[string]*time.Time
+	}{
+		{
+			name:                 "two active",
+			schedules:            []models.SchedulableEntity{scheduleActive1, scheduleActive2},
+			snapshoter:           &snapshoter.SnapshotV1{},
+			expectedCatchUpTimes: map[string]*time.Time{"11407394263542327059": &scheduleActive1.UpdatedAt, "1420107156943834850": &scheduleActive2.UpdatedAt},
+		},
+		{
+			name:                 "two active one inactive",
+			schedules:            []models.SchedulableEntity{scheduleActive1, scheduleActive2, scheduleInactive},
+			snapshoter:           &snapshoter.SnapshotV1{},
+			expectedCatchUpTimes: map[string]*time.Time{"11407394263542327059": &scheduleActive1.UpdatedAt, "1420107156943834850": &scheduleActive2.UpdatedAt},
+		},
+		{
+			name:      "two active one inactive with snapshot populated",
+			schedules: []models.SchedulableEntity{scheduleActive1, scheduleActive2, scheduleInactive},
+			snapshoter: &snapshoter.SnapshotV1{
+				LastTimes: map[string]*time.Time{
+					"11407394263542327059": &schedule1SnapshotTime,
+					"1420107156943834850":  &schedule2SnapshotTime,
+				},
+			},
+			expectedCatchUpTimes: map[string]*time.Time{"11407394263542327059": &schedule1SnapshotTime, "1420107156943834850": &schedule2SnapshotTime},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			g.BootStrapSchedulesFromSnapShot(context.Background(), tt.schedules, tt.snapshoter)
+			g.jobStore.Range(func(key, value interface{}) bool {
+				jobID := key.(string)
+				job := value.(*GoCronJob)
+				if !*job.schedule.Active {
+					return true
+				}
+				assert.Equal(t, job.catchupFromTime, tt.expectedCatchUpTimes[jobID])
+				return true
+			})
+			for _, schedule := range tt.schedules {
+				g.DeScheduleJob(context.TODO(), schedule)
+			}
+		})
+	}
+}
