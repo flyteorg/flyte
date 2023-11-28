@@ -1,4 +1,4 @@
-package plugins
+package testing
 
 import (
 	"context"
@@ -6,11 +6,9 @@ import (
 	"time"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	flytestdconfig "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -18,21 +16,6 @@ import (
 const (
 	echoTaskType = "echo"
 )
-
-//go:generate pflags EchoPluginConfig --default-var=defaultEchoPluginConfig
-
-var (
-	defaultEchoPluginConfig = EchoPluginConfig{
-		SleepDuration: flytestdconfig.Duration{Duration: 0 * time.Second},
-	}
-
-	EchoPluginConfigSection = config.MustRegisterSubSection(echoTaskType, &defaultEchoPluginConfig)
-)
-
-type EchoPluginConfig struct {
-	// SleepDuration indicates the amount of time before transitioning to success
-	SleepDuration flytestdconfig.Duration `json:"sleep-duration" pflag:"-,Indicates the amount of time before transitioning to success"`
-}
 
 type EchoPlugin struct {
 	enqueueOwner   core.EnqueueOwner
@@ -48,7 +31,7 @@ func (e *EchoPlugin) GetProperties() core.PluginProperties {
 }
 
 func (e *EchoPlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	echoConfig := EchoPluginConfigSection.GetConfig().(*EchoPluginConfig)
+	echoConfig := ConfigSection.GetConfig().(*Config)
 
 	var startTime time.Time
 	var exists bool
