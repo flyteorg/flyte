@@ -19,7 +19,7 @@ type NodeExecutionEventRepo struct {
 
 func (r *NodeExecutionEventRepo) Create(ctx context.Context, input models.NodeExecutionEvent) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&input)
+	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
