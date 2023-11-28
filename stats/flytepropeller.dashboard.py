@@ -162,7 +162,7 @@ class FlytePropeller(object):
                 ),
                 Target(
                     expr='{__name__=~"flyte:propeller:all:node:plugin:.*_success_unlabeled"}',
-                    refId='A',
+                    refId='B',
                 ),
             ],
             yAxes=YAxes(
@@ -232,22 +232,22 @@ class FlytePropeller(object):
                 Target(
                     expr=f'sum(rate(flyte:propeller:all:metastore:bad_container_unlabeled[5m]))',
                     legendFormat="bad-container",
-                    refId='A',
+                    refId='B',
                 ),
                 Target(
                     expr=f'sum(rate(flyte:propeller:all:metastore:bad_key_unlabeled[5m]))',
                     legendFormat="bad-key",
-                    refId='A',
+                    refId='C',
                 ),
                 Target(
                     expr=f'sum(rate(flyte:propeller:all:metastore:read_failure_unlabeled[5m]))',
                     legendFormat="read-failure",
-                    refId='A',
+                    refId='D',
                 ),
                 Target(
                     expr=f'sum(rate(flyte:propeller:all:metastore:write_failure_unlabeled[5m]))',
                     legendFormat="write-failure",
-                    refId='A',
+                    refId='E',
                 ),
             ],
             yAxes=YAxes(
@@ -418,7 +418,7 @@ class FlytePropeller(object):
                     Target(
                         expr=f'sum(rate(flyte:propeller:all:task:event_recording:failure_duration_ms_count[5m])) by (wf)',
                         legendFormat="failure",
-                        refId='A',
+                        refId='B',
                     ),
                 ],
                 yAxes=single_y_axis(format=NO_FORMAT),
@@ -451,7 +451,7 @@ class FlytePropeller(object):
                     Target(
                         expr=f'sum(rate(flyte:propeller:all:node:event_recording:failure_duration_ms_count[5m])) by (wf)',
                         legendFormat="failure",
-                        refId='A',
+                        refId='B',
                     ),
                 ],
                 yAxes=single_y_axis(format=NO_FORMAT),
@@ -484,7 +484,7 @@ class FlytePropeller(object):
                     Target(
                         expr=f'sum(rate(flyte:propeller:all:workflow:event_recording:failure_duration_ms_count[5m])) by (wf)',
                         legendFormat="failure",
-                        refId='A',
+                        refId='B',
                     ),
                 ],
                 yAxes=single_y_axis(format=NO_FORMAT),
@@ -582,12 +582,12 @@ class FlytePropeller(object):
                 Target(
                     expr=f'sum(rate(flyte:propeller:all:node:perma_user_error_duration_unlabeled_ms[5m]))',
                     legendFormat="user error",
-                    refId='A',
+                    refId='B',
                 ),
                 Target(
                     expr=f'sum(rate(flyte:propeller:all:node:perma_unknown_error_duration_unlabeled_ms[5m]))',
                     legendFormat="user error",
-                    refId='A',
+                    refId='C',
                 ),
             ],
             yAxes=single_y_axis(format=NO_FORMAT),

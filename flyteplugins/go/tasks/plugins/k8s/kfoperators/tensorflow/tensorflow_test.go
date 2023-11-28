@@ -295,6 +295,22 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 	}
 }
 
+func TestGetReplicaCount(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	tfObj := dummyTensorFlowCustomObj(1, 0, 0, 0)
+	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+	tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
+	assert.True(t, ok)
+
+	assert.NotNil(t, getReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeWorker))
+	assert.NotNil(t, getReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypePS))
+	assert.NotNil(t, getReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeChief))
+	assert.NotNil(t, getReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeEval))
+}
+
 func TestBuildResourceTensorFlow(t *testing.T) {
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 
