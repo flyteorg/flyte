@@ -22,12 +22,12 @@ import (
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -119,6 +119,15 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 		labeled.SetMetricKeys(keys...)
 	}
 
+	// register opentelementry tracer providers
+	for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.BlobstoreClientTracer,
+		otelutils.DataCatalogClientTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+		if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+			logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+			return err
+		}
+	}
+
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
 	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
 	limitNamespace := ""
@@ -135,8 +144,21 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 			SyncPeriod:        &cfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
+		NewCache: func(config *rest.Config, options cache.Options) (cache.Cache, error) {
+			k8sCache, err := cache.New(config, options)
+			if err != nil {
+				return k8sCache, err
+			}
+
+			return otelutils.WrapK8sCache(k8sCache), nil
+		},
 		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(nil, config, options)
+			k8sClient, err := client.New(config, options)
+			if err != nil {
+				return k8sClient, err
+			}
+
+			return otelutils.WrapK8sClient(k8sClient), nil
 		},
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
