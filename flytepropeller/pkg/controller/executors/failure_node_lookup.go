@@ -13,14 +13,14 @@ type FailureNodeLookup struct {
 }
 
 func (f FailureNodeLookup) GetNode(nodeID v1alpha1.NodeID) (v1alpha1.ExecutableNode, bool) {
-	if nodeID == v1alpha1.StartNodeID {
-		return f.NodeLookup.GetNode(nodeID)
+	if node, ok := f.NodeLookup.GetNode(nodeID); ok {
+		return node, true
 	}
 	return f.FailureNode, true
 }
 
 func (f FailureNodeLookup) GetNodeExecutionStatus(ctx context.Context, id v1alpha1.NodeID) v1alpha1.ExecutableNodeStatus {
-	if id == v1alpha1.StartNodeID {
+	if _, ok := f.NodeLookup.GetNode(id); ok {
 		return f.NodeLookup.GetNodeExecutionStatus(ctx, id)
 	}
 	return f.FailureNodeStatus

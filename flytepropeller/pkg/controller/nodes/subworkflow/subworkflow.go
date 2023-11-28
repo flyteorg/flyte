@@ -64,11 +64,10 @@ func (s *subworkflowHandler) startAndHandleSubWorkflow(ctx context.Context, nCtx
 func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	// The current node would end up becoming the parent for the sub workflow nodes.
 	// This is done to track the lineage. For level zero, the CreateParentInfo will return nil
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	execContext, err := s.getExecutionContextForDownstream(nCtx)
 	if err != nil {
 		return handler.UnknownTransition, err
 	}
-	execContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 	state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.StartNode())
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
@@ -149,10 +148,12 @@ func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context,
 		if err != nil {
 			return handler.UnknownTransition, err
 		}
-		subNodeLookup := nCtx.ContextualNodeLookup()
+		status := nCtx.NodeStatus()
+		subworkflowNodeLookup := executors.NewNodeLookup(subworkflow, status, subworkflow)
+		// subNodeLookup := nCtx.ContextualNodeLookup()
 		// TODO: NodeStatus() is deprecated, how do we get the status of the failure node?
-		failureNodeStatus := nCtx.NodeStatus().GetNodeExecutionStatus(ctx, failureNode.GetID())
-		failureNodeLookup := executors.NewFailureNodeLookup(subNodeLookup, failureNode, failureNodeStatus)
+		failureNodeStatus := status.GetNodeExecutionStatus(ctx, failureNode.GetID())
+		failureNodeLookup := executors.NewFailureNodeLookup(subworkflowNodeLookup, failureNode, failureNodeStatus)
 
 		state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, failureNodeLookup, failureNodeLookup, failureNode)
 		if err != nil {

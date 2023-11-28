@@ -87,16 +87,6 @@ func buildFlyteWorkflowSpec(wf *core.CompiledWorkflow, tasks []*core.CompiledTas
 
 	var failureN *v1alpha1.NodeSpec
 	if n := wf.Template.GetFailureNode(); n != nil {
-		for _, in := range n.Inputs {
-			in.Binding = &core.BindingData{
-				Value: &core.BindingData_Promise{
-					Promise: &core.OutputReference{
-						Var:    in.Binding.GetPromise().GetVar(),
-						NodeId: v1alpha1.StartNodeID,
-					},
-				},
-			}
-		}
 		nodes, ok := buildNodeSpec(n, tasks, errs.NewScope())
 		if !ok {
 			return nil, errs
