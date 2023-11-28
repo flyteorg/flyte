@@ -530,13 +530,12 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		expectedState              fakeplugins.NextPhaseState
 	}
 	type want struct {
-		handlerPhase    handler.EPhase
-		wantErr         bool
-		event           bool
-		eventPhase      core.TaskExecution_Phase
-		skipStateUpdate bool
-		incrParallel    bool
-		checkpoint      bool
+		handlerPhase handler.EPhase
+		wantErr      bool
+		event        bool
+		eventPhase   core.TaskExecution_Phase
+		incrParallel bool
+		checkpoint   bool
 	}
 	tests := []struct {
 		name string
@@ -666,10 +665,9 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				},
 			},
 			want{
-				handlerPhase:    handler.EPhaseRunning,
-				event:           false,
-				skipStateUpdate: true,
-				incrParallel:    true,
+				handlerPhase: handler.EPhaseRunning,
+				event:        false,
+				incrParallel: true,
 			},
 		},
 		{
@@ -738,13 +736,8 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 						expectedPhase = pluginCore.PhasePermanentFailure
 					}
 				}
-				if tt.want.skipStateUpdate {
-					assert.Equal(t, pluginCore.PhaseUndefined, state.s.PluginPhase)
-					assert.Equal(t, uint32(0), state.s.PluginPhaseVersion)
-				} else {
-					assert.Equal(t, expectedPhase.String(), state.s.PluginPhase.String())
-					assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
-				}
+				assert.Equal(t, expectedPhase.String(), state.s.PluginPhase.String())
+				assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
 				if tt.want.checkpoint {
 					assert.Equal(t, "s3://sandbox/x/name-n1-1/_flytecheckpoints",
 						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri)

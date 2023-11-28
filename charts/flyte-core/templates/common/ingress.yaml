@@ -1,4 +1,8 @@
 {{- define "grpcRoutes" -}}
+{{- $grpcPort := 81 -}}
+{{- if eq .Values.configmap.adminServer.server.security.secure true -}}
+  {{- $grpcPort = 80 -}}
+{{- end }}
 # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
 - path: /flyteidl.service.SignalService
   pathType: ImplementationSpecific
@@ -7,10 +11,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.SignalService/*
   pathType: ImplementationSpecific
@@ -19,10 +23,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.AdminService
   pathType: ImplementationSpecific
@@ -31,10 +35,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.AdminService/*
   pathType: ImplementationSpecific
@@ -43,10 +47,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.DataProxyService
   pathType: ImplementationSpecific
@@ -55,10 +59,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.DataProxyService/*
   pathType: ImplementationSpecific
@@ -67,10 +71,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.AuthMetadataService
   pathType: ImplementationSpecific
@@ -79,10 +83,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.AuthMetadataService/*
   pathType: ImplementationSpecific
@@ -91,10 +95,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.IdentityService
   pathType: ImplementationSpecific
@@ -103,10 +107,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /flyteidl.service.IdentityService/*
   pathType: ImplementationSpecific
@@ -115,10 +119,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /grpc.health.v1.Health
   pathType: ImplementationSpecific
@@ -127,10 +131,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
 - path: /grpc.health.v1.Health/*
   pathType: ImplementationSpecific
@@ -139,10 +143,10 @@
     service:
       name: flyteadmin
       port:
-        number: 81
+        number: {{ $grpcPort }}
 {{- else }}
     serviceName: flyteadmin
-    servicePort: 81
+    servicePort: {{ $grpcPort }}
 {{- end }}
   {{- end }}
   {{- if .Values.common.ingress.enabled }}
