@@ -42,83 +42,84 @@ Databricks workspace
 To set up your Databricks account, follow these steps:
 
 1. Create a `Databricks account <https://www.databricks.com/>`__.
+
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/plugins/databricks/databricks_workspace.png
+    :alt: A screenshot of Databricks workspace creation.
+
 2. Ensure that you have a Databricks workspace up and running.
+
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/plugins/databricks/open_workspace.png
+    :alt: A screenshot of Databricks workspace.
+
 3. Generate a `personal access token 
    <https://docs.databricks.com/dev-tools/auth.html#databricks-personal-ACCESS_TOKEN-authentication>`__ to be used in the Flyte configuration.
-   You can find the personal access token in the user settings within the workspace.
+   You can find the personal access token in the user settings within the workspace. ``User settings`` -> ``Developer`` -> ``Access tokens``
 
-.. note::
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/plugins/databricks/databricks_access_token.png
+    :alt: A screenshot of access token.
 
-  When testing the Databricks plugin on the demo cluster, create an S3 bucket because the local demo 
-  cluster utilizes MinIO. Follow the `AWS instructions 
-  <https://docs.aws.amazon.com/powershell/latest/userguide/pstools-appendix-sign-up.html>`__
-  to generate access and secret keys, which can be used to access your preferred S3 bucket.
+4. Enable custom containers on your Databricks cluster before you trigger the workflow.
 
-Create an `instance profile 
+.. code-block:: bash
+
+   curl -X PATCH -n -H "Authorization: Bearer <your-personal-access-token>" \
+   https://<databricks-instance>/api/2.0/workspace-conf \
+   -d '{"enableDcs": "true"}'
+
+For more detail, check `custom containers <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__.
+
+5. Create an `instance profile 
 <https://docs.databricks.com/administration-guide/cloud-configurations/aws/instance-profiles.html>`__ 
 for the Spark cluster. This profile enables the Spark job to access your data in the S3 bucket.
-Please follow all four steps specified in the documentation.
 
-Upload the following entrypoint.py file to either 
-`DBFS <https://docs.databricks.com/archive/legacy/data-tab.html>`__ 
-(the final path can be ``dbfs:///FileStore/tables/entrypoint.py``) or S3. 
-This file will be executed by the Spark driver node, overriding the default command in the 
-`dbx <https://docs.databricks.com/dev-tools/dbx.html>`__ job.
+Create an instance profile using the AWS console (For AWS Users)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. TODO: A quick-and-dirty workaround to resolve https://github.com/flyteorg/flyte/issues/3853 issue is to import pandas.
+1. In the AWS console, go to the IAM service.
+2. Click the Roles tab in the sidebar.
+3. Click Create role.
 
-.. code-block:: python
+   a. Under Trusted entity type, select AWS service.
+   b. Under Use case, select **EC2**.
+   c. Click Next.
+   d. At the bottom of the page, click Next.
+   e. In the Role name field, type a role name.
+   f. Click Create role.
 
-  import os
-  import sys
-  from typing import List
+4. In the role list, click the **AmazonS3FullAccess** role.
+5. Click Create role button.
 
-  import click
-  import pandas
-  from flytekit.bin.entrypoint import fast_execute_task_cmd as _fast_execute_task_cmd
-  from flytekit.bin.entrypoint import execute_task_cmd as _execute_task_cmd
-  from flytekit.exceptions.user import FlyteUserException
-  from flytekit.tools.fast_registration import download_distribution
+In the role summary, copy the Role ARN.
 
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/deployment/plugins/databricks/s3_arn.png
+    :alt: A screenshot of s3 arn.
 
-  def fast_execute_task_cmd(additional_distribution: str, dest_dir: str, task_execute_cmd: List[str]):
-      if additional_distribution is not None:
-          if not dest_dir:
-              dest_dir = os.getcwd()
-          download_distribution(additional_distribution, dest_dir)
+Locate the IAM role that created the Databricks deployment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you don’t know which IAM role created the Databricks deployment, do the following:
 
-      # Insert the call to fast before the unbounded resolver args
-      cmd = []
-      for arg in task_execute_cmd:
-          if arg == "--resolver":
-              cmd.extend(["--dynamic-addl-distro", additional_distribution, "--dynamic-dest-dir", dest_dir])
-          cmd.append(arg)
+1. As an account admin, log in to the account console.
+2. Go to ``Workspaces`` and click your workspace name.
+3. In the Credentials box, note the role name at the end of the Role ARN
 
-      click_ctx = click.Context(click.Command("dummy"))
-      parser = _execute_task_cmd.make_parser(click_ctx)
-      args, _, _ = parser.parse_args(cmd[1:])
-      _execute_task_cmd.callback(test=False, **args)
+For example, in the Role ARN ``arn:aws:iam::123456789123:role/finance-prod``, the role name is finance-prod
 
+Edit the IAM role that created the Databricks deployment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. In the AWS console, go to the IAM service.
+2. Click the Roles tab in the sidebar.
+3. Click the role that created the Databricks deployment.
+4. On the Permissions tab, click the policy.
+5. Click Edit Policy.
+6. Append the following block to the end of the Statement array. Ensure that you don’t overwrite any of the existing policy. Replace <iam-role-for-s3-access> with the role you created in Configure S3 access with instance profiles.
 
-  def main():
+.. code-block:: bash
 
-      args = sys.argv
-
-      click_ctx = click.Context(click.Command("dummy"))
-      if args[1] == "pyflyte-fast-execute":
-          parser = _fast_execute_task_cmd.make_parser(click_ctx)
-          args, _, _ = parser.parse_args(args[2:])
-          fast_execute_task_cmd(**args)
-      elif args[1] == "pyflyte-execute":
-          parser = _execute_task_cmd.make_parser(click_ctx)
-          args, _, _ = parser.parse_args(args[2:])
-          _execute_task_cmd.callback(test=False, dynamic_addl_distro=None, dynamic_dest_dir=None, **args)
-      else:
-          raise FlyteUserException(f"Unrecognized command: {args[1:]}")
-
-
-  if __name__ == '__main__':
-      main()
+    {
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::<aws-account-id-databricks>:role/<iam-role-for-s3-access>"
+    }
 
 Specify agent configuration
 ----------------------------
@@ -290,8 +291,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
   kubectl get pods -n flyte
 
-.. note::
-
-  Make sure you enable `custom containers 
-  <https://docs.databricks.com/administration-guide/clusters/container-services.html>`__
-  on your Databricks cluster before you trigger the workflow.
+For databricks plugin on the Flyte cluster, please refer to `Databricks Plugin Example <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/databricks_plugin/index.html>`_
