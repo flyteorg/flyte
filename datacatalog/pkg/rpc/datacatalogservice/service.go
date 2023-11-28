@@ -8,6 +8,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
@@ -21,6 +23,7 @@ import (
 	catalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -129,7 +132,15 @@ func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 
 // Creates a new GRPC Server with all the configuration
 func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
-	grpcServer := grpc.NewServer()
+	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			otelgrpc.UnaryServerInterceptor(
+				otelgrpc.WithTracerProvider(tracerProvider),
+				otelgrpc.WithPropagators(propagation.TraceContext{}),
+			),
+		),
+	)
 	catalog.RegisterDataCatalogServer(grpcServer, NewDataCatalogService())
 
 	healthServer := health.NewServer()
@@ -176,7 +187,15 @@ func Serve(ctx context.Context, cfg *config.Config) error {
 
 // Creates a new GRPC Server with all the configuration
 func newGRPCDummyServer(_ context.Context, cfg *config.Config) *grpc.Server {
-	grpcServer := grpc.NewServer()
+	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
+	grpcServer := grpc.NewServer(
+		grpc.UnaryInterceptor(
+			otelgrpc.UnaryServerInterceptor(
+				otelgrpc.WithTracerProvider(tracerProvider),
+				otelgrpc.WithPropagators(propagation.TraceContext{}),
+			),
+		),
+	)
 	catalog.RegisterDataCatalogServer(grpcServer, &DataCatalogService{})
 	if cfg.GrpcServerReflection {
 		reflection.Register(grpcServer)

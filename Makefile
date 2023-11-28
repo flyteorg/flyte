@@ -59,9 +59,9 @@ doc-requirements.txt: doc-requirements.in install-piptools
 
 .PHONY: stats
 stats:
-	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller_dashboard.py
-	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin_dashboard.py
-	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser_dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller.dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flyteadmin-dashboard.json stats/flyteadmin.dashboard.py
+	@generate-dashboard -o deployment/stats/prometheus/flyteuser-dashboard.json stats/flyteuser.dashboard.py
 
 .PHONY: prepare_artifacts
 prepare_artifacts:
@@ -100,3 +100,14 @@ build_native_flyte:
 	docker build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy
+	make -C datacatalog go-tidy
+	make -C flyteadmin go-tidy
+	make -C flyteidl go-tidy
+	make -C flytepropeller go-tidy
+	make -C flyteplugins go-tidy
+	make -C flytestdlib go-tidy
+

@@ -828,10 +828,6 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - name: grpc-2
-    port: 8089
-    protocol: TCP
-    targetPort: 8089
   - name: http
     port: 88
     protocol: TCP
@@ -1693,6 +1689,7 @@ spec:
           #   path: /*
           #   pathType: ImplementationSpecific
           #
+          
           # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
           - path: /flyteidl.service.SignalService
             pathType: ImplementationSpecific
