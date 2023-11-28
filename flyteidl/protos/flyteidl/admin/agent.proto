@@ -7,9 +7,10 @@ import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
 import "flyteidl/core/interface.proto";
 import "flyteidl/core/identifier.proto";
+import "flyteidl/core/execution.proto";
 
 // The state of the execution is used to control its visibility in the UI/CLI.
-enum State {
+enum Phase {
   RETRYABLE_FAILURE = 0;
   PERMANENT_FAILURE = 1;
   PENDING = 2;
@@ -45,6 +46,10 @@ message CreateTaskRequest {
   string output_prefix = 3;
   // subset of runtime task execution metadata.
   TaskExecutionMetadata task_execution_metadata = 4;
+  // Secret to be passed to the agent.
+  // Key is the name of the secret in secret manager.
+  // Value is the actual secret value.
+  map<string, string> secret = 5;
 }
 
 // Represents a create response structure.
@@ -64,11 +69,13 @@ message GetTaskRequest {
 // Response to get an individual task resource.
 message GetTaskResponse {
   Resource resource = 1;
+
+  repeated core.TaskLog logs = 2;
 }
 
 message Resource {
-  // The state of the execution is used to control its visibility in the UI/CLI.
-  State state = 1;
+  // The phase of the execution is used to control its visibility in the UI/CLI.
+  Phase phase = 1;
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
@@ -86,5 +93,20 @@ message DeleteTaskRequest {
 }
 
 // Response to delete a task.
-message DeleteTaskResponse {
+message DeleteTaskResponse {}
+
+
+message GetMetadataRequest {}
+
+message GetMetadataResponse {
+  repeated Agent agent = 1;
+}
+
+// A message containing the agent information.
+message Agent {
+  repeated string secret_name = 1;
+
+  string task_type = 2;
+
+  bool is_sync = 3;
 }
