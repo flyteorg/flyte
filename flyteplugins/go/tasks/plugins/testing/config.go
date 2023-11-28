@@ -19,5 +19,5 @@ var (
 
 type Config struct {
 	// SleepDuration indicates the amount of time before transitioning to success
-	SleepDuration flytestdconfig.Duration `json:"sleep-duration" pflag:"-,Indicates the amount of time before transitioning to success"`
+	SleepDuration flytestdconfig.Duration `json:"sleep-duration" pflag:",Indicates the amount of time before transitioning to success"`
 }

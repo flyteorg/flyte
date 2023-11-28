@@ -99,4 +99,18 @@ func TestConfig_SetFlags(t *testing.T) {
 	cmdFlags := actual.GetPFlagSet("")
 	assert.True(t, cmdFlags.HasFlags())
 
+	t.Run("Test_sleep-duration", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.SleepDuration.String()
+
+			cmdFlags.Set("sleep-duration", testValue)
+			if vString, err := cmdFlags.GetString("sleep-duration"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.SleepDuration)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }
