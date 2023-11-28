@@ -110,4 +110,4 @@ go-tidy:
 	make -C flytepropeller go-tidy
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
-
+	make -C flytecopilot go-tidy
