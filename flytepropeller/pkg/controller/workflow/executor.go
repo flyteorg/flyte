@@ -145,6 +145,7 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 	}
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
+
 	if err != nil {
 		return StatusRunning, err
 	}
@@ -293,7 +294,6 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "", wfEvent.GetError())
 			wfEvent.OccurredAt = utils.GetProtoTime(nil)
 		case v1alpha1.WorkflowPhaseHandlingFailureNode:
-			// TODO: Add core.WorkflowPhaseHandlingFailureNode to idl?
 			wfEvent.Phase = core.WorkflowExecution_FAILING
 			wfEvent.OutputResult = convertToExecutionError(toStatus.Err, previousError)
 			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseHandlingFailureNode, "", wfEvent.GetError())

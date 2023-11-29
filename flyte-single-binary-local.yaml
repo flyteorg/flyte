@@ -15,7 +15,7 @@ cluster_resources:
 
 logger:
   show-source: true
-  level: 6
+  level: 4
 
 propeller:
   create-flyteworkflow-crd: true
@@ -83,3 +83,8 @@ storage:
       access_key_id: minio
       secret_key: miniostorage
   container: my-s3-bucket
+
+
+flyte:
+  propeller:
+    disableWebhook: true
