@@ -81,6 +81,16 @@ configuration:
       gcs:
         # project Google Cloud project in which bucket resides
         project: "my-organization-gcp-project"
+      # azure Provider configuration for Azure object store
+      azure:
+        # configDomainSuffix Domain name suffix
+        configDomainSuffix: ""
+        # configUploadConcurrency Upload Concurrency (default 4)
+        configUploadConcurrency: 4
+        # account Storage Account name
+        account: "storage-account-name"
+        # key Storage Account key if used
+        key: ""
   # logging Specify configuration for logs emitted by Flyte
   logging:
     # level Set the log level
