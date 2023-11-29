@@ -379,7 +379,7 @@ class FlytePropeller(object):
     @staticmethod
     def admin_launcher_cache() -> Graph:
         return Graph(
-            title="Admin Launcher cache",
+            title="Admin Launcher cache hit/miss rate",
             dataSource=DATASOURCE,
             targets=[
                 Target(
@@ -393,7 +393,10 @@ class FlytePropeller(object):
                     refId="B",
                 ),
             ],
-            yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
+            yAxes=YAxes(
+                YAxis(format=OPS_FORMAT),
+                YAxis(format=SHORT_FORMAT),
+            ),
         )
 
     @staticmethod
@@ -900,16 +903,16 @@ class FlytePropeller(object):
     def create_all_rows(interval: int = 5) -> typing.List[Row]:
         return [
             FlytePropeller.core_metrics(interval, False),
+            FlytePropeller.queue_metrics(False),
             FlytePropeller.metastore_metrics(interval, True),
             FlytePropeller.metastore_latencies(True),
             FlytePropeller.node_metrics(True),
             FlytePropeller.perf_metrics(True),
-            FlytePropeller.wf_store_latency(False),
-            FlytePropeller.queue_metrics(True),
             FlytePropeller.workflow_latencies(False),
-            FlytePropeller.k8s_pod_informers(False),
-            FlytePropeller.workflowstore(False),
-            FlytePropeller.workflow_garbage_collection(False),
+            FlytePropeller.wf_store_latency(False),
+            FlytePropeller.k8s_pod_informers(True),
+            FlytePropeller.workflowstore(True),
+            FlytePropeller.workflow_garbage_collection(True),
         ]
 
 
