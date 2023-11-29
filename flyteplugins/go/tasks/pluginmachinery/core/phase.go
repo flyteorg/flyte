@@ -261,6 +261,10 @@ func PhaseInfoFailure(code, reason string, info *TaskInfo) PhaseInfo {
 	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info)
 }
 
+func PhaseInfoFailureWithCleanup(code, reason string, info *TaskInfo) PhaseInfo {
+	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info, true)
+}
+
 func PhaseInfoRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
 	return PhaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info)
 }

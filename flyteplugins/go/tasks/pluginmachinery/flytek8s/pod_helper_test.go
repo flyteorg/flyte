@@ -1436,7 +1436,7 @@ func TestDemystifyPending(t *testing.T) {
 		}
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
 	})
 
 	t.Run("CreateContainerErrorWithinGracePeriod", func(t *testing.T) {
