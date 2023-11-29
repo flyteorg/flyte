@@ -140,8 +140,8 @@ type K8sPluginConfig struct {
 	CreateContainerErrorGracePeriod config2.Duration `json:"create-container-error-grace-period" pflag:"-,Time to wait for transient CreateContainerError errors to be resolved."`
 
 	// Time to wait for transient CreateContainerConfigError errors to be resolved. If the
-	// error persists past this grace period, it will be inferred to be a permanent
-	// one, and the corresponding task marked as failed
+	// error persists past this grace period, it will be inferred to be a permanent error.
+	// The pod will be deleted and the task will be retried.
 	CreateContainerConfigErrorGracePeriod config2.Duration `json:"create-container-config-error-grace-period" pflag:"-,Time to wait for transient CreateContainerConfigError errors to be resolved."`
 
 	// Time to wait for transient ImagePullBackoff errors to be resolved. If the
