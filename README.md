@@ -16,7 +16,8 @@
   </strong>
 </p>
 
-Flyte is an **open-source orchestrator** that facilitates building production-grade data and ML pipelines. It is built for scalability and reproducibility, leveraging Kubernetes as its underlying platform. With Flyte, user teams can construct pipelines using the Python SDK, and seamlessly deploy them on both cloud and on-premises environments, enabling distributed processing and efficient resource utilization.
+
+
 
 <p align="center">
   <a href="https://github.com/flyteorg/flyte/releases/latest">
@@ -37,6 +38,13 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
     <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack" /></a>
 </p>
 
+Flyte helps you create a repeatable, reliable process for releasing ML-enabled software to production.
+
+--GIF GOES HERE--
+
+<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
+
+
 <h3 align="center">
   <a href="#quick-start">Get Started</a>
   <span> · </span>
@@ -47,15 +55,74 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
 
 <br />
 
-<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
+## Table of contents
+* Features
+* Quick start
+* Who uses Flyte?
+* How to stay in touch
+* How to contribute
 
 ---
 
 ## Features
 
-We ship new features, bug fixes and performance improvements regularly. Read our [release notes](https://github.com/flyteorg/flyte/releases) to stay updated.
+* **Write code in Python with type annotations:**
 
-🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types. <br />
+```python
+from flytekit import task, workflow
+
+@task #just add a decorator
+def say_hello() -> str: #type hints required: catch type errors at compile time
+    return "Hello, World!"
+
+@workflow
+def hello_world_wf() -> str:
+    res = say_hello()
+    return res
+```
+
+* **Test locally:**
+
+```bash
+$ pyflyte run hello.py hello_world_wf 
+
+Running Execution on local.
+Hello, World!
+```
+
+* **Execute remotely on a cloud/on-prem environment:**
+
+```bash
+pyflyte run --remote hello.py hello_world_wf
+
+Running Execution on Remote.
+
+[✔] Go to https://flyte.uniondemo.run/console/projects/flytesnacks/domains/development/executions/f1327fb107be741acaa7 to see execution in the console.
+```
+* **Keep everything in version control:**
+
+```bash
+$ flytectl get execution --project flytesnacks --domain development 
+
+
+| NAME                 | VERSION                  |  PHASE     |
+ ----------------------  -------------------------- -----------
+| f49407dd0c4be4703982 | cxB1fQlk0fTjUzkmD6DiMw== |  SUCCEEDED |
+```
+* **Configure the recipe for your workflow execution including schedules:**
+
+```python
+from flytekit import LaunchPlan
+
+launch_plan = LaunchPlan.get_or_create(
+    wf,
+    name="hello_world_wf",
+    schedule=CronSchedule(schedule="*/1 * * * *"), #both cron-based and fixed-rate schedules supported
+)
+```
+
+And much, much more:
+
 🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
 📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/map_task.html). <br />
 🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/dynamics.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
@@ -64,7 +131,6 @@ We ship new features, bug fixes and performance improvements regularly. Read our
 🗃️ **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/data_types_and_io/structured_dataset.html). <br />
 🛡️ **Recover from failures**: Recover only the failed tasks. <br />
 🔁 **Rerun a single task**: Rerun workflows at the most granular level without modifying the previous state of a data/ML workflow. <br />
-🚦 **Versioned workflows**: Reproduce results and roll back to a previous workflow version any time. <br />
 🔍 **Cache outputs**: Cache task outputs by passing `cache=True` to the task decorator. <br />
 🚩 **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/checkpoint.html) within a task execution. <br />
 🌎 **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
@@ -84,6 +150,7 @@ We ship new features, bug fixes and performance improvements regularly. Read our
 💾 **Allocate resources dynamically** at the task level. <br />
 ⏯️ [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
 
+We ship new features, bug fixes and performance improvements regularly. Read our [release notes](https://github.com/flyteorg/flyte/releases) to stay updated.
 ## Quick start
 
 If you want to try out Flyte, the easiest way to get started is by using the Flyte Hosted Sandbox, available at https://sandbox.union.ai/. It allows you to experiment with Flyte's capabilities without installing anything on your local machine.
@@ -91,10 +158,6 @@ If you want to try out Flyte, the easiest way to get started is by using the Fly
 However, if you prefer to install Flyte locally and run a workflow, our [getting started guide](https://docs.flyte.org/projects/cookbook/en/latest/index.html) is the best place to start. It provides step-by-step instructions on how to install Flyte locally and run your first workflow.
 
 > If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/workflow.html) are, be sure to check out our guides on both!
-
-### Deploy Flyte to production
-
-The [deployment guide](https://docs.flyte.org/en/latest/deployment/index.html) provides useful information on how to self-host and manage Flyte.
 
 ## Adopters
 
