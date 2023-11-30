@@ -302,10 +302,6 @@ type allowsCommandOverride interface {
 
 func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs kfDistributedReplicaSpec, primaryContainerName string, isMaster bool) (*commonOp.ReplicaSpec, error) {
 	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
-	// Master should always run as non-interruptible
-	if isMaster {
-		taskCtxOptions = append(taskCtxOptions, flytek8s.WithInterruptible(false))
-	}
 	if rs != nil && rs.GetResources() != nil {
 		resources, err := flytek8s.ToK8sResourceRequirements(rs.GetResources())
 		if err != nil {
