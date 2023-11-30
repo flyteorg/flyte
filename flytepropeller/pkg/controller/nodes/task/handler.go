@@ -3,11 +3,10 @@ package task
 import (
 	"context"
 	"fmt"
-	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
-	"github.com/golang/protobuf/ptypes"
 	"runtime/debug"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	regErrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
@@ -20,6 +19,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"

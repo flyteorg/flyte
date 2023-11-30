@@ -382,6 +382,9 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	}
 	phaseInfo := core.PhaseInfoFailureWithCleanup(core.PhasePermanentFailure.String(), "Array subtasks were aborted", taskInfo)
 	err = tCtx.EventsRecorder().RecordRaw(ctx, phaseInfo)
+	if err != nil {
+		return err
+	}
 
 	if messageCollector.Length() > 0 {
 		return fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength))
