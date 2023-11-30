@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	errors2 "errors"
 	"fmt"
-	"os"
-
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"os"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -25,7 +24,7 @@ const (
 )
 
 func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
-	defaultNamespace string, scope *promutils.Scope, mgr *manager.Manager) error {
+	defaultNamespace string, scope *promutils.Scope, mgr manager.Manager) error {
 	raw, err := json.Marshal(cfg)
 	if err != nil {
 		return err
@@ -40,7 +39,7 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 
 	webhookScope := (*scope).NewSubScope("webhook")
 
-	secretsWebhook := NewPodMutator(cfg, webhookScope)
+	secretsWebhook := NewPodMutator(cfg, mgr.GetScheme(), webhookScope)
 
 	// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
 	err = createMutationConfig(ctx, kubeClient, secretsWebhook, defaultNamespace)
@@ -48,7 +47,7 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 		return err
 	}
 
-	err = secretsWebhook.Register(ctx, *mgr)
+	err = secretsWebhook.Register(ctx, mgr)
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to register webhook with manager. Error: %v", err)
 	}
