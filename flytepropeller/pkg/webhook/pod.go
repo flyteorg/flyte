@@ -31,6 +31,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"k8s.io/apimachinery/pkg/runtime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -40,7 +41,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 
@@ -70,17 +70,7 @@ type Mutator interface {
 	Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Pod, changed bool, err error)
 }
 
-func (pm *PodMutator) InjectClient(_ client.Client) error {
-	return nil
-}
-
-// InjectDecoder injects the decoder into a mutatingHandler.
-func (pm *PodMutator) InjectDecoder(d *admission.Decoder) error {
-	pm.decoder = d
-	return nil
-}
-
-func (pm *PodMutator) Handle(ctx context.Context, request admission.Request) admission.Response {
+func (pm PodMutator) Handle(ctx context.Context, request admission.Request) admission.Response {
 	// Get the object in the request
 	obj := &corev1.Pod{}
 	err := pm.decoder.Decode(request, obj)
@@ -132,7 +122,7 @@ func (pm PodMutator) Mutate(ctx context.Context, p *corev1.Pod) (newP *corev1.Po
 	return newP, changed, nil
 }
 
-func (pm *PodMutator) Register(ctx context.Context, mgr manager.Manager) error {
+func (pm PodMutator) Register(ctx context.Context, mgr manager.Manager) error {
 	wh := &admission.Webhook{
 		Handler: pm,
 	}
@@ -220,9 +210,10 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 	return mutateConfig, nil
 }
 
-func NewPodMutator(cfg *config.Config, scope promutils.Scope) *PodMutator {
+func NewPodMutator(cfg *config.Config, scheme *runtime.Scheme, scope promutils.Scope) *PodMutator {
 	return &PodMutator{
-		cfg: cfg,
+		decoder: admission.NewDecoder(scheme),
+		cfg:     cfg,
 		Mutators: []MutatorConfig{
 			{
 				Mutator: NewSecretsMutator(cfg, scope.NewSubScope("secrets")),
