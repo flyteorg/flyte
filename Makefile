@@ -100,3 +100,14 @@ build_native_flyte:
 	docker build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy
+	make -C datacatalog go-tidy
+	make -C flyteadmin go-tidy
+	make -C flyteidl go-tidy
+	make -C flytepropeller go-tidy
+	make -C flyteplugins go-tidy
+	make -C flytestdlib go-tidy
+	make -C flytecopilot go-tidy
