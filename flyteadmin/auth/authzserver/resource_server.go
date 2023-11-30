@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
 	jwtgo "github.com/golang-jwt/jwt/v4"
 	"golang.org/x/oauth2"
 	"k8s.io/apimachinery/pkg/util/sets"
