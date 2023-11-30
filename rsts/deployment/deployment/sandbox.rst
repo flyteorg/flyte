@@ -110,7 +110,7 @@ ___________________________
 
 Flyte Sandbox ships with a reasonable default configuration. However, you can specify overrides as necessary to fit your use case, in the ``~/.flyte/sandbox/config.yaml`` file. See the following example for enabling the Ray plugin (requires `kuberay-operator <https://github.com/ray-project/kuberay>`__ to also be installed):
 
-.. code-block:: yaml
+.. code-block:: shell
 
    > cat ~/.flyte/sandbox/config.yaml
    tasks:
@@ -129,7 +129,7 @@ Flyte Sandbox ships with a reasonable default configuration. However, you can sp
 
 You can also specify additional cluster resource templates in the ``~/.flyte/sandbox/cluster-resource-templates`` directory. See the following example:
 
-.. code-block:: yaml
+.. code-block:: shell
 
    > cat ~/.flyte/sandbox/cluster-resource-templates/001-serviceaccount.yaml
    apiVersion: v1
@@ -138,8 +138,7 @@ You can also specify additional cluster resource templates in the ``~/.flyte/san
      name: flyte-worker
      namespace: {{ namespace }}
 
-Once you are happy with the changes, simply run ``flytectl demo reload`` to trigger a
-reload of the sandbox with the updated configuration.
+Once you are happy with the changes, simply run ``flytectl demo reload`` to trigger a reload of the sandbox with the updated configuration.
 
 
 Now that you have the sandbox cluster running, you can now go to the :ref:`User Guide <cookbook:userguide>` or
