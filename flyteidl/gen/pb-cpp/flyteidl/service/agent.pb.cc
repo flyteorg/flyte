@@ -46,20 +46,20 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto[] =
   "min.GetTaskRequest\032\037.flyteidl.admin.GetT"
   "askResponse\"\000\022U\n\nDeleteTask\022!.flyteidl.a"
   "dmin.DeleteTaskRequest\032\".flyteidl.admin."
-  "DeleteTaskResponse\"\0002\365\001\n\024AgentMetadataSe"
-  "rvice\022q\n\010GetAgent\022\037.flyteidl.admin.GetAg"
+  "DeleteTaskResponse\"\0002\360\001\n\024AgentMetadataSe"
+  "rvice\022l\n\010GetAgent\022\037.flyteidl.admin.GetAg"
   "entRequest\032 .flyteidl.admin.GetAgentResp"
-  "onse\"\"\202\323\344\223\002\034\022\032/api/v1/agents/{task_type}"
-  "\022j\n\tListAgent\022!.flyteidl.admin.ListAgent"
-  "sRequest\032\".flyteidl.admin.ListAgentsResp"
-  "onse\"\026\202\323\344\223\002\020\022\016/api/v1/agentsB\?Z=github.c"
-  "om/flyteorg/flyte/flyteidl/gen/pb-go/fly"
-  "teidl/serviceb\006proto3"
+  "onse\"\035\202\323\344\223\002\027\022\025/api/v1/agents/{name}\022j\n\tL"
+  "istAgent\022!.flyteidl.admin.ListAgentsRequ"
+  "est\032\".flyteidl.admin.ListAgentsResponse\""
+  "\026\202\323\344\223\002\020\022\016/api/v1/agentsB\?Z=github.com/fl"
+  "yteorg/flyte/flyteidl/gen/pb-go/flyteidl"
+  "/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto,
-  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 701,
+  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 696,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fagent_2eproto() {

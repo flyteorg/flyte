@@ -75,7 +75,7 @@ message GetTaskResponse {
 }
 
 message Resource {
-  // The phase of the execution is used to control its visibility in the UI/CLI.
+  // The state of the execution is used to control its visibility in the UI/CLI.
   State state = 1;
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
@@ -103,16 +103,15 @@ message Agent {
   // A list of secret in the secret manager.
   repeated string secret_name = 2;
   // The type of the task that the agent can handle.
-  string task_type = 3;
-  // Use sync agent or async agent.
+  string supported_task_type = 3;
+  // Indicates if this agent is a sync agent.
   bool is_sync = 4;
 }
 
-
 // A request to get an agent.
 message GetAgentRequest {
-  // The type of the task that the agent can handle.
-  string task_type = 1;
+  // The name of the agent.
+  string name = 1;
 }
 
 // A response containing an agent.

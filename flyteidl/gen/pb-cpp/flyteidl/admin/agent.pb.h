@@ -1506,19 +1506,19 @@ class Agent final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
-  // string task_type = 3;
-  void clear_task_type();
-  static const int kTaskTypeFieldNumber = 3;
-  const ::std::string& task_type() const;
-  void set_task_type(const ::std::string& value);
+  // string supported_task_type = 3;
+  void clear_supported_task_type();
+  static const int kSupportedTaskTypeFieldNumber = 3;
+  const ::std::string& supported_task_type() const;
+  void set_supported_task_type(const ::std::string& value);
   #if LANG_CXX11
-  void set_task_type(::std::string&& value);
+  void set_supported_task_type(::std::string&& value);
   #endif
-  void set_task_type(const char* value);
-  void set_task_type(const char* value, size_t size);
-  ::std::string* mutable_task_type();
-  ::std::string* release_task_type();
-  void set_allocated_task_type(::std::string* task_type);
+  void set_supported_task_type(const char* value);
+  void set_supported_task_type(const char* value, size_t size);
+  ::std::string* mutable_supported_task_type();
+  ::std::string* release_supported_task_type();
+  void set_allocated_supported_task_type(::std::string* supported_task_type);
 
   // bool is_sync = 4;
   void clear_is_sync();
@@ -1533,7 +1533,7 @@ class Agent final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> secret_name_;
   ::google::protobuf::internal::ArenaStringPtr name_;
-  ::google::protobuf::internal::ArenaStringPtr task_type_;
+  ::google::protobuf::internal::ArenaStringPtr supported_task_type_;
   bool is_sync_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
@@ -1635,26 +1635,26 @@ class GetAgentRequest final :
 
   // accessors -------------------------------------------------------
 
-  // string task_type = 1;
-  void clear_task_type();
-  static const int kTaskTypeFieldNumber = 1;
-  const ::std::string& task_type() const;
-  void set_task_type(const ::std::string& value);
+  // string name = 1;
+  void clear_name();
+  static const int kNameFieldNumber = 1;
+  const ::std::string& name() const;
+  void set_name(const ::std::string& value);
   #if LANG_CXX11
-  void set_task_type(::std::string&& value);
+  void set_name(::std::string&& value);
   #endif
-  void set_task_type(const char* value);
-  void set_task_type(const char* value, size_t size);
-  ::std::string* mutable_task_type();
-  ::std::string* release_task_type();
-  void set_allocated_task_type(::std::string* task_type);
+  void set_name(const char* value);
+  void set_name(const char* value, size_t size);
+  ::std::string* mutable_name();
+  ::std::string* release_name();
+  void set_allocated_name(::std::string* name);
 
   // @@protoc_insertion_point(class_scope:flyteidl.admin.GetAgentRequest)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr task_type_;
+  ::google::protobuf::internal::ArenaStringPtr name_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
 };
@@ -3041,57 +3041,57 @@ Agent::mutable_secret_name() {
   return &secret_name_;
 }
 
-// string task_type = 3;
-inline void Agent::clear_task_type() {
-  task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string supported_task_type = 3;
+inline void Agent::clear_supported_task_type() {
+  supported_task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Agent::task_type() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.task_type)
-  return task_type_.GetNoArena();
+inline const ::std::string& Agent::supported_task_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.supported_task_type)
+  return supported_task_type_.GetNoArena();
 }
-inline void Agent::set_task_type(const ::std::string& value) {
+inline void Agent::set_supported_task_type(const ::std::string& value) {
   
-  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.task_type)
+  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.supported_task_type)
 }
 #if LANG_CXX11
-inline void Agent::set_task_type(::std::string&& value) {
+inline void Agent::set_supported_task_type(::std::string&& value) {
   
-  task_type_.SetNoArena(
+  supported_task_type_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Agent.task_type)
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Agent.supported_task_type)
 }
 #endif
-inline void Agent::set_task_type(const char* value) {
+inline void Agent::set_supported_task_type(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.task_type)
+  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.supported_task_type)
 }
-inline void Agent::set_task_type(const char* value, size_t size) {
+inline void Agent::set_supported_task_type(const char* value, size_t size) {
   
-  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.task_type)
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.supported_task_type)
 }
-inline ::std::string* Agent::mutable_task_type() {
+inline ::std::string* Agent::mutable_supported_task_type() {
   
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.task_type)
-  return task_type_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.supported_task_type)
+  return supported_task_type_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Agent::release_task_type() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.Agent.task_type)
+inline ::std::string* Agent::release_supported_task_type() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Agent.supported_task_type)
   
-  return task_type_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return supported_task_type_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Agent::set_allocated_task_type(::std::string* task_type) {
-  if (task_type != nullptr) {
+inline void Agent::set_allocated_supported_task_type(::std::string* supported_task_type) {
+  if (supported_task_type != nullptr) {
     
   } else {
     
   }
-  task_type_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), task_type);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.task_type)
+  supported_task_type_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), supported_task_type);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.supported_task_type)
 }
 
 // bool is_sync = 4;
@@ -3112,57 +3112,57 @@ inline void Agent::set_is_sync(bool value) {
 
 // GetAgentRequest
 
-// string task_type = 1;
-inline void GetAgentRequest::clear_task_type() {
-  task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string name = 1;
+inline void GetAgentRequest::clear_name() {
+  name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& GetAgentRequest::task_type() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.GetAgentRequest.task_type)
-  return task_type_.GetNoArena();
+inline const ::std::string& GetAgentRequest::name() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetAgentRequest.name)
+  return name_.GetNoArena();
 }
-inline void GetAgentRequest::set_task_type(const ::std::string& value) {
+inline void GetAgentRequest::set_name(const ::std::string& value) {
   
-  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.admin.GetAgentRequest.task_type)
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.GetAgentRequest.name)
 }
 #if LANG_CXX11
-inline void GetAgentRequest::set_task_type(::std::string&& value) {
+inline void GetAgentRequest::set_name(::std::string&& value) {
   
-  task_type_.SetNoArena(
+  name_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.GetAgentRequest.task_type)
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.GetAgentRequest.name)
 }
 #endif
-inline void GetAgentRequest::set_task_type(const char* value) {
+inline void GetAgentRequest::set_name(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.GetAgentRequest.task_type)
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.GetAgentRequest.name)
 }
-inline void GetAgentRequest::set_task_type(const char* value, size_t size) {
+inline void GetAgentRequest::set_name(const char* value, size_t size) {
   
-  task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  name_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.GetAgentRequest.task_type)
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.GetAgentRequest.name)
 }
-inline ::std::string* GetAgentRequest::mutable_task_type() {
+inline ::std::string* GetAgentRequest::mutable_name() {
   
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetAgentRequest.task_type)
-  return task_type_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetAgentRequest.name)
+  return name_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* GetAgentRequest::release_task_type() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.GetAgentRequest.task_type)
+inline ::std::string* GetAgentRequest::release_name() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.GetAgentRequest.name)
   
-  return task_type_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return name_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void GetAgentRequest::set_allocated_task_type(::std::string* task_type) {
-  if (task_type != nullptr) {
+inline void GetAgentRequest::set_allocated_name(::std::string* name) {
+  if (name != nullptr) {
     
   } else {
     
   }
-  task_type_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), task_type);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetAgentRequest.task_type)
+  name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetAgentRequest.name)
 }
 
 // -------------------------------------------------------------------

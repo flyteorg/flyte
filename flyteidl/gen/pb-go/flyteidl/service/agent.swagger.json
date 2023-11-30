@@ -32,7 +32,7 @@
         ]
       }
     },
-    "/api/v1/agents/{task_type}": {
+    "/api/v1/agents/{name}": {
       "get": {
         "summary": "Send a task create request to the agent server.",
         "operationId": "GetAgent",
@@ -46,8 +46,8 @@
         },
         "parameters": [
           {
-            "name": "task_type",
-            "description": "The type of the task that the agent can handle.",
+            "name": "name",
+            "description": "The name of the agent.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -221,22 +221,23 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "A list of secret in the secret manager."
+          "description": "The name of the agent."
         },
         "secret_name": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "A list of secret in the secret manager."
         },
-        "task_type": {
+        "supported_task_type": {
           "type": "string",
           "description": "The type of the task that the agent can handle."
         },
         "is_sync": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Use sync agent or async agent."
+          "description": "Indicates if this agent is a sync agent."
         }
       },
       "description": "A message containing the agent metadata."

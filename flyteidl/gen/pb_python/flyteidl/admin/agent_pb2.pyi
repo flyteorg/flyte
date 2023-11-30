@@ -127,22 +127,22 @@ class DeleteTaskResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class Agent(_message.Message):
-    __slots__ = ["name", "secret_name", "task_type", "is_sync"]
+    __slots__ = ["name", "secret_name", "supported_task_type", "is_sync"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SECRET_NAME_FIELD_NUMBER: _ClassVar[int]
-    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    SUPPORTED_TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     IS_SYNC_FIELD_NUMBER: _ClassVar[int]
     name: str
     secret_name: _containers.RepeatedScalarFieldContainer[str]
-    task_type: str
+    supported_task_type: str
     is_sync: bool
-    def __init__(self, name: _Optional[str] = ..., secret_name: _Optional[_Iterable[str]] = ..., task_type: _Optional[str] = ..., is_sync: bool = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., secret_name: _Optional[_Iterable[str]] = ..., supported_task_type: _Optional[str] = ..., is_sync: bool = ...) -> None: ...
 
 class GetAgentRequest(_message.Message):
-    __slots__ = ["task_type"]
-    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    task_type: str
-    def __init__(self, task_type: _Optional[str] = ...) -> None: ...
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class GetAgentResponse(_message.Message):
     __slots__ = ["agent"]

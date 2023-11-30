@@ -110,15 +110,16 @@ pub struct DeleteTaskResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Agent {
-    /// A list of secret in the secret manager.
+    /// The name of the agent.
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
+    /// A list of secret in the secret manager.
     #[prost(string, repeated, tag="2")]
     pub secret_name: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// The type of the task that the agent can handle.
     #[prost(string, tag="3")]
-    pub task_type: ::prost::alloc::string::String,
-    /// Use sync agent or async agent.
+    pub supported_task_type: ::prost::alloc::string::String,
+    /// Indicates if this agent is a sync agent.
     #[prost(bool, tag="4")]
     pub is_sync: bool,
 }
@@ -126,9 +127,9 @@ pub struct Agent {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetAgentRequest {
-    /// The type of the task that the agent can handle.
+    /// The name of the agent.
     #[prost(string, tag="1")]
-    pub task_type: ::prost::alloc::string::String,
+    pub name: ::prost::alloc::string::String,
 }
 /// A response containing an agent.
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -8368,8 +8368,8 @@ export namespace flyteidl {
             /** Agent secretName */
             secretName?: (string[]|null);
 
-            /** Agent taskType */
-            taskType?: (string|null);
+            /** Agent supportedTaskType */
+            supportedTaskType?: (string|null);
 
             /** Agent isSync */
             isSync?: (boolean|null);
@@ -8390,8 +8390,8 @@ export namespace flyteidl {
             /** Agent secretName. */
             public secretName: string[];
 
-            /** Agent taskType. */
-            public taskType: string;
+            /** Agent supportedTaskType. */
+            public supportedTaskType: string;
 
             /** Agent isSync. */
             public isSync: boolean;
@@ -8432,8 +8432,8 @@ export namespace flyteidl {
         /** Properties of a GetAgentRequest. */
         interface IGetAgentRequest {
 
-            /** GetAgentRequest taskType */
-            taskType?: (string|null);
+            /** GetAgentRequest name */
+            name?: (string|null);
         }
 
         /** Represents a GetAgentRequest. */
@@ -8445,8 +8445,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.IGetAgentRequest);
 
-            /** GetAgentRequest taskType. */
-            public taskType: string;
+            /** GetAgentRequest name. */
+            public name: string;
 
             /**
              * Creates a new GetAgentRequest instance using the specified properties.

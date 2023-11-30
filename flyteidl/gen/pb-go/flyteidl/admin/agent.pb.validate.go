@@ -677,7 +677,7 @@ func (m *Agent) Validate() error {
 
 	// no validation rules for Name
 
-	// no validation rules for TaskType
+	// no validation rules for SupportedTaskType
 
 	// no validation rules for IsSync
 
@@ -746,7 +746,7 @@ func (m *GetAgentRequest) Validate() error {
 		return nil
 	}
 
-	// no validation rules for TaskType
+	// no validation rules for Name
 
 	return nil
 }

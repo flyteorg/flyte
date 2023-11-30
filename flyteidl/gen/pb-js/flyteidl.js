@@ -20418,7 +20418,7 @@
                  * @interface IAgent
                  * @property {string|null} [name] Agent name
                  * @property {Array.<string>|null} [secretName] Agent secretName
-                 * @property {string|null} [taskType] Agent taskType
+                 * @property {string|null} [supportedTaskType] Agent supportedTaskType
                  * @property {boolean|null} [isSync] Agent isSync
                  */
     
@@ -20455,12 +20455,12 @@
                 Agent.prototype.secretName = $util.emptyArray;
     
                 /**
-                 * Agent taskType.
-                 * @member {string} taskType
+                 * Agent supportedTaskType.
+                 * @member {string} supportedTaskType
                  * @memberof flyteidl.admin.Agent
                  * @instance
                  */
-                Agent.prototype.taskType = "";
+                Agent.prototype.supportedTaskType = "";
     
                 /**
                  * Agent isSync.
@@ -20499,8 +20499,8 @@
                     if (message.secretName != null && message.secretName.length)
                         for (var i = 0; i < message.secretName.length; ++i)
                             writer.uint32(/* id 2, wireType 2 =*/18).string(message.secretName[i]);
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.taskType);
+                    if (message.supportedTaskType != null && message.hasOwnProperty("supportedTaskType"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.supportedTaskType);
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isSync);
                     return writer;
@@ -20533,7 +20533,7 @@
                             message.secretName.push(reader.string());
                             break;
                         case 3:
-                            message.taskType = reader.string();
+                            message.supportedTaskType = reader.string();
                             break;
                         case 4:
                             message.isSync = reader.bool();
@@ -20567,9 +20567,9 @@
                             if (!$util.isString(message.secretName[i]))
                                 return "secretName: string[] expected";
                     }
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        if (!$util.isString(message.taskType))
-                            return "taskType: string expected";
+                    if (message.supportedTaskType != null && message.hasOwnProperty("supportedTaskType"))
+                        if (!$util.isString(message.supportedTaskType))
+                            return "supportedTaskType: string expected";
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         if (typeof message.isSync !== "boolean")
                             return "isSync: boolean expected";
@@ -20585,7 +20585,7 @@
                  * Properties of a GetAgentRequest.
                  * @memberof flyteidl.admin
                  * @interface IGetAgentRequest
-                 * @property {string|null} [taskType] GetAgentRequest taskType
+                 * @property {string|null} [name] GetAgentRequest name
                  */
     
                 /**
@@ -20604,12 +20604,12 @@
                 }
     
                 /**
-                 * GetAgentRequest taskType.
-                 * @member {string} taskType
+                 * GetAgentRequest name.
+                 * @member {string} name
                  * @memberof flyteidl.admin.GetAgentRequest
                  * @instance
                  */
-                GetAgentRequest.prototype.taskType = "";
+                GetAgentRequest.prototype.name = "";
     
                 /**
                  * Creates a new GetAgentRequest instance using the specified properties.
@@ -20635,8 +20635,8 @@
                 GetAgentRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.taskType);
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
                     return writer;
                 };
     
@@ -20659,7 +20659,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.taskType = reader.string();
+                            message.name = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20680,9 +20680,9 @@
                 GetAgentRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        if (!$util.isString(message.taskType))
-                            return "taskType: string expected";
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        if (!$util.isString(message.name))
+                            return "name: string expected";
                     return null;
                 };
     
