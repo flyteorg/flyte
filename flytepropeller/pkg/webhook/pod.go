@@ -30,7 +30,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -158,7 +157,7 @@ func generateMutatePath(gvk schema.GroupVersionKind) string {
 }
 
 func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
-	caBytes, err := ioutil.ReadFile(filepath.Join(pm.cfg.CertDir, "ca.crt"))
+	caBytes, err := os.ReadFile(filepath.Join(pm.cfg.ExpandCertDir(), "ca.crt"))
 	if err != nil {
 		// ca.crt is optional. If not provided, API Server will assume the webhook is serving SSL using a certificate
 		// issued by a known Cert Authority.
