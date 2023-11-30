@@ -78,7 +78,7 @@ who wish to dig deeper into the storage layer.
       🐋 Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000
       📂 The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console
 
-Flytectl/Flyte Remote Configuration
+Flytectl/Flyte-remote Configuration
 ___________________________________
 
 The ``config-sandbox.yaml`` file contains configuration for clients  to communicate with **FlyteAdmin**, which is the Flyte cluster backend component that processes all client requests such as workflow executions. The default values are enough to let you connect and use Flyte:
@@ -108,7 +108,7 @@ The ``config-sandbox.yaml`` file contains configuration for clients  to communic
 Flyte Cluster Configuration
 ___________________________
 
-Flyte Sandbox ships with a reasonable default configuration. However, you can specify overrides as necessary to fit your use case, in the ``~/.flyte/sandbox/config.yaml`` file. See the following example for enabling the Ray plugin (requires [`kuberay-operator`](https://github.com/ray-project/kuberay) to also be installed):
+Flyte Sandbox ships with a reasonable default configuration. However, you can specify overrides as necessary to fit your use case, in the ``~/.flyte/sandbox/config.yaml`` file. See the following example for enabling the Ray plugin (requires `kuberay-operator <https://github.com/ray-project/kuberay>`__ to also be installed):
 
 .. code-block:: yaml
 
