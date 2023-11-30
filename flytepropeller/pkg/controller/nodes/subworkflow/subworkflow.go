@@ -150,8 +150,6 @@ func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context,
 		}
 		status := nCtx.NodeStatus()
 		subworkflowNodeLookup := executors.NewNodeLookup(subworkflow, status, subworkflow)
-		// subNodeLookup := nCtx.ContextualNodeLookup()
-		// TODO: NodeStatus() is deprecated, how do we get the status of the failure node?
 		failureNodeStatus := status.GetNodeExecutionStatus(ctx, failureNode.GetID())
 		failureNodeLookup := executors.NewFailureNodeLookup(subworkflowNodeLookup, failureNode, failureNodeStatus)
 

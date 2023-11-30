@@ -171,7 +171,6 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 func (c *workflowExecutor) handleFailureNode(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	execErr := executionErrorOrDefault(w.GetExecutionStatus().GetExecutionError(), w.GetExecutionStatus().GetMessage())
 	failureNode := w.GetOnFailureNode()
-	logger.Infof(ctx, "Handling FailureNode [%v]", failureNode.GetID())
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 
 	failureNodeStatus := w.GetExecutionStatus().GetNodeExecutionStatus(ctx, failureNode.GetID())

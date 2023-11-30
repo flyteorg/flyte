@@ -48,10 +48,19 @@ func TestNewTestFailureNodeLookup(t *testing.T) {
 	r, ok := failureNodeLookup.GetNode(v1alpha1.StartNodeID)
 	assert.True(t, ok)
 	assert.Equal(t, n, r)
-	assert.Equal(t, ns, nl.GetNodeExecutionStatus(context.TODO(), v1alpha1.StartNodeID))
+	assert.Equal(t, ns, failureNodeLookup.GetNodeExecutionStatus(context.TODO(), v1alpha1.StartNodeID))
 
 	r, ok = failureNodeLookup.GetNode(failureNodeID)
 	assert.True(t, ok)
 	assert.Equal(t, n, r)
-	assert.Equal(t, ns, nl.GetNodeExecutionStatus(context.TODO(), failureNodeID))
+	assert.Equal(t, ns, failureNodeLookup.GetNodeExecutionStatus(context.TODO(), failureNodeID))
+
+	nodeIDs, err := failureNodeLookup.ToNode(failureNodeID)
+	assert.Equal(t, len(nodeIDs), 1)
+	assert.Equal(t, nodeIDs[0], v1alpha1.StartNodeID)
+	assert.Nil(t, err)
+
+	nodeIDs, err = failureNodeLookup.FromNode(failureNodeID)
+	assert.Nil(t, nodeIDs)
+	assert.Nil(t, err)
 }

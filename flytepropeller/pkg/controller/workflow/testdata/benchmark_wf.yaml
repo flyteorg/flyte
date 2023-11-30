@@ -206,7 +206,7 @@ spec:
         phase: 0
       task: sum-non-none
   onFailure:
-    id: en0
+    id: fn0
     inputBindings:
       - binding:
           promise:

@@ -216,8 +216,6 @@ func ToNodePhase(p handler.EPhase) (v1alpha1.NodePhase, error) {
 		return v1alpha1.NodePhaseSucceeding, nil
 	case handler.EPhaseFailed:
 		return v1alpha1.NodePhaseFailing, nil
-	case handler.EPhaseFailing:
-		return v1alpha1.NodePhaseFailing, nil
 	case handler.EPhaseTimedout:
 		return v1alpha1.NodePhaseTimingOut, nil
 	case handler.EPhaseRecovered:

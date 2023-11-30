@@ -463,7 +463,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 	recordedRunning := false
 	recordedFailed := false
-	recordedFailing := true
+	recordedFailing := false
 	eventSink := eventMocks.NewMockEventSink()
 	eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 		e, ok := message.(*event.WorkflowExecutionEvent)
@@ -565,7 +565,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 
 	recordedRunning := false
 	recordedSuccess := false
-	recordedFailing := true
+	recordedFailing := false
 	eventSink := eventMocks.NewMockEventSink()
 	eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 		e, ok := message.(*event.WorkflowExecutionEvent)
