@@ -10,7 +10,7 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/execution.proto";
 
 // The state of the execution is used to control its visibility in the UI/CLI.
-enum Phase {
+enum State {
   RETRYABLE_FAILURE = 0;
   PERMANENT_FAILURE = 1;
   PENDING = 2;
@@ -70,12 +70,13 @@ message GetTaskRequest {
 message GetTaskResponse {
   Resource resource = 1;
 
+  // log information for the task execution
   repeated core.TaskLog logs = 2;
 }
 
 message Resource {
   // The phase of the execution is used to control its visibility in the UI/CLI.
-  Phase phase = 1;
+  State state = 1;
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
@@ -95,18 +96,34 @@ message DeleteTaskRequest {
 // Response to delete a task.
 message DeleteTaskResponse {}
 
-
-message GetMetadataRequest {}
-
-message GetMetadataResponse {
-  repeated Agent agent = 1;
+// A message containing the agent metadata.
+message Agent {
+  // The name of the agent.
+  string name = 1;
+  // A list of secret in the secret manager.
+  repeated string secret_name = 2;
+  // The type of the task that the agent can handle.
+  string task_type = 3;
+  // Use sync agent or async agent.
+  bool is_sync = 4;
 }
 
-// A message containing the agent information.
-message Agent {
-  repeated string secret_name = 1;
 
-  string task_type = 2;
+// A request to get an agent.
+message GetAgentRequest {
+  // The type of the task that the agent can handle.
+  string task_type = 1;
+}
 
-  bool is_sync = 3;
+// A response containing an agent.
+message GetAgentResponse {
+  Agent agent = 1;
+}
+
+// A request to list all agents.
+message ListAgentsRequest {}
+
+// A response containing a list of agents.
+message ListAgentsResponse {
+  repeated Agent agents = 1;
 }

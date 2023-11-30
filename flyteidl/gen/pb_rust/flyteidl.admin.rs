@@ -40,6 +40,11 @@ pub struct CreateTaskRequest {
     /// subset of runtime task execution metadata.
     #[prost(message, optional, tag="4")]
     pub task_execution_metadata: ::core::option::Option<TaskExecutionMetadata>,
+    /// Secret to be passed to the agent.
+    /// Key is the name of the secret in secret manager.
+    /// Value is the actual secret value.
+    #[prost(map="string, string", tag="5")]
+    pub secret: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Represents a create response structure.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -66,11 +71,14 @@ pub struct GetTaskRequest {
 pub struct GetTaskResponse {
     #[prost(message, optional, tag="1")]
     pub resource: ::core::option::Option<Resource>,
+    /// log information for the task execution
+    #[prost(message, repeated, tag="2")]
+    pub logs: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Resource {
-    /// The state of the execution is used to control its visibility in the UI/CLI.
+    /// The phase of the execution is used to control its visibility in the UI/CLI.
     #[prost(enumeration="State", tag="1")]
     pub state: i32,
     /// The outputs of the execution. It's typically used by sql task. Agent service will create a
@@ -97,6 +105,49 @@ pub struct DeleteTaskRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTaskResponse {
+}
+/// A message containing the agent metadata.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Agent {
+    /// A list of secret in the secret manager.
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+    #[prost(string, repeated, tag="2")]
+    pub secret_name: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// The type of the task that the agent can handle.
+    #[prost(string, tag="3")]
+    pub task_type: ::prost::alloc::string::String,
+    /// Use sync agent or async agent.
+    #[prost(bool, tag="4")]
+    pub is_sync: bool,
+}
+/// A request to get an agent.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetAgentRequest {
+    /// The type of the task that the agent can handle.
+    #[prost(string, tag="1")]
+    pub task_type: ::prost::alloc::string::String,
+}
+/// A response containing an agent.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetAgentResponse {
+    #[prost(message, optional, tag="1")]
+    pub agent: ::core::option::Option<Agent>,
+}
+/// A request to list all agents.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListAgentsRequest {
+}
+/// A response containing a list of agents.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListAgentsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub agents: ::prost::alloc::vec::Vec<Agent>,
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
