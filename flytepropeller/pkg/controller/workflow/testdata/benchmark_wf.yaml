@@ -211,8 +211,8 @@ spec:
       - binding:
           promise:
             nodeId: start-node
-            var: triggered_date
-        var: triggered_date
+            var: name
+        var: name
     kind: task
     name: delete-cluster
     resources:
@@ -329,9 +329,9 @@ tasks:
     interface:
       inputs:
         variables:
-          date_triggered:
+          name:
             type:
-              simple: DATETIME
+              simple: STRING
       outputs:
         variables: { }
     metadata:
