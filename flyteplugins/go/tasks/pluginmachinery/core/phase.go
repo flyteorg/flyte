@@ -36,8 +36,6 @@ const (
 	PhasePermanentFailure
 	// Indicates the task is waiting for the cache to be populated so it can reuse results
 	PhaseWaitingForCache
-	// Inidicates subtasks are needing to be aborted
-	PhaseSubTasksAborted
 )
 
 var Phases = []Phase{
@@ -51,7 +49,6 @@ var Phases = []Phase{
 	PhaseRetryableFailure,
 	PhasePermanentFailure,
 	PhaseWaitingForCache,
-	PhaseSubTasksAborted,
 }
 
 // Returns true if the given phase is failure, retryable failure or success
@@ -85,6 +82,8 @@ type ExternalResource struct {
 	RetryAttempt uint32
 	// Phase (if exists) associated with the external resource
 	Phase Phase
+	// Indicates if external resource is a subtask getting aborted
+	IsAbortedSubtask bool
 }
 
 type ReasonInfo struct {

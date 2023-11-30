@@ -369,17 +369,18 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 		}
 
 		externalResources = append(externalResources, &core.ExternalResource{
-			ExternalID:   stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
-			Index:        uint32(originalIdx),
-			RetryAttempt: uint32(retryAttempt),
-			Phase:        core.PhaseSubTasksAborted,
+			ExternalID:       stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+			Index:            uint32(originalIdx),
+			RetryAttempt:     uint32(retryAttempt),
+			Phase:            existingPhase,
+			IsAbortedSubtask: true,
 		})
 	}
 
 	taskInfo := &core.TaskInfo{
 		ExternalResources: externalResources,
 	}
-	phaseInfo := core.PhaseInfoFailureWithCleanup(core.PhaseSubTasksAborted.String(), "Array subtasks were aborted", taskInfo)
+	phaseInfo := core.PhaseInfoFailureWithCleanup(core.PhasePermanentFailure.String(), "Array subtasks were aborted", taskInfo)
 	err = tCtx.EventsRecorder().RecordRaw(ctx, phaseInfo)
 
 	if messageCollector.Length() > 0 {
