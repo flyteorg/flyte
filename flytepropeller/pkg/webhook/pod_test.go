@@ -85,7 +85,7 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 	pm := NewPodMutator(&config.Config{
 		CertDir:     "testdata",
 		ServiceName: "my-service",
-	}, nil, promutils.NewTestScope())
+	}, latest.Scheme, promutils.NewTestScope())
 
 	t.Run("Empty namespace", func(t *testing.T) {
 		c, err := pm.CreateMutationWebhookConfiguration("")
