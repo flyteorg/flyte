@@ -337,6 +337,7 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 	}
 
 	messageCollector := errorcollector.NewErrorMessageCollector()
+	externalResources := make([]*core.ExternalResource, 0, len(currentState.GetArrayStatus().Detailed.GetItems()))
 	for childIdx, existingPhaseIdx := range currentState.GetArrayStatus().Detailed.GetItems() {
 		existingPhase := core.Phases[existingPhaseIdx]
 		retryAttempt := uint64(0)
@@ -344,23 +345,42 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 			// we can use RetryAttempts if it has been initialized, otherwise stay with default 0
 			retryAttempt = currentState.RetryAttempts.GetItem(childIdx)
 		}
-
-		// return immediately if subtask has completed or not yet started
-		if existingPhase.IsTerminal() || existingPhase == core.PhaseUndefined {
-			continue
-		}
-
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, currentState.GetIndexesToCache())
 		stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, 0)
 		if err != nil {
 			return err
 		}
 
+		// return immediately if subtask has completed or not yet started
+		if existingPhase.IsTerminal() || existingPhase == core.PhaseUndefined {
+			// still write subtask to buffer to persist to admin
+			externalResources = append(externalResources, &core.ExternalResource{
+				ExternalID:   stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Index:        uint32(originalIdx),
+				RetryAttempt: uint32(retryAttempt),
+				Phase:        existingPhase,
+			})
+			continue
+		}
+
 		err = terminateFunction(ctx, stCtx, config, kubeClient)
 		if err != nil {
 			messageCollector.Collect(childIdx, err.Error())
 		}
+
+		externalResources = append(externalResources, &core.ExternalResource{
+			ExternalID:   stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+			Index:        uint32(originalIdx),
+			RetryAttempt: uint32(retryAttempt),
+			Phase:        core.PhaseSubTasksAborted,
+		})
 	}
+
+	taskInfo := &core.TaskInfo{
+		ExternalResources: externalResources,
+	}
+	phaseInfo := core.PhaseInfoFailureWithCleanup(core.PhaseSubTasksAborted.String(), "Array subtasks were aborted", taskInfo)
+	err = tCtx.EventsRecorder().RecordRaw(ctx, phaseInfo)
 
 	if messageCollector.Length() > 0 {
 		return fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength))

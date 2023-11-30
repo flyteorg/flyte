@@ -3,10 +3,11 @@ package task
 import (
 	"context"
 	"fmt"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/golang/protobuf/ptypes"
 	"runtime/debug"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	regErrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
@@ -19,7 +20,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -749,6 +749,7 @@ func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i 
 func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	taskNodeState := nCtx.NodeStateReader().GetTaskNodeState()
 	currentPhase := taskNodeState.PluginPhase
+	currentPhaseVersion := taskNodeState.PluginPhaseVersion
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
 
 	if currentPhase.IsTerminal() && !(currentPhase.IsFailure() && taskNodeState.CleanupOnFailure) {
@@ -786,12 +787,44 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 		logger.Errorf(ctx, "Abort failed when calling plugin abort.")
 		return err
 	}
-	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	evRecorder := nCtx.EventsRecorder()
+	logger.Debugf(ctx, "Sending buffered Task events.")
+	for _, ev := range tCtx.ber.GetAll(ctx) {
+		evInfo, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
+			TaskExecContext:       tCtx,
+			InputReader:           nCtx.InputReader(),
+			EventConfig:           t.eventConfig,
+			OutputWriter:          tCtx.ow,
+			Info:                  ev.WithVersion(currentPhaseVersion + 1),
+			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
+			ExecContext:           nCtx.ExecutionContext(),
+			TaskType:              ttype,
+			PluginID:              p.GetID(),
+			ResourcePoolInfo:      tCtx.rm.GetResourcePoolInfo(),
+			ClusterID:             t.clusterID,
+		})
+		if err != nil {
+			return err
+		}
+		if currentPhase.IsFailure() {
+			evInfo.Phase = core.TaskExecution_FAILED
+		} else {
+			evInfo.Phase = core.TaskExecution_ABORTED
+		}
+		if err := evRecorder.RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
+			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.Phase.String(), err.Error())
+			// Check for idempotency
+			// Check for terminate state error
+			return err
+		}
+	}
+
+	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	nodeExecutionID, err := getParentNodeExecIDForTask(&taskExecID, nCtx.ExecutionContext())
 	if err != nil {
 		return err
 	}
+	// TODO handle this call failing if phase is set to Failure - probably doesn't matter
 	if err := evRecorder.RecordTaskEvent(ctx, &event.TaskExecutionEvent{
 		TaskId:                taskExecID.TaskId,
 		ParentNodeExecutionId: nodeExecutionID,

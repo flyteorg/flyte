@@ -36,6 +36,8 @@ const (
 	PhasePermanentFailure
 	// Indicates the task is waiting for the cache to be populated so it can reuse results
 	PhaseWaitingForCache
+	// Inidicates subtasks are needing to be aborted
+	PhaseSubTasksAborted
 )
 
 var Phases = []Phase{
@@ -49,6 +51,7 @@ var Phases = []Phase{
 	PhaseRetryableFailure,
 	PhasePermanentFailure,
 	PhaseWaitingForCache,
+	PhaseSubTasksAborted,
 }
 
 // Returns true if the given phase is failure, retryable failure or success

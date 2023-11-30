@@ -44,6 +44,8 @@ func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
 		return core.TaskExecution_FAILED
 	case pluginCore.PhaseRetryableFailure:
 		return core.TaskExecution_FAILED
+	case pluginCore.PhaseSubTasksAborted:
+		return core.TaskExecution_ABORTED
 	case pluginCore.PhaseNotReady:
 		fallthrough
 	case pluginCore.PhaseUndefined:
