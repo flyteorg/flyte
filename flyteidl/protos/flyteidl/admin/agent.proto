@@ -71,7 +71,7 @@ message GetTaskResponse {
   Resource resource = 1;
 
   // log information for the task execution
-  repeated core.TaskLog logs = 2;
+  repeated core.TaskLog log_links = 2;
 }
 
 message Resource {
