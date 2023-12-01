@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/flyteorg/flyte/datacatalog v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyte/flyteartifacts v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytestdlib v1.9.5
 	github.com/golang/glog v1.1.0
@@ -219,7 +218,6 @@ require (
 replace (
 	github.com/flyteorg/flyte/datacatalog => ./datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ./flyteadmin
-	github.com/flyteorg/flyte/flyteartifacts => ./flyteartifacts
 	github.com/flyteorg/flyte/flytecopilot => ./flytecopilot
 	github.com/flyteorg/flyte/flyteidl => ./flyteidl
 	github.com/flyteorg/flyte/flyteplugins => ./flyteplugins

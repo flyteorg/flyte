@@ -308,10 +308,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 	// Replace with call to GetNodeExecutionData
 	var inputs *core.LiteralMap
 	logger.Infof(ctx, "DEBUGART-0: id %v", rawEvent.Id)
-	if rawEvent.GetInputData() != nil {
-		logger.Infof(ctx, "DEBUGART-1: input data %v", rawEvent.GetInputData())
-		inputs = rawEvent.GetInputData()
-	} else if len(rawEvent.GetInputUri()) > 0 {
+	if len(rawEvent.GetInputUri()) > 0 {
 		inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
 			c.storageClient, rawEvent.GetInputUri())
 		logger.Infof(ctx, "DEBUGART-2: input uri %v, %v", rawEvent.GetInputUri(), inputs)
@@ -319,6 +316,9 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		if err != nil {
 			fmt.Printf("Error fetching input literal map %v", rawEvent)
 		}
+	} else if rawEvent.GetInputData() != nil {
+		inputs = rawEvent.GetInputData()
+		logger.Infof(ctx, "DEBUGART-1: input data %v, %v", rawEvent.GetInputData(), inputs)
 	} else {
 		logger.Infof(ctx, "Node execution for node exec [%+v] has no input data", rawEvent.Id)
 	}
