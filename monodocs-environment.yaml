@@ -46,7 +46,6 @@ dependencies:
   - numpy==1.23.5               # onnxtensorflow numpy.bool warning
   - tf2onnx                     # onnxtensorflow
   - tensorflow>=2.13.0          # onnxtensorflow
-  - whylabs-client              # whylogs
   - scikit-learn                # scikit-learn
   - dask[distributed]           # dask
   - mlflow==2.7.0               # mlflow
@@ -55,16 +54,17 @@ dependencies:
   - vaex                        # vaex
 
   - pip:
+    - sphinx-code-include
+    - sphinxext-remoteliteralinclude
+    - sphinx_markdown_tables
+    - sphinxcontrib-video
     - flytekitplugins-deck-standard
     - flytekitplugins-kfpytorch
     - flytekitplugins-sqlalchemy
     - dolt_integrations
     - google-cloud
-    - sphinx-code-include
-    - sphinxext-remoteliteralinclude
-    - sphinx_markdown_tables
-    - sphinxcontrib-video
     - ydata_profiling
-    - whylogs==1.3.3
+    - whylogs==1.3.3              # whylogs
+    - whylabs-client              # whylogs
     - ray==2.6.3
     - duckdb
