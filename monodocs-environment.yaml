@@ -27,6 +27,7 @@ dependencies:
 
   # Packages for Plugin docs
   # Package name              Plugin needing it
+  - retry                       # aws sagemaker
   - botocore                    # fsspec
   - fsspec                      # fsspec
   - google-cloud-bigquery       # bigquery
