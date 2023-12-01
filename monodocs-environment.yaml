@@ -4,6 +4,7 @@ dependencies:
   - python=3.9
   - pip
   - codespell
+  - furo
   - flytekit
   - gitpython
   - ipython!=8.7.0
