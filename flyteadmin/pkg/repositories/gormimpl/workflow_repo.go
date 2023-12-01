@@ -20,16 +20,16 @@ type WorkflowRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *WorkflowRepo) Create(_ context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
+func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 	timer := r.metrics.CreateDuration.Start()
-	err := r.db.Transaction(func(_ *gorm.DB) error {
+	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if descriptionEntity != nil {
-			tx := r.db.Omit("id").Create(descriptionEntity)
+			tx := r.db.WithContext(ctx).Omit("id").Create(descriptionEntity)
 			if tx.Error != nil {
 				return r.errorTransformer.ToFlyteAdminError(tx.Error)
 			}
 		}
-		tx := r.db.Omit("id").Create(&input)
+		tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 		if tx.Error != nil {
 			return r.errorTransformer.ToFlyteAdminError(tx.Error)
 		}
@@ -43,7 +43,7 @@ func (r *WorkflowRepo) Create(_ context.Context, input models.Workflow, descript
 func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Workflow, error) {
 	var workflow models.Workflow
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.Workflow{
+	tx := r.db.WithContext(ctx).Where(&models.Workflow{
 		WorkflowKey: models.WorkflowKey{
 			Project: input.Project,
 			Domain:  input.Domain,
@@ -73,7 +73,7 @@ func (r *WorkflowRepo) List(
 		return interfaces.WorkflowCollectionOutput{}, err
 	}
 	var workflows []models.Workflow
-	tx := r.db.Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
@@ -103,7 +103,7 @@ func (r *WorkflowRepo) ListIdentifiers(ctx context.Context, input interfaces.Lis
 		return interfaces.WorkflowCollectionOutput{}, err
 	}
 
-	tx := r.db.Model(models.Workflow{}).Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Model(models.Workflow{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)

@@ -494,7 +494,12 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))
 
 	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
-	inputLiteralMap, err := constructLiteralMap(ctx, nCtx.InputReader(), subNodeIndex)
+	inputs, err := nCtx.InputReader().Get(ctx)
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
+	inputLiteralMap, err := constructLiteralMap(inputs, subNodeIndex)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}

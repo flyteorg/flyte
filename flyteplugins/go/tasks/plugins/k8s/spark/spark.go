@@ -173,7 +173,7 @@ type driverSpec struct {
 
 func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string) (*driverSpec, error) {
 	// Spark driver pods should always run as non-interruptible
-	nonInterruptibleTaskCtx := flytek8s.NewNonInterruptibleTaskExecutionContext(taskCtx)
+	nonInterruptibleTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithInterruptible(false))
 	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
 	if err != nil {
 		return nil, err
@@ -329,7 +329,7 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	sparkConfig := GetSparkConfig()
 	taskLogs := make([]*core.TaskLog, 0, 3)
-	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
 	if !isQueued {
 		if sj.Status.DriverInfo.PodName != "" {
@@ -340,10 +340,10 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 			if p != nil {
 				o, err := p.GetTaskLogs(tasklog.Input{
-					PodName:                 sj.Status.DriverInfo.PodName,
-					Namespace:               sj.Namespace,
-					LogName:                 "(Driver Logs)",
-					TaskExecutionIdentifier: &taskExecID,
+					PodName:         sj.Status.DriverInfo.PodName,
+					Namespace:       sj.Namespace,
+					LogName:         "(Driver Logs)",
+					TaskExecutionID: taskExecID,
 				})
 
 				if err != nil {
@@ -361,10 +361,10 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 		if p != nil {
 			o, err := p.GetTaskLogs(tasklog.Input{
-				PodName:                 sj.Status.DriverInfo.PodName,
-				Namespace:               sj.Namespace,
-				LogName:                 "(User Logs)",
-				TaskExecutionIdentifier: &taskExecID,
+				PodName:         sj.Status.DriverInfo.PodName,
+				Namespace:       sj.Namespace,
+				LogName:         "(User Logs)",
+				TaskExecutionID: taskExecID,
 			})
 
 			if err != nil {
@@ -381,10 +381,10 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 		if p != nil {
 			o, err := p.GetTaskLogs(tasklog.Input{
-				PodName:                 sj.Name,
-				Namespace:               sj.Namespace,
-				LogName:                 "(System Logs)",
-				TaskExecutionIdentifier: &taskExecID,
+				PodName:         sj.Name,
+				Namespace:       sj.Namespace,
+				LogName:         "(System Logs)",
+				TaskExecutionID: taskExecID,
 			})
 
 			if err != nil {
@@ -402,10 +402,10 @@ func getEventInfoForSpark(pluginContext k8s.PluginContext, sj *sparkOp.SparkAppl
 
 	if p != nil {
 		o, err := p.GetTaskLogs(tasklog.Input{
-			PodName:                 sj.Name,
-			Namespace:               sj.Namespace,
-			LogName:                 "(Spark-Submit/All User Logs)",
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:         sj.Name,
+			Namespace:       sj.Namespace,
+			LogName:         "(Spark-Submit/All User Logs)",
+			TaskExecutionID: taskExecID,
 		})
 
 		if err != nil {

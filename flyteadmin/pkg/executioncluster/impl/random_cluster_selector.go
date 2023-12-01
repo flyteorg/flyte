@@ -6,8 +6,6 @@ import (
 	"hash/fnv"
 	"math/rand"
 
-	"google.golang.org/grpc/codes"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
@@ -102,10 +100,8 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 		LaunchPlan:   spec.LaunchPlan,
 		ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
 	})
-	if err != nil {
-		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
-			return nil, err
-		}
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		return nil, err
 	}
 
 	var weightedRandomList random.WeightedRandomList

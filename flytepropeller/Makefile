@@ -59,3 +59,7 @@ clean:
 golden:
 	go test ./cmd/kubectl-flyte/cmd -update
 	go test ./pkg/compiler/test -update
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy

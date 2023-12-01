@@ -30,7 +30,7 @@ func (h *tagRepo) Create(ctx context.Context, tag models.Tag) error {
 	timer := h.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
-	db := h.db.Create(&tag)
+	db := h.db.WithContext(ctx).Create(&tag)
 
 	if db.Error != nil {
 		return h.errorTransformer.ToDataCatalogError(db.Error)
@@ -43,10 +43,10 @@ func (h *tagRepo) Get(ctx context.Context, in models.TagKey) (models.Tag, error)
 	defer timer.Stop()
 
 	var tag models.Tag
-	result := h.db.Preload("Artifact").
+	result := h.db.WithContext(ctx).Preload("Artifact").
 		Preload("Artifact.ArtifactData").
 		Preload("Artifact.Partitions", func(db *gorm.DB) *gorm.DB {
-			return db.Order("partitions.created_at ASC") // preserve the order in which the partitions were created
+			return db.WithContext(ctx).Order("partitions.created_at ASC") // preserve the order in which the partitions were created
 		}).
 		Preload("Artifact.Tags").
 		Order("tags.created_at DESC").

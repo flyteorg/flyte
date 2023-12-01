@@ -201,9 +201,8 @@ jobs:
                   advanced_composition/advanced_composition/dynamics.py \
                   advanced_composition/advanced_composition/map_task.py \
                   advanced_composition/advanced_composition/subworkflows.py \
-                  data_types_and_io/data_types_and_io/custom_objects.py \
-                  data_types_and_io/data_types_and_io/schema.py \
-                  data_types_and_io/data_types_and_io/typed_schema.py ;
+                  data_types_and_io/data_types_and_io/dataclass.py \
+                  data_types_and_io/data_types_and_io/structured_dataset.py ;
           do
               pyflyte --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
                   register \
