@@ -307,11 +307,15 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 	// This will likely need to move to the artifact service side, given message size limits.
 	// Replace with call to GetNodeExecutionData
 	var inputs *core.LiteralMap
+	logger.Infof(ctx, "DEBUGART-0: id %v", rawEvent.Id)
 	if rawEvent.GetInputData() != nil {
+		logger.Infof(ctx, "DEBUGART-1: input data %v", rawEvent.GetInputData())
 		inputs = rawEvent.GetInputData()
 	} else if len(rawEvent.GetInputUri()) > 0 {
 		inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
 			c.storageClient, rawEvent.GetInputUri())
+		logger.Infof(ctx, "DEBUGART-2: input uri %v, %v", rawEvent.GetInputUri(), inputs)
+
 		if err != nil {
 			fmt.Printf("Error fetching input literal map %v", rawEvent)
 		}
