@@ -14,7 +14,51 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v1/agents": {
+      "get": {
+        "summary": "Get job status.",
+        "operationId": "ListAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminListAgentsResponse"
+            }
+          }
+        },
+        "tags": [
+          "AgentMetadataService"
+        ]
+      }
+    },
+    "/api/v1/agents/{name}": {
+      "get": {
+        "summary": "Send a task create request to the agent server.",
+        "operationId": "GetAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminGetAgentResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The name of the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AgentMetadataService"
+        ]
+      }
+    }
+  },
   "definitions": {
     "BlobTypeBlobDimensionality": {
       "type": "string",
@@ -163,6 +207,41 @@
         }
       }
     },
+    "TaskLogMessageFormat": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CSV",
+        "JSON"
+      ],
+      "default": "UNKNOWN"
+    },
+    "adminAgent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the agent."
+        },
+        "secret_name": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of secret in the secret manager."
+        },
+        "supported_task_type": {
+          "type": "string",
+          "description": "The type of the task that the agent can handle."
+        },
+        "is_sync": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Indicates if this agent is a sync agent."
+        }
+      },
+      "description": "A message containing the agent metadata."
+    },
     "adminCreateTaskResponse": {
       "type": "object",
       "properties": {
@@ -178,14 +257,42 @@
       "type": "object",
       "description": "Response to delete a task."
     },
+    "adminGetAgentResponse": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/adminAgent"
+        }
+      },
+      "description": "A response containing an agent."
+    },
     "adminGetTaskResponse": {
       "type": "object",
       "properties": {
         "resource": {
           "$ref": "#/definitions/adminResource"
+        },
+        "logs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "title": "log information for the task execution"
         }
       },
       "description": "Response to get an individual task resource."
+    },
+    "adminListAgentsResponse": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminAgent"
+          }
+        }
+      },
+      "description": "A response containing a list of agents."
     },
     "adminResource": {
       "type": "object",
@@ -950,6 +1057,24 @@
         }
       },
       "description": "Encapsulation of fields that identify a Flyte task execution entity."
+    },
+    "coreTaskLog": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "message_format": {
+          "$ref": "#/definitions/TaskLogMessageFormat"
+        },
+        "ttl": {
+          "type": "string"
+        }
+      },
+      "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
     },
     "coreTaskMetadata": {
       "type": "object",
