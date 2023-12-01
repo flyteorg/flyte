@@ -365,6 +365,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		taskExecID = lte.Id
 	}
 
+	logger.Infof(ctx, "DEBUGART: inputs %v", inputs)
 	return &event.CloudEventNodeExecution{
 		RawEvent:        rawEvent,
 		TaskExecId:      taskExecID,
