@@ -26,7 +26,7 @@ dependencies:
   - sphinx-tags==0.2.1
 
   # Packages for Plugin docs
-  # Package name              Plugin needing it
+  # Package name                Plugin needing it
   - retry                       # aws sagemaker
   - botocore                    # fsspec
   - fsspec                      # fsspec
@@ -38,6 +38,7 @@ dependencies:
   - kubernetes                  # k8s-pod
   - modin                       # modin
   - pandera                     # pandera
+  - pydantic                    # vaex, pydantic
   - papermill                   # papermill
   - jupyter                     # papermill
   - polars                      # polars
@@ -53,7 +54,6 @@ dependencies:
   - mlflow==2.7.0               # mlflow
   - snowflake-connector-python  # snowflake
   - vaex-core                   # vaex
-  - vaex                        # vaex
 
   - pip:
     - sphinx-code-include
