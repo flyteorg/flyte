@@ -44,6 +44,8 @@ jobs:
           conda config --show-sources
           conda config --show
           printenv | sort
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v1
       - name: Build the documentation
         shell: bash -el {0}
         run: make docs
