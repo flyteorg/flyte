@@ -28,3 +28,7 @@ compile:
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy
