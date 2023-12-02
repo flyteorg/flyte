@@ -163,7 +163,7 @@ func (m *CreateTaskRequest) Validate() error {
 		}
 	}
 
-	// no validation rules for Secret
+	// no validation rules for Secrets
 
 	return nil
 }
@@ -380,13 +380,13 @@ func (m *GetTaskResponse) Validate() error {
 		}
 	}
 
-	for idx, item := range m.GetLogs() {
+	for idx, item := range m.GetLogLinks() {
 		_, _ = idx, item
 
 		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
 			if err := v.Validate(); err != nil {
 				return GetTaskResponseValidationError{
-					field:  fmt.Sprintf("Logs[%v]", idx),
+					field:  fmt.Sprintf("LogLinks[%v]", idx),
 					reason: "embedded message failed validation",
 					cause:  err,
 				}
@@ -677,7 +677,7 @@ func (m *Agent) Validate() error {
 
 	// no validation rules for Name
 
-	// no validation rules for SupportedTaskType
+	// no validation rules for SupportedTaskTypes
 
 	// no validation rules for IsSync
 

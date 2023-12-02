@@ -44,7 +44,7 @@ pub struct CreateTaskRequest {
     /// Key is the name of the secret in secret manager.
     /// Value is the actual secret value.
     #[prost(map="string, string", tag="5")]
-    pub secret: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    pub secrets: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Represents a create response structure.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -73,7 +73,7 @@ pub struct GetTaskResponse {
     pub resource: ::core::option::Option<Resource>,
     /// log information for the task execution
     #[prost(message, repeated, tag="2")]
-    pub logs: ::prost::alloc::vec::Vec<super::core::TaskLog>,
+    pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -110,18 +110,18 @@ pub struct DeleteTaskResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Agent {
-    /// The name of the agent.
+    /// Name is the developer-assigned name of the agent.
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
-    /// A list of secret in the secret manager.
-    #[prost(string, repeated, tag="2")]
-    pub secret_name: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    /// The type of the task that the agent can handle.
-    #[prost(string, tag="3")]
-    pub supported_task_type: ::prost::alloc::string::String,
-    /// Indicates if this agent is a sync agent.
-    #[prost(bool, tag="4")]
+    /// SupportedTaskTypes are the types of the tasks that the agent can handle.
+    #[prost(string, tag="2")]
+    pub supported_task_types: ::prost::alloc::string::String,
+    /// IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
+    #[prost(bool, tag="3")]
     pub is_sync: bool,
+    /// SecretNames is a list of secrets the agent requires to execute tasks.
+    #[prost(string, repeated, tag="4")]
+    pub secret_names: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// A request to get an agent.
 #[allow(clippy::derive_partial_eq_without_eq)]

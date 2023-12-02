@@ -19474,7 +19474,7 @@
                  * @property {flyteidl.core.ITaskTemplate|null} [template] CreateTaskRequest template
                  * @property {string|null} [outputPrefix] CreateTaskRequest outputPrefix
                  * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] CreateTaskRequest taskExecutionMetadata
-                 * @property {Object.<string,string>|null} [secret] CreateTaskRequest secret
+                 * @property {Object.<string,string>|null} [secrets] CreateTaskRequest secrets
                  */
     
                 /**
@@ -19486,7 +19486,7 @@
                  * @param {flyteidl.admin.ICreateTaskRequest=} [properties] Properties to set
                  */
                 function CreateTaskRequest(properties) {
-                    this.secret = {};
+                    this.secrets = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19526,12 +19526,12 @@
                 CreateTaskRequest.prototype.taskExecutionMetadata = null;
     
                 /**
-                 * CreateTaskRequest secret.
-                 * @member {Object.<string,string>} secret
+                 * CreateTaskRequest secrets.
+                 * @member {Object.<string,string>} secrets
                  * @memberof flyteidl.admin.CreateTaskRequest
                  * @instance
                  */
-                CreateTaskRequest.prototype.secret = $util.emptyObject;
+                CreateTaskRequest.prototype.secrets = $util.emptyObject;
     
                 /**
                  * Creates a new CreateTaskRequest instance using the specified properties.
@@ -19565,9 +19565,9 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputPrefix);
                     if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata"))
                         $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.secret != null && message.hasOwnProperty("secret"))
-                        for (var keys = Object.keys(message.secret), i = 0; i < keys.length; ++i)
-                            writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secret[keys[i]]).ldelim();
+                    if (message.secrets != null && message.hasOwnProperty("secrets"))
+                        for (var keys = Object.keys(message.secrets), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secrets[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -19603,11 +19603,11 @@
                             break;
                         case 5:
                             reader.skip().pos++;
-                            if (message.secret === $util.emptyObject)
-                                message.secret = {};
+                            if (message.secrets === $util.emptyObject)
+                                message.secrets = {};
                             key = reader.string();
                             reader.pos++;
-                            message.secret[key] = reader.string();
+                            message.secrets[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -19646,13 +19646,13 @@
                         if (error)
                             return "taskExecutionMetadata." + error;
                     }
-                    if (message.secret != null && message.hasOwnProperty("secret")) {
-                        if (!$util.isObject(message.secret))
-                            return "secret: object expected";
-                        var key = Object.keys(message.secret);
+                    if (message.secrets != null && message.hasOwnProperty("secrets")) {
+                        if (!$util.isObject(message.secrets))
+                            return "secrets: object expected";
+                        var key = Object.keys(message.secrets);
                         for (var i = 0; i < key.length; ++i)
-                            if (!$util.isString(message.secret[key[i]]))
-                                return "secret: string{k:string} expected";
+                            if (!$util.isString(message.secrets[key[i]]))
+                                return "secrets: string{k:string} expected";
                     }
                     return null;
                 };
@@ -19904,7 +19904,7 @@
                  * @memberof flyteidl.admin
                  * @interface IGetTaskResponse
                  * @property {flyteidl.admin.IResource|null} [resource] GetTaskResponse resource
-                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] GetTaskResponse logs
+                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] GetTaskResponse logLinks
                  */
     
                 /**
@@ -19916,7 +19916,7 @@
                  * @param {flyteidl.admin.IGetTaskResponse=} [properties] Properties to set
                  */
                 function GetTaskResponse(properties) {
-                    this.logs = [];
+                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19932,12 +19932,12 @@
                 GetTaskResponse.prototype.resource = null;
     
                 /**
-                 * GetTaskResponse logs.
-                 * @member {Array.<flyteidl.core.ITaskLog>} logs
+                 * GetTaskResponse logLinks.
+                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
                  * @memberof flyteidl.admin.GetTaskResponse
                  * @instance
                  */
-                GetTaskResponse.prototype.logs = $util.emptyArray;
+                GetTaskResponse.prototype.logLinks = $util.emptyArray;
     
                 /**
                  * Creates a new GetTaskResponse instance using the specified properties.
@@ -19965,9 +19965,9 @@
                         writer = $Writer.create();
                     if (message.resource != null && message.hasOwnProperty("resource"))
                         $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.logs != null && message.logs.length)
-                        for (var i = 0; i < message.logs.length; ++i)
-                            $root.flyteidl.core.TaskLog.encode(message.logs[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.logLinks != null && message.logLinks.length)
+                        for (var i = 0; i < message.logLinks.length; ++i)
+                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -19993,9 +19993,9 @@
                             message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
                             break;
                         case 2:
-                            if (!(message.logs && message.logs.length))
-                                message.logs = [];
-                            message.logs.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
+                            if (!(message.logLinks && message.logLinks.length))
+                                message.logLinks = [];
+                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20021,13 +20021,13 @@
                         if (error)
                             return "resource." + error;
                     }
-                    if (message.logs != null && message.hasOwnProperty("logs")) {
-                        if (!Array.isArray(message.logs))
-                            return "logs: array expected";
-                        for (var i = 0; i < message.logs.length; ++i) {
-                            var error = $root.flyteidl.core.TaskLog.verify(message.logs[i]);
+                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
+                        if (!Array.isArray(message.logLinks))
+                            return "logLinks: array expected";
+                        for (var i = 0; i < message.logLinks.length; ++i) {
+                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
                             if (error)
-                                return "logs." + error;
+                                return "logLinks." + error;
                         }
                     }
                     return null;
@@ -20417,9 +20417,9 @@
                  * @memberof flyteidl.admin
                  * @interface IAgent
                  * @property {string|null} [name] Agent name
-                 * @property {Array.<string>|null} [secretName] Agent secretName
-                 * @property {string|null} [supportedTaskType] Agent supportedTaskType
+                 * @property {string|null} [supportedTaskTypes] Agent supportedTaskTypes
                  * @property {boolean|null} [isSync] Agent isSync
+                 * @property {Array.<string>|null} [secretNames] Agent secretNames
                  */
     
                 /**
@@ -20431,7 +20431,7 @@
                  * @param {flyteidl.admin.IAgent=} [properties] Properties to set
                  */
                 function Agent(properties) {
-                    this.secretName = [];
+                    this.secretNames = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -20447,20 +20447,12 @@
                 Agent.prototype.name = "";
     
                 /**
-                 * Agent secretName.
-                 * @member {Array.<string>} secretName
+                 * Agent supportedTaskTypes.
+                 * @member {string} supportedTaskTypes
                  * @memberof flyteidl.admin.Agent
                  * @instance
                  */
-                Agent.prototype.secretName = $util.emptyArray;
-    
-                /**
-                 * Agent supportedTaskType.
-                 * @member {string} supportedTaskType
-                 * @memberof flyteidl.admin.Agent
-                 * @instance
-                 */
-                Agent.prototype.supportedTaskType = "";
+                Agent.prototype.supportedTaskTypes = "";
     
                 /**
                  * Agent isSync.
@@ -20469,6 +20461,14 @@
                  * @instance
                  */
                 Agent.prototype.isSync = false;
+    
+                /**
+                 * Agent secretNames.
+                 * @member {Array.<string>} secretNames
+                 * @memberof flyteidl.admin.Agent
+                 * @instance
+                 */
+                Agent.prototype.secretNames = $util.emptyArray;
     
                 /**
                  * Creates a new Agent instance using the specified properties.
@@ -20496,13 +20496,13 @@
                         writer = $Writer.create();
                     if (message.name != null && message.hasOwnProperty("name"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-                    if (message.secretName != null && message.secretName.length)
-                        for (var i = 0; i < message.secretName.length; ++i)
-                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.secretName[i]);
-                    if (message.supportedTaskType != null && message.hasOwnProperty("supportedTaskType"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.supportedTaskType);
+                    if (message.supportedTaskTypes != null && message.hasOwnProperty("supportedTaskTypes"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.supportedTaskTypes);
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
-                        writer.uint32(/* id 4, wireType 0 =*/32).bool(message.isSync);
+                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isSync);
+                    if (message.secretNames != null && message.secretNames.length)
+                        for (var i = 0; i < message.secretNames.length; ++i)
+                            writer.uint32(/* id 4, wireType 2 =*/34).string(message.secretNames[i]);
                     return writer;
                 };
     
@@ -20528,15 +20528,15 @@
                             message.name = reader.string();
                             break;
                         case 2:
-                            if (!(message.secretName && message.secretName.length))
-                                message.secretName = [];
-                            message.secretName.push(reader.string());
+                            message.supportedTaskTypes = reader.string();
                             break;
                         case 3:
-                            message.supportedTaskType = reader.string();
+                            message.isSync = reader.bool();
                             break;
                         case 4:
-                            message.isSync = reader.bool();
+                            if (!(message.secretNames && message.secretNames.length))
+                                message.secretNames = [];
+                            message.secretNames.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20560,19 +20560,19 @@
                     if (message.name != null && message.hasOwnProperty("name"))
                         if (!$util.isString(message.name))
                             return "name: string expected";
-                    if (message.secretName != null && message.hasOwnProperty("secretName")) {
-                        if (!Array.isArray(message.secretName))
-                            return "secretName: array expected";
-                        for (var i = 0; i < message.secretName.length; ++i)
-                            if (!$util.isString(message.secretName[i]))
-                                return "secretName: string[] expected";
-                    }
-                    if (message.supportedTaskType != null && message.hasOwnProperty("supportedTaskType"))
-                        if (!$util.isString(message.supportedTaskType))
-                            return "supportedTaskType: string expected";
+                    if (message.supportedTaskTypes != null && message.hasOwnProperty("supportedTaskTypes"))
+                        if (!$util.isString(message.supportedTaskTypes))
+                            return "supportedTaskTypes: string expected";
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         if (typeof message.isSync !== "boolean")
                             return "isSync: boolean expected";
+                    if (message.secretNames != null && message.hasOwnProperty("secretNames")) {
+                        if (!Array.isArray(message.secretNames))
+                            return "secretNames: array expected";
+                        for (var i = 0; i < message.secretNames.length; ++i)
+                            if (!$util.isString(message.secretNames[i]))
+                                return "secretNames: string[] expected";
+                    }
                     return null;
                 };
     

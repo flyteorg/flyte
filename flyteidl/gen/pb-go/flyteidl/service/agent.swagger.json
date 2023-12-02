@@ -221,23 +221,23 @@
       "properties": {
         "name": {
           "type": "string",
-          "description": "The name of the agent."
+          "description": "Name is the developer-assigned name of the agent."
         },
-        "secret_name": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "A list of secret in the secret manager."
-        },
-        "supported_task_type": {
+        "supported_task_types": {
           "type": "string",
-          "description": "The type of the task that the agent can handle."
+          "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
         },
         "is_sync": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Indicates if this agent is a sync agent."
+          "description": "IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress."
+        },
+        "secret_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "SecretNames is a list of secrets the agent requires to execute tasks."
         }
       },
       "description": "A message containing the agent metadata."
@@ -272,7 +272,7 @@
         "resource": {
           "$ref": "#/definitions/adminResource"
         },
-        "logs": {
+        "log_links": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/coreTaskLog"

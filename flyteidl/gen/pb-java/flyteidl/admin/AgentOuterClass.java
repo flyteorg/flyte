@@ -2335,9 +2335,9 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
-    int getSecretCount();
+    int getSecretsCount();
     /**
      * <pre>
      * Secret to be passed to the agent.
@@ -2345,16 +2345,16 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
-    boolean containsSecret(
+    boolean containsSecrets(
         java.lang.String key);
     /**
-     * Use {@link #getSecretMap()} instead.
+     * Use {@link #getSecretsMap()} instead.
      */
     @java.lang.Deprecated
     java.util.Map<java.lang.String, java.lang.String>
-    getSecret();
+    getSecrets();
     /**
      * <pre>
      * Secret to be passed to the agent.
@@ -2362,10 +2362,10 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
     java.util.Map<java.lang.String, java.lang.String>
-    getSecretMap();
+    getSecretsMap();
     /**
      * <pre>
      * Secret to be passed to the agent.
@@ -2373,10 +2373,10 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
 
-    java.lang.String getSecretOrDefault(
+    java.lang.String getSecretsOrDefault(
         java.lang.String key,
         java.lang.String defaultValue);
     /**
@@ -2386,10 +2386,10 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
 
-    java.lang.String getSecretOrThrow(
+    java.lang.String getSecretsOrThrow(
         java.lang.String key);
   }
   /**
@@ -2483,15 +2483,15 @@ public final class AgentOuterClass {
             }
             case 42: {
               if (!((mutable_bitField0_ & 0x00000010) != 0)) {
-                secret_ = com.google.protobuf.MapField.newMapField(
-                    SecretDefaultEntryHolder.defaultEntry);
+                secrets_ = com.google.protobuf.MapField.newMapField(
+                    SecretsDefaultEntryHolder.defaultEntry);
                 mutable_bitField0_ |= 0x00000010;
               }
               com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-              secret__ = input.readMessage(
-                  SecretDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              secret_.getMutableMap().put(
-                  secret__.getKey(), secret__.getValue());
+              secrets__ = input.readMessage(
+                  SecretsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              secrets_.getMutableMap().put(
+                  secrets__.getKey(), secrets__.getValue());
               break;
             }
             default: {
@@ -2524,7 +2524,7 @@ public final class AgentOuterClass {
         int number) {
       switch (number) {
         case 5:
-          return internalGetSecret();
+          return internalGetSecrets();
         default:
           throw new RuntimeException(
               "Invalid map field number: " + number);
@@ -2686,31 +2686,31 @@ public final class AgentOuterClass {
       return getTaskExecutionMetadata();
     }
 
-    public static final int SECRET_FIELD_NUMBER = 5;
-    private static final class SecretDefaultEntryHolder {
+    public static final int SECRETS_FIELD_NUMBER = 5;
+    private static final class SecretsDefaultEntryHolder {
       static final com.google.protobuf.MapEntry<
           java.lang.String, java.lang.String> defaultEntry =
               com.google.protobuf.MapEntry
               .<java.lang.String, java.lang.String>newDefaultInstance(
-                  flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_CreateTaskRequest_SecretEntry_descriptor, 
+                  flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor, 
                   com.google.protobuf.WireFormat.FieldType.STRING,
                   "",
                   com.google.protobuf.WireFormat.FieldType.STRING,
                   "");
     }
     private com.google.protobuf.MapField<
-        java.lang.String, java.lang.String> secret_;
+        java.lang.String, java.lang.String> secrets_;
     private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-    internalGetSecret() {
-      if (secret_ == null) {
+    internalGetSecrets() {
+      if (secrets_ == null) {
         return com.google.protobuf.MapField.emptyMapField(
-            SecretDefaultEntryHolder.defaultEntry);
+            SecretsDefaultEntryHolder.defaultEntry);
       }
-      return secret_;
+      return secrets_;
     }
 
-    public int getSecretCount() {
-      return internalGetSecret().getMap().size();
+    public int getSecretsCount() {
+      return internalGetSecrets().getMap().size();
     }
     /**
      * <pre>
@@ -2719,20 +2719,20 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
 
-    public boolean containsSecret(
+    public boolean containsSecrets(
         java.lang.String key) {
       if (key == null) { throw new java.lang.NullPointerException(); }
-      return internalGetSecret().getMap().containsKey(key);
+      return internalGetSecrets().getMap().containsKey(key);
     }
     /**
-     * Use {@link #getSecretMap()} instead.
+     * Use {@link #getSecretsMap()} instead.
      */
     @java.lang.Deprecated
-    public java.util.Map<java.lang.String, java.lang.String> getSecret() {
-      return getSecretMap();
+    public java.util.Map<java.lang.String, java.lang.String> getSecrets() {
+      return getSecretsMap();
     }
     /**
      * <pre>
@@ -2741,11 +2741,11 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
 
-    public java.util.Map<java.lang.String, java.lang.String> getSecretMap() {
-      return internalGetSecret().getMap();
+    public java.util.Map<java.lang.String, java.lang.String> getSecretsMap() {
+      return internalGetSecrets().getMap();
     }
     /**
      * <pre>
@@ -2754,15 +2754,15 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
 
-    public java.lang.String getSecretOrDefault(
+    public java.lang.String getSecretsOrDefault(
         java.lang.String key,
         java.lang.String defaultValue) {
       if (key == null) { throw new java.lang.NullPointerException(); }
       java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetSecret().getMap();
+          internalGetSecrets().getMap();
       return map.containsKey(key) ? map.get(key) : defaultValue;
     }
     /**
@@ -2772,14 +2772,14 @@ public final class AgentOuterClass {
      * Value is the actual secret value.
      * </pre>
      *
-     * <code>map&lt;string, string&gt; secret = 5;</code>
+     * <code>map&lt;string, string&gt; secrets = 5;</code>
      */
 
-    public java.lang.String getSecretOrThrow(
+    public java.lang.String getSecretsOrThrow(
         java.lang.String key) {
       if (key == null) { throw new java.lang.NullPointerException(); }
       java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetSecret().getMap();
+          internalGetSecrets().getMap();
       if (!map.containsKey(key)) {
         throw new java.lang.IllegalArgumentException();
       }
@@ -2815,8 +2815,8 @@ public final class AgentOuterClass {
       com.google.protobuf.GeneratedMessageV3
         .serializeStringMapTo(
           output,
-          internalGetSecret(),
-          SecretDefaultEntryHolder.defaultEntry,
+          internalGetSecrets(),
+          SecretsDefaultEntryHolder.defaultEntry,
           5);
       unknownFields.writeTo(output);
     }
@@ -2843,14 +2843,14 @@ public final class AgentOuterClass {
           .computeMessageSize(4, getTaskExecutionMetadata());
       }
       for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
-           : internalGetSecret().getMap().entrySet()) {
+           : internalGetSecrets().getMap().entrySet()) {
         com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-        secret__ = SecretDefaultEntryHolder.defaultEntry.newBuilderForType()
+        secrets__ = SecretsDefaultEntryHolder.defaultEntry.newBuilderForType()
             .setKey(entry.getKey())
             .setValue(entry.getValue())
             .build();
         size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(5, secret__);
+            .computeMessageSize(5, secrets__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2884,8 +2884,8 @@ public final class AgentOuterClass {
         if (!getTaskExecutionMetadata()
             .equals(other.getTaskExecutionMetadata())) return false;
       }
-      if (!internalGetSecret().equals(
-          other.internalGetSecret())) return false;
+      if (!internalGetSecrets().equals(
+          other.internalGetSecrets())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2911,9 +2911,9 @@ public final class AgentOuterClass {
         hash = (37 * hash) + TASK_EXECUTION_METADATA_FIELD_NUMBER;
         hash = (53 * hash) + getTaskExecutionMetadata().hashCode();
       }
-      if (!internalGetSecret().getMap().isEmpty()) {
-        hash = (37 * hash) + SECRET_FIELD_NUMBER;
-        hash = (53 * hash) + internalGetSecret().hashCode();
+      if (!internalGetSecrets().getMap().isEmpty()) {
+        hash = (37 * hash) + SECRETS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetSecrets().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -3031,7 +3031,7 @@ public final class AgentOuterClass {
           int number) {
         switch (number) {
           case 5:
-            return internalGetSecret();
+            return internalGetSecrets();
           default:
             throw new RuntimeException(
                 "Invalid map field number: " + number);
@@ -3042,7 +3042,7 @@ public final class AgentOuterClass {
           int number) {
         switch (number) {
           case 5:
-            return internalGetMutableSecret();
+            return internalGetMutableSecrets();
           default:
             throw new RuntimeException(
                 "Invalid map field number: " + number);
@@ -3094,7 +3094,7 @@ public final class AgentOuterClass {
           taskExecutionMetadata_ = null;
           taskExecutionMetadataBuilder_ = null;
         }
-        internalGetMutableSecret().clear();
+        internalGetMutableSecrets().clear();
         return this;
       }
 
@@ -3139,8 +3139,8 @@ public final class AgentOuterClass {
         } else {
           result.taskExecutionMetadata_ = taskExecutionMetadataBuilder_.build();
         }
-        result.secret_ = internalGetSecret();
-        result.secret_.makeImmutable();
+        result.secrets_ = internalGetSecrets();
+        result.secrets_.makeImmutable();
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -3203,8 +3203,8 @@ public final class AgentOuterClass {
         if (other.hasTaskExecutionMetadata()) {
           mergeTaskExecutionMetadata(other.getTaskExecutionMetadata());
         }
-        internalGetMutableSecret().mergeFrom(
-            other.internalGetSecret());
+        internalGetMutableSecrets().mergeFrom(
+            other.internalGetSecrets());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -3802,30 +3802,30 @@ public final class AgentOuterClass {
       }
 
       private com.google.protobuf.MapField<
-          java.lang.String, java.lang.String> secret_;
+          java.lang.String, java.lang.String> secrets_;
       private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetSecret() {
-        if (secret_ == null) {
+      internalGetSecrets() {
+        if (secrets_ == null) {
           return com.google.protobuf.MapField.emptyMapField(
-              SecretDefaultEntryHolder.defaultEntry);
+              SecretsDefaultEntryHolder.defaultEntry);
         }
-        return secret_;
+        return secrets_;
       }
       private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetMutableSecret() {
+      internalGetMutableSecrets() {
         onChanged();;
-        if (secret_ == null) {
-          secret_ = com.google.protobuf.MapField.newMapField(
-              SecretDefaultEntryHolder.defaultEntry);
+        if (secrets_ == null) {
+          secrets_ = com.google.protobuf.MapField.newMapField(
+              SecretsDefaultEntryHolder.defaultEntry);
         }
-        if (!secret_.isMutable()) {
-          secret_ = secret_.copy();
+        if (!secrets_.isMutable()) {
+          secrets_ = secrets_.copy();
         }
-        return secret_;
+        return secrets_;
       }
 
-      public int getSecretCount() {
-        return internalGetSecret().getMap().size();
+      public int getSecretsCount() {
+        return internalGetSecrets().getMap().size();
       }
       /**
        * <pre>
@@ -3834,20 +3834,20 @@ public final class AgentOuterClass {
        * Value is the actual secret value.
        * </pre>
        *
-       * <code>map&lt;string, string&gt; secret = 5;</code>
+       * <code>map&lt;string, string&gt; secrets = 5;</code>
        */
 
-      public boolean containsSecret(
+      public boolean containsSecrets(
           java.lang.String key) {
         if (key == null) { throw new java.lang.NullPointerException(); }
-        return internalGetSecret().getMap().containsKey(key);
+        return internalGetSecrets().getMap().containsKey(key);
       }
       /**
-       * Use {@link #getSecretMap()} instead.
+       * Use {@link #getSecretsMap()} instead.
        */
       @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String> getSecret() {
-        return getSecretMap();
+      public java.util.Map<java.lang.String, java.lang.String> getSecrets() {
+        return getSecretsMap();
       }
       /**
        * <pre>
@@ -3856,11 +3856,11 @@ public final class AgentOuterClass {
        * Value is the actual secret value.
        * </pre>
        *
-       * <code>map&lt;string, string&gt; secret = 5;</code>
+       * <code>map&lt;string, string&gt; secrets = 5;</code>
        */
 
-      public java.util.Map<java.lang.String, java.lang.String> getSecretMap() {
-        return internalGetSecret().getMap();
+      public java.util.Map<java.lang.String, java.lang.String> getSecretsMap() {
+        return internalGetSecrets().getMap();
       }
       /**
        * <pre>
@@ -3869,15 +3869,15 @@ public final class AgentOuterClass {
        * Value is the actual secret value.
        * </pre>
        *
-       * <code>map&lt;string, string&gt; secret = 5;</code>
+       * <code>map&lt;string, string&gt; secrets = 5;</code>
        */
 
-      public java.lang.String getSecretOrDefault(
+      public java.lang.String getSecretsOrDefault(
           java.lang.String key,
           java.lang.String defaultValue) {
         if (key == null) { throw new java.lang.NullPointerException(); }
         java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetSecret().getMap();
+            internalGetSecrets().getMap();
         return map.containsKey(key) ? map.get(key) : defaultValue;
       }
       /**
@@ -3887,22 +3887,22 @@ public final class AgentOuterClass {
        * Value is the actual secret value.
        * </pre>
        *
-       * <code>map&lt;string, string&gt; secret = 5;</code>
+       * <code>map&lt;string, string&gt; secrets = 5;</code>
        */
 
-      public java.lang.String getSecretOrThrow(
+      public java.lang.String getSecretsOrThrow(
           java.lang.String key) {
         if (key == null) { throw new java.lang.NullPointerException(); }
         java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetSecret().getMap();
+            internalGetSecrets().getMap();
         if (!map.containsKey(key)) {
           throw new java.lang.IllegalArgumentException();
         }
         return map.get(key);
       }
 
-      public Builder clearSecret() {
-        internalGetMutableSecret().getMutableMap()
+      public Builder clearSecrets() {
+        internalGetMutableSecrets().getMutableMap()
             .clear();
         return this;
       }
@@ -3913,13 +3913,13 @@ public final class AgentOuterClass {
        * Value is the actual secret value.
        * </pre>
        *
-       * <code>map&lt;string, string&gt; secret = 5;</code>
+       * <code>map&lt;string, string&gt; secrets = 5;</code>
        */
 
-      public Builder removeSecret(
+      public Builder removeSecrets(
           java.lang.String key) {
         if (key == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableSecret().getMutableMap()
+        internalGetMutableSecrets().getMutableMap()
             .remove(key);
         return this;
       }
@@ -3928,8 +3928,8 @@ public final class AgentOuterClass {
        */
       @java.lang.Deprecated
       public java.util.Map<java.lang.String, java.lang.String>
-      getMutableSecret() {
-        return internalGetMutableSecret().getMutableMap();
+      getMutableSecrets() {
+        return internalGetMutableSecrets().getMutableMap();
       }
       /**
        * <pre>
@@ -3938,14 +3938,14 @@ public final class AgentOuterClass {
        * Value is the actual secret value.
        * </pre>
        *
-       * <code>map&lt;string, string&gt; secret = 5;</code>
+       * <code>map&lt;string, string&gt; secrets = 5;</code>
        */
-      public Builder putSecret(
+      public Builder putSecrets(
           java.lang.String key,
           java.lang.String value) {
         if (key == null) { throw new java.lang.NullPointerException(); }
         if (value == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableSecret().getMutableMap()
+        internalGetMutableSecrets().getMutableMap()
             .put(key, value);
         return this;
       }
@@ -3956,12 +3956,12 @@ public final class AgentOuterClass {
        * Value is the actual secret value.
        * </pre>
        *
-       * <code>map&lt;string, string&gt; secret = 5;</code>
+       * <code>map&lt;string, string&gt; secrets = 5;</code>
        */
 
-      public Builder putAllSecret(
+      public Builder putAllSecrets(
           java.util.Map<java.lang.String, java.lang.String> values) {
-        internalGetMutableSecret().getMutableMap()
+        internalGetMutableSecrets().getMutableMap()
             .putAll(values);
         return this;
       }
@@ -5225,43 +5225,43 @@ public final class AgentOuterClass {
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
     java.util.List<flyteidl.core.Execution.TaskLog> 
-        getLogsList();
+        getLogLinksList();
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
-    flyteidl.core.Execution.TaskLog getLogs(int index);
+    flyteidl.core.Execution.TaskLog getLogLinks(int index);
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
-    int getLogsCount();
+    int getLogLinksCount();
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
     java.util.List<? extends flyteidl.core.Execution.TaskLogOrBuilder> 
-        getLogsOrBuilderList();
+        getLogLinksOrBuilderList();
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
-    flyteidl.core.Execution.TaskLogOrBuilder getLogsOrBuilder(
+    flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
         int index);
   }
   /**
@@ -5281,7 +5281,7 @@ public final class AgentOuterClass {
       super(builder);
     }
     private GetTaskResponse() {
-      logs_ = java.util.Collections.emptyList();
+      logLinks_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -5323,10 +5323,10 @@ public final class AgentOuterClass {
             }
             case 18: {
               if (!((mutable_bitField0_ & 0x00000002) != 0)) {
-                logs_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>();
+                logLinks_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>();
                 mutable_bitField0_ |= 0x00000002;
               }
-              logs_.add(
+              logLinks_.add(
                   input.readMessage(flyteidl.core.Execution.TaskLog.parser(), extensionRegistry));
               break;
             }
@@ -5346,7 +5346,7 @@ public final class AgentOuterClass {
             e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000002) != 0)) {
-          logs_ = java.util.Collections.unmodifiableList(logs_);
+          logLinks_ = java.util.Collections.unmodifiableList(logLinks_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5387,59 +5387,59 @@ public final class AgentOuterClass {
       return getResource();
     }
 
-    public static final int LOGS_FIELD_NUMBER = 2;
-    private java.util.List<flyteidl.core.Execution.TaskLog> logs_;
+    public static final int LOG_LINKS_FIELD_NUMBER = 2;
+    private java.util.List<flyteidl.core.Execution.TaskLog> logLinks_;
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
-    public java.util.List<flyteidl.core.Execution.TaskLog> getLogsList() {
-      return logs_;
+    public java.util.List<flyteidl.core.Execution.TaskLog> getLogLinksList() {
+      return logLinks_;
     }
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
     public java.util.List<? extends flyteidl.core.Execution.TaskLogOrBuilder> 
-        getLogsOrBuilderList() {
-      return logs_;
+        getLogLinksOrBuilderList() {
+      return logLinks_;
     }
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
-    public int getLogsCount() {
-      return logs_.size();
+    public int getLogLinksCount() {
+      return logLinks_.size();
     }
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
-    public flyteidl.core.Execution.TaskLog getLogs(int index) {
-      return logs_.get(index);
+    public flyteidl.core.Execution.TaskLog getLogLinks(int index) {
+      return logLinks_.get(index);
     }
     /**
      * <pre>
      * log information for the task execution
      * </pre>
      *
-     * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+     * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
      */
-    public flyteidl.core.Execution.TaskLogOrBuilder getLogsOrBuilder(
+    public flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
         int index) {
-      return logs_.get(index);
+      return logLinks_.get(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5459,8 +5459,8 @@ public final class AgentOuterClass {
       if (resource_ != null) {
         output.writeMessage(1, getResource());
       }
-      for (int i = 0; i < logs_.size(); i++) {
-        output.writeMessage(2, logs_.get(i));
+      for (int i = 0; i < logLinks_.size(); i++) {
+        output.writeMessage(2, logLinks_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -5475,9 +5475,9 @@ public final class AgentOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getResource());
       }
-      for (int i = 0; i < logs_.size(); i++) {
+      for (int i = 0; i < logLinks_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, logs_.get(i));
+          .computeMessageSize(2, logLinks_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5499,8 +5499,8 @@ public final class AgentOuterClass {
         if (!getResource()
             .equals(other.getResource())) return false;
       }
-      if (!getLogsList()
-          .equals(other.getLogsList())) return false;
+      if (!getLogLinksList()
+          .equals(other.getLogLinksList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5516,9 +5516,9 @@ public final class AgentOuterClass {
         hash = (37 * hash) + RESOURCE_FIELD_NUMBER;
         hash = (53 * hash) + getResource().hashCode();
       }
-      if (getLogsCount() > 0) {
-        hash = (37 * hash) + LOGS_FIELD_NUMBER;
-        hash = (53 * hash) + getLogsList().hashCode();
+      if (getLogLinksCount() > 0) {
+        hash = (37 * hash) + LOG_LINKS_FIELD_NUMBER;
+        hash = (53 * hash) + getLogLinksList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -5652,7 +5652,7 @@ public final class AgentOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getLogsFieldBuilder();
+          getLogLinksFieldBuilder();
         }
       }
       @java.lang.Override
@@ -5664,11 +5664,11 @@ public final class AgentOuterClass {
           resource_ = null;
           resourceBuilder_ = null;
         }
-        if (logsBuilder_ == null) {
-          logs_ = java.util.Collections.emptyList();
+        if (logLinksBuilder_ == null) {
+          logLinks_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000002);
         } else {
-          logsBuilder_.clear();
+          logLinksBuilder_.clear();
         }
         return this;
       }
@@ -5703,14 +5703,14 @@ public final class AgentOuterClass {
         } else {
           result.resource_ = resourceBuilder_.build();
         }
-        if (logsBuilder_ == null) {
+        if (logLinksBuilder_ == null) {
           if (((bitField0_ & 0x00000002) != 0)) {
-            logs_ = java.util.Collections.unmodifiableList(logs_);
+            logLinks_ = java.util.Collections.unmodifiableList(logLinks_);
             bitField0_ = (bitField0_ & ~0x00000002);
           }
-          result.logs_ = logs_;
+          result.logLinks_ = logLinks_;
         } else {
-          result.logs_ = logsBuilder_.build();
+          result.logLinks_ = logLinksBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -5764,29 +5764,29 @@ public final class AgentOuterClass {
         if (other.hasResource()) {
           mergeResource(other.getResource());
         }
-        if (logsBuilder_ == null) {
-          if (!other.logs_.isEmpty()) {
-            if (logs_.isEmpty()) {
-              logs_ = other.logs_;
+        if (logLinksBuilder_ == null) {
+          if (!other.logLinks_.isEmpty()) {
+            if (logLinks_.isEmpty()) {
+              logLinks_ = other.logLinks_;
               bitField0_ = (bitField0_ & ~0x00000002);
             } else {
-              ensureLogsIsMutable();
-              logs_.addAll(other.logs_);
+              ensureLogLinksIsMutable();
+              logLinks_.addAll(other.logLinks_);
             }
             onChanged();
           }
         } else {
-          if (!other.logs_.isEmpty()) {
-            if (logsBuilder_.isEmpty()) {
-              logsBuilder_.dispose();
-              logsBuilder_ = null;
-              logs_ = other.logs_;
+          if (!other.logLinks_.isEmpty()) {
+            if (logLinksBuilder_.isEmpty()) {
+              logLinksBuilder_.dispose();
+              logLinksBuilder_ = null;
+              logLinks_ = other.logLinks_;
               bitField0_ = (bitField0_ & ~0x00000002);
-              logsBuilder_ = 
+              logLinksBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                   getLogsFieldBuilder() : null;
+                   getLogLinksFieldBuilder() : null;
             } else {
-              logsBuilder_.addAllMessages(other.logs_);
+              logLinksBuilder_.addAllMessages(other.logLinks_);
             }
           }
         }
@@ -5937,30 +5937,30 @@ public final class AgentOuterClass {
         return resourceBuilder_;
       }
 
-      private java.util.List<flyteidl.core.Execution.TaskLog> logs_ =
+      private java.util.List<flyteidl.core.Execution.TaskLog> logLinks_ =
         java.util.Collections.emptyList();
-      private void ensureLogsIsMutable() {
+      private void ensureLogLinksIsMutable() {
         if (!((bitField0_ & 0x00000002) != 0)) {
-          logs_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>(logs_);
+          logLinks_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>(logLinks_);
           bitField0_ |= 0x00000002;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilderV3<
-          flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder> logsBuilder_;
+          flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder> logLinksBuilder_;
 
       /**
        * <pre>
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public java.util.List<flyteidl.core.Execution.TaskLog> getLogsList() {
-        if (logsBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(logs_);
+      public java.util.List<flyteidl.core.Execution.TaskLog> getLogLinksList() {
+        if (logLinksBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(logLinks_);
         } else {
-          return logsBuilder_.getMessageList();
+          return logLinksBuilder_.getMessageList();
         }
       }
       /**
@@ -5968,13 +5968,13 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public int getLogsCount() {
-        if (logsBuilder_ == null) {
-          return logs_.size();
+      public int getLogLinksCount() {
+        if (logLinksBuilder_ == null) {
+          return logLinks_.size();
         } else {
-          return logsBuilder_.getCount();
+          return logLinksBuilder_.getCount();
         }
       }
       /**
@@ -5982,13 +5982,13 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public flyteidl.core.Execution.TaskLog getLogs(int index) {
-        if (logsBuilder_ == null) {
-          return logs_.get(index);
+      public flyteidl.core.Execution.TaskLog getLogLinks(int index) {
+        if (logLinksBuilder_ == null) {
+          return logLinks_.get(index);
         } else {
-          return logsBuilder_.getMessage(index);
+          return logLinksBuilder_.getMessage(index);
         }
       }
       /**
@@ -5996,19 +5996,19 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder setLogs(
+      public Builder setLogLinks(
           int index, flyteidl.core.Execution.TaskLog value) {
-        if (logsBuilder_ == null) {
+        if (logLinksBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureLogsIsMutable();
-          logs_.set(index, value);
+          ensureLogLinksIsMutable();
+          logLinks_.set(index, value);
           onChanged();
         } else {
-          logsBuilder_.setMessage(index, value);
+          logLinksBuilder_.setMessage(index, value);
         }
         return this;
       }
@@ -6017,16 +6017,16 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder setLogs(
+      public Builder setLogLinks(
           int index, flyteidl.core.Execution.TaskLog.Builder builderForValue) {
-        if (logsBuilder_ == null) {
-          ensureLogsIsMutable();
-          logs_.set(index, builderForValue.build());
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.set(index, builderForValue.build());
           onChanged();
         } else {
-          logsBuilder_.setMessage(index, builderForValue.build());
+          logLinksBuilder_.setMessage(index, builderForValue.build());
         }
         return this;
       }
@@ -6035,18 +6035,18 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder addLogs(flyteidl.core.Execution.TaskLog value) {
-        if (logsBuilder_ == null) {
+      public Builder addLogLinks(flyteidl.core.Execution.TaskLog value) {
+        if (logLinksBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureLogsIsMutable();
-          logs_.add(value);
+          ensureLogLinksIsMutable();
+          logLinks_.add(value);
           onChanged();
         } else {
-          logsBuilder_.addMessage(value);
+          logLinksBuilder_.addMessage(value);
         }
         return this;
       }
@@ -6055,19 +6055,19 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder addLogs(
+      public Builder addLogLinks(
           int index, flyteidl.core.Execution.TaskLog value) {
-        if (logsBuilder_ == null) {
+        if (logLinksBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensureLogsIsMutable();
-          logs_.add(index, value);
+          ensureLogLinksIsMutable();
+          logLinks_.add(index, value);
           onChanged();
         } else {
-          logsBuilder_.addMessage(index, value);
+          logLinksBuilder_.addMessage(index, value);
         }
         return this;
       }
@@ -6076,16 +6076,16 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder addLogs(
+      public Builder addLogLinks(
           flyteidl.core.Execution.TaskLog.Builder builderForValue) {
-        if (logsBuilder_ == null) {
-          ensureLogsIsMutable();
-          logs_.add(builderForValue.build());
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.add(builderForValue.build());
           onChanged();
         } else {
-          logsBuilder_.addMessage(builderForValue.build());
+          logLinksBuilder_.addMessage(builderForValue.build());
         }
         return this;
       }
@@ -6094,16 +6094,16 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder addLogs(
+      public Builder addLogLinks(
           int index, flyteidl.core.Execution.TaskLog.Builder builderForValue) {
-        if (logsBuilder_ == null) {
-          ensureLogsIsMutable();
-          logs_.add(index, builderForValue.build());
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.add(index, builderForValue.build());
           onChanged();
         } else {
-          logsBuilder_.addMessage(index, builderForValue.build());
+          logLinksBuilder_.addMessage(index, builderForValue.build());
         }
         return this;
       }
@@ -6112,17 +6112,17 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder addAllLogs(
+      public Builder addAllLogLinks(
           java.lang.Iterable<? extends flyteidl.core.Execution.TaskLog> values) {
-        if (logsBuilder_ == null) {
-          ensureLogsIsMutable();
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
           com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, logs_);
+              values, logLinks_);
           onChanged();
         } else {
-          logsBuilder_.addAllMessages(values);
+          logLinksBuilder_.addAllMessages(values);
         }
         return this;
       }
@@ -6131,15 +6131,15 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder clearLogs() {
-        if (logsBuilder_ == null) {
-          logs_ = java.util.Collections.emptyList();
+      public Builder clearLogLinks() {
+        if (logLinksBuilder_ == null) {
+          logLinks_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00000002);
           onChanged();
         } else {
-          logsBuilder_.clear();
+          logLinksBuilder_.clear();
         }
         return this;
       }
@@ -6148,15 +6148,15 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public Builder removeLogs(int index) {
-        if (logsBuilder_ == null) {
-          ensureLogsIsMutable();
-          logs_.remove(index);
+      public Builder removeLogLinks(int index) {
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.remove(index);
           onChanged();
         } else {
-          logsBuilder_.remove(index);
+          logLinksBuilder_.remove(index);
         }
         return this;
       }
@@ -6165,24 +6165,24 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public flyteidl.core.Execution.TaskLog.Builder getLogsBuilder(
+      public flyteidl.core.Execution.TaskLog.Builder getLogLinksBuilder(
           int index) {
-        return getLogsFieldBuilder().getBuilder(index);
+        return getLogLinksFieldBuilder().getBuilder(index);
       }
       /**
        * <pre>
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public flyteidl.core.Execution.TaskLogOrBuilder getLogsOrBuilder(
+      public flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
           int index) {
-        if (logsBuilder_ == null) {
-          return logs_.get(index);  } else {
-          return logsBuilder_.getMessageOrBuilder(index);
+        if (logLinksBuilder_ == null) {
+          return logLinks_.get(index);  } else {
+          return logLinksBuilder_.getMessageOrBuilder(index);
         }
       }
       /**
@@ -6190,14 +6190,14 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
       public java.util.List<? extends flyteidl.core.Execution.TaskLogOrBuilder> 
-           getLogsOrBuilderList() {
-        if (logsBuilder_ != null) {
-          return logsBuilder_.getMessageOrBuilderList();
+           getLogLinksOrBuilderList() {
+        if (logLinksBuilder_ != null) {
+          return logLinksBuilder_.getMessageOrBuilderList();
         } else {
-          return java.util.Collections.unmodifiableList(logs_);
+          return java.util.Collections.unmodifiableList(logLinks_);
         }
       }
       /**
@@ -6205,10 +6205,10 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public flyteidl.core.Execution.TaskLog.Builder addLogsBuilder() {
-        return getLogsFieldBuilder().addBuilder(
+      public flyteidl.core.Execution.TaskLog.Builder addLogLinksBuilder() {
+        return getLogLinksFieldBuilder().addBuilder(
             flyteidl.core.Execution.TaskLog.getDefaultInstance());
       }
       /**
@@ -6216,11 +6216,11 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
-      public flyteidl.core.Execution.TaskLog.Builder addLogsBuilder(
+      public flyteidl.core.Execution.TaskLog.Builder addLogLinksBuilder(
           int index) {
-        return getLogsFieldBuilder().addBuilder(
+        return getLogLinksFieldBuilder().addBuilder(
             index, flyteidl.core.Execution.TaskLog.getDefaultInstance());
       }
       /**
@@ -6228,25 +6228,25 @@ public final class AgentOuterClass {
        * log information for the task execution
        * </pre>
        *
-       * <code>repeated .flyteidl.core.TaskLog logs = 2;</code>
+       * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
        */
       public java.util.List<flyteidl.core.Execution.TaskLog.Builder> 
-           getLogsBuilderList() {
-        return getLogsFieldBuilder().getBuilderList();
+           getLogLinksBuilderList() {
+        return getLogLinksFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilderV3<
           flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder> 
-          getLogsFieldBuilder() {
-        if (logsBuilder_ == null) {
-          logsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+          getLogLinksFieldBuilder() {
+        if (logLinksBuilder_ == null) {
+          logLinksBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder>(
-                  logs_,
+                  logLinks_,
                   ((bitField0_ & 0x00000002) != 0),
                   getParentForChildren(),
                   isClean());
-          logs_ = null;
+          logLinks_ = null;
         }
-        return logsBuilder_;
+        return logLinksBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8404,7 +8404,7 @@ public final class AgentOuterClass {
 
     /**
      * <pre>
-     * The name of the agent.
+     * Name is the developer-assigned name of the agent.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -8412,7 +8412,7 @@ public final class AgentOuterClass {
     java.lang.String getName();
     /**
      * <pre>
-     * The name of the agent.
+     * Name is the developer-assigned name of the agent.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -8422,65 +8422,65 @@ public final class AgentOuterClass {
 
     /**
      * <pre>
-     * A list of secret in the secret manager.
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>repeated string secret_name = 2;</code>
+     * <code>string supported_task_types = 2;</code>
      */
-    java.util.List<java.lang.String>
-        getSecretNameList();
+    java.lang.String getSupportedTaskTypes();
     /**
      * <pre>
-     * A list of secret in the secret manager.
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>repeated string secret_name = 2;</code>
-     */
-    int getSecretNameCount();
-    /**
-     * <pre>
-     * A list of secret in the secret manager.
-     * </pre>
-     *
-     * <code>repeated string secret_name = 2;</code>
-     */
-    java.lang.String getSecretName(int index);
-    /**
-     * <pre>
-     * A list of secret in the secret manager.
-     * </pre>
-     *
-     * <code>repeated string secret_name = 2;</code>
+     * <code>string supported_task_types = 2;</code>
      */
     com.google.protobuf.ByteString
-        getSecretNameBytes(int index);
+        getSupportedTaskTypesBytes();
 
     /**
      * <pre>
-     * The type of the task that the agent can handle.
+     * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
      * </pre>
      *
-     * <code>string supported_task_type = 3;</code>
-     */
-    java.lang.String getSupportedTaskType();
-    /**
-     * <pre>
-     * The type of the task that the agent can handle.
-     * </pre>
-     *
-     * <code>string supported_task_type = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getSupportedTaskTypeBytes();
-
-    /**
-     * <pre>
-     * Indicates if this agent is a sync agent.
-     * </pre>
-     *
-     * <code>bool is_sync = 4;</code>
+     * <code>bool is_sync = 3;</code>
      */
     boolean getIsSync();
+
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    java.util.List<java.lang.String>
+        getSecretNamesList();
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    int getSecretNamesCount();
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    java.lang.String getSecretNames(int index);
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getSecretNamesBytes(int index);
   }
   /**
    * <pre>
@@ -8500,8 +8500,8 @@ public final class AgentOuterClass {
     }
     private Agent() {
       name_ = "";
-      secretName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      supportedTaskType_ = "";
+      supportedTaskTypes_ = "";
+      secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -8536,22 +8536,22 @@ public final class AgentOuterClass {
             }
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
-              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
-                secretName_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00000002;
-              }
-              secretName_.add(s);
-              break;
-            }
-            case 26: {
-              java.lang.String s = input.readStringRequireUtf8();
 
-              supportedTaskType_ = s;
+              supportedTaskTypes_ = s;
               break;
             }
-            case 32: {
+            case 24: {
 
               isSync_ = input.readBool();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
+                secretNames_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000008;
+              }
+              secretNames_.add(s);
               break;
             }
             default: {
@@ -8569,8 +8569,8 @@ public final class AgentOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000002) != 0)) {
-          secretName_ = secretName_.getUnmodifiableView();
+        if (((mutable_bitField0_ & 0x00000008) != 0)) {
+          secretNames_ = secretNames_.getUnmodifiableView();
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -8594,7 +8594,7 @@ public final class AgentOuterClass {
     private volatile java.lang.Object name_;
     /**
      * <pre>
-     * The name of the agent.
+     * Name is the developer-assigned name of the agent.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -8613,7 +8613,7 @@ public final class AgentOuterClass {
     }
     /**
      * <pre>
-     * The name of the agent.
+     * Name is the developer-assigned name of the agent.
      * </pre>
      *
      * <code>string name = 1;</code>
@@ -8632,104 +8632,104 @@ public final class AgentOuterClass {
       }
     }
 
-    public static final int SECRET_NAME_FIELD_NUMBER = 2;
-    private com.google.protobuf.LazyStringList secretName_;
+    public static final int SUPPORTED_TASK_TYPES_FIELD_NUMBER = 2;
+    private volatile java.lang.Object supportedTaskTypes_;
     /**
      * <pre>
-     * A list of secret in the secret manager.
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>repeated string secret_name = 2;</code>
+     * <code>string supported_task_types = 2;</code>
      */
-    public com.google.protobuf.ProtocolStringList
-        getSecretNameList() {
-      return secretName_;
-    }
-    /**
-     * <pre>
-     * A list of secret in the secret manager.
-     * </pre>
-     *
-     * <code>repeated string secret_name = 2;</code>
-     */
-    public int getSecretNameCount() {
-      return secretName_.size();
-    }
-    /**
-     * <pre>
-     * A list of secret in the secret manager.
-     * </pre>
-     *
-     * <code>repeated string secret_name = 2;</code>
-     */
-    public java.lang.String getSecretName(int index) {
-      return secretName_.get(index);
-    }
-    /**
-     * <pre>
-     * A list of secret in the secret manager.
-     * </pre>
-     *
-     * <code>repeated string secret_name = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getSecretNameBytes(int index) {
-      return secretName_.getByteString(index);
-    }
-
-    public static final int SUPPORTED_TASK_TYPE_FIELD_NUMBER = 3;
-    private volatile java.lang.Object supportedTaskType_;
-    /**
-     * <pre>
-     * The type of the task that the agent can handle.
-     * </pre>
-     *
-     * <code>string supported_task_type = 3;</code>
-     */
-    public java.lang.String getSupportedTaskType() {
-      java.lang.Object ref = supportedTaskType_;
+    public java.lang.String getSupportedTaskTypes() {
+      java.lang.Object ref = supportedTaskTypes_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        supportedTaskType_ = s;
+        supportedTaskTypes_ = s;
         return s;
       }
     }
     /**
      * <pre>
-     * The type of the task that the agent can handle.
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>string supported_task_type = 3;</code>
+     * <code>string supported_task_types = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getSupportedTaskTypeBytes() {
-      java.lang.Object ref = supportedTaskType_;
+        getSupportedTaskTypesBytes() {
+      java.lang.Object ref = supportedTaskTypes_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        supportedTaskType_ = b;
+        supportedTaskTypes_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
     }
 
-    public static final int IS_SYNC_FIELD_NUMBER = 4;
+    public static final int IS_SYNC_FIELD_NUMBER = 3;
     private boolean isSync_;
     /**
      * <pre>
-     * Indicates if this agent is a sync agent.
+     * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
      * </pre>
      *
-     * <code>bool is_sync = 4;</code>
+     * <code>bool is_sync = 3;</code>
      */
     public boolean getIsSync() {
       return isSync_;
+    }
+
+    public static final int SECRET_NAMES_FIELD_NUMBER = 4;
+    private com.google.protobuf.LazyStringList secretNames_;
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getSecretNamesList() {
+      return secretNames_;
+    }
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    public int getSecretNamesCount() {
+      return secretNames_.size();
+    }
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    public java.lang.String getSecretNames(int index) {
+      return secretNames_.get(index);
+    }
+    /**
+     * <pre>
+     * SecretNames is a list of secrets the agent requires to execute tasks.
+     * </pre>
+     *
+     * <code>repeated string secret_names = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSecretNamesBytes(int index) {
+      return secretNames_.getByteString(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -8749,14 +8749,14 @@ public final class AgentOuterClass {
       if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
-      for (int i = 0; i < secretName_.size(); i++) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, secretName_.getRaw(i));
-      }
-      if (!getSupportedTaskTypeBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, supportedTaskType_);
+      if (!getSupportedTaskTypesBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, supportedTaskTypes_);
       }
       if (isSync_ != false) {
-        output.writeBool(4, isSync_);
+        output.writeBool(3, isSync_);
+      }
+      for (int i = 0; i < secretNames_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, secretNames_.getRaw(i));
       }
       unknownFields.writeTo(output);
     }
@@ -8770,20 +8770,20 @@ public final class AgentOuterClass {
       if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < secretName_.size(); i++) {
-          dataSize += computeStringSizeNoTag(secretName_.getRaw(i));
-        }
-        size += dataSize;
-        size += 1 * getSecretNameList().size();
-      }
-      if (!getSupportedTaskTypeBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, supportedTaskType_);
+      if (!getSupportedTaskTypesBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, supportedTaskTypes_);
       }
       if (isSync_ != false) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(4, isSync_);
+          .computeBoolSize(3, isSync_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < secretNames_.size(); i++) {
+          dataSize += computeStringSizeNoTag(secretNames_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getSecretNamesList().size();
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -8802,12 +8802,12 @@ public final class AgentOuterClass {
 
       if (!getName()
           .equals(other.getName())) return false;
-      if (!getSecretNameList()
-          .equals(other.getSecretNameList())) return false;
-      if (!getSupportedTaskType()
-          .equals(other.getSupportedTaskType())) return false;
+      if (!getSupportedTaskTypes()
+          .equals(other.getSupportedTaskTypes())) return false;
       if (getIsSync()
           != other.getIsSync()) return false;
+      if (!getSecretNamesList()
+          .equals(other.getSecretNamesList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -8821,15 +8821,15 @@ public final class AgentOuterClass {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + NAME_FIELD_NUMBER;
       hash = (53 * hash) + getName().hashCode();
-      if (getSecretNameCount() > 0) {
-        hash = (37 * hash) + SECRET_NAME_FIELD_NUMBER;
-        hash = (53 * hash) + getSecretNameList().hashCode();
-      }
-      hash = (37 * hash) + SUPPORTED_TASK_TYPE_FIELD_NUMBER;
-      hash = (53 * hash) + getSupportedTaskType().hashCode();
+      hash = (37 * hash) + SUPPORTED_TASK_TYPES_FIELD_NUMBER;
+      hash = (53 * hash) + getSupportedTaskTypes().hashCode();
       hash = (37 * hash) + IS_SYNC_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getIsSync());
+      if (getSecretNamesCount() > 0) {
+        hash = (37 * hash) + SECRET_NAMES_FIELD_NUMBER;
+        hash = (53 * hash) + getSecretNamesList().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -8969,12 +8969,12 @@ public final class AgentOuterClass {
         super.clear();
         name_ = "";
 
-        secretName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        supportedTaskType_ = "";
+        supportedTaskTypes_ = "";
 
         isSync_ = false;
 
+        secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -9004,13 +9004,13 @@ public final class AgentOuterClass {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         result.name_ = name_;
-        if (((bitField0_ & 0x00000002) != 0)) {
-          secretName_ = secretName_.getUnmodifiableView();
-          bitField0_ = (bitField0_ & ~0x00000002);
-        }
-        result.secretName_ = secretName_;
-        result.supportedTaskType_ = supportedTaskType_;
+        result.supportedTaskTypes_ = supportedTaskTypes_;
         result.isSync_ = isSync_;
+        if (((bitField0_ & 0x00000008) != 0)) {
+          secretNames_ = secretNames_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        }
+        result.secretNames_ = secretNames_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -9064,22 +9064,22 @@ public final class AgentOuterClass {
           name_ = other.name_;
           onChanged();
         }
-        if (!other.secretName_.isEmpty()) {
-          if (secretName_.isEmpty()) {
-            secretName_ = other.secretName_;
-            bitField0_ = (bitField0_ & ~0x00000002);
-          } else {
-            ensureSecretNameIsMutable();
-            secretName_.addAll(other.secretName_);
-          }
-          onChanged();
-        }
-        if (!other.getSupportedTaskType().isEmpty()) {
-          supportedTaskType_ = other.supportedTaskType_;
+        if (!other.getSupportedTaskTypes().isEmpty()) {
+          supportedTaskTypes_ = other.supportedTaskTypes_;
           onChanged();
         }
         if (other.getIsSync() != false) {
           setIsSync(other.getIsSync());
+        }
+        if (!other.secretNames_.isEmpty()) {
+          if (secretNames_.isEmpty()) {
+            secretNames_ = other.secretNames_;
+            bitField0_ = (bitField0_ & ~0x00000008);
+          } else {
+            ensureSecretNamesIsMutable();
+            secretNames_.addAll(other.secretNames_);
+          }
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -9114,7 +9114,7 @@ public final class AgentOuterClass {
       private java.lang.Object name_ = "";
       /**
        * <pre>
-       * The name of the agent.
+       * Name is the developer-assigned name of the agent.
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -9133,7 +9133,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The name of the agent.
+       * Name is the developer-assigned name of the agent.
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -9153,7 +9153,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The name of the agent.
+       * Name is the developer-assigned name of the agent.
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -9170,7 +9170,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The name of the agent.
+       * Name is the developer-assigned name of the agent.
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -9183,7 +9183,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The name of the agent.
+       * Name is the developer-assigned name of the agent.
        * </pre>
        *
        * <code>string name = 1;</code>
@@ -9200,151 +9200,21 @@ public final class AgentOuterClass {
         return this;
       }
 
-      private com.google.protobuf.LazyStringList secretName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureSecretNameIsMutable() {
-        if (!((bitField0_ & 0x00000002) != 0)) {
-          secretName_ = new com.google.protobuf.LazyStringArrayList(secretName_);
-          bitField0_ |= 0x00000002;
-         }
-      }
+      private java.lang.Object supportedTaskTypes_ = "";
       /**
        * <pre>
-       * A list of secret in the secret manager.
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>repeated string secret_name = 2;</code>
+       * <code>string supported_task_types = 2;</code>
        */
-      public com.google.protobuf.ProtocolStringList
-          getSecretNameList() {
-        return secretName_.getUnmodifiableView();
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public int getSecretNameCount() {
-        return secretName_.size();
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public java.lang.String getSecretName(int index) {
-        return secretName_.get(index);
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getSecretNameBytes(int index) {
-        return secretName_.getByteString(index);
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public Builder setSecretName(
-          int index, java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureSecretNameIsMutable();
-        secretName_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public Builder addSecretName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureSecretNameIsMutable();
-        secretName_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public Builder addAllSecretName(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureSecretNameIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, secretName_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public Builder clearSecretName() {
-        secretName_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000002);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * A list of secret in the secret manager.
-       * </pre>
-       *
-       * <code>repeated string secret_name = 2;</code>
-       */
-      public Builder addSecretNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        ensureSecretNameIsMutable();
-        secretName_.add(value);
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object supportedTaskType_ = "";
-      /**
-       * <pre>
-       * The type of the task that the agent can handle.
-       * </pre>
-       *
-       * <code>string supported_task_type = 3;</code>
-       */
-      public java.lang.String getSupportedTaskType() {
-        java.lang.Object ref = supportedTaskType_;
+      public java.lang.String getSupportedTaskTypes() {
+        java.lang.Object ref = supportedTaskTypes_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          supportedTaskType_ = s;
+          supportedTaskTypes_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -9352,19 +9222,19 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The type of the task that the agent can handle.
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 3;</code>
+       * <code>string supported_task_types = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getSupportedTaskTypeBytes() {
-        java.lang.Object ref = supportedTaskType_;
+          getSupportedTaskTypesBytes() {
+        java.lang.Object ref = supportedTaskTypes_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          supportedTaskType_ = b;
+          supportedTaskTypes_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -9372,49 +9242,49 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The type of the task that the agent can handle.
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 3;</code>
+       * <code>string supported_task_types = 2;</code>
        */
-      public Builder setSupportedTaskType(
+      public Builder setSupportedTaskTypes(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        supportedTaskType_ = value;
+        supportedTaskTypes_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * The type of the task that the agent can handle.
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 3;</code>
+       * <code>string supported_task_types = 2;</code>
        */
-      public Builder clearSupportedTaskType() {
+      public Builder clearSupportedTaskTypes() {
         
-        supportedTaskType_ = getDefaultInstance().getSupportedTaskType();
+        supportedTaskTypes_ = getDefaultInstance().getSupportedTaskTypes();
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * The type of the task that the agent can handle.
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 3;</code>
+       * <code>string supported_task_types = 2;</code>
        */
-      public Builder setSupportedTaskTypeBytes(
+      public Builder setSupportedTaskTypesBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        supportedTaskType_ = value;
+        supportedTaskTypes_ = value;
         onChanged();
         return this;
       }
@@ -9422,20 +9292,20 @@ public final class AgentOuterClass {
       private boolean isSync_ ;
       /**
        * <pre>
-       * Indicates if this agent is a sync agent.
+       * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
        * </pre>
        *
-       * <code>bool is_sync = 4;</code>
+       * <code>bool is_sync = 3;</code>
        */
       public boolean getIsSync() {
         return isSync_;
       }
       /**
        * <pre>
-       * Indicates if this agent is a sync agent.
+       * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
        * </pre>
        *
-       * <code>bool is_sync = 4;</code>
+       * <code>bool is_sync = 3;</code>
        */
       public Builder setIsSync(boolean value) {
         
@@ -9445,14 +9315,144 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * Indicates if this agent is a sync agent.
+       * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
        * </pre>
        *
-       * <code>bool is_sync = 4;</code>
+       * <code>bool is_sync = 3;</code>
        */
       public Builder clearIsSync() {
         
         isSync_ = false;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureSecretNamesIsMutable() {
+        if (!((bitField0_ & 0x00000008) != 0)) {
+          secretNames_ = new com.google.protobuf.LazyStringArrayList(secretNames_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getSecretNamesList() {
+        return secretNames_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public int getSecretNamesCount() {
+        return secretNames_.size();
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public java.lang.String getSecretNames(int index) {
+        return secretNames_.get(index);
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSecretNamesBytes(int index) {
+        return secretNames_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public Builder setSecretNames(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureSecretNamesIsMutable();
+        secretNames_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public Builder addSecretNames(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureSecretNamesIsMutable();
+        secretNames_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public Builder addAllSecretNames(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureSecretNamesIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, secretNames_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public Builder clearSecretNames() {
+        secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SecretNames is a list of secrets the agent requires to execute tasks.
+       * </pre>
+       *
+       * <code>repeated string secret_names = 4;</code>
+       */
+      public Builder addSecretNamesBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureSecretNamesIsMutable();
+        secretNames_.add(value);
         onChanged();
         return this;
       }
@@ -11950,10 +11950,10 @@ public final class AgentOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_CreateTaskRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_admin_CreateTaskRequest_SecretEntry_descriptor;
+    internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_admin_CreateTaskRequest_SecretEntry_fieldAccessorTable;
+      internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_CreateTaskResponse_descriptor;
   private static final 
@@ -12036,36 +12036,36 @@ public final class AgentOuterClass {
       " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEn" +
       "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031E" +
       "nvironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-      "\005value\030\002 \001(\t:\0028\001\"\272\002\n\021CreateTaskRequest\022)" +
+      "\005value\030\002 \001(\t:\0028\001\"\275\002\n\021CreateTaskRequest\022)" +
       "\n\006inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMa" +
       "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task" +
       "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_" +
       "execution_metadata\030\004 \001(\0132%.flyteidl.admi" +
-      "n.TaskExecutionMetadata\022=\n\006secret\030\005 \003(\0132" +
-      "-.flyteidl.admin.CreateTaskRequest.Secre" +
-      "tEntry\032-\n\013SecretEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
-      "lue\030\002 \001(\t:\0028\001\"+\n\022CreateTaskResponse\022\025\n\rr" +
-      "esource_meta\030\001 \001(\014\":\n\016GetTaskRequest\022\021\n\t" +
-      "task_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"c" +
-      "\n\017GetTaskResponse\022*\n\010resource\030\001 \001(\0132\030.fl" +
-      "yteidl.admin.Resource\022$\n\004logs\030\002 \003(\0132\026.fl" +
-      "yteidl.core.TaskLog\"m\n\010Resource\022$\n\005state" +
-      "\030\001 \001(\0162\025.flyteidl.admin.State\022*\n\007outputs" +
-      "\030\002 \001(\0132\031.flyteidl.core.LiteralMap\022\017\n\007mes" +
-      "sage\030\003 \001(\t\"=\n\021DeleteTaskRequest\022\021\n\ttask_" +
-      "type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022Del" +
-      "eteTaskResponse\"X\n\005Agent\022\014\n\004name\030\001 \001(\t\022\023" +
-      "\n\013secret_name\030\002 \003(\t\022\033\n\023supported_task_ty" +
-      "pe\030\003 \001(\t\022\017\n\007is_sync\030\004 \001(\010\"\037\n\017GetAgentReq" +
-      "uest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$" +
-      "\n\005agent\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021" +
-      "ListAgentsRequest\";\n\022ListAgentsResponse\022" +
-      "%\n\006agents\030\001 \003(\0132\025.flyteidl.admin.Agent*^" +
-      "\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMAN" +
-      "ENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022" +
-      "\r\n\tSUCCEEDED\020\004B=Z;github.com/flyteorg/fl" +
-      "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p" +
-      "roto3"
+      "n.TaskExecutionMetadata\022?\n\007secrets\030\005 \003(\013" +
+      "2..flyteidl.admin.CreateTaskRequest.Secr" +
+      "etsEntry\032.\n\014SecretsEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
+      "\005value\030\002 \001(\t:\0028\001\"+\n\022CreateTaskResponse\022\025" +
+      "\n\rresource_meta\030\001 \001(\014\":\n\016GetTaskRequest\022" +
+      "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(" +
+      "\014\"h\n\017GetTaskResponse\022*\n\010resource\030\001 \001(\0132\030" +
+      ".flyteidl.admin.Resource\022)\n\tlog_links\030\002 " +
+      "\003(\0132\026.flyteidl.core.TaskLog\"m\n\010Resource\022" +
+      "$\n\005state\030\001 \001(\0162\025.flyteidl.admin.State\022*\n" +
+      "\007outputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa" +
+      "p\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskRequest\022" +
+      "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(" +
+      "\014\"\024\n\022DeleteTaskResponse\"Z\n\005Agent\022\014\n\004name" +
+      "\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \001(\t\022\017\n\007" +
+      "is_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017G" +
+      "etAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgent" +
+      "Response\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin" +
+      ".Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgent" +
+      "sResponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.adm" +
+      "in.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000" +
+      "\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007" +
+      "RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/f" +
+      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
+      "l/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12113,12 +12113,12 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_CreateTaskRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_CreateTaskRequest_descriptor,
-        new java.lang.String[] { "Inputs", "Template", "OutputPrefix", "TaskExecutionMetadata", "Secret", });
-    internal_static_flyteidl_admin_CreateTaskRequest_SecretEntry_descriptor =
+        new java.lang.String[] { "Inputs", "Template", "OutputPrefix", "TaskExecutionMetadata", "Secrets", });
+    internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor =
       internal_static_flyteidl_admin_CreateTaskRequest_descriptor.getNestedTypes().get(0);
-    internal_static_flyteidl_admin_CreateTaskRequest_SecretEntry_fieldAccessorTable = new
+    internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_admin_CreateTaskRequest_SecretEntry_descriptor,
+        internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_admin_CreateTaskResponse_descriptor =
       getDescriptor().getMessageTypes().get(2);
@@ -12137,7 +12137,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_GetTaskResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_GetTaskResponse_descriptor,
-        new java.lang.String[] { "Resource", "Logs", });
+        new java.lang.String[] { "Resource", "LogLinks", });
     internal_static_flyteidl_admin_Resource_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
@@ -12161,7 +12161,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_Agent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Agent_descriptor,
-        new java.lang.String[] { "Name", "SecretName", "SupportedTaskType", "IsSync", });
+        new java.lang.String[] { "Name", "SupportedTaskTypes", "IsSync", "SecretNames", });
     internal_static_flyteidl_admin_GetAgentRequest_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_GetAgentRequest_fieldAccessorTable = new

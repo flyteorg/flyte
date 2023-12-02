@@ -65,9 +65,9 @@ extern AgentDefaultTypeInternal _Agent_default_instance_;
 class CreateTaskRequest;
 class CreateTaskRequestDefaultTypeInternal;
 extern CreateTaskRequestDefaultTypeInternal _CreateTaskRequest_default_instance_;
-class CreateTaskRequest_SecretEntry_DoNotUse;
-class CreateTaskRequest_SecretEntry_DoNotUseDefaultTypeInternal;
-extern CreateTaskRequest_SecretEntry_DoNotUseDefaultTypeInternal _CreateTaskRequest_SecretEntry_DoNotUse_default_instance_;
+class CreateTaskRequest_SecretsEntry_DoNotUse;
+class CreateTaskRequest_SecretsEntry_DoNotUseDefaultTypeInternal;
+extern CreateTaskRequest_SecretsEntry_DoNotUseDefaultTypeInternal _CreateTaskRequest_SecretsEntry_DoNotUse_default_instance_;
 class CreateTaskResponse;
 class CreateTaskResponseDefaultTypeInternal;
 extern CreateTaskResponseDefaultTypeInternal _CreateTaskResponse_default_instance_;
@@ -116,7 +116,7 @@ namespace google {
 namespace protobuf {
 template<> ::flyteidl::admin::Agent* Arena::CreateMaybeMessage<::flyteidl::admin::Agent>(Arena*);
 template<> ::flyteidl::admin::CreateTaskRequest* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskRequest>(Arena*);
-template<> ::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse>(Arena*);
+template<> ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::admin::CreateTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskResponse>(Arena*);
 template<> ::flyteidl::admin::DeleteTaskRequest* Arena::CreateMaybeMessage<::flyteidl::admin::DeleteTaskRequest>(Arena*);
 template<> ::flyteidl::admin::DeleteTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::DeleteTaskResponse>(Arena*);
@@ -425,7 +425,7 @@ class TaskExecutionMetadata final :
 };
 // -------------------------------------------------------------------
 
-class CreateTaskRequest_SecretEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<CreateTaskRequest_SecretEntry_DoNotUse, 
+class CreateTaskRequest_SecretsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<CreateTaskRequest_SecretsEntry_DoNotUse, 
     ::std::string, ::std::string,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
@@ -434,15 +434,15 @@ public:
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  typedef ::google::protobuf::internal::MapEntry<CreateTaskRequest_SecretEntry_DoNotUse, 
+  typedef ::google::protobuf::internal::MapEntry<CreateTaskRequest_SecretsEntry_DoNotUse, 
     ::std::string, ::std::string,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
     ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
     0 > SuperType;
-  CreateTaskRequest_SecretEntry_DoNotUse();
-  CreateTaskRequest_SecretEntry_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const CreateTaskRequest_SecretEntry_DoNotUse& other);
-  static const CreateTaskRequest_SecretEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const CreateTaskRequest_SecretEntry_DoNotUse*>(&_CreateTaskRequest_SecretEntry_DoNotUse_default_instance_); }
+  CreateTaskRequest_SecretsEntry_DoNotUse();
+  CreateTaskRequest_SecretsEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const CreateTaskRequest_SecretsEntry_DoNotUse& other);
+  static const CreateTaskRequest_SecretsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const CreateTaskRequest_SecretsEntry_DoNotUse*>(&_CreateTaskRequest_SecretsEntry_DoNotUse_default_instance_); }
   void MergeFrom(const ::google::protobuf::Message& other) final;
   ::google::protobuf::Metadata GetMetadata() const;
 };
@@ -545,14 +545,14 @@ class CreateTaskRequest final :
 
   // accessors -------------------------------------------------------
 
-  // map<string, string> secret = 5;
-  int secret_size() const;
-  void clear_secret();
-  static const int kSecretFieldNumber = 5;
+  // map<string, string> secrets = 5;
+  int secrets_size() const;
+  void clear_secrets();
+  static const int kSecretsFieldNumber = 5;
   const ::google::protobuf::Map< ::std::string, ::std::string >&
-      secret() const;
+      secrets() const;
   ::google::protobuf::Map< ::std::string, ::std::string >*
-      mutable_secret();
+      mutable_secrets();
 
   // string output_prefix = 3;
   void clear_output_prefix();
@@ -601,11 +601,11 @@ class CreateTaskRequest final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::MapField<
-      CreateTaskRequest_SecretEntry_DoNotUse,
+      CreateTaskRequest_SecretsEntry_DoNotUse,
       ::std::string, ::std::string,
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      0 > secret_;
+      0 > secrets_;
   ::google::protobuf::internal::ArenaStringPtr output_prefix_;
   ::flyteidl::core::LiteralMap* inputs_;
   ::flyteidl::core::TaskTemplate* template__;
@@ -965,17 +965,17 @@ class GetTaskResponse final :
 
   // accessors -------------------------------------------------------
 
-  // repeated .flyteidl.core.TaskLog logs = 2;
-  int logs_size() const;
-  void clear_logs();
-  static const int kLogsFieldNumber = 2;
-  ::flyteidl::core::TaskLog* mutable_logs(int index);
+  // repeated .flyteidl.core.TaskLog log_links = 2;
+  int log_links_size() const;
+  void clear_log_links();
+  static const int kLogLinksFieldNumber = 2;
+  ::flyteidl::core::TaskLog* mutable_log_links(int index);
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
-      mutable_logs();
-  const ::flyteidl::core::TaskLog& logs(int index) const;
-  ::flyteidl::core::TaskLog* add_logs();
+      mutable_log_links();
+  const ::flyteidl::core::TaskLog& log_links(int index) const;
+  ::flyteidl::core::TaskLog* add_log_links();
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
-      logs() const;
+      log_links() const;
 
   // .flyteidl.admin.Resource resource = 1;
   bool has_resource() const;
@@ -991,7 +991,7 @@ class GetTaskResponse final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > logs_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > log_links_;
   ::flyteidl::admin::Resource* resource_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
@@ -1470,27 +1470,27 @@ class Agent final :
 
   // accessors -------------------------------------------------------
 
-  // repeated string secret_name = 2;
-  int secret_name_size() const;
-  void clear_secret_name();
-  static const int kSecretNameFieldNumber = 2;
-  const ::std::string& secret_name(int index) const;
-  ::std::string* mutable_secret_name(int index);
-  void set_secret_name(int index, const ::std::string& value);
+  // repeated string secret_names = 4;
+  int secret_names_size() const;
+  void clear_secret_names();
+  static const int kSecretNamesFieldNumber = 4;
+  const ::std::string& secret_names(int index) const;
+  ::std::string* mutable_secret_names(int index);
+  void set_secret_names(int index, const ::std::string& value);
   #if LANG_CXX11
-  void set_secret_name(int index, ::std::string&& value);
+  void set_secret_names(int index, ::std::string&& value);
   #endif
-  void set_secret_name(int index, const char* value);
-  void set_secret_name(int index, const char* value, size_t size);
-  ::std::string* add_secret_name();
-  void add_secret_name(const ::std::string& value);
+  void set_secret_names(int index, const char* value);
+  void set_secret_names(int index, const char* value, size_t size);
+  ::std::string* add_secret_names();
+  void add_secret_names(const ::std::string& value);
   #if LANG_CXX11
-  void add_secret_name(::std::string&& value);
+  void add_secret_names(::std::string&& value);
   #endif
-  void add_secret_name(const char* value);
-  void add_secret_name(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& secret_name() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_secret_name();
+  void add_secret_names(const char* value);
+  void add_secret_names(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& secret_names() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_secret_names();
 
   // string name = 1;
   void clear_name();
@@ -1506,23 +1506,23 @@ class Agent final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
-  // string supported_task_type = 3;
-  void clear_supported_task_type();
-  static const int kSupportedTaskTypeFieldNumber = 3;
-  const ::std::string& supported_task_type() const;
-  void set_supported_task_type(const ::std::string& value);
+  // string supported_task_types = 2;
+  void clear_supported_task_types();
+  static const int kSupportedTaskTypesFieldNumber = 2;
+  const ::std::string& supported_task_types() const;
+  void set_supported_task_types(const ::std::string& value);
   #if LANG_CXX11
-  void set_supported_task_type(::std::string&& value);
+  void set_supported_task_types(::std::string&& value);
   #endif
-  void set_supported_task_type(const char* value);
-  void set_supported_task_type(const char* value, size_t size);
-  ::std::string* mutable_supported_task_type();
-  ::std::string* release_supported_task_type();
-  void set_allocated_supported_task_type(::std::string* supported_task_type);
+  void set_supported_task_types(const char* value);
+  void set_supported_task_types(const char* value, size_t size);
+  ::std::string* mutable_supported_task_types();
+  ::std::string* release_supported_task_types();
+  void set_allocated_supported_task_types(::std::string* supported_task_types);
 
-  // bool is_sync = 4;
+  // bool is_sync = 3;
   void clear_is_sync();
-  static const int kIsSyncFieldNumber = 4;
+  static const int kIsSyncFieldNumber = 3;
   bool is_sync() const;
   void set_is_sync(bool value);
 
@@ -1531,9 +1531,9 @@ class Agent final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField<::std::string> secret_name_;
+  ::google::protobuf::RepeatedPtrField<::std::string> secret_names_;
   ::google::protobuf::internal::ArenaStringPtr name_;
-  ::google::protobuf::internal::ArenaStringPtr supported_task_type_;
+  ::google::protobuf::internal::ArenaStringPtr supported_task_types_;
   bool is_sync_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
@@ -2418,22 +2418,22 @@ inline void CreateTaskRequest::set_allocated_task_execution_metadata(::flyteidl:
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.CreateTaskRequest.task_execution_metadata)
 }
 
-// map<string, string> secret = 5;
-inline int CreateTaskRequest::secret_size() const {
-  return secret_.size();
+// map<string, string> secrets = 5;
+inline int CreateTaskRequest::secrets_size() const {
+  return secrets_.size();
 }
-inline void CreateTaskRequest::clear_secret() {
-  secret_.Clear();
+inline void CreateTaskRequest::clear_secrets() {
+  secrets_.Clear();
 }
 inline const ::google::protobuf::Map< ::std::string, ::std::string >&
-CreateTaskRequest::secret() const {
-  // @@protoc_insertion_point(field_map:flyteidl.admin.CreateTaskRequest.secret)
-  return secret_.GetMap();
+CreateTaskRequest::secrets() const {
+  // @@protoc_insertion_point(field_map:flyteidl.admin.CreateTaskRequest.secrets)
+  return secrets_.GetMap();
 }
 inline ::google::protobuf::Map< ::std::string, ::std::string >*
-CreateTaskRequest::mutable_secret() {
-  // @@protoc_insertion_point(field_mutable_map:flyteidl.admin.CreateTaskRequest.secret)
-  return secret_.MutableMap();
+CreateTaskRequest::mutable_secrets() {
+  // @@protoc_insertion_point(field_mutable_map:flyteidl.admin.CreateTaskRequest.secrets)
+  return secrets_.MutableMap();
 }
 
 // -------------------------------------------------------------------
@@ -2658,31 +2658,31 @@ inline void GetTaskResponse::set_allocated_resource(::flyteidl::admin::Resource*
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskResponse.resource)
 }
 
-// repeated .flyteidl.core.TaskLog logs = 2;
-inline int GetTaskResponse::logs_size() const {
-  return logs_.size();
+// repeated .flyteidl.core.TaskLog log_links = 2;
+inline int GetTaskResponse::log_links_size() const {
+  return log_links_.size();
 }
-inline ::flyteidl::core::TaskLog* GetTaskResponse::mutable_logs(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskResponse.logs)
-  return logs_.Mutable(index);
+inline ::flyteidl::core::TaskLog* GetTaskResponse::mutable_log_links(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_.Mutable(index);
 }
 inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
-GetTaskResponse::mutable_logs() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.GetTaskResponse.logs)
-  return &logs_;
+GetTaskResponse::mutable_log_links() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.GetTaskResponse.log_links)
+  return &log_links_;
 }
-inline const ::flyteidl::core::TaskLog& GetTaskResponse::logs(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskResponse.logs)
-  return logs_.Get(index);
+inline const ::flyteidl::core::TaskLog& GetTaskResponse::log_links(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_.Get(index);
 }
-inline ::flyteidl::core::TaskLog* GetTaskResponse::add_logs() {
-  // @@protoc_insertion_point(field_add:flyteidl.admin.GetTaskResponse.logs)
-  return logs_.Add();
+inline ::flyteidl::core::TaskLog* GetTaskResponse::add_log_links() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_.Add();
 }
 inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
-GetTaskResponse::logs() const {
-  // @@protoc_insertion_point(field_list:flyteidl.admin.GetTaskResponse.logs)
-  return logs_;
+GetTaskResponse::log_links() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_;
 }
 
 // -------------------------------------------------------------------
@@ -2972,129 +2972,60 @@ inline void Agent::set_allocated_name(::std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.name)
 }
 
-// repeated string secret_name = 2;
-inline int Agent::secret_name_size() const {
-  return secret_name_.size();
+// string supported_task_types = 2;
+inline void Agent::clear_supported_task_types() {
+  supported_task_types_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Agent::clear_secret_name() {
-  secret_name_.Clear();
+inline const ::std::string& Agent::supported_task_types() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.supported_task_types)
+  return supported_task_types_.GetNoArena();
 }
-inline const ::std::string& Agent::secret_name(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.secret_name)
-  return secret_name_.Get(index);
-}
-inline ::std::string* Agent::mutable_secret_name(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.secret_name)
-  return secret_name_.Mutable(index);
-}
-inline void Agent::set_secret_name(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.secret_name)
-  secret_name_.Mutable(index)->assign(value);
-}
-#if LANG_CXX11
-inline void Agent::set_secret_name(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.secret_name)
-  secret_name_.Mutable(index)->assign(std::move(value));
-}
-#endif
-inline void Agent::set_secret_name(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  secret_name_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.secret_name)
-}
-inline void Agent::set_secret_name(int index, const char* value, size_t size) {
-  secret_name_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.secret_name)
-}
-inline ::std::string* Agent::add_secret_name() {
-  // @@protoc_insertion_point(field_add_mutable:flyteidl.admin.Agent.secret_name)
-  return secret_name_.Add();
-}
-inline void Agent::add_secret_name(const ::std::string& value) {
-  secret_name_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:flyteidl.admin.Agent.secret_name)
-}
-#if LANG_CXX11
-inline void Agent::add_secret_name(::std::string&& value) {
-  secret_name_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:flyteidl.admin.Agent.secret_name)
-}
-#endif
-inline void Agent::add_secret_name(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  secret_name_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:flyteidl.admin.Agent.secret_name)
-}
-inline void Agent::add_secret_name(const char* value, size_t size) {
-  secret_name_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:flyteidl.admin.Agent.secret_name)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-Agent::secret_name() const {
-  // @@protoc_insertion_point(field_list:flyteidl.admin.Agent.secret_name)
-  return secret_name_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-Agent::mutable_secret_name() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.Agent.secret_name)
-  return &secret_name_;
-}
-
-// string supported_task_type = 3;
-inline void Agent::clear_supported_task_type() {
-  supported_task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& Agent::supported_task_type() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.supported_task_type)
-  return supported_task_type_.GetNoArena();
-}
-inline void Agent::set_supported_task_type(const ::std::string& value) {
+inline void Agent::set_supported_task_types(const ::std::string& value) {
   
-  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.supported_task_type)
+  supported_task_types_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.supported_task_types)
 }
 #if LANG_CXX11
-inline void Agent::set_supported_task_type(::std::string&& value) {
+inline void Agent::set_supported_task_types(::std::string&& value) {
   
-  supported_task_type_.SetNoArena(
+  supported_task_types_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Agent.supported_task_type)
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Agent.supported_task_types)
 }
 #endif
-inline void Agent::set_supported_task_type(const char* value) {
+inline void Agent::set_supported_task_types(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.supported_task_type)
+  supported_task_types_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.supported_task_types)
 }
-inline void Agent::set_supported_task_type(const char* value, size_t size) {
+inline void Agent::set_supported_task_types(const char* value, size_t size) {
   
-  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  supported_task_types_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.supported_task_type)
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.supported_task_types)
 }
-inline ::std::string* Agent::mutable_supported_task_type() {
+inline ::std::string* Agent::mutable_supported_task_types() {
   
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.supported_task_type)
-  return supported_task_type_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.supported_task_types)
+  return supported_task_types_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Agent::release_supported_task_type() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.Agent.supported_task_type)
+inline ::std::string* Agent::release_supported_task_types() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Agent.supported_task_types)
   
-  return supported_task_type_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return supported_task_types_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Agent::set_allocated_supported_task_type(::std::string* supported_task_type) {
-  if (supported_task_type != nullptr) {
+inline void Agent::set_allocated_supported_task_types(::std::string* supported_task_types) {
+  if (supported_task_types != nullptr) {
     
   } else {
     
   }
-  supported_task_type_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), supported_task_type);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.supported_task_type)
+  supported_task_types_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), supported_task_types);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.supported_task_types)
 }
 
-// bool is_sync = 4;
+// bool is_sync = 3;
 inline void Agent::clear_is_sync() {
   is_sync_ = false;
 }
@@ -3106,6 +3037,75 @@ inline void Agent::set_is_sync(bool value) {
   
   is_sync_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.is_sync)
+}
+
+// repeated string secret_names = 4;
+inline int Agent::secret_names_size() const {
+  return secret_names_.size();
+}
+inline void Agent::clear_secret_names() {
+  secret_names_.Clear();
+}
+inline const ::std::string& Agent::secret_names(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.secret_names)
+  return secret_names_.Get(index);
+}
+inline ::std::string* Agent::mutable_secret_names(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.secret_names)
+  return secret_names_.Mutable(index);
+}
+inline void Agent::set_secret_names(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.secret_names)
+  secret_names_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void Agent::set_secret_names(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.secret_names)
+  secret_names_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void Agent::set_secret_names(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  secret_names_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.secret_names)
+}
+inline void Agent::set_secret_names(int index, const char* value, size_t size) {
+  secret_names_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.secret_names)
+}
+inline ::std::string* Agent::add_secret_names() {
+  // @@protoc_insertion_point(field_add_mutable:flyteidl.admin.Agent.secret_names)
+  return secret_names_.Add();
+}
+inline void Agent::add_secret_names(const ::std::string& value) {
+  secret_names_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:flyteidl.admin.Agent.secret_names)
+}
+#if LANG_CXX11
+inline void Agent::add_secret_names(::std::string&& value) {
+  secret_names_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:flyteidl.admin.Agent.secret_names)
+}
+#endif
+inline void Agent::add_secret_names(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  secret_names_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:flyteidl.admin.Agent.secret_names)
+}
+inline void Agent::add_secret_names(const char* value, size_t size) {
+  secret_names_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:flyteidl.admin.Agent.secret_names)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+Agent::secret_names() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.Agent.secret_names)
+  return secret_names_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+Agent::mutable_secret_names() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.Agent.secret_names)
+  return &secret_names_;
 }
 
 // -------------------------------------------------------------------

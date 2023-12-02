@@ -62,8 +62,8 @@ class TaskExecutionMetadata(_message.Message):
     def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CreateTaskRequest(_message.Message):
-    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata", "secret"]
-    class SecretEntry(_message.Message):
+    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata", "secrets"]
+    class SecretsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
         VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -74,13 +74,13 @@ class CreateTaskRequest(_message.Message):
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
     TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
-    SECRET_FIELD_NUMBER: _ClassVar[int]
+    SECRETS_FIELD_NUMBER: _ClassVar[int]
     inputs: _literals_pb2.LiteralMap
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
     task_execution_metadata: TaskExecutionMetadata
-    secret: _containers.ScalarMap[str, str]
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., secret: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    secrets: _containers.ScalarMap[str, str]
+    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., secrets: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
     __slots__ = ["resource_meta"]
@@ -97,12 +97,12 @@ class GetTaskRequest(_message.Message):
     def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ...) -> None: ...
 
 class GetTaskResponse(_message.Message):
-    __slots__ = ["resource", "logs"]
+    __slots__ = ["resource", "log_links"]
     RESOURCE_FIELD_NUMBER: _ClassVar[int]
-    LOGS_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     resource: Resource
-    logs: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
-    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ..., logs: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
+    log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
+    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class Resource(_message.Message):
     __slots__ = ["state", "outputs", "message"]
@@ -127,16 +127,16 @@ class DeleteTaskResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class Agent(_message.Message):
-    __slots__ = ["name", "secret_name", "supported_task_type", "is_sync"]
+    __slots__ = ["name", "supported_task_types", "is_sync", "secret_names"]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    SECRET_NAME_FIELD_NUMBER: _ClassVar[int]
-    SUPPORTED_TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
     IS_SYNC_FIELD_NUMBER: _ClassVar[int]
+    SECRET_NAMES_FIELD_NUMBER: _ClassVar[int]
     name: str
-    secret_name: _containers.RepeatedScalarFieldContainer[str]
-    supported_task_type: str
+    supported_task_types: str
     is_sync: bool
-    def __init__(self, name: _Optional[str] = ..., secret_name: _Optional[_Iterable[str]] = ..., supported_task_type: _Optional[str] = ..., is_sync: bool = ...) -> None: ...
+    secret_names: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[str] = ..., is_sync: bool = ..., secret_names: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetAgentRequest(_message.Message):
     __slots__ = ["name"]

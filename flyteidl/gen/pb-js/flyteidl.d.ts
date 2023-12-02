@@ -7962,8 +7962,8 @@ export namespace flyteidl {
             /** CreateTaskRequest taskExecutionMetadata */
             taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
 
-            /** CreateTaskRequest secret */
-            secret?: ({ [k: string]: string }|null);
+            /** CreateTaskRequest secrets */
+            secrets?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CreateTaskRequest. */
@@ -7987,8 +7987,8 @@ export namespace flyteidl {
             /** CreateTaskRequest taskExecutionMetadata. */
             public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
 
-            /** CreateTaskRequest secret. */
-            public secret: { [k: string]: string };
+            /** CreateTaskRequest secrets. */
+            public secrets: { [k: string]: string };
 
             /**
              * Creates a new CreateTaskRequest instance using the specified properties.
@@ -8139,8 +8139,8 @@ export namespace flyteidl {
             /** GetTaskResponse resource */
             resource?: (flyteidl.admin.IResource|null);
 
-            /** GetTaskResponse logs */
-            logs?: (flyteidl.core.ITaskLog[]|null);
+            /** GetTaskResponse logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a GetTaskResponse. */
@@ -8155,8 +8155,8 @@ export namespace flyteidl {
             /** GetTaskResponse resource. */
             public resource?: (flyteidl.admin.IResource|null);
 
-            /** GetTaskResponse logs. */
-            public logs: flyteidl.core.ITaskLog[];
+            /** GetTaskResponse logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
 
             /**
              * Creates a new GetTaskResponse instance using the specified properties.
@@ -8365,14 +8365,14 @@ export namespace flyteidl {
             /** Agent name */
             name?: (string|null);
 
-            /** Agent secretName */
-            secretName?: (string[]|null);
-
-            /** Agent supportedTaskType */
-            supportedTaskType?: (string|null);
+            /** Agent supportedTaskTypes */
+            supportedTaskTypes?: (string|null);
 
             /** Agent isSync */
             isSync?: (boolean|null);
+
+            /** Agent secretNames */
+            secretNames?: (string[]|null);
         }
 
         /** Represents an Agent. */
@@ -8387,14 +8387,14 @@ export namespace flyteidl {
             /** Agent name. */
             public name: string;
 
-            /** Agent secretName. */
-            public secretName: string[];
-
-            /** Agent supportedTaskType. */
-            public supportedTaskType: string;
+            /** Agent supportedTaskTypes. */
+            public supportedTaskTypes: string;
 
             /** Agent isSync. */
             public isSync: boolean;
+
+            /** Agent secretNames. */
+            public secretNames: string[];
 
             /**
              * Creates a new Agent instance using the specified properties.

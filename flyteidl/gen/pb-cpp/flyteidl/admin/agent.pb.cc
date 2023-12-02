@@ -17,7 +17,7 @@
 #include <google/protobuf/port_def.inc>
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Agent_flyteidl_2fadmin_2fagent_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_CreateTaskRequest_SecretEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_CreateTaskRequest_SecretsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskExecutionMetadata_AnnotationsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_TaskExecutionMetadata_LabelsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto;
@@ -45,10 +45,10 @@ class TaskExecutionMetadataDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<TaskExecutionMetadata> _instance;
 } _TaskExecutionMetadata_default_instance_;
-class CreateTaskRequest_SecretEntry_DoNotUseDefaultTypeInternal {
+class CreateTaskRequest_SecretsEntry_DoNotUseDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<CreateTaskRequest_SecretEntry_DoNotUse> _instance;
-} _CreateTaskRequest_SecretEntry_DoNotUse_default_instance_;
+  ::google::protobuf::internal::ExplicitlyConstructed<CreateTaskRequest_SecretsEntry_DoNotUse> _instance;
+} _CreateTaskRequest_SecretsEntry_DoNotUse_default_instance_;
 class CreateTaskRequestDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<CreateTaskRequest> _instance;
@@ -156,18 +156,18 @@ static void InitDefaultsTaskExecutionMetadata_flyteidl_2fadmin_2fagent_2eproto()
       &scc_info_TaskExecutionMetadata_AnnotationsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base,
       &scc_info_TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base,}};
 
-static void InitDefaultsCreateTaskRequest_SecretEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto() {
+static void InitDefaultsCreateTaskRequest_SecretsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::flyteidl::admin::_CreateTaskRequest_SecretEntry_DoNotUse_default_instance_;
-    new (ptr) ::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse();
+    void* ptr = &::flyteidl::admin::_CreateTaskRequest_SecretsEntry_DoNotUse_default_instance_;
+    new (ptr) ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse();
   }
-  ::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse::InitAsDefaultInstance();
+  ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_CreateTaskRequest_SecretEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCreateTaskRequest_SecretEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_CreateTaskRequest_SecretsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCreateTaskRequest_SecretsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto}, {}};
 
 static void InitDefaultsCreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -185,7 +185,7 @@ static void InitDefaultsCreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto() {
       &scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto.base,
       &scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto.base,
       &scc_info_TaskExecutionMetadata_flyteidl_2fadmin_2fagent_2eproto.base,
-      &scc_info_CreateTaskRequest_SecretEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base,}};
+      &scc_info_CreateTaskRequest_SecretsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base,}};
 
 static void InitDefaultsCreateTaskResponse_flyteidl_2fadmin_2fagent_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -351,7 +351,7 @@ void InitDefaults_flyteidl_2fadmin_2fagent_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_TaskExecutionMetadata_AnnotationsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_TaskExecutionMetadata_flyteidl_2fadmin_2fagent_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_CreateTaskRequest_SecretEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_CreateTaskRequest_SecretsEntry_DoNotUse_flyteidl_2fadmin_2fagent_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_CreateTaskRequest_flyteidl_2fadmin_2fagent_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_CreateTaskResponse_flyteidl_2fadmin_2fagent_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_GetTaskRequest_flyteidl_2fadmin_2fagent_2eproto.base);
@@ -409,13 +409,13 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionMetadata, annotations_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionMetadata, k8s_service_account_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::TaskExecutionMetadata, environment_variables_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse, _has_bits_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse, key_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse, value_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse, value_),
   0,
   1,
   ~0u,  // no _has_bits_
@@ -427,7 +427,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, template__),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, output_prefix_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, task_execution_metadata_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, secret_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskRequest, secrets_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::CreateTaskResponse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -447,7 +447,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskResponse, resource_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskResponse, logs_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskResponse, log_links_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -474,9 +474,9 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, name_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, secret_name_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, supported_task_type_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, supported_task_types_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, is_sync_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, secret_names_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetAgentRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -506,7 +506,7 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 9, 16, sizeof(::flyteidl::admin::TaskExecutionMetadata_AnnotationsEntry_DoNotUse)},
   { 18, 25, sizeof(::flyteidl::admin::TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse)},
   { 27, -1, sizeof(::flyteidl::admin::TaskExecutionMetadata)},
-  { 38, 45, sizeof(::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse)},
+  { 38, 45, sizeof(::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse)},
   { 47, -1, sizeof(::flyteidl::admin::CreateTaskRequest)},
   { 57, -1, sizeof(::flyteidl::admin::CreateTaskResponse)},
   { 63, -1, sizeof(::flyteidl::admin::GetTaskRequest)},
@@ -526,7 +526,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_TaskExecutionMetadata_AnnotationsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_TaskExecutionMetadata_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_CreateTaskRequest_SecretEntry_DoNotUse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_CreateTaskRequest_SecretsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_CreateTaskRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_CreateTaskResponse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::admin::_GetTaskRequest_default_instance_),
@@ -566,41 +566,41 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEn"
   "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031E"
   "nvironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n"
-  "\005value\030\002 \001(\t:\0028\001\"\272\002\n\021CreateTaskRequest\022)"
+  "\005value\030\002 \001(\t:\0028\001\"\275\002\n\021CreateTaskRequest\022)"
   "\n\006inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMa"
   "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task"
   "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_"
   "execution_metadata\030\004 \001(\0132%.flyteidl.admi"
-  "n.TaskExecutionMetadata\022=\n\006secret\030\005 \003(\0132"
-  "-.flyteidl.admin.CreateTaskRequest.Secre"
-  "tEntry\032-\n\013SecretEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va"
-  "lue\030\002 \001(\t:\0028\001\"+\n\022CreateTaskResponse\022\025\n\rr"
-  "esource_meta\030\001 \001(\014\":\n\016GetTaskRequest\022\021\n\t"
-  "task_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"c"
-  "\n\017GetTaskResponse\022*\n\010resource\030\001 \001(\0132\030.fl"
-  "yteidl.admin.Resource\022$\n\004logs\030\002 \003(\0132\026.fl"
-  "yteidl.core.TaskLog\"m\n\010Resource\022$\n\005state"
-  "\030\001 \001(\0162\025.flyteidl.admin.State\022*\n\007outputs"
-  "\030\002 \001(\0132\031.flyteidl.core.LiteralMap\022\017\n\007mes"
-  "sage\030\003 \001(\t\"=\n\021DeleteTaskRequest\022\021\n\ttask_"
-  "type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022Del"
-  "eteTaskResponse\"X\n\005Agent\022\014\n\004name\030\001 \001(\t\022\023"
-  "\n\013secret_name\030\002 \003(\t\022\033\n\023supported_task_ty"
-  "pe\030\003 \001(\t\022\017\n\007is_sync\030\004 \001(\010\"\037\n\017GetAgentReq"
-  "uest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$"
-  "\n\005agent\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021"
-  "ListAgentsRequest\";\n\022ListAgentsResponse\022"
-  "%\n\006agents\030\001 \003(\0132\025.flyteidl.admin.Agent*^"
-  "\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMAN"
-  "ENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022"
-  "\r\n\tSUCCEEDED\020\004B=Z;github.com/flyteorg/fl"
-  "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p"
-  "roto3"
+  "n.TaskExecutionMetadata\022\?\n\007secrets\030\005 \003(\013"
+  "2..flyteidl.admin.CreateTaskRequest.Secr"
+  "etsEntry\032.\n\014SecretsEntry\022\013\n\003key\030\001 \001(\t\022\r\n"
+  "\005value\030\002 \001(\t:\0028\001\"+\n\022CreateTaskResponse\022\025"
+  "\n\rresource_meta\030\001 \001(\014\":\n\016GetTaskRequest\022"
+  "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001("
+  "\014\"h\n\017GetTaskResponse\022*\n\010resource\030\001 \001(\0132\030"
+  ".flyteidl.admin.Resource\022)\n\tlog_links\030\002 "
+  "\003(\0132\026.flyteidl.core.TaskLog\"m\n\010Resource\022"
+  "$\n\005state\030\001 \001(\0162\025.flyteidl.admin.State\022*\n"
+  "\007outputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa"
+  "p\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskRequest\022"
+  "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001("
+  "\014\"\024\n\022DeleteTaskResponse\"Z\n\005Agent\022\014\n\004name"
+  "\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \001(\t\022\017\n\007"
+  "is_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017G"
+  "etAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgent"
+  "Response\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin"
+  ".Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgent"
+  "sResponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.adm"
+  "in.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000"
+  "\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007"
+  "RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/f"
+  "lyteorg/flyte/flyteidl/gen/pb-go/flyteid"
+  "l/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1885,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1895,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -1691,25 +1691,25 @@ void TaskExecutionMetadata::InternalSwap(TaskExecutionMetadata* other) {
 
 // ===================================================================
 
-CreateTaskRequest_SecretEntry_DoNotUse::CreateTaskRequest_SecretEntry_DoNotUse() {}
-CreateTaskRequest_SecretEntry_DoNotUse::CreateTaskRequest_SecretEntry_DoNotUse(::google::protobuf::Arena* arena)
+CreateTaskRequest_SecretsEntry_DoNotUse::CreateTaskRequest_SecretsEntry_DoNotUse() {}
+CreateTaskRequest_SecretsEntry_DoNotUse::CreateTaskRequest_SecretsEntry_DoNotUse(::google::protobuf::Arena* arena)
     : SuperType(arena) {}
-void CreateTaskRequest_SecretEntry_DoNotUse::MergeFrom(const CreateTaskRequest_SecretEntry_DoNotUse& other) {
+void CreateTaskRequest_SecretsEntry_DoNotUse::MergeFrom(const CreateTaskRequest_SecretsEntry_DoNotUse& other) {
   MergeFromInternal(other);
 }
-::google::protobuf::Metadata CreateTaskRequest_SecretEntry_DoNotUse::GetMetadata() const {
+::google::protobuf::Metadata CreateTaskRequest_SecretsEntry_DoNotUse::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto);
   return ::file_level_metadata_flyteidl_2fadmin_2fagent_2eproto[4];
 }
-void CreateTaskRequest_SecretEntry_DoNotUse::MergeFrom(
+void CreateTaskRequest_SecretsEntry_DoNotUse::MergeFrom(
     const ::google::protobuf::Message& other) {
   ::google::protobuf::Message::MergeFrom(other);
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool CreateTaskRequest_SecretEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+bool CreateTaskRequest_SecretsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
   using MF = ::google::protobuf::internal::MapField<
-      CreateTaskRequest_SecretEntry_DoNotUse, EntryKeyType, EntryValueType,
+      CreateTaskRequest_SecretsEntry_DoNotUse, EntryKeyType, EntryValueType,
       kEntryKeyFieldType, kEntryValueFieldType,
       kEntryDefaultEnumValue>;
   auto mf = static_cast<MF*>(object);
@@ -1719,11 +1719,11 @@ bool CreateTaskRequest_SecretEntry_DoNotUse::_ParseMap(const char* begin, const 
   DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
     parser.key().data(), static_cast<int>(parser.key().length()),
     ::google::protobuf::internal::WireFormatLite::PARSE,
-    "flyteidl.admin.CreateTaskRequest.SecretEntry.key"));
+    "flyteidl.admin.CreateTaskRequest.SecretsEntry.key"));
   DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
     parser.value().data(), static_cast<int>(parser.value().length()),
     ::google::protobuf::internal::WireFormatLite::PARSE,
-    "flyteidl.admin.CreateTaskRequest.SecretEntry.value"));
+    "flyteidl.admin.CreateTaskRequest.SecretsEntry.value"));
 #undef DO_
   return true;
 }
@@ -1776,7 +1776,7 @@ const int CreateTaskRequest::kInputsFieldNumber;
 const int CreateTaskRequest::kTemplateFieldNumber;
 const int CreateTaskRequest::kOutputPrefixFieldNumber;
 const int CreateTaskRequest::kTaskExecutionMetadataFieldNumber;
-const int CreateTaskRequest::kSecretFieldNumber;
+const int CreateTaskRequest::kSecretsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 CreateTaskRequest::CreateTaskRequest()
@@ -1788,7 +1788,7 @@ CreateTaskRequest::CreateTaskRequest(const CreateTaskRequest& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  secret_.MergeFrom(from.secret_);
+  secrets_.MergeFrom(from.secrets_);
   output_prefix_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.output_prefix().size() > 0) {
     output_prefix_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.output_prefix_);
@@ -1847,7 +1847,7 @@ void CreateTaskRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  secret_.Clear();
+  secrets_.Clear();
   output_prefix_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && inputs_ != nullptr) {
     delete inputs_;
@@ -1932,17 +1932,17 @@ const char* CreateTaskRequest::_InternalParse(const char* begin, const char* end
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
-      // map<string, string> secret = 5;
+      // map<string, string> secrets = 5;
       case 5: {
         if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
           parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
-          auto parse_map = ::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse::_ParseMap;
+          auto parse_map = ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse::_ParseMap;
           ctx->extra_parse_data().payload.clear();
           ctx->extra_parse_data().parse_map = parse_map;
-          object = &msg->secret_;
+          object = &msg->secrets_;
           if (size > end - ptr) goto len_delim_till_end;
           auto newend = ptr + size;
           GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
@@ -2033,26 +2033,26 @@ bool CreateTaskRequest::MergePartialFromCodedStream(
         break;
       }
 
-      // map<string, string> secret = 5;
+      // map<string, string> secrets = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
-          CreateTaskRequest_SecretEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
-              CreateTaskRequest_SecretEntry_DoNotUse,
+          CreateTaskRequest_SecretsEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              CreateTaskRequest_SecretsEntry_DoNotUse,
               ::std::string, ::std::string,
               ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
               ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
               0 >,
-            ::google::protobuf::Map< ::std::string, ::std::string > > parser(&secret_);
+            ::google::protobuf::Map< ::std::string, ::std::string > > parser(&secrets_);
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
               input, &parser));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             parser.key().data(), static_cast<int>(parser.key().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.CreateTaskRequest.SecretEntry.key"));
+            "flyteidl.admin.CreateTaskRequest.SecretsEntry.key"));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
             parser.value().data(), static_cast<int>(parser.value().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.CreateTaskRequest.SecretEntry.value"));
+            "flyteidl.admin.CreateTaskRequest.SecretsEntry.value"));
         } else {
           goto handle_unusual;
         }
@@ -2114,8 +2114,8 @@ void CreateTaskRequest::SerializeWithCachedSizes(
       4, HasBitSetters::task_execution_metadata(this), output);
   }
 
-  // map<string, string> secret = 5;
-  if (!this->secret().empty()) {
+  // map<string, string> secrets = 5;
+  if (!this->secrets().empty()) {
     typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
         ConstPtr;
     typedef ConstPtr SortItem;
@@ -2125,38 +2125,38 @@ void CreateTaskRequest::SerializeWithCachedSizes(
         ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           p->first.data(), static_cast<int>(p->first.length()),
           ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-          "flyteidl.admin.CreateTaskRequest.SecretEntry.key");
+          "flyteidl.admin.CreateTaskRequest.SecretsEntry.key");
         ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           p->second.data(), static_cast<int>(p->second.length()),
           ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-          "flyteidl.admin.CreateTaskRequest.SecretEntry.value");
+          "flyteidl.admin.CreateTaskRequest.SecretsEntry.value");
       }
     };
 
     if (output->IsSerializationDeterministic() &&
-        this->secret().size() > 1) {
+        this->secrets().size() > 1) {
       ::std::unique_ptr<SortItem[]> items(
-          new SortItem[this->secret().size()]);
+          new SortItem[this->secrets().size()]);
       typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
       size_type n = 0;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
-          it = this->secret().begin();
-          it != this->secret().end(); ++it, ++n) {
+          it = this->secrets().begin();
+          it != this->secrets().end(); ++it, ++n) {
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::std::unique_ptr<CreateTaskRequest_SecretEntry_DoNotUse> entry;
+      ::std::unique_ptr<CreateTaskRequest_SecretsEntry_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
-        entry.reset(secret_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        entry.reset(secrets_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
         ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(5, *entry, output);
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::std::unique_ptr<CreateTaskRequest_SecretEntry_DoNotUse> entry;
+      ::std::unique_ptr<CreateTaskRequest_SecretsEntry_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
-          it = this->secret().begin();
-          it != this->secret().end(); ++it) {
-        entry.reset(secret_.NewEntryWrapper(it->first, it->second));
+          it = this->secrets().begin();
+          it != this->secrets().end(); ++it) {
+        entry.reset(secrets_.NewEntryWrapper(it->first, it->second));
         ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(5, *entry, output);
         Utf8Check::Check(&(*it));
       }
@@ -2208,8 +2208,8 @@ void CreateTaskRequest::SerializeWithCachedSizes(
         4, HasBitSetters::task_execution_metadata(this), target);
   }
 
-  // map<string, string> secret = 5;
-  if (!this->secret().empty()) {
+  // map<string, string> secrets = 5;
+  if (!this->secrets().empty()) {
     typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
         ConstPtr;
     typedef ConstPtr SortItem;
@@ -2219,38 +2219,38 @@ void CreateTaskRequest::SerializeWithCachedSizes(
         ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           p->first.data(), static_cast<int>(p->first.length()),
           ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-          "flyteidl.admin.CreateTaskRequest.SecretEntry.key");
+          "flyteidl.admin.CreateTaskRequest.SecretsEntry.key");
         ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
           p->second.data(), static_cast<int>(p->second.length()),
           ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-          "flyteidl.admin.CreateTaskRequest.SecretEntry.value");
+          "flyteidl.admin.CreateTaskRequest.SecretsEntry.value");
       }
     };
 
     if (false &&
-        this->secret().size() > 1) {
+        this->secrets().size() > 1) {
       ::std::unique_ptr<SortItem[]> items(
-          new SortItem[this->secret().size()]);
+          new SortItem[this->secrets().size()]);
       typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
       size_type n = 0;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
-          it = this->secret().begin();
-          it != this->secret().end(); ++it, ++n) {
+          it = this->secrets().begin();
+          it != this->secrets().end(); ++it, ++n) {
         items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
       }
       ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
-      ::std::unique_ptr<CreateTaskRequest_SecretEntry_DoNotUse> entry;
+      ::std::unique_ptr<CreateTaskRequest_SecretsEntry_DoNotUse> entry;
       for (size_type i = 0; i < n; i++) {
-        entry.reset(secret_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        entry.reset(secrets_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
         target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(5, *entry, target);
         Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
       }
     } else {
-      ::std::unique_ptr<CreateTaskRequest_SecretEntry_DoNotUse> entry;
+      ::std::unique_ptr<CreateTaskRequest_SecretsEntry_DoNotUse> entry;
       for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
-          it = this->secret().begin();
-          it != this->secret().end(); ++it) {
-        entry.reset(secret_.NewEntryWrapper(it->first, it->second));
+          it = this->secrets().begin();
+          it != this->secrets().end(); ++it) {
+        entry.reset(secrets_.NewEntryWrapper(it->first, it->second));
         target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(5, *entry, target);
         Utf8Check::Check(&(*it));
       }
@@ -2278,15 +2278,15 @@ size_t CreateTaskRequest::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // map<string, string> secret = 5;
+  // map<string, string> secrets = 5;
   total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->secret_size());
+      ::google::protobuf::internal::FromIntSize(this->secrets_size());
   {
-    ::std::unique_ptr<CreateTaskRequest_SecretEntry_DoNotUse> entry;
+    ::std::unique_ptr<CreateTaskRequest_SecretsEntry_DoNotUse> entry;
     for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
-        it = this->secret().begin();
-        it != this->secret().end(); ++it) {
-      entry.reset(secret_.NewEntryWrapper(it->first, it->second));
+        it = this->secrets().begin();
+        it != this->secrets().end(); ++it) {
+      entry.reset(secrets_.NewEntryWrapper(it->first, it->second));
       total_size += ::google::protobuf::internal::WireFormatLite::
           MessageSizeNoVirtual(*entry);
     }
@@ -2347,7 +2347,7 @@ void CreateTaskRequest::MergeFrom(const CreateTaskRequest& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  secret_.MergeFrom(from.secret_);
+  secrets_.MergeFrom(from.secrets_);
   if (from.output_prefix().size() > 0) {
 
     output_prefix_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.output_prefix_);
@@ -2388,7 +2388,7 @@ void CreateTaskRequest::Swap(CreateTaskRequest* other) {
 void CreateTaskRequest::InternalSwap(CreateTaskRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  secret_.Swap(&other->secret_);
+  secrets_.Swap(&other->secrets_);
   output_prefix_.Swap(&other->output_prefix_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(inputs_, other->inputs_);
@@ -3058,12 +3058,12 @@ const ::flyteidl::admin::Resource&
 GetTaskResponse::HasBitSetters::resource(const GetTaskResponse* msg) {
   return *msg->resource_;
 }
-void GetTaskResponse::clear_logs() {
-  logs_.Clear();
+void GetTaskResponse::clear_log_links() {
+  log_links_.Clear();
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int GetTaskResponse::kResourceFieldNumber;
-const int GetTaskResponse::kLogsFieldNumber;
+const int GetTaskResponse::kLogLinksFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 GetTaskResponse::GetTaskResponse()
@@ -3074,7 +3074,7 @@ GetTaskResponse::GetTaskResponse()
 GetTaskResponse::GetTaskResponse(const GetTaskResponse& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      logs_(from.logs_) {
+      log_links_(from.log_links_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   if (from.has_resource()) {
     resource_ = new ::flyteidl::admin::Resource(*from.resource_);
@@ -3114,7 +3114,7 @@ void GetTaskResponse::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  logs_.Clear();
+  log_links_.Clear();
   if (GetArenaNoVirtual() == nullptr && resource_ != nullptr) {
     delete resource_;
   }
@@ -3148,14 +3148,14 @@ const char* GetTaskResponse::_InternalParse(const char* begin, const char* end, 
             {parser_till_end, object}, ptr - size, ptr));
         break;
       }
-      // repeated .flyteidl.core.TaskLog logs = 2;
+      // repeated .flyteidl.core.TaskLog log_links = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
           parser_till_end = ::flyteidl::core::TaskLog::_InternalParse;
-          object = msg->add_logs();
+          object = msg->add_log_links();
           if (size > end - ptr) goto len_delim_till_end;
           ptr += size;
           GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -3205,11 +3205,11 @@ bool GetTaskResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated .flyteidl.core.TaskLog logs = 2;
+      // repeated .flyteidl.core.TaskLog log_links = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_logs()));
+                input, add_log_links()));
         } else {
           goto handle_unusual;
         }
@@ -3249,12 +3249,12 @@ void GetTaskResponse::SerializeWithCachedSizes(
       1, HasBitSetters::resource(this), output);
   }
 
-  // repeated .flyteidl.core.TaskLog logs = 2;
+  // repeated .flyteidl.core.TaskLog log_links = 2;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->logs_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->log_links_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       2,
-      this->logs(static_cast<int>(i)),
+      this->log_links(static_cast<int>(i)),
       output);
   }
 
@@ -3278,12 +3278,12 @@ void GetTaskResponse::SerializeWithCachedSizes(
         1, HasBitSetters::resource(this), target);
   }
 
-  // repeated .flyteidl.core.TaskLog logs = 2;
+  // repeated .flyteidl.core.TaskLog log_links = 2;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->logs_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->log_links_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        2, this->logs(static_cast<int>(i)), target);
+        2, this->log_links(static_cast<int>(i)), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3307,14 +3307,14 @@ size_t GetTaskResponse::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .flyteidl.core.TaskLog logs = 2;
+  // repeated .flyteidl.core.TaskLog log_links = 2;
   {
-    unsigned int count = static_cast<unsigned int>(this->logs_size());
+    unsigned int count = static_cast<unsigned int>(this->log_links_size());
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->logs(static_cast<int>(i)));
+          this->log_links(static_cast<int>(i)));
     }
   }
 
@@ -3352,7 +3352,7 @@ void GetTaskResponse::MergeFrom(const GetTaskResponse& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  logs_.MergeFrom(from.logs_);
+  log_links_.MergeFrom(from.log_links_);
   if (from.has_resource()) {
     mutable_resource()->::flyteidl::admin::Resource::MergeFrom(from.resource());
   }
@@ -3383,7 +3383,7 @@ void GetTaskResponse::Swap(GetTaskResponse* other) {
 void GetTaskResponse::InternalSwap(GetTaskResponse* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  CastToBase(&logs_)->InternalSwap(CastToBase(&other->logs_));
+  CastToBase(&log_links_)->InternalSwap(CastToBase(&other->log_links_));
   swap(resource_, other->resource_);
 }
 
@@ -4388,9 +4388,9 @@ class Agent::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Agent::kNameFieldNumber;
-const int Agent::kSecretNameFieldNumber;
-const int Agent::kSupportedTaskTypeFieldNumber;
+const int Agent::kSupportedTaskTypesFieldNumber;
 const int Agent::kIsSyncFieldNumber;
+const int Agent::kSecretNamesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Agent::Agent()
@@ -4401,15 +4401,15 @@ Agent::Agent()
 Agent::Agent(const Agent& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      secret_name_(from.secret_name_) {
+      secret_names_(from.secret_names_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.name().size() > 0) {
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  supported_task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.supported_task_type().size() > 0) {
-    supported_task_type_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.supported_task_type_);
+  supported_task_types_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.supported_task_types().size() > 0) {
+    supported_task_types_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.supported_task_types_);
   }
   is_sync_ = from.is_sync_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Agent)
@@ -4419,7 +4419,7 @@ void Agent::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Agent_flyteidl_2fadmin_2fagent_2eproto.base);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  supported_task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  supported_task_types_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   is_sync_ = false;
 }
 
@@ -4430,7 +4430,7 @@ Agent::~Agent() {
 
 void Agent::SharedDtor() {
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  supported_task_type_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  supported_task_types_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void Agent::SetCachedSize(int size) const {
@@ -4448,9 +4448,9 @@ void Agent::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  secret_name_.Clear();
+  secret_names_.Clear();
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  supported_task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  supported_task_types_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   is_sync_ = false;
   _internal_metadata_.Clear();
 }
@@ -4484,32 +4484,13 @@ const char* Agent::_InternalParse(const char* begin, const char* end, void* obje
         ptr += size;
         break;
       }
-      // repeated string secret_name = 2;
+      // string supported_task_types = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("flyteidl.admin.Agent.secret_name");
-          object = msg->add_secret_name();
-          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-            goto string_till_end;
-          }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-          ptr += size;
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
-        break;
-      }
-      // string supported_task_type = 3;
-      case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Agent.supported_task_type");
-        object = msg->mutable_supported_task_type();
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Agent.supported_task_types");
+        object = msg->mutable_supported_task_types();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -4519,11 +4500,30 @@ const char* Agent::_InternalParse(const char* begin, const char* end, void* obje
         ptr += size;
         break;
       }
-      // bool is_sync = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
+      // bool is_sync = 3;
+      case 3: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
         msg->set_is_sync(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // repeated string secret_names = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("flyteidl.admin.Agent.secret_names");
+          object = msg->add_secret_names();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
         break;
       }
       default: {
@@ -4575,44 +4575,44 @@ bool Agent::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated string secret_name = 2;
+      // string supported_task_types = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->add_secret_name()));
+                input, this->mutable_supported_task_types()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->secret_name(this->secret_name_size() - 1).data(),
-            static_cast<int>(this->secret_name(this->secret_name_size() - 1).length()),
+            this->supported_task_types().data(), static_cast<int>(this->supported_task_types().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.Agent.secret_name"));
+            "flyteidl.admin.Agent.supported_task_types"));
         } else {
           goto handle_unusual;
         }
         break;
       }
 
-      // string supported_task_type = 3;
+      // bool is_sync = 3;
       case 3: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_supported_task_type()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->supported_task_type().data(), static_cast<int>(this->supported_task_type().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.Agent.supported_task_type"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // bool is_sync = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
 
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
                  input, &is_sync_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // repeated string secret_names = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_secret_names()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->secret_names(this->secret_names_size() - 1).data(),
+            static_cast<int>(this->secret_names(this->secret_names_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.Agent.secret_names"));
         } else {
           goto handle_unusual;
         }
@@ -4656,29 +4656,29 @@ void Agent::SerializeWithCachedSizes(
       1, this->name(), output);
   }
 
-  // repeated string secret_name = 2;
-  for (int i = 0, n = this->secret_name_size(); i < n; i++) {
+  // string supported_task_types = 2;
+  if (this->supported_task_types().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->secret_name(i).data(), static_cast<int>(this->secret_name(i).length()),
+      this->supported_task_types().data(), static_cast<int>(this->supported_task_types().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.secret_name");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      2, this->secret_name(i), output);
-  }
-
-  // string supported_task_type = 3;
-  if (this->supported_task_type().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->supported_task_type().data(), static_cast<int>(this->supported_task_type().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.supported_task_type");
+      "flyteidl.admin.Agent.supported_task_types");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->supported_task_type(), output);
+      2, this->supported_task_types(), output);
   }
 
-  // bool is_sync = 4;
+  // bool is_sync = 3;
   if (this->is_sync() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteBool(4, this->is_sync(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->is_sync(), output);
+  }
+
+  // repeated string secret_names = 4;
+  for (int i = 0, n = this->secret_names_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->secret_names(i).data(), static_cast<int>(this->secret_names(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Agent.secret_names");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      4, this->secret_names(i), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4705,30 +4705,30 @@ void Agent::SerializeWithCachedSizes(
         1, this->name(), target);
   }
 
-  // repeated string secret_name = 2;
-  for (int i = 0, n = this->secret_name_size(); i < n; i++) {
+  // string supported_task_types = 2;
+  if (this->supported_task_types().size() > 0) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->secret_name(i).data(), static_cast<int>(this->secret_name(i).length()),
+      this->supported_task_types().data(), static_cast<int>(this->supported_task_types().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.secret_name");
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(2, this->secret_name(i), target);
-  }
-
-  // string supported_task_type = 3;
-  if (this->supported_task_type().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->supported_task_type().data(), static_cast<int>(this->supported_task_type().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.supported_task_type");
+      "flyteidl.admin.Agent.supported_task_types");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->supported_task_type(), target);
+        2, this->supported_task_types(), target);
   }
 
-  // bool is_sync = 4;
+  // bool is_sync = 3;
   if (this->is_sync() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(4, this->is_sync(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->is_sync(), target);
+  }
+
+  // repeated string secret_names = 4;
+  for (int i = 0, n = this->secret_names_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->secret_names(i).data(), static_cast<int>(this->secret_names(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Agent.secret_names");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(4, this->secret_names(i), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -4752,12 +4752,12 @@ size_t Agent::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated string secret_name = 2;
+  // repeated string secret_names = 4;
   total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->secret_name_size());
-  for (int i = 0, n = this->secret_name_size(); i < n; i++) {
+      ::google::protobuf::internal::FromIntSize(this->secret_names_size());
+  for (int i = 0, n = this->secret_names_size(); i < n; i++) {
     total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->secret_name(i));
+      this->secret_names(i));
   }
 
   // string name = 1;
@@ -4767,14 +4767,14 @@ size_t Agent::ByteSizeLong() const {
         this->name());
   }
 
-  // string supported_task_type = 3;
-  if (this->supported_task_type().size() > 0) {
+  // string supported_task_types = 2;
+  if (this->supported_task_types().size() > 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->supported_task_type());
+        this->supported_task_types());
   }
 
-  // bool is_sync = 4;
+  // bool is_sync = 3;
   if (this->is_sync() != 0) {
     total_size += 1 + 1;
   }
@@ -4806,14 +4806,14 @@ void Agent::MergeFrom(const Agent& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  secret_name_.MergeFrom(from.secret_name_);
+  secret_names_.MergeFrom(from.secret_names_);
   if (from.name().size() > 0) {
 
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
   }
-  if (from.supported_task_type().size() > 0) {
+  if (from.supported_task_types().size() > 0) {
 
-    supported_task_type_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.supported_task_type_);
+    supported_task_types_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.supported_task_types_);
   }
   if (from.is_sync() != 0) {
     set_is_sync(from.is_sync());
@@ -4845,10 +4845,10 @@ void Agent::Swap(Agent* other) {
 void Agent::InternalSwap(Agent* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  secret_name_.InternalSwap(CastToBase(&other->secret_name_));
+  secret_names_.InternalSwap(CastToBase(&other->secret_names_));
   name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  supported_task_type_.Swap(&other->supported_task_type_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  supported_task_types_.Swap(&other->supported_task_types_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(is_sync_, other->is_sync_);
 }
@@ -5949,8 +5949,8 @@ template<> PROTOBUF_NOINLINE ::flyteidl::admin::TaskExecutionMetadata_Environmen
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::TaskExecutionMetadata* Arena::CreateMaybeMessage< ::flyteidl::admin::TaskExecutionMetadata >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::TaskExecutionMetadata >(arena);
 }
-template<> PROTOBUF_NOINLINE ::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::admin::CreateTaskRequest_SecretEntry_DoNotUse >(arena);
+template<> PROTOBUF_NOINLINE ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::admin::CreateTaskRequest* Arena::CreateMaybeMessage< ::flyteidl::admin::CreateTaskRequest >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::admin::CreateTaskRequest >(arena);
