@@ -29,6 +29,7 @@ sphinx-tags==0.2.1
 
 # Packages for Plugin docs
 # Package name              Plugin needing it
+retry                       # aws sagemaker
 botocore                    # fsspec
 fsspec                      # fsspec
 google-cloud                # bigquery
