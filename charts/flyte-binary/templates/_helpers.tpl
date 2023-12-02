@@ -99,6 +99,8 @@ Get the Flyte user data prefix.
 {{- printf "s3://%s/data" $userDataContainer -}}
 {{- else if eq "gcs" .Values.configuration.storage.provider -}}
 {{- printf "gs://%s/data" $userDataContainer -}}
+{{- else if eq "azure" .Values.configuration.storage.provider -}}
+{{- printf "abfs://%s/data" $userDataContainer -}}
 {{- end -}}
 {{- end -}}
 

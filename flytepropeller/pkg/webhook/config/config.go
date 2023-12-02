@@ -3,6 +3,7 @@ package config
 import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"os"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
@@ -101,6 +102,10 @@ type Config struct {
 	AWSSecretManagerConfig   AWSSecretManagerConfig   `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
 	GCPSecretManagerConfig   GCPSecretManagerConfig   `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
 	VaultSecretManagerConfig VaultSecretManagerConfig `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
+}
+
+func (c Config) ExpandCertDir() string {
+	return os.ExpandEnv(c.CertDir)
 }
 
 type AWSSecretManagerConfig struct {
