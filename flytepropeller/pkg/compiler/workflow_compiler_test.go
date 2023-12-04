@@ -148,14 +148,8 @@ func TestCompileWorkflowWithFailureNode(t *testing.T) {
 	// Detect what other workflows/tasks does this coreWorkflow reference
 	subWorkflows := make([]*core.WorkflowTemplate, 0)
 	reqs, err := GetRequirements(inputWorkflow, subWorkflows)
-	if err != nil {
-		fmt.Printf("failed to get requirements. Error: %v", err)
-		return
-	}
-
-	fmt.Printf("Needed Tasks: [%v], Needed Workflows [%v]\n",
-		strings.Join(dumpIdentifierNames(reqs.GetRequiredTaskIds()), ","),
-		strings.Join(dumpIdentifierNames(reqs.GetRequiredLaunchPlanIds()), ","))
+	assert.Nil(t, err)
+	assert.Equal(t, reqs.taskIds, []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}})
 
 	// Replace with logic to satisfy the requirements
 	workflows := make([]common.InterfaceProvider, 0)
@@ -193,10 +187,7 @@ func TestCompileWorkflowWithFailureNode(t *testing.T) {
 	compiledTasks := make([]*core.CompiledTask, 0, len(tasks))
 	for _, task := range tasks {
 		compiledTask, err := CompileTask(task)
-		if err != nil {
-			fmt.Printf("failed to compile task [%v]. Error: %v", task.Id, err)
-			return
-		}
+		assert.Nil(t, err)
 
 		compiledTasks = append(compiledTasks, compiledTask)
 	}

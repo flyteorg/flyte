@@ -142,8 +142,7 @@ func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx interfaces.No
 
 func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	originalError := nCtx.NodeStateReader().GetWorkflowNodeState().Error
-	failureNode := subworkflow.GetOnFailureNode()
-	if failureNode != nil {
+	if failureNode := subworkflow.GetOnFailureNode(); failureNode != nil {
 		execContext, err := s.getExecutionContextForDownstream(nCtx)
 		if err != nil {
 			return handler.UnknownTransition, err

@@ -227,7 +227,7 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 
 	if fg.Template.FailureNode != nil {
 		failureNode := fg.Template.FailureNode
-		v.ValidateNode(&wf, wf.GetOrCreateNodeBuilder(failureNode), false /* validateConditionTypes */, errs.NewScope())
+		v.ValidateNode(&wf, wf.GetOrCreateNodeBuilder(failureNode), false, errs.NewScope())
 		wf.AddEdges(wf.GetOrCreateNodeBuilder(failureNode), c.EdgeDirectionUpstream, errs.NewScope())
 	}
 
