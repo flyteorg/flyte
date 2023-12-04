@@ -360,10 +360,11 @@ func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientC
 func newAgentPlugin() webapi.PluginEntry {
 	cfg := GetConfig()
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
+	cfg.SupportedTaskTypes = getSupportedTaskTypes(cfg, connectionCache)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
-		SupportedTaskTypes: getSupportedTaskTypes(cfg, connectionCache),
+		SupportedTaskTypes: cfg.SupportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope:     iCtx.MetricsScope(),
