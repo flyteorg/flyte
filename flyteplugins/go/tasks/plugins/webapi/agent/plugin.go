@@ -320,13 +320,13 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func combineToDistinctTaskTypes(grpcSupportedTaskTypes, configSupportedTaskTypes []string) []string {
+func combineToDistinctTaskTypes(originalTaskTypes, additionalTaskTypes []string) []string {
 	set := make(map[string]struct{})
 
-	for _, task := range grpcSupportedTaskTypes {
+	for _, task := range originalTaskTypes {
 		set[task] = struct{}{}
 	}
-	for _, task := range configSupportedTaskTypes {
+	for _, task := range additionalTaskTypes {
 		set[task] = struct{}{}
 	}
 
@@ -338,16 +338,10 @@ func combineToDistinctTaskTypes(grpcSupportedTaskTypes, configSupportedTaskTypes
 	return supportedTaskTypes
 }
 
-func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) []string {
-	agent, err := getFinalAgent("", cfg)
-	if err != nil {
-		logger.Errorf(context.Background(), "failed to find agent with error: %v", err)
-		return []string{}
-	}
-
+func getAgentSupportedTaskTypes(agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) []string {
 	client, err := getAgentMetadataClientFunc(context.Background(), agent, connectionCache)
 	if err != nil {
-		logger.Errorf(context.Background(), "failed to connect to agent with error: %v", err)
+		logger.Errorf(context.Background(), "failed to connect to agent [%v] with error: [%v]", agent, err)
 		return []string{}
 	}
 
@@ -356,12 +350,12 @@ func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientC
 
 	res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
 	if err != nil {
-		logger.Errorf(context.Background(), "failed to send list agent request with error: %v", err)
+		logger.Errorf(context.Background(), "failed to send list agent request with error: [%v]", err)
 		return []string{}
 	}
 
 	agents := res.GetAgents()
-	logger.Infof(context.Background(), "here are all agents:[%v]", agents)
+	logger.Infof(context.Background(), "here are all agents [%v] in [%v] agent server", agents, agent)
 
 	var supportedTaskTypes []string
 	for _, agent := range agents {
@@ -371,11 +365,31 @@ func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientC
 	return supportedTaskTypes
 }
 
+func setSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) {
+	// Combine default agent server's task types with config's existing task types.
+	// Use empty string as key to return default agent server
+	defaultAgent, err := getFinalAgent("", cfg)
+	if err != nil {
+		logger.Errorf(context.Background(), "failed to get default agent [%v] with error: [%v]", err)
+		return
+	}
+
+	cfg.SupportedTaskTypes = combineToDistinctTaskTypes(cfg.SupportedTaskTypes, getAgentSupportedTaskTypes(defaultAgent, connectionCache))
+
+	// For each agent server, update config's SupportedTaskTypes by aggregating their unique supported tasks.
+	// For example, 1 agent server support bigquery task only, another agent server support spark task only
+	// We can get both of them by combining the supported task types from 2 agent servers
+	for _, agent := range cfg.Agents {
+		cfg.SupportedTaskTypes = combineToDistinctTaskTypes(cfg.SupportedTaskTypes, getAgentSupportedTaskTypes(agent, connectionCache))
+	}
+}
+
 func newAgentPlugin() webapi.PluginEntry {
 	cfg := GetConfig()
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	cfg.SupportedTaskTypes = combineToDistinctTaskTypes(getSupportedTaskTypes(cfg, connectionCache), cfg.SupportedTaskTypes)
-	logger.Infof(context.Background(), "Supported task types: %v", cfg.SupportedTaskTypes)
+
+	setSupportedTaskTypes(cfg, connectionCache)
+	logger.Infof(context.Background(), "supported task types: %v", cfg.SupportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
