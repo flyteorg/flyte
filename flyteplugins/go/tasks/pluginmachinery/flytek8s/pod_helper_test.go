@@ -1193,6 +1193,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1208,6 +1209,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1223,6 +1225,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1238,6 +1241,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1260,6 +1264,7 @@ func TestDemystifyPending(t *testing.T) {
 			},
 		},
 	}
+	s.Conditions[0].LastTransitionTime = metav1.Now()
 
 	t.Run("ContainerCreating", func(t *testing.T) {
 		s.ContainerStatuses = []v1.ContainerStatus{
@@ -1290,6 +1295,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
@@ -1307,6 +1313,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
@@ -1370,6 +1377,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
@@ -1387,6 +1395,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
@@ -1404,6 +1413,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
@@ -1421,6 +1431,7 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
@@ -1586,6 +1597,11 @@ func TestDemystifyFailure(t *testing.T) {
 }
 
 func TestDemystifyPending_testcases(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		PodPendingTimeout: config1.Duration{
+			Duration: 0,
+		},
+	}))
 
 	tests := []struct {
 		name     string
