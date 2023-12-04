@@ -1,10 +1,5 @@
-<!--
-Thank you for sending the PR! 
-Please fill the applicable details below
-Happy contributing!
--->
-
 ## Tracking issue
+_https://github.com/flyteorg/flyte/issues/<number>_
 
 <!-- If your PR fixes an open issue, use `Closes #999` to link your PR with the issue. #999 stands for the issue number you are fixing -->
 
@@ -12,20 +7,34 @@ Happy contributing!
 
 <!-- Example: Closes #31 -->
 
-## Docs link
+## Why are the changes needed?
 
-<!-- Add documentation link built by CI jobs here, and specify the changed place -->
-
-## Describe your changes
-
-<!-- List all the proposed changes in your PR -->
-
-<!-- Mark all the applicable boxes. To mark the box as done follow the following conventions -->
 <!--
-[x] - Correct; marked as done
-[X] - Correct; marked as done
-[ ] - Not correct; marked as **not** done
+Please clarify why the changes are needed. For instance,
+1. If you propose a new API, clarify the use case for a new API.
+2. If you fix a bug, you can clarify why it is a bug.
 -->
+
+## What changes were proposed in this pull request?
+
+<!--
+Please clarify what changes you are proposing. The purpose of this section is to outline the changes and how this PR fixes the issue.
+If possible, please consider writing useful notes for better and faster reviews in your PR. See the examples below.
+1. If you refactor some codes with changing classes, showing the class hierarchy will help reviewers.
+2. If there is design documentation, please add the link.
+-->
+
+## How was this patch tested?
+
+<!--
+If tests were added, say they were added here. Please make sure to add some test cases that check the changes thoroughly including negative and positive cases if possible.
+If it was tested in a way different from regular unit tests, please clarify how you tested step by step, ideally copy and paste-able, so that other reviewers can test and check, and descendants can verify in the future.
+If tests were not added, please describe why they were not added and/or why it was difficult to add.
+-->
+
+### Setup process
+
+### Screenshots
 
 ## Check all the applicable boxes <!-- Follow the above conventions to check the box -->
 
@@ -33,19 +42,10 @@ Happy contributing!
 - [ ] All new and existing tests passed.
 - [ ] All commits are signed-off.
 
-## Setup Process
-
-<!-- Describe how you set up this PR's environment to help maintainers reproduce your results more easily -->
-
-## Screenshots
-
-<!-- Add all the screenshots which support your changes -->
-
-## Note to reviewers
-
-<!-- Add notes to reviewers if applicable -->
-
 ## Related PRs
 
 <!-- Add related pull requests for reviewers to check -->
 
+## Docs link
+
+<!-- Add documentation link built by CI jobs here, and specify the changed place -->
