@@ -145,7 +145,7 @@ func createSparkPodSpec(taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.Po
 	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
-	sparkEnv := make([]v1.EnvVar, len(container.Env)+1)
+	sparkEnv := make([]v1.EnvVar, 0)
 	for _, envVar := range container.Env {
 		sparkEnv = append(sparkEnv, *envVar.DeepCopy())
 	}
