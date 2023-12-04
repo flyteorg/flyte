@@ -105,7 +105,11 @@ jobs:
       - name: Get Latest Version of component
         id: set_version
         run: |
-          echo ::set-output name=version::$(yq eval '.${{ matrix.component }}.image.tag' charts/flyte-core/values.yaml)
+          if [ ${{ matrix.component }} = "flytecopilot" ]; then
+             echo ::set-output name=version::$(yq eval '.configmap.copilot.plugins.k8s.co-pilot.image' charts/flyte-core/values.yaml | cut -d ":" -f 2 )
+          else
+             echo ::set-output name=version::$(yq eval '.${{ matrix.component }}.image.tag' charts/flyte-core/values.yaml)
+          fi
         shell: bash
 
       - name: Login to GitHub Container Registry
@@ -173,7 +177,7 @@ jobs:
           git stash
 
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
           args: release --rm-dist --release-notes=CHANGELOG/CHANGELOG-${{ github.event.inputs.version }}.md

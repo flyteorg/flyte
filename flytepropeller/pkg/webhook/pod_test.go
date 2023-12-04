@@ -85,7 +85,7 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 	pm := NewPodMutator(&config.Config{
 		CertDir:     "testdata",
 		ServiceName: "my-service",
-	}, promutils.NewTestScope())
+	}, latest.Scheme, promutils.NewTestScope())
 
 	t.Run("Empty namespace", func(t *testing.T) {
 		c, err := pm.CreateMutationWebhookConfiguration("")
@@ -104,10 +104,7 @@ func Test_Handle(t *testing.T) {
 	pm := NewPodMutator(&config.Config{
 		CertDir:     "testdata",
 		ServiceName: "my-service",
-	}, promutils.NewTestScope())
-
-	decoder := admission.NewDecoder(latest.Scheme)
-	assert.NoError(t, pm.InjectDecoder(decoder))
+	}, latest.Scheme, promutils.NewTestScope())
 
 	req := admission.Request{
 		AdmissionRequest: admissionv1.AdmissionRequest{

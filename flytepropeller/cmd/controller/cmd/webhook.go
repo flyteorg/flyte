@@ -118,7 +118,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 			BindAddress: "0",
 		},
 		WebhookServer: ctrlWebhook.NewServer(ctrlWebhook.Options{
-			CertDir: cfg.CertDir,
+			CertDir: cfg.ExpandCertDir(),
 			Port:    cfg.ListenPort,
 		}),
 	}

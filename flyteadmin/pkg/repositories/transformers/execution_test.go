@@ -2,6 +2,7 @@ package transformers
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"strings"
 	"testing"
@@ -70,62 +71,265 @@ func TestCreateExecutionModel(t *testing.T) {
 		},
 	}
 	namespace := "ns"
-	execution, err := CreateExecutionModel(CreateExecutionModelInput{
-		WorkflowExecutionID: core.WorkflowExecutionIdentifier{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "name",
-		},
-		RequestSpec:           execRequest.Spec,
-		LaunchPlanID:          lpID,
-		WorkflowID:            wfID,
-		Phase:                 core.WorkflowExecution_RUNNING,
-		CreatedAt:             createdAt,
-		WorkflowIdentifier:    workflowIdentifier,
-		ParentNodeExecutionID: nodeID,
-		SourceExecutionID:     sourceID,
-		Cluster:               cluster,
-		SecurityContext:       securityCtx,
-		LaunchEntity:          core.ResourceType_LAUNCH_PLAN,
-		Namespace:             namespace,
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, "project", execution.Project)
-	assert.Equal(t, "domain", execution.Domain)
-	assert.Equal(t, "name", execution.Name)
-	assert.Equal(t, lpID, execution.LaunchPlanID)
-	assert.Equal(t, wfID, execution.WorkflowID)
-	assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
-	assert.EqualValues(t, createdAt, *execution.ExecutionUpdatedAt)
-	assert.Equal(t, int32(admin.ExecutionMetadata_SYSTEM), execution.Mode)
-	assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
-	assert.Equal(t, sourceID, execution.SourceExecutionID)
-	assert.Equal(t, "launch_plan", execution.LaunchEntity)
-	expectedSpec := execRequest.Spec
-	expectedSpec.Metadata.Principal = principal
-	expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
-		ExecutionCluster: cluster,
-		Namespace:        namespace,
-	}
-	expectedSpec.SecurityContext = securityCtx
-	expectedSpecBytes, _ := proto.Marshal(expectedSpec)
-	assert.Equal(t, expectedSpecBytes, execution.Spec)
-	assert.Equal(t, execution.User, principal)
+	t.Run("running", func(t *testing.T) {
+		execution, err := CreateExecutionModel(CreateExecutionModelInput{
+			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			RequestSpec:           execRequest.Spec,
+			LaunchPlanID:          lpID,
+			WorkflowID:            wfID,
+			Phase:                 core.WorkflowExecution_RUNNING,
+			CreatedAt:             createdAt,
+			WorkflowIdentifier:    workflowIdentifier,
+			ParentNodeExecutionID: nodeID,
+			SourceExecutionID:     sourceID,
+			Cluster:               cluster,
+			SecurityContext:       securityCtx,
+			LaunchEntity:          core.ResourceType_LAUNCH_PLAN,
+			Namespace:             namespace,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, "project", execution.Project)
+		assert.Equal(t, "domain", execution.Domain)
+		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, lpID, execution.LaunchPlanID)
+		assert.Equal(t, wfID, execution.WorkflowID)
+		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
+		assert.EqualValues(t, createdAt, *execution.ExecutionUpdatedAt)
+		assert.Equal(t, int32(admin.ExecutionMetadata_SYSTEM), execution.Mode)
+		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
+		assert.Equal(t, sourceID, execution.SourceExecutionID)
+		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		expectedSpec := execRequest.Spec
+		expectedSpec.Metadata.Principal = principal
+		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
+			ExecutionCluster: cluster,
+			Namespace:        namespace,
+		}
+		expectedSpec.SecurityContext = securityCtx
+		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
+		assert.Equal(t, expectedSpecBytes, execution.Spec)
+		assert.Equal(t, execution.User, principal)
 
-	expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
-	expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
-		Phase:      core.WorkflowExecution_RUNNING,
-		CreatedAt:  expectedCreatedAt,
-		StartedAt:  expectedCreatedAt,
-		UpdatedAt:  expectedCreatedAt,
-		WorkflowId: workflowIdentifier,
-		StateChangeDetails: &admin.ExecutionStateChangeDetails{
-			State:      admin.ExecutionState_EXECUTION_ACTIVE,
-			OccurredAt: expectedCreatedAt,
-			Principal:  principal,
-		},
+		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
+			Phase:      core.WorkflowExecution_RUNNING,
+			CreatedAt:  expectedCreatedAt,
+			StartedAt:  expectedCreatedAt,
+			UpdatedAt:  expectedCreatedAt,
+			WorkflowId: workflowIdentifier,
+			StateChangeDetails: &admin.ExecutionStateChangeDetails{
+				State:      admin.ExecutionState_EXECUTION_ACTIVE,
+				OccurredAt: expectedCreatedAt,
+				Principal:  principal,
+			},
+		})
+		assert.Equal(t, expectedClosure, execution.Closure)
 	})
-	assert.Equal(t, expectedClosure, execution.Closure)
+	t.Run("failed with unknown error", func(t *testing.T) {
+		execErr := fmt.Errorf("bla-bla")
+		execution, err := CreateExecutionModel(CreateExecutionModelInput{
+			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			RequestSpec:           execRequest.Spec,
+			LaunchPlanID:          lpID,
+			WorkflowID:            wfID,
+			Phase:                 core.WorkflowExecution_RUNNING,
+			CreatedAt:             createdAt,
+			WorkflowIdentifier:    workflowIdentifier,
+			ParentNodeExecutionID: nodeID,
+			SourceExecutionID:     sourceID,
+			Cluster:               cluster,
+			SecurityContext:       securityCtx,
+			LaunchEntity:          core.ResourceType_LAUNCH_PLAN,
+			Namespace:             namespace,
+			Error:                 execErr,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, "project", execution.Project)
+		assert.Equal(t, "domain", execution.Domain)
+		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, lpID, execution.LaunchPlanID)
+		assert.Equal(t, wfID, execution.WorkflowID)
+		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
+		assert.EqualValues(t, createdAt, *execution.ExecutionUpdatedAt)
+		assert.Equal(t, int32(admin.ExecutionMetadata_SYSTEM), execution.Mode)
+		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
+		assert.Equal(t, sourceID, execution.SourceExecutionID)
+		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		expectedSpec := execRequest.Spec
+		expectedSpec.Metadata.Principal = principal
+		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
+			ExecutionCluster: cluster,
+			Namespace:        namespace,
+		}
+		expectedSpec.SecurityContext = securityCtx
+		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
+		assert.Equal(t, expectedSpecBytes, execution.Spec)
+		assert.Equal(t, execution.User, principal)
+
+		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
+			Phase: core.WorkflowExecution_FAILED,
+			OutputResult: &admin.ExecutionClosure_Error{
+				Error: &core.ExecutionError{
+					Code:    "Unknown",
+					Message: execErr.Error(),
+					Kind:    core.ExecutionError_SYSTEM,
+				},
+			},
+			CreatedAt:  expectedCreatedAt,
+			StartedAt:  expectedCreatedAt,
+			UpdatedAt:  expectedCreatedAt,
+			WorkflowId: workflowIdentifier,
+			StateChangeDetails: &admin.ExecutionStateChangeDetails{
+				State:      admin.ExecutionState_EXECUTION_ACTIVE,
+				OccurredAt: expectedCreatedAt,
+				Principal:  principal,
+			},
+		})
+		assert.Equal(t, string(expectedClosure), string(execution.Closure))
+	})
+	t.Run("failed with invalid argument error", func(t *testing.T) {
+		execErr := errors.NewFlyteAdminError(codes.InvalidArgument, "task validation failed")
+		execution, err := CreateExecutionModel(CreateExecutionModelInput{
+			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			RequestSpec:           execRequest.Spec,
+			LaunchPlanID:          lpID,
+			WorkflowID:            wfID,
+			Phase:                 core.WorkflowExecution_RUNNING,
+			CreatedAt:             createdAt,
+			WorkflowIdentifier:    workflowIdentifier,
+			ParentNodeExecutionID: nodeID,
+			SourceExecutionID:     sourceID,
+			Cluster:               cluster,
+			SecurityContext:       securityCtx,
+			LaunchEntity:          core.ResourceType_LAUNCH_PLAN,
+			Namespace:             namespace,
+			Error:                 execErr,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, "project", execution.Project)
+		assert.Equal(t, "domain", execution.Domain)
+		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, lpID, execution.LaunchPlanID)
+		assert.Equal(t, wfID, execution.WorkflowID)
+		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
+		assert.EqualValues(t, createdAt, *execution.ExecutionUpdatedAt)
+		assert.Equal(t, int32(admin.ExecutionMetadata_SYSTEM), execution.Mode)
+		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
+		assert.Equal(t, sourceID, execution.SourceExecutionID)
+		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		expectedSpec := execRequest.Spec
+		expectedSpec.Metadata.Principal = principal
+		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
+			ExecutionCluster: cluster,
+			Namespace:        namespace,
+		}
+		expectedSpec.SecurityContext = securityCtx
+		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
+		assert.Equal(t, expectedSpecBytes, execution.Spec)
+		assert.Equal(t, execution.User, principal)
+
+		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
+			Phase: core.WorkflowExecution_FAILED,
+			OutputResult: &admin.ExecutionClosure_Error{
+				Error: &core.ExecutionError{
+					Code:    execErr.Code().String(),
+					Message: execErr.Error(),
+					Kind:    core.ExecutionError_USER,
+				},
+			},
+			CreatedAt:  expectedCreatedAt,
+			StartedAt:  expectedCreatedAt,
+			UpdatedAt:  expectedCreatedAt,
+			WorkflowId: workflowIdentifier,
+			StateChangeDetails: &admin.ExecutionStateChangeDetails{
+				State:      admin.ExecutionState_EXECUTION_ACTIVE,
+				OccurredAt: expectedCreatedAt,
+				Principal:  principal,
+			},
+		})
+		assert.Equal(t, expectedClosure, execution.Closure)
+	})
+	t.Run("failed with internal error", func(t *testing.T) {
+		execErr := errors.NewFlyteAdminError(codes.Internal, "db failed")
+		execution, err := CreateExecutionModel(CreateExecutionModelInput{
+			WorkflowExecutionID: core.WorkflowExecutionIdentifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			RequestSpec:           execRequest.Spec,
+			LaunchPlanID:          lpID,
+			WorkflowID:            wfID,
+			Phase:                 core.WorkflowExecution_RUNNING,
+			CreatedAt:             createdAt,
+			WorkflowIdentifier:    workflowIdentifier,
+			ParentNodeExecutionID: nodeID,
+			SourceExecutionID:     sourceID,
+			Cluster:               cluster,
+			SecurityContext:       securityCtx,
+			LaunchEntity:          core.ResourceType_LAUNCH_PLAN,
+			Namespace:             namespace,
+			Error:                 execErr,
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, "project", execution.Project)
+		assert.Equal(t, "domain", execution.Domain)
+		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, lpID, execution.LaunchPlanID)
+		assert.Equal(t, wfID, execution.WorkflowID)
+		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
+		assert.EqualValues(t, createdAt, *execution.ExecutionUpdatedAt)
+		assert.Equal(t, int32(admin.ExecutionMetadata_SYSTEM), execution.Mode)
+		assert.Equal(t, nodeID, execution.ParentNodeExecutionID)
+		assert.Equal(t, sourceID, execution.SourceExecutionID)
+		assert.Equal(t, "launch_plan", execution.LaunchEntity)
+		expectedSpec := execRequest.Spec
+		expectedSpec.Metadata.Principal = principal
+		expectedSpec.Metadata.SystemMetadata = &admin.SystemMetadata{
+			ExecutionCluster: cluster,
+			Namespace:        namespace,
+		}
+		expectedSpec.SecurityContext = securityCtx
+		expectedSpecBytes, _ := proto.Marshal(expectedSpec)
+		assert.Equal(t, expectedSpecBytes, execution.Spec)
+		assert.Equal(t, execution.User, principal)
+
+		expectedCreatedAt, _ := ptypes.TimestampProto(createdAt)
+		expectedClosure, _ := proto.Marshal(&admin.ExecutionClosure{
+			Phase: core.WorkflowExecution_FAILED,
+			OutputResult: &admin.ExecutionClosure_Error{
+				Error: &core.ExecutionError{
+					Code:    execErr.Code().String(),
+					Message: execErr.Error(),
+					Kind:    core.ExecutionError_SYSTEM,
+				},
+			},
+			CreatedAt:  expectedCreatedAt,
+			StartedAt:  expectedCreatedAt,
+			UpdatedAt:  expectedCreatedAt,
+			WorkflowId: workflowIdentifier,
+			StateChangeDetails: &admin.ExecutionStateChangeDetails{
+				State:      admin.ExecutionState_EXECUTION_ACTIVE,
+				OccurredAt: expectedCreatedAt,
+				Principal:  principal,
+			},
+		})
+		assert.Equal(t, expectedClosure, execution.Closure)
+	})
 }
 
 func TestUpdateModelState_UnknownToRunning(t *testing.T) {

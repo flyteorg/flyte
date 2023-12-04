@@ -23,7 +23,7 @@ type ProjectRepo struct {
 
 func (r *ProjectRepo) Create(ctx context.Context, project models.Project) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&project)
+	tx := r.db.WithContext(ctx).Omit("id").Create(&project)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -34,7 +34,7 @@ func (r *ProjectRepo) Create(ctx context.Context, project models.Project) error 
 func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project, error) {
 	var project models.Project
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.Project{
+	tx := r.db.WithContext(ctx).Where(&models.Project{
 		Identifier: projectID,
 	}).Take(&project)
 	timer.Stop()
@@ -52,7 +52,7 @@ func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project
 func (r *ProjectRepo) List(ctx context.Context, input interfaces.ListResourceInput) ([]models.Project, error) {
 	var projects []models.Project
 
-	tx := r.db.Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Offset(input.Offset)
 	if input.Limit != 0 {
 		tx = tx.Limit(input.Limit)
 	}
@@ -96,7 +96,7 @@ func NewProjectRepo(db *gorm.DB, errorTransformer flyteAdminDbErrors.ErrorTransf
 
 func (r *ProjectRepo) UpdateProject(ctx context.Context, projectUpdate models.Project) error {
 	// Use gorm client to update the two fields that are changed.
-	writeTx := r.db.Model(&projectUpdate).Updates(projectUpdate)
+	writeTx := r.db.WithContext(ctx).Model(&projectUpdate).Updates(projectUpdate)
 
 	// Return error if applies.
 	if writeTx.Error != nil {
