@@ -36,6 +36,7 @@ type CorePlugin struct {
 	cache          cache.AutoRefresh
 	tokenAllocator tokenAllocator
 	metrics        Metrics
+	IsSyncTask     map[string]bool
 }
 
 func (c CorePlugin) unmarshalState(ctx context.Context, stateReader core.PluginStateReader) (State, error) {
