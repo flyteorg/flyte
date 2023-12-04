@@ -223,7 +223,7 @@
           "type": "string",
           "description": "Name is the developer-assigned name of the agent."
         },
-        "supported_task_types": {
+        "supported_task_type": {
           "type": "string",
           "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
         },

@@ -8365,8 +8365,8 @@ export namespace flyteidl {
             /** Agent name */
             name?: (string|null);
 
-            /** Agent supportedTaskTypes */
-            supportedTaskTypes?: (string|null);
+            /** Agent supportedTaskType */
+            supportedTaskType?: (string|null);
 
             /** Agent isSync */
             isSync?: (boolean|null);
@@ -8387,8 +8387,8 @@ export namespace flyteidl {
             /** Agent name. */
             public name: string;
 
-            /** Agent supportedTaskTypes. */
-            public supportedTaskTypes: string;
+            /** Agent supportedTaskType. */
+            public supportedTaskType: string;
 
             /** Agent isSync. */
             public isSync: boolean;

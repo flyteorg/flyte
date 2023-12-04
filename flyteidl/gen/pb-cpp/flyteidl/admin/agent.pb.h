@@ -1506,19 +1506,19 @@ class Agent final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
-  // string supported_task_types = 2;
-  void clear_supported_task_types();
-  static const int kSupportedTaskTypesFieldNumber = 2;
-  const ::std::string& supported_task_types() const;
-  void set_supported_task_types(const ::std::string& value);
+  // string supported_task_type = 2;
+  void clear_supported_task_type();
+  static const int kSupportedTaskTypeFieldNumber = 2;
+  const ::std::string& supported_task_type() const;
+  void set_supported_task_type(const ::std::string& value);
   #if LANG_CXX11
-  void set_supported_task_types(::std::string&& value);
+  void set_supported_task_type(::std::string&& value);
   #endif
-  void set_supported_task_types(const char* value);
-  void set_supported_task_types(const char* value, size_t size);
-  ::std::string* mutable_supported_task_types();
-  ::std::string* release_supported_task_types();
-  void set_allocated_supported_task_types(::std::string* supported_task_types);
+  void set_supported_task_type(const char* value);
+  void set_supported_task_type(const char* value, size_t size);
+  ::std::string* mutable_supported_task_type();
+  ::std::string* release_supported_task_type();
+  void set_allocated_supported_task_type(::std::string* supported_task_type);
 
   // bool is_sync = 3;
   void clear_is_sync();
@@ -1533,7 +1533,7 @@ class Agent final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> secret_names_;
   ::google::protobuf::internal::ArenaStringPtr name_;
-  ::google::protobuf::internal::ArenaStringPtr supported_task_types_;
+  ::google::protobuf::internal::ArenaStringPtr supported_task_type_;
   bool is_sync_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
@@ -2972,57 +2972,57 @@ inline void Agent::set_allocated_name(::std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.name)
 }
 
-// string supported_task_types = 2;
-inline void Agent::clear_supported_task_types() {
-  supported_task_types_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// string supported_task_type = 2;
+inline void Agent::clear_supported_task_type() {
+  supported_task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline const ::std::string& Agent::supported_task_types() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.supported_task_types)
-  return supported_task_types_.GetNoArena();
+inline const ::std::string& Agent::supported_task_type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.supported_task_type)
+  return supported_task_type_.GetNoArena();
 }
-inline void Agent::set_supported_task_types(const ::std::string& value) {
+inline void Agent::set_supported_task_type(const ::std::string& value) {
   
-  supported_task_types_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.supported_task_types)
+  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.supported_task_type)
 }
 #if LANG_CXX11
-inline void Agent::set_supported_task_types(::std::string&& value) {
+inline void Agent::set_supported_task_type(::std::string&& value) {
   
-  supported_task_types_.SetNoArena(
+  supported_task_type_.SetNoArena(
     &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Agent.supported_task_types)
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Agent.supported_task_type)
 }
 #endif
-inline void Agent::set_supported_task_types(const char* value) {
+inline void Agent::set_supported_task_type(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
   
-  supported_task_types_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.supported_task_types)
+  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.supported_task_type)
 }
-inline void Agent::set_supported_task_types(const char* value, size_t size) {
+inline void Agent::set_supported_task_type(const char* value, size_t size) {
   
-  supported_task_types_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+  supported_task_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
       ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.supported_task_types)
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.supported_task_type)
 }
-inline ::std::string* Agent::mutable_supported_task_types() {
+inline ::std::string* Agent::mutable_supported_task_type() {
   
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.supported_task_types)
-  return supported_task_types_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.supported_task_type)
+  return supported_task_type_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::std::string* Agent::release_supported_task_types() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.Agent.supported_task_types)
+inline ::std::string* Agent::release_supported_task_type() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Agent.supported_task_type)
   
-  return supported_task_types_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return supported_task_type_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Agent::set_allocated_supported_task_types(::std::string* supported_task_types) {
-  if (supported_task_types != nullptr) {
+inline void Agent::set_allocated_supported_task_type(::std::string* supported_task_type) {
+  if (supported_task_type != nullptr) {
     
   } else {
     
   }
-  supported_task_types_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), supported_task_types);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.supported_task_types)
+  supported_task_type_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), supported_task_type);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Agent.supported_task_type)
 }
 
 // bool is_sync = 3;

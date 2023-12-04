@@ -27,12 +27,12 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
+type GetAsyncClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
 
 type Plugin struct {
 	metricScope     promutils.Scope
 	cfg             *Config
-	getClient       GetClientFunc
+	getAsyncClient  GetAsyncClientFunc
 	connectionCache map[*Agent]*grpc.ClientConn
 }
 
@@ -92,7 +92,8 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
-	client, err := p.getClient(ctx, agent, p.connectionCache)
+
+	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -126,7 +127,8 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	if err != nil {
 		return nil, fmt.Errorf("failed to find agent with error: %v", err)
 	}
-	client, err := p.getClient(ctx, agent, p.connectionCache)
+
+	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -156,7 +158,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	if err != nil {
 		return fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
-	client, err := p.getClient(ctx, agent, p.connectionCache)
+	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -225,12 +227,11 @@ func getFinalAgent(taskType string, cfg *Config) (*Agent, error) {
 	return &cfg.DefaultAgent, nil
 }
 
-func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (*grpc.ClientConn, error) {
 	conn, ok := connectionCache[agent]
 	if ok {
-		return service.NewAsyncAgentServiceClient(conn), nil
+		return conn, nil
 	}
-
 	var opts []grpc.DialOption
 
 	if agent.Insecure {
@@ -269,7 +270,26 @@ func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent
 			}
 		}()
 	}()
+
+	return conn, nil
+}
+
+func getAsyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	conn, err := getGrpcConnection(ctx, agent, connectionCache)
+	if err != nil {
+		return nil, err
+	}
+
 	return service.NewAsyncAgentServiceClient(conn), nil
+}
+
+func getAgentMetadataClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
+	conn, err := getGrpcConnection(ctx, agent, connectionCache)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.NewAgentMetadataServiceClient(conn), nil
 }
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
@@ -300,18 +320,51 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
+func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) []string {
+	agent, err := getFinalAgent("", cfg)
+	if err != nil {
+		logger.Errorf(context.Background(), "failed to find agent with error: %v", err)
+		return []string{}
+	}
+
+	client, err := getAgentMetadataClientFunc(context.Background(), agent, connectionCache)
+	if err != nil {
+		logger.Errorf(context.Background(), "failed to connect to agent with error: %v", err)
+		return []string{}
+	}
+
+	finalCtx, cancel := getFinalContext(context.Background(), "ListAgent", agent)
+	defer cancel()
+
+	res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
+	if err != nil {
+		logger.Errorf(context.Background(), "failed to send list agent request with error: %v", err)
+		return []string{}
+	}
+
+	agents := res.GetAgents()
+	supportedTaskTypes := make([]string, 0, len(agents))
+
+	for _, agent := range agents {
+		supportedTaskTypes = append(supportedTaskTypes, agent.SupportedTaskType)
+	}
+
+	return supportedTaskTypes
+}
+
 func newAgentPlugin() webapi.PluginEntry {
-	supportedTaskTypes := GetConfig().SupportedTaskTypes
+	cfg := GetConfig()
+	connectionCache := make(map[*Agent]*grpc.ClientConn)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
-		SupportedTaskTypes: supportedTaskTypes,
+		SupportedTaskTypes: getSupportedTaskTypes(cfg, connectionCache),
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope:     iCtx.MetricsScope(),
-				cfg:             GetConfig(),
-				getClient:       getClientFunc,
-				connectionCache: make(map[*Agent]*grpc.ClientConn),
+				cfg:             cfg,
+				getAsyncClient:  getAsyncClientFunc,
+				connectionCache: connectionCache,
 			}, nil
 		},
 	}
