@@ -575,6 +575,14 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
 	for _, c := range status.Conditions {
+
+		t := c.LastTransitionTime.Time
+		if time.Since(t) >= config.GetK8sPluginConfig().PodPendingTimeout.Duration {
+			return pluginsCore.PhaseInfoRetryableFailureWithCleanup("PodPendingTimeout", "Pod exceeded pod-pending-timeout", &pluginsCore.TaskInfo{
+				OccurredAt: &t,
+			}), nil
+		}
+
 		switch c.Type {
 		case v1.PodScheduled:
 			if c.Status == v1.ConditionFalse {

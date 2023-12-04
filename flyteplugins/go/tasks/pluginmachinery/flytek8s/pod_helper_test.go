@@ -1178,6 +1178,9 @@ func TestDemystifyPending(t *testing.T) {
 		ImagePullBackoffGracePeriod: config1.Duration{
 			Duration: time.Minute * 3,
 		},
+		PodPendingTimeout: config1.Duration{
+			Duration: time.Minute * 10,
+		},
 	}))
 
 	t.Run("PodNotScheduled", func(t *testing.T) {
@@ -1342,6 +1345,14 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
+		taskStatus, err := DemystifyPending(s2)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+	})
+
+	t.Run("PodPendingExceedsTimeout", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().PodPendingTimeout.Duration)
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
