@@ -41,6 +41,7 @@ def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
     sys.path.insert(0, flytekit_src_dir)
     sys.path.insert(0, flytekit_dir)
 
+    # add plugins to python path
     for possible_plugin_dir in os.listdir(plugins_dir):
         dir_path = os.path.abspath((os.path.join(plugins_dir, possible_plugin_dir)))
         plugin_path = os.path.abspath(os.path.join(dir_path, "flytekitplugins"))

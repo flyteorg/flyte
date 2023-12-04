@@ -8,6 +8,7 @@ dependencies:
   - flytekit
   - gitpython
   - ipython!=8.7.0
+  - graphviz
   - jupytext
   - myst-nb
   - psycopg2-binary

@@ -333,28 +333,51 @@ import_projects_config = {
     "source_regex_mapping": REPLACE_PATTERNS,
 }
 
+# Define these environment variables to use local copies of the projects. This
+# is useful for building the docs in the CI/CD of the corresponding repos.
+flytesnacks_local_path = os.environ.get("FLYTESNACKS_LOCAL_PATH", None)
+flytekit_local_path = os.environ.get("FLYTEKIT_LOCAL_PATH", None)
+flytectl_local_path = os.environ.get("FLYTECTL_LOCAL_PATH", None)
+
+flytesnacks_path = flytesnacks_local_path or "_projects/flytesnacks"
+flytekit_path = flytekit_local_path or "_projects/api/flytekit"
+
 import_projects = [
     {
-        "source": "https://github.com/flyteorg/flytesnacks",
+        "source": flytesnacks_local_path or "https://github.com/flyteorg/flytesnacks",
         "docs_path": "docs",
         "dest": "flytesnacks",
-        "cmd": ["cp", "-R", "_projects/flytesnacks/examples", "./examples"],
+        "cmd": [
+            ["cp", "-R", f"{flytesnacks_path}/examples", "./examples"],
+            [
+                # remove un-needed docs files in flytesnacks
+                "rm",
+                "-rf",
+                "flytesnacks/jupyter_execute",
+                "flytesnacks/auto_examples",
+                "flytesnacks/_build",
+                "flytesnacks/_tags",
+            ]
+        ],
+        "local": flytesnacks_local_path is not None,
     },
     {
-        "source": "https://github.com/flyteorg/flytekit",
+        "source": flytekit_local_path or "https://github.com/flyteorg/flytekit",
         "docs_path": "docs/source",
         "dest": "api/flytekit",
         "cmd": [
             ["mkdir", "-p", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", "_projects/api/flytekit/flytekit", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", "_projects/api/flytekit/plugins", import_projects_config["flytekit_api_dir"]],
-            ["cp", "-R", "_projects/api/flytekit/tests", "./tests"],
+            ["cp", "-R", f"{flytekit_path}/flytekit", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", f"{flytekit_path}/plugins", import_projects_config["flytekit_api_dir"]],
+            ["cp", "-R", f"{flytekit_path}/tests", "./tests"],
         ],
+        "local": flytekit_local_path is not None,
     },
     {
-        "source": "https://github.com/flyteorg/flytectl",
+        "source": flytectl_local_path or "https://github.com/flyteorg/flytectl",
         "docs_path": "docs/source",
         "dest": "flytectl",
+        "local": flytectl_local_path is not None,
     },
     {
         "source": "../flyteidl",
