@@ -787,6 +787,7 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 		logger.Errorf(ctx, "Abort failed when calling plugin abort.")
 		return err
 	}
+
 	evRecorder := nCtx.EventsRecorder()
 	logger.Debugf(ctx, "Sending buffered Task events.")
 	for _, ev := range tCtx.ber.GetAll(ctx) {

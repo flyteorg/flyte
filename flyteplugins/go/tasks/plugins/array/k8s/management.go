@@ -351,21 +351,15 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 			return err
 		}
 
-		// return immediately if subtask has completed or not yet started
-		if existingPhase.IsTerminal() || existingPhase == core.PhaseUndefined {
-			// still write subtask to buffer to persist to admin
-			externalResources = append(externalResources, &core.ExternalResource{
-				ExternalID:   stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
-				Index:        uint32(originalIdx),
-				RetryAttempt: uint32(retryAttempt),
-				Phase:        existingPhase,
-			})
-			continue
-		}
-
-		err = terminateFunction(ctx, stCtx, config, kubeClient)
-		if err != nil {
-			messageCollector.Collect(childIdx, err.Error())
+		isAbortedSubtask := false
+		if !existingPhase.IsTerminal() && existingPhase != core.PhaseUndefined {
+			// only terminate subtask  if it has completed or has not yet started
+			err = terminateFunction(ctx, stCtx, config, kubeClient)
+			if err != nil {
+				messageCollector.Collect(childIdx, err.Error())
+			} else {
+				isAbortedSubtask = true
+			}
 		}
 
 		externalResources = append(externalResources, &core.ExternalResource{
@@ -373,7 +367,7 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 			Index:            uint32(originalIdx),
 			RetryAttempt:     uint32(retryAttempt),
 			Phase:            existingPhase,
-			IsAbortedSubtask: true,
+			IsAbortedSubtask: isAbortedSubtask,
 		})
 	}
 
