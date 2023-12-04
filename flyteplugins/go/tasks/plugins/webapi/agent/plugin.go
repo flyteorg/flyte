@@ -320,6 +320,24 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
+func combineToDistinctTaskTypes(grpcSupportedTaskTypes, configSupportedTaskTypes []string) []string {
+	set := make(map[string]struct{})
+
+	for _, task := range grpcSupportedTaskTypes {
+		set[task] = struct{}{}
+	}
+	for _, task := range configSupportedTaskTypes {
+		set[task] = struct{}{}
+	}
+
+	var supportedTaskTypes []string
+	for task := range set {
+		supportedTaskTypes = append(supportedTaskTypes, task)
+	}
+
+	return supportedTaskTypes
+}
+
 func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) []string {
 	agent, err := getFinalAgent("", cfg)
 	if err != nil {
@@ -343,13 +361,9 @@ func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientC
 	}
 
 	agents := res.GetAgents()
-	logger.Infof(context.Background(), "list all agents:[%v]", agents)
-	// AsyncPlugin should be registered to at least one task type.
-	// Reference: https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
-	initialTaskTypes := []string{"task_type_1", "task_type_2"}
-	supportedTaskTypes := make([]string, 0, len(initialTaskTypes)+len(agents))
-	supportedTaskTypes = append(supportedTaskTypes, initialTaskTypes...)
+	logger.Infof(context.Background(), "here are all agents:[%v]", agents)
 
+	var supportedTaskTypes []string
 	for _, agent := range agents {
 		supportedTaskTypes = append(supportedTaskTypes, agent.SupportedTaskType)
 	}
@@ -360,7 +374,8 @@ func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientC
 func newAgentPlugin() webapi.PluginEntry {
 	cfg := GetConfig()
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	cfg.SupportedTaskTypes = getSupportedTaskTypes(cfg, connectionCache)
+	cfg.SupportedTaskTypes = combineToDistinctTaskTypes(getSupportedTaskTypes(cfg, connectionCache), cfg.SupportedTaskTypes)
+	logger.Infof(context.Background(), "Supported task types: %v", cfg.SupportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
