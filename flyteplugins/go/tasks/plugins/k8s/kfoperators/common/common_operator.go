@@ -266,14 +266,6 @@ func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image stri
 	return nil
 }
 
-<<<<<<< HEAD
-func GetReplicaCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, replicaType commonOp.ReplicaType) *int32 {
-	if spec, ok := specs[replicaType]; ok && spec.Replicas != nil {
-		return spec.Replicas
-	}
-
-	return new(int32) // return 0 as default value
-=======
 func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, primaryContainerName string) (*commonOp.ReplicaSpec, error) {
 	podSpec, objectMeta, oldPrimaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
 	if err != nil {
@@ -352,5 +344,12 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 	}
 
 	return replicaSpec, nil
->>>>>>> 9df8677729c804d2a9471c20da74b6e50af5cb8e
+}
+
+func GetReplicaCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, replicaType commonOp.ReplicaType) *int32 {
+	if spec, ok := specs[replicaType]; ok && spec.Replicas != nil {
+		return spec.Replicas
+	}
+
+	return new(int32) // return 0 as default value
 }
