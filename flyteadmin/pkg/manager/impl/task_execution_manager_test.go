@@ -442,6 +442,7 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 	taskEventRequest.Event.Phase = core.TaskExecution_FAILED
 	taskEventRequest.Event.PhaseVersion = uint32(0)
 	taskExecManager = NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
+	resp, err = taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.Nil(t, resp)
 	adminError = err.(flyteAdminErrors.FlyteAdminError)
 	assert.Equal(t, adminError.Code(), codes.FailedPrecondition)
@@ -454,13 +455,10 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 	taskEventRequest.Event.Phase = core.TaskExecution_SUCCEEDED
 	taskEventRequest.Event.PhaseVersion = uint32(0)
 	taskExecManager = NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
+	resp, err = taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
 	assert.Nil(t, resp)
 	adminError = err.(flyteAdminErrors.FlyteAdminError)
-	assert.Equal(t, adminError.Code(), codes.FailedPrecondition)
-	details, ok = adminError.GRPCStatus().Details()[0].(*admin.EventFailureReason)
-	assert.True(t, ok)
-	_, ok = details.GetReason().(*admin.EventFailureReason_AlreadyInTerminalState)
-	assert.True(t, ok)
+	assert.Equal(t, adminError.Code(), codes.AlreadyExists)
 
 	// request w/ same terminal phase, later version
 	taskEventRequest.Event.Phase = core.TaskExecution_SUCCEEDED
