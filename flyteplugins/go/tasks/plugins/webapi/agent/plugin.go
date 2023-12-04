@@ -343,7 +343,11 @@ func getSupportedTaskTypes(cfg *Config, connectionCache map[*Agent]*grpc.ClientC
 	}
 
 	agents := res.GetAgents()
-	supportedTaskTypes := make([]string, 0, len(agents))
+	// AsyncPlugin should be registered to at least one task type.
+	// Reference: https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
+	initialTaskTypes := []string{"task_type_1", "task_type_2"}
+	supportedTaskTypes := make([]string, 0, len(initialTaskTypes)+len(agents))
+	supportedTaskTypes = append(supportedTaskTypes, initialTaskTypes...)
 
 	for _, agent := range agents {
 		supportedTaskTypes = append(supportedTaskTypes, agent.SupportedTaskType)
