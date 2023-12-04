@@ -1607,7 +1607,7 @@ func TestDemystifyPending_testcases(t *testing.T) {
 		errCode  string
 		message  string
 	}{
-		{"ImagePullBackOff", "imagepull-failurepod.json", false, "ContainersNotReady|ImagePullBackOff", "containers with unready status: [fdf98e4ed2b524dc3bf7-get-flyte-id-task-0]|Back-off pulling image \"image\""},
+		{"ImagePullBackOff", "imagepull-failurepod.json", false, "ContainersNotReady|ImagePullBackOff", "Grace period [3m0s] exceeded|containers with unready status: [fdf98e4ed2b524dc3bf7-get-flyte-id-task-0]|Back-off pulling image \"image\""},
 	}
 
 	for _, tt := range tests {
