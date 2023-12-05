@@ -71,11 +71,7 @@ pub struct GetTaskRequest {
 pub struct GetTaskResponse {
     #[prost(message, optional, tag="1")]
     pub resource: ::core::option::Option<Resource>,
-<<<<<<< HEAD
     /// log information for the task execution
-=======
-    /// log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640
     #[prost(message, repeated, tag="2")]
     pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }

@@ -216,7 +216,6 @@
       ],
       "default": "UNKNOWN"
     },
-<<<<<<< HEAD
     "adminAgent": {
       "type": "object",
       "properties": {
@@ -243,8 +242,6 @@
       },
       "description": "A message containing the agent metadata."
     },
-=======
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640
     "adminCreateTaskResponse": {
       "type": "object",
       "properties": {
@@ -280,11 +277,7 @@
           "items": {
             "$ref": "#/definitions/coreTaskLog"
           },
-<<<<<<< HEAD
           "title": "log information for the task execution"
-=======
-          "description": "log information for the task execution."
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640
         }
       },
       "description": "Response to get an individual task resource."

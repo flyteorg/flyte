@@ -5218,19 +5218,11 @@ public final class AgentOuterClass {
     /**
      * <code>.flyteidl.admin.Resource resource = 1;</code>
      */
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
     flyteidl.admin.AgentOuterClass.ResourceOrBuilder getResourceOrBuilder();
 
     /**
      * <pre>
      * log information for the task execution
-=======
-    flyteidl.admin.Agent.ResourceOrBuilder getResourceOrBuilder();
-
-    /**
-     * <pre>
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5239,11 +5231,7 @@ public final class AgentOuterClass {
         getLogLinksList();
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5251,11 +5239,7 @@ public final class AgentOuterClass {
     flyteidl.core.Execution.TaskLog getLogLinks(int index);
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5263,11 +5247,7 @@ public final class AgentOuterClass {
     int getLogLinksCount();
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5276,11 +5256,7 @@ public final class AgentOuterClass {
         getLogLinksOrBuilderList();
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5415,11 +5391,7 @@ public final class AgentOuterClass {
     private java.util.List<flyteidl.core.Execution.TaskLog> logLinks_;
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5429,11 +5401,7 @@ public final class AgentOuterClass {
     }
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5444,11 +5412,7 @@ public final class AgentOuterClass {
     }
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5458,11 +5422,7 @@ public final class AgentOuterClass {
     }
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5472,11 +5432,7 @@ public final class AgentOuterClass {
     }
     /**
      * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
      * log information for the task execution
-=======
-     * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
      * </pre>
      *
      * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -5738,13 +5694,8 @@ public final class AgentOuterClass {
       }
 
       @java.lang.Override
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
       public flyteidl.admin.AgentOuterClass.GetTaskResponse buildPartial() {
         flyteidl.admin.AgentOuterClass.GetTaskResponse result = new flyteidl.admin.AgentOuterClass.GetTaskResponse(this);
-=======
-      public flyteidl.admin.Agent.GetTaskResponse buildPartial() {
-        flyteidl.admin.Agent.GetTaskResponse result = new flyteidl.admin.Agent.GetTaskResponse(this);
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         if (resourceBuilder_ == null) {
@@ -6000,11 +5951,7 @@ public final class AgentOuterClass {
 
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6018,11 +5965,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6036,11 +5979,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6054,11 +5993,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6079,11 +6014,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6101,11 +6032,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6125,11 +6052,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6150,11 +6073,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6172,11 +6091,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6194,11 +6109,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6217,11 +6128,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6238,11 +6145,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6259,11 +6162,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6274,11 +6173,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6292,11 +6187,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6311,11 +6202,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6326,11 +6213,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -6342,11 +6225,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
        * log information for the task execution
-=======
-       * log information for the task execution.
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
        * </pre>
        *
        * <code>repeated .flyteidl.core.TaskLog log_links = 2;</code>
@@ -12157,16 +12036,11 @@ public final class AgentOuterClass {
       " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEn" +
       "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031E" +
       "nvironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
       "\005value\030\002 \001(\t:\0028\001\"\275\002\n\021CreateTaskRequest\022)" +
-=======
-      "\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTaskRequest\022)" +
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
       "\n\006inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMa" +
       "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task" +
       "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_" +
       "execution_metadata\030\004 \001(\0132%.flyteidl.admi" +
-<<<<<<< HEAD:flyteidl/gen/pb-java/flyteidl/admin/AgentOuterClass.java
       "n.TaskExecutionMetadata\022?\n\007secrets\030\005 \003(\013" +
       "2..flyteidl.admin.CreateTaskRequest.Secr" +
       "etsEntry\032.\n\014SecretsEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
@@ -12192,23 +12066,6 @@ public final class AgentOuterClass {
       "UNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/fl" +
       "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +
       "/adminb\006proto3"
-=======
-      "n.TaskExecutionMetadata\"+\n\022CreateTaskRes" +
-      "ponse\022\025\n\rresource_meta\030\001 \001(\014\":\n\016GetTaskR" +
-      "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me" +
-      "ta\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030" +
-      "\001 \001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_l" +
-      "inks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"m\n\010Re" +
-      "source\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin.S" +
-      "tate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Li" +
-      "teralMap\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskR" +
-      "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me" +
-      "ta\030\002 \001(\014\"\024\n\022DeleteTaskResponse*^\n\005State\022" +
-      "\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAIL" +
-      "URE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCE" +
-      "EDED\020\004B=Z;github.com/flyteorg/flyte/flyt" +
-      "eidl/gen/pb-go/flyteidl/adminb\006proto3"
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640:flyteidl/gen/pb-java/flyteidl/admin/Agent.java
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -506,7 +506,6 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 9, 16, sizeof(::flyteidl::admin::TaskExecutionMetadata_AnnotationsEntry_DoNotUse)},
   { 18, 25, sizeof(::flyteidl::admin::TaskExecutionMetadata_EnvironmentVariablesEntry_DoNotUse)},
   { 27, -1, sizeof(::flyteidl::admin::TaskExecutionMetadata)},
-<<<<<<< HEAD
   { 38, 45, sizeof(::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse)},
   { 47, -1, sizeof(::flyteidl::admin::CreateTaskRequest)},
   { 57, -1, sizeof(::flyteidl::admin::CreateTaskResponse)},
@@ -520,15 +519,6 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 112, -1, sizeof(::flyteidl::admin::GetAgentResponse)},
   { 118, -1, sizeof(::flyteidl::admin::ListAgentsRequest)},
   { 123, -1, sizeof(::flyteidl::admin::ListAgentsResponse)},
-=======
-  { 38, -1, sizeof(::flyteidl::admin::CreateTaskRequest)},
-  { 47, -1, sizeof(::flyteidl::admin::CreateTaskResponse)},
-  { 53, -1, sizeof(::flyteidl::admin::GetTaskRequest)},
-  { 60, -1, sizeof(::flyteidl::admin::GetTaskResponse)},
-  { 67, -1, sizeof(::flyteidl::admin::Resource)},
-  { 75, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
-  { 82, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -576,16 +566,11 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEn"
   "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031E"
   "nvironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n"
-<<<<<<< HEAD
   "\005value\030\002 \001(\t:\0028\001\"\275\002\n\021CreateTaskRequest\022)"
-=======
-  "\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTaskRequest\022)"
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640
   "\n\006inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMa"
   "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task"
   "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_"
   "execution_metadata\030\004 \001(\0132%.flyteidl.admi"
-<<<<<<< HEAD
   "n.TaskExecutionMetadata\022\?\n\007secrets\030\005 \003(\013"
   "2..flyteidl.admin.CreateTaskRequest.Secr"
   "etsEntry\032.\n\014SecretsEntry\022\013\n\003key\030\001 \001(\t\022\r\n"
@@ -611,32 +596,11 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "UNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/fl"
   "yteorg/flyte/flyteidl/gen/pb-go/flyteidl"
   "/adminb\006proto3"
-=======
-  "n.TaskExecutionMetadata\"+\n\022CreateTaskRes"
-  "ponse\022\025\n\rresource_meta\030\001 \001(\014\":\n\016GetTaskR"
-  "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me"
-  "ta\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030"
-  "\001 \001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_l"
-  "inks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"m\n\010Re"
-  "source\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin.S"
-  "tate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Li"
-  "teralMap\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskR"
-  "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me"
-  "ta\030\002 \001(\014\"\024\n\022DeleteTaskResponse*^\n\005State\022"
-  "\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAIL"
-  "URE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCE"
-  "EDED\020\004B=Z;github.com/flyteorg/flyte/flyt"
-  "eidl/gen/pb-go/flyteidl/adminb\006proto3"
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-<<<<<<< HEAD
   "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1894,
-=======
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1517,
->>>>>>> 475e9d07644c612150f09598cf1b5eef1f1fa640
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
