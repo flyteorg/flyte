@@ -1485,6 +1485,7 @@ func TestDemystifyPendingTimeout(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().Code)
 	})
 }
 
