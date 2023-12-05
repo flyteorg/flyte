@@ -1179,7 +1179,7 @@ func TestDemystifyPending(t *testing.T) {
 			Duration: time.Minute * 3,
 		},
 		PodPendingTimeout: config1.Duration{
-			Duration: time.Minute * 10,
+			Duration: 0,
 		},
 	}))
 
@@ -1193,7 +1193,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1209,7 +1208,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1225,7 +1223,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1241,7 +1238,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseQueued, taskStatus.Phase())
@@ -1264,7 +1260,6 @@ func TestDemystifyPending(t *testing.T) {
 			},
 		},
 	}
-	s.Conditions[0].LastTransitionTime = metav1.Now()
 
 	t.Run("ContainerCreating", func(t *testing.T) {
 		s.ContainerStatuses = []v1.ContainerStatus{
@@ -1295,7 +1290,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
@@ -1313,7 +1307,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
@@ -1357,14 +1350,6 @@ func TestDemystifyPending(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 	})
 
-	t.Run("PodPendingExceedsTimeout", func(t *testing.T) {
-		s2 := *s.DeepCopy()
-		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().PodPendingTimeout.Duration)
-		taskStatus, err := DemystifyPending(s2)
-		assert.NoError(t, err)
-		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
-	})
-
 	t.Run("InvalidImageName", func(t *testing.T) {
 		s.ContainerStatuses = []v1.ContainerStatus{
 			{
@@ -1377,7 +1362,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
@@ -1395,7 +1379,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
@@ -1413,7 +1396,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
@@ -1431,7 +1413,6 @@ func TestDemystifyPending(t *testing.T) {
 				},
 			},
 		}
-		s.Conditions[0].LastTransitionTime = metav1.Now()
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
@@ -1473,6 +1454,37 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+	})
+}
+
+func TestDemystifyPendingTimeout(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		CreateContainerErrorGracePeriod: config1.Duration{
+			Duration: time.Minute * 3,
+		},
+		ImagePullBackoffGracePeriod: config1.Duration{
+			Duration: time.Minute * 3,
+		},
+		PodPendingTimeout: config1.Duration{
+			Duration: 10,
+		},
+	}))
+
+	s := v1.PodStatus{
+		Phase: v1.PodPending,
+		Conditions: []v1.PodCondition{
+			{
+				Type:   v1.PodScheduled,
+				Status: v1.ConditionFalse,
+			},
+		},
+	}
+	s.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().PodPendingTimeout.Duration)
+
+	t.Run("PodPendingExceedsTimeout", func(t *testing.T) {
+		taskStatus, err := DemystifyPending(s)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 	})
 }
 
