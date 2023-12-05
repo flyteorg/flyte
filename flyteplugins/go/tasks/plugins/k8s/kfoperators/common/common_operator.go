@@ -345,3 +345,11 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 
 	return replicaSpec, nil
 }
+
+func GetReplicaCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, replicaType commonOp.ReplicaType) *int32 {
+	if spec, ok := specs[replicaType]; ok && spec.Replicas != nil {
+		return spec.Replicas
+	}
+
+	return new(int32) // return 0 as default value
+}

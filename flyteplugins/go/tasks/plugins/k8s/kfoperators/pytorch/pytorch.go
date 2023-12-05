@@ -171,7 +171,10 @@ func ParseElasticConfig(elasticConfig ElasticConfig) *kubeflowv1.ElasticPolicy {
 // any operations that might take a long time (limits are configured system-wide) should be offloaded to the
 // background.
 func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
-	app := resource.(*kubeflowv1.PyTorchJob)
+	app, ok := resource.(*kubeflowv1.PyTorchJob)
+	if !ok {
+		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
+	}
 
 	// Elastic PytorchJobs don't use master replicas
 	hasMaster := false
@@ -179,7 +182,7 @@ func (pytorchOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginCont
 		hasMaster = true
 	}
 
-	workersCount := app.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas
+	workersCount := common.GetReplicaCount(app.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker)
 
 	taskLogs, err := common.GetLogs(pluginContext, common.PytorchTaskType, app.ObjectMeta, hasMaster, *workersCount, 0, 0, 0)
 	if err != nil {
