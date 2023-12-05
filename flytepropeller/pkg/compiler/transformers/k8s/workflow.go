@@ -22,6 +22,8 @@ const (
 	DomainLabel = "domain"
 	// A concatenation of project, domain, workflow name, and a unique ID
 	ExecutionIDLabel = "execution-id"
+	// An optional organization that the FlyteWorkflow was created under
+	OrganizationLabel = "organization"
 	// The FlyteWorkflow project according to registration ownership
 	ProjectLabel = "project"
 	// Shard keys are used during FlytePropeller sharding, this value is set to a hash of the FlyteWorkflow ExecutionID.

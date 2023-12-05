@@ -46,6 +46,9 @@ message WorkflowExecutionIdentifier {
 
     // User or system provided value for the resource.
     string name                 = 4;
+
+    // Name of the organization that the resource belongs to.
+    string organization         = 5;
 }
 
 // Encapsulation of fields that identify a Flyte node execution entity.

@@ -59,6 +59,7 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("executionName"),
 		MustCreateRegex("executionProject"),
 		MustCreateRegex("executionDomain"),
+		MustCreateRegex("executionOrganization"),
 		MustCreateRegex("generatedName"),
 	}
 }
@@ -167,6 +168,10 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 				TemplateVar{
 					defaultRegexes.ExecutionDomain,
 					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Domain,
+				},
+				TemplateVar{
+					defaultRegexes.ExecutionOrganization,
+					taskExecutionIdentifier.NodeExecutionId.ExecutionId.Organization,
 				},
 			)
 		}

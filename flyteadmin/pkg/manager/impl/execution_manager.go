@@ -755,6 +755,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Project: request.Project,
 		Domain:  request.Domain,
 		Name:    name,
+		// Organization: "foo",
 	}
 	ctx = getExecutionContext(ctx, &workflowExecutionID)
 	var requestSpec = request.Spec
