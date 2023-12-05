@@ -115,7 +115,7 @@ A new version of our stow fork added support for Azure AD in https://github.com/
 * Silence NotFound when get task resource by @honnix in https://github.com/flyteorg/flyte/pull/4388
 * adding consoleUrl parameterization based on partition by @lauralindy in https://github.com/flyteorg/flyte/pull/4375
 * [Docs] Sensor Agent Doc by @Future-Outlier in https://github.com/flyteorg/flyte/pull/4195
-* [flytepropeller]  Add Tests in v1alpha.go including `array_test.go`, `branch_test.go`, `error_test.go`, and `iface_test.go` with 0.13% Coverage  Improvment by @Future-Outlier in https://github.com/flyteorg/flyte/pull/4234
+* [flytepropeller]  Add Tests in v1alpha.go including `array_test.go`, `branch_test.go`, `error_test.go`, and `iface_test.go` with 0.13% Coverage  Improvement by @Future-Outlier in https://github.com/flyteorg/flyte/pull/4234
 * Add more context for ray log template links by @jeevb in https://github.com/flyteorg/flyte/pull/4416
 * Add ClusterRole config for Ray by @davidmirror-ops in https://github.com/flyteorg/flyte/pull/4405
 * Fix and update scripts for generating grafana dashboards by @Tom-Newton in https://github.com/flyteorg/flyte/pull/4382
