@@ -53,7 +53,7 @@ var (
 			Duration: time.Minute * 3,
 		},
 		PodPendingTimeout: config2.Duration{
-			Duration: time.Minute * 10,
+			Duration: 0,
 		},
 		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
 		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
