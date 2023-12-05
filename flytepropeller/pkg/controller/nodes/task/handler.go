@@ -825,7 +825,6 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 	if err != nil {
 		return err
 	}
-	// TODO handle this call failing if phase is set to Failure - probably doesn't matter
 	if err := evRecorder.RecordTaskEvent(ctx, &event.TaskExecutionEvent{
 		TaskId:                taskExecID.TaskId,
 		ParentNodeExecutionId: nodeExecutionID,
