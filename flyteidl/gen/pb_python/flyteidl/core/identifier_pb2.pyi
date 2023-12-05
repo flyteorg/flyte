@@ -33,14 +33,16 @@ class Identifier(_message.Message):
     def __init__(self, resource_type: _Optional[_Union[ResourceType, str]] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
 
 class WorkflowExecutionIdentifier(_message.Message):
-    __slots__ = ["project", "domain", "name"]
+    __slots__ = ["project", "domain", "name", "organization"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    ORGANIZATION_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     name: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+    organization: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., organization: _Optional[str] = ...) -> None: ...
 
 class NodeExecutionIdentifier(_message.Message):
     __slots__ = ["node_id", "execution_id"]

@@ -681,6 +681,7 @@
                  * @property {string|null} [project] WorkflowExecutionIdentifier project
                  * @property {string|null} [domain] WorkflowExecutionIdentifier domain
                  * @property {string|null} [name] WorkflowExecutionIdentifier name
+                 * @property {string|null} [organization] WorkflowExecutionIdentifier organization
                  */
     
                 /**
@@ -723,6 +724,14 @@
                 WorkflowExecutionIdentifier.prototype.name = "";
     
                 /**
+                 * WorkflowExecutionIdentifier organization.
+                 * @member {string} organization
+                 * @memberof flyteidl.core.WorkflowExecutionIdentifier
+                 * @instance
+                 */
+                WorkflowExecutionIdentifier.prototype.organization = "";
+    
+                /**
                  * Creates a new WorkflowExecutionIdentifier instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.WorkflowExecutionIdentifier
@@ -752,6 +761,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
                     if (message.name != null && message.hasOwnProperty("name"))
                         writer.uint32(/* id 4, wireType 2 =*/34).string(message.name);
+                    if (message.organization != null && message.hasOwnProperty("organization"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.organization);
                     return writer;
                 };
     
@@ -782,6 +793,9 @@
                         case 4:
                             message.name = reader.string();
                             break;
+                        case 5:
+                            message.organization = reader.string();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -810,6 +824,9 @@
                     if (message.name != null && message.hasOwnProperty("name"))
                         if (!$util.isString(message.name))
                             return "name: string expected";
+                    if (message.organization != null && message.hasOwnProperty("organization"))
+                        if (!$util.isString(message.organization))
+                            return "organization: string expected";
                     return null;
                 };
     

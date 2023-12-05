@@ -572,6 +572,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Name of the organization that the resource belongs to."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

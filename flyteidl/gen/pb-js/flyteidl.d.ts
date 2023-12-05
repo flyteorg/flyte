@@ -295,6 +295,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionIdentifier name */
             name?: (string|null);
+
+            /** WorkflowExecutionIdentifier organization */
+            organization?: (string|null);
         }
 
         /** Represents a WorkflowExecutionIdentifier. */
@@ -314,6 +317,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionIdentifier name. */
             public name: string;
+
+            /** WorkflowExecutionIdentifier organization. */
+            public organization: string;
 
             /**
              * Creates a new WorkflowExecutionIdentifier instance using the specified properties.

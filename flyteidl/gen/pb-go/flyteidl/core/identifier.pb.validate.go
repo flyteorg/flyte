@@ -124,6 +124,8 @@ func (m *WorkflowExecutionIdentifier) Validate() error {
 
 	// no validation rules for Name
 
+	// no validation rules for Organization
+
 	return nil
 }
 

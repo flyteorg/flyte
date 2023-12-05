@@ -415,6 +415,20 @@ class WorkflowExecutionIdentifier final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
+  // string organization = 5;
+  void clear_organization();
+  static const int kOrganizationFieldNumber = 5;
+  const ::std::string& organization() const;
+  void set_organization(const ::std::string& value);
+  #if LANG_CXX11
+  void set_organization(::std::string&& value);
+  #endif
+  void set_organization(const char* value);
+  void set_organization(const char* value, size_t size);
+  ::std::string* mutable_organization();
+  ::std::string* release_organization();
+  void set_allocated_organization(::std::string* organization);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.WorkflowExecutionIdentifier)
  private:
   class HasBitSetters;
@@ -423,6 +437,7 @@ class WorkflowExecutionIdentifier final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr organization_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fidentifier_2eproto;
 };
@@ -1216,6 +1231,59 @@ inline void WorkflowExecutionIdentifier::set_allocated_name(::std::string* name)
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.WorkflowExecutionIdentifier.name)
+}
+
+// string organization = 5;
+inline void WorkflowExecutionIdentifier::clear_organization() {
+  organization_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& WorkflowExecutionIdentifier::organization() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.WorkflowExecutionIdentifier.organization)
+  return organization_.GetNoArena();
+}
+inline void WorkflowExecutionIdentifier::set_organization(const ::std::string& value) {
+  
+  organization_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.WorkflowExecutionIdentifier.organization)
+}
+#if LANG_CXX11
+inline void WorkflowExecutionIdentifier::set_organization(::std::string&& value) {
+  
+  organization_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.WorkflowExecutionIdentifier.organization)
+}
+#endif
+inline void WorkflowExecutionIdentifier::set_organization(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  organization_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.WorkflowExecutionIdentifier.organization)
+}
+inline void WorkflowExecutionIdentifier::set_organization(const char* value, size_t size) {
+  
+  organization_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.WorkflowExecutionIdentifier.organization)
+}
+inline ::std::string* WorkflowExecutionIdentifier::mutable_organization() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.WorkflowExecutionIdentifier.organization)
+  return organization_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* WorkflowExecutionIdentifier::release_organization() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.WorkflowExecutionIdentifier.organization)
+  
+  return organization_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void WorkflowExecutionIdentifier::set_allocated_organization(::std::string* organization) {
+  if (organization != nullptr) {
+    
+  } else {
+    
+  }
+  organization_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), organization);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.WorkflowExecutionIdentifier.organization)
 }
 
 // -------------------------------------------------------------------

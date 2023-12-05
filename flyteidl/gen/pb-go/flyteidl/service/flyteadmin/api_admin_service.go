@@ -1122,10 +1122,17 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
+ * @param optional nil or *GetExecutionOpts - Optional Parameters:
+     * @param "IdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
 
 @return AdminExecution
 */
-func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject string, idDomain string, idName string) (AdminExecution, *http.Response, error) {
+
+type GetExecutionOpts struct { 
+	IdOrganization optional.String
+}
+
+func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionOpts) (AdminExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1144,6 +1151,9 @@ func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject str
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.IdOrganization.IsSet() {
+		localVarQueryParams.Add("id.organization", parameterToString(localVarOptionals.IdOrganization.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
 
@@ -1214,10 +1224,17 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
+ * @param optional nil or *GetExecutionDataOpts - Optional Parameters:
+     * @param "IdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
 
 @return AdminWorkflowExecutionGetDataResponse
 */
-func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject string, idDomain string, idName string) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
+
+type GetExecutionDataOpts struct { 
+	IdOrganization optional.String
+}
+
+func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionDataOpts) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1236,6 +1253,9 @@ func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.IdOrganization.IsSet() {
+		localVarQueryParams.Add("id.organization", parameterToString(localVarOptionals.IdOrganization.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
 
@@ -1307,12 +1327,14 @@ AdminServiceApiService Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.adm
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
  * @param optional nil or *GetExecutionMetricsOpts - Optional Parameters:
+     * @param "IdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
      * @param "Depth" (optional.Int32) -  depth defines the number of Flyte entity levels to traverse when breaking down execution details.
 
 @return AdminWorkflowExecutionGetMetricsResponse
 */
 
 type GetExecutionMetricsOpts struct { 
+	IdOrganization optional.String
 	Depth optional.Int32
 }
 
@@ -1335,6 +1357,9 @@ func (a *AdminServiceApiService) GetExecutionMetrics(ctx context.Context, idProj
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.IdOrganization.IsSet() {
+		localVarQueryParams.Add("id.organization", parameterToString(localVarOptionals.IdOrganization.Value(), ""))
+	}
 	if localVarOptionals != nil && localVarOptionals.Depth.IsSet() {
 		localVarQueryParams.Add("depth", parameterToString(localVarOptionals.Depth.Value(), ""))
 	}
@@ -1607,10 +1632,17 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x6
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idExecutionIdName User or system provided value for the resource.
  * @param idNodeId
+ * @param optional nil or *GetNodeExecutionOpts - Optional Parameters:
+     * @param "IdExecutionIdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
 
 @return FlyteidladminNodeExecution
 */
-func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (FlyteidladminNodeExecution, *http.Response, error) {
+
+type GetNodeExecutionOpts struct { 
+	IdExecutionIdOrganization optional.String
+}
+
+func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetNodeExecutionOpts) (FlyteidladminNodeExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1630,6 +1662,9 @@ func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecuti
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.IdExecutionIdOrganization.IsSet() {
+		localVarQueryParams.Add("id.execution_id.organization", parameterToString(localVarOptionals.IdExecutionIdOrganization.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
 
@@ -1701,10 +1736,17 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idExecutionIdName User or system provided value for the resource.
  * @param idNodeId
+ * @param optional nil or *GetNodeExecutionDataOpts - Optional Parameters:
+     * @param "IdExecutionIdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
 
 @return AdminNodeExecutionGetDataResponse
 */
-func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
+
+type GetNodeExecutionDataOpts struct { 
+	IdExecutionIdOrganization optional.String
+}
+
+func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetNodeExecutionDataOpts) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1724,6 +1766,9 @@ func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExe
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.IdExecutionIdOrganization.IsSet() {
+		localVarQueryParams.Add("id.execution_id.organization", parameterToString(localVarOptionals.IdExecutionIdOrganization.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
 
@@ -2104,12 +2149,14 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x6
  * @param idRetryAttempt
  * @param optional nil or *GetTaskExecutionOpts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdNodeExecutionIdExecutionIdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
 
 @return FlyteidladminTaskExecution
 */
 
 type GetTaskExecutionOpts struct { 
 	IdTaskIdResourceType optional.String
+	IdNodeExecutionIdExecutionIdOrganization optional.String
 }
 
 func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionOpts) (FlyteidladminTaskExecution, *http.Response, error) {
@@ -2139,6 +2186,9 @@ func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExe
 
 	if localVarOptionals != nil && localVarOptionals.IdTaskIdResourceType.IsSet() {
 		localVarQueryParams.Add("id.task_id.resource_type", parameterToString(localVarOptionals.IdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdNodeExecutionIdExecutionIdOrganization.IsSet() {
+		localVarQueryParams.Add("id.node_execution_id.execution_id.organization", parameterToString(localVarOptionals.IdNodeExecutionIdExecutionIdOrganization.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
@@ -2218,12 +2268,14 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idRetryAttempt
  * @param optional nil or *GetTaskExecutionDataOpts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdNodeExecutionIdExecutionIdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
 
 @return AdminTaskExecutionGetDataResponse
 */
 
 type GetTaskExecutionDataOpts struct { 
 	IdTaskIdResourceType optional.String
+	IdNodeExecutionIdExecutionIdOrganization optional.String
 }
 
 func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionDataOpts) (AdminTaskExecutionGetDataResponse, *http.Response, error) {
@@ -2253,6 +2305,9 @@ func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNod
 
 	if localVarOptionals != nil && localVarOptionals.IdTaskIdResourceType.IsSet() {
 		localVarQueryParams.Add("id.task_id.resource_type", parameterToString(localVarOptionals.IdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdNodeExecutionIdExecutionIdOrganization.IsSet() {
+		localVarQueryParams.Add("id.node_execution_id.execution_id.organization", parameterToString(localVarOptionals.IdNodeExecutionIdExecutionIdOrganization.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
@@ -3693,6 +3748,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
  * @param workflowExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param workflowExecutionIdName User or system provided value for the resource.
  * @param optional nil or *ListNodeExecutionsOpts - Optional Parameters:
+     * @param "WorkflowExecutionIdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) - 
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -3704,6 +3760,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
 */
 
 type ListNodeExecutionsOpts struct { 
+	WorkflowExecutionIdOrganization optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -3731,6 +3788,9 @@ func (a *AdminServiceApiService) ListNodeExecutions(ctx context.Context, workflo
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.WorkflowExecutionIdOrganization.IsSet() {
+		localVarQueryParams.Add("workflow_execution_id.organization", parameterToString(localVarOptionals.WorkflowExecutionIdOrganization.Value(), ""))
+	}
 	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
 		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
 	}
@@ -3827,6 +3887,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
  * @param taskExecutionIdRetryAttempt
  * @param optional nil or *ListNodeExecutionsForTaskOpts - Optional Parameters:
      * @param "TaskExecutionIdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "TaskExecutionIdNodeExecutionIdExecutionIdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -3838,6 +3899,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
 
 type ListNodeExecutionsForTaskOpts struct { 
 	TaskExecutionIdTaskIdResourceType optional.String
+	TaskExecutionIdNodeExecutionIdExecutionIdOrganization optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -3872,6 +3934,9 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask(ctx context.Context, 
 
 	if localVarOptionals != nil && localVarOptionals.TaskExecutionIdTaskIdResourceType.IsSet() {
 		localVarQueryParams.Add("task_execution_id.task_id.resource_type", parameterToString(localVarOptionals.TaskExecutionIdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.TaskExecutionIdNodeExecutionIdExecutionIdOrganization.IsSet() {
+		localVarQueryParams.Add("task_execution_id.node_execution_id.execution_id.organization", parameterToString(localVarOptionals.TaskExecutionIdNodeExecutionIdExecutionIdOrganization.Value(), ""))
 	}
 	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
 		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
@@ -4076,6 +4141,7 @@ AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecu
  * @param nodeExecutionIdExecutionIdName User or system provided value for the resource.
  * @param nodeExecutionIdNodeId
  * @param optional nil or *ListTaskExecutionsOpts - Optional Parameters:
+     * @param "NodeExecutionIdExecutionIdOrganization" (optional.String) -  Name of the organization that the resource belongs to.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -4086,6 +4152,7 @@ AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecu
 */
 
 type ListTaskExecutionsOpts struct { 
+	NodeExecutionIdExecutionIdOrganization optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -4113,6 +4180,9 @@ func (a *AdminServiceApiService) ListTaskExecutions(ctx context.Context, nodeExe
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.NodeExecutionIdExecutionIdOrganization.IsSet() {
+		localVarQueryParams.Add("node_execution_id.execution_id.organization", parameterToString(localVarOptionals.NodeExecutionIdExecutionIdOrganization.Value(), ""))
+	}
 	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
 		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
 	}

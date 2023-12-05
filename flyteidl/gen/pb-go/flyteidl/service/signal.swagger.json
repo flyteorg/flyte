@@ -77,6 +77,13 @@
             "type": "string"
           },
           {
+            "name": "workflow_execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
@@ -648,6 +655,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Name of the organization that the resource belongs to."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

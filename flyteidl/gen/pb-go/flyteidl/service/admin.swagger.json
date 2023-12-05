@@ -213,6 +213,13 @@
             "default": "UNSPECIFIED"
           },
           {
+            "name": "task_execution_id.node_execution_id.execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
@@ -292,6 +299,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -337,6 +351,13 @@
             "name": "id.node_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -434,6 +455,13 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -967,6 +995,13 @@
             "description": "User or system provided value for the resource.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -1517,6 +1552,13 @@
             "type": "string"
           },
           {
+            "name": "id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "depth",
             "description": "depth defines the number of Flyte entity levels to traverse when breaking down execution details.",
             "in": "query",
@@ -1771,6 +1813,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "id.execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1810,6 +1859,13 @@
             "description": "User or system provided value for the resource.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow_execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -2314,6 +2370,13 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2359,6 +2422,13 @@
             "name": "node_execution_id.node_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "node_execution_id.execution_id.organization",
+            "description": "Name of the organization that the resource belongs to.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -7222,6 +7292,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Name of the organization that the resource belongs to."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

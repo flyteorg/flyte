@@ -16,4 +16,6 @@ type CoreWorkflowExecutionIdentifier struct {
 	Domain string `json:"domain,omitempty"`
 	// User or system provided value for the resource.
 	Name string `json:"name,omitempty"`
+	// Name of the organization that the resource belongs to.
+	Organization string `json:"organization,omitempty"`
 }

@@ -33,21 +33,24 @@ class CoreWorkflowExecutionIdentifier(object):
     swagger_types = {
         'project': 'str',
         'domain': 'str',
-        'name': 'str'
+        'name': 'str',
+        'organization': 'str'
     }
 
     attribute_map = {
         'project': 'project',
         'domain': 'domain',
-        'name': 'name'
+        'name': 'name',
+        'organization': 'organization'
     }
 
-    def __init__(self, project=None, domain=None, name=None):  # noqa: E501
+    def __init__(self, project=None, domain=None, name=None, organization=None):  # noqa: E501
         """CoreWorkflowExecutionIdentifier - a model defined in Swagger"""  # noqa: E501
 
         self._project = None
         self._domain = None
         self._name = None
+        self._organization = None
         self.discriminator = None
 
         if project is not None:
@@ -56,6 +59,8 @@ class CoreWorkflowExecutionIdentifier(object):
             self.domain = domain
         if name is not None:
             self.name = name
+        if organization is not None:
+            self.organization = organization
 
     @property
     def project(self):
@@ -125,6 +130,29 @@ class CoreWorkflowExecutionIdentifier(object):
         """
 
         self._name = name
+
+    @property
+    def organization(self):
+        """Gets the organization of this CoreWorkflowExecutionIdentifier.  # noqa: E501
+
+        Name of the organization that the resource belongs to.  # noqa: E501
+
+        :return: The organization of this CoreWorkflowExecutionIdentifier.  # noqa: E501
+        :rtype: str
+        """
+        return self._organization
+
+    @organization.setter
+    def organization(self, organization):
+        """Sets the organization of this CoreWorkflowExecutionIdentifier.
+
+        Name of the organization that the resource belongs to.  # noqa: E501
+
+        :param organization: The organization of this CoreWorkflowExecutionIdentifier.  # noqa: E501
+        :type: str
+        """
+
+        self._organization = organization
 
     def to_dict(self):
         """Returns the model properties as a dict"""
