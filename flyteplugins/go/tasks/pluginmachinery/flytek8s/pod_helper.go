@@ -579,7 +579,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 	}
 
 	podPendingTimeout := config.GetK8sPluginConfig().PodPendingTimeout.Duration
-	if podPendingTimeout > 0 && time.Since(t) >= config.GetK8sPluginConfig().PodPendingTimeout.Duration {
+	if podPendingTimeout > 0 && time.Since(t) >= podPendingTimeout {
 		return pluginsCore.PhaseInfoRetryableFailureWithCleanup("PodPendingTimeout", phaseInfo.Reason(), &pluginsCore.TaskInfo{
 			OccurredAt: &t,
 		}), nil
