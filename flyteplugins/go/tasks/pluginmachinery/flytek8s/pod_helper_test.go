@@ -1609,11 +1609,6 @@ func TestDemystifyFailure(t *testing.T) {
 }
 
 func TestDemystifyPending_testcases(t *testing.T) {
-	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-		PodPendingTimeout: config1.Duration{
-			Duration: 0,
-		},
-	}))
 
 	tests := []struct {
 		name     string
