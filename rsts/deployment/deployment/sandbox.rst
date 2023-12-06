@@ -140,6 +140,5 @@ You can also specify additional cluster resource templates in the ``~/.flyte/san
 
 Once you are happy with the changes, simply run ``flytectl demo reload`` to trigger a reload of the sandbox with the updated configuration.
 
-
 Now that you have the sandbox cluster running, you can now go to the :ref:`User Guide <cookbook:userguide>` or
 :ref:`Tutorials <cookbook:tutorials>` to run tasks and workflows written in ``flytekit``, the Python SDK for Flyte.

@@ -99,7 +99,7 @@ flytectl demo start --image ghcr.io/flyteorg/flyte-sandbox-bundled:sha-e240038be
    ```
 
 ### Databricks Code
-You'll need to upload an [entrypoint](https://gist.github.com/pingsutw/482e7f0134414dac437500344bac5134) file to your dbfs (or S3). This is the referenced gist from the primary [Databricks plugin documentation](https://github.com/flyteorg/flyte/blob/master/rsts/deployment/plugin_setup/webapi/databricks.rst) as well, which currently only covers the `flyte-core` Helm chart installation.
+You'll need to upload an [entrypoint](https://gist.github.com/pingsutw/482e7f0134414dac437500344bac5134) file to your dbfs (or S3). This is the referenced gist from the primary [Databricks plugin documentation](https://github.com/flyteorg/flyte/blob/master/docs/deployment/plugin_setup/webapi/databricks.rst) as well, which currently only covers the `flyte-core` Helm chart installation.
 
 
 ### User Code
