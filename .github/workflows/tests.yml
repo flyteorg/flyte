@@ -28,16 +28,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch the code
-        uses: actions/checkout@v2
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
+        uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: "3.8"
-      - name: Install dependencies
+          python-version: 3.9
+          mamba-version: "*"
+          channels: conda-forge
+          channel-priority: true
+          activate-environment: monodocs-env
+          environment-file: monodocs-environment.yaml
+      - shell: bash -el {0}
         run: |
-          python -m pip install --upgrade pip
-          if [ -f doc-requirements.txt ]; then pip install -r doc-requirements.txt; fi
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+          printenv | sort
+      - name: Setup Graphviz
+        uses: ts-graphviz/setup-graphviz@v1
       - name: Build the documentation
+        shell: bash -el {0}
         run: make docs
 
   generate_kustomize:
