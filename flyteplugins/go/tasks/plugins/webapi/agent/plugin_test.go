@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"testing"
 	"time"
 
@@ -104,9 +105,10 @@ func TestPlugin(t *testing.T) {
 	t.Run("test PENDING Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:   admin.State_PENDING,
-			Outputs: nil,
-			Message: "Waiting for cluster",
+			State:    admin.State_PENDING,
+			Outputs:  nil,
+			Message:  "Waiting for cluster",
+			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -118,9 +120,10 @@ func TestPlugin(t *testing.T) {
 	t.Run("test RUNNING Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:   admin.State_RUNNING,
-			Outputs: nil,
-			Message: "Job is running",
+			State:    admin.State_RUNNING,
+			Outputs:  nil,
+			Message:  "Job is running",
+			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -131,9 +134,10 @@ func TestPlugin(t *testing.T) {
 	t.Run("test PERMANENT_FAILURE Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:   admin.State_PERMANENT_FAILURE,
-			Outputs: nil,
-			Message: "",
+			State:    admin.State_PERMANENT_FAILURE,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -144,9 +148,10 @@ func TestPlugin(t *testing.T) {
 	t.Run("test RETRYABLE_FAILURE Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:   admin.State_RETRYABLE_FAILURE,
-			Outputs: nil,
-			Message: "",
+			State:    admin.State_RETRYABLE_FAILURE,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -157,9 +162,10 @@ func TestPlugin(t *testing.T) {
 	t.Run("test UNDEFINED Status", func(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
-			State:   5,
-			Outputs: nil,
-			Message: "",
+			State:    5,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
