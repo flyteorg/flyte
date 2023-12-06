@@ -163,7 +163,7 @@ func TestContainerTaskExecutor_BuildIdentityResource(t *testing.T) {
 	assert.Equal(t, flytek8s.PodKind, r.GetObjectKind().GroupVersionKind().Kind)
 }
 
-func TestContainerTaskExecutor_BuildResource_U(t *testing.T) {
+func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
 	testCases := []struct {
