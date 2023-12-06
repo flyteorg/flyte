@@ -29,9 +29,11 @@ var containerResourceRequirements = &v1.ResourceRequirements{
 	},
 }
 
-var serviceAccount = "service-account"
-var podTemplateServiceAccount = "test-service-account"
-var securityContextServiceAccount = "security-context-service-account"
+var (
+	serviceAccount                = "service-account"
+	podTemplateServiceAccount     = "test-service-account"
+	securityContextServiceAccount = "security-context-service-account"
+)
 
 func dummyContainerTaskTemplate(command []string, args []string) *core.TaskTemplate {
 	return &core.TaskTemplate{
