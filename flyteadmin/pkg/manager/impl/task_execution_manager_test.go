@@ -454,7 +454,6 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 	})
 
 	t.Run("CreateExecutionEvent_SameTerminalPhase_OldVersion", func(t *testing.T) {
-		// request w/ same terminal phase, not a later version
 		taskEventRequest.Event.Phase = core.TaskExecution_SUCCEEDED
 		taskEventRequest.Event.PhaseVersion = uint32(0)
 		taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
@@ -465,7 +464,6 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 	})
 
 	t.Run("CreateExecutionEvent_SameTerminalPhase_NewVersion", func(t *testing.T) {
-		// request w/ same terminal phase, later version
 		taskEventRequest.Event.Phase = core.TaskExecution_SUCCEEDED
 		taskEventRequest.Event.PhaseVersion = uint32(1)
 		taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, &mockPublisher, &mockPublisher)
