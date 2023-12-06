@@ -19,6 +19,7 @@ import (
 	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 var containerResourceRequirements = &v1.ResourceRequirements{
@@ -27,6 +28,8 @@ var containerResourceRequirements = &v1.ResourceRequirements{
 		v1.ResourceStorage: resource.MustParse("100M"),
 	},
 }
+
+var podTemplateServiceAccount = "test-service-account"
 
 func dummyContainerTaskTemplate(command []string, args []string) *core.TaskTemplate {
 	return &core.TaskTemplate{
@@ -38,6 +41,39 @@ func dummyContainerTaskTemplate(command []string, args []string) *core.TaskTempl
 			},
 		},
 	}
+}
+
+func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *core.TaskTemplate {
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Name:    "test-image",
+				Command: command,
+				Args:    args,
+			},
+		},
+		ServiceAccountName: podTemplateServiceAccount,
+	}
+
+	podSpecPb, err := utils.MarshalObjToStruct(podSpec)
+	if err != nil {
+		panic(err)
+	}
+
+	taskTemplate := &core.TaskTemplate{
+		Type: "test",
+		Target: &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				PodSpec: podSpecPb,
+			},
+		},
+		Config: map[string]string{
+			"primary_container_name": "test-image",
+		},
+	}
+
+	return taskTemplate
 }
 
 func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionMetadata {
@@ -145,6 +181,31 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 	assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
 
 	assert.Equal(t, "service-account", j.Spec.ServiceAccountName)
+}
+
+func TestContainerTaskExecutor_BuildResource_PodTemplate(t *testing.T) {
+	command := []string{"command"}
+	args := []string{"{{.Input}}"}
+	taskTemplate := dummyContainerTaskTemplateWithPodSpec(command, args)
+	taskCtx := dummyContainerTaskContext(taskTemplate, containerResourceRequirements, nil)
+
+	r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
+	assert.NoError(t, err)
+	assert.NotNil(t, r)
+	j, ok := r.(*v1.Pod)
+	assert.True(t, ok)
+
+	assert.NotEmpty(t, j.Spec.Containers)
+	assert.Equal(t, containerResourceRequirements.Limits[v1.ResourceCPU], j.Spec.Containers[0].Resources.Limits[v1.ResourceCPU])
+
+	// TODO: Once configurable, test when setting storage is supported on the cluster vs not.
+	storageRes := j.Spec.Containers[0].Resources.Limits[v1.ResourceStorage]
+	assert.Equal(t, int64(0), (&storageRes).Value())
+
+	assert.Equal(t, command, j.Spec.Containers[0].Command)
+	assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
+
+	assert.Equal(t, podTemplateServiceAccount, j.Spec.ServiceAccountName)
 }
 
 func TestContainerTaskExecutor_BuildResource_ExtendedResources(t *testing.T) {
