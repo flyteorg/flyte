@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	errors2 "errors"
 	"fmt"
+	"os"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"os"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
