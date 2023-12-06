@@ -199,7 +199,7 @@ jobs:
                   register \
                   --project flytesnacks \
                   --domain development \
-                  --image cr.flyte.org/flyteorg/flytekit:py3.11-1.10.0 \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
           done < flyte_tests.txt
