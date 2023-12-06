@@ -40,9 +40,8 @@
 
 Flyte helps you create a repeatable, reliable process for releasing ML-enabled software to production.
 
---GIF GOES HERE--
 
-<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
+<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadmegif.gif" style="width: 100%; height: auto;" />
 
 
 <h3 align="center">
@@ -50,19 +49,47 @@ Flyte helps you create a repeatable, reliable process for releasing ML-enabled s
   <span> · </span>
   <a href="https://docs.flyte.org/">Documentation</a>
   <span> · </span>
-  <a href="#resources">Resources</a>
+  <a href="#how-to-stay-involved">Resources</a>
 </h3>
 
-<br />
-
 ## Table of contents
-* Features
-* Quick start
-* Who uses Flyte?
-* How to stay in touch
-* How to contribute
-
+* [Quick start](#quick-start)
+* [Features](#features)
+* [Who uses Flyte?](#whos-using-flyte)
+* [How to stay involved?](#how-to-stay-involved)
+* [How to contribute?](#how-to-contribute)
 ---
+## Quick start
+
+1. Install Flyte's Python SDK
+```bash
+pip install flytekit
+```
+2. Create a workflow (see [example](https://github.com/flyteorg/flytesnacks/blob/master/examples/basics/basics/hello_world.py))
+3. Run it locally with:
+```bash
+pyflyte run hello_world.py hello_world_wf
+```
+**Ready to try a Flyte cluster?**
+
+1. Create a new sandbox cluster, running as a Docker container:
+```bash
+flytectl demo start
+```
+2. Now execute your workflows on the cluster:
+```bash
+pyflyte run --remote hello_world.py hello_world_wf
+```
+
+**Do you want to see more but don't want to install anything?**
+
+Head over to https://sandbox.union.ai/. It allows you to experiment with Flyte's capabilities from a hosted Jupyter notebook.
+
+**Ready to productionize?**
+
+Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deployment/index.html) for instructions to install Flyte on different environments
+
+
 
 ## Features
 
@@ -75,7 +102,7 @@ from flytekit import task, workflow
 def say_hello() -> str: #type hints required: catch type errors at compile time
     return "Hello, World!"
 
-@workflow
+@workflow 
 def hello_world_wf() -> str:
     res = say_hello()
     return res
@@ -109,7 +136,7 @@ $ flytectl get execution --project flytesnacks --domain development
  ----------------------  -------------------------- -----------
 | f49407dd0c4be4703982 | cxB1fQlk0fTjUzkmD6DiMw== |  SUCCEEDED |
 ```
-* **Configure the recipe for your workflow execution including schedules:**
+* **Configure schedules:**
 
 ```python
 from flytekit import LaunchPlan
@@ -121,23 +148,24 @@ launch_plan = LaunchPlan.get_or_create(
 )
 ```
 
-And much, much more:
+😎 And much, much more 😎
 
 🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
+🔒 **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
+🧬 **Data lineage**: Track the movement and transformation of data throughout the lifecycle of your data and ML workflows. <br />
 📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/map_task.html). <br />
+🌎 **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
 🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/dynamics.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
+⏯️ [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
 🌳 **Branching**: [Selectively execute branches](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/conditions.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
+📈 **Data visualization**: Visualize data, monitor models and view training history through plots. <br />
 📂 **FlyteFile & FlyteDirectory**: Transfer [files](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/files.html) and [directories](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/folders.html) between local and cloud storage. <br />
 🗃️ **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/data_types_and_io/structured_dataset.html). <br />
 🛡️ **Recover from failures**: Recover only the failed tasks. <br />
 🔁 **Rerun a single task**: Rerun workflows at the most granular level without modifying the previous state of a data/ML workflow. <br />
 🔍 **Cache outputs**: Cache task outputs by passing `cache=True` to the task decorator. <br />
 🚩 **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/checkpoint.html) within a task execution. <br />
-🌎 **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
 ⏰ **Timeout**: Define a timeout period, after which the task is marked as failure. <br />
-🔒 **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
-🧬 **Data lineage**: Track the movement and transformation of data throughout the lifecycle of your data and ML workflows. <br />
-📈 **Data visualization**: Visualize data, monitor models and view training history through plots. <br />
 🏭 **Dev to prod**: As simple as changing your [domain](https://docs.flyte.org/en/latest/concepts/domains.html) from development or staging to production. <br />
 💸 **Spot or preemptible instances**: Schedule your workflows on spot instances by setting `interruptible` to `True` in the task decorator. <br />
 ☁️ **Cloud-native deployment**: Deploy Flyte on AWS, GCP, Azure and other cloud services. <br />
@@ -148,28 +176,23 @@ And much, much more:
 🐳 **Dependency isolation via containers**: Maintain separate sets of dependencies for your tasks so no dependency conflicts arise. <br />
 🔀 **Parallelism**: Flyte tasks are inherently parallel to optimize resource consumption and improve performance. <br />
 💾 **Allocate resources dynamically** at the task level. <br />
-⏯️ [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
+
 
 We ship new features, bug fixes and performance improvements regularly. Read our [release notes](https://github.com/flyteorg/flyte/releases) to stay updated.
-## Quick start
-
-If you want to try out Flyte, the easiest way to get started is by using the Flyte Hosted Sandbox, available at https://sandbox.union.ai/. It allows you to experiment with Flyte's capabilities without installing anything on your local machine.
-
-However, if you prefer to install Flyte locally and run a workflow, our [getting started guide](https://docs.flyte.org/projects/cookbook/en/latest/index.html) is the best place to start. It provides step-by-step instructions on how to install Flyte locally and run your first workflow.
-
-> If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/workflow.html) are, be sure to check out our guides on both!
-
-## Adopters
-
-Join the likes of LinkedIn, Spotify, Freenome, Pachama, Gojek, and Woven Planet in adopting Flyte. For a full list of adopters and information on how to add your organization or project, please visit our [ADOPTERS](https://github.com/flyteorg/community/blob/main/ADOPTERS.md) page.
 
 
-## Resources
+## Who's using Flyte?
+
+
+Join the likes of LinkedIn, Spotify, Freenome, Pachama, Warner Bros. and many others in adopting Flyte for mission-critical use cases. For a full list of adopters and information on how to add your organization or project, please visit our [ADOPTERS](https://github.com/flyteorg/community/blob/main/ADOPTERS.md) page.
+
+
+## How to stay involved?
 
 📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered. <br>
 👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions. <br>
 💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help. <br>
-⚠️ [GitHub](https://github.com/flyteorg/flyte): Check out the Flyte project on GitHub to file issues, contribute code, and stay up to date on the latest development. <br>
+⚠️ [Newsletter](https://lists.lfaidata.foundation/g/flyte-announce/join): join this group to receive the Flyte Monthly newsletter. <br>
 📹 [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. <br>
 📄 [Blog](https://flyte.org/blog): Here, you can find tutorials and feature deep dives to help you learn more about Flyte. <br>
 💡 [RFCs](rfc/.): RFCs are used for proposing new ideas and features to improve Flyte. You can refer to them to stay updated on the latest developments and contribute to the growth of the platform.
