@@ -391,7 +391,7 @@ func newAgentPlugin() webapi.PluginEntry {
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
 	isSyncTask := make(map[string]bool)
 
-	setAgentMetadata(cfg, connectionCache, isSyncTask)
+	agentMetadata := setAgentMetadata(cfg, connectionCache, isSyncTask)
 	logger.Infof(context.Background(), "supported task types: %v", cfg.SupportedTaskTypes)
 	logger.Infof(context.Background(), "is sync task: %v", isSyncTask)
 
