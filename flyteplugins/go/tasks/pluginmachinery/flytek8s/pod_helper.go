@@ -683,8 +683,9 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								// synced, and therefore, only provides an
 								// approximation of the elapsed time since the last
 								// transition.
-								if time.Since(t) >= config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration {
-									return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t, nil
 								}
@@ -695,14 +696,29 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 									&pluginsCore.TaskInfo{OccurredAt: &t},
 								), t, nil
 
-							case "CreateContainerConfigError", "InvalidImageName":
+							case "CreateContainerConfigError":
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+										OccurredAt: &t,
+									}), t, nil
+								}
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), t, nil
+
+							case "InvalidImageName":
 								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), t, nil
 
 							case "ImagePullBackOff":
-								if time.Since(t) >= config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration {
-									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t, nil
 								}
@@ -732,6 +748,10 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 	}
 
 	return phaseInfo, t, nil
+}
+
+func GetMessageAfterGracePeriod(message string, gracePeriod time.Duration) string {
+	return fmt.Sprintf("Grace period [%s] exceeded|%s", gracePeriod, message)
 }
 
 func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
