@@ -29,6 +29,7 @@ var containerResourceRequirements = &v1.ResourceRequirements{
 	},
 }
 
+var serviceAccount = "service-account"
 var podTemplateServiceAccount = "test-service-account"
 var securityContextServiceAccount = "security-context-service-account"
 
@@ -87,7 +88,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 		Name: "blah",
 	})
 	if returnsServiceAccount {
-		taskMetadata.On("GetK8sServiceAccount").Return("service-account")
+		taskMetadata.On("GetK8sServiceAccount").Return(serviceAccount)
 	} else {
 		taskMetadata.On("GetK8sServiceAccount").Return("")
 	}
@@ -175,7 +176,7 @@ func TestContainerTaskExecutor_BuildResource_U(t *testing.T) {
 			name:                 "BuildResource",
 			taskTemplate:         dummyContainerTaskTemplate(command, args),
 			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true),
-			expectServiceAccount: "service-account",
+			expectServiceAccount: serviceAccount,
 		},
 		{
 			name:                 "BuildResource_PodTemplate",
