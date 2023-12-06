@@ -9,6 +9,9 @@ on:
       go-version:
         required: true
         type: string
+    secrets:
+      FLYTE_BOT_PAT:
+        required: true
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -19,6 +22,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: arduino/setup-protoc@v1
+        with:
+          repo-token: ${{ secrets.FLYTE_BOT_PAT }}
       - uses: bufbuild/buf-setup-action@v1
       - uses: actions/setup-go@v3
         with:

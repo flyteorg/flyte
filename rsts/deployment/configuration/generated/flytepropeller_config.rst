@@ -982,6 +982,16 @@ databricks (`databricks.Config`_)
       qps: 10
   
 
+echo (`testing.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  sleep-duration: 0s
+  
+
 k8s (`config.K8sPluginConfig`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -3812,6 +3822,21 @@ All user logs across driver and executors.
   stackdriver-logresourcename: ""
   stackdriver-template-uri: ""
   templates: null
+  
+
+testing.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sleep-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Indicates the amount of time before transitioning to success
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 Section: propeller
