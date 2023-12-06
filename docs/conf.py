@@ -426,11 +426,14 @@ class CustomWarningSuppressor(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         msg = record.getMessage()
 
+        # TODO: These are all warnings that should be fixed as follow-ups to the
+        # monodocs build project.
         filter_out = (
             "duplicate label",
             "Unexpected indentation",
             'Error with CSV data in "csv-table" directive',
             "Definition list ends without a blank line",
+            "autodoc: failed to import module 'awssagemaker' from module 'flytekitplugins'",
         )
 
         if msg.strip().startswith(filter_out):
