@@ -115,6 +115,38 @@ func (_m *TaskExecutionID) GetID() flyteidlcore.TaskExecutionIdentifier {
 	return r0
 }
 
+type TaskExecutionID_GetOrganization struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionID_GetOrganization) Return(_a0 string) *TaskExecutionID_GetOrganization {
+	return &TaskExecutionID_GetOrganization{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionID) OnGetOrganization() *TaskExecutionID_GetOrganization {
+	c_call := _m.On("GetOrganization")
+	return &TaskExecutionID_GetOrganization{Call: c_call}
+}
+
+func (_m *TaskExecutionID) OnGetOrganizationMatch(matchers ...interface{}) *TaskExecutionID_GetOrganization {
+	c_call := _m.On("GetOrganization", matchers...)
+	return &TaskExecutionID_GetOrganization{Call: c_call}
+}
+
+// GetOrganization provides a mock function with given fields:
+func (_m *TaskExecutionID) GetOrganization() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}
+
 type TaskExecutionID_GetUniqueNodeID struct {
 	*mock.Call
 }

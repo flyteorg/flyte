@@ -626,6 +626,7 @@ func newPluginContext() k8s.PluginContext {
 	})
 	taskExecID.OnGetUniqueNodeID().Return("unique-node")
 	taskExecID.OnGetGeneratedName().Return("generated-name")
+	taskExecID.OnGetOrganization().Return("myorg")
 
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)

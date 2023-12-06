@@ -231,6 +231,10 @@ func (m mockTaskExecutionIdentifier) GetUniqueNodeID() string {
 	return "unique-node-id"
 }
 
+func (m mockTaskExecutionIdentifier) GetOrganization() string {
+	return "myorg"
+}
+
 func TestDecorateEnvVars(t *testing.T) {
 	ctx := context.Background()
 	ctx = contextutils.WithWorkflowID(ctx, "fake_workflow")

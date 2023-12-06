@@ -35,6 +35,7 @@ type templateRegexes struct {
 	ExecutionProject     *regexp.Regexp
 	ExecutionDomain      *regexp.Regexp
 	GeneratedName        *regexp.Regexp
+	Organization         *regexp.Regexp
 }
 
 func initDefaultRegexes() templateRegexes {
@@ -60,6 +61,7 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("executionProject"),
 		MustCreateRegex("executionDomain"),
 		MustCreateRegex("generatedName"),
+		MustCreateRegex("organization"),
 	}
 }
 
@@ -126,6 +128,10 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 			TemplateVar{
 				defaultRegexes.GeneratedName,
 				input.TaskExecutionID.GetGeneratedName(),
+			},
+			TemplateVar{
+				defaultRegexes.Organization,
+				input.TaskExecutionID.GetOrganization(),
 			},
 			TemplateVar{
 				defaultRegexes.TaskRetryAttempt,

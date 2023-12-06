@@ -31,6 +31,9 @@ type TaskExecutionID interface {
 	// GetUniqueNodeID returns the fully-qualified Node ID that is unique within a
 	// given workflow execution.
 	GetUniqueNodeID() string
+
+	// GetOrganization returns the organization for the running task.
+	GetOrganization() string
 }
 
 // TaskExecutionMetadata represents any execution information for a Task. It is used to communicate meta information about the

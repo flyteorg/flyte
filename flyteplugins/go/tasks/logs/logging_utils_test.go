@@ -38,6 +38,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 		RetryAttempt: 1,
 	})
 	tID.OnGetUniqueNodeID().Return("n0-0-n0")
+	tID.OnGetOrganization().Return("")
 	return tID
 }
 

@@ -40,6 +40,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 		RetryAttempt: 1,
 	})
 	tID.OnGetUniqueNodeID().Return("n0-0-n0")
+	tID.OnGetOrganization().Return("myorg")
 	return tID
 }
 
@@ -152,6 +153,7 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 				{defaultRegexes.LogName, "main_logs"},
 				{defaultRegexes.NodeID, "n0-0-n0"},
 				{defaultRegexes.GeneratedName, "generated-name"},
+				{defaultRegexes.Organization, "myorg"},
 				{defaultRegexes.TaskRetryAttempt, "1"},
 				{defaultRegexes.TaskID, "my-task-name"},
 				{defaultRegexes.TaskVersion, "1"},

@@ -20,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
@@ -50,6 +51,7 @@ var (
 		Limits:   make(corev1.ResourceList),
 	}
 	dummyPluginStateA = 45
+	dummyOrg          = "myorg"
 )
 
 func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParentInfo, eventVersion v1alpha1.EventVersion) interfaces.NodeExecutionContext {
@@ -60,7 +62,7 @@ func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParen
 		ExecutionId: wfExecID,
 	})
 	nm.OnGetK8sServiceAccount().Return("service-account")
-	nm.OnGetLabels().Return(map[string]string{})
+	nm.OnGetLabels().Return(map[string]string{k8s.OrganizationLabel: dummyOrg})
 	nm.OnGetNamespace().Return("namespace")
 	nm.OnGetOwnerID().Return(types.NamespacedName{Namespace: "namespace", Name: "name"})
 	nm.OnGetOwnerReference().Return(v1.OwnerReference{
@@ -174,6 +176,7 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetNodeId(), nodeID)
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetExecutionId(), wfExecID)
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetUniqueNodeID(), nodeID)
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetOrganization(), dummyOrg)
 
 	assert.EqualValues(t, got.ResourceManager().(resourcemanager.TaskResourceManager).GetResourcePoolInfo(), make([]*event.ResourcePoolInfo, 0))
 

@@ -16,6 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
 	controllerconfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
@@ -35,6 +36,7 @@ const IDMaxLength = 50
 type taskExecutionID struct {
 	execName     string
 	id           *core.TaskExecutionIdentifier
+	organization string
 	uniqueNodeID string
 }
 
@@ -48,6 +50,10 @@ func (te taskExecutionID) GetUniqueNodeID() string {
 
 func (te taskExecutionID) GetGeneratedName() string {
 	return te.execName
+}
+
+func (te taskExecutionID) GetOrganization() string {
+	return te.organization
 }
 
 func (te taskExecutionID) GetGeneratedNameWith(minLength, maxLength int) (string, error) {
@@ -292,6 +298,12 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		return nil, err
 	}
 
+	// Extract the organization for this execution from labels
+	var organization string
+	if v, ok := nCtx.NodeExecutionMetadata().GetLabels()[k8s.OrganizationLabel]; ok {
+		organization = v
+	}
+
 	return &taskExecutionContext{
 		NodeExecutionContext: nCtx,
 		tm: taskExecutionMetadata{
@@ -299,6 +311,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 			taskExecID: taskExecutionID{
 				execName:     uniqueID,
 				id:           id,
+				organization: organization,
 				uniqueNodeID: currentNodeUniqueID,
 			},
 			o:                    nCtx.Node(),
