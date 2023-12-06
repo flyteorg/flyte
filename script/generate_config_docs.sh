@@ -5,7 +5,7 @@ set -e
 echo "Generating Flyte Configuration Documents"
 CUR_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 ROOT_DIR=${CUR_DIR}/..
-OUTPUT_DIR="${ROOT_DIR}"/rsts/deployment/configuration/generated
+OUTPUT_DIR="${ROOT_DIR}"/docs/deployment/configuration/generated
 GOBIN=${GOPATH:-~/go}/bin
 
 make -C datacatalog compile
