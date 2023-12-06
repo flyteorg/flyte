@@ -776,3 +776,17 @@ func TestBuildResourceMPIV1ResourceTolerations(t *testing.T) {
 	assert.NotContains(t, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Template.Spec.Tolerations, gpuToleration)
 	assert.Contains(t, mpiJob.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
 }
+
+func TestGetReplicaCount(t *testing.T) {
+	mpiResourceHandler := mpiOperatorResourceHandler{}
+	tfObj := dummyMPICustomObj(1, 1, 0)
+	taskTemplate := dummyMPITaskTemplate("the job", tfObj)
+	resource, err := mpiResourceHandler.BuildResource(context.TODO(), dummyMPITaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+	MPIJob, ok := resource.(*kubeflowv1.MPIJob)
+	assert.True(t, ok)
+
+	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker))
+	assert.NotNil(t, common.GetReplicaCount(MPIJob.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher))
+}
