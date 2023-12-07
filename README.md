@@ -52,6 +52,9 @@ Either locally or on a remote cluster, execute your models with ease.
 <h2 align="center">
  Scale
  </h2>
+ <p>
+TBD
+ </p>
 
 <h3 align="center">
   <a href="#quick-start">Get Started</a>
