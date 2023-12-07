@@ -934,8 +934,6 @@ func (m *FindByWorkflowExecRequest) Validate() error {
 
 	// no validation rules for Direction
 
-	// no validation rules for FetchSpecs
-
 	return nil
 }
 
