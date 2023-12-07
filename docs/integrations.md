@@ -49,12 +49,11 @@ Data is automatically marshalled and unmarshalled in and out of the plugin. User
 {py:class}`~flytekit.core.base_task.PythonTask` API defined in Flytekit.
 
 Flytekit Plugins are lazily loaded and can be released independently like libraries. We follow a convention to name the
-plugin like `flytekitplugins-*`, where * indicates the package to be integrated into Flytekit. For example
+plugin like `flytekitplugins-*`, where \* indicates the package to be integrated into Flytekit. For example
 `flytekitplugins-papermill` enables users to author Flytekit tasks using [Papermill](https://papermill.readthedocs.io/en/latest/).
 
 You can find the plugins maintained by the core Flyte team [here](https://github.com/flyteorg/flytekit/tree/master/plugins).
 :::
-
 
 ## Native Backend Plugins
 
@@ -82,7 +81,6 @@ orchestrated by Flyte itself, within its provisioned Kubernetes clusters.
 ```
 
 (external_service_backend_plugins)=
-
 
 ## External Service Backend Plugins
 
@@ -137,7 +135,6 @@ This is a little tricky since you have to look at the source code of the plugin 
 Flyte uses Kustomize to generate the the deployment configuration which can be leveraged to [kustomize your own deployment](https://github.com/flyteorg/flyte/tree/master/kustomize).
 
 ::::
-
 
 ## Custom Container Tasks
 
@@ -208,6 +205,7 @@ flytesnacks/examples/athena_plugin/index
 flytesnacks/examples/aws_batch_plugin/index
 flytesnacks/examples/hive_plugin/index
 flytesnacks/examples/mmcloud_plugin/index
+flytesnacks/examples/sensor/index
 flytesnacks/examples/snowflake_plugin/index
 flytesnacks/examples/databricks_plugin/index
 flytesnacks/examples/bigquery_plugin/index
