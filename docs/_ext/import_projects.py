@@ -33,11 +33,6 @@ class Project:
 
 
 def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
-    # create flytekit/_version.py file manually
-    with open(f"{import_project_config.flytekit_api_dir}/flytekit/_version.py", "w") as f:
-        f.write(f'__version__ = "dev"')
-
-
     # add flytekit to python path
     flytekit_dir = os.path.abspath(import_project_config.flytekit_api_dir)
     flytekit_src_dir = os.path.abspath(os.path.join(flytekit_dir, "flytekit"))

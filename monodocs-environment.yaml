@@ -1,3 +1,4 @@
+name: monodocs-env
 channels:
   - conda-forge
 dependencies:
@@ -71,3 +72,7 @@ dependencies:
     - whylabs-client              # whylogs
     - ray==2.6.3
     - duckdb
+
+platforms:
+  - linux-64
+  - osx-arm64
