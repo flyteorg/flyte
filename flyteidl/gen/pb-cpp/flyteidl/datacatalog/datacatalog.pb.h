@@ -2100,6 +2100,15 @@ class UpdateArtifactRequest final :
   ::datacatalog::DatasetID* mutable_dataset();
   void set_allocated_dataset(::datacatalog::DatasetID* dataset);
 
+  // .datacatalog.Metadata metadata = 5;
+  bool has_metadata() const;
+  void clear_metadata();
+  static const int kMetadataFieldNumber = 5;
+  const ::datacatalog::Metadata& metadata() const;
+  ::datacatalog::Metadata* release_metadata();
+  ::datacatalog::Metadata* mutable_metadata();
+  void set_allocated_metadata(::datacatalog::Metadata* metadata);
+
   // string artifact_id = 2;
   private:
   bool has_artifact_id() const;
@@ -2148,6 +2157,7 @@ class UpdateArtifactRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::datacatalog::ArtifactData > data_;
   ::datacatalog::DatasetID* dataset_;
+  ::datacatalog::Metadata* metadata_;
   union QueryHandleUnion {
     QueryHandleUnion() {}
     ::google::protobuf::internal::ArenaStringPtr artifact_id_;
@@ -6681,6 +6691,57 @@ inline const ::google::protobuf::RepeatedPtrField< ::datacatalog::ArtifactData >
 UpdateArtifactRequest::data() const {
   // @@protoc_insertion_point(field_list:datacatalog.UpdateArtifactRequest.data)
   return data_;
+}
+
+// .datacatalog.Metadata metadata = 5;
+inline bool UpdateArtifactRequest::has_metadata() const {
+  return this != internal_default_instance() && metadata_ != nullptr;
+}
+inline void UpdateArtifactRequest::clear_metadata() {
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
+}
+inline const ::datacatalog::Metadata& UpdateArtifactRequest::metadata() const {
+  const ::datacatalog::Metadata* p = metadata_;
+  // @@protoc_insertion_point(field_get:datacatalog.UpdateArtifactRequest.metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::datacatalog::Metadata*>(
+      &::datacatalog::_Metadata_default_instance_);
+}
+inline ::datacatalog::Metadata* UpdateArtifactRequest::release_metadata() {
+  // @@protoc_insertion_point(field_release:datacatalog.UpdateArtifactRequest.metadata)
+  
+  ::datacatalog::Metadata* temp = metadata_;
+  metadata_ = nullptr;
+  return temp;
+}
+inline ::datacatalog::Metadata* UpdateArtifactRequest::mutable_metadata() {
+  
+  if (metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::datacatalog::Metadata>(GetArenaNoVirtual());
+    metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:datacatalog.UpdateArtifactRequest.metadata)
+  return metadata_;
+}
+inline void UpdateArtifactRequest::set_allocated_metadata(::datacatalog::Metadata* metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete metadata_;
+  }
+  if (metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metadata_ = metadata;
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.UpdateArtifactRequest.metadata)
 }
 
 inline bool UpdateArtifactRequest::has_query_handle() const {

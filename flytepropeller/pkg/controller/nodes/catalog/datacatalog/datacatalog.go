@@ -286,6 +286,7 @@ func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, dat
 		Dataset:     datasetID,
 		QueryHandle: &datacatalog.UpdateArtifactRequest_TagName{TagName: tagName},
 		Data:        artifactDataList,
+		Metadata:    GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
 	}
 	resp, err := m.client.UpdateArtifact(ctx, updateArtifactRequest)
 	if err != nil {
