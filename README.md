@@ -7,27 +7,27 @@
 </h1>
 
 <p align="center">
-  🏗️ 🚀 📈 
+  :building_construction: :rocket: :chart_with_upwards_trend: 
 </p>
 
 
 <p align="center">
   <a href="https://github.com/flyteorg/flyte/releases/latest">
-    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge" alt="Current Release" /></a>
+    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge" alt="Current Release label" /></a>
   <a href="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge" alt="Sandbox Status" /></a>
+    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge" alt="Sandbox Status label" /></a>
   <a href="https://github.com/flyteorg/flyte/actions/workflows/tests.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge" alt="Test Status" /></a>
+    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge" alt="Test Status label" /></a>
   <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
-    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge" alt="License" /></a>
+    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge" alt="License label" /></a>
   <a href="https://bestpractices.coreinfrastructure.org/projects/4670">
-    <img src="https://img.shields.io/badge/openssf%20best%20practices-passing-green?style=for-the-badge" alt="OpenSSF Best Practices" /></a>
+    <img src="https://img.shields.io/badge/openssf%20best%20practices-passing-green?style=for-the-badge" alt="OpenSSF Best Practices label" /></a>
   <a href="https://artifacthub.io/packages/search?repo=flyte">
-    <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" /></a>
+    <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart label" /></a>
   <a href="https://twitter.com/flyteorg"> 
     <img src="https://img.shields.io/badge/X-000000.svg?style=for-the-badge&logo=X&logoColor=white" height=30px/></a>
-  <a href="https://slack.flyte.org">
-    <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack" /></a>
+  <a href="https://slack.flyte.org" alt="Twitter, formerly X logo label">
+    <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack label" /></a>
 </p>
 
 Flyte is an open-source orchestrator that facilitates building production-grade data and ML pipelines. It is built for scalability and reproducibility, leveraging Kubernetes as its underlying platform. With Flyte, user teams can construct pipelines using the Python SDK, and seamlessly deploy them on both cloud and on-premises environments, enabling distributed processing and efficient resource utilization.
@@ -85,6 +85,9 @@ pyflyte run hello_world.py hello_world_wf
 ```
 **Ready to try a Flyte cluster?**
 
+<img alt="Getting started with Flyte, showing the welcome screen and Flyte dashboard" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
+
+
 1. Create a new sandbox cluster, running as a Docker container:
 ```bash
 flytectl demo start
@@ -103,6 +106,7 @@ Head over to https://sandbox.union.ai/. It allows you to experiment with Flyte's
 Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deployment/index.html) for instructions to install Flyte on different environments
 
 ## Tutorials
+
 
 - [Fine-tune Code Llama on the Flyte codebase](https://github.com/unionai-oss/llm-fine-tuning/tree/main/flyte_llama#readme)
 - [Forecast sales with Horovod and Spark](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/forecasting_sales/index.html)
@@ -139,9 +143,6 @@ Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deploym
 💾 **Allocate resources dynamically** at the task level. <br />
 
 
-We ship new features, bug fixes and performance improvements regularly. Read our [release notes](https://github.com/flyteorg/flyte/releases) to stay updated.
-
-
 ## Who's using Flyte?
 
 
@@ -150,6 +151,7 @@ Join the likes of LinkedIn, Spotify, Freenome, Pachama, Warner Bros. and many ot
 
 ## How to stay involved?
 
+
 📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered. <br>
 👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions. <br>
 💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help. <br>
@@ -157,6 +159,7 @@ Join the likes of LinkedIn, Spotify, Freenome, Pachama, Warner Bros. and many ot
 📹 [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. <br>
 📄 [Blog](https://flyte.org/blog): Here, you can find tutorials and feature deep dives to help you learn more about Flyte. <br>
 💡 [RFCs](rfc/.): RFCs are used for proposing new ideas and features to improve Flyte. You can refer to them to stay updated on the latest developments and contribute to the growth of the platform.
+
 
 ## How to contribute
 
@@ -168,7 +171,7 @@ There are many ways to get involved in Flyte, including:
 - Taking on a [`help wanted`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+) or [`good-first-issue`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) and following the [CONTRIBUTING](https://docs.flyte.org/en/latest/community/contribute.html) guide to submit changes to the codebase.
 - Upvoting [popular feature requests](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement+sort%3Areactions-%2B1-desc) to show your support.
 
-### We ❤️ our contributors
+### We :heart: our contributors
 
 <!-- CONTRIBUTORS START -->
 

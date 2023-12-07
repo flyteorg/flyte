@@ -12,6 +12,8 @@ Flyte Propeller Configuration
 
 - `logger <#section-logger>`_
 
+- `otel <#section-otel>`_
+
 - `plugins <#section-plugins>`_
 
 - `propeller <#section-propeller>`_
@@ -735,6 +737,75 @@ Sets logging format type.
   json
   
 
+Section: otel
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of exporter to configure [noop/file/jaeger].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+file (`otelutils.FileConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a file
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  filename: /tmp/trace.txt
+  
+
+jaeger (`otelutils.JaegerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a jaeger
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:14268/api/traces
+  
+
+otelutils.FileConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+filename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Filename to store exported telemetry traces
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /tmp/trace.txt
+  
+
+otelutils.JaegerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the jaeger telemtry trace ingestor
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:14268/api/traces
+  
+
 Section: plugins
 ========================================================================================================================
 
@@ -911,6 +982,16 @@ databricks (`databricks.Config`_)
       qps: 10
   
 
+echo (`testing.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  sleep-duration: 0s
+  
+
 k8s (`config.K8sPluginConfig`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -1075,6 +1156,7 @@ ray (`ray.Config`_)
 .. code-block:: yaml
 
   dashboardHost: 0.0.0.0
+  dashboardURLTemplate: null
   defaults:
     headNode:
       ipAddress: $MY_POD_IP
@@ -1099,6 +1181,7 @@ ray (`ray.Config`_)
     stackdriver-logresourcename: ""
     stackdriver-template-uri: ""
     templates: null
+  logsSidecar: null
   remoteClusterConfig:
     auth:
       caCertPath: ""
@@ -1109,25 +1192,6 @@ ray (`ray.Config`_)
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
-  
-
-sagemaker (`config.Config (sagemaker)`_)
-------------------------------------------------------------------------------------------------------------------------
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  prebuiltAlgorithms:
-  - name: xgboost
-    regionalConfigs:
-    - region: us-east-1
-      versionConfigs:
-      - image: 683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3
-        version: "0.90"
-  region: us-east-1
-  roleAnnotationKey: ""
-  roleArn: default_role
   
 
 snowflake (`snowflake.Config`_)
@@ -2056,60 +2120,6 @@ destinationClusterConfigs ([]config.DestinationClusterConfig)
 .. code-block:: yaml
 
   []
-  
-
-config.Config (sagemaker)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-roleArn (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-The role the SageMaker plugin uses to communicate with the SageMaker service
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  default_role
-  
-
-region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-The AWS region the SageMaker plugin communicates to
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  us-east-1
-  
-
-roleAnnotationKey (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Map key to use to lookup role from task annotations.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-prebuiltAlgorithms ([]config.PrebuiltAlgorithmConfig)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  - name: xgboost
-    regionalConfigs:
-    - region: us-east-1
-      versionConfigs:
-      - image: 683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3
-        version: "0.90"
   
 
 config.K8sPluginConfig
@@ -3159,7 +3169,7 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-templates ([]logs.TemplateLogPluginConfig)
+templates ([]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3332,7 +3342,7 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-templates ([]logs.TemplateLogPluginConfig)
+templates ([]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3441,6 +3451,28 @@ logs (`logs.LogConfig`_)
   stackdriver-logresourcename: ""
   stackdriver-template-uri: ""
   templates: null
+  
+
+logsSidecar (v1.Container)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+dashboardURLTemplate (tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template for URL of Ray dashboard running on a head node.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 defaults (`ray.DefaultConfig`_)
@@ -3790,6 +3822,21 @@ All user logs across driver and executors.
   stackdriver-logresourcename: ""
   stackdriver-template-uri: ""
   templates: null
+  
+
+testing.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sleep-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Indicates the amount of time before transitioning to success
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 Section: propeller
@@ -5464,6 +5511,16 @@ requests (v1.ResourceList)
 
   cpu: 200m
   memory: 500Mi
+  
+
+claims ([]v1.ResourceClaim)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 config.GCPSecretManagerConfig
