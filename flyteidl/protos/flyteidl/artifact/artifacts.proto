@@ -189,10 +189,10 @@ service ArtifactRegistry {
 
   rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {
     option (google.api.http) = {
-      get: "/data/v1/artifacts"
-      additional_bindings {get: "/data/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
-      additional_bindings {get: "/data/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
-      additional_bindings {get: "/data/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
+      get: "/artifacts/api/v1/data/artifacts"
+      additional_bindings {get: "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
+      additional_bindings {get: "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
+      additional_bindings {get: "/artifacts/api/v1/api/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
     };
   }
 
@@ -217,7 +217,7 @@ service ArtifactRegistry {
 
   rpc FindByWorkflowExec (FindByWorkflowExecRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
-      get: "/data/v1/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
+      get: "/artifacts/api/v1/data/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
     };
   }
 

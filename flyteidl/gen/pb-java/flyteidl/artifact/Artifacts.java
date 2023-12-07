@@ -20017,54 +20017,55 @@ public final class Artifacts {
       "sRequest\022@\n\014execution_id\030\001 \001(\0132*.flyteid" +
       "l.core.WorkflowExecutionIdentifier\022)\n\006in" +
       "puts\030\002 \003(\0132\031.flyteidl.core.ArtifactID\"\031\n" +
-      "\027ExecutionInputsResponse2\365\r\n\020ArtifactReg" +
+      "\027ExecutionInputsResponse2\272\016\n\020ArtifactReg" +
       "istry\022g\n\016CreateArtifact\022(.flyteidl.artif" +
       "act.CreateArtifactRequest\032).flyteidl.art" +
-      "ifact.CreateArtifactResponse\"\000\022\315\004\n\013GetAr" +
+      "ifact.CreateArtifactResponse\"\000\022\204\005\n\013GetAr" +
       "tifact\022%.flyteidl.artifact.GetArtifactRe" +
       "quest\032&.flyteidl.artifact.GetArtifactRes" +
-      "ponse\"\356\003\202\323\344\223\002\347\003\022\022/data/v1/artifactsZ\252\001\022\247" +
-      "\001/data/v1/artifact/id/{query.artifact_id" +
-      ".artifact_key.project}/{query.artifact_i" +
-      "d.artifact_key.domain}/{query.artifact_i" +
-      "d.artifact_key.name}/{query.artifact_id." +
-      "version}Z\216\001\022\213\001/data/v1/artifact/id/{quer" +
-      "y.artifact_id.artifact_key.project}/{que" +
-      "ry.artifact_id.artifact_key.domain}/{que" +
-      "ry.artifact_id.artifact_key.name}Z\222\001\022\217\001/" +
-      "data/v1/artifact/tag/{query.artifact_tag" +
-      ".artifact_key.project}/{query.artifact_t" +
-      "ag.artifact_key.domain}/{query.artifact_" +
-      "tag.artifact_key.name}\022\204\002\n\017SearchArtifac" +
-      "ts\022).flyteidl.artifact.SearchArtifactsRe" +
-      "quest\032*.flyteidl.artifact.SearchArtifact" +
-      "sResponse\"\231\001\202\323\344\223\002\222\001\022Q/data/v1/query/s/{a" +
-      "rtifact_key.project}/{artifact_key.domai" +
-      "n}/{artifact_key.name}Z=\022;/data/v1/query" +
-      "/{artifact_key.project}/{artifact_key.do" +
-      "main}\022d\n\rCreateTrigger\022\'.flyteidl.artifa" +
-      "ct.CreateTriggerRequest\032(.flyteidl.artif" +
-      "act.CreateTriggerResponse\"\000\022d\n\rDeleteTri" +
-      "gger\022\'.flyteidl.artifact.DeleteTriggerRe" +
-      "quest\032(.flyteidl.artifact.DeleteTriggerR" +
-      "esponse\"\000\022O\n\006AddTag\022 .flyteidl.artifact." +
-      "AddTagRequest\032!.flyteidl.artifact.AddTag" +
-      "Response\"\000\022e\n\020RegisterProducer\022*.flyteid" +
-      "l.artifact.RegisterProducerRequest\032#.fly" +
-      "teidl.artifact.RegisterResponse\"\000\022e\n\020Reg" +
-      "isterConsumer\022*.flyteidl.artifact.Regist" +
-      "erConsumerRequest\032#.flyteidl.artifact.Re" +
-      "gisterResponse\"\000\022m\n\022SetExecutionInputs\022)" +
-      ".flyteidl.artifact.ExecutionInputsReques" +
-      "t\032*.flyteidl.artifact.ExecutionInputsRes" +
-      "ponse\"\000\022\306\001\n\022FindByWorkflowExec\022,.flyteid" +
-      "l.artifact.FindByWorkflowExecRequest\032*.f" +
-      "lyteidl.artifact.SearchArtifactsResponse" +
-      "\"V\202\323\344\223\002P\022N/data/v1/query/e/{exec_id.proj" +
-      "ect}/{exec_id.domain}/{exec_id.name}/{di" +
-      "rection}B@Z>github.com/flyteorg/flyte/fl" +
-      "yteidl/gen/pb-go/flyteidl/artifactb\006prot" +
-      "o3"
+      "ponse\"\245\004\202\323\344\223\002\236\004\022 /artifacts/api/v1/data/" +
+      "artifactsZ\270\001\022\265\001/artifacts/api/v1/data/ar" +
+      "tifact/id/{query.artifact_id.artifact_ke" +
+      "y.project}/{query.artifact_id.artifact_k" +
+      "ey.domain}/{query.artifact_id.artifact_k" +
+      "ey.name}/{query.artifact_id.version}Z\234\001\022" +
+      "\231\001/artifacts/api/v1/data/artifact/id/{qu" +
+      "ery.artifact_id.artifact_key.project}/{q" +
+      "uery.artifact_id.artifact_key.domain}/{q" +
+      "uery.artifact_id.artifact_key.name}Z\237\001\022\234" +
+      "\001/artifacts/api/v1/api/artifact/tag/{que" +
+      "ry.artifact_tag.artifact_key.project}/{q" +
+      "uery.artifact_tag.artifact_key.domain}/{" +
+      "query.artifact_tag.artifact_key.name}\022\204\002" +
+      "\n\017SearchArtifacts\022).flyteidl.artifact.Se" +
+      "archArtifactsRequest\032*.flyteidl.artifact" +
+      ".SearchArtifactsResponse\"\231\001\202\323\344\223\002\222\001\022Q/dat" +
+      "a/v1/query/s/{artifact_key.project}/{art" +
+      "ifact_key.domain}/{artifact_key.name}Z=\022" +
+      ";/data/v1/query/{artifact_key.project}/{" +
+      "artifact_key.domain}\022d\n\rCreateTrigger\022\'." +
+      "flyteidl.artifact.CreateTriggerRequest\032(" +
+      ".flyteidl.artifact.CreateTriggerResponse" +
+      "\"\000\022d\n\rDeleteTrigger\022\'.flyteidl.artifact." +
+      "DeleteTriggerRequest\032(.flyteidl.artifact" +
+      ".DeleteTriggerResponse\"\000\022O\n\006AddTag\022 .fly" +
+      "teidl.artifact.AddTagRequest\032!.flyteidl." +
+      "artifact.AddTagResponse\"\000\022e\n\020RegisterPro" +
+      "ducer\022*.flyteidl.artifact.RegisterProduc" +
+      "erRequest\032#.flyteidl.artifact.RegisterRe" +
+      "sponse\"\000\022e\n\020RegisterConsumer\022*.flyteidl." +
+      "artifact.RegisterConsumerRequest\032#.flyte" +
+      "idl.artifact.RegisterResponse\"\000\022m\n\022SetEx" +
+      "ecutionInputs\022).flyteidl.artifact.Execut" +
+      "ionInputsRequest\032*.flyteidl.artifact.Exe" +
+      "cutionInputsResponse\"\000\022\324\001\n\022FindByWorkflo" +
+      "wExec\022,.flyteidl.artifact.FindByWorkflow" +
+      "ExecRequest\032*.flyteidl.artifact.SearchAr" +
+      "tifactsResponse\"d\202\323\344\223\002^\022\\/artifacts/api/" +
+      "v1/data/query/e/{exec_id.project}/{exec_" +
+      "id.domain}/{exec_id.name}/{direction}B@Z" +
+      ">github.com/flyteorg/flyte/flyteidl/gen/" +
+      "pb-go/flyteidl/artifactb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

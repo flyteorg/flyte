@@ -604,19 +604,19 @@ func RegisterArtifactRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 }
 
 var (
-	pattern_ArtifactRegistry_GetArtifact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"data", "v1", "artifacts"}, ""))
+	pattern_ArtifactRegistry_GetArtifact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 0}, []string{"artifacts", "api", "v1", "data"}, ""))
 
-	pattern_ArtifactRegistry_GetArtifact_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"data", "v1", "artifact", "id", "query.artifact_id.artifact_key.project", "query.artifact_id.artifact_key.domain", "query.artifact_id.artifact_key.name", "query.artifact_id.version"}, ""))
+	pattern_ArtifactRegistry_GetArtifact_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"artifacts", "api", "v1", "data", "artifact", "id", "query.artifact_id.artifact_key.project", "query.artifact_id.artifact_key.domain", "query.artifact_id.artifact_key.name", "query.artifact_id.version"}, ""))
 
-	pattern_ArtifactRegistry_GetArtifact_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"data", "v1", "artifact", "id", "query.artifact_id.artifact_key.project", "query.artifact_id.artifact_key.domain", "query.artifact_id.artifact_key.name"}, ""))
+	pattern_ArtifactRegistry_GetArtifact_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"artifacts", "api", "v1", "data", "artifact", "id", "query.artifact_id.artifact_key.project", "query.artifact_id.artifact_key.domain", "query.artifact_id.artifact_key.name"}, ""))
 
-	pattern_ArtifactRegistry_GetArtifact_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"data", "v1", "artifact", "tag", "query.artifact_tag.artifact_key.project", "query.artifact_tag.artifact_key.domain", "query.artifact_tag.artifact_key.name"}, ""))
+	pattern_ArtifactRegistry_GetArtifact_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 1, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"artifacts", "api", "v1", "artifact", "tag", "query.artifact_tag.artifact_key.project", "query.artifact_tag.artifact_key.domain", "query.artifact_tag.artifact_key.name"}, ""))
 
 	pattern_ArtifactRegistry_SearchArtifacts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"data", "v1", "query", "s", "artifact_key.project", "artifact_key.domain", "artifact_key.name"}, ""))
 
 	pattern_ArtifactRegistry_SearchArtifacts_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"data", "v1", "query", "artifact_key.project", "artifact_key.domain"}, ""))
 
-	pattern_ArtifactRegistry_FindByWorkflowExec_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"data", "v1", "query", "e", "exec_id.project", "exec_id.domain", "exec_id.name", "direction"}, ""))
+	pattern_ArtifactRegistry_FindByWorkflowExec_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"artifacts", "api", "v1", "data", "query", "e", "exec_id.project", "exec_id.domain", "exec_id.name", "direction"}, ""))
 )
 
 var (
