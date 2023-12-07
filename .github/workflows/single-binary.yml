@@ -202,7 +202,7 @@ jobs:
                   --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
-          done < flyte_tests.txt
+          done < flytesnacks/flyte_tests.txt
       - name: End2End
         run: |
           make end2end_execute
