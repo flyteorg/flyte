@@ -135,7 +135,7 @@ spec:
     n0-n0:
       branch:
         elseFail:
-          failedNodeId: inner_fractions
+          failed_node_id: inner_fractions
           message: Only <0.7 allowed
         elseIf:
         - condition:
