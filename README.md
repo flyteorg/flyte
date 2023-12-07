@@ -53,7 +53,6 @@ Either locally or on a remote cluster, execute your models with ease.
  Scale
  </h2>
 
-
 <h3 align="center">
   <a href="#quick-start">Get Started</a>
   <span> · </span>
