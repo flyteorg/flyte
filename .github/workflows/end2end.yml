@@ -88,7 +88,7 @@ jobs:
                   --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
-          done < flyte_tests.txt
+          done < flytesnacks/flyte_tests.txt
       - name: Register all flytesnacks examples
         if: ${{ inputs.priorities != 'P0' }}
         uses: unionai/flyte-register-action@v0.0.2
