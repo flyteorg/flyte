@@ -1,9 +1,10 @@
 package config
 
 import (
+	"os"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	"os"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )

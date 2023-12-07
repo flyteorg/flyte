@@ -126,7 +126,9 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
-	podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	if len(podSpec.ServiceAccountName) == 0 {
+		podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	}
 
 	pod := flytek8s.BuildIdentityPod()
 	pod.ObjectMeta = *objectMeta
