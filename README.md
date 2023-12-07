@@ -10,14 +10,6 @@
   🏗️ 🚀 📈 
 </p>
 
-<p align="center">
-  <strong>
-    Build. Deploy. Scale.
-  </strong>
-</p>
-
-
-
 
 <p align="center">
   <a href="https://github.com/flyteorg/flyte/releases/latest">
@@ -38,10 +30,28 @@
     <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack" /></a>
 </p>
 
-Flyte helps you create a repeatable, reliable process for releasing ML-enabled software to production.
+Flyte is an open-source orchestrator that facilitates building production-grade data and ML pipelines. It is built for scalability and reproducibility, leveraging Kubernetes as its underlying platform. With Flyte, user teams can construct pipelines using the Python SDK, and seamlessly deploy them on both cloud and on-premises environments, enabling distributed processing and efficient resource utilization.
 
+<h2 align="center">
+  Build
+</h2>
+<p>
+Write code in Python or any other language and leverage a robust type engine. 
+</p>
 
-<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadmegif.gif" style="width: 100%; height: auto;" />
+<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadmebuildv2.gif" style="width: 100%; height: auto;" />
+
+<h2 align="center">
+ Deploy
+ </h2>
+ <p>
+Either locally or on a remote cluster, execute your models with ease.
+</p>
+<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadme-deploy.gif" style="width: 100%; height: auto;" />
+ 
+<h2 align="center">
+ Scale
+ </h2>
 
 
 <h3 align="center">
@@ -54,6 +64,7 @@ Flyte helps you create a repeatable, reliable process for releasing ML-enabled s
 
 ## Table of contents
 * [Quick start](#quick-start)
+* [Tutorials](#tutorials)
 * [Features](#features)
 * [Who uses Flyte?](#whos-using-flyte)
 * [How to stay involved?](#how-to-stay-involved)
@@ -89,67 +100,15 @@ Head over to https://sandbox.union.ai/. It allows you to experiment with Flyte's
 
 Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deployment/index.html) for instructions to install Flyte on different environments
 
+## Tutorials
 
+- [Fine-tune Code Llama on the Flyte codebase](https://github.com/unionai-oss/llm-fine-tuning/tree/main/flyte_llama#readme)
+- [Forecast sales with Horovod and Spark](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/forecasting_sales/index.html)
+- [Nucleotide Sequence Querying with BLASTX](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/blast/index.html)
 
 ## Features
 
-* **Write code in Python with type annotations:**
-
-```python
-from flytekit import task, workflow
-
-@task #just add a decorator
-def say_hello() -> str: #type hints required: catch type errors at compile time
-    return "Hello, World!"
-
-@workflow 
-def hello_world_wf() -> str:
-    res = say_hello()
-    return res
-```
-
-* **Test locally:**
-
-```bash
-$ pyflyte run hello.py hello_world_wf 
-
-Running Execution on local.
-Hello, World!
-```
-
-* **Execute remotely on a cloud/on-prem environment:**
-
-```bash
-pyflyte run --remote hello.py hello_world_wf
-
-Running Execution on Remote.
-
-[✔] Go to https://flyte.uniondemo.run/console/projects/flytesnacks/domains/development/executions/f1327fb107be741acaa7 to see execution in the console.
-```
-* **Keep everything in version control:**
-
-```bash
-$ flytectl get execution --project flytesnacks --domain development 
-
-
-| NAME                 | VERSION                  |  PHASE     |
- ----------------------  -------------------------- -----------
-| f49407dd0c4be4703982 | cxB1fQlk0fTjUzkmD6DiMw== |  SUCCEEDED |
-```
-* **Configure schedules:**
-
-```python
-from flytekit import LaunchPlan
-
-launch_plan = LaunchPlan.get_or_create(
-    wf,
-    name="hello_world_wf",
-    schedule=CronSchedule(schedule="*/1 * * * *"), #both cron-based and fixed-rate schedules supported
-)
-```
-
-😎 And much, much more 😎
-
+🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types.<br>
 🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
 🔒 **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
 🧬 **Data lineage**: Track the movement and transformation of data throughout the lifecycle of your data and ML workflows. <br />
