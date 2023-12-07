@@ -49,6 +49,28 @@ type arrayNodeHandler struct {
 	pluginStateBytesStarted    []byte
 }
 
+// TODO @hamersaw - docs
+type nodeExecutionRequest struct {
+	index              int
+	nodePhase		   v1alpha1.NodePhase
+	taskPhase		   int
+    nodeExecutor       interfaces.Node
+    executionContext   executors.ExecutionContext
+    dagStructure       executors.DAGStructure
+    nodeLookup         executors.NodeLookup
+    subNodeSpec        *v1alpha1.NodeSpec
+    subNodeStatus      *v1alpha1.NodeStatus
+	arrayEventRecorder arrayEventRecorder
+	responseChannel    chan struct {interfaces.NodeStatus; error}
+}
+
+type outputRequest struct {
+	index           int
+	nodePhase		v1alpha1.NodePhase
+	currentAttempt  uint32
+	responseChannel chan struct {literalMap map[string]*idlcore.Literal; error}
+}
+
 // metrics encapsulates the prometheus metrics for this handler
 type metrics struct {
 	scope promutils.Scope
@@ -244,7 +266,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// process array node subNodes
 		currentParallelism := uint32(0)
 		messageCollector := errorcollector.NewErrorMessageCollector()
-		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+		/*for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
 
@@ -287,6 +309,107 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 			// increment task phase version if subNode phase or task phase changed
 			if subNodeStatus.GetPhase() != nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != taskPhase {
+				incrementTaskPhaseVersion = true
+			}
+		}*/
+
+		// TODO @hamersaw docs
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		workerCount := 10
+		nodeExecutionRequestChan := make(chan *nodeExecutionRequest, workerCount)
+		for i := 0; i < workerCount; i++ {
+			go func() {
+				for {
+					select {
+					case <-ctx.Done():
+						return
+					case nodeExecutionRequest := <-nodeExecutionRequestChan:
+						nodeStatus, err := nodeExecutionRequest.nodeExecutor.RecursiveNodeHandler(ctx, nodeExecutionRequest.executionContext,
+							nodeExecutionRequest.dagStructure, nodeExecutionRequest.nodeLookup, nodeExecutionRequest.subNodeSpec)
+						nodeExecutionRequest.responseChannel <- struct {interfaces.NodeStatus; error}{nodeStatus, err}
+					}
+				}
+			}()
+		}
+
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0) // TODO @hamersaw right-size
+		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
+			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
+
+			// do not process nodes in terminal state
+			if isTerminalNodePhase(nodePhase) {
+				continue
+			}
+
+			// create array contexts
+			subNodeEventRecorder := newArrayEventRecorder(nCtx.EventsRecorder())
+			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, subNodeStatus, err :=
+				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism, subNodeEventRecorder)
+			if err != nil {
+				return handler.UnknownTransition, err
+			}
+
+			nodeExecutionRequest := &nodeExecutionRequest{
+				index:              i,
+				nodePhase:          nodePhase,
+				taskPhase:          taskPhase,
+				nodeExecutor:	    arrayNodeExecutor,
+				executionContext:   arrayExecutionContext,
+				dagStructure:       arrayDAGStructure,
+				nodeLookup:         arrayNodeLookup,
+				subNodeSpec:        subNodeSpec,
+				subNodeStatus:      subNodeStatus,
+				arrayEventRecorder: subNodeEventRecorder,
+				responseChannel:    make(chan struct {interfaces.NodeStatus; error}, 1),
+			}
+
+			nodeExecutionRequests = append(nodeExecutionRequests, nodeExecutionRequest)
+			nodeExecutionRequestChan <- nodeExecutionRequest
+
+			// TODO @hamersaw - need to handle parallelism here somehow?!?
+		}
+
+		for _, nodeExecutionRequest := range nodeExecutionRequests {
+			nodeExecutionResponse := <-nodeExecutionRequest.responseChannel
+			if nodeExecutionResponse.error != nil {
+				return handler.UnknownTransition, nodeExecutionResponse.error
+			}
+
+			index := nodeExecutionRequest.index
+			subNodeStatus := nodeExecutionRequest.subNodeStatus
+
+			// capture subNode error if exists
+			if nodeExecutionRequest.subNodeStatus.Error != nil {
+				messageCollector.Collect(index, subNodeStatus.Error.Message)
+			}
+
+			// process events - TODO @hamersaw - this is a hack
+			if arrayEventRecorder, ok := nodeExecutionRequest.arrayEventRecorder.(*externalResourcesEventRecorder); ok {
+				for _, event := range arrayEventRecorder.taskEvents {
+					eventRecorder.RecordTaskEvent(ctx, event, a.eventConfig)
+				}
+				for _, event := range arrayEventRecorder.nodeEvents {
+					eventRecorder.RecordNodeEvent(ctx, event, a.eventConfig)
+				}
+			}
+			eventRecorder.process(ctx, nCtx, index, subNodeStatus.GetAttempts())
+
+			// update subNode state
+			arrayNodeState.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
+			if subNodeStatus.GetTaskNodeStatus() == nil {
+				// resetting task phase because during retries we clear the GetTaskNodeStatus
+				arrayNodeState.SubNodeTaskPhases.SetItem(index, uint64(0))
+			} else {
+				arrayNodeState.SubNodeTaskPhases.SetItem(index, uint64(subNodeStatus.GetTaskNodeStatus().GetPhase()))
+			}
+			arrayNodeState.SubNodeRetryAttempts.SetItem(index, uint64(subNodeStatus.GetAttempts()))
+			arrayNodeState.SubNodeSystemFailures.SetItem(index, uint64(subNodeStatus.GetSystemFailures()))
+
+			// increment task phase version if subNode phase or task phase changed
+			if subNodeStatus.GetPhase() != nodeExecutionRequest.nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != nodeExecutionRequest.taskPhase {
 				incrementTaskPhaseVersion = true
 			}
 		}
@@ -350,7 +473,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		)), nil
 	case v1alpha1.ArrayNodePhaseSucceeding:
 		outputLiterals := make(map[string]*idlcore.Literal)
-		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+		/*for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 
 			if nodePhase != v1alpha1.NodePhaseSucceeded {
@@ -396,6 +519,96 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				for name, literal := range outputs.GetLiterals() {
 					appendLiteral(name, literal, outputLiterals, len(arrayNodeState.SubNodePhases.GetItems()))
 				}
+			}
+		}*/
+
+		// TODO @hamersaw docs
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+
+		workerCount := 10
+		outputRequestChannel := make(chan *outputRequest, workerCount)
+		for i := 0; i < workerCount; i++ {
+			go func() {
+				for {
+					select {
+					case <-ctx.Done():
+						return
+					case outputRequest := <-outputRequestChannel:
+						if outputRequest.nodePhase != v1alpha1.NodePhaseSucceeded {
+							// retrieve output variables from task template
+							var outputLiterals map[string]*idlcore.Literal
+							task, err := nCtx.ExecutionContext().GetTask(*arrayNode.GetSubNodeSpec().TaskRef)
+							if err != nil {
+								// Should never happen
+								outputRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{nil, err}
+								continue
+							}
+
+							if task.CoreTask() != nil && task.CoreTask().Interface != nil && task.CoreTask().Interface.Outputs != nil {
+								for name := range task.CoreTask().Interface.Outputs.Variables {
+									outputLiterals[name] = nilLiteral
+								}
+							}
+
+							outputRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{outputLiterals, nil}
+						} else {
+							// initialize subNode reader
+							subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx,
+								strconv.Itoa(outputRequest.index), strconv.Itoa(int(outputRequest.currentAttempt)))
+							if err != nil {
+								outputRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{nil, err}
+								continue
+							}
+
+							// checkpoint paths are not computed here because this function is only called when writing
+							// existing cached outputs. if this functionality changes this will need to be revisited.
+							outputPaths := ioutils.NewCheckpointRemoteFilePaths(ctx, nCtx.DataStore(), subOutputDir, ioutils.NewRawOutputPaths(ctx, subDataDir), "")
+							reader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
+
+							// read outputs
+							outputs, executionErr, err := reader.Read(ctx)
+							if err != nil {
+								outputRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{nil, err}
+								continue
+							} else if executionErr != nil {
+								outputRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{
+									nil,
+									errors.Errorf(errors.IllegalStateError, nCtx.NodeID(),
+										"execution error ArrayNode output, bad state: %s", executionErr.String())}
+								continue
+							}
+
+							outputRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{outputs.GetLiterals(), nil}
+						}
+					}
+				}
+			}()
+		}
+
+		outputRequests := make([]*outputRequest, 0) // TODO @hamersaw right-size
+		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
+			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
+			outputRequest := &outputRequest{
+				index:           i,
+				nodePhase:       nodePhase,
+				currentAttempt:  uint32(arrayNodeState.SubNodeRetryAttempts.GetItem(i)),
+				responseChannel: make(chan struct{literalMap map[string]*idlcore.Literal; error}, 1),
+			}
+
+			outputRequests = append(outputRequests, outputRequest)
+			outputRequestChannel <- outputRequest
+		}
+
+		for _, outputRequest := range outputRequests {
+			outputResponse := <-outputRequest.responseChannel
+			if outputResponse.error != nil {
+				return handler.UnknownTransition, outputResponse.error
+			}
+
+			// append literal for all output variables
+			for name, literal := range outputResponse.literalMap {
+				appendLiteral(name, literal, outputLiterals, len(arrayNodeState.SubNodePhases.GetItems()))
 			}
 		}
 
