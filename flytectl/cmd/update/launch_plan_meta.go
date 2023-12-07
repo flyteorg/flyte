@@ -16,17 +16,17 @@ const (
 Update the description on the launch plan:
 ::
 
- flytectl update launchplan -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --description "Mergesort example"
+ flytectl update launchplan-meta -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --description "Mergesort example"
 
 Archiving launch plan named entity is not supported and would throw an error:
 ::
 
- flytectl update launchplan -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --archive
+ flytectl update launchplan-meta -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --archive
 
 Activating launch plan named entity would be a noop:
 ::
 
- flytectl update launchplan -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --activate
+ flytectl update launchplan-meta -p flytesnacks -d development  core.advanced.merge_sort.merge_sort --activate
 
 Usage
 `

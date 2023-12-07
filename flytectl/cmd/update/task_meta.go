@@ -16,17 +16,17 @@ const (
 Update the description on the task:
 ::
 
- flytectl update  task -d development -p flytesnacks core.control_flow.merge_sort.merge --description "Merge sort example"
+ flytectl update task-meta  -d development -p flytesnacks core.control_flow.merge_sort.merge --description "Merge sort example"
 
 Archiving task named entity is not supported and would throw an error:
 ::
 
- flytectl update  task -d development -p flytesnacks core.control_flow.merge_sort.merge --archive
+ flytectl update task-meta -d development -p flytesnacks core.control_flow.merge_sort.merge --archive
 
 Activating task named entity would be a noop since archiving is not possible:
 ::
 
- flytectl update  task -d development -p flytesnacks core.control_flow.merge_sort.merge --activate
+ flytectl update task-meta -d development -p flytesnacks core.control_flow.merge_sort.merge --activate
 
 Usage
 `
