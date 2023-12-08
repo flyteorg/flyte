@@ -959,3 +959,16 @@ func TestParseElasticConfig(t *testing.T) {
 	assert.Equal(t, int32(4), *elasticPolicy.NProcPerNode)
 	assert.Equal(t, kubeflowv1.RDZVBackend("c10d"), *elasticPolicy.RDZVBackend)
 }
+
+func TestGetReplicaCount(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	tfObj := dummyPytorchCustomObj(1)
+	taskTemplate := dummyPytorchTaskTemplate("the job", tfObj)
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+	PytorchJob, ok := resource.(*kubeflowv1.PyTorchJob)
+	assert.True(t, ok)
+
+	assert.NotNil(t, common.GetReplicaCount(PytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker))
+}

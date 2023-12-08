@@ -7,7 +7,7 @@
 1. Open [issues](https://github.com/flyteorg/flyte/issues) and filter by milestone and make sure they are either closed or moved over to the next milestone.
 ## Start a release PR
 1. Run [Generate Flyte Manifests workflow](https://github.com/flyteorg/flyte/actions/workflows/generate_flyte_manifest.yml). It’ll create a PR ([example](https://github.com/flyteorg/flyte/pull/888))
-1. Update [docs version](https://github.com/flyteorg/flyte/blob/master/rsts/conf.py#L33) to match the milestone version.
+1. Update [docs version](https://github.com/flyteorg/flyte/blob/master/docs/conf.py#L33) to match the milestone version.
 1. Create a CHANGELOG file ([example](https://github.com/flyteorg/flyte/pull/888/files#diff-0c33dda4ecbd7e1116ddce683b5e143d85b22e43223ca258ecc571fb3b240a57))
 1. Wait for endtoend tests to finish then Merge PR.
 ## Create a release

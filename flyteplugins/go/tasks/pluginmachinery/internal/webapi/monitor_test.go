@@ -21,6 +21,7 @@ import (
 
 func Test_monitor(t *testing.T) {
 	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
 	tCtx := &mocks.TaskExecutionContext{}
 	ctxMeta := &mocks.TaskExecutionMetadata{}
 	execID := &mocks.TaskExecutionID{}
@@ -70,6 +71,7 @@ func Test_monitor(t *testing.T) {
 
 	// Wait for sync to run to actually delete the resource
 	wg.Wait()
+	cancel()
 	cachedItem, err = cacheObj.GetOrCreate("generated_name", CacheItem{Resource: "new_resource"})
 	assert.NoError(t, err)
 	assert.Equal(t, "new_resource", cachedItem.(CacheItem).Resource.(string))
