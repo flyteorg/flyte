@@ -72,7 +72,6 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 	messageCollector := errorcollector.NewErrorMessageCollector()
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing:
-		currentParallelism := uint32(0)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 
@@ -83,7 +82,7 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 
 			// create array contexts
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
-				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism, eventRecorder)
+				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, eventRecorder)
 			if err != nil {
 				return err
 			}
@@ -126,7 +125,6 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 	messageCollector := errorcollector.NewErrorMessageCollector()
 	switch arrayNodeState.Phase {
 	case v1alpha1.ArrayNodePhaseExecuting, v1alpha1.ArrayNodePhaseFailing, v1alpha1.ArrayNodePhaseSucceeding:
-		currentParallelism := uint32(0)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 
@@ -137,7 +135,7 @@ func (a *arrayNodeHandler) Finalize(ctx context.Context, nCtx interfaces.NodeExe
 
 			// create array contexts
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, _, err :=
-				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism, eventRecorder)
+				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, eventRecorder)
 			if err != nil {
 				return err
 			}
@@ -244,13 +242,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		arrayNodeState.Phase = v1alpha1.ArrayNodePhaseExecuting
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
-		currentParallelism := uint32(0)
-		nodeExecutionRequestsSize := int(arrayNode.GetParallelism())
-		if nodeExecutionRequestsSize == 0 {
-			nodeExecutionRequestsSize = len(arrayNodeState.SubNodePhases.GetItems())
+		currentParallelism := int(arrayNode.GetParallelism())
+		if currentParallelism == 0 {
+			currentParallelism = len(arrayNodeState.SubNodePhases.GetItems())
 		}
 
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, nodeExecutionRequestsSize)
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, currentParallelism)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
@@ -263,7 +260,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// create array contexts
 			subNodeEventRecorder := newArrayEventRecorder(nCtx.EventsRecorder())
 			arrayNodeExecutor, arrayExecutionContext, arrayDAGStructure, arrayNodeLookup, subNodeSpec, subNodeStatus, err :=
-				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, &currentParallelism, subNodeEventRecorder)
+				a.buildArrayNodeContext(ctx, nCtx, &arrayNodeState, arrayNode, i, subNodeEventRecorder)
 			if err != nil {
 				return handler.UnknownTransition, err
 			}
@@ -273,20 +270,29 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				index:              i,
 				nodePhase:          nodePhase,
 				taskPhase:          taskPhase,
-				nodeExecutor:	    arrayNodeExecutor,
+				nodeExecutor:       arrayNodeExecutor,
 				executionContext:   arrayExecutionContext,
 				dagStructure:       arrayDAGStructure,
 				nodeLookup:         arrayNodeLookup,
 				subNodeSpec:        subNodeSpec,
 				subNodeStatus:      subNodeStatus,
 				arrayEventRecorder: subNodeEventRecorder,
-				responseChannel:    make(chan struct {interfaces.NodeStatus; error}, 1),
+				responseChannel: make(chan struct {
+					interfaces.NodeStatus
+					error
+				}, 1),
 			}
 
 			nodeExecutionRequests = append(nodeExecutionRequests, nodeExecutionRequest)
 			a.nodeExecutionRequestChannel <- nodeExecutionRequest
 
-			// TODO @hamersaw - need to handle parallelism here somehow?!?
+			// TODO - this is a naive implementation of parallelism, if we want to support more
+			// complex subNodes (ie. dynamics / subworkflows) we need to revisit this so that
+			// parallelism is handled during subNode evaluations.
+			currentParallelism--
+			if currentParallelism == 0 {
+				break
+			}
 		}
 
 		workerErrorCollector := errorcollector.NewErrorMessageCollector()
@@ -306,13 +312,17 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				subNodeFailureCollector.Collect(index, subNodeStatus.Error.Message)
 			}
 
-			// process events
+			// process events by copying from internal event recorder
 			if arrayEventRecorder, ok := nodeExecutionRequest.arrayEventRecorder.(*externalResourcesEventRecorder); ok {
 				for _, event := range arrayEventRecorder.taskEvents {
-					eventRecorder.RecordTaskEvent(ctx, event, a.eventConfig)
+					if err := eventRecorder.RecordTaskEvent(ctx, event, a.eventConfig); err != nil {
+						return handler.UnknownTransition, err
+					}
 				}
 				for _, event := range arrayEventRecorder.nodeEvents {
-					eventRecorder.RecordNodeEvent(ctx, event, a.eventConfig)
+					if err := eventRecorder.RecordNodeEvent(ctx, event, a.eventConfig); err != nil {
+						return handler.UnknownTransition, err
+					}
 				}
 			}
 			eventRecorder.process(ctx, nCtx, index, subNodeStatus.GetAttempts())
@@ -401,8 +411,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			gatherOutputsRequest := &gatherOutputsRequest{
-				ctx:             ctx,
-				responseChannel: make(chan struct{literalMap map[string]*idlcore.Literal; error}, 1),
+				ctx: ctx,
+				responseChannel: make(chan struct {
+					literalMap map[string]*idlcore.Literal
+					error
+				}, 1),
 			}
 
 			if nodePhase != v1alpha1.NodePhaseSucceeded {
@@ -411,7 +424,10 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				task, err := nCtx.ExecutionContext().GetTask(*arrayNode.GetSubNodeSpec().TaskRef)
 				if err != nil {
 					// Should never happen
-					gatherOutputsRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{nil, err}
+					gatherOutputsRequest.responseChannel <- struct {
+						literalMap map[string]*idlcore.Literal
+						error
+					}{nil, err}
 					continue
 				}
 
@@ -421,14 +437,20 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					}
 				}
 
-				gatherOutputsRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{outputLiterals, nil}
+				gatherOutputsRequest.responseChannel <- struct {
+					literalMap map[string]*idlcore.Literal
+					error
+				}{outputLiterals, nil}
 			} else {
 				// initialize subNode reader
 				currentAttempt := int(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
 				subDataDir, subOutputDir, err := constructOutputReferences(ctx, nCtx,
 					strconv.Itoa(i), strconv.Itoa(currentAttempt))
 				if err != nil {
-					gatherOutputsRequest.responseChannel <- struct{literalMap map[string]*idlcore.Literal; error}{nil, err}
+					gatherOutputsRequest.responseChannel <- struct {
+						literalMap map[string]*idlcore.Literal
+						error
+					}{nil, err}
 					continue
 				}
 
@@ -533,7 +555,7 @@ func (a *arrayNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) e
 			nodeExecutionRequestChannel: a.nodeExecutionRequestChannel,
 		}
 
-		go func(){
+		go func() {
 			worker.run()
 		}()
 	}
@@ -575,7 +597,7 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 // but need many different execution details, for example setting input values as a singular item rather than a collection,
 // injecting environment variables for flytekit maptask execution, aggregating eventing so that rather than tracking state for
 // each subnode individually it sends a single event for the whole ArrayNode, and many more.
-func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNodeState *handler.ArrayNodeState, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, currentParallelism *uint32, eventRecorder arrayEventRecorder) (
+func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx interfaces.NodeExecutionContext, arrayNodeState *handler.ArrayNodeState, arrayNode v1alpha1.ExecutableArrayNode, subNodeIndex int, eventRecorder arrayEventRecorder) (
 	interfaces.Node, executors.ExecutionContext, executors.DAGStructure, executors.NodeLookup, *v1alpha1.NodeSpec, *v1alpha1.NodeStatus, error) {
 
 	nodePhase := v1alpha1.NodePhase(arrayNodeState.SubNodePhases.GetItem(subNodeIndex))
@@ -640,12 +662,10 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
-	arrayExecutionContext := newArrayExecutionContext(
-		executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo),
-		subNodeIndex, currentParallelism, arrayNode.GetParallelism())
+	arrayExecutionContext := newArrayExecutionContext(executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo), subNodeIndex)
 
 	arrayNodeExecutionContextBuilder := newArrayNodeExecutionContextBuilder(a.nodeExecutor.GetNodeExecutionContextBuilder(),
-		subNodeID, subNodeIndex, subNodeStatus, inputReader, currentParallelism, arrayNode.GetParallelism(), eventRecorder)
+		subNodeID, subNodeIndex, subNodeStatus, inputReader, eventRecorder)
 	arrayNodeExecutor := a.nodeExecutor.WithNodeExecutionContextBuilder(arrayNodeExecutionContextBuilder)
 
 	return arrayNodeExecutor, arrayExecutionContext, &arrayNodeLookup, &arrayNodeLookup, &subNodeSpec, subNodeStatus, nil

@@ -10,14 +10,12 @@ import (
 )
 
 type arrayNodeExecutionContextBuilder struct {
-	nCtxBuilder        interfaces.NodeExecutionContextBuilder
-	subNodeID          v1alpha1.NodeID
-	subNodeIndex       int
-	subNodeStatus      *v1alpha1.NodeStatus
-	inputReader        io.InputReader
-	currentParallelism *uint32
-	maxParallelism     uint32
-	eventRecorder      arrayEventRecorder
+	nCtxBuilder   interfaces.NodeExecutionContextBuilder
+	subNodeID     v1alpha1.NodeID
+	subNodeIndex  int
+	subNodeStatus *v1alpha1.NodeStatus
+	inputReader   io.InputReader
+	eventRecorder arrayEventRecorder
 }
 
 func (a *arrayNodeExecutionContextBuilder) BuildNodeExecutionContext(ctx context.Context, executionContext executors.ExecutionContext,
@@ -31,23 +29,21 @@ func (a *arrayNodeExecutionContextBuilder) BuildNodeExecutionContext(ctx context
 
 	if currentNodeID == a.subNodeID {
 		// overwrite NodeExecutionContext for ArrayNode execution
-		nCtx = newArrayNodeExecutionContext(nCtx, a.inputReader, a.eventRecorder, a.subNodeIndex, a.subNodeStatus, a.currentParallelism, a.maxParallelism)
+		nCtx = newArrayNodeExecutionContext(nCtx, a.inputReader, a.eventRecorder, a.subNodeIndex, a.subNodeStatus)
 	}
 
 	return nCtx, nil
 }
 
-func newArrayNodeExecutionContextBuilder(nCtxBuilder interfaces.NodeExecutionContextBuilder, subNodeID v1alpha1.NodeID, subNodeIndex int, subNodeStatus *v1alpha1.NodeStatus,
-	inputReader io.InputReader, currentParallelism *uint32, maxParallelism uint32, eventRecorder arrayEventRecorder) interfaces.NodeExecutionContextBuilder {
+func newArrayNodeExecutionContextBuilder(nCtxBuilder interfaces.NodeExecutionContextBuilder, subNodeID v1alpha1.NodeID, subNodeIndex int,
+	subNodeStatus *v1alpha1.NodeStatus, inputReader io.InputReader, eventRecorder arrayEventRecorder) interfaces.NodeExecutionContextBuilder {
 
 	return &arrayNodeExecutionContextBuilder{
-		nCtxBuilder:        nCtxBuilder,
-		subNodeID:          subNodeID,
-		subNodeIndex:       subNodeIndex,
-		subNodeStatus:      subNodeStatus,
-		inputReader:        inputReader,
-		currentParallelism: currentParallelism,
-		maxParallelism:     maxParallelism,
-		eventRecorder:      eventRecorder,
+		nCtxBuilder:   nCtxBuilder,
+		subNodeID:     subNodeID,
+		subNodeIndex:  subNodeIndex,
+		subNodeStatus: subNodeStatus,
+		inputReader:   inputReader,
+		eventRecorder: eventRecorder,
 	}
 }

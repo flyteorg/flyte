@@ -14,35 +14,24 @@ const (
 
 type arrayExecutionContext struct {
 	executors.ExecutionContext
-	executionConfig    v1alpha1.ExecutionConfig
-	currentParallelism *uint32
+	executionConfig v1alpha1.ExecutionConfig
 }
 
 func (a *arrayExecutionContext) GetExecutionConfig() v1alpha1.ExecutionConfig {
 	return a.executionConfig
 }
 
-func (a *arrayExecutionContext) CurrentParallelism() uint32 {
-	return *a.currentParallelism
-}
-
-func (a *arrayExecutionContext) IncrementParallelism() uint32 {
-	*a.currentParallelism = *a.currentParallelism + 1
-	return *a.currentParallelism
-}
-
-func newArrayExecutionContext(executionContext executors.ExecutionContext, subNodeIndex int, currentParallelism *uint32, maxParallelism uint32) *arrayExecutionContext {
+func newArrayExecutionContext(executionContext executors.ExecutionContext, subNodeIndex int) *arrayExecutionContext {
 	executionConfig := executionContext.GetExecutionConfig()
 	if executionConfig.EnvironmentVariables == nil {
 		executionConfig.EnvironmentVariables = make(map[string]string)
 	}
 	executionConfig.EnvironmentVariables[JobIndexVarName] = FlyteK8sArrayIndexVarName
 	executionConfig.EnvironmentVariables[FlyteK8sArrayIndexVarName] = strconv.Itoa(subNodeIndex)
-	executionConfig.MaxParallelism = maxParallelism
+	executionConfig.MaxParallelism = 0 // hardcoded to 0 because parallelism is handled by the array node
 
 	return &arrayExecutionContext{
-		ExecutionContext:   executionContext,
-		executionConfig:    executionConfig,
-		currentParallelism: currentParallelism,
+		ExecutionContext: executionContext,
+		executionConfig:  executionConfig,
 	}
 }
