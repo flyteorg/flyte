@@ -911,4 +911,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_node-execution-worker-count", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-execution-worker-count", testValue)
+			if vInt, err := cmdFlags.GetInt("node-execution-worker-count"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NodeExecutionWorkerCount)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

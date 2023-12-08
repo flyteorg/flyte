@@ -548,8 +548,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 // Setup handles any initialization requirements for this handler
 func (a *arrayNodeHandler) Setup(_ context.Context, _ interfaces.SetupContext) error {
 	// start workers
-	workerCount := 8
-	for i := 0; i < workerCount; i++ {
+	for i := 0; i < config.GetConfig().NodeExecutionWorkerCount; i++ {
 		worker := worker{
 			gatherOutputsRequestChannel: a.gatherOutputsRequestChannel,
 			nodeExecutionRequestChannel: a.nodeExecutionRequestChannel,
