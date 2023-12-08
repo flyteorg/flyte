@@ -222,7 +222,7 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 
 	case PhasePermanentFailure:
 		if state.GetExecutionErr() != nil {
-			phaseInfo = core.PhaseInfoFailureWithCleanup(core.PhasePermanentFailure.String(), state.GetReason(), nowTaskInfo)
+			phaseInfo = core.PhaseInfoFailureWithCleanup(core.PhasePermanentFailure.String(), state.GetExecutionErr().Message, nowTaskInfo)
 		} else {
 			phaseInfo = core.PhaseInfoSystemFailureWithCleanup(ErrorK8sArrayGeneric, state.GetReason(), nowTaskInfo)
 		}
