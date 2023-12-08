@@ -245,9 +245,12 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 	case v1alpha1.ArrayNodePhaseExecuting:
 		// process array node subNodes
 		currentParallelism := uint32(0)
-		messageCollector := errorcollector.NewErrorMessageCollector()
+		nodeExecutionRequestsSize := int(arrayNode.GetParallelism())
+		if nodeExecutionRequestsSize == 0 {
+			nodeExecutionRequestsSize = len(arrayNodeState.SubNodePhases.GetItems())
+		}
 
-		nodeExecutionRequests := make([]*nodeExecutionRequest, 0) // TODO @hamersaw right-size
+		nodeExecutionRequests := make([]*nodeExecutionRequest, 0, nodeExecutionRequestsSize)
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
@@ -286,11 +289,13 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// TODO @hamersaw - need to handle parallelism here somehow?!?
 		}
 
-		for _, nodeExecutionRequest := range nodeExecutionRequests {
+		workerErrorCollector := errorcollector.NewErrorMessageCollector()
+		subNodeFailureCollector := errorcollector.NewErrorMessageCollector()
+		for i, nodeExecutionRequest := range nodeExecutionRequests {
 			nodeExecutionResponse := <-nodeExecutionRequest.responseChannel
 			if nodeExecutionResponse.error != nil {
-				return handler.UnknownTransition, nodeExecutionResponse.error
-				// TODO @hamersaw - error message collector
+				workerErrorCollector.Collect(i, nodeExecutionResponse.error.Error())
+				continue
 			}
 
 			index := nodeExecutionRequest.index
@@ -298,7 +303,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 
 			// capture subNode error if exists
 			if nodeExecutionRequest.subNodeStatus.Error != nil {
-				messageCollector.Collect(index, subNodeStatus.Error.Message)
+				subNodeFailureCollector.Collect(index, subNodeStatus.Error.Message)
 			}
 
 			// process events
@@ -327,6 +332,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			if subNodeStatus.GetPhase() != nodeExecutionRequest.nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != nodeExecutionRequest.taskPhase {
 				incrementTaskPhaseVersion = true
 			}
+		}
+
+		// if any workers failed then return the error
+		if workerErrorCollector.Length() > 0 {
+			return handler.UnknownTransition, fmt.Errorf("worker error(s) encountered: %s", workerErrorCollector.Summary(events.MaxErrorMessageLength))
 		}
 
 		// process phases of subNodes to determine overall `ArrayNode` phase
@@ -359,7 +369,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		// if there is a failing node set the error message if it has not been previous set
 		if failingCount > 0 && arrayNodeState.Error == nil {
 			arrayNodeState.Error = &idlcore.ExecutionError{
-				Message: messageCollector.Summary(events.MaxErrorMessageLength),
+				Message: subNodeFailureCollector.Summary(events.MaxErrorMessageLength),
 			}
 		}
 
@@ -387,7 +397,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			nil,
 		)), nil
 	case v1alpha1.ArrayNodePhaseSucceeding:
-		gatherOutputsRequests := make([]*gatherOutputsRequest, 0) // TODO hamersaw - right size
+		gatherOutputsRequests := make([]*gatherOutputsRequest, 0, len(arrayNodeState.SubNodePhases.GetItems()))
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
 			gatherOutputsRequest := &gatherOutputsRequest{
@@ -435,17 +445,23 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		outputLiterals := make(map[string]*idlcore.Literal)
-		for _, gatherOutputsRequest := range gatherOutputsRequests {
+		workerErrorCollector := errorcollector.NewErrorMessageCollector()
+		for i, gatherOutputsRequest := range gatherOutputsRequests {
 			outputResponse := <-gatherOutputsRequest.responseChannel
 			if outputResponse.error != nil {
-				return handler.UnknownTransition, outputResponse.error
-				// TODO - error message collector
+				workerErrorCollector.Collect(i, outputResponse.error.Error())
+				continue
 			}
 
 			// append literal for all output variables
 			for name, literal := range outputResponse.literalMap {
 				appendLiteral(name, literal, outputLiterals, len(arrayNodeState.SubNodePhases.GetItems()))
 			}
+		}
+
+		// if any workers failed then return the error
+		if workerErrorCollector.Length() > 0 {
+			return handler.UnknownTransition, fmt.Errorf("worker error(s) encountered: %s", workerErrorCollector.Summary(events.MaxErrorMessageLength))
 		}
 
 		outputLiteralMap := &idlcore.LiteralMap{

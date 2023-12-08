@@ -45,6 +45,7 @@ func (w *worker) run() {
 	for {
 		select {
 		case nodeExecutionRequest := <-w.nodeExecutionRequestChannel:
+			// execute RecurseNodeHandler on node
 			nodeStatus, err := nodeExecutionRequest.nodeExecutor.RecursiveNodeHandler(nodeExecutionRequest.ctx, nodeExecutionRequest.executionContext,
 				nodeExecutionRequest.dagStructure, nodeExecutionRequest.nodeLookup, nodeExecutionRequest.subNodeSpec)
 			nodeExecutionRequest.responseChannel <- struct {interfaces.NodeStatus; error}{nodeStatus, err}
