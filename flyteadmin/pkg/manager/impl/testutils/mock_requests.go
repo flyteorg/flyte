@@ -164,11 +164,24 @@ func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
 	}
 }
 
-func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+func GetLaunchPlanRequestWithDeprecatedCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
 	lpRequest := GetLaunchPlanRequest()
 	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
 		Schedule: &admin.Schedule{
 			ScheduleExpression:  &admin.Schedule_CronExpression{CronExpression: testCronExpr},
+			KickoffTimeInputArg: "",
+		},
+	}
+	return lpRequest
+}
+
+func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+	lpRequest := GetLaunchPlanRequest()
+	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
+		Schedule: &admin.Schedule{
+			ScheduleExpression: &admin.Schedule_CronSchedule{CronSchedule: &admin.CronSchedule{
+				Schedule: testCronExpr,
+			}},
 			KickoffTimeInputArg: "",
 		},
 	}
