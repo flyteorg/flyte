@@ -62,7 +62,13 @@ func createArrayNodeHandler(ctx context.Context, t *testing.T, nodeHandler inter
 	assert.NoError(t, err)
 
 	// return ArrayNodeHandler
-	return New(nodeExecutor, eventConfig, scope)
+	arrayNodeHandler, err := New(nodeExecutor, eventConfig, scope)
+	if err != nil {
+		return nil, err
+	}
+
+	err = arrayNodeHandler.Setup(ctx, nil)
+	return arrayNodeHandler, err
 }
 
 func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder interfaces.EventRecorder, outputVariables []string,
