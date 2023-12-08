@@ -57,6 +57,14 @@ install-piptools: ## Install pip-tools
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
 
+.PHONY: install-conda-lock
+install-conda-lock:
+	pip install conda-lock
+
+.PHONY: conda-lock
+conda-lock: install-conda-lock
+	conda-lock -f monodocs-environment.yaml --without-cuda --lockfile monodocs-environment.lock.yaml
+
 .PHONY: stats
 stats:
 	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller.dashboard.py
