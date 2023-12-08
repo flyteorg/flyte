@@ -133,7 +133,7 @@ class SearchArtifactsResponse(_message.Message):
     def __init__(self, artifacts: _Optional[_Iterable[_Union[Artifact, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class FindByWorkflowExecRequest(_message.Message):
-    __slots__ = ["exec_id", "direction", "fetch_specs"]
+    __slots__ = ["exec_id", "direction"]
     class Direction(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         INPUTS: _ClassVar[FindByWorkflowExecRequest.Direction]
@@ -142,11 +142,9 @@ class FindByWorkflowExecRequest(_message.Message):
     OUTPUTS: FindByWorkflowExecRequest.Direction
     EXEC_ID_FIELD_NUMBER: _ClassVar[int]
     DIRECTION_FIELD_NUMBER: _ClassVar[int]
-    FETCH_SPECS_FIELD_NUMBER: _ClassVar[int]
     exec_id: _identifier_pb2.WorkflowExecutionIdentifier
     direction: FindByWorkflowExecRequest.Direction
-    fetch_specs: bool
-    def __init__(self, exec_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., direction: _Optional[_Union[FindByWorkflowExecRequest.Direction, str]] = ..., fetch_specs: bool = ...) -> None: ...
+    def __init__(self, exec_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., direction: _Optional[_Union[FindByWorkflowExecRequest.Direction, str]] = ...) -> None: ...
 
 class AddTagRequest(_message.Message):
     __slots__ = ["artifact_id", "value", "overwrite"]
