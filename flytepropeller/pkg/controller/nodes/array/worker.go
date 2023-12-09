@@ -11,7 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 )
 
-// TODO @hamersaw - docs
+// nodeExecutionRequest is a request to execute an ArrayNode subNode
 type nodeExecutionRequest struct {
 	ctx                context.Context
 	index              int
@@ -30,7 +30,7 @@ type nodeExecutionRequest struct {
 	}
 }
 
-// TODO @hamersaw - docs
+// gatherOutputsRequest is a request to read outputs from an ArrayNode subNode
 type gatherOutputsRequest struct {
 	ctx             context.Context
 	reader          *ioutils.RemoteFileOutputReader
@@ -40,13 +40,13 @@ type gatherOutputsRequest struct {
 	}
 }
 
-// TODO @hamersaw - docs
+// worker is an entity that is used to parallelize I/O bound operations for ArrayNode execution
 type worker struct {
 	gatherOutputsRequestChannel chan *gatherOutputsRequest
 	nodeExecutionRequestChannel chan *nodeExecutionRequest
 }
 
-// TODO @hamersaw - docs
+// run starts the main handle loop for the worker
 func (w *worker) run() {
 	for {
 		select {
