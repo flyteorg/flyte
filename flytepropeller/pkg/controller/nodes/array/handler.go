@@ -575,10 +575,6 @@ func New(nodeExecutor interfaces.Node, eventConfig *config.EventConfig, scope pr
 		return nil, err
 	}
 
-	/*nodeExecutionRequestChannel := make(chan *nodeExecutionRequest, workerCount)
-	for i := 0; i < workerCount; i++ {
-		go func() {*/
-
 	arrayScope := scope.NewSubScope("array")
 	return &arrayNodeHandler{
 		eventConfig:                 eventConfig,
