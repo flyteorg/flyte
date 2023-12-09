@@ -205,6 +205,22 @@ spec:
       status:
         phase: 0
       task: sum-non-none
+  onFailure:
+    id: fn0
+    inputBindings:
+      - binding:
+          promise:
+            nodeId: start-node
+            var: name
+        var: name
+    kind: task
+    name: delete-cluster
+    resources:
+      requests:
+        cpu: "2"
+        memory: 2Gi
+    status:
+      phase: 0
 status:
   phase: 0
 tasks:
@@ -284,6 +300,40 @@ tasks:
               simple: INTEGER
       outputs:
         variables: {}
+    metadata:
+      runtime:
+        type: 1
+        version: 1.19.0b10
+      timeout: 0s
+    type: "7"
+  delete-cluster:
+    container:
+      args:
+        - --task-module=flytekit.examples.tasks
+        - --task-name=print_every_time
+        - --inputs={{$input}}
+        - --output-prefix={{$output}}
+      command:
+        - flyte-python-entrypoint
+      image: myflytecontainer:abc123
+      resources:
+        requests:
+          - name: 1
+            value: "2.000"
+          - name: 3
+            value: 2048Mi
+          - name: 2
+            value: "0.000"
+    id:
+      name: delete-cluster
+    interface:
+      inputs:
+        variables:
+          name:
+            type:
+              simple: STRING
+      outputs:
+        variables: { }
     metadata:
       runtime:
         type: 1

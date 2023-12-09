@@ -60,6 +60,9 @@ func updateWorkflowRequirements(workflow *core.WorkflowTemplate, subWfs common.W
 	for _, node := range workflow.Nodes {
 		updateNodeRequirements(node, subWfs, taskIds, workflowIds, followSubworkflows, errs)
 	}
+	if workflow.FailureNode != nil {
+		updateNodeRequirements(workflow.FailureNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
+	}
 }
 
 func updateNodeRequirements(node *flyteNode, subWfs common.WorkflowIndex, taskIds, workflowIds common.IdentifierSet,
