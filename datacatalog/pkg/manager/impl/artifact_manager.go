@@ -379,9 +379,9 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 
 	// update artifact in DB, also replaces/upserts associated artifact data
 	artifactModel.ArtifactData = artifactDataModels
-	logger.Infof(ctx, "ArtifactModel is %+v", artifactModel)
-	logger.Infof(ctx, "ArtifactModel ArtifactData is %+v", artifactModel.ArtifactData)
-	logger.Infof(ctx, "ArtifactModel SerializedMetadata is %+v", artifactModel.SerializedMetadata)
+	logger.Debugf(ctx, "ArtifactModel is %+v", artifactModel)
+	logger.Debugf(ctx, "ArtifactModel ArtifactData is %+v", artifactModel.ArtifactData)
+	logger.Debugf(ctx, "ArtifactModel SerializedMetadata is %+v", artifactModel.SerializedMetadata)
 
 	err = m.repo.ArtifactRepo().Update(ctx, artifactModel)
 	if err != nil {
