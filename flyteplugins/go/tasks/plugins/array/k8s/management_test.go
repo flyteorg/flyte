@@ -531,7 +531,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		// validate results
 		assert.Nil(t, err)
 		p, _ := newState.GetPhase()
-		assert.Equal(t, arrayCore.PhaseWriteToDiscoveryThenFail.String(), p.String())
+		assert.Equal(t, arrayCore.PhaseAbortSubTasks.String(), p.String())
 		resourceManager.AssertNumberOfCalls(t, "ReleaseResource", subtaskCount)
 		for _, subtaskPhaseIndex := range newState.GetArrayStatus().Detailed.GetItems() {
 			assert.Equal(t, core.PhasePermanentFailure, core.Phases[subtaskPhaseIndex])
@@ -539,7 +539,7 @@ func TestCheckSubTasksState(t *testing.T) {
 	})
 }
 
-func TestTerminateSubtasks(t *testing.T) {
+func TestTerminateSubTasksOnAbort(t *testing.T) {
 	ctx := context.Background()
 	subtaskCount := 3
 	config := Config{
@@ -554,9 +554,9 @@ func TestTerminateSubtasks(t *testing.T) {
 	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
 
 	compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
-	compactArray.SetItem(0, 8) // PhasePermanentFailure
-	compactArray.SetItem(1, 0) // PhaseUndefined
-	compactArray.SetItem(2, 5) // PhaseRunning
+	for i := 0; i < subtaskCount; i++ {
+		compactArray.SetItem(i, 5)
+	}
 
 	currentState := &arrayCore.State{
 		CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
@@ -566,68 +566,123 @@ func TestTerminateSubtasks(t *testing.T) {
 		ArrayStatus: arraystatus.ArrayStatus{
 			Detailed: compactArray,
 		},
-		IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)), // set all tasks to be cached
+		IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
 	}
 
-	t.Run("TerminateSubtasks", func(t *testing.T) {
-		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
+	t.Run("SuccessfulTermination", func(t *testing.T) {
 		eventRecorder := mocks.EventsRecorder{}
 		eventRecorder.OnRecordRawMatch(mock.Anything, mock.Anything).Return(nil)
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
 		tCtx.OnEventsRecorder().Return(&eventRecorder)
 
-		terminateCounter := 0
 		mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
-			terminateCounter++
 			return nil
 		}
 
-		err := TerminateSubTasks(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
-		assert.Equal(t, 1, terminateCounter)
+		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+
 		assert.Nil(t, err)
-
-		args := eventRecorder.Calls[0].Arguments
-		phaseInfo, ok := args.Get(1).(core.PhaseInfo)
-		assert.True(t, ok)
-
-		externalResources := phaseInfo.Info().ExternalResources
-		assert.Len(t, externalResources, subtaskCount)
-
-		assert.False(t, externalResources[0].IsAbortedSubtask)
-		assert.False(t, externalResources[1].IsAbortedSubtask)
-		assert.True(t, externalResources[2].IsAbortedSubtask)
+		eventRecorder.AssertCalled(t, "RecordRaw", mock.Anything, mock.Anything)
 	})
 
-	t.Run("TerminateSubtasksWithFailure", func(t *testing.T) {
-		resourceManager := mocks.ResourceManager{}
-		resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(core.AllocationStatusGranted, nil)
+	t.Run("TerminationWithError", func(t *testing.T) {
 		eventRecorder := mocks.EventsRecorder{}
 		eventRecorder.OnRecordRawMatch(mock.Anything, mock.Anything).Return(nil)
 		tCtx := getMockTaskExecutionContext(ctx, 0)
-		tCtx.OnResourceManager().Return(&resourceManager)
 		tCtx.OnEventsRecorder().Return(&eventRecorder)
 
-		terminateCounter := 0
 		mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
-			terminateCounter++
-			return fmt.Errorf("error")
+			return fmt.Errorf("termination error")
 		}
 
-		err := TerminateSubTasks(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+
 		assert.NotNil(t, err)
-		assert.Equal(t, 1, terminateCounter)
-
-		args := eventRecorder.Calls[0].Arguments
-		phaseInfo, ok := args.Get(1).(core.PhaseInfo)
-		assert.True(t, ok)
-
-		externalResources := phaseInfo.Info().ExternalResources
-		assert.Len(t, externalResources, subtaskCount)
-
-		assert.False(t, externalResources[0].IsAbortedSubtask)
-		assert.False(t, externalResources[1].IsAbortedSubtask)
-		assert.False(t, externalResources[2].IsAbortedSubtask)
+		eventRecorder.AssertNotCalled(t, "RecordRaw", mock.Anything, mock.Anything)
 	})
+}
+
+func TestTerminateSubTasks(t *testing.T) {
+	ctx := context.Background()
+	subtaskCount := 3
+	config := Config{
+		MaxArrayJobSize: int64(subtaskCount * 10),
+		ResourceConfig: ResourceConfig{
+			PrimaryLabel: "p",
+			Limit:        subtaskCount,
+		},
+	}
+	kubeClient := mocks.KubeClient{}
+	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+
+	tests := []struct {
+		name                string
+		initialPhaseIndices []int
+		expectedAbortCount  int
+		terminateError      error
+	}{
+		{
+			name:                "AllSubTasksRunning",
+			initialPhaseIndices: []int{5, 5, 5},
+			expectedAbortCount:  3,
+			terminateError:      nil,
+		},
+		{
+			name:                "MixedSubTaskStates",
+			initialPhaseIndices: []int{8, 0, 5},
+			expectedAbortCount:  1,
+			terminateError:      nil,
+		},
+		{
+			name:                "TerminateFunctionFails",
+			initialPhaseIndices: []int{5, 5, 5},
+			expectedAbortCount:  3,
+			terminateError:      fmt.Errorf("error"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+			for i, phaseIdx := range test.initialPhaseIndices {
+				compactArray.SetItem(i, bitarray.Item(phaseIdx))
+			}
+			currentState := &arrayCore.State{
+				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
+				PhaseVersion:         0,
+				ExecutionArraySize:   subtaskCount,
+				OriginalArraySize:    int64(subtaskCount),
+				OriginalMinSuccesses: int64(subtaskCount),
+				ArrayStatus: arraystatus.ArrayStatus{
+					Detailed: compactArray,
+				},
+				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
+			}
+
+			tCtx := getMockTaskExecutionContext(ctx, 0)
+			terminateCounter := 0
+			mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
+				terminateCounter++
+				return test.terminateError
+			}
+
+			nextState, externalResources, err := TerminateSubTasks(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+
+			assert.Equal(t, test.expectedAbortCount, terminateCounter)
+
+			if test.terminateError != nil {
+				assert.NotNil(t, err)
+				return
+			}
+
+			assert.Nil(t, err)
+			assert.Equal(t, uint32(1), nextState.PhaseVersion)
+			assert.Equal(t, arrayCore.PhaseWriteToDiscoveryThenFail, nextState.CurrentPhase)
+			assert.Len(t, externalResources, subtaskCount)
+			for _, externalResource := range externalResources {
+				assert.True(t, externalResource.IsAbortedSubtask || core.Phases[externalResource.Phase].IsTerminal() || core.Phases[externalResource.Phase] == core.PhaseUndefined)
+			}
+		})
+	}
 }

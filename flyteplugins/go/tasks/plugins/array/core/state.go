@@ -35,6 +35,7 @@ const (
 	PhaseAssembleFinalError
 	PhaseRetryableFailure
 	PhasePermanentFailure
+	PhaseAbortSubTasks
 )
 
 type State struct {
@@ -204,6 +205,9 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 	case PhaseAssembleFinalError:
 		fallthrough
 
+	case PhaseAbortSubTasks:
+		fallthrough
+
 	case PhaseWriteToDiscoveryThenFail:
 		fallthrough
 
@@ -259,14 +263,14 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 
 	if totalCount < minSuccesses {
 		logger.Infof(ctx, "Array failed because totalCount[%v] < minSuccesses[%v]", totalCount, minSuccesses)
-		return PhaseWriteToDiscoveryThenFail
+		return PhaseAbortSubTasks
 	}
 
 	// No chance to reach the required success numbers.
 	if totalRunning+totalSuccesses+totalWaitingForResources+totalRetryableFailures < minSuccesses {
 		logger.Infof(ctx, "Array failed early because total failures > minSuccesses[%v]. Snapshot totalRunning[%v] + totalSuccesses[%v] + totalWaitingForResource[%v] + totalRetryableFailures[%v]",
 			minSuccesses, totalRunning, totalSuccesses, totalWaitingForResources, totalRetryableFailures)
-		return PhaseWriteToDiscoveryThenFail
+		return PhaseAbortSubTasks
 	}
 
 	if totalWaitingForResources > 0 {

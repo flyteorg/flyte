@@ -174,9 +174,8 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 	}
 
 	currentPhase := core.TaskExecution_Phase(core.TaskExecution_Phase_value[taskExecutionModel.Phase])
-	if common.IsTaskExecutionTerminal(currentPhase) &&
-		(taskExecutionModel.Phase != request.Event.Phase.String() || taskExecutionModel.PhaseVersion >= request.Event.PhaseVersion) {
-		// Only update terminate execution if phase matches and it's a newer version
+	if common.IsTaskExecutionTerminal(currentPhase) {
+		// Cannot update a terminal execution.
 		curPhase := request.Event.Phase.String()
 		errorMsg := fmt.Sprintf("invalid phase change from %v to %v for task execution %v", taskExecutionModel.Phase, request.Event.Phase, taskExecutionID)
 		logger.Warnf(ctx, errorMsg)
