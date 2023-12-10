@@ -60,6 +60,12 @@ func TestPlugin(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
+	t.Run("test getAgentMetadataClientFunc", func(t *testing.T) {
+		client, err := getAgentMetadataClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
+		assert.NoError(t, err)
+		assert.NotNil(t, client)
+	})
+
 	t.Run("test getAsyncClientFunc", func(t *testing.T) {
 		client, err := getAsyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
