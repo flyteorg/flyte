@@ -319,32 +319,15 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	if timeout == 0 {
 		return ctx, func() {}
 	}
+
 	return context.WithTimeout(ctx, timeout)
 }
 
-func combineToDistinctTaskTypes(originalTaskTypes, additionalTaskTypes []string) []string {
-	set := make(map[string]struct{})
-
-	for _, task := range originalTaskTypes {
-		set[task] = struct{}{}
-	}
-	for _, task := range additionalTaskTypes {
-		set[task] = struct{}{}
-	}
-
-	var supportedTaskTypes []string
-	for task := range set {
-		supportedTaskTypes = append(supportedTaskTypes, task)
-	}
-
-	return supportedTaskTypes
-}
-
-func getAgentMetadata(agent *Agent, connectionCache map[*Agent]*grpc.ClientConn, isSyncTask map[string]bool) []string {
+func updateAgentTaskTypes(agent *Agent, connectionCache map[*Agent]*grpc.ClientConn, isSyncTask map[string]bool) {
 	client, err := getAgentMetadataClientFunc(context.Background(), agent, connectionCache)
 	if err != nil {
 		logger.Errorf(context.Background(), "failed to connect to agent [%v] with error: [%v]", agent, err)
-		return []string{}
+		return
 	}
 
 	finalCtx, cancel := getFinalContext(context.Background(), "ListAgent", agent)
@@ -353,51 +336,59 @@ func getAgentMetadata(agent *Agent, connectionCache map[*Agent]*grpc.ClientConn,
 	res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
 	if err != nil {
 		logger.Errorf(context.Background(), "failed to send list agent request with error: [%v]", err)
-		return []string{}
+		return
 	}
 
 	agents := res.GetAgents()
 	logger.Infof(context.Background(), "here are all agents [%v] in [%v] agent server", agents, agent)
 
-	var supportedTaskTypes []string
 	for _, agent := range agents {
-		supportedTaskTypes = append(supportedTaskTypes, agent.SupportedTaskType)
 		isSyncTask[agent.SupportedTaskType] = agent.IsSync
 	}
-
-	return supportedTaskTypes
 }
 
-func setAgentMetadata(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, isSyncTask map[string]bool) {
-	// Combine default agent server's task types with config's existing task types.
+func getAgentMetadata(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) ([]string, map[string]bool) {
+	// Assign supported task types from the config to prevent a panic when no task type is supported.
+	// https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
+	supportedTaskTypes := cfg.SupportedTaskTypes
+	isSyncTask := make(map[string]bool)
+
+	// Combine the default agent server's task types with the config's existing task types.
 	// Use empty string as key to return default agent server
 	defaultAgent, err := getFinalAgent("", cfg)
 	if err != nil {
 		logger.Errorf(context.Background(), "failed to get default agent [%v] with error: [%v]", err)
 	} else {
-		cfg.SupportedTaskTypes = combineToDistinctTaskTypes(cfg.SupportedTaskTypes, getAgentMetadata(defaultAgent, connectionCache, isSyncTask))
+		updateAgentTaskTypes(defaultAgent, connectionCache, isSyncTask)
 	}
 
-	// For each agent server, update config's SupportedTaskTypes by aggregating their unique supported tasks.
-	// For example, 1 agent server support bigquery task only, another agent server support spark task only
-	// We can get both of them by combining the supported task types from 2 agent servers
+	// For each agent server, use a map to store its supported task types and whether it is a sync task.
+	// This combines unique task types across all agents.
+	// We need to iterate all agent servers to get all supported task types.
+	// For example, one agent server supports only bigquery tasks, while another supports only spark tasks.
+	// We can get both by combining the supported task types from two agent servers.
 	for _, agent := range cfg.Agents {
-		cfg.SupportedTaskTypes = combineToDistinctTaskTypes(cfg.SupportedTaskTypes, getAgentMetadata(agent, connectionCache, isSyncTask))
+		updateAgentTaskTypes(agent, connectionCache, isSyncTask)
 	}
+
+	for task := range isSyncTask {
+		supportedTaskTypes = append(supportedTaskTypes, task)
+	}
+
+	return supportedTaskTypes, isSyncTask
 }
 
 func newAgentPlugin() webapi.PluginEntry {
 	cfg := GetConfig()
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	isSyncTask := make(map[string]bool)
 
-	agentMetadata := setAgentMetadata(cfg, connectionCache, isSyncTask)
-	logger.Infof(context.Background(), "supported task types: %v", cfg.SupportedTaskTypes)
+	supportedTaskTypes, isSyncTask := getAgentMetadata(cfg, connectionCache)
+	logger.Infof(context.Background(), "supported task types: %v", supportedTaskTypes)
 	logger.Infof(context.Background(), "is sync task: %v", isSyncTask)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
-		SupportedTaskTypes: cfg.SupportedTaskTypes,
+		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope:     iCtx.MetricsScope(),

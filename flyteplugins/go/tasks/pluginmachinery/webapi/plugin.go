@@ -43,7 +43,7 @@ type PluginEntry struct {
 	// is supported.
 	DefaultForTaskTypes []pluginsCore.TaskType
 
-	// Synchronous plugin
+	// A map of task types to boolean indicating if the plugin should be used synchronously for that task type.
 	IsSyncTask map[pluginsCore.TaskType]bool
 }
 
