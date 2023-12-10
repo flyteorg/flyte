@@ -463,7 +463,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 	recordedRunning := false
 	recordedFailed := false
-	recordedFailing := true
+	recordedFailing := false
 	eventSink := eventMocks.NewMockEventSink()
 	eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 		e, ok := message.(*event.WorkflowExecutionEvent)
@@ -520,7 +520,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we will run into the first failure on round 6
 
-			roundsToFail := 7
+			roundsToFail := 8
 			for i := 0; i < roundsToFail; i++ {
 				err := executor.HandleFlyteWorkflow(ctx, w)
 				assert.Nil(t, err, "Round [%v]", i)
@@ -534,6 +534,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 				if i == roundsToFail-1 {
 					assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
+				} else if i == roundsToFail-2 {
+					assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
 				} else {
 					assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
 				}
@@ -563,7 +565,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Events(t *testing.T) {
 
 	recordedRunning := false
 	recordedSuccess := false
-	recordedFailing := true
+	recordedFailing := false
 	eventSink := eventMocks.NewMockEventSink()
 	eventSink.SinkCb = func(ctx context.Context, message proto.Message) error {
 		e, ok := message.(*event.WorkflowExecutionEvent)

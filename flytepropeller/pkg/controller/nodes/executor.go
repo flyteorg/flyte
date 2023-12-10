@@ -753,7 +753,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 				return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "BindingResolutionFailure", err.Error(), nil), nil
 			}
 
-			if nodeInputs != nil {
+			if nodeInputs != nil && len(nodeInputs.Literals) > 0 {
 				inputsFile := v1alpha1.GetInputsFile(dataDir)
 				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
@@ -941,7 +941,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 	}
 
 	var cacheStatus *catalog.Status
-	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); ok {
+	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && ok {
 		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
