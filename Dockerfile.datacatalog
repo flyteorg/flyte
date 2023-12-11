@@ -3,7 +3,7 @@
 # 
 # TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
 
-FROM --platform=${BUILDPLATFORM} golang:1.19-alpine3.16 as builder
+FROM --platform=${BUILDPLATFORM} golang:1.21.5-alpine3.18 as builder
 
 ARG TARGETARCH
 ENV GOARCH "${TARGETARCH}"
@@ -39,7 +39,7 @@ RUN make linux_compile
 ENV PATH="/artifacts:${PATH}"
 
 # This will eventually move to centurylink/ca-certs:latest for minimum possible image size
-FROM alpine:3.16
+FROM alpine:3.18
 LABEL org.opencontainers.image.source=https://github.com/flyteorg/datacatalog
 
 COPY --from=builder /artifacts /bin
