@@ -21,3 +21,7 @@ linux_compile:
 .PHONY: generate
 generate:
 	@go generate ./...
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy

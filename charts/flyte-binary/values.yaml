@@ -81,6 +81,16 @@ configuration:
       gcs:
         # project Google Cloud project in which bucket resides
         project: "my-organization-gcp-project"
+      # azure Provider configuration for Azure object store
+      azure:
+        # configDomainSuffix Domain name suffix
+        configDomainSuffix: ""
+        # configUploadConcurrency Upload Concurrency (default 4)
+        configUploadConcurrency: 4
+        # account Storage Account name
+        account: "storage-account-name"
+        # key Storage Account key if used
+        key: ""
   # logging Specify configuration for logs emitted by Flyte
   logging:
     # level Set the log level
@@ -149,7 +159,7 @@ configuration:
       # repository CoPilot sidecar image repository
       repository: cr.flyte.org/flyteorg/flytecopilot # FLYTECOPILOT_IMAGE
       # tag CoPilot sidecar image tag
-      tag: v1.9.37 # FLYTECOPILOT_TAG
+      tag: v1.10.6 # FLYTECOPILOT_TAG
   # agentService Flyte Agent configuration
   agentService:
     defaultAgent:

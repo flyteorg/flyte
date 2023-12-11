@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"go.opentelemetry.io/otel/trace"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -19,6 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -176,11 +178,17 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 //
 // </pre>
 func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
+	var span trace.Span
+	ctx, span = otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.Propeller/Handle")
+	defer span.End()
+
 	logger.Infof(ctx, "Processing Workflow.")
 	defer logger.Infof(ctx, "Completed processing workflow.")
 
 	// Get the FlyteWorkflow resource with this namespace/name
+	_, wfStoreGetSpan := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "WorkflowStore.Get")
 	w, fetchErr := p.wfStore.Get(ctx, namespace, name)
+	wfStoreGetSpan.End()
 	if fetchErr != nil {
 		if workflowstore.IsNotFound(fetchErr) {
 			p.metrics.WorkflowNotFound.Inc()
@@ -213,25 +221,12 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	// static fields to the blobstore to reduce CRD size. we must read and parse the workflow
 	// closure so that these fields may be temporarily repopulated.
 	var wfClosureCrdFields *k8s.WfClosureCrdFields
+	var err error
 	if len(w.WorkflowClosureReference) > 0 {
-		t := p.metrics.WorkflowClosureReadTime.Start(ctx)
-
-		wfClosure := &admin.WorkflowClosure{}
-		err := p.store.ReadProtobuf(ctx, w.WorkflowClosureReference, wfClosure)
+		wfClosureCrdFields, err = p.parseWorkflowClosureCrdFields(ctx, w.WorkflowClosureReference)
 		if err != nil {
-			t.Stop()
-			logger.Errorf(ctx, "Failed to retrieve workflow closure data from '%s' with error '%s'", w.WorkflowClosureReference, err)
 			return err
 		}
-
-		wfClosureCrdFields, err = k8s.BuildWfClosureCrdFields(wfClosure.CompiledWorkflow)
-		if err != nil {
-			t.Stop()
-			logger.Errorf(ctx, "Failed to parse workflow closure data from '%s' with error '%s'", w.WorkflowClosureReference, err)
-			return err
-		}
-
-		t.Stop()
 	}
 
 	streak := 0
@@ -243,140 +238,177 @@ func (p *Propeller) Handle(ctx context.Context, namespace, name string) error {
 	}
 
 	for streak = 0; streak < maxLength; streak++ {
-		// if the wfClosureCrdFields struct is not nil then it contains static workflow data which
-		// has been offloaded to the blobstore. we must set these fields so they're available
-		// during workflow processing and immediately remove them afterwards so they do not
-		// accidentally get written to the workflow store once the new state is stored.
-		if wfClosureCrdFields != nil {
-			w.WorkflowSpec = wfClosureCrdFields.WorkflowSpec
-			w.Tasks = wfClosureCrdFields.Tasks
-			w.SubWorkflows = wfClosureCrdFields.SubWorkflows
-		}
-
-		t := p.metrics.RoundTime.Start(ctx)
-		mutatedWf, err := p.TryMutateWorkflow(ctx, w)
-
-		if wfClosureCrdFields != nil {
-			// strip data populated from WorkflowClosureReference
-			w.SubWorkflows, w.Tasks, w.WorkflowSpec = nil, nil, nil
-			if mutatedWf != nil {
-				mutatedWf.SubWorkflows, mutatedWf.Tasks, mutatedWf.WorkflowSpec = nil, nil, nil
-			}
-		}
-
+		w, err = p.streak(ctx, w, wfClosureCrdFields)
 		if err != nil {
-			// NOTE We are overriding the deepcopy here, as we are essentially ignoring all mutations
-			// We only want to increase failed attempts and discard any other partial changes to the CRD.
-			mutatedWf = RecordSystemError(w, err)
-			p.metrics.SystemError.Inc(ctx)
-		} else if mutatedWf == nil {
-			logger.Errorf(ctx, "Should not happen! Mutation resulted in a nil workflow!")
-			return nil
-		} else {
-			if !w.GetExecutionStatus().IsTerminated() {
-				// No updates in the status we detected, we will skip writing to KubeAPI
-				if mutatedWf.Status.Equals(&w.Status) {
-					logger.Info(ctx, "WF hasn't been updated in this round.")
-					t.Stop()
-					return nil
-				}
-			}
-			if mutatedWf.GetExecutionStatus().IsTerminated() {
-				// If the end result is a terminated workflow, we remove the labels
-				// We add a completed label so that we can avoid polling for this workflow
-				SetCompletedLabel(mutatedWf, time.Now())
-				ResetFinalizers(mutatedWf)
-			}
-		}
-
-		// ExecutionNotFound error is returned when flyteadmin is missing the workflow. This is not
-		// a valid state unless we are experiencing a race condition where the workflow has not yet
-		// been inserted into the db (ie. workflow phase is WorkflowPhaseReady).
-		if err != nil && eventsErr.IsNotFound(err) && w.GetExecutionStatus().GetPhase() != v1alpha1.WorkflowPhaseReady {
-			t.Stop()
-			logger.Errorf(ctx, "Failed to process workflow, failing: %s", err)
-
-			// We set the workflow status to failing to abort any active tasks in the next round.
-			mutableW := w.DeepCopy()
-			mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow execution is missing in flyteadmin, aborting", &core.ExecutionError{
-				Kind:    core.ExecutionError_SYSTEM,
-				Code:    "ExecutionNotFound",
-				Message: "Workflow execution not found in flyteadmin.",
-			})
-			if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
-				logger.Errorf(ctx, "Failed to record an ExecutionNotFound workflow as failed, reason: %s. Retrying...", e)
-				return e
-			}
-			return nil
-		}
-
-		// Incompatible cluster means that another cluster has been designated to handle this workflow execution.
-		// We should early abort in this case, since any events originating from this cluster for this execution will
-		// be rejected.
-		if err != nil && eventsErr.IsEventIncompatibleClusterError(err) {
-			t.Stop()
-			logger.Errorf(ctx, "No longer designated to process workflow, failing: %s", err)
-
-			// We set the workflow status to failing to abort any active tasks in the next round.
-			mutableW := w.DeepCopy()
-			mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow execution cluster reassigned, aborting", &core.ExecutionError{
-				Kind:    core.ExecutionError_SYSTEM,
-				Code:    string(eventsErr.EventIncompatibleCusterError),
-				Message: fmt.Sprintf("Workflow execution cluster reassigned: %v", err),
-			})
-			if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
-				logger.Errorf(ctx, "Failed to record an EventIncompatibleClusterError workflow as failed, reason: %s. Retrying...", e)
-				return e
-			}
-			return nil
-		}
-
-		// TODO we will need to call updatestatus when it is supported. But to preserve metadata like (label/finalizer) we will need to use update
-
-		// update the GetExecutionStatus block of the FlyteWorkflow resource. UpdateStatus will not
-		// allow changes to the Spec of the resource, which is ideal for ensuring
-		// nothing other than resource status has been updated.
-		newWf, updateErr := p.wfStore.Update(ctx, mutatedWf, workflowstore.PriorityClassCritical)
-		if updateErr != nil {
-			t.Stop()
-			// The update has failed, lets check if this is because the size is too large. If so
-			if workflowstore.IsWorkflowTooLarge(updateErr) {
-				logger.Errorf(ctx, "Failed storing workflow to the store, reason: %s", updateErr)
-				p.metrics.SystemError.Inc(ctx)
-				// Workflow is too large, we will mark the workflow as failing and record it. This will automatically
-				// propagate the failure in the next round.
-				mutableW := w.DeepCopy()
-				mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow size has breached threshold, aborting", &core.ExecutionError{
-					Kind:    core.ExecutionError_SYSTEM,
-					Code:    "WorkflowTooLarge",
-					Message: "Workflow execution state is too large for Flyte to handle.",
-				})
-				if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
-					logger.Errorf(ctx, "Failed recording a large workflow as failed, reason: %s. Retrying...", e)
-					return e
-				}
-				return nil
-			}
-			return updateErr
-		}
-		if err != nil {
-			t.Stop()
-			// An error was encountered during the round. Let us return, so that we can back-off gracefully
 			return err
+		} else if w == nil {
+			break
 		}
-		if mutatedWf.GetExecutionStatus().IsTerminated() || newWf.ResourceVersion == mutatedWf.ResourceVersion {
-			// Workflow is terminated (no need to continue) or no status was changed, we can wait
-			logger.Infof(ctx, "Will not fast follow, Reason: Wf terminated? %v, Version matched? %v",
-				mutatedWf.GetExecutionStatus().IsTerminated(), newWf.ResourceVersion == mutatedWf.ResourceVersion)
-			t.Stop()
-			return nil
-		}
+
 		logger.Infof(ctx, "FastFollow Enabled. Detected State change, we will try another round. StreakLength [%d]", streak)
-		w = newWf
-		t.Stop()
 	}
 	logger.Infof(ctx, "Streak ended at [%d]/Max: [%d]", streak, maxLength)
 	return nil
+}
+
+// parseWorkflowClosureCrdFields attempts to retrieve offloaded static workflow closure data from the specified
+// DataReference.
+func (p *Propeller) parseWorkflowClosureCrdFields(ctx context.Context, dataReference storage.DataReference) (*k8s.WfClosureCrdFields, error) {
+	_, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.Propeller/parseWorkflowClosureCrdFields")
+	defer span.End()
+
+	t := p.metrics.WorkflowClosureReadTime.Start(ctx)
+	defer t.Stop()
+
+	wfClosure := &admin.WorkflowClosure{}
+	err := p.store.ReadProtobuf(ctx, dataReference, wfClosure)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to retrieve workflow closure data from '%s' with error '%s'", dataReference, err)
+		return nil, err
+	}
+
+	wfClosureCrdFields, err := k8s.BuildWfClosureCrdFields(wfClosure.CompiledWorkflow)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to parse workflow closure data from '%s' with error '%s'", dataReference, err)
+		return nil, err
+	}
+
+	return wfClosureCrdFields, nil
+}
+
+// streak performs a single iteration of mutating a workflow returning the newly mutated workflow on success or nil if
+// the workflow was not updated.
+func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClosureCrdFields *k8s.WfClosureCrdFields) (*v1alpha1.FlyteWorkflow, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.Propeller/streak")
+	defer span.End()
+
+	t := p.metrics.RoundTime.Start(ctx)
+	defer t.Stop()
+
+	// if the wfClosureCrdFields struct is not nil then it contains static workflow data which
+	// has been offloaded to the blobstore. we must set these fields so they're available
+	// during workflow processing and immediately remove them afterwards so they do not
+	// accidentally get written to the workflow store once the new state is stored.
+	if wfClosureCrdFields != nil {
+		w.WorkflowSpec = wfClosureCrdFields.WorkflowSpec
+		w.Tasks = wfClosureCrdFields.Tasks
+		w.SubWorkflows = wfClosureCrdFields.SubWorkflows
+	}
+
+	mutatedWf, err := p.TryMutateWorkflow(ctx, w)
+
+	if wfClosureCrdFields != nil {
+		// strip data populated from WorkflowClosureReference
+		w.SubWorkflows, w.Tasks, w.WorkflowSpec = nil, nil, nil
+		if mutatedWf != nil {
+			mutatedWf.SubWorkflows, mutatedWf.Tasks, mutatedWf.WorkflowSpec = nil, nil, nil
+		}
+	}
+
+	if err != nil {
+		// NOTE We are overriding the deepcopy here, as we are essentially ignoring all mutations
+		// We only want to increase failed attempts and discard any other partial changes to the CRD.
+		mutatedWf = RecordSystemError(w, err)
+		p.metrics.SystemError.Inc(ctx)
+	} else if mutatedWf == nil {
+		logger.Errorf(ctx, "Should not happen! Mutation resulted in a nil workflow!")
+		return nil, nil
+	} else {
+		if !w.GetExecutionStatus().IsTerminated() {
+			// No updates in the status we detected, we will skip writing to KubeAPI
+			if mutatedWf.Status.Equals(&w.Status) {
+				logger.Info(ctx, "WF hasn't been updated in this round.")
+				return nil, nil
+			}
+		}
+		if mutatedWf.GetExecutionStatus().IsTerminated() {
+			// If the end result is a terminated workflow, we remove the labels
+			// We add a completed label so that we can avoid polling for this workflow
+			SetCompletedLabel(mutatedWf, time.Now())
+			ResetFinalizers(mutatedWf)
+		}
+	}
+
+	// ExecutionNotFound error is returned when flyteadmin is missing the workflow. This is not
+	// a valid state unless we are experiencing a race condition where the workflow has not yet
+	// been inserted into the db (ie. workflow phase is WorkflowPhaseReady).
+	if err != nil && eventsErr.IsNotFound(err) && w.GetExecutionStatus().GetPhase() != v1alpha1.WorkflowPhaseReady {
+		logger.Errorf(ctx, "Failed to process workflow, failing: %s", err)
+
+		// We set the workflow status to failing to abort any active tasks in the next round.
+		mutableW := w.DeepCopy()
+		mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow execution is missing in flyteadmin, aborting", &core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    "ExecutionNotFound",
+			Message: "Workflow execution not found in flyteadmin.",
+		})
+		if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+			logger.Errorf(ctx, "Failed to record an ExecutionNotFound workflow as failed, reason: %s. Retrying...", e)
+			return nil, e
+		}
+		return nil, nil
+	}
+
+	// Incompatible cluster means that another cluster has been designated to handle this workflow execution.
+	// We should early abort in this case, since any events originating from this cluster for this execution will
+	// be rejected.
+	if err != nil && eventsErr.IsEventIncompatibleClusterError(err) {
+		logger.Errorf(ctx, "No longer designated to process workflow, failing: %s", err)
+
+		// We set the workflow status to failing to abort any active tasks in the next round.
+		mutableW := w.DeepCopy()
+		mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow execution cluster reassigned, aborting", &core.ExecutionError{
+			Kind:    core.ExecutionError_SYSTEM,
+			Code:    string(eventsErr.EventIncompatibleCusterError),
+			Message: fmt.Sprintf("Workflow execution cluster reassigned: %v", err),
+		})
+		if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+			logger.Errorf(ctx, "Failed to record an EventIncompatibleClusterError workflow as failed, reason: %s. Retrying...", e)
+			return nil, e
+		}
+		return nil, nil
+	}
+
+	// TODO we will need to call updatestatus when it is supported. But to preserve metadata like (label/finalizer) we will need to use update
+
+	// update the GetExecutionStatus block of the FlyteWorkflow resource. UpdateStatus will not
+	// allow changes to the Spec of the resource, which is ideal for ensuring
+	// nothing other than resource status has been updated.
+	_, wfStoreUpdateSpan := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "WorkflowStore.Update")
+	newWf, updateErr := p.wfStore.Update(ctx, mutatedWf, workflowstore.PriorityClassCritical)
+	wfStoreUpdateSpan.End()
+	if updateErr != nil {
+		// The update has failed, lets check if this is because the size is too large. If so
+		if workflowstore.IsWorkflowTooLarge(updateErr) {
+			logger.Errorf(ctx, "Failed storing workflow to the store, reason: %s", updateErr)
+			p.metrics.SystemError.Inc(ctx)
+			// Workflow is too large, we will mark the workflow as failing and record it. This will automatically
+			// propagate the failure in the next round.
+			mutableW := w.DeepCopy()
+			mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailing, "Workflow size has breached threshold, aborting", &core.ExecutionError{
+				Kind:    core.ExecutionError_SYSTEM,
+				Code:    "WorkflowTooLarge",
+				Message: "Workflow execution state is too large for Flyte to handle.",
+			})
+			if _, e := p.wfStore.Update(ctx, mutableW, workflowstore.PriorityClassCritical); e != nil {
+				logger.Errorf(ctx, "Failed recording a large workflow as failed, reason: %s. Retrying...", e)
+				return nil, e
+			}
+			return nil, nil
+		}
+		return nil, updateErr
+	}
+	if err != nil {
+		// An error was encountered during the round. Let us return, so that we can back-off gracefully
+		return nil, err
+	}
+	if mutatedWf.GetExecutionStatus().IsTerminated() || newWf.ResourceVersion == mutatedWf.ResourceVersion {
+		// Workflow is terminated (no need to continue) or no status was changed, we can wait
+		logger.Infof(ctx, "Will not fast follow, Reason: Wf terminated? %v, Version matched? %v",
+			mutatedWf.GetExecutionStatus().IsTerminated(), newWf.ResourceVersion == mutatedWf.ResourceVersion)
+		return nil, nil
+	}
+	return newWf, nil
 }
 
 // NewPropellerHandler creates a new Propeller and initializes metrics

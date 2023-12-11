@@ -53,6 +53,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+const (
+	principal = "principal"
+	rawOutput = "raw_output"
+)
+
 var spec = testutils.GetExecutionRequest().Spec
 var specBytes, _ = proto.Marshal(spec)
 var phase = core.WorkflowExecution_RUNNING.String()
@@ -296,8 +301,6 @@ func TestCreateExecution(t *testing.T) {
 			Labels: &labels}), nil
 	}
 
-	principal := "principal"
-	rawOutput := "raw_output"
 	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
 		func(ctx context.Context, input models.Execution) error {
@@ -421,7 +424,6 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		},
 	)
 
-	principal := "feeny"
 	getExecutionCalled := false
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
@@ -618,6 +620,7 @@ func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 }
 
 func TestCreateExecutionPropellerFailure(t *testing.T) {
+	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "ABC")
@@ -626,13 +629,45 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	mockExecutor.OnID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
+	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
+		core.QualityOfService_HIGH: {
+			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
+		},
+		core.QualityOfService_MEDIUM: {
+			QueueingBudget: ptypes.DurationProto(20 * time.Minute),
+		},
+		core.QualityOfService_LOW: {
+			QueueingBudget: ptypes.DurationProto(30 * time.Minute),
+		},
+	})
+
+	qosProvider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
+		"domain": core.QualityOfService_HIGH,
+	})
+
+	mockConfig := getMockExecutionsConfigProvider()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).AddQualityOfServiceConfiguration(qosProvider)
 
 	request := testutils.GetExecutionRequest()
+	request.Spec.Metadata = &admin.ExecutionMetadata{
+		Principal: "unused - populated from authenticated context",
+	}
+	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
+	request.Spec.ClusterAssignment = &clusterAssignment
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
-	assert.EqualError(t, err, expectedErr.Error())
-	assert.Nil(t, response)
+	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
+	assert.NoError(t, err)
+	ctx := identity.WithContext(context.Background())
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+	expectedResponse := &admin.ExecutionCreateResponse{Id: &executionIdentifier}
+
+	response, err := execManager.CreateExecution(ctx, request, requestedAt)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expectedResponse, response)
 }
 
 func TestCreateExecutionDatabaseFailure(t *testing.T) {
@@ -3379,7 +3414,6 @@ func TestTerminateExecution(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 
 	abortCause := "abort cause"
-	principal := "principal"
 	updateExecutionFunc := func(
 		context context.Context, execution models.Execution) error {
 		assert.Equal(t, "project", execution.Project)

@@ -31,7 +31,7 @@ type GarbageCollector struct {
 	namespaceClient           corev1.NamespaceInterface
 	ttlHours                  int
 	interval                  time.Duration
-	clk                       clock.Clock
+	clk                       clock.WithTicker
 	metrics                   *gcMetrics
 	namespace                 string
 	labelSelectorRequirements []v1.LabelSelectorRequirement
@@ -128,7 +128,7 @@ func (g *GarbageCollector) deleteWorkflowsForNamespace(ctx context.Context, name
 }
 
 // runGC runs GC periodically
-func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Timer) {
+func (g *GarbageCollector) runGC(ctx context.Context, ticker clock.Ticker) {
 	logger.Infof(ctx, "Background workflow garbage collection started, with duration [%s], TTL [%d] hours", g.interval.String(), g.ttlHours)
 
 	ctx = contextutils.WithGoroutineLabel(ctx, "gc-worker")
@@ -162,12 +162,12 @@ func (g *GarbageCollector) StartGC(ctx context.Context) error {
 		logger.Warningf(ctx, "Garbage collector is disabled, as ttl [%d] is <=0", g.ttlHours)
 		return nil
 	}
-	ticker := g.clk.NewTimer(g.interval)
+	ticker := g.clk.NewTicker(g.interval)
 	go g.runGC(ctx, ticker)
 	return nil
 }
 
-func NewGarbageCollector(cfg *config.Config, scope promutils.Scope, clk clock.Clock, namespaceClient corev1.NamespaceInterface, wfClient v1alpha1.FlyteworkflowV1alpha1Interface) (*GarbageCollector, error) {
+func NewGarbageCollector(cfg *config.Config, scope promutils.Scope, clk clock.WithTicker, namespaceClient corev1.NamespaceInterface, wfClient v1alpha1.FlyteworkflowV1alpha1Interface) (*GarbageCollector, error) {
 	ttl := 23
 	if cfg.MaxTTLInHours < 23 {
 		ttl = cfg.MaxTTLInHours

@@ -33,6 +33,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -516,6 +517,9 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 }
 
 func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.task.Handler/HandleTask")
+	defer span.End()
+
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
@@ -570,6 +574,12 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		}
 		if pluginTrns.IsPreviouslyObserved() {
 			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
+			logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+
+			// This is a hack to ensure that we do not re-evaluate the same node again in the same round.
+			if err := nCtx.NodeStateWriter().PutTaskNodeState(ts); err != nil {
+				return handler.UnknownTransition, err
+			}
 			return pluginTrns.FinalTransition(ctx)
 		}
 	}
