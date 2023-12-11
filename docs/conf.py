@@ -331,7 +331,10 @@ import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
+    "show_repo_tags": bool(int(os.environ.get("SHOW_REPO_TAGS", 0))),
 }
+
+html_context = {}
 
 # Define these environment variables to use local copies of the projects. This
 # is useful for building the docs in the CI/CD of the corresponding repos.
@@ -344,6 +347,7 @@ flytekit_path = flytekit_local_path or "_projects/api/flytekit"
 
 import_projects = [
     {
+        "name": "flytesnacks",
         "source": flytesnacks_local_path or "https://github.com/flyteorg/flytesnacks",
         "docs_path": "docs",
         "dest": "flytesnacks",
@@ -362,6 +366,7 @@ import_projects = [
         "local": flytesnacks_local_path is not None,
     },
     {
+        "name": "flytekit",
         "source": flytekit_local_path or "https://github.com/flyteorg/flytekit",
         "docs_path": "docs/source",
         "dest": "api/flytekit",
@@ -374,12 +379,14 @@ import_projects = [
         "local": flytekit_local_path is not None,
     },
     {
+        "name": "flytectl",
         "source": flytectl_local_path or "https://github.com/flyteorg/flytectl",
         "docs_path": "docs/source",
         "dest": "flytectl",
         "local": flytectl_local_path is not None,
     },
     {
+        "name": "flyteidl",
         "source": "../flyteidl",
         "docs_path": "protos",
         "dest": "protos",  # to stay compatible with flyteidl docs path naming

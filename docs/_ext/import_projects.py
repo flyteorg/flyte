@@ -19,11 +19,13 @@ __version__ = "0.0.0"
 class ImportProjectsConfig:
     clone_dir: str
     flytekit_api_dir: str
+    show_repo_tags: bool
     source_regex_mapping: dict = field(default_factory=dict)
 
 
 @dataclass
 class Project:
+    name: str
     source: str
     dest: str
     local: bool = False
@@ -54,6 +56,16 @@ def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
             sys.path.insert(0, dir_path)
 
 
+def update_html_context(project: Project, tag: str, commit: str, config: Config):
+    tag_url = f"{project.source}/releases/tag/{tag}"
+    commit_url = f"{project.source}/tree/{commit}"
+
+    config.html_context[f"{project.name}_tag"] = tag
+    config.html_context[f"{project.name}_tag_url"] = tag_url
+    config.html_context[f"{project.name}_commit"] = commit
+    config.html_context[f"{project.name}_commit_url"] = commit_url
+
+
 def import_projects(app: Sphinx, config: Config):
     """Clone projects from git or copy from local directory."""
     projects = [Project(**p) for p in config.import_projects]
@@ -67,13 +79,24 @@ def import_projects(app: Sphinx, config: Config):
     ):
         (srcdir / _dir).mkdir(parents=True, exist_ok=True)
 
+    config.html_context["show_repo_tags"] = False
+    if import_projects_config.show_repo_tags:
+        config.html_context["show_repo_tags"] = True
+
     for project in projects:
         if project.local:
             local_dir = srcdir / project.source
         else:
             local_dir = srcdir / import_projects_config.clone_dir / project.dest
             shutil.rmtree(local_dir, ignore_errors=True)
-            Repo.clone_from(project.source, local_dir)
+            repo = Repo.clone_from(project.source, local_dir)
+
+            if import_projects_config.show_repo_tags:
+                # use the latest git tag when building docs in a prod
+                tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
+                tag = tags[-1]
+                update_html_context(project, str(tag), str(tag.commit)[:7], config)
+                repo.git.checkout(str(tag))
 
         local_docs_path = local_dir / project.docs_path
         dest_docs_dir = srcdir / project.dest
