@@ -79,6 +79,9 @@ def import_projects(app: Sphinx, config: Config):
     ):
         (srcdir / _dir).mkdir(parents=True, exist_ok=True)
 
+    if not hasattr(config, "html_context"):
+        config.html_context = {}
+
     config.html_context["show_repo_tags"] = False
     if import_projects_config.show_repo_tags:
         config.html_context["show_repo_tags"] = True

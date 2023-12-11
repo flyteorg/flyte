@@ -334,8 +334,6 @@ import_projects_config = {
     "show_repo_tags": bool(int(os.environ.get("SHOW_REPO_TAGS", 0))),
 }
 
-html_context = {}
-
 # Define these environment variables to use local copies of the projects. This
 # is useful for building the docs in the CI/CD of the corresponding repos.
 flytesnacks_local_path = os.environ.get("FLYTESNACKS_LOCAL_PATH", None)
