@@ -677,8 +677,6 @@ func (m *Agent) Validate() error {
 
 	// no validation rules for Name
 
-	// no validation rules for SupportedTaskType
-
 	// no validation rules for IsSync
 
 	return nil

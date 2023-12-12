@@ -8425,18 +8425,35 @@ public final class AgentOuterClass {
      * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>string supported_task_type = 2;</code>
+     * <code>repeated string supported_task_types = 2;</code>
      */
-    java.lang.String getSupportedTaskType();
+    java.util.List<java.lang.String>
+        getSupportedTaskTypesList();
     /**
      * <pre>
      * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>string supported_task_type = 2;</code>
+     * <code>repeated string supported_task_types = 2;</code>
+     */
+    int getSupportedTaskTypesCount();
+    /**
+     * <pre>
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
+     * </pre>
+     *
+     * <code>repeated string supported_task_types = 2;</code>
+     */
+    java.lang.String getSupportedTaskTypes(int index);
+    /**
+     * <pre>
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
+     * </pre>
+     *
+     * <code>repeated string supported_task_types = 2;</code>
      */
     com.google.protobuf.ByteString
-        getSupportedTaskTypeBytes();
+        getSupportedTaskTypesBytes(int index);
 
     /**
      * <pre>
@@ -8500,7 +8517,7 @@ public final class AgentOuterClass {
     }
     private Agent() {
       name_ = "";
-      supportedTaskType_ = "";
+      supportedTaskTypes_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
@@ -8536,8 +8553,11 @@ public final class AgentOuterClass {
             }
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
-
-              supportedTaskType_ = s;
+              if (!((mutable_bitField0_ & 0x00000002) != 0)) {
+                supportedTaskTypes_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000002;
+              }
+              supportedTaskTypes_.add(s);
               break;
             }
             case 24: {
@@ -8569,6 +8589,9 @@ public final class AgentOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000002) != 0)) {
+          supportedTaskTypes_ = supportedTaskTypes_.getUnmodifiableView();
+        }
         if (((mutable_bitField0_ & 0x00000008) != 0)) {
           secretNames_ = secretNames_.getUnmodifiableView();
         }
@@ -8632,46 +8655,49 @@ public final class AgentOuterClass {
       }
     }
 
-    public static final int SUPPORTED_TASK_TYPE_FIELD_NUMBER = 2;
-    private volatile java.lang.Object supportedTaskType_;
+    public static final int SUPPORTED_TASK_TYPES_FIELD_NUMBER = 2;
+    private com.google.protobuf.LazyStringList supportedTaskTypes_;
     /**
      * <pre>
      * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>string supported_task_type = 2;</code>
+     * <code>repeated string supported_task_types = 2;</code>
      */
-    public java.lang.String getSupportedTaskType() {
-      java.lang.Object ref = supportedTaskType_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        supportedTaskType_ = s;
-        return s;
-      }
+    public com.google.protobuf.ProtocolStringList
+        getSupportedTaskTypesList() {
+      return supportedTaskTypes_;
     }
     /**
      * <pre>
      * SupportedTaskTypes are the types of the tasks that the agent can handle.
      * </pre>
      *
-     * <code>string supported_task_type = 2;</code>
+     * <code>repeated string supported_task_types = 2;</code>
+     */
+    public int getSupportedTaskTypesCount() {
+      return supportedTaskTypes_.size();
+    }
+    /**
+     * <pre>
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
+     * </pre>
+     *
+     * <code>repeated string supported_task_types = 2;</code>
+     */
+    public java.lang.String getSupportedTaskTypes(int index) {
+      return supportedTaskTypes_.get(index);
+    }
+    /**
+     * <pre>
+     * SupportedTaskTypes are the types of the tasks that the agent can handle.
+     * </pre>
+     *
+     * <code>repeated string supported_task_types = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getSupportedTaskTypeBytes() {
-      java.lang.Object ref = supportedTaskType_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        supportedTaskType_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+        getSupportedTaskTypesBytes(int index) {
+      return supportedTaskTypes_.getByteString(index);
     }
 
     public static final int IS_SYNC_FIELD_NUMBER = 3;
@@ -8749,8 +8775,8 @@ public final class AgentOuterClass {
       if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, name_);
       }
-      if (!getSupportedTaskTypeBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, supportedTaskType_);
+      for (int i = 0; i < supportedTaskTypes_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, supportedTaskTypes_.getRaw(i));
       }
       if (isSync_ != false) {
         output.writeBool(3, isSync_);
@@ -8770,8 +8796,13 @@ public final class AgentOuterClass {
       if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, name_);
       }
-      if (!getSupportedTaskTypeBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, supportedTaskType_);
+      {
+        int dataSize = 0;
+        for (int i = 0; i < supportedTaskTypes_.size(); i++) {
+          dataSize += computeStringSizeNoTag(supportedTaskTypes_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getSupportedTaskTypesList().size();
       }
       if (isSync_ != false) {
         size += com.google.protobuf.CodedOutputStream
@@ -8802,8 +8833,8 @@ public final class AgentOuterClass {
 
       if (!getName()
           .equals(other.getName())) return false;
-      if (!getSupportedTaskType()
-          .equals(other.getSupportedTaskType())) return false;
+      if (!getSupportedTaskTypesList()
+          .equals(other.getSupportedTaskTypesList())) return false;
       if (getIsSync()
           != other.getIsSync()) return false;
       if (!getSecretNamesList()
@@ -8821,8 +8852,10 @@ public final class AgentOuterClass {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + NAME_FIELD_NUMBER;
       hash = (53 * hash) + getName().hashCode();
-      hash = (37 * hash) + SUPPORTED_TASK_TYPE_FIELD_NUMBER;
-      hash = (53 * hash) + getSupportedTaskType().hashCode();
+      if (getSupportedTaskTypesCount() > 0) {
+        hash = (37 * hash) + SUPPORTED_TASK_TYPES_FIELD_NUMBER;
+        hash = (53 * hash) + getSupportedTaskTypesList().hashCode();
+      }
       hash = (37 * hash) + IS_SYNC_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getIsSync());
@@ -8969,8 +9002,8 @@ public final class AgentOuterClass {
         super.clear();
         name_ = "";
 
-        supportedTaskType_ = "";
-
+        supportedTaskTypes_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
         isSync_ = false;
 
         secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
@@ -9004,7 +9037,11 @@ public final class AgentOuterClass {
         int from_bitField0_ = bitField0_;
         int to_bitField0_ = 0;
         result.name_ = name_;
-        result.supportedTaskType_ = supportedTaskType_;
+        if (((bitField0_ & 0x00000002) != 0)) {
+          supportedTaskTypes_ = supportedTaskTypes_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000002);
+        }
+        result.supportedTaskTypes_ = supportedTaskTypes_;
         result.isSync_ = isSync_;
         if (((bitField0_ & 0x00000008) != 0)) {
           secretNames_ = secretNames_.getUnmodifiableView();
@@ -9064,8 +9101,14 @@ public final class AgentOuterClass {
           name_ = other.name_;
           onChanged();
         }
-        if (!other.getSupportedTaskType().isEmpty()) {
-          supportedTaskType_ = other.supportedTaskType_;
+        if (!other.supportedTaskTypes_.isEmpty()) {
+          if (supportedTaskTypes_.isEmpty()) {
+            supportedTaskTypes_ = other.supportedTaskTypes_;
+            bitField0_ = (bitField0_ & ~0x00000002);
+          } else {
+            ensureSupportedTaskTypesIsMutable();
+            supportedTaskTypes_.addAll(other.supportedTaskTypes_);
+          }
           onChanged();
         }
         if (other.getIsSync() != false) {
@@ -9200,60 +9243,86 @@ public final class AgentOuterClass {
         return this;
       }
 
-      private java.lang.Object supportedTaskType_ = "";
-      /**
-       * <pre>
-       * SupportedTaskTypes are the types of the tasks that the agent can handle.
-       * </pre>
-       *
-       * <code>string supported_task_type = 2;</code>
-       */
-      public java.lang.String getSupportedTaskType() {
-        java.lang.Object ref = supportedTaskType_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          supportedTaskType_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
+      private com.google.protobuf.LazyStringList supportedTaskTypes_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureSupportedTaskTypesIsMutable() {
+        if (!((bitField0_ & 0x00000002) != 0)) {
+          supportedTaskTypes_ = new com.google.protobuf.LazyStringArrayList(supportedTaskTypes_);
+          bitField0_ |= 0x00000002;
+         }
       }
       /**
        * <pre>
        * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 2;</code>
+       * <code>repeated string supported_task_types = 2;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getSupportedTaskTypesList() {
+        return supportedTaskTypes_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
+       * </pre>
+       *
+       * <code>repeated string supported_task_types = 2;</code>
+       */
+      public int getSupportedTaskTypesCount() {
+        return supportedTaskTypes_.size();
+      }
+      /**
+       * <pre>
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
+       * </pre>
+       *
+       * <code>repeated string supported_task_types = 2;</code>
+       */
+      public java.lang.String getSupportedTaskTypes(int index) {
+        return supportedTaskTypes_.get(index);
+      }
+      /**
+       * <pre>
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
+       * </pre>
+       *
+       * <code>repeated string supported_task_types = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getSupportedTaskTypeBytes() {
-        java.lang.Object ref = supportedTaskType_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          supportedTaskType_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
+          getSupportedTaskTypesBytes(int index) {
+        return supportedTaskTypes_.getByteString(index);
       }
       /**
        * <pre>
        * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 2;</code>
+       * <code>repeated string supported_task_types = 2;</code>
        */
-      public Builder setSupportedTaskType(
+      public Builder setSupportedTaskTypes(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureSupportedTaskTypesIsMutable();
+        supportedTaskTypes_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
+       * </pre>
+       *
+       * <code>repeated string supported_task_types = 2;</code>
+       */
+      public Builder addSupportedTaskTypes(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  
-        supportedTaskType_ = value;
+  ensureSupportedTaskTypesIsMutable();
+        supportedTaskTypes_.add(value);
         onChanged();
         return this;
       }
@@ -9262,11 +9331,13 @@ public final class AgentOuterClass {
        * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 2;</code>
+       * <code>repeated string supported_task_types = 2;</code>
        */
-      public Builder clearSupportedTaskType() {
-        
-        supportedTaskType_ = getDefaultInstance().getSupportedTaskType();
+      public Builder addAllSupportedTaskTypes(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureSupportedTaskTypesIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, supportedTaskTypes_);
         onChanged();
         return this;
       }
@@ -9275,16 +9346,29 @@ public final class AgentOuterClass {
        * SupportedTaskTypes are the types of the tasks that the agent can handle.
        * </pre>
        *
-       * <code>string supported_task_type = 2;</code>
+       * <code>repeated string supported_task_types = 2;</code>
        */
-      public Builder setSupportedTaskTypeBytes(
+      public Builder clearSupportedTaskTypes() {
+        supportedTaskTypes_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SupportedTaskTypes are the types of the tasks that the agent can handle.
+       * </pre>
+       *
+       * <code>repeated string supported_task_types = 2;</code>
+       */
+      public Builder addSupportedTaskTypesBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        
-        supportedTaskType_ = value;
+        ensureSupportedTaskTypesIsMutable();
+        supportedTaskTypes_.add(value);
         onChanged();
         return this;
       }
@@ -12054,18 +12138,18 @@ public final class AgentOuterClass {
       "\007outputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa" +
       "p\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskRequest\022" +
       "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(" +
-      "\014\"\024\n\022DeleteTaskResponse\"Y\n\005Agent\022\014\n\004name" +
-      "\030\001 \001(\t\022\033\n\023supported_task_type\030\002 \001(\t\022\017\n\007i" +
-      "s_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017Ge" +
-      "tAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentR" +
-      "esponse\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin." +
-      "Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgents" +
-      "Response\022%\n\006agents\030\001 \003(\0132\025.flyteidl.admi" +
-      "n.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022" +
-      "\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007R" +
-      "UNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/fl" +
-      "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +
-      "/adminb\006proto3"
+      "\014\"\024\n\022DeleteTaskResponse\"Z\n\005Agent\022\014\n\004name" +
+      "\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \003(\t\022\017\n\007" +
+      "is_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017G" +
+      "etAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgent" +
+      "Response\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin" +
+      ".Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgent" +
+      "sResponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.adm" +
+      "in.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000" +
+      "\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007" +
+      "RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/f" +
+      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
+      "l/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12161,7 +12245,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_Agent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Agent_descriptor,
-        new java.lang.String[] { "Name", "SupportedTaskType", "IsSync", "SecretNames", });
+        new java.lang.String[] { "Name", "SupportedTaskTypes", "IsSync", "SecretNames", });
     internal_static_flyteidl_admin_GetAgentRequest_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_GetAgentRequest_fieldAccessorTable = new

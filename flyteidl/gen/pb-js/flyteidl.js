@@ -20417,7 +20417,7 @@
                  * @memberof flyteidl.admin
                  * @interface IAgent
                  * @property {string|null} [name] Agent name
-                 * @property {string|null} [supportedTaskType] Agent supportedTaskType
+                 * @property {Array.<string>|null} [supportedTaskTypes] Agent supportedTaskTypes
                  * @property {boolean|null} [isSync] Agent isSync
                  * @property {Array.<string>|null} [secretNames] Agent secretNames
                  */
@@ -20431,6 +20431,7 @@
                  * @param {flyteidl.admin.IAgent=} [properties] Properties to set
                  */
                 function Agent(properties) {
+                    this.supportedTaskTypes = [];
                     this.secretNames = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -20447,12 +20448,12 @@
                 Agent.prototype.name = "";
     
                 /**
-                 * Agent supportedTaskType.
-                 * @member {string} supportedTaskType
+                 * Agent supportedTaskTypes.
+                 * @member {Array.<string>} supportedTaskTypes
                  * @memberof flyteidl.admin.Agent
                  * @instance
                  */
-                Agent.prototype.supportedTaskType = "";
+                Agent.prototype.supportedTaskTypes = $util.emptyArray;
     
                 /**
                  * Agent isSync.
@@ -20496,8 +20497,9 @@
                         writer = $Writer.create();
                     if (message.name != null && message.hasOwnProperty("name"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-                    if (message.supportedTaskType != null && message.hasOwnProperty("supportedTaskType"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.supportedTaskType);
+                    if (message.supportedTaskTypes != null && message.supportedTaskTypes.length)
+                        for (var i = 0; i < message.supportedTaskTypes.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.supportedTaskTypes[i]);
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isSync);
                     if (message.secretNames != null && message.secretNames.length)
@@ -20528,7 +20530,9 @@
                             message.name = reader.string();
                             break;
                         case 2:
-                            message.supportedTaskType = reader.string();
+                            if (!(message.supportedTaskTypes && message.supportedTaskTypes.length))
+                                message.supportedTaskTypes = [];
+                            message.supportedTaskTypes.push(reader.string());
                             break;
                         case 3:
                             message.isSync = reader.bool();
@@ -20560,9 +20564,13 @@
                     if (message.name != null && message.hasOwnProperty("name"))
                         if (!$util.isString(message.name))
                             return "name: string expected";
-                    if (message.supportedTaskType != null && message.hasOwnProperty("supportedTaskType"))
-                        if (!$util.isString(message.supportedTaskType))
-                            return "supportedTaskType: string expected";
+                    if (message.supportedTaskTypes != null && message.hasOwnProperty("supportedTaskTypes")) {
+                        if (!Array.isArray(message.supportedTaskTypes))
+                            return "supportedTaskTypes: array expected";
+                        for (var i = 0; i < message.supportedTaskTypes.length; ++i)
+                            if (!$util.isString(message.supportedTaskTypes[i]))
+                                return "supportedTaskTypes: string[] expected";
+                    }
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         if (typeof message.isSync !== "boolean")
                             return "isSync: boolean expected";

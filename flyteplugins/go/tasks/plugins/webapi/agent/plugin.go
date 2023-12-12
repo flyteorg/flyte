@@ -351,10 +351,15 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 
 		agents := res.GetAgents()
 		for _, agent := range agents {
-			if _, ok := agentRegistry[agent.SupportedTaskType]; !ok {
-				agentRegistry[agent.SupportedTaskType] = make(map[bool]*Agent)
+			supportedTaskTypes := agent.SupportedTaskTypes
+			isSync := agent.IsSync
+
+			for _, supportedTaskType := range supportedTaskTypes {
+				if _, ok := agentRegistry[supportedTaskType]; !ok {
+					agentRegistry[supportedTaskType] = make(map[bool]*Agent)
+				}
+				agentRegistry[supportedTaskType][isSync] = agentDeployment
 			}
-			agentRegistry[agent.SupportedTaskType][agent.IsSync] = agentDeployment
 		}
 	}
 

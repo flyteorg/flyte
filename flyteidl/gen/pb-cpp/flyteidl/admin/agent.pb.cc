@@ -474,7 +474,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, name_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, supported_task_type_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, supported_task_types_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, is_sync_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, secret_names_),
   ~0u,  // no _has_bits_
@@ -584,23 +584,23 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "\007outputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa"
   "p\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskRequest\022"
   "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001("
-  "\014\"\024\n\022DeleteTaskResponse\"Y\n\005Agent\022\014\n\004name"
-  "\030\001 \001(\t\022\033\n\023supported_task_type\030\002 \001(\t\022\017\n\007i"
-  "s_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017Ge"
-  "tAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentR"
-  "esponse\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin."
-  "Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgents"
-  "Response\022%\n\006agents\030\001 \003(\0132\025.flyteidl.admi"
-  "n.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022"
-  "\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007R"
-  "UNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/fl"
-  "yteorg/flyte/flyteidl/gen/pb-go/flyteidl"
-  "/adminb\006proto3"
+  "\014\"\024\n\022DeleteTaskResponse\"Z\n\005Agent\022\014\n\004name"
+  "\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \003(\t\022\017\n\007"
+  "is_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017G"
+  "etAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgent"
+  "Response\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin"
+  ".Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgent"
+  "sResponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.adm"
+  "in.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000"
+  "\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007"
+  "RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/f"
+  "lyteorg/flyte/flyteidl/gen/pb-go/flyteid"
+  "l/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1894,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1895,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -4388,7 +4388,7 @@ class Agent::HasBitSetters {
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Agent::kNameFieldNumber;
-const int Agent::kSupportedTaskTypeFieldNumber;
+const int Agent::kSupportedTaskTypesFieldNumber;
 const int Agent::kIsSyncFieldNumber;
 const int Agent::kSecretNamesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
@@ -4401,15 +4401,12 @@ Agent::Agent()
 Agent::Agent(const Agent& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
+      supported_task_types_(from.supported_task_types_),
       secret_names_(from.secret_names_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.name().size() > 0) {
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
-  }
-  supported_task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.supported_task_type().size() > 0) {
-    supported_task_type_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.supported_task_type_);
   }
   is_sync_ = from.is_sync_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Agent)
@@ -4419,7 +4416,6 @@ void Agent::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_Agent_flyteidl_2fadmin_2fagent_2eproto.base);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  supported_task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   is_sync_ = false;
 }
 
@@ -4430,7 +4426,6 @@ Agent::~Agent() {
 
 void Agent::SharedDtor() {
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  supported_task_type_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void Agent::SetCachedSize(int size) const {
@@ -4448,9 +4443,9 @@ void Agent::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  supported_task_types_.Clear();
   secret_names_.Clear();
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  supported_task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   is_sync_ = false;
   _internal_metadata_.Clear();
 }
@@ -4484,20 +4479,23 @@ const char* Agent::_InternalParse(const char* begin, const char* end, void* obje
         ptr += size;
         break;
       }
-      // string supported_task_type = 2;
+      // repeated string supported_task_types = 2;
       case 2: {
         if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Agent.supported_task_type");
-        object = msg->mutable_supported_task_type();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("flyteidl.admin.Agent.supported_task_types");
+          object = msg->add_supported_task_types();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
         break;
       }
       // bool is_sync = 3;
@@ -4575,15 +4573,16 @@ bool Agent::MergePartialFromCodedStream(
         break;
       }
 
-      // string supported_task_type = 2;
+      // repeated string supported_task_types = 2;
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_supported_task_type()));
+                input, this->add_supported_task_types()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->supported_task_type().data(), static_cast<int>(this->supported_task_type().length()),
+            this->supported_task_types(this->supported_task_types_size() - 1).data(),
+            static_cast<int>(this->supported_task_types(this->supported_task_types_size() - 1).length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.Agent.supported_task_type"));
+            "flyteidl.admin.Agent.supported_task_types"));
         } else {
           goto handle_unusual;
         }
@@ -4656,14 +4655,14 @@ void Agent::SerializeWithCachedSizes(
       1, this->name(), output);
   }
 
-  // string supported_task_type = 2;
-  if (this->supported_task_type().size() > 0) {
+  // repeated string supported_task_types = 2;
+  for (int i = 0, n = this->supported_task_types_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->supported_task_type().data(), static_cast<int>(this->supported_task_type().length()),
+      this->supported_task_types(i).data(), static_cast<int>(this->supported_task_types(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.supported_task_type");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->supported_task_type(), output);
+      "flyteidl.admin.Agent.supported_task_types");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      2, this->supported_task_types(i), output);
   }
 
   // bool is_sync = 3;
@@ -4705,15 +4704,14 @@ void Agent::SerializeWithCachedSizes(
         1, this->name(), target);
   }
 
-  // string supported_task_type = 2;
-  if (this->supported_task_type().size() > 0) {
+  // repeated string supported_task_types = 2;
+  for (int i = 0, n = this->supported_task_types_size(); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->supported_task_type().data(), static_cast<int>(this->supported_task_type().length()),
+      this->supported_task_types(i).data(), static_cast<int>(this->supported_task_types(i).length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.supported_task_type");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->supported_task_type(), target);
+      "flyteidl.admin.Agent.supported_task_types");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(2, this->supported_task_types(i), target);
   }
 
   // bool is_sync = 3;
@@ -4752,6 +4750,14 @@ size_t Agent::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  // repeated string supported_task_types = 2;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->supported_task_types_size());
+  for (int i = 0, n = this->supported_task_types_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->supported_task_types(i));
+  }
+
   // repeated string secret_names = 4;
   total_size += 1 *
       ::google::protobuf::internal::FromIntSize(this->secret_names_size());
@@ -4765,13 +4771,6 @@ size_t Agent::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->name());
-  }
-
-  // string supported_task_type = 2;
-  if (this->supported_task_type().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->supported_task_type());
   }
 
   // bool is_sync = 3;
@@ -4806,14 +4805,11 @@ void Agent::MergeFrom(const Agent& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  supported_task_types_.MergeFrom(from.supported_task_types_);
   secret_names_.MergeFrom(from.secret_names_);
   if (from.name().size() > 0) {
 
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
-  }
-  if (from.supported_task_type().size() > 0) {
-
-    supported_task_type_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.supported_task_type_);
   }
   if (from.is_sync() != 0) {
     set_is_sync(from.is_sync());
@@ -4845,10 +4841,9 @@ void Agent::Swap(Agent* other) {
 void Agent::InternalSwap(Agent* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  supported_task_types_.InternalSwap(CastToBase(&other->supported_task_types_));
   secret_names_.InternalSwap(CastToBase(&other->secret_names_));
   name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  supported_task_type_.Swap(&other->supported_task_type_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(is_sync_, other->is_sync_);
 }
