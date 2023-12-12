@@ -6,6 +6,7 @@ import (
 	"strings"
 	"sync"
 
+	"golang.org/x/exp/slices"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -25,8 +26,11 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 	}
 
 	// Register the GRPC plugin after the config is loaded
-	once.Do(func() { agent.RegisterAgentPlugin() })
 	pluginsConfigMeta, err := cfg.GetEnabledPlugins()
+	enabledPluginsList := pluginsConfigMeta.EnabledPlugins.List()
+	if slices.Contains(enabledPluginsList, "agent-service") {
+		once.Do(func() { agent.RegisterAgentPlugin() })
+	}
 
 	if err != nil {
 		return nil, nil, err
@@ -37,7 +41,7 @@ func WranglePluginsAndGenerateFinalList(ctx context.Context, cfg *config.TaskPlu
 		allPluginsEnabled = true
 	}
 
-	logger.Infof(ctx, "Enabled plugins: %v", pluginsConfigMeta.EnabledPlugins.List())
+	logger.Infof(ctx, "Enabled plugins: %v", enabledPluginsList)
 	logger.Infof(ctx, "Loading core Plugins, plugin configuration [all plugins enabled: %v]", allPluginsEnabled)
 	for _, cpe := range pr.GetCorePlugins() {
 		id := strings.ToLower(cpe.ID)
