@@ -12,7 +12,13 @@ on:
 jobs:
   lint:
     name: Run Lint
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - union-k8s-runner
     defaults:
       run:
         working-directory: ${{ inputs.component }}
