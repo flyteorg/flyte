@@ -45,7 +45,7 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test newAgentPlugin", func(t *testing.T) {
-		p := newAgentPlugin()
+		p := newMockAgentPlugin()
 		assert.NotNil(t, p)
 		assert.Equal(t, "agent-service", p.ID)
 		assert.NotNil(t, p.PluginLoader)

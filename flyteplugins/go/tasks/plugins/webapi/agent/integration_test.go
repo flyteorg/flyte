@@ -120,7 +120,6 @@ func TestEndToEnd(t *testing.T) {
 		template.Type = "spark_job"
 		phase = tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
 		assert.Equal(t, true, phase.Phase().IsSuccess())
-
 	})
 
 	t.Run("failed to create a job", func(t *testing.T) {
@@ -161,7 +160,7 @@ func TestEndToEnd(t *testing.T) {
 		tr.OnRead(context.Background()).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnTaskReader().Return(tr)
 
-		agentPlugin := newAgentPlugin()
+		agentPlugin := newMockAgentPlugin()
 		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test3"))
 		assert.NoError(t, err)
