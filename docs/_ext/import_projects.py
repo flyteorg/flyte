@@ -82,17 +82,20 @@ def import_projects(app: Sphinx, config: Config):
     if not hasattr(config, "html_context"):
         config.html_context = {}
 
+    show_repo_tags = False
     for project in projects:
         if project.local:
             local_dir = srcdir / project.source
             try:
                 repo = Repo(local_dir)
+                show_repo_tags = True
             except git.InvalidGitRepositoryError:
                 repo = None
         else:
             local_dir = srcdir / import_projects_config.clone_dir / project.dest
             shutil.rmtree(local_dir, ignore_errors=True)
             repo = Repo.clone_from(project.source, local_dir)
+            show_repo_tags = True
 
         local_docs_path = local_dir / project.docs_path
         dest_docs_dir = srcdir / project.dest
@@ -114,6 +117,8 @@ def import_projects(app: Sphinx, config: Config):
                     subprocess.run(c)
             else:
                 subprocess.run(project.cmd)
+
+    config.html_context["show_repo_tags"] = show_repo_tags
 
     # remove cloned directories
     shutil.rmtree(import_projects_config.clone_dir)
