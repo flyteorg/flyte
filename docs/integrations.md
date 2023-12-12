@@ -102,6 +102,8 @@ the Flyte task that use the respective plugin.
   - Execute queries using AWS Athena
 * - {doc}`AWS Batch <flytesnacks/examples/aws_batch_plugin/index>`
   - Running tasks and workflows on AWS batch service
+* - {doc}`Flyte Interactive <flytesnacks/examples/flyin_plugin/index>`
+  - Execute tasks using Flyte Interactive to debug.
 * - {doc}`Hive <flytesnacks/examples/hive_plugin/index>`
   - Run Hive jobs in your workflows.
 * - {doc}`MMCloud <flytesnacks/examples/mmcloud_plugin/index>`
@@ -210,4 +212,5 @@ flytesnacks/examples/snowflake_plugin/index
 flytesnacks/examples/databricks_plugin/index
 flytesnacks/examples/bigquery_plugin/index
 flytesnacks/examples/airflow_plugin/index
+flytesnacks/examples/flyin_plugin/index
 ```
