@@ -42,9 +42,6 @@ type PluginEntry struct {
 	// support the same task type. This must be a subset of RegisteredTaskTypes and at most one default per task type
 	// is supported.
 	DefaultForTaskTypes []pluginsCore.TaskType
-
-	// A map of task types to boolean indicating if the plugin should be used synchronously for that task type.
-	IsSyncTask map[pluginsCore.TaskType]bool
 }
 
 // PluginSetupContext is the interface made available to the plugin loader when initializing the plugin.
