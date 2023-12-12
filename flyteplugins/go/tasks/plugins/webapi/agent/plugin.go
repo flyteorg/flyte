@@ -5,9 +5,9 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
-	"golang.org/x/exp/maps"
 	"time"
 
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -334,17 +334,27 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 		agentRegistry[taskType][false] = cfg.Agents[agentID]
 	}
 
+	var agentDeployments []*Agent
+	agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
+
 	for _, agentDeployment := range cfg.Agents {
+		agentDeployments = append(agentDeployments, agentDeployment)
+	}
+
+	for _, agentDeployment := range agentDeployments {
 		client, err := getAgentMetadataClientFunc(context.Background(), agentDeployment, connectionCache)
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to agent [%v] with error: [%v]", agentDeployment, err)
 		}
+
 		finalCtx, cancel := getFinalContext(context.Background(), "ListAgent", agentDeployment)
 		defer cancel()
+
 		res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
 			return nil, fmt.Errorf("failed to list agent with error: [%v]", err)
 		}
+
 		agents := res.GetAgents()
 		for _, agent := range agents {
 			if _, ok := agentRegistry[agent.SupportedTaskType]; !ok {
