@@ -371,6 +371,7 @@ func newAgentPlugin() webapi.PluginEntry {
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
 	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache)
 	if err != nil {
+		// We should wait for all agents to be up and running before starting the server
 		panic(err)
 	}
 
