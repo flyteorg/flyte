@@ -1,0 +1,52 @@
+name: Monodocs Build
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  docs:
+    name: Monodocs Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch flytectl code
+        uses: actions/checkout@v4
+        with:
+          path: "${{ github.workspace }}/flytectl"
+      - name: Fetch flyte code
+        uses: actions/checkout@v4
+        with:
+          repository: flyteorg/flyte
+          path: "${{ github.workspace }}/flyte"
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-update-conda: true
+          python-version: 3.9
+      - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flyte
+        run: |
+          conda install -c conda-forge conda-lock
+          conda-lock install -n monodocs-env monodocs-environment.lock.yaml
+      - shell: bash -el {0}
+        run: |
+          conda activate monodocs-env
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+          printenv | sort
+      - name: Build the documentation
+        working-directory: ${{ github.workspace }}/flyte
+        shell: bash -el {0}
+        env:
+            FLYTECTL_LOCAL_PATH: ${{ github.workspace }}/flytectl
+        run: |
+          conda activate monodocs-env
+          make docs
