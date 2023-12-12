@@ -110,6 +110,21 @@ data:
           {{- printf "Invalid value for S3 storage provider authentication type. Expected one of (iam, accesskey), but got: %s" .authType | fail }}
           {{- end }}
         {{- end }}
+        {{- else if eq "azure" .provider }}
+        {{- with .providerConfig.azure }}
+        kind: azure
+        config:
+          account: {{ .account }}
+          {{- if .key }}
+          key: {{ .key }}
+          {{- end }}
+          {{- if .configDomainSuffix }}
+          configDomainSuffix: {{ .configDomainSuffix }}
+          {{- end }}
+          {{- if .configUploadConcurrency }}
+          configUploadConcurrency: {{ .configUploadConcurrency }}
+          {{- end }}
+        {{- end }}
         {{- else if eq "gcs" .provider }}
         kind: google
         config:

@@ -389,15 +389,7 @@ that integrates all Flyte components into a single binary.
    go mod tidy
    make compile
 
-   # Step3: Edit the config file: ./flyte-single-binary-local.yaml.
-   # Replace occurrences of $HOME with the actual path of your home directory.
-   sedi=(-i)
-   case "$(uname)" in
-     Darwin*) sedi=(-i "")
-   esac
-   sed "${sedi[@]}" -e "s|\$HOME|${HOME}|g" flyte-single-binary-local.yaml
-
-   # Step 4: Prepare a namespace template for the cluster resource controller.
+   # Step3: Prepare a namespace template for the cluster resource controller.
    # The configuration file "flyte-single-binary-local.yaml" has an entry named cluster_resources.templatePath.
    # This entry needs to direct to a directory containing the templates for the cluster resource controller to use.
    # We will now create a simple template that allows the automatic creation of required namespaces for projects.
@@ -409,7 +401,7 @@ that integrates all Flyte components into a single binary.
    metadata:
      name: '{{ namespace }}'" > $HOME/.flyte/cluster-resource-templates/namespace.yaml
 
-   # Step5: Running the single binary.
+   # Step4: Running the single binary.
    # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly. 
    # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Running the command again will solve the problem.
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml

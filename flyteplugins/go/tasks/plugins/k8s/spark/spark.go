@@ -145,17 +145,17 @@ func createSparkPodSpec(taskCtx pluginsCore.TaskExecutionContext, podSpec *v1.Po
 	annotations := utils.UnionMaps(config.GetK8sPluginConfig().DefaultAnnotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
 	labels := utils.UnionMaps(config.GetK8sPluginConfig().DefaultLabels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
-	sparkEnvVars := make(map[string]string)
+	sparkEnv := make([]v1.EnvVar, 0)
 	for _, envVar := range container.Env {
-		sparkEnvVars[envVar.Name] = envVar.Value
+		sparkEnv = append(sparkEnv, *envVar.DeepCopy())
 	}
-	sparkEnvVars["FLYTE_MAX_ATTEMPTS"] = strconv.Itoa(int(taskCtx.TaskExecutionMetadata().GetMaxAttempts()))
+	sparkEnv = append(sparkEnv, v1.EnvVar{Name: "FLYTE_MAX_ATTEMPTS", Value: strconv.Itoa(int(taskCtx.TaskExecutionMetadata().GetMaxAttempts()))})
 
 	spec := sparkOp.SparkPodSpec{
 		Affinity:         podSpec.Affinity,
 		Annotations:      annotations,
 		Labels:           labels,
-		EnvVars:          sparkEnvVars,
+		Env:              sparkEnv,
 		Image:            &container.Image,
 		SecurityContenxt: podSpec.SecurityContext.DeepCopy(),
 		DNSConfig:        podSpec.DNSConfig.DeepCopy(),
@@ -173,7 +173,7 @@ type driverSpec struct {
 
 func createDriverSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, sparkConfig map[string]string) (*driverSpec, error) {
 	// Spark driver pods should always run as non-interruptible
-	nonInterruptibleTaskCtx := flytek8s.NewNonInterruptibleTaskExecutionContext(taskCtx)
+	nonInterruptibleTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithInterruptible(false))
 	podSpec, _, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
 	if err != nil {
 		return nil, err

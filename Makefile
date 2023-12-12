@@ -3,7 +3,7 @@ include boilerplate/flyte/end2end/Makefile
 include boilerplate/flyte/golang_test_targets/Makefile
 
 define PIP_COMPILE
-pip-compile $(1) --upgrade --verbose --resolver=backtracking
+pip-compile $(1) --upgrade --verbose --resolver=backtracking --annotation-style=line
 endef
 
 GIT_VERSION := $(shell git describe --always --tags)
@@ -57,6 +57,14 @@ install-piptools: ## Install pip-tools
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
 
+.PHONY: install-conda-lock
+install-conda-lock:
+	pip install conda-lock
+
+.PHONY: conda-lock
+conda-lock: install-conda-lock
+	conda-lock -f monodocs-environment.yaml --without-cuda --lockfile monodocs-environment.lock.yaml
+
 .PHONY: stats
 stats:
 	@generate-dashboard -o deployment/stats/prometheus/flytepropeller-dashboard.json stats/flytepropeller.dashboard.py
@@ -81,7 +89,7 @@ helm_upgrade: ## Upgrade helm charts
 
 .PHONY: docs
 docs:
-	make -C rsts clean html SPHINXOPTS=-W
+	make -C docs clean html SPHINXOPTS=-W
 
 .PHONY: help
 help: SHELL := /bin/sh
@@ -100,3 +108,14 @@ build_native_flyte:
 	docker build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy
+	make -C datacatalog go-tidy
+	make -C flyteadmin go-tidy
+	make -C flyteidl go-tidy
+	make -C flytepropeller go-tidy
+	make -C flyteplugins go-tidy
+	make -C flytestdlib go-tidy
+	make -C flytecopilot go-tidy

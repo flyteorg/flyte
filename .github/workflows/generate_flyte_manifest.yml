@@ -11,15 +11,13 @@ jobs:
   update-flyte-releases:
     name: Update Flyte components
     runs-on: ubuntu-latest
-    needs:
-      - generate-tags
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: "0"
       - uses: actions/setup-go@v2
         with:
-          go-version: "1.19"
+          go-version: "1.21"
       - name: Update references
         env:
           VERSION: ${{ github.event.inputs.next-version }}
