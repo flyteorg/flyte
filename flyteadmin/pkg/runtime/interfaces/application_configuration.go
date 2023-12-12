@@ -97,6 +97,8 @@ type ApplicationConfig struct {
 
 	// Environment variables to be set for the execution.
 	Envs map[string]string `json:"envs,omitempty"`
+
+	 NotificationsConfig NotificationsConfig `json:"notifications"`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -468,12 +470,13 @@ type NotificationsPublisherConfig struct {
 }
 
 // This section handles configuration for processing workflow events.
+// NotificationsProcessorConfig struct no longer has the Region field
 type NotificationsProcessorConfig struct {
 	// The name of the queue onto which workflow notifications will enqueue.
-	QueueName string `json:"queueName"`
+    QueueName string `json:"queueName"`
 	// The account id (according to whichever cloud provider scheme is used) that has permission to read from the above
 	// queue.
-	AccountID string `json:"accountId"`
+    AccountID string `json:"accountId"`
 }
 
 type EmailServerConfig struct {
@@ -484,15 +487,16 @@ type EmailServerConfig struct {
 }
 
 // This section handles the configuration of notifications emails.
+// NotificationsEmailerConfig struct no longer has the Region field
 type NotificationsEmailerConfig struct {
-	// For use with external email services (mailchimp/sendgrid)
-	EmailerConfig EmailServerConfig `json:"emailServerConfig"`
-	// The optionally templatized subject used in notification emails.
-	Subject string `json:"subject"`
-	// The optionally templatized sender used in notification emails.
-	Sender string `json:"sender"`
-	// The optionally templatized body the sender used in notification emails.
-	Body string `json:"body"`
+    // For use with external email services (mailchimp/sendgrid)
+    EmailerConfig EmailServerConfig `json:"emailServerConfig"`
+    // The optionally templatized subject used in notification emails.
+    Subject       string           `json:"subject"`
+    // The optionally templatized sender used in notification emails.    
+    Sender        string           `json:"sender"`
+    // The optionally templatized body the sender used in notification emails.
+    Body          string           `json:"body"`
 }
 
 // This section handles configuration for the workflow notifications pipeline.
@@ -535,21 +539,16 @@ type CloudEventsConfig struct {
 }
 
 // Configuration specific to notifications handling
+// NotificationsConfig struct now does not have the Region field
 type NotificationsConfig struct {
-	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
-	// scheme is used.
-	Type string `json:"type"`
-	//  Deprecated: Please use AWSConfig instead.
-	Region                       string                       `json:"region"`
-	AWSConfig                    AWSConfig                    `json:"aws"`
-	GCPConfig                    GCPConfig                    `json:"gcp"`
-	NotificationsPublisherConfig NotificationsPublisherConfig `json:"publisher"`
-	NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
-	NotificationsEmailerConfig   NotificationsEmailerConfig   `json:"emailer"`
-	// Number of times to attempt recreating a notifications processor client should there be any disruptions.
-	ReconnectAttempts int `json:"reconnectAttempts"`
-	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
-	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
+    Type                       string                     `json:"type"`
+    AWSConfig                   AWSConfig                   `json:"aws"`
+    GCPConfig                   GCPConfig                   `json:"gcp"`
+    NotificationsPublisherConfig NotificationsPublisherConfig `json:"publisher"`
+    NotificationsProcessorConfig NotificationsProcessorConfig `json:"processor"`
+    NotificationsEmailerConfig   NotificationsEmailerConfig   `json:"emailer"`
+    ReconnectAttempts           int                        `json:"reconnectAttempts"`
+    ReconnectDelaySeconds       int                        `json:"reconnectDelaySeconds"`
 }
 
 // Domains are always globally set in the application config, whereas individual projects can be individually registered.
