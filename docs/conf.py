@@ -331,7 +331,6 @@ import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
-    "show_repo_tags": bool(int(os.environ.get("SHOW_REPO_TAGS", 0))),
 }
 
 # Define these environment variables to use local copies of the projects. This

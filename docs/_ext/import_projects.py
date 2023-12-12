@@ -8,6 +8,7 @@ from functools import partial
 from pathlib import Path
 from typing import Optional, List, Union
 
+import git
 from git import Repo
 from sphinx.application import Sphinx
 from sphinx.config import Config
@@ -19,7 +20,6 @@ __version__ = "0.0.0"
 class ImportProjectsConfig:
     clone_dir: str
     flytekit_api_dir: str
-    show_repo_tags: bool
     source_regex_mapping: dict = field(default_factory=dict)
 
 
@@ -82,27 +82,27 @@ def import_projects(app: Sphinx, config: Config):
     if not hasattr(config, "html_context"):
         config.html_context = {}
 
-    config.html_context["show_repo_tags"] = False
-    if import_projects_config.show_repo_tags:
-        config.html_context["show_repo_tags"] = True
-
     for project in projects:
         if project.local:
             local_dir = srcdir / project.source
+            try:
+                repo = Repo(local_dir)
+            except git.InvalidGitRepositoryError:
+                repo = None
         else:
             local_dir = srcdir / import_projects_config.clone_dir / project.dest
             shutil.rmtree(local_dir, ignore_errors=True)
             repo = Repo.clone_from(project.source, local_dir)
 
-            if import_projects_config.show_repo_tags:
-                # use the latest git tag when building docs in a prod
-                tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
-                tag = tags[-1]
-                update_html_context(project, str(tag), str(tag.commit)[:7], config)
-                repo.git.checkout(str(tag))
-
         local_docs_path = local_dir / project.docs_path
         dest_docs_dir = srcdir / project.dest
+
+        # use the latest git tag when building docs
+        if repo:
+            tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
+            tag = tags[-1]
+            update_html_context(project, str(tag), str(tag.commit)[:7], config)
+            repo.git.checkout(str(tag))
 
         if project.refresh or not dest_docs_dir.exists():
             shutil.rmtree(dest_docs_dir, ignore_errors=True)
