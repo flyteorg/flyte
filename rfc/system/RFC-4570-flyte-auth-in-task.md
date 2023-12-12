@@ -76,27 +76,37 @@ async def hello_main(name: str = "flyte") -> str:
 
 ## 5 Drawbacks
 
-- This proposal requires a new system to be built and maintained.
-- 
+- We now have a new Auth surface area that needs to be secured and maintained.
+- New kubernetes infrastructure / services may need to be created to support the handling of task only authentication.
+- We need to ensure that the Auth Agent is performant and does not introduce any significant overhead.
 
 ## 6 Alternatives
 
-*What are other ways of achieving the same outcome?*
+- Continue to use the existing method of passing credentials to tasks
+  - This would include both adding plaintext credentials to the task container, attaching environment variables during registration; or  setting up AWS/GCP secrets.
 
 ## 7 Potential Impact and Dependencies
+- **Integration with Existing Infrastructure:** The implementation of the Flyte Auth Agent will require integration with existing Flyte clusters and possibly modifications to the FlyteAdmin service for proper authentication handling.
+- **Dependency on Kubernetes Features:** The automatic binding of authentication information might rely on specific Kubernetes features, such as Secrets or ConfigMaps, to securely transmit data to the task containers.
+- **Client-side Flytekit Changes:** Adoption of this approach may necessitate updates to Flytekit, particularly in how it handles task execution context and authorization.
 
-*Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions.*
+## 8 Security Considerations
 
-- *What other systems or teams are affected by this proposal?*
-- *How could this be exploited by malicious attackers?*
+- **Encryption and Security Protocols:** Ensuring that the transmission of authentication information from the Flyte Auth Agent to task containers is secure and encrypted.
+- **Access Control:** Proper implementation of access control mechanisms to prevent unauthorized access to sensitive information or unauthorized execution of tasks.
+- **Audit and Compliance:** Implementing logging and auditing capabilities to track the use of authentication tokens and access patterns for compliance and security analysis.
 
 ## 8 Unresolved questions
 
-*What parts of the proposal are still being defined or not covered by this proposal?*
-
+- **Integration into Flyte Backend** How will the Flyte Auth Agent be integrated into the Flyte backend? Will it be a separate service or part of an existing service?
+- **Authentication Mechanisms:** What authentication mechanisms will be supported by the Flyte Auth Agent? Will it support multiple authentication mechanisms?
+- **Task Execution Context:** How will the Flyte Auth Agent bind the authentication of the task executor to the task execution context? Will it use environment variables, Kubernetes Secrets, or some other mechanism?
+- 
 ## 9 Conclusion
 
-*Here, we briefly outline why this is the right decision to make at this time and move forward!*
+The introduction of the Flyte Auth Agent represents a significant step forward in enhancing the security, simplicity, and efficiency of task execution within the Flyte ecosystem. This proposal comes at a crucial time when the need for secure, scalable, and easy-to-manage authentication mechanisms is more pronounced than ever in the world of automated workflows and data processing.
+
+The Flyte Auth Agent system addresses several key challenges currently faced by Flyte users, including the complexity of managing task-specific credentials, the security risks associated with handling plaintext credentials, and the operational overhead of managing Kubernetes secrets or external authentication systems. By automating the flow of authentication information into task containers.
 
 ## 10 RFC Process Guide, remove this section when done
 
