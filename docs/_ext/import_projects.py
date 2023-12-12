@@ -63,7 +63,9 @@ class ListTableToc(SphinxDirective):
     def parse(self):
         """Parses the list-table and adds a toctree"""
         toc = ""
-        for doc in re.findall(r"<(/flytesnacks/.+)>", self.block_text):
+
+        # finds all doc references in the form <doc/path>
+        for doc in re.findall(r"<(.+)>", self.block_text):
             toc += f"\n{doc}"
 
         container = nodes.container("")
