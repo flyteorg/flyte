@@ -29,6 +29,7 @@ import (
 )
 
 type GetAsyncClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
+type GetAgentMetadataClientFunc func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error)
 
 type Plugin struct {
 	metricScope     promutils.Scope
@@ -325,7 +326,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) (map[string]map[bool]*Agent, error) {
+func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, getAgentMetadataClientFunc GetAgentMetadataClientFunc) (map[string]map[bool]*Agent, error) {
 	agentRegistry := make(map[string]map[bool]*Agent)
 	agentDeployments := append([]*Agent{&cfg.DefaultAgent}, maps.Values(cfg.Agents)...)
 
@@ -369,7 +370,7 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 func newAgentPlugin() webapi.PluginEntry {
 	cfg := GetConfig()
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache)
+	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache, getAgentMetadataClientFunc)
 	if err != nil {
 		// We should wait for all agents to be up and running before starting the server
 		panic(err)

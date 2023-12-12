@@ -2,17 +2,22 @@ package agent
 
 import (
 	"context"
+	"sort"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -178,4 +183,35 @@ func TestPlugin(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
 	})
+}
+
+func TestInitializeAgentRegistry(t *testing.T) {
+	mockClient := new(agentMocks.AgentMetadataServiceClient)
+	mockRequest := &admin.ListAgentsRequest{}
+	mockResponse := &admin.ListAgentsResponse{
+		Agents: []*admin.Agent{
+			{
+				Name:               "test-agent",
+				SupportedTaskTypes: []string{"task1", "task2", "task3"},
+				IsSync:             false,
+			},
+		},
+	}
+
+	mockClient.On("ListAgent", mock.Anything, mockRequest).Return(mockResponse, nil)
+	getClientFunc := func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
+		return mockClient, nil
+	}
+
+	cfg := defaultConfig
+	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
+	connectionCache := make(map[*Agent]*grpc.ClientConn)
+	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, getClientFunc)
+	assert.NoError(t, err)
+
+	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
+	agentRegistryKeys := maps.Keys(agentRegistry)
+	sort.Strings(agentRegistryKeys)
+
+	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
 }
