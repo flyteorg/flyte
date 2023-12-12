@@ -325,6 +325,7 @@ REPLACE_PATTERNS = {
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
     r"/protos/docs/service/index": r"/protos/docs/service/service",
     r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
+    r"<environment_setup>": r"</flytesnacks/environment_setup>"
 }
 
 import_projects_config = {
