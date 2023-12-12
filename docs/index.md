@@ -145,9 +145,9 @@ Core Use Cases <flytesnacks/getting_started/core_use_cases>
 :name: examples-guides
 :hidden:
 
-User Guide <userguide>
-Tutorials <tutorials>
-Integrations <integrations>
+User Guide <flytesnacks/userguide>
+Tutorials <flytesnacks/tutorials>
+Integrations <flytesnacks/integrations>
 ```
 
 ```{toctree}
