@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/gob"
 	"fmt"
+	"golang.org/x/exp/maps"
 	"time"
 
 	"google.golang.org/grpc"
@@ -34,6 +35,7 @@ type Plugin struct {
 	cfg             *Config
 	getAsyncClient  GetAsyncClientFunc
 	connectionCache map[*Agent]*grpc.ClientConn
+	agentRegistry   map[string]map[bool]*Agent // map[taskType][isSync] => Agent
 }
 
 type ResourceWrapper struct {
@@ -323,68 +325,48 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func updateAgentTaskTypes(agent *Agent, connectionCache map[*Agent]*grpc.ClientConn, isSyncTask map[string]bool) {
-	client, err := getAgentMetadataClientFunc(context.Background(), agent, connectionCache)
-	if err != nil {
-		logger.Errorf(context.Background(), "failed to connect to agent [%v] with error: [%v]", agent, err)
-		return
+func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) (map[string]map[bool]*Agent, error) {
+	agentRegistry := make(map[string]map[bool]*Agent)
+
+	// Ensure that the old configuration is backward compatible
+	for taskType, agentID := range cfg.AgentForTaskTypes {
+		agentRegistry[taskType] = make(map[bool]*Agent)
+		agentRegistry[taskType][false] = cfg.Agents[agentID]
 	}
 
-	finalCtx, cancel := getFinalContext(context.Background(), "ListAgent", agent)
-	defer cancel()
-
-	res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
-	if err != nil {
-		logger.Errorf(context.Background(), "failed to send list agent request with error: [%v]", err)
-		return
+	for _, agentDeployment := range cfg.Agents {
+		client, err := getAgentMetadataClientFunc(context.Background(), agentDeployment, connectionCache)
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect to agent [%v] with error: [%v]", agentDeployment, err)
+		}
+		finalCtx, cancel := getFinalContext(context.Background(), "ListAgent", agentDeployment)
+		defer cancel()
+		res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
+		if err != nil {
+			return nil, fmt.Errorf("failed to list agent with error: [%v]", err)
+		}
+		agents := res.GetAgents()
+		for _, agent := range agents {
+			if _, ok := agentRegistry[agent.SupportedTaskType]; !ok {
+				agentRegistry[agent.SupportedTaskType] = make(map[bool]*Agent)
+			}
+			agentRegistry[agent.SupportedTaskType][agent.IsSync] = agentDeployment
+		}
 	}
 
-	agents := res.GetAgents()
-	logger.Infof(context.Background(), "here are all agents [%v] in [%v] agent server", agents, agent)
-
-	for _, agent := range agents {
-		isSyncTask[agent.SupportedTaskType] = agent.IsSync
-	}
-}
-
-func getAgentMetadata(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn) ([]string, map[string]bool) {
-	// Assign supported task types from the config to prevent a panic when no task type is supported.
-	// https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
-	supportedTaskTypes := cfg.SupportedTaskTypes
-	isSyncTask := make(map[string]bool)
-
-	// Combine the default agent server's task types with the config's existing task types.
-	// Use empty string as key to return default agent server
-	defaultAgent, err := getFinalAgent("", cfg)
-	if err != nil {
-		logger.Errorf(context.Background(), "failed to get default agent [%v] with error: [%v]", err)
-	} else {
-		updateAgentTaskTypes(defaultAgent, connectionCache, isSyncTask)
-	}
-
-	// For each agent server, use a map to store its supported task types and whether it is a sync task.
-	// This combines unique task types across all agents.
-	// We need to iterate all agent servers to get all supported task types.
-	// For example, one agent server supports only bigquery tasks, while another supports only spark tasks.
-	// We can get both by combining the supported task types from two agent servers.
-	for _, agent := range cfg.Agents {
-		updateAgentTaskTypes(agent, connectionCache, isSyncTask)
-	}
-
-	for task := range isSyncTask {
-		supportedTaskTypes = append(supportedTaskTypes, task)
-	}
-
-	return supportedTaskTypes, isSyncTask
+	return agentRegistry, nil
 }
 
 func newAgentPlugin() webapi.PluginEntry {
 	cfg := GetConfig()
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
+	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache)
+	if err != nil {
+		panic(err)
+	}
 
-	supportedTaskTypes, isSyncTask := getAgentMetadata(cfg, connectionCache)
-	logger.Infof(context.Background(), "supported task types: %v", supportedTaskTypes)
-	logger.Infof(context.Background(), "is sync task: %v", isSyncTask)
+	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
+	logger.Infof(context.Background(), "Agent supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
@@ -395,9 +377,9 @@ func newAgentPlugin() webapi.PluginEntry {
 				cfg:             cfg,
 				getAsyncClient:  getAsyncClientFunc,
 				connectionCache: connectionCache,
+				agentRegistry:   agentRegistry,
 			}, nil
 		},
-		IsSyncTask: isSyncTask,
 	}
 }
 
