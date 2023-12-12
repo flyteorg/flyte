@@ -1,7 +1,7 @@
-// The PodMutator is a controller-runtime webhook that intercepts Pod Creation events and mutates them. Currently, there
-// is only one registered Mutator, that's the SecretsMutator. It works as follows:
+// Package webhook container PodMutator. It's a controller-runtime webhook that intercepts Pod Creation events and
+// mutates them. Currently, there is only one registered Mutator, that's the SecretsMutator. It works as follows:
 //
-//   - The Webhook only works on Pods. If propeller/plugins launch a resource outside of K8s (or in a separate k8s
+//   - The Webhook only works on Pods. If propeller/plugins launch a resource outside K8s (or in a separate k8s
 //     cluster), it's the responsibility of the plugin to correctly pass secret injection information.
 //   - When a k8s-plugin builds a resource, propeller's PluginManager will automatically inject a label `inject-flyte
 //     -secrets: true` and serialize the secret injection information into the annotations.
@@ -9,11 +9,12 @@
 //   - If a k8s plugin creates a CRD that launches other Pods (e.g. Spark/PyTorch... etc.), it's its responsibility to
 //     make sure the labels/annotations set on the CRD by PluginManager are propagated to those launched Pods. This
 //     ensures secret injection happens no matter how many levels of indirections there are.
-//   - The Webhook expects 'inject-flyte-secrets: true' as a label on the Pod. Otherwise it won't listen/observe that pod.
+//   - The Webhook expects 'inject-flyte-secrets: true' as a label on the Pod. Otherwise, it won't listen/observe that
+//     pod.
 //   - Once it intercepts the admission request, it goes over all registered Mutators and invoke them in the order they
-//     are registered as. If a Mutator fails and it's marked as `required`, the operation will fail and the admission
+//     are registered as. If a Mutator fails, and it's marked as `required`, the operation will fail and the admission
 //     will be rejected.
-//   - The SecretsMutator will attempt to lookup the requested secret from the process environment. If the secret is
+//   - The SecretsMutator will attempt to look up the requested secret from the process environment. If the secret is
 //     already mounted, it'll inject it as plain-text into the Pod Spec (Less secure).
 //   - If it's not found in the environment it'll, instead, fallback to the enabled Secrets Injector (K8s, Confidant,
 //     Vault... etc.).
@@ -30,8 +31,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"k8s.io/apimachinery/pkg/runtime"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -40,6 +39,7 @@ import (
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -148,7 +148,7 @@ func generateMutatePath(gvk schema.GroupVersionKind) string {
 }
 
 func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admissionregistrationv1.MutatingWebhookConfiguration, error) {
-	caBytes, err := ioutil.ReadFile(filepath.Join(pm.cfg.CertDir, "ca.crt"))
+	caBytes, err := os.ReadFile(filepath.Join(pm.cfg.ExpandCertDir(), "ca.crt"))
 	if err != nil {
 		// ca.crt is optional. If not provided, API Server will assume the webhook is serving SSL using a certificate
 		// issued by a known Cert Authority.

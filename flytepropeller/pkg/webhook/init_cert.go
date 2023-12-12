@@ -78,21 +78,22 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhookConf
 	}
 
 	if cfg.LocalCert {
-		if _, err := os.Stat(cfg.CertDir); os.IsNotExist(err) {
-			if err := os.Mkdir(cfg.CertDir, folderPerm); err != nil {
+		certPath := cfg.ExpandCertDir()
+		if _, err := os.Stat(certPath); os.IsNotExist(err) {
+			if err := os.Mkdir(certPath, folderPerm); err != nil {
 				return err
 			}
 		}
 
-		if err := os.WriteFile(path.Join(cfg.CertDir, CaCertKey), certs.CaPEM.Bytes(), permission); err != nil {
+		if err := os.WriteFile(path.Join(certPath, CaCertKey), certs.CaPEM.Bytes(), permission); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(path.Join(cfg.CertDir, ServerCertKey), certs.ServerPEM.Bytes(), permission); err != nil {
+		if err := os.WriteFile(path.Join(certPath, ServerCertKey), certs.ServerPEM.Bytes(), permission); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(path.Join(cfg.CertDir, ServerCertPrivateKey), certs.PrivateKeyPEM.Bytes(), permission); err != nil {
+		if err := os.WriteFile(path.Join(certPath, ServerCertPrivateKey), certs.PrivateKeyPEM.Bytes(), permission); err != nil {
 			return err
 		}
 	}

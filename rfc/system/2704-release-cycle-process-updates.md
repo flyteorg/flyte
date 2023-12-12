@@ -3,7 +3,7 @@
 Hack MD: https://hackmd.io/ZwarNg5iSjeJz2l0YBKIZQ
 
 ## Background & Issues
-This is the current [roadmap](https://github.com/flyteorg/flyte/blob/master/rsts/community/roadmap.rst). The core Flyte maintainers team is proposing some updates to it, specifically to the Milestones and Releases section.
+This is the current [roadmap](https://github.com/flyteorg/flyte/blob/master/docs/community/roadmap.rst). The core Flyte maintainers team is proposing some updates to it, specifically to the Milestones and Releases section.
 
 We are proposing:
 * Changes to the pace of Flyte releases.
@@ -78,7 +78,7 @@ We decided that this approach was less desirable because:
 Whether or not a patch version of any of the Flyte components also creates a Flyte patch release shall be left to the discretion of the developer.
 
 ### Documentation Versioning
-We also currently have an issue with our documentation versioning. While our readthedocs page does have versioning enabled and we publish the [docs version](https://github.com/flyteorg/flyte/blob/80c098f10334b1c916d1e4274ab9f204152d9d80/rsts/conf.py#L33), all the [intersphinx mappings](https://github.com/flyteorg/flyte/blob/80c098f10334b1c916d1e4274ab9f204152d9d80/rsts/conf.py#L219) just point to `latest`. Keep in mind that this mapping not only exists in this `flyte` repo, but also in all the other repos that that mapping points to. That is, to maintain an accurate mapping of different versions of documentation, we'll need to update the mapping in all the repos.
+We also currently have an issue with our documentation versioning. While our readthedocs page does have versioning enabled and we publish the [docs version](https://github.com/flyteorg/flyte/blob/80c098f10334b1c916d1e4274ab9f204152d9d80/docs/conf.py#L33), all the [intersphinx mappings](https://github.com/flyteorg/flyte/blob/80c098f10334b1c916d1e4274ab9f204152d9d80/docs/conf.py#L219) just point to `latest`. Keep in mind that this mapping not only exists in this `flyte` repo, but also in all the other repos that that mapping points to. That is, to maintain an accurate mapping of different versions of documentation, we'll need to update the mapping in all the repos.
 
 To remediate this, we propose the following:
 * Documentation should be pinned only to Major.Minor on all the repos that have their versions "aligned".
