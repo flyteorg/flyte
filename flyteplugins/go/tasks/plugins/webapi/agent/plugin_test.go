@@ -199,14 +199,15 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	}
 
 	mockClient.On("ListAgent", mock.Anything, mockRequest).Return(mockResponse, nil)
-	getClientFunc := func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
+	getAgentMetadataClientFunc := func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
 		return mockClient, nil
 	}
 
 	cfg := defaultConfig
+	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, getClientFunc)
+	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, getAgentMetadataClientFunc)
 	assert.NoError(t, err)
 
 	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.

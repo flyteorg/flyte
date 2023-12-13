@@ -40,7 +40,7 @@ var (
 			},
 		},
 		DefaultAgent: Agent{
-			Endpoint:       "dns:///flyteagent.flyte.svc.cluster.local:80",
+			Endpoint:       "",
 			Insecure:       true,
 			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
 		},

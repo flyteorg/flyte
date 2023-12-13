@@ -328,8 +328,12 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 
 func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, getAgentMetadataClientFunc GetAgentMetadataClientFunc) (map[string]map[bool]*Agent, error) {
 	agentRegistry := make(map[string]map[bool]*Agent)
-	agentDeployments := append([]*Agent{&cfg.DefaultAgent}, maps.Values(cfg.Agents)...)
+	var agentDeployments []*Agent
 
+	if cfg.DefaultAgent.Endpoint != "" {
+		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
+	}
+	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {
 		agentRegistry[taskType] = make(map[bool]*Agent)
