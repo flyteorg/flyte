@@ -642,6 +642,13 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 			in.SubNodeStatus = nil
 			in.TaskNodeStatus = nil
 			in.WorkflowNodeStatus = nil
+		} else {
+			if in.StartedAt == nil {
+				in.StartedAt = &n
+			}
+			if in.LastAttemptStartedAt == nil {
+				in.LastAttemptStartedAt = &n
+			}
 		}
 	}
 	in.SetDirty()
