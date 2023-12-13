@@ -28,13 +28,13 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type GetAsyncClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
+type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
 type GetAgentMetadataClientFunc func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error)
 
 type Plugin struct {
 	metricScope     promutils.Scope
 	cfg             *Config
-	getAsyncClient  GetAsyncClientFunc
+	getClient       GetClientFunc
 	connectionCache map[*Agent]*grpc.ClientConn
 	agentRegistry   map[string]map[bool]*Agent // map[taskType][isSync] => Agent
 }
@@ -97,7 +97,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
 
-	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
+	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -132,7 +132,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, fmt.Errorf("failed to find agent with error: %v", err)
 	}
 
-	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
+	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -163,7 +163,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	if err != nil {
 		return fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
-	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
+	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -279,7 +279,7 @@ func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*A
 	return conn, nil
 }
 
-func getAsyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 	conn, err := getGrpcConnection(ctx, agent, connectionCache)
 	if err != nil {
 		return nil, err
@@ -390,7 +390,7 @@ func newAgentPlugin() webapi.PluginEntry {
 			return &Plugin{
 				metricScope:     iCtx.MetricsScope(),
 				cfg:             cfg,
-				getAsyncClient:  getAsyncClientFunc,
+				getClient:       getClientFunc,
 				connectionCache: connectionCache,
 				agentRegistry:   agentRegistry,
 			}, nil

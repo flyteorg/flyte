@@ -37,10 +37,10 @@ type MockPlugin struct {
 	Plugin
 }
 
-type MockAsyncClient struct {
+type MockClient struct {
 }
 
-func (m *MockAsyncClient) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+func (m *MockClient) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
 	expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "fake://bucket/prefix/nhv"}
 	if slices.Equal(createTaskRequest.Template.GetContainer().Args, expectedArgs) {
 		return nil, fmt.Errorf("args not as expected")
@@ -48,7 +48,7 @@ func (m *MockAsyncClient) CreateTask(_ context.Context, createTaskRequest *admin
 	return &admin.CreateTaskResponse{ResourceMeta: []byte{1, 2, 3, 4}}, nil
 }
 
-func (m *MockAsyncClient) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+func (m *MockClient) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
 	if req.GetTaskType() == "bigquery_query_job_task" {
 		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
 			Literals: map[string]*flyteIdlCore.Literal{
@@ -59,15 +59,15 @@ func (m *MockAsyncClient) GetTask(_ context.Context, req *admin.GetTaskRequest, 
 	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
 }
 
-func (m *MockAsyncClient) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+func (m *MockClient) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
 	return &admin.DeleteTaskResponse{}, nil
 }
 
-func mockGetAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	return &MockAsyncClient{}, nil
+func mockGetClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	return &MockClient{}, nil
 }
 
-func mockGetAsyncBadClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+func mockGetBadClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 	return nil, fmt.Errorf("error")
 }
 
@@ -120,6 +120,7 @@ func TestEndToEnd(t *testing.T) {
 		template.Type = "spark_job"
 		phase = tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
 		assert.Equal(t, true, phase.Phase().IsSuccess())
+
 	})
 
 	t.Run("failed to create a job", func(t *testing.T) {
@@ -127,9 +128,9 @@ func TestEndToEnd(t *testing.T) {
 		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
-					metricScope:    iCtx.MetricsScope(),
-					cfg:            GetConfig(),
-					getAsyncClient: mockGetAsyncBadClientFunc,
+					metricScope: iCtx.MetricsScope(),
+					cfg:         GetConfig(),
+					getClient:   mockGetBadClientFunc,
 				},
 			}, nil
 		}
@@ -262,9 +263,9 @@ func newMockAgentPlugin() webapi.PluginEntry {
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
-					metricScope:    iCtx.MetricsScope(),
-					cfg:            GetConfig(),
-					getAsyncClient: mockGetAsyncClientFunc,
+					metricScope: iCtx.MetricsScope(),
+					cfg:         GetConfig(),
+					getClient:   mockGetClientFunc,
 				},
 			}, nil
 		},
