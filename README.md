@@ -39,7 +39,7 @@ Flyte is an open-source orchestrator that facilitates building production-grade 
 Write code in Python or any other language and leverage a robust type engine. 
 </p>
 
-<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadmebuildv2.gif" style="width: 100%; height: auto;" />
+<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadmebuildv2.gif" style="width: 60%; height: auto;" />
 
 <h2 align="center">
  Deploy
@@ -47,7 +47,7 @@ Write code in Python or any other language and leverage a robust type engine.
  <p>
 Either locally or on a remote cluster, execute your models with ease.
 </p>
-<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadme-deploy.gif" style="width: 100%; height: auto;" />
+<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadme-deploy.gif" style="width: 60%; height: auto;" />
  
 <h2 align="center">
  Scale
@@ -106,14 +106,11 @@ Head over to https://sandbox.union.ai/. It allows you to experiment with Flyte's
 Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deployment/index.html) for instructions to install Flyte on different environments
 
 ## Tutorials
-
-
 - [Fine-tune Code Llama on the Flyte codebase](https://github.com/unionai-oss/llm-fine-tuning/tree/main/flyte_llama#readme)
 - [Forecast sales with Horovod and Spark](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/forecasting_sales/index.html)
 - [Nucleotide Sequence Querying with BLASTX](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/blast/index.html)
 
 ## Features
-
 🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types.<br>
 🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
 🔒 **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
@@ -143,15 +140,11 @@ Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deploym
 💾 **Allocate resources dynamically** at the task level. <br />
 
 
-## Who's using Flyte?
-
-
+## Who's using Flyte
 Join the likes of LinkedIn, Spotify, Freenome, Pachama, Warner Bros. and many others in adopting Flyte for mission-critical use cases. For a full list of adopters and information on how to add your organization or project, please visit our [ADOPTERS](https://github.com/flyteorg/community/blob/main/ADOPTERS.md) page.
 
 
-## How to stay involved?
-
-
+## How to stay involved
 📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered. <br>
 👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions. <br>
 💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help. <br>
@@ -162,7 +155,6 @@ Join the likes of LinkedIn, Spotify, Freenome, Pachama, Warner Bros. and many ot
 
 
 ## How to contribute
-
 There are many ways to get involved in Flyte, including:
 
 - Submitting [bugs](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=bug%2Cuntriaged&template=bug_report.yaml&title=%5BBUG%5D+) and [feature requests](https://github.com/flyteorg/flyte/issues/new?assignees=&labels=enhancement%2Cuntriaged&template=feature_request.yaml&title=%5BCore+feature%5D+) for various components.
