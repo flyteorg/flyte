@@ -661,7 +661,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								// ErrImagePull -> Transitionary phase to ImagePullBackOff
 								// ContainerCreating -> Image is being downloaded
 								// PodInitializing -> Init containers are running
-								return pluginsCore.PhaseInfoInitializing(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &c.LastTransitionTime.Time}), t
+								return pluginsCore.PhaseInfoInitializing(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
 
 							case "CreateContainerError":
 								// This may consist of:
@@ -698,7 +698,6 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								), t
 
 							case "CreateContainerConfigError":
-								t := c.LastTransitionTime.Time
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
 									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
