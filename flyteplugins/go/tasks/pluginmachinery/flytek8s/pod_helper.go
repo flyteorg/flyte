@@ -572,7 +572,7 @@ func BuildIdentityPod() *v1.Pod {
 //	and hence input gates. We should not allow bad requests that Request for large number of resource through.
 //	In the case it makes through, we will fail after timeout
 func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
-	phaseInfo, t, err := DemystifyPendingHelper(status)
+	phaseInfo, t, err := demystifyPendingHelper(status)
 
 	if phaseInfo.Phase().IsTerminal() {
 		return phaseInfo, err
@@ -592,7 +592,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
 }
 
-func DemystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time, error) {
+func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time, error) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
 	phaseInfo := pluginsCore.PhaseInfoUndefined
