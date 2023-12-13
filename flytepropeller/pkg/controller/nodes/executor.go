@@ -1006,7 +1006,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
 		}
-		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.clearStateOnTermination)
 		c.RecordTransitionLatency(ctx, dag, nCtx.ContextualNodeLookup(), nCtx.Node(), nodeStatus)
 	}
 
@@ -1272,7 +1272,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		}
 	}
 
-	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.clearStateOnTermination)
 	return finalStatus, nil
 }
 
