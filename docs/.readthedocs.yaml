@@ -15,7 +15,7 @@ build:
     - conda info
     - conda env list
     - cat docs/conf.py
-    - cd docs && SHOW_REPO_TAGS=1 /home/docs/monodocs-env/bin/python -m sphinx -T -E -b html -d docs/_build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html
+    - cd docs && /home/docs/monodocs-env/bin/python -m sphinx -T -E -b html -d docs/_build/doctrees -D language=en . $READTHEDOCS_OUTPUT/html
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
