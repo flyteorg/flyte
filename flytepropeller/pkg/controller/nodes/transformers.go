@@ -228,7 +228,7 @@ func ToK8sTime(t time.Time) v1.Time {
 	return v1.Time{Time: t}
 }
 
-func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus clearStateOnTermination, bool) {
+func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus, clearStateOnTermination bool) {
 	// We update the phase and / or reason only if they are not already updated
 	if np != s.GetPhase() || p.GetReason() != s.GetMessage() {
 		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), clearStateOnTermination, p.GetErr())
