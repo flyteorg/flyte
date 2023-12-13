@@ -55,6 +55,9 @@ var (
 		ImagePullBackoffGracePeriod: config2.Duration{
 			Duration: time.Minute * 3,
 		},
+		PodPendingTimeout: config2.Duration{
+			Duration: 0,
+		},
 		GpuDeviceNodeLabel:        "k8s.amazonaws.com/accelerator",
 		GpuPartitionSizeNodeLabel: "k8s.amazonaws.com/gpu-partition-size",
 		GpuResourceName:           ResourceNvidiaGPU,
@@ -148,6 +151,11 @@ type K8sPluginConfig struct {
 	// error persists past this grace period, it will be inferred to be a permanent
 	// one, and the corresponding task marked as failed
 	ImagePullBackoffGracePeriod config2.Duration `json:"image-pull-backoff-grace-period" pflag:"-,Time to wait for transient ImagePullBackoff errors to be resolved."`
+
+	// Time to wait while pod is in pending phase. If the pod is stuck in
+	// pending phase past this timeout, it will be inferred to be a permanent
+	// issue, and the corresponding task marked as failed
+	PodPendingTimeout config2.Duration `json:"pod-pending-timeout" pflag:"-,Time to wait while pod is stuck in pending."`
 
 	// The node label that specifies the attached GPU device.
 	GpuDeviceNodeLabel string `json:"gpu-device-node-label" pflag:"-,The node label that specifies the attached GPU device."`
