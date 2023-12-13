@@ -572,10 +572,10 @@ func BuildIdentityPod() *v1.Pod {
 //	and hence input gates. We should not allow bad requests that Request for large number of resource through.
 //	In the case it makes through, we will fail after timeout
 func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
-	phaseInfo, t, err := demystifyPendingHelper(status)
+	phaseInfo, t := demystifyPendingHelper(status)
 
 	if phaseInfo.Phase().IsTerminal() {
-		return phaseInfo, err
+		return phaseInfo, nil
 	}
 
 	podPendingTimeout := config.GetK8sPluginConfig().PodPendingTimeout.Duration
@@ -586,13 +586,13 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 	}
 
 	if phaseInfo.Phase() != pluginsCore.PhaseUndefined {
-		return phaseInfo, err
+		return phaseInfo, nil
 	}
 
 	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
 }
 
-func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time, error) {
+func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
 	phaseInfo := pluginsCore.PhaseInfoUndefined
@@ -603,7 +603,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 		case v1.PodScheduled:
 			if c.Status == v1.ConditionFalse {
 				// Waiting to be scheduled. This usually refers to inability to acquire resources.
-				return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t, nil
+				return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
 			}
 
 		case v1.PodReasonUnschedulable:
@@ -616,7 +616,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 			//  reason: Unschedulable
 			// 	status: "False"
 			// 	type: PodScheduled
-			return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t, nil
+			return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
 
 		case v1.PodReady:
 			if c.Status == v1.ConditionFalse {
@@ -661,7 +661,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								// ErrImagePull -> Transitionary phase to ImagePullBackOff
 								// ContainerCreating -> Image is being downloaded
 								// PodInitializing -> Init containers are running
-								return pluginsCore.PhaseInfoInitializing(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &c.LastTransitionTime.Time}), t, nil
+								return pluginsCore.PhaseInfoInitializing(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &c.LastTransitionTime.Time}), t
 
 							case "CreateContainerError":
 								// This may consist of:
@@ -688,14 +688,14 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								if time.Since(t) >= gracePeriod {
 									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
-									}), t, nil
+									}), t
 								}
 								return pluginsCore.PhaseInfoInitializing(
 									t,
 									pluginsCore.DefaultPhaseVersion,
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), t, nil
+								), t
 
 							case "CreateContainerConfigError":
 								t := c.LastTransitionTime.Time
@@ -703,26 +703,26 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								if time.Since(t) >= gracePeriod {
 									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
-									}), t, nil
+									}), t
 								}
 								return pluginsCore.PhaseInfoInitializing(
 									t,
 									pluginsCore.DefaultPhaseVersion,
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), t, nil
+								), t
 
 							case "InvalidImageName":
 								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
-								}), t, nil
+								}), t
 
 							case "ImagePullBackOff":
 								gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
 									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
-									}), t, nil
+									}), t
 								}
 
 								return pluginsCore.PhaseInfoInitializing(
@@ -730,7 +730,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 									pluginsCore.DefaultPhaseVersion,
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), t, nil
+								), t
 
 							default:
 								// Since we are not checking for all error states, we may end up perpetually
@@ -740,7 +740,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								// reasons, then we will assume a failure reason, and fail instantly
 								return pluginsCore.PhaseInfoSystemRetryableFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
-								}), t, nil
+								}), t
 							}
 						}
 					}
@@ -749,7 +749,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 		}
 	}
 
-	return phaseInfo, t, nil
+	return phaseInfo, t
 }
 
 func GetMessageAfterGracePeriod(message string, gracePeriod time.Duration) string {
