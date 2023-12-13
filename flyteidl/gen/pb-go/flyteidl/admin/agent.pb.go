@@ -215,7 +215,7 @@ func (m *CreateTaskRequest) GetTaskExecutionMetadata() *TaskExecutionMetadata {
 // Represents a create response structure.
 type CreateTaskResponse struct {
 	// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-	// Resouce is for synchronous task execution.
+	// Resource is for synchronous task execution.
 	//
 	// Types that are valid to be assigned to Res:
 	//	*CreateTaskResponse_ResourceMeta

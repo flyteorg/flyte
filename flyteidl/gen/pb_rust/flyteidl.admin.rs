@@ -49,14 +49,14 @@ pub struct CreateTaskResponse {
     #[prost(message, repeated, tag="3")]
     pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-    /// Resouce is for synchronous task execution.
+    /// Resource is for synchronous task execution.
     #[prost(oneof="create_task_response::Res", tags="1, 2")]
     pub res: ::core::option::Option<create_task_response::Res>,
 }
 /// Nested message and enum types in `CreateTaskResponse`.
 pub mod create_task_response {
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-    /// Resouce is for synchronous task execution.
+    /// Resource is for synchronous task execution.
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Res {
