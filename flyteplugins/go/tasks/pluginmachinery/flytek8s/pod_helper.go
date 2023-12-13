@@ -574,7 +574,7 @@ func BuildIdentityPod() *v1.Pod {
 func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 	phaseInfo, t, err := demystifyPendingHelper(status)
 
-	if phaseInfo.Phase().IsTerminal() {
+	if phaseInfo.Phase().IsTerminal() || err != nil {
 		return phaseInfo, err
 	}
 
