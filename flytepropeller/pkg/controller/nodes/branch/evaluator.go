@@ -129,6 +129,7 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 		}
 		nStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 		logger.Infof(ctx, "Branch Setting Node[%v] status to Skipped!", skippedNodeID)
+		// TODO: What is the impact of always setting clearStateOnAnyTermination=false here? 
 		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false", false, nil)
 	}
 
