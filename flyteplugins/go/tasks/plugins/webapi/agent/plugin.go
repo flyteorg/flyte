@@ -330,16 +330,16 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 	agentRegistry := make(map[string]map[bool]*Agent)
 	var agentDeployments []*Agent
 
-	if cfg.DefaultAgent.Endpoint != "" {
-		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
-	}
-	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {
 		agentRegistry[taskType] = make(map[bool]*Agent)
 		agentRegistry[taskType][false] = cfg.Agents[agentID]
 	}
 
+	if cfg.DefaultAgent.Endpoint != "" {
+		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
+	}
+	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
 	for _, agentDeployment := range agentDeployments {
 		client, err := getAgentMetadataClientFunc(context.Background(), agentDeployment, connectionCache)
 		if err != nil {
