@@ -128,10 +128,7 @@ exclude_patterns = [
     "flytesnacks/bioinformatics_examples.md",
     "flytesnacks/feature_engineering.md",
     "flytesnacks/flyte_lab.md",
-    "flytesnacks/integrations.md",
     "flytesnacks/ml_training.md",
-    "flytesnacks/tutorials.md",
-    "flytesnacks/userguide.md",
     "flytesnacks/README.md",
     "flytekit/**/README.md",
     "flytekit/_templates/**",
@@ -313,8 +310,10 @@ PROTO_REF_REPLACE = r"\1/protos/docs"
 # These patterns are used to replace values in source files that are imported
 # from other repos.
 REPLACE_PATTERNS = {
+    r"<flyte:deployment/index>": r"</deployment/index>",
     r"<flytectl:index>": r"</flytectl_overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
+    r"<auto_examples": r"<flytesnacks/examples",
     r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
     r"<protos/docs/core/core:tasktemplate>": r"<ref_flyteidl.core.TaskTemplate>",
     r"<flytesnacks/examples": r"</flytesnacks/examples",
@@ -325,12 +324,19 @@ REPLACE_PATTERNS = {
     r"{ref}`bioinformatics <bioinformatics>`": r"bioinformatics",
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
     r"/protos/docs/service/index": r"/protos/docs/service/service",
+    r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
+    r"<environment_setup>": r"</flytesnacks/environment_setup>"
 }
 
 import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
+    "list_table_toc": [
+        "flytesnacks/userguide",
+        "flytesnacks/tutorials",
+        "flytesnacks/integrations",
+    ],
 }
 
 # Define these environment variables to use local copies of the projects. This
