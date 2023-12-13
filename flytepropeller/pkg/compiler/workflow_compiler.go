@@ -225,6 +225,12 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 		wf.AddEdges(n, c.EdgeDirectionBidirectional, errs.NewScope())
 	}
 
+	if fg.Template.FailureNode != nil {
+		failureNode := fg.Template.FailureNode
+		v.ValidateNode(&wf, wf.GetOrCreateNodeBuilder(failureNode), false, errs.NewScope())
+		wf.AddEdges(wf.GetOrCreateNodeBuilder(failureNode), c.EdgeDirectionUpstream, errs.NewScope())
+	}
+
 	// Add execution edges for orphan nodes that don't have any inward/outward edges.
 	for nodeID := range wf.Nodes {
 		if nodeID == c.StartNodeID || nodeID == c.EndNodeID {
