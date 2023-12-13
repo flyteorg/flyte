@@ -68,9 +68,9 @@ TBD
 * [Quick start](#quick-start)
 * [Tutorials](#tutorials)
 * [Features](#features)
-* [Who uses Flyte?](#whos-using-flyte)
-* [How to stay involved?](#how-to-stay-involved)
-* [How to contribute?](#how-to-contribute)
+* [Who uses Flyte](#whos-using-flyte)
+* [How to stay involved](#how-to-stay-involved)
+* [How to contribute](#how-to-contribute)
 ---
 ## Quick start
 
