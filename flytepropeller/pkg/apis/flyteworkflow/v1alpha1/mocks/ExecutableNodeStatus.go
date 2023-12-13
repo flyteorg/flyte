@@ -1187,9 +1187,9 @@ func (_m *ExecutableNodeStatus) SetParentTaskID(t *core.TaskExecutionIdentifier)
 	_m.Called(t)
 }
 
-// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason, clearStateOnTermination, err
-func (_m *ExecutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string, clearStateOnTermination bool, err *core.ExecutionError) {
-	_m.Called(phase, occurredAt, reason, clearStateOnTermination, err)
+// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason, clearStateOnAnyTermination, err
+func (_m *ExecutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string, clearStateOnAnyTermination bool, err *core.ExecutionError) {
+	_m.Called(phase, occurredAt, reason, clearStateOnAnyTermination, err)
 }
 
 // VisitNodeStatuses provides a mock function with given fields: visitor

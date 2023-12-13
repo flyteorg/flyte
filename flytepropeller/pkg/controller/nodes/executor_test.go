@@ -582,7 +582,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 			mockN2Status.OnGetStoppedAt().Return(nil)
 			var ee *core.ExecutionError
-			// TODO: Add tests case with clearStateOnTermination=true
+			// TODO: Add tests case with clearStateOnAnyTermination=true
 			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), false, ee)
 			mockN2Status.OnIsDirty().Return(false)
 			mockN2Status.OnGetTaskNodeStatus().Return(nil)

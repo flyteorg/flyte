@@ -98,7 +98,7 @@ var (
 			InterruptibleFailureThreshold:  -1,
 			DefaultMaxAttempts:             1,
 			IgnoreRetryCause:               false,
-			ClearStateOnTermination:        false,
+			ClearStateOnAnyTermination:     false,
 		},
 		MaxStreakLength: 8, // Turbo mode is enabled by default
 		ProfilerPort: config.Port{
@@ -212,7 +212,7 @@ type NodeConfig struct {
 	InterruptibleFailureThreshold  int32            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'"`
 	DefaultMaxAttempts             int32            `json:"default-max-attempts" pflag:"3,Default maximum number of attempts for a node"`
 	IgnoreRetryCause               bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
-	ClearStateOnTermination        bool             `json:"clear-state-on-termination" pflag:",Collapse node on any terminal state"`
+	ClearStateOnAnyTermination     bool             `json:"clear-state-on-any-termination" pflag:",Collapse node on any terminal state"`
 }
 
 // DefaultDeadlines contains default values for timeouts
