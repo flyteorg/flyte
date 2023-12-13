@@ -19767,6 +19767,8 @@
                  * @memberof flyteidl.admin
                  * @interface ICreateTaskResponse
                  * @property {Uint8Array|null} [resourceMeta] CreateTaskResponse resourceMeta
+                 * @property {flyteidl.admin.IResource|null} [resource] CreateTaskResponse resource
+                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] CreateTaskResponse logLinks
                  */
     
                 /**
@@ -19778,6 +19780,7 @@
                  * @param {flyteidl.admin.ICreateTaskResponse=} [properties] Properties to set
                  */
                 function CreateTaskResponse(properties) {
+                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19791,6 +19794,36 @@
                  * @instance
                  */
                 CreateTaskResponse.prototype.resourceMeta = $util.newBuffer([]);
+    
+                /**
+                 * CreateTaskResponse resource.
+                 * @member {flyteidl.admin.IResource|null|undefined} resource
+                 * @memberof flyteidl.admin.CreateTaskResponse
+                 * @instance
+                 */
+                CreateTaskResponse.prototype.resource = null;
+    
+                /**
+                 * CreateTaskResponse logLinks.
+                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
+                 * @memberof flyteidl.admin.CreateTaskResponse
+                 * @instance
+                 */
+                CreateTaskResponse.prototype.logLinks = $util.emptyArray;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * CreateTaskResponse res.
+                 * @member {"resourceMeta"|"resource"|undefined} res
+                 * @memberof flyteidl.admin.CreateTaskResponse
+                 * @instance
+                 */
+                Object.defineProperty(CreateTaskResponse.prototype, "res", {
+                    get: $util.oneOfGetter($oneOfFields = ["resourceMeta", "resource"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
     
                 /**
                  * Creates a new CreateTaskResponse instance using the specified properties.
@@ -19818,6 +19851,11 @@
                         writer = $Writer.create();
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.resourceMeta);
+                    if (message.resource != null && message.hasOwnProperty("resource"))
+                        $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.logLinks != null && message.logLinks.length)
+                        for (var i = 0; i < message.logLinks.length; ++i)
+                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -19842,6 +19880,14 @@
                         case 1:
                             message.resourceMeta = reader.bytes();
                             break;
+                        case 2:
+                            message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            if (!(message.logLinks && message.logLinks.length))
+                                message.logLinks = [];
+                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -19861,9 +19907,31 @@
                 CreateTaskResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
+                    var properties = {};
+                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta")) {
+                        properties.res = 1;
                         if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
                             return "resourceMeta: buffer expected";
+                    }
+                    if (message.resource != null && message.hasOwnProperty("resource")) {
+                        if (properties.res === 1)
+                            return "res: multiple values";
+                        properties.res = 1;
+                        {
+                            var error = $root.flyteidl.admin.Resource.verify(message.resource);
+                            if (error)
+                                return "resource." + error;
+                        }
+                    }
+                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
+                        if (!Array.isArray(message.logLinks))
+                            return "logLinks: array expected";
+                        for (var i = 0; i < message.logLinks.length; ++i) {
+                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
+                            if (error)
+                                return "logLinks." + error;
+                        }
+                    }
                     return null;
                 };
     
@@ -20508,285 +20576,6 @@
                 };
     
                 return DeleteTaskResponse;
-            })();
-    
-            admin.DoTaskRequest = (function() {
-    
-                /**
-                 * Properties of a DoTaskRequest.
-                 * @memberof flyteidl.admin
-                 * @interface IDoTaskRequest
-                 * @property {flyteidl.core.ILiteralMap|null} [inputs] DoTaskRequest inputs
-                 * @property {flyteidl.core.ITaskTemplate|null} [template] DoTaskRequest template
-                 * @property {string|null} [outputPrefix] DoTaskRequest outputPrefix
-                 * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] DoTaskRequest taskExecutionMetadata
-                 */
-    
-                /**
-                 * Constructs a new DoTaskRequest.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a DoTaskRequest.
-                 * @implements IDoTaskRequest
-                 * @constructor
-                 * @param {flyteidl.admin.IDoTaskRequest=} [properties] Properties to set
-                 */
-                function DoTaskRequest(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * DoTaskRequest inputs.
-                 * @member {flyteidl.core.ILiteralMap|null|undefined} inputs
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @instance
-                 */
-                DoTaskRequest.prototype.inputs = null;
-    
-                /**
-                 * DoTaskRequest template.
-                 * @member {flyteidl.core.ITaskTemplate|null|undefined} template
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @instance
-                 */
-                DoTaskRequest.prototype.template = null;
-    
-                /**
-                 * DoTaskRequest outputPrefix.
-                 * @member {string} outputPrefix
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @instance
-                 */
-                DoTaskRequest.prototype.outputPrefix = "";
-    
-                /**
-                 * DoTaskRequest taskExecutionMetadata.
-                 * @member {flyteidl.admin.ITaskExecutionMetadata|null|undefined} taskExecutionMetadata
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @instance
-                 */
-                DoTaskRequest.prototype.taskExecutionMetadata = null;
-    
-                /**
-                 * Creates a new DoTaskRequest instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @static
-                 * @param {flyteidl.admin.IDoTaskRequest=} [properties] Properties to set
-                 * @returns {flyteidl.admin.DoTaskRequest} DoTaskRequest instance
-                 */
-                DoTaskRequest.create = function create(properties) {
-                    return new DoTaskRequest(properties);
-                };
-    
-                /**
-                 * Encodes the specified DoTaskRequest message. Does not implicitly {@link flyteidl.admin.DoTaskRequest.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @static
-                 * @param {flyteidl.admin.IDoTaskRequest} message DoTaskRequest message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                DoTaskRequest.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.inputs != null && message.hasOwnProperty("inputs"))
-                        $root.flyteidl.core.LiteralMap.encode(message.inputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.template != null && message.hasOwnProperty("template"))
-                        $root.flyteidl.core.TaskTemplate.encode(message.template, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputPrefix);
-                    if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata"))
-                        $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a DoTaskRequest message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.DoTaskRequest} DoTaskRequest
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                DoTaskRequest.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.DoTaskRequest();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.inputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.template = $root.flyteidl.core.TaskTemplate.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            message.outputPrefix = reader.string();
-                            break;
-                        case 4:
-                            message.taskExecutionMetadata = $root.flyteidl.admin.TaskExecutionMetadata.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a DoTaskRequest message.
-                 * @function verify
-                 * @memberof flyteidl.admin.DoTaskRequest
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                DoTaskRequest.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.inputs != null && message.hasOwnProperty("inputs")) {
-                        var error = $root.flyteidl.core.LiteralMap.verify(message.inputs);
-                        if (error)
-                            return "inputs." + error;
-                    }
-                    if (message.template != null && message.hasOwnProperty("template")) {
-                        var error = $root.flyteidl.core.TaskTemplate.verify(message.template);
-                        if (error)
-                            return "template." + error;
-                    }
-                    if (message.outputPrefix != null && message.hasOwnProperty("outputPrefix"))
-                        if (!$util.isString(message.outputPrefix))
-                            return "outputPrefix: string expected";
-                    if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata")) {
-                        var error = $root.flyteidl.admin.TaskExecutionMetadata.verify(message.taskExecutionMetadata);
-                        if (error)
-                            return "taskExecutionMetadata." + error;
-                    }
-                    return null;
-                };
-    
-                return DoTaskRequest;
-            })();
-    
-            admin.DoTaskResponse = (function() {
-    
-                /**
-                 * Properties of a DoTaskResponse.
-                 * @memberof flyteidl.admin
-                 * @interface IDoTaskResponse
-                 * @property {flyteidl.admin.IResource|null} [resource] DoTaskResponse resource
-                 */
-    
-                /**
-                 * Constructs a new DoTaskResponse.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a DoTaskResponse.
-                 * @implements IDoTaskResponse
-                 * @constructor
-                 * @param {flyteidl.admin.IDoTaskResponse=} [properties] Properties to set
-                 */
-                function DoTaskResponse(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * DoTaskResponse resource.
-                 * @member {flyteidl.admin.IResource|null|undefined} resource
-                 * @memberof flyteidl.admin.DoTaskResponse
-                 * @instance
-                 */
-                DoTaskResponse.prototype.resource = null;
-    
-                /**
-                 * Creates a new DoTaskResponse instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.DoTaskResponse
-                 * @static
-                 * @param {flyteidl.admin.IDoTaskResponse=} [properties] Properties to set
-                 * @returns {flyteidl.admin.DoTaskResponse} DoTaskResponse instance
-                 */
-                DoTaskResponse.create = function create(properties) {
-                    return new DoTaskResponse(properties);
-                };
-    
-                /**
-                 * Encodes the specified DoTaskResponse message. Does not implicitly {@link flyteidl.admin.DoTaskResponse.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.DoTaskResponse
-                 * @static
-                 * @param {flyteidl.admin.IDoTaskResponse} message DoTaskResponse message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                DoTaskResponse.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.resource != null && message.hasOwnProperty("resource"))
-                        $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a DoTaskResponse message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.DoTaskResponse
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.DoTaskResponse} DoTaskResponse
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                DoTaskResponse.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.DoTaskResponse();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a DoTaskResponse message.
-                 * @function verify
-                 * @memberof flyteidl.admin.DoTaskResponse
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                DoTaskResponse.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.resource != null && message.hasOwnProperty("resource")) {
-                        var error = $root.flyteidl.admin.Resource.verify(message.resource);
-                        if (error)
-                            return "resource." + error;
-                    }
-                    return null;
-                };
-    
-                return DoTaskResponse;
             })();
     
             admin.ClusterAssignment = (function() {
@@ -46423,41 +46212,41 @@
                 return AdminService;
             })();
     
-            service.AsyncAgentService = (function() {
+            service.AgentService = (function() {
     
                 /**
-                 * Constructs a new AsyncAgentService service.
+                 * Constructs a new AgentService service.
                  * @memberof flyteidl.service
-                 * @classdesc Represents an AsyncAgentService
+                 * @classdesc Represents an AgentService
                  * @extends $protobuf.rpc.Service
                  * @constructor
                  * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
                  * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
                  * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
                  */
-                function AsyncAgentService(rpcImpl, requestDelimited, responseDelimited) {
+                function AgentService(rpcImpl, requestDelimited, responseDelimited) {
                     $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
                 }
     
-                (AsyncAgentService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = AsyncAgentService;
+                (AgentService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = AgentService;
     
                 /**
-                 * Creates new AsyncAgentService service using the specified rpc implementation.
+                 * Creates new AgentService service using the specified rpc implementation.
                  * @function create
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.AgentService
                  * @static
                  * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
                  * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
                  * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
-                 * @returns {AsyncAgentService} RPC service. Useful where requests and/or responses are streamed.
+                 * @returns {AgentService} RPC service. Useful where requests and/or responses are streamed.
                  */
-                AsyncAgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                AgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
                     return new this(rpcImpl, requestDelimited, responseDelimited);
                 };
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AsyncAgentService#createTask}.
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * Callback as used by {@link flyteidl.service.AgentService#createTask}.
+                 * @memberof flyteidl.service.AgentService
                  * @typedef CreateTaskCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
@@ -46467,21 +46256,21 @@
                 /**
                  * Calls CreateTask.
                  * @function createTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.AgentService
                  * @instance
                  * @param {flyteidl.admin.ICreateTaskRequest} request CreateTaskRequest message or plain object
-                 * @param {flyteidl.service.AsyncAgentService.CreateTaskCallback} callback Node-style callback called with the error, if any, and CreateTaskResponse
+                 * @param {flyteidl.service.AgentService.CreateTaskCallback} callback Node-style callback called with the error, if any, and CreateTaskResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AsyncAgentService.prototype.createTask = function createTask(request, callback) {
+                Object.defineProperty(AgentService.prototype.createTask = function createTask(request, callback) {
                     return this.rpcCall(createTask, $root.flyteidl.admin.CreateTaskRequest, $root.flyteidl.admin.CreateTaskResponse, request, callback);
                 }, "name", { value: "CreateTask" });
     
                 /**
                  * Calls CreateTask.
                  * @function createTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.AgentService
                  * @instance
                  * @param {flyteidl.admin.ICreateTaskRequest} request CreateTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.CreateTaskResponse>} Promise
@@ -46489,8 +46278,8 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AsyncAgentService#getTask}.
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * Callback as used by {@link flyteidl.service.AgentService#getTask}.
+                 * @memberof flyteidl.service.AgentService
                  * @typedef GetTaskCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
@@ -46500,21 +46289,21 @@
                 /**
                  * Calls GetTask.
                  * @function getTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.AgentService
                  * @instance
                  * @param {flyteidl.admin.IGetTaskRequest} request GetTaskRequest message or plain object
-                 * @param {flyteidl.service.AsyncAgentService.GetTaskCallback} callback Node-style callback called with the error, if any, and GetTaskResponse
+                 * @param {flyteidl.service.AgentService.GetTaskCallback} callback Node-style callback called with the error, if any, and GetTaskResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AsyncAgentService.prototype.getTask = function getTask(request, callback) {
+                Object.defineProperty(AgentService.prototype.getTask = function getTask(request, callback) {
                     return this.rpcCall(getTask, $root.flyteidl.admin.GetTaskRequest, $root.flyteidl.admin.GetTaskResponse, request, callback);
                 }, "name", { value: "GetTask" });
     
                 /**
                  * Calls GetTask.
                  * @function getTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.AgentService
                  * @instance
                  * @param {flyteidl.admin.IGetTaskRequest} request GetTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.GetTaskResponse>} Promise
@@ -46522,8 +46311,8 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AsyncAgentService#deleteTask}.
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * Callback as used by {@link flyteidl.service.AgentService#deleteTask}.
+                 * @memberof flyteidl.service.AgentService
                  * @typedef DeleteTaskCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
@@ -46533,96 +46322,28 @@
                 /**
                  * Calls DeleteTask.
                  * @function deleteTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.AgentService
                  * @instance
                  * @param {flyteidl.admin.IDeleteTaskRequest} request DeleteTaskRequest message or plain object
-                 * @param {flyteidl.service.AsyncAgentService.DeleteTaskCallback} callback Node-style callback called with the error, if any, and DeleteTaskResponse
+                 * @param {flyteidl.service.AgentService.DeleteTaskCallback} callback Node-style callback called with the error, if any, and DeleteTaskResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AsyncAgentService.prototype.deleteTask = function deleteTask(request, callback) {
+                Object.defineProperty(AgentService.prototype.deleteTask = function deleteTask(request, callback) {
                     return this.rpcCall(deleteTask, $root.flyteidl.admin.DeleteTaskRequest, $root.flyteidl.admin.DeleteTaskResponse, request, callback);
                 }, "name", { value: "DeleteTask" });
     
                 /**
                  * Calls DeleteTask.
                  * @function deleteTask
-                 * @memberof flyteidl.service.AsyncAgentService
+                 * @memberof flyteidl.service.AgentService
                  * @instance
                  * @param {flyteidl.admin.IDeleteTaskRequest} request DeleteTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.DeleteTaskResponse>} Promise
                  * @variation 2
                  */
     
-                return AsyncAgentService;
-            })();
-    
-            service.SyncAgentService = (function() {
-    
-                /**
-                 * Constructs a new SyncAgentService service.
-                 * @memberof flyteidl.service
-                 * @classdesc Represents a SyncAgentService
-                 * @extends $protobuf.rpc.Service
-                 * @constructor
-                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
-                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
-                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
-                 */
-                function SyncAgentService(rpcImpl, requestDelimited, responseDelimited) {
-                    $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
-                }
-    
-                (SyncAgentService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = SyncAgentService;
-    
-                /**
-                 * Creates new SyncAgentService service using the specified rpc implementation.
-                 * @function create
-                 * @memberof flyteidl.service.SyncAgentService
-                 * @static
-                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
-                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
-                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
-                 * @returns {SyncAgentService} RPC service. Useful where requests and/or responses are streamed.
-                 */
-                SyncAgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
-                    return new this(rpcImpl, requestDelimited, responseDelimited);
-                };
-    
-                /**
-                 * Callback as used by {@link flyteidl.service.SyncAgentService#doTask}.
-                 * @memberof flyteidl.service.SyncAgentService
-                 * @typedef DoTaskCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.admin.DoTaskResponse} [response] DoTaskResponse
-                 */
-    
-                /**
-                 * Calls DoTask.
-                 * @function doTask
-                 * @memberof flyteidl.service.SyncAgentService
-                 * @instance
-                 * @param {flyteidl.admin.IDoTaskRequest} request DoTaskRequest message or plain object
-                 * @param {flyteidl.service.SyncAgentService.DoTaskCallback} callback Node-style callback called with the error, if any, and DoTaskResponse
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(SyncAgentService.prototype.doTask = function doTask(request, callback) {
-                    return this.rpcCall(doTask, $root.flyteidl.admin.DoTaskRequest, $root.flyteidl.admin.DoTaskResponse, request, callback);
-                }, "name", { value: "DoTask" });
-    
-                /**
-                 * Calls DoTask.
-                 * @function doTask
-                 * @memberof flyteidl.service.SyncAgentService
-                 * @instance
-                 * @param {flyteidl.admin.IDoTaskRequest} request DoTaskRequest message or plain object
-                 * @returns {Promise<flyteidl.admin.DoTaskResponse>} Promise
-                 * @variation 2
-                 */
-    
-                return SyncAgentService;
+                return AgentService;
             })();
     
             service.OAuth2MetadataRequest = (function() {

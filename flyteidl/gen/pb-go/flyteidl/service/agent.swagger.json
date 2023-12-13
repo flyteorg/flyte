@@ -177,8 +177,17 @@
       "properties": {
         "resource_meta": {
           "type": "string",
-          "format": "byte",
-          "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata)."
+          "format": "byte"
+        },
+        "resource": {
+          "$ref": "#/definitions/adminResource"
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
         }
       },
       "description": "Represents a create response structure."
@@ -186,14 +195,6 @@
     "adminDeleteTaskResponse": {
       "type": "object",
       "description": "Response to delete a task."
-    },
-    "adminDoTaskResponse": {
-      "type": "object",
-      "properties": {
-        "resource": {
-          "$ref": "#/definitions/adminResource"
-        }
-      }
     },
     "adminGetTaskResponse": {
       "type": "object",

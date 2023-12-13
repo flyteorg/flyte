@@ -2,9 +2,10 @@ package agent
 
 import (
 	"context"
-	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"testing"
 	"time"
+
+	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -42,9 +43,9 @@ func TestDo(t *testing.T) {
 
 	tCtx.OnTaskReader().Return(taskReader)
 
-	agentPlugin := newMockAgentPlugin()
+	agentPlugin := newMockSyncAgentPlugin()
 	pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
-	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("do_test"))
+	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("create_task_sync_test"))
 	assert.NoError(t, err)
 
 	// Call the Do function by Flavor
@@ -106,26 +107,14 @@ func TestPlugin(t *testing.T) {
 		assert.NotNil(t, err)
 	})
 
-	t.Run("test getAsyncClientFunc", func(t *testing.T) {
-		client, err := getAsyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
+	t.Run("test getClientFunc", func(t *testing.T) {
+		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 	})
 
-	t.Run("test getSyncClientFunc", func(t *testing.T) {
-		client, err := getSyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
-		assert.NoError(t, err)
-		assert.NotNil(t, client)
-	})
-
-	t.Run("test getAsyncClientFunc more config", func(t *testing.T) {
-		client, err := getAsyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
-		assert.NoError(t, err)
-		assert.NotNil(t, client)
-	})
-
-	t.Run("test getSyncClientFunc more config", func(t *testing.T) {
-		client, err := getSyncClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
+	t.Run("test getClientFunc more config", func(t *testing.T) {
+		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 	})
@@ -134,12 +123,12 @@ func TestPlugin(t *testing.T) {
 		connectionCache := make(map[*Agent]*grpc.ClientConn)
 		agent := &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}
 
-		client, err := getAsyncClientFunc(context.Background(), agent, connectionCache)
+		client, err := getClientFunc(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 		assert.NotNil(t, client, connectionCache[agent])
 
-		cachedClient, err := getAsyncClientFunc(context.Background(), agent, connectionCache)
+		cachedClient, err := getClientFunc(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, cachedClient)
 		assert.Equal(t, client, cachedClient)

@@ -45,9 +45,26 @@ pub struct CreateTaskRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTaskResponse {
+    /// log information for the task execution.
+    #[prost(message, repeated, tag="3")]
+    pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-    #[prost(bytes="vec", tag="1")]
-    pub resource_meta: ::prost::alloc::vec::Vec<u8>,
+    /// Resouce is for synchronous task execution.
+    #[prost(oneof="create_task_response::Res", tags="1, 2")]
+    pub res: ::core::option::Option<create_task_response::Res>,
+}
+/// Nested message and enum types in `CreateTaskResponse`.
+pub mod create_task_response {
+    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// Resouce is for synchronous task execution.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Res {
+        #[prost(bytes, tag="1")]
+        ResourceMeta(::prost::alloc::vec::Vec<u8>),
+        #[prost(message, tag="2")]
+        Resource(super::Resource),
+    }
 }
 /// A message used to fetch a job resource from flyte agent server.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -100,31 +117,6 @@ pub struct DeleteTaskRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTaskResponse {
-}
-/// A message used to do a task
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DoTaskRequest {
-    /// The inputs required to start the execution. All required inputs must be
-    /// included in this map. If not required and not provided, defaults apply.
-    /// +optional
-    #[prost(message, optional, tag="1")]
-    pub inputs: ::core::option::Option<super::core::LiteralMap>,
-    /// Template of the task that encapsulates all the metadata of the task.
-    #[prost(message, optional, tag="2")]
-    pub template: ::core::option::Option<super::core::TaskTemplate>,
-    /// Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
-    #[prost(string, tag="3")]
-    pub output_prefix: ::prost::alloc::string::String,
-    /// subset of runtime task execution metadata.
-    #[prost(message, optional, tag="4")]
-    pub task_execution_metadata: ::core::option::Option<TaskExecutionMetadata>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DoTaskResponse {
-    #[prost(message, optional, tag="1")]
-    pub resource: ::core::option::Option<Resource>,
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

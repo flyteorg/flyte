@@ -51,7 +51,13 @@ message CreateTaskRequest {
 // Represents a create response structure.
 message CreateTaskResponse {
   // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-  bytes resource_meta = 1;
+  // Resouce is for synchronous task execution.
+  oneof res {
+    bytes resource_meta = 1;
+    Resource resource = 2;
+  }
+  // log information for the task execution.
+  repeated core.TaskLog log_links = 3;
 }
 
 // A message used to fetch a job resource from flyte agent server.
@@ -89,23 +95,4 @@ message DeleteTaskRequest {
 }
 
 // Response to delete a task.
-message DeleteTaskResponse {
-}
-
-// A message used to do a task
-message DoTaskRequest {
-  // The inputs required to start the execution. All required inputs must be
-  // included in this map. If not required and not provided, defaults apply.
-  // +optional
-  core.LiteralMap inputs = 1;
-  // Template of the task that encapsulates all the metadata of the task.
-  core.TaskTemplate template = 2;
-  // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
-  string output_prefix = 3;
-  // subset of runtime task execution metadata.
-  TaskExecutionMetadata task_execution_metadata = 4;
-}
-
-message DoTaskResponse {
-  Resource resource = 1;
-}
+message DeleteTaskResponse {}

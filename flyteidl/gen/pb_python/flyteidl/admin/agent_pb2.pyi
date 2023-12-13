@@ -74,10 +74,14 @@ class CreateTaskRequest(_message.Message):
     def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
-    __slots__ = ["resource_meta"]
+    __slots__ = ["resource_meta", "resource", "log_links"]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    RESOURCE_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     resource_meta: bytes
-    def __init__(self, resource_meta: _Optional[bytes] = ...) -> None: ...
+    resource: Resource
+    log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
+    def __init__(self, resource_meta: _Optional[bytes] = ..., resource: _Optional[_Union[Resource, _Mapping]] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class GetTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]
@@ -116,21 +120,3 @@ class DeleteTaskRequest(_message.Message):
 class DeleteTaskResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
-
-class DoTaskRequest(_message.Message):
-    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata"]
-    INPUTS_FIELD_NUMBER: _ClassVar[int]
-    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
-    OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
-    TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
-    inputs: _literals_pb2.LiteralMap
-    template: _tasks_pb2.TaskTemplate
-    output_prefix: str
-    task_execution_metadata: TaskExecutionMetadata
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
-
-class DoTaskResponse(_message.Message):
-    __slots__ = ["resource"]
-    RESOURCE_FIELD_NUMBER: _ClassVar[int]
-    resource: Resource
-    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...

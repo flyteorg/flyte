@@ -25,9 +25,6 @@ func TestGetAndSetConfig(t *testing.T) {
 		"DeleteTask": {
 			Duration: 3 * time.Millisecond,
 		},
-		"DoTask": {
-			Duration: 3 * time.Millisecond,
-		},
 	}
 	cfg.DefaultAgent.DefaultTimeout = config.Duration{Duration: 10 * time.Second}
 	cfg.Agents = map[string]*Agent{

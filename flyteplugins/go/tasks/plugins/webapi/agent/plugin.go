@@ -27,14 +27,12 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type GetAsyncClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
-type GetSyncClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.SyncAgentServiceClient, error)
+type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentServiceClient, error)
 
 type Plugin struct {
 	metricScope     promutils.Scope
 	cfg             *Config
-	getAsyncClient  GetAsyncClientFunc
-	getSyncClient   GetSyncClientFunc
+	getClient       GetClientFunc
 	connectionCache map[*Agent]*grpc.ClientConn
 }
 
@@ -94,27 +92,33 @@ func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (ph
 		return core.PhaseInfoUndefined, fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
 
-	client, err := p.getSyncClient(ctx, agent, p.connectionCache)
+	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return core.PhaseInfoUndefined, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
 
-	finalCtx, cancel := getFinalContext(ctx, "DoTask", agent)
+	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	res, err := client.DoTask(finalCtx, &admin.DoTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
+	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
 	if err != nil {
 		return core.PhaseInfoUndefined, err
 	}
 
-	resource := ResourceWrapper{
-		State:   res.Resource.State,
-		Outputs: res.Resource.Outputs,
-		Message: res.Resource.Message,
+	resource := res.GetResource()
+	if resource == nil {
+		return core.PhaseInfoUndefined, fmt.Errorf("agent sync task returned nil resource, please check the agent implementation")
 	}
 
-	return p.Status(ctx, pluginContext{TaskExecutionContext: taskCtx, resource: resource})
+	resourceWrapper := ResourceWrapper{
+		State:    resource.State,
+		Outputs:  resource.Outputs,
+		Message:  resource.Message,
+		LogLinks: res.LogLinks,
+	}
+
+	return p.Status(ctx, pluginContext{TaskExecutionContext: taskCtx, resource: resourceWrapper})
 }
 
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
@@ -149,7 +153,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
-	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
+	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -183,7 +187,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	if err != nil {
 		return nil, fmt.Errorf("failed to find agent with error: %v", err)
 	}
-	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
+	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -214,7 +218,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	if err != nil {
 		return fmt.Errorf("failed to find agent agent with error: %v", err)
 	}
-	client, err := p.getAsyncClient(ctx, agent, p.connectionCache)
+	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -330,22 +334,13 @@ func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*A
 	return conn, nil
 }
 
-func getAsyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentServiceClient, error) {
 	conn, err := getGrpcConnection(ctx, agent, connectionCache)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.NewAsyncAgentServiceClient(conn), nil
-}
-
-func getSyncClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.SyncAgentServiceClient, error) {
-	conn, err := getGrpcConnection(ctx, agent, connectionCache)
-	if err != nil {
-		return nil, err
-	}
-
-	return service.NewSyncAgentServiceClient(conn), nil
+	return service.NewAgentServiceClient(conn), nil
 }
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
@@ -386,8 +381,7 @@ func newAgentPlugin() webapi.PluginEntry {
 			return &Plugin{
 				metricScope:     iCtx.MetricsScope(),
 				cfg:             GetConfig(),
-				getAsyncClient:  getAsyncClientFunc,
-				getSyncClient:   getSyncClientFunc,
+				getClient:       getClientFunc,
 				connectionCache: make(map[*Agent]*grpc.ClientConn),
 			}, nil
 		},

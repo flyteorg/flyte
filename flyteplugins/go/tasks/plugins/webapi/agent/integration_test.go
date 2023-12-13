@@ -37,21 +37,24 @@ type MockPlugin struct {
 	Plugin
 }
 
-type MockAsyncClient struct {
+type MockAsyncTask struct {
 }
 
-type MockSyncClient struct {
+type MockSyncTask struct {
 }
 
-func (m *MockAsyncClient) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+func (m *MockAsyncTask) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
 	expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "fake://bucket/prefix/nhv"}
 	if slices.Equal(createTaskRequest.Template.GetContainer().Args, expectedArgs) {
 		return nil, fmt.Errorf("args not as expected")
 	}
-	return &admin.CreateTaskResponse{ResourceMeta: []byte{1, 2, 3, 4}}, nil
+	return &admin.CreateTaskResponse{
+		Res: &admin.CreateTaskResponse_ResourceMeta{
+			ResourceMeta: []byte{1, 2, 3, 4},
+		}}, nil
 }
 
-func (m *MockAsyncClient) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+func (m *MockAsyncTask) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
 	if req.GetTaskType() == "bigquery_query_job_task" {
 		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
 			Literals: map[string]*flyteIdlCore.Literal{
@@ -62,31 +65,48 @@ func (m *MockAsyncClient) GetTask(_ context.Context, req *admin.GetTaskRequest, 
 	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
 }
 
-func (m *MockAsyncClient) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+func (m *MockAsyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
 	return &admin.DeleteTaskResponse{}, nil
 }
 
-func (m *MockSyncClient) DoTask(_ context.Context, _ *admin.DoTaskRequest, _ ...grpc.CallOption) (*admin.DoTaskResponse, error) {
-	return &admin.DoTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
-		Literals: map[string]*flyteIdlCore.Literal{
-			"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+func (m *MockSyncTask) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+	return &admin.CreateTaskResponse{
+		Res: &admin.CreateTaskResponse_Resource{
+			Resource: &admin.Resource{
+				State: admin.State_SUCCEEDED,
+				Outputs: &flyteIdlCore.LiteralMap{
+					Literals: map[string]*flyteIdlCore.Literal{},
+				},
+			},
 		},
-	}}}, nil
+	}, nil
+
 }
 
-func mockGetAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	return &MockAsyncClient{}, nil
+func (m *MockSyncTask) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+	if req.GetTaskType() == "fake_task" {
+		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
+			Literals: map[string]*flyteIdlCore.Literal{
+				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+			},
+		}}}, nil
+	}
+	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
 }
 
-func mockGetSyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.SyncAgentServiceClient, error) {
-	return &MockSyncClient{}, nil
+func (m *MockSyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+	return &admin.DeleteTaskResponse{}, nil
 }
 
-func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	return nil, fmt.Errorf("error")
+func mockAsyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AgentServiceClient, error) {
+	return &MockAsyncTask{}, nil
 }
 
-func mockGetBadSyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.SyncAgentServiceClient, error) {
+func mockSyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AgentServiceClient, error) {
+	return &MockSyncTask{}, nil
+}
+
+func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AgentServiceClient, error) {
 	return nil, fmt.Errorf("error")
 }
 
@@ -147,10 +167,9 @@ func TestEndToEnd(t *testing.T) {
 		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
-					metricScope:    iCtx.MetricsScope(),
-					cfg:            GetConfig(),
-					getAsyncClient: mockGetBadAsyncClientFunc,
-					getSyncClient:  mockGetBadSyncClientFunc,
+					metricScope: iCtx.MetricsScope(),
+					cfg:         GetConfig(),
+					getClient:   mockGetBadAsyncClientFunc,
 				},
 			}, nil
 		}
@@ -288,10 +307,25 @@ func newMockAgentPlugin() webapi.PluginEntry {
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
-					metricScope:    iCtx.MetricsScope(),
-					cfg:            GetConfig(),
-					getAsyncClient: mockGetAsyncClientFunc,
-					getSyncClient:  mockGetSyncClientFunc,
+					metricScope: iCtx.MetricsScope(),
+					cfg:         GetConfig(),
+					getClient:   mockAsyncTaskClientFunc,
+				},
+			}, nil
+		},
+	}
+}
+
+func newMockSyncAgentPlugin() webapi.PluginEntry {
+	return webapi.PluginEntry{
+		ID:                 "agent-service",
+		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job", "api_task"},
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+			return &MockPlugin{
+				Plugin{
+					metricScope: iCtx.MetricsScope(),
+					cfg:         GetConfig(),
+					getClient:   mockSyncTaskClientFunc,
 				},
 			}, nil
 		},

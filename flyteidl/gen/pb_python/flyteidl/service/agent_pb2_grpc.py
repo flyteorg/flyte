@@ -5,8 +5,11 @@ import grpc
 from flyteidl.admin import agent_pb2 as flyteidl_dot_admin_dot_agent__pb2
 
 
-class AsyncAgentServiceStub(object):
+class AgentServiceStub(object):
     """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    It can handle asynchronous tasks and synchronous tasks.
+    Asynchronous tasks are for tasks running long, for example running query job.
+    Synchronous tasks are for tasks running quick, for example, you want to execute something really fast, or even retrieving some metadata from a backend service.
     """
 
     def __init__(self, channel):
@@ -16,24 +19,27 @@ class AsyncAgentServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateTask = channel.unary_unary(
-                '/flyteidl.service.AsyncAgentService/CreateTask',
+                '/flyteidl.service.AgentService/CreateTask',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.CreateTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.CreateTaskResponse.FromString,
                 )
         self.GetTask = channel.unary_unary(
-                '/flyteidl.service.AsyncAgentService/GetTask',
+                '/flyteidl.service.AgentService/GetTask',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskResponse.FromString,
                 )
         self.DeleteTask = channel.unary_unary(
-                '/flyteidl.service.AsyncAgentService/DeleteTask',
+                '/flyteidl.service.AgentService/DeleteTask',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
                 )
 
 
-class AsyncAgentServiceServicer(object):
+class AgentServiceServicer(object):
     """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    It can handle asynchronous tasks and synchronous tasks.
+    Asynchronous tasks are for tasks running long, for example running query job.
+    Synchronous tasks are for tasks running quick, for example, you want to execute something really fast, or even retrieving some metadata from a backend service.
     """
 
     def CreateTask(self, request, context):
@@ -58,7 +64,7 @@ class AsyncAgentServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_AsyncAgentServiceServicer_to_server(servicer, server):
+def add_AgentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'CreateTask': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateTask,
@@ -77,13 +83,16 @@ def add_AsyncAgentServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.service.AsyncAgentService', rpc_method_handlers)
+            'flyteidl.service.AgentService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class AsyncAgentService(object):
+class AgentService(object):
     """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    It can handle asynchronous tasks and synchronous tasks.
+    Asynchronous tasks are for tasks running long, for example running query job.
+    Synchronous tasks are for tasks running quick, for example, you want to execute something really fast, or even retrieving some metadata from a backend service.
     """
 
     @staticmethod
@@ -97,7 +106,7 @@ class AsyncAgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/CreateTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentService/CreateTask',
             flyteidl_dot_admin_dot_agent__pb2.CreateTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.CreateTaskResponse.FromString,
             options, channel_credentials,
@@ -114,7 +123,7 @@ class AsyncAgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/GetTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentService/GetTask',
             flyteidl_dot_admin_dot_agent__pb2.GetTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.GetTaskResponse.FromString,
             options, channel_credentials,
@@ -131,70 +140,8 @@ class AsyncAgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/DeleteTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentService/DeleteTask',
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-
-class SyncAgentServiceStub(object):
-    """Missing associated documentation comment in .proto file."""
-
-    def __init__(self, channel):
-        """Constructor.
-
-        Args:
-            channel: A grpc.Channel.
-        """
-        self.DoTask = channel.unary_unary(
-                '/flyteidl.service.SyncAgentService/DoTask',
-                request_serializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.FromString,
-                )
-
-
-class SyncAgentServiceServicer(object):
-    """Missing associated documentation comment in .proto file."""
-
-    def DoTask(self, request, context):
-        """Do a job and get response from the agent server.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-
-def add_SyncAgentServiceServicer_to_server(servicer, server):
-    rpc_method_handlers = {
-            'DoTask': grpc.unary_unary_rpc_method_handler(
-                    servicer.DoTask,
-                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.FromString,
-                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.SerializeToString,
-            ),
-    }
-    generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.service.SyncAgentService', rpc_method_handlers)
-    server.add_generic_rpc_handlers((generic_handler,))
-
-
- # This class is part of an EXPERIMENTAL API.
-class SyncAgentService(object):
-    """Missing associated documentation comment in .proto file."""
-
-    @staticmethod
-    def DoTask(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.SyncAgentService/DoTask',
-            flyteidl_dot_admin_dot_agent__pb2.DoTaskRequest.SerializeToString,
-            flyteidl_dot_admin_dot_agent__pb2.DoTaskResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

@@ -8080,6 +8080,12 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resourceMeta */
             resourceMeta?: (Uint8Array|null);
+
+            /** CreateTaskResponse resource */
+            resource?: (flyteidl.admin.IResource|null);
+
+            /** CreateTaskResponse logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a CreateTaskResponse. */
@@ -8093,6 +8099,15 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resourceMeta. */
             public resourceMeta: Uint8Array;
+
+            /** CreateTaskResponse resource. */
+            public resource?: (flyteidl.admin.IResource|null);
+
+            /** CreateTaskResponse logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
+
+            /** CreateTaskResponse res. */
+            public res?: ("resourceMeta"|"resource");
 
             /**
              * Creates a new CreateTaskResponse instance using the specified properties.
@@ -8405,128 +8420,6 @@ export namespace flyteidl {
 
             /**
              * Verifies a DeleteTaskResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a DoTaskRequest. */
-        interface IDoTaskRequest {
-
-            /** DoTaskRequest inputs */
-            inputs?: (flyteidl.core.ILiteralMap|null);
-
-            /** DoTaskRequest template */
-            template?: (flyteidl.core.ITaskTemplate|null);
-
-            /** DoTaskRequest outputPrefix */
-            outputPrefix?: (string|null);
-
-            /** DoTaskRequest taskExecutionMetadata */
-            taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
-        }
-
-        /** Represents a DoTaskRequest. */
-        class DoTaskRequest implements IDoTaskRequest {
-
-            /**
-             * Constructs a new DoTaskRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IDoTaskRequest);
-
-            /** DoTaskRequest inputs. */
-            public inputs?: (flyteidl.core.ILiteralMap|null);
-
-            /** DoTaskRequest template. */
-            public template?: (flyteidl.core.ITaskTemplate|null);
-
-            /** DoTaskRequest outputPrefix. */
-            public outputPrefix: string;
-
-            /** DoTaskRequest taskExecutionMetadata. */
-            public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
-
-            /**
-             * Creates a new DoTaskRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns DoTaskRequest instance
-             */
-            public static create(properties?: flyteidl.admin.IDoTaskRequest): flyteidl.admin.DoTaskRequest;
-
-            /**
-             * Encodes the specified DoTaskRequest message. Does not implicitly {@link flyteidl.admin.DoTaskRequest.verify|verify} messages.
-             * @param message DoTaskRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IDoTaskRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a DoTaskRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns DoTaskRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DoTaskRequest;
-
-            /**
-             * Verifies a DoTaskRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a DoTaskResponse. */
-        interface IDoTaskResponse {
-
-            /** DoTaskResponse resource */
-            resource?: (flyteidl.admin.IResource|null);
-        }
-
-        /** Represents a DoTaskResponse. */
-        class DoTaskResponse implements IDoTaskResponse {
-
-            /**
-             * Constructs a new DoTaskResponse.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IDoTaskResponse);
-
-            /** DoTaskResponse resource. */
-            public resource?: (flyteidl.admin.IResource|null);
-
-            /**
-             * Creates a new DoTaskResponse instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns DoTaskResponse instance
-             */
-            public static create(properties?: flyteidl.admin.IDoTaskResponse): flyteidl.admin.DoTaskResponse;
-
-            /**
-             * Encodes the specified DoTaskResponse message. Does not implicitly {@link flyteidl.admin.DoTaskResponse.verify|verify} messages.
-             * @param message DoTaskResponse message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IDoTaskResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a DoTaskResponse message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns DoTaskResponse
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DoTaskResponse;
-
-            /**
-             * Verifies a DoTaskResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -19823,11 +19716,11 @@ export namespace flyteidl {
             type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
         }
 
-        /** Represents an AsyncAgentService */
-        class AsyncAgentService extends $protobuf.rpc.Service {
+        /** Represents an AgentService */
+        class AgentService extends $protobuf.rpc.Service {
 
             /**
-             * Constructs a new AsyncAgentService service.
+             * Constructs a new AgentService service.
              * @param rpcImpl RPC implementation
              * @param [requestDelimited=false] Whether requests are length-delimited
              * @param [responseDelimited=false] Whether responses are length-delimited
@@ -19835,20 +19728,20 @@ export namespace flyteidl {
             constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
 
             /**
-             * Creates new AsyncAgentService service using the specified rpc implementation.
+             * Creates new AgentService service using the specified rpc implementation.
              * @param rpcImpl RPC implementation
              * @param [requestDelimited=false] Whether requests are length-delimited
              * @param [responseDelimited=false] Whether responses are length-delimited
              * @returns RPC service. Useful where requests and/or responses are streamed.
              */
-            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AsyncAgentService;
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AgentService;
 
             /**
              * Calls CreateTask.
              * @param request CreateTaskRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and CreateTaskResponse
              */
-            public createTask(request: flyteidl.admin.ICreateTaskRequest, callback: flyteidl.service.AsyncAgentService.CreateTaskCallback): void;
+            public createTask(request: flyteidl.admin.ICreateTaskRequest, callback: flyteidl.service.AgentService.CreateTaskCallback): void;
 
             /**
              * Calls CreateTask.
@@ -19862,7 +19755,7 @@ export namespace flyteidl {
              * @param request GetTaskRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and GetTaskResponse
              */
-            public getTask(request: flyteidl.admin.IGetTaskRequest, callback: flyteidl.service.AsyncAgentService.GetTaskCallback): void;
+            public getTask(request: flyteidl.admin.IGetTaskRequest, callback: flyteidl.service.AgentService.GetTaskCallback): void;
 
             /**
              * Calls GetTask.
@@ -19876,7 +19769,7 @@ export namespace flyteidl {
              * @param request DeleteTaskRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and DeleteTaskResponse
              */
-            public deleteTask(request: flyteidl.admin.IDeleteTaskRequest, callback: flyteidl.service.AsyncAgentService.DeleteTaskCallback): void;
+            public deleteTask(request: flyteidl.admin.IDeleteTaskRequest, callback: flyteidl.service.AgentService.DeleteTaskCallback): void;
 
             /**
              * Calls DeleteTask.
@@ -19886,73 +19779,28 @@ export namespace flyteidl {
             public deleteTask(request: flyteidl.admin.IDeleteTaskRequest): Promise<flyteidl.admin.DeleteTaskResponse>;
         }
 
-        namespace AsyncAgentService {
+        namespace AgentService {
 
             /**
-             * Callback as used by {@link flyteidl.service.AsyncAgentService#createTask}.
+             * Callback as used by {@link flyteidl.service.AgentService#createTask}.
              * @param error Error, if any
              * @param [response] CreateTaskResponse
              */
             type CreateTaskCallback = (error: (Error|null), response?: flyteidl.admin.CreateTaskResponse) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AsyncAgentService#getTask}.
+             * Callback as used by {@link flyteidl.service.AgentService#getTask}.
              * @param error Error, if any
              * @param [response] GetTaskResponse
              */
             type GetTaskCallback = (error: (Error|null), response?: flyteidl.admin.GetTaskResponse) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AsyncAgentService#deleteTask}.
+             * Callback as used by {@link flyteidl.service.AgentService#deleteTask}.
              * @param error Error, if any
              * @param [response] DeleteTaskResponse
              */
             type DeleteTaskCallback = (error: (Error|null), response?: flyteidl.admin.DeleteTaskResponse) => void;
-        }
-
-        /** Represents a SyncAgentService */
-        class SyncAgentService extends $protobuf.rpc.Service {
-
-            /**
-             * Constructs a new SyncAgentService service.
-             * @param rpcImpl RPC implementation
-             * @param [requestDelimited=false] Whether requests are length-delimited
-             * @param [responseDelimited=false] Whether responses are length-delimited
-             */
-            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
-
-            /**
-             * Creates new SyncAgentService service using the specified rpc implementation.
-             * @param rpcImpl RPC implementation
-             * @param [requestDelimited=false] Whether requests are length-delimited
-             * @param [responseDelimited=false] Whether responses are length-delimited
-             * @returns RPC service. Useful where requests and/or responses are streamed.
-             */
-            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): SyncAgentService;
-
-            /**
-             * Calls DoTask.
-             * @param request DoTaskRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and DoTaskResponse
-             */
-            public doTask(request: flyteidl.admin.IDoTaskRequest, callback: flyteidl.service.SyncAgentService.DoTaskCallback): void;
-
-            /**
-             * Calls DoTask.
-             * @param request DoTaskRequest message or plain object
-             * @returns Promise
-             */
-            public doTask(request: flyteidl.admin.IDoTaskRequest): Promise<flyteidl.admin.DoTaskResponse>;
-        }
-
-        namespace SyncAgentService {
-
-            /**
-             * Callback as used by {@link flyteidl.service.SyncAgentService#doTask}.
-             * @param error Error, if any
-             * @param [response] DoTaskResponse
-             */
-            type DoTaskCallback = (error: (Error|null), response?: flyteidl.admin.DoTaskResponse) => void;
         }
 
         /** Properties of a OAuth2MetadataRequest. */
