@@ -679,9 +679,11 @@ func TestTerminateSubTasks(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, uint32(1), nextState.PhaseVersion)
 			assert.Equal(t, arrayCore.PhaseWriteToDiscoveryThenFail, nextState.CurrentPhase)
-			assert.Len(t, externalResources, subtaskCount)
+			assert.Len(t, externalResources, terminateCounter)
+
 			for _, externalResource := range externalResources {
-				assert.True(t, externalResource.IsAbortedSubtask || core.Phases[externalResource.Phase].IsTerminal() || core.Phases[externalResource.Phase] == core.PhaseUndefined)
+				phase := core.Phases[externalResource.Phase]
+				assert.True(t, phase.IsAborted())
 			}
 		})
 	}
