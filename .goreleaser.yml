@@ -12,3 +12,12 @@ release:
   disable: false
   extra_files:
     - glob: ./release/*
+git:
+  ignore_tags:
+    - "datacatalog/*"
+    - "flyteadmin/*"
+    - "flytecopilot/*"
+    - "flyteidl/*"
+    - "flyteplugins/*"
+    - "flytepropeller/*"
+    - "flytestdlib/*"

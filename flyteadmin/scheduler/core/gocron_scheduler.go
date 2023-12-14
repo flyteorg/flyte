@@ -54,23 +54,26 @@ func (g *GoCronScheduler) GetTimedFuncWithSchedule() TimedFuncWithSchedule {
 func (g *GoCronScheduler) BootStrapSchedulesFromSnapShot(ctx context.Context, schedules []models.SchedulableEntity,
 	snapshot snapshoter.Snapshot) {
 	for _, s := range schedules {
+		// Copy the object to save to a new pointer since the pointer is saved later
+		// Issue due to https://github.com/golang/go/discussions/56010
+		schedule := s
 		if *s.Active {
 			funcRef := g.GetTimedFuncWithSchedule()
 			nameOfSchedule := identifier.GetScheduleName(ctx, s)
 			// Initialize the lastExectime as the updatedAt time
 			// Assumption here that schedule was activated and that the 0th execution of the schedule
 			// which will be used as a reference
-			lastExecTime := &s.UpdatedAt
+			lastExecTime := &schedule.UpdatedAt
 
 			fromSnapshot := snapshot.GetLastExecutionTime(nameOfSchedule)
 			// Use the latest time if available in the snapshot
-			if fromSnapshot != nil && fromSnapshot.After(s.UpdatedAt) {
+			if fromSnapshot != nil && fromSnapshot.After(schedule.UpdatedAt) {
 				lastExecTime = fromSnapshot
 			}
-			err := g.ScheduleJob(ctx, s, funcRef, lastExecTime)
+			err := g.ScheduleJob(ctx, schedule, funcRef, lastExecTime)
 			if err != nil {
 				g.metrics.JobScheduledFailedCounter.Inc()
-				logger.Errorf(ctx, "unable to register the schedule %+v due to %v", s, err)
+				logger.Errorf(ctx, "unable to register the schedule %+v due to %v", schedule, err)
 			}
 		}
 	}

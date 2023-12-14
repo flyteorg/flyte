@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
@@ -41,6 +42,14 @@ var serveCmd = &cobra.Command{
 
 		// Set Keys
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+
+		// register otel tracer providers
+		for _, serviceName := range []string{otelutils.DataCatalogGormTracer, otelutils.DataCatalogServerTracer} {
+			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+				return err
+			}
+		}
 
 		return datacatalogservice.ServeInsecure(ctx, cfg)
 	},
