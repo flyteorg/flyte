@@ -337,6 +337,7 @@ import_projects_config = {
         "flytesnacks/tutorials",
         "flytesnacks/integrations",
     ],
+    "dev_build": bool(int(os.environ.get("DOCS_DEV_BUILD", 0))),
 }
 
 # Define these environment variables to use local copies of the projects. This

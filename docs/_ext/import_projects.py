@@ -26,6 +26,7 @@ class ImportProjectsConfig:
     flytekit_api_dir: str
     source_regex_mapping: dict = field(default_factory=dict)
     list_table_toc: List[str] = field(default_factory=list)
+    dev_build: bool = False
 
 
 @dataclass
@@ -127,27 +128,28 @@ def import_projects(app: Sphinx, config: Config):
     if not hasattr(config, "html_context"):
         config.html_context = {}
 
-    show_repo_tags = False
+    show_repo_tags = not import_projects_config.dev_build
     for project in projects:
         if project.local:
             local_dir = srcdir / project.source
             try:
                 repo = Repo(local_dir)
-                show_repo_tags = True
             except git.InvalidGitRepositoryError:
                 repo = None
         else:
             local_dir = srcdir / import_projects_config.clone_dir / project.dest
             shutil.rmtree(local_dir, ignore_errors=True)
             repo = Repo.clone_from(project.source, local_dir)
-            show_repo_tags = True
 
         local_docs_path = local_dir / project.docs_path
         dest_docs_dir = srcdir / project.dest
 
-        # use the latest git tag when building docs
-        if repo:
+        # don't checkout/show latest tag on dev builds
+        if repo and show_repo_tags:
+            # use the latest git tag when building docs
             tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
+            if not tags:
+                raise RuntimeError(f"No tags found for {project.name}")
             tag = tags[-1]
             update_html_context(project, str(tag), str(tag.commit)[:7], config)
             repo.git.checkout(str(tag))
