@@ -150,7 +150,7 @@ def import_projects(app: Sphinx, config: Config):
             if not tags:
                 # If tags don't exist just use the current commit. This occurs
                 # when the git repo fetch depth is 0.
-                tag = None
+                tag_str = "dev"
                 commit = repo.head.commit
             else:
                 tag = tags[-1]
