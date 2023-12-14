@@ -149,7 +149,7 @@ def import_projects(app: Sphinx, config: Config):
             tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
             if not tags:
                 # If tags don't exist just use the current commit. This occurs
-                # when the git repo fetch depth is 0.
+                # when the git repo is a shallow clone.
                 tag_str = "dev"
                 commit = repo.head.commit
             else:
