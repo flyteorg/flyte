@@ -46,7 +46,7 @@ jobs:
         working-directory: ${{ github.workspace }}/flyte
         shell: bash -el {0}
         env:
-            FLYTECTL_LOCAL_PATH: ${{ github.workspace }}/flytectl
+          FLYTECTL_LOCAL_PATH: ${{ github.workspace }}/flytectl
         run: |
           conda activate monodocs-env
-          make docs
+          make -C docs clean html SPHINXOPTS="-W -vvv"
