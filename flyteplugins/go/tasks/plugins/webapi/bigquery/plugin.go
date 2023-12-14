@@ -7,29 +7,23 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
-	"golang.org/x/oauth2"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/google"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	"golang.org/x/oauth2"
 	"google.golang.org/api/bigquery/v2"
 	"google.golang.org/api/googleapi"
+	"google.golang.org/api/option"
 
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"google.golang.org/api/option"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/google"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (
@@ -176,7 +170,7 @@ func (p Plugin) createImpl(ctx context.Context, taskCtx webapi.TaskExecutionCont
 	return &resourceMeta, &resource, nil
 }
 
-func createQueryJob(jobID string, custom *structpb.Struct, inputs *flyteIdlCore.LiteralMap) (*bigquery.Job, error) {
+func createQueryJob(jobID string, custom *structpb.Struct, inputs *flyteIdlCore.InputData) (*bigquery.Job, error) {
 	queryJobConfig, err := unmarshalQueryJobConfig(custom)
 
 	if err != nil {
@@ -334,16 +328,18 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, OutputLocation 
 		return nil
 	}
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
-		&flyteIdlCore.LiteralMap{
-			Literals: map[string]*flyteIdlCore.Literal{
-				"results": {
-					Value: &flyteIdlCore.Literal_Scalar{
-						Scalar: &flyteIdlCore.Scalar{
-							Value: &flyteIdlCore.Scalar_StructuredDataset{
-								StructuredDataset: &flyteIdlCore.StructuredDataset{
-									Uri: OutputLocation,
-									Metadata: &flyteIdlCore.StructuredDatasetMetadata{
-										StructuredDatasetType: resultsStructuredDatasetType.GetType().GetStructuredDatasetType(),
+		&flyteIdlCore.OutputData{
+			Outputs: &flyteIdlCore.LiteralMap{
+				Literals: map[string]*flyteIdlCore.Literal{
+					"results": {
+						Value: &flyteIdlCore.Literal_Scalar{
+							Scalar: &flyteIdlCore.Scalar{
+								Value: &flyteIdlCore.Scalar_StructuredDataset{
+									StructuredDataset: &flyteIdlCore.StructuredDataset{
+										Uri: OutputLocation,
+										Metadata: &flyteIdlCore.StructuredDatasetMetadata{
+											StructuredDatasetType: resultsStructuredDatasetType.GetType().GetStructuredDatasetType(),
+										},
 									},
 								},
 							},

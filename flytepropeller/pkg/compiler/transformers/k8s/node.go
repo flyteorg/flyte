@@ -3,13 +3,14 @@ package k8s
 import (
 	"strings"
 
+	"github.com/go-test/deep"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"github.com/go-test/deep"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Gets the compiled subgraph if this node contains an inline-declared coreWorkflow. Otherwise nil.
@@ -228,7 +229,7 @@ func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, er
 		childNodes = append(childNodes, ns...)
 		res.Else = refStr(branch.IfElse.GetElseNode().Id)
 	case *core.IfElseBlock_Error:
-		res.ElseFail = &v1alpha1.Error{Error: branch.IfElse.GetError()}
+		res.ElseFail = branch.IfElse.GetError()
 	}
 
 	other := make([]*v1alpha1.IfBlock, 0, len(branch.IfElse.Other))

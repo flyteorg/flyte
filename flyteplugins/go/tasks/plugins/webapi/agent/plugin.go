@@ -7,13 +7,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
-
 	"google.golang.org/grpc/grpclog"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
@@ -23,9 +22,9 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"google.golang.org/grpc"
 )
 
 type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
@@ -38,9 +37,10 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	State   admin.State
-	Outputs *flyteIdl.LiteralMap
-	Message string
+	State    admin.State
+	Outputs  *flyteIdl.OutputData
+	Message  string
+	LogLinks []*flyteIdl.TaskLog
 }
 
 type ResourceMetaWrapper struct {
@@ -141,9 +141,10 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	}
 
 	return ResourceWrapper{
-		State:   res.Resource.State,
-		Outputs: res.Resource.Outputs,
-		Message: res.Resource.Message,
+		State:    res.Resource.State,
+		Outputs:  res.Resource.Outputs,
+		Message:  res.Resource.Message,
+		LogLinks: res.LogLinks,
 	}, nil
 }
 
@@ -171,7 +172,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
-	taskInfo := &core.TaskInfo{}
+	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
 	switch resource.State {
 	case admin.State_PENDING:
@@ -212,6 +213,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
 	}
+
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 

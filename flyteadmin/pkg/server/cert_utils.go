@@ -4,11 +4,10 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"io/ioutil"
 
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"io/ioutil"
 )
 
 const (

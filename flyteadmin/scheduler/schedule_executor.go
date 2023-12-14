@@ -4,19 +4,18 @@ import (
 	"context"
 	"time"
 
-	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
+	"golang.org/x/time/rate"
+	"k8s.io/apimachinery/pkg/util/wait"
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/core"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/executor"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/snapshoter"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/futures"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"golang.org/x/time/rate"
-	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 const snapshotWriterDuration = 30 * time.Second

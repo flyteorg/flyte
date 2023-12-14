@@ -5,6 +5,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
+	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws/interfaces"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -13,13 +20,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/awserr"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
-	"github.com/prometheus/client_golang/prometheus"
-	"google.golang.org/grpc/codes"
 )
 
 // To indicate that a schedule rule is enabled.

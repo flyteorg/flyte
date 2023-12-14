@@ -9,8 +9,16 @@ import (
 	"path"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	errors2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -18,18 +26,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
-	structpb "github.com/golang/protobuf/ptypes/struct"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"
@@ -848,6 +844,13 @@ func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 
 func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
 			ContainerStatuses: []v1.ContainerStatus{
@@ -864,6 +867,33 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+}
+
+func TestDemystifiedSidecarStatus_PrimaryNotExistsYet(t *testing.T) {
+	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Primary",
+				},
+			},
+		},
+		Status: v1.PodStatus{
+			Phase: v1.PodRunning,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
+	}
+	res.SetAnnotations(map[string]string{
+		flytek8s.PrimaryContainerKey: "Primary",
+	})
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	assert.Nil(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }
 
 func TestGetProperties(t *testing.T) {

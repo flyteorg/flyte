@@ -11,25 +11,21 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
+	"github.com/ghodss/yaml"
+	"github.com/go-test/deep"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/go-test/deep"
-
-	"github.com/ghodss/yaml"
-
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 )
 
 var update = flag.Bool("update", false, "Update .golden files")

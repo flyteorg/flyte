@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
@@ -16,7 +16,6 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/stretchr/testify/assert"
 )
 
 var mockProjectConfigProvider = runtimeMocks.NewMockConfigurationProvider(

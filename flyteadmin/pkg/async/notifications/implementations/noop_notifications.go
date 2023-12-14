@@ -2,15 +2,13 @@ package implementations
 
 import (
 	"context"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Email to use when there is no email configuration.

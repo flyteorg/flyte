@@ -3,13 +3,13 @@ package impl
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
-	"github.com/golang/protobuf/proto"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Satisfies

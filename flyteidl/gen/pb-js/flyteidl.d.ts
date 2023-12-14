@@ -3976,6 +3976,9 @@ export namespace flyteidl {
 
             /** TypeStructure tag */
             tag?: (string|null);
+
+            /** TypeStructure dataclassType */
+            dataclassType?: ({ [k: string]: flyteidl.core.ILiteralType }|null);
         }
 
         /** Represents a TypeStructure. */
@@ -3989,6 +3992,9 @@ export namespace flyteidl {
 
             /** TypeStructure tag. */
             public tag: string;
+
+            /** TypeStructure dataclassType. */
+            public dataclassType: { [k: string]: flyteidl.core.ILiteralType };
 
             /**
              * Creates a new TypeStructure instance using the specified properties.
@@ -8272,6 +8278,9 @@ export namespace flyteidl {
 
             /** GetTaskResponse resource */
             resource?: (flyteidl.admin.IResource|null);
+
+            /** GetTaskResponse logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a GetTaskResponse. */
@@ -8285,6 +8294,9 @@ export namespace flyteidl {
 
             /** GetTaskResponse resource. */
             public resource?: (flyteidl.admin.IResource|null);
+
+            /** GetTaskResponse logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
 
             /**
              * Creates a new GetTaskResponse instance using the specified properties.

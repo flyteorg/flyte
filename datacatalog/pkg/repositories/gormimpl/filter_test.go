@@ -3,8 +3,9 @@ package gormimpl
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 )
 
 func TestGormValueFilter(t *testing.T) {

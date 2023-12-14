@@ -2,30 +2,27 @@ package cmd
 
 import (
 	"context"
+
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+	"k8s.io/client-go/rest"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
+
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	"github.com/spf13/cobra"
-
-	"golang.org/x/sync/errgroup"
-
-	"k8s.io/client-go/rest"
-
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 var webhookCmd = &cobra.Command{
@@ -121,7 +118,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 			BindAddress: "0",
 		},
 		WebhookServer: ctrlWebhook.NewServer(ctrlWebhook.Options{
-			CertDir: cfg.CertDir,
+			CertDir: cfg.ExpandCertDir(),
 			Port:    cfg.ListenPort,
 		}),
 	}

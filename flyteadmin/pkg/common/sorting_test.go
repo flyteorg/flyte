@@ -3,10 +3,10 @@ package common
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestSortParameter_Nil(t *testing.T) {

@@ -6,17 +6,16 @@ import (
 	"testing"
 	"time"
 
-	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
+	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	repoErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/golang/protobuf/proto"
-	"github.com/stretchr/testify/assert"
 )
 
 const requestID = "request id"

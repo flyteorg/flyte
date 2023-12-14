@@ -12,6 +12,7 @@ import (
 	a "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/batch"
+
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/aws"
 	definition2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/definition"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

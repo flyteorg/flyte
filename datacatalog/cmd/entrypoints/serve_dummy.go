@@ -3,10 +3,11 @@ package entrypoints
 import (
 	"context"
 
+	"github.com/spf13/cobra"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/config"
 	"github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/spf13/cobra"
 )
 
 var serveDummyCmd = &cobra.Command{

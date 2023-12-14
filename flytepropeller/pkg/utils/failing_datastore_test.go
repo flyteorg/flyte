@@ -5,8 +5,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func TestFailingRawStore(t *testing.T) {

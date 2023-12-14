@@ -4,14 +4,13 @@ import (
 	"context"
 	"os"
 
+	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	stdErrs "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
 	"github.com/flyteorg/stow"
-	"github.com/pkg/errors"
 )
 
 var (

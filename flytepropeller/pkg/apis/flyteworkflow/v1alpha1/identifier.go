@@ -3,8 +3,9 @@ package v1alpha1
 import (
 	"bytes"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/jsonpb"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type Identifier struct {

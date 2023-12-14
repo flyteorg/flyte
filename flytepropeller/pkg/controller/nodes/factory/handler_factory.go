@@ -3,12 +3,11 @@ package factory
 import (
 	"context"
 
+	"github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -23,10 +22,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
-
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/pkg/errors"
 )
 
 type handlerFactory struct {

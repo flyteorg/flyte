@@ -3,8 +3,9 @@ package ioutils
 import (
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func TestSimpleInputFilePath_GetInputPath(t *testing.T) {

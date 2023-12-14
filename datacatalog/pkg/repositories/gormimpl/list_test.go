@@ -6,11 +6,12 @@ import (
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/utils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestApplyFilter(t *testing.T) {

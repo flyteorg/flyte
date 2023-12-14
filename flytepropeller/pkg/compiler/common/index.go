@@ -1,9 +1,10 @@
 package common
 
 import (
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 // Defines an index of nodebuilders based on the id.

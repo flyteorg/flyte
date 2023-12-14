@@ -9,14 +9,13 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/stretchr/testify/assert"
 )
 
 const project, domain, name = "project", "domain", "execution name"

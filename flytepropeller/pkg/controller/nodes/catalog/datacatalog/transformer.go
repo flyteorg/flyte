@@ -23,18 +23,19 @@ const maxParamHashLength = 8
 // the literal and variable maps. So Nil and empty literals and variable maps should translate to these definitions
 // in order to have a consistent hash.
 var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
+var emptyOutputData = core.OutputData{Outputs: &emptyLiteralMap}
 var emptyVariableMap = core.VariableMap{Variables: map[string]*core.Variable{}}
 
 func getDatasetNameFromTask(taskID core.Identifier) string {
 	return fmt.Sprintf("%s-%s", taskNamespace, taskID.Name)
 }
 
-// Transform the artifact Data into task execution outputs as a literal map
-func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.TypedInterface, artifact *datacatalog.Artifact) (*core.LiteralMap, error) {
+// GenerateTaskOutputsFromArtifact transforms the artifact Data into task execution outputs as a literal map
+func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.TypedInterface, artifact *datacatalog.Artifact) (*core.OutputData, error) {
 
 	// if there are no outputs in the task, return empty map
 	if taskInterface.Outputs == nil || len(taskInterface.Outputs.Variables) == 0 {
-		return &emptyLiteralMap, nil
+		return &emptyOutputData, nil
 	}
 
 	outputVariables := taskInterface.Outputs.Variables
@@ -61,7 +62,7 @@ func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.Type
 		outputs[artifactData.Name] = artifactData.Value
 	}
 
-	return &core.LiteralMap{Literals: outputs}, nil
+	return &core.OutputData{Outputs: &core.LiteralMap{Literals: outputs}}, nil
 }
 
 func generateDataSetVersionFromTask(ctx context.Context, taskInterface core.TypedInterface, cacheVersion string) (string, error) {
@@ -115,7 +116,7 @@ func generateTaskSignatureHash(ctx context.Context, taskInterface core.TypedInte
 }
 
 // Generate a tag by hashing the input values
-func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap) (string, error) {
+func GenerateArtifactTagName(ctx context.Context, inputs *core.InputData) (string, error) {
 	hashString, err := catalog.HashLiteralMap(ctx, inputs)
 	if err != nil {
 		return "", err

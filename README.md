@@ -7,7 +7,7 @@
 </h1>
 
 <p align="center">
-  🏗️ 🚀 📈 
+  :building_construction: :rocket: :chart_with_upwards_trend: 
 </p>
 
 <p align="center">
@@ -20,21 +20,21 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
 
 <p align="center">
   <a href="https://github.com/flyteorg/flyte/releases/latest">
-    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge" alt="Current Release" /></a>
+    <img src="https://img.shields.io/github/release/flyteorg/flyte.svg?style=for-the-badge" alt="Current Release label" /></a>
   <a href="https://github.com/flyteorg/flyte/actions/workflows/sandbox.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge" alt="Sandbox Status" /></a>
+    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/sandbox.yml?label=Sandbox%20docker%20image&style=for-the-badge" alt="Sandbox Status label" /></a>
   <a href="https://github.com/flyteorg/flyte/actions/workflows/tests.yml">
-    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge" alt="Test Status" /></a>
+    <img src="https://img.shields.io/github/actions/workflow/status/flyteorg/flyte/tests.yml?label=tests&style=for-the-badge" alt="Test Status label" /></a>
   <a href="http://www.apache.org/licenses/LICENSE-2.0.html">
-    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge" alt="License" /></a>
+    <img src="https://img.shields.io/badge/LICENSE-Apache2.0-ff69b4.svg?style=for-the-badge" alt="License label" /></a>
   <a href="https://bestpractices.coreinfrastructure.org/projects/4670">
-    <img src="https://img.shields.io/badge/openssf%20best%20practices-passing-green?style=for-the-badge" alt="OpenSSF Best Practices" /></a>
+    <img src="https://img.shields.io/badge/openssf%20best%20practices-passing-green?style=for-the-badge" alt="OpenSSF Best Practices label" /></a>
   <a href="https://artifacthub.io/packages/search?repo=flyte">
-    <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart" /></a>
+    <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart label" /></a>
   <a href="https://twitter.com/flyteorg"> 
     <img src="https://img.shields.io/badge/X-000000.svg?style=for-the-badge&logo=X&logoColor=white" height=30px/></a>
-  <a href="https://slack.flyte.org">
-    <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack" /></a>
+  <a href="https://slack.flyte.org" alt="Twitter, formerly X logo label">
+    <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack label" /></a>
 </p>
 
 <h3 align="center">
@@ -47,7 +47,7 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
 
 <br />
 
-<img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
+<img alt="Getting started with Flyte, showing the welcome screen and Flyte dashboard" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
 
 ---
 
@@ -55,34 +55,34 @@ Flyte is an **open-source orchestrator** that facilitates building production-gr
 
 We ship new features, bug fixes and performance improvements regularly. Read our [release notes](https://github.com/flyteorg/flyte/releases) to stay updated.
 
-🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types. <br />
-🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
-📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/map_task.html). <br />
-🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/dynamics.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
-🌳 **Branching**: [Selectively execute branches](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/conditions.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
-📂 **FlyteFile & FlyteDirectory**: Transfer [files](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/files.html) and [directories](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/folders.html) between local and cloud storage. <br />
-🗃️ **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/data_types_and_io/structured_dataset.html). <br />
-🛡️ **Recover from failures**: Recover only the failed tasks. <br />
-🔁 **Rerun a single task**: Rerun workflows at the most granular level without modifying the previous state of a data/ML workflow. <br />
-🚦 **Versioned workflows**: Reproduce results and roll back to a previous workflow version any time. <br />
-🔍 **Cache outputs**: Cache task outputs by passing `cache=True` to the task decorator. <br />
-🚩 **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/checkpoint.html) within a task execution. <br />
-🌎 **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
-⏰ **Timeout**: Define a timeout period, after which the task is marked as failure. <br />
-🔒 **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
-🧬 **Data lineage**: Track the movement and transformation of data throughout the lifecycle of your data and ML workflows. <br />
-📈 **Data visualization**: Visualize data, monitor models and view training history through plots. <br />
-🏭 **Dev to prod**: As simple as changing your [domain](https://docs.flyte.org/en/latest/concepts/domains.html) from development or staging to production. <br />
-💸 **Spot or preemptible instances**: Schedule your workflows on spot instances by setting `interruptible` to `True` in the task decorator. <br />
-☁️ **Cloud-native deployment**: Deploy Flyte on AWS, GCP, Azure and other cloud services. <br />
-📅 **Scheduling**: [Schedule](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/lp_schedules.html) your data and ML workflows to run at a specific time. <br />
-📢 **Notifications**: Stay informed about changes to your workflow's state by configuring [notifications](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/lp_notifications.html) through Slack, PagerDuty or email. <br />
-⌛️ **Timeline view**: Evaluate the duration of each of your Flyte tasks and identify potential bottlenecks. <br />
-💨 **GPU acceleration**: Enable and control your tasks’ GPU demands by requesting resources in the task decorator. <br />
-🐳 **Dependency isolation via containers**: Maintain separate sets of dependencies for your tasks so no dependency conflicts arise. <br />
-🔀 **Parallelism**: Flyte tasks are inherently parallel to optimize resource consumption and improve performance. <br />
-💾 **Allocate resources dynamically** at the task level. <br />
-⏯️ [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
+:rocket: **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types. <br />
+:globe_with_meridians: **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
+:bar_chart: **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/map_task.html). <br />
+:star2: **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/dynamics.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
+:deciduous_tree: **Branching**: [Selectively execute branches](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/conditions.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
+:open_file_folder: **FlyteFile & FlyteDirectory**: Transfer [files](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/files.html) and [directories](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/folders.html) between local and cloud storage. <br />
+:card_file_box: **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/data_types_and_io/structured_dataset.html). <br />
+:shield: **Recover from failures**: Recover only the failed tasks. <br />
+:arrows_counterclockwise: **Rerun a single task**: Rerun workflows at the most granular level without modifying the previous state of a data/ML workflow. <br />
+:vertical_traffic_light: **Versioned workflows**: Reproduce results and roll back to a previous workflow version any time. <br />
+:mag: **Cache outputs**: Cache task outputs by passing `cache=True` to the task decorator. <br />
+:triangular_flag_on_post: **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/checkpoint.html) within a task execution. <br />
+:earth_americas: **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
+:alarm_clock: **Timeout**: Define a timeout period, after which the task is marked as failure. <br />
+:lock: **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
+:dna: **Data lineage**: Track the movement and transformation of data throughout the lifecycle of your data and ML workflows. <br />
+:chart_with_upwards_trend: **Data visualization**: Visualize data, monitor models and view training history through plots. <br />
+:factory: **Dev to prod**: As simple as changing your [domain](https://docs.flyte.org/en/latest/concepts/domains.html) from development or staging to production. <br />
+:money_with_wings: **Spot or preemptible instances**: Schedule your workflows on spot instances by setting `interruptible` to `True` in the task decorator. <br />
+:cloud: **Cloud-native deployment**: Deploy Flyte on AWS, GCP, Azure and other cloud services. <br />
+:calendar: **Scheduling**: [Schedule](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/lp_schedules.html) your data and ML workflows to run at a specific time. <br />
+:mega: **Notifications**: Stay informed about changes to your workflow's state by configuring [notifications](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/lp_notifications.html) through Slack, PagerDuty or email. <br />
+:hourglass: **Timeline view**: Evaluate the duration of each of your Flyte tasks and identify potential bottlenecks. <br />
+:fast_forward: **GPU acceleration**: Enable and control your tasks’ GPU demands by requesting resources in the task decorator. <br />
+:whale: **Dependency isolation via containers**: Maintain separate sets of dependencies for your tasks so no dependency conflicts arise. <br />
+:arrows_counterclockwise: **Parallelism**: Flyte tasks are inherently parallel to optimize resource consumption and improve performance. <br />
+:floppy_disk: **Allocate resources dynamically** at the task level. <br />
+:play_or_pause_button: [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
 
 ## Quick start
 
@@ -90,7 +90,7 @@ If you want to try out Flyte, the easiest way to get started is by using the Fly
 
 However, if you prefer to install Flyte locally and run a workflow, our [getting started guide](https://docs.flyte.org/projects/cookbook/en/latest/index.html) is the best place to start. It provides step-by-step instructions on how to install Flyte locally and run your first workflow.
 
-> If you're unsure what a Flyte [task](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/task.html) and [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/workflow.html) are, be sure to check out our guides on both!
+> If you're unsure what either a [Flyte task](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/task.html), or a [workflow](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/basics/workflow.html) is, be sure to check out our guides on both!
 
 ### Deploy Flyte to production
 
@@ -103,13 +103,13 @@ Join the likes of LinkedIn, Spotify, Freenome, Pachama, Gojek, and Woven Planet 
 
 ## Resources
 
-📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered. <br>
-👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions. <br>
-💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help. <br>
-⚠️ [GitHub](https://github.com/flyteorg/flyte): Check out the Flyte project on GitHub to file issues, contribute code, and stay up to date on the latest development. <br>
-📹 [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. <br>
-📄 [Blog](https://flyte.org/blog): Here, you can find tutorials and feature deep dives to help you learn more about Flyte. <br>
-💡 [RFCs](rfc/.): RFCs are used for proposing new ideas and features to improve Flyte. You can refer to them to stay updated on the latest developments and contribute to the growth of the platform.
+:spiral_calendar: [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered. <br>
+:couple: [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions. <br>
+:speech_balloon: [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help. <br>
+:warning: [GitHub](https://github.com/flyteorg/flyte): Check out the Flyte project on GitHub to file issues, contribute code, and stay up to date on the latest development. <br>
+:video_camera: [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. <br>
+:writing_hand: [Blog](https://flyte.org/blog): Here, you can find tutorials and feature deep dives to help you learn more about Flyte. <br>
+:bulb: [RFCs](rfc/.): RFCs are used for proposing new ideas and features to improve Flyte. You can refer to them to stay updated on the latest developments and contribute to the growth of the platform.
 
 ## How to contribute
 
@@ -121,7 +121,7 @@ There are many ways to get involved in Flyte, including:
 - Taking on a [`help wanted`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22+) or [`good-first-issue`](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22) and following the [CONTRIBUTING](https://docs.flyte.org/en/latest/community/contribute.html) guide to submit changes to the codebase.
 - Upvoting [popular feature requests](https://github.com/flyteorg/flyte/issues?q=is%3Aopen+is%3Aissue+label%3Aenhancement+sort%3Areactions-%2B1-desc) to show your support.
 
-### We ❤️ our contributors
+### We :heart: our contributors
 
 <!-- CONTRIBUTORS START -->
 

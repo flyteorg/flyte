@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	idlPlugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
 //go:generate mockery -all -case=underscore
@@ -274,7 +273,10 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 		logger.Infof(ctx, "Array is still running and waiting for resources totalWaitingForResources[%v]", totalWaitingForResources)
 		return PhaseWaitingForResources
 	}
-	if totalSuccesses >= minSuccesses && totalRunning == 0 {
+
+	// if we have enough successes, ensure all tasks are in a terminal phase (success or failure)
+	// before transitioning to the next phase.
+	if totalSuccesses >= minSuccesses && totalSuccesses+totalPermanentFailures == totalCount {
 		logger.Infof(ctx, "Array succeeded because totalSuccesses[%v] >= minSuccesses[%v]", totalSuccesses, minSuccesses)
 		return PhaseWriteToDiscovery
 	}

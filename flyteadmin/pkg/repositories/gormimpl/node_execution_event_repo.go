@@ -3,12 +3,12 @@ package gormimpl
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type NodeExecutionEventRepo struct {
@@ -19,7 +19,7 @@ type NodeExecutionEventRepo struct {
 
 func (r *NodeExecutionEventRepo) Create(ctx context.Context, input models.NodeExecutionEvent) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&input)
+	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)

@@ -2,6 +2,7 @@ package array
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -12,30 +13,30 @@ import (
 
 type staticInputReader struct {
 	io.InputFilePaths
-	input *core.LiteralMap
+	input *core.InputData
 }
 
-func (i staticInputReader) Get(_ context.Context) (*core.LiteralMap, error) {
+func (i staticInputReader) Get(_ context.Context) (*core.InputData, error) {
 	return i.input, nil
 }
 
-func newStaticInputReader(inputPaths io.InputFilePaths, input *core.LiteralMap) staticInputReader {
+func newStaticInputReader(inputPaths io.InputFilePaths, input *core.InputData) staticInputReader {
 	return staticInputReader{
 		InputFilePaths: inputPaths,
 		input:          input,
 	}
 }
 
-func constructLiteralMap(ctx context.Context, inputReader io.InputReader, index int) (*core.LiteralMap, error) {
-	inputs, err := inputReader.Get(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+func constructLiteralMap(inputs *core.LiteralMap, index int) (*core.LiteralMap, error) {
 	literals := make(map[string]*core.Literal)
 	for name, literal := range inputs.Literals {
 		if literalCollection := literal.GetCollection(); literalCollection != nil {
+			if index >= len(literalCollection.Literals) {
+				return nil, fmt.Errorf("index %v out of bounds for literal collection %v", index, name)
+			}
 			literals[name] = literalCollection.Literals[index]
+		} else {
+			literals[name] = literal
 		}
 	}
 

@@ -8,17 +8,17 @@ import (
 	"testing"
 	"time"
 
-	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
-
 	"github.com/stretchr/testify/assert"
-
-	taskErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 	v1 "k8s.io/api/core/v1"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/utils/clock"
+	testing2 "k8s.io/utils/clock/testing"
+
+	taskErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
+	stdlibErrors "github.com/flyteorg/flyte/flytestdlib/errors"
 )
 
 func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
@@ -38,7 +38,7 @@ func TestComputeResourceAwareBackOffHandler_Handle(t *testing.T) {
 	}
 
 	ctx := context.TODO()
-	tc := testing.NewFakeClock(time.Now())
+	tc := testing2.NewFakeClock(time.Now())
 	type fields struct {
 		SimpleBackOffBlocker    *SimpleBackOffBlocker
 		ComputeResourceCeilings *ComputeResourceCeilings
@@ -475,7 +475,7 @@ func TestIsResourceQuotaExceeded(t *testing.T) {
 }
 
 func TestSimpleBackOffBlocker_backOff(t *testing.T) {
-	tc := testing.NewFakeClock(time.Now())
+	tc := testing2.NewFakeClock(time.Now())
 	maxBackOffDuration := 10 * time.Minute
 	type fields struct {
 		Clock              clock.Clock

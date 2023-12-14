@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/api/core/v1"
@@ -19,7 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginCatalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -29,7 +27,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	pluginK8sMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
-
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
@@ -43,7 +40,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/fakeplugins"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -534,13 +530,12 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		expectedState              fakeplugins.NextPhaseState
 	}
 	type want struct {
-		handlerPhase    handler.EPhase
-		wantErr         bool
-		event           bool
-		eventPhase      core.TaskExecution_Phase
-		skipStateUpdate bool
-		incrParallel    bool
-		checkpoint      bool
+		handlerPhase handler.EPhase
+		wantErr      bool
+		event        bool
+		eventPhase   core.TaskExecution_Phase
+		incrParallel bool
+		checkpoint   bool
 	}
 	tests := []struct {
 		name string
@@ -670,10 +665,9 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				},
 			},
 			want{
-				handlerPhase:    handler.EPhaseRunning,
-				event:           false,
-				skipStateUpdate: true,
-				incrParallel:    true,
+				handlerPhase: handler.EPhaseRunning,
+				event:        false,
+				incrParallel: true,
 			},
 		},
 		{
@@ -742,13 +736,8 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 						expectedPhase = pluginCore.PhasePermanentFailure
 					}
 				}
-				if tt.want.skipStateUpdate {
-					assert.Equal(t, pluginCore.PhaseUndefined, state.s.PluginPhase)
-					assert.Equal(t, uint32(0), state.s.PluginPhaseVersion)
-				} else {
-					assert.Equal(t, expectedPhase.String(), state.s.PluginPhase.String())
-					assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
-				}
+				assert.Equal(t, expectedPhase.String(), state.s.PluginPhase.String())
+				assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
 				if tt.want.checkpoint {
 					assert.Equal(t, "s3://sandbox/x/name-n1-1/_flytecheckpoints",
 						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri)

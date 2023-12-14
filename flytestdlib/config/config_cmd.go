@@ -8,11 +8,10 @@ import (
 	"strings"
 	"unsafe"
 
-	"github.com/ghodss/yaml"
-	"k8s.io/apimachinery/pkg/util/sets"
-
 	"github.com/fatih/color"
+	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
+	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 const (

@@ -7,9 +7,6 @@ import (
 	"time"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -17,6 +14,9 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var createdAt = time.Date(2018, time.February, 17, 00, 00, 00, 00, time.UTC).UTC()

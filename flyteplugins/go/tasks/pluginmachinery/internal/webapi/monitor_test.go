@@ -6,25 +6,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/util/workqueue"
 
-	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
-	"github.com/stretchr/testify/mock"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/stretchr/testify/assert"
-
+	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	internalMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/internal/webapi/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func Test_monitor(t *testing.T) {
 	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
 	tCtx := &mocks.TaskExecutionContext{}
 	ctxMeta := &mocks.TaskExecutionMetadata{}
 	execID := &mocks.TaskExecutionID{}
@@ -37,7 +34,7 @@ func Test_monitor(t *testing.T) {
 	client.OnStatusMatch(ctx, mock.Anything).Return(core2.PhaseInfoSuccess(nil), nil)
 
 	wg := sync.WaitGroup{}
-	wg.Add(4)
+	wg.Add(8)
 	cacheObj, err := cache.NewAutoRefreshCache(rand.String(5), func(ctx context.Context, batch cache.Batch) (updatedBatch []cache.ItemSyncResponse, err error) {
 		wg.Done()
 		t.Logf("Syncing Item [%+v]", batch[0])
@@ -74,6 +71,7 @@ func Test_monitor(t *testing.T) {
 
 	// Wait for sync to run to actually delete the resource
 	wg.Wait()
+	cancel()
 	cachedItem, err = cacheObj.GetOrCreate("generated_name", CacheItem{Resource: "new_resource"})
 	assert.NoError(t, err)
 	assert.Equal(t, "new_resource", cachedItem.(CacheItem).Resource.(string))

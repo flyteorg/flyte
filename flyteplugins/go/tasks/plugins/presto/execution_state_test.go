@@ -6,7 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
 	prestoMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
@@ -15,13 +20,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func init() {

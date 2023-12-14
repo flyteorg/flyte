@@ -4,9 +4,9 @@ package shared
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 )
 
 const missingFieldFormat = "missing %s"

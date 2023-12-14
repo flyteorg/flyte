@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytestdlib/database"
-
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/config"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 

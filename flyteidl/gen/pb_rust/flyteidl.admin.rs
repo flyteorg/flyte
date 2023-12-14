@@ -73,6 +73,9 @@ pub struct GetTaskRequest {
 pub struct GetTaskResponse {
     #[prost(message, optional, tag="1")]
     pub resource: ::core::option::Option<Resource>,
+    /// log information for the task execution.
+    #[prost(message, repeated, tag="2")]
+    pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

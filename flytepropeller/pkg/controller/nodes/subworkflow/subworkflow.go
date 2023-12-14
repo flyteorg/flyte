@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -13,7 +12,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -66,11 +64,10 @@ func (s *subworkflowHandler) startAndHandleSubWorkflow(ctx context.Context, nCtx
 func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	// The current node would end up becoming the parent for the sub workflow nodes.
 	// This is done to track the lineage. For level zero, the CreateParentInfo will return nil
-	newParentInfo, err := common.CreateParentInfo(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID(), nCtx.CurrentAttempt())
+	execContext, err := s.getExecutionContextForDownstream(nCtx)
 	if err != nil {
 		return handler.UnknownTransition, err
 	}
-	execContext := executors.NewExecutionContextWithParentInfo(nCtx.ExecutionContext(), newParentInfo)
 	state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.StartNode())
 	if err != nil {
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
@@ -145,17 +142,22 @@ func (s *subworkflowHandler) getExecutionContextForDownstream(nCtx interfaces.No
 
 func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context, nCtx interfaces.NodeExecutionContext, subworkflow v1alpha1.ExecutableSubWorkflow, nl executors.NodeLookup) (handler.Transition, error) {
 	originalError := nCtx.NodeStateReader().GetWorkflowNodeState().Error
-	if subworkflow.GetOnFailureNode() != nil {
+	if failureNode := subworkflow.GetOnFailureNode(); failureNode != nil {
 		execContext, err := s.getExecutionContextForDownstream(nCtx)
 		if err != nil {
 			return handler.UnknownTransition, err
 		}
-		state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, subworkflow, nl, subworkflow.GetOnFailureNode())
+		status := nCtx.NodeStatus()
+		subworkflowNodeLookup := executors.NewNodeLookup(subworkflow, status, subworkflow)
+		failureNodeStatus := status.GetNodeExecutionStatus(ctx, failureNode.GetID())
+		failureNodeLookup := executors.NewFailureNodeLookup(subworkflowNodeLookup, failureNode, failureNodeStatus)
+
+		state, err := s.nodeExecutor.RecursiveNodeHandler(ctx, execContext, failureNodeLookup, failureNodeLookup, failureNode)
 		if err != nil {
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoUndefined), err
 		}
 
-		if state.NodePhase == interfaces.NodePhaseRunning {
+		if state.NodePhase == interfaces.NodePhaseQueued || state.NodePhase == interfaces.NodePhaseRunning {
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 		}
 
@@ -170,7 +172,7 @@ func (s *subworkflowHandler) HandleFailureNodeOfSubWorkflow(ctx context.Context,
 				return handler.UnknownTransition, err
 			}
 
-			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailingErr(originalError, nil)), nil
+			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 		}
 
 		// When handling the failure node succeeds, the final status will still be failure

@@ -1,22 +1,17 @@
 package array
 
 import (
-	"testing"
-
-	"github.com/flyteorg/flyte/flyteplugins/tests"
-
-	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
 	"context"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/tests"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 type AdvanceIteration func(ctx context.Context, tCtx core.TaskExecutionContext) error

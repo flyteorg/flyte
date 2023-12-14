@@ -4,11 +4,11 @@ import (
 	"errors"
 	"testing"
 
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/jackc/pgconn"
 	"github.com/magiconair/properties/assert"
 	"google.golang.org/grpc/codes"
+
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func TestToFlyteAdminError_InvalidPqError(t *testing.T) {

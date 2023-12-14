@@ -1,19 +1,19 @@
 package implementations
 
 import (
-	"testing"
-
 	"context"
+	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ses"
 	"github.com/aws/aws-sdk-go/service/ses/sesiface"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
 )
 
 func getNotificationsConfig() runtimeInterfaces.NotificationsConfig {

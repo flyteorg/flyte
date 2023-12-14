@@ -2,24 +2,25 @@ package transformers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	flyteErrs "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/protobuf/types/known/timestamppb"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 const trimmedErrMessageLen = 100
@@ -45,6 +46,7 @@ type CreateExecutionModelInput struct {
 	SecurityContext       *core.SecurityContext
 	LaunchEntity          core.ResourceType
 	Namespace             string
+	Error                 error
 }
 
 type ExecutionTransformerOptions struct {
@@ -70,12 +72,9 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	requestSpec.SecurityContext = input.SecurityContext
 	spec, err := proto.Marshal(requestSpec)
 	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Failed to serialize execution spec: %v", err)
+		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to serialize execution spec: %v", err)
 	}
-	createdAt, err := ptypes.TimestampProto(input.CreatedAt)
-	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to serialize execution created at time")
-	}
+	createdAt := timestamppb.New(input.CreatedAt)
 	closure := admin.ExecutionClosure{
 		Phase:         input.Phase,
 		CreatedAt:     createdAt,
@@ -91,11 +90,29 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	if input.Phase == core.WorkflowExecution_RUNNING {
 		closure.StartedAt = createdAt
 	}
+	if input.Error != nil {
+		closure.Phase = core.WorkflowExecution_FAILED
+		execErr := &core.ExecutionError{
+			Code:    "Unknown",
+			Message: input.Error.Error(),
+			Kind:    core.ExecutionError_SYSTEM,
+		}
+
+		var adminErr flyteErrs.FlyteAdminError
+		if errors.As(input.Error, &adminErr) {
+			execErr.Code = adminErr.Code().String()
+			execErr.Message = adminErr.Error()
+			if adminErr.Code() == codes.InvalidArgument {
+				execErr.Kind = core.ExecutionError_USER
+			}
+		}
+		closure.OutputResult = &admin.ExecutionClosure_Error{Error: execErr}
+	}
 
 	closureBytes, err := proto.Marshal(&closure)
 
 	if err != nil {
-		return nil, errors.NewFlyteAdminError(codes.Internal, "Failed to serialize launch plan status")
+		return nil, flyteErrs.NewFlyteAdminError(codes.Internal, "Failed to serialize launch plan status")
 	}
 
 	activeExecution := int32(admin.ExecutionState_EXECUTION_ACTIVE)
@@ -147,7 +164,7 @@ func reassignCluster(ctx context.Context, cluster string, executionID *core.Work
 	var executionSpec admin.ExecutionSpec
 	err := proto.Unmarshal(execution.Spec, &executionSpec)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution spec: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution spec: %v", err)
 	}
 	if executionSpec.Metadata == nil {
 		executionSpec.Metadata = &admin.ExecutionMetadata{}
@@ -158,7 +175,7 @@ func reassignCluster(ctx context.Context, cluster string, executionID *core.Work
 	executionSpec.Metadata.SystemMetadata.ExecutionCluster = cluster
 	marshaledSpec, err := proto.Marshal(&executionSpec)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution spec: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution spec: %v", err)
 	}
 	execution.Spec = marshaledSpec
 	return nil
@@ -172,7 +189,7 @@ func UpdateExecutionModelState(
 	var executionClosure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &executionClosure)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
 	}
 	executionClosure.Phase = request.Event.Phase
 	executionClosure.UpdatedAt = request.Event.OccurredAt
@@ -180,7 +197,7 @@ func UpdateExecutionModelState(
 
 	occurredAtTimestamp, err := ptypes.Timestamp(request.Event.OccurredAt)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to parse OccurredAt: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to parse OccurredAt: %v", err)
 	}
 	execution.ExecutionUpdatedAt = &occurredAtTimestamp
 
@@ -210,7 +227,7 @@ func UpdateExecutionModelState(
 			errorMsg := fmt.Sprintf("Cannot accept events for running/terminated execution [%v] from cluster [%s],"+
 				"expected events to originate from [%s]",
 				request.Event.ExecutionId, request.Event.ProducerId, execution.Cluster)
-			return errors.NewIncompatibleClusterError(ctx, errorMsg, execution.Cluster)
+			return flyteErrs.NewIncompatibleClusterError(ctx, errorMsg, execution.Cluster)
 		}
 	}
 
@@ -276,7 +293,7 @@ func UpdateExecutionModelState(
 	}
 	marshaledClosure, err := proto.Marshal(&executionClosure)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
 	}
 	execution.Closure = marshaledClosure
 	return nil
@@ -290,7 +307,7 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 	var closure admin.ExecutionClosure
 	err := proto.Unmarshal(executionModel.Closure, &closure)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
 	}
 	// Update the indexed columns
 	stateInt := int32(stateUpdatedTo)
@@ -309,7 +326,7 @@ func UpdateExecutionModelStateChangeDetails(executionModel *models.Execution, st
 	}
 	marshaledClosure, err := proto.Marshal(&closure)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
 	}
 	executionModel.Closure = marshaledClosure
 	return nil
@@ -321,7 +338,7 @@ func SetExecutionAborting(execution *models.Execution, cause, principal string) 
 	var closure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &closure)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to unmarshal execution closure: %v", err)
 	}
 	closure.OutputResult = &admin.ExecutionClosure_AbortMetadata{
 		AbortMetadata: &admin.AbortMetadata{
@@ -332,7 +349,7 @@ func SetExecutionAborting(execution *models.Execution, cause, principal string) 
 	closure.Phase = core.WorkflowExecution_ABORTING
 	marshaledClosure, err := proto.Marshal(&closure)
 	if err != nil {
-		return errors.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
+		return flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to marshal execution closure: %v", err)
 	}
 	execution.Closure = marshaledClosure
 	execution.AbortCause = cause
@@ -352,7 +369,7 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 	var spec admin.ExecutionSpec
 	var err error
 	if err = proto.Unmarshal(executionModel.Spec, &spec); err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
+		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal spec")
 	}
 	if len(opts.DefaultNamespace) > 0 {
 		if spec.Metadata == nil {
@@ -369,7 +386,7 @@ func FromExecutionModel(ctx context.Context, executionModel models.Execution, op
 
 	var closure admin.ExecutionClosure
 	if err = proto.Unmarshal(executionModel.Closure, &closure); err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
+		return nil, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal closure")
 	}
 	if closure.GetError() != nil && opts != nil && opts.TrimErrorMessage && len(closure.GetError().Message) > 0 {
 		trimmedErrOutputResult := closure.GetError()

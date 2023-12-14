@@ -3,8 +3,9 @@ package fastcheck
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	cache "github.com/hashicorp/golang-lru"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // validate that it conforms to the interface

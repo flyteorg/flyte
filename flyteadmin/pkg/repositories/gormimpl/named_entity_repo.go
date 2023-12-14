@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
@@ -14,6 +12,8 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const innerJoinTableAlias = "entities"
@@ -114,7 +114,7 @@ type NamedEntityRepo struct {
 func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) error {
 	timer := r.metrics.UpdateDuration.Start()
 	var metadata models.NamedEntityMetadata
-	tx := r.db.Where(&models.NamedEntityMetadata{
+	tx := r.db.WithContext(ctx).Where(&models.NamedEntityMetadata{
 		NamedEntityMetadataKey: models.NamedEntityMetadataKey{
 			ResourceType: input.ResourceType,
 			Project:      input.Project,
@@ -143,7 +143,7 @@ func (r *NamedEntityRepo) Get(ctx context.Context, input interfaces.GetNamedEnti
 		return models.NamedEntity{}, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, "Cannot get NamedEntityMetadata for resource type: %v", input.ResourceType)
 	}
 
-	tx := r.db.Table(tableName).Joins(joinString)
+	tx := r.db.WithContext(ctx).Table(tableName).Joins(joinString)
 
 	// Apply filters
 	tx, err = applyScopedFilters(tx, filters, nil)

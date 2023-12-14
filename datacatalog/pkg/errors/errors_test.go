@@ -1,9 +1,8 @@
 package errors
 
 import (
-	"testing"
-
 	"fmt"
+	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"

@@ -6,22 +6,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/golang/protobuf/ptypes"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/golang/protobuf/ptypes"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/util/uuid"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 )
 
 var (
@@ -99,7 +102,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		return catalog.Entry{}, errors.Wrapf(err, "DataCatalog failed to get dataset for ID %s", key.Identifier.String())
 	}
 
-	inputs := &core.LiteralMap{}
+	inputs := &core.InputData{}
 	if key.TypedInterface.Inputs != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
@@ -140,7 +143,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_MISS, md)), err
 	}
 
-	logger.Infof(ctx, "Retrieved %v outputs from artifact %v, tag: %v", len(outputs.Literals), artifact.Id, tag)
+	logger.Infof(ctx, "Retrieved %v outputs from artifact %v, tag: %v", len(outputs.GetOutputs().GetLiterals()), artifact.Id, tag)
 	return catalog.NewCatalogEntry(ioutils.NewInMemoryOutputReader(outputs, nil, nil), catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, md)), nil
 }
 
@@ -172,9 +175,9 @@ func (m *CatalogClient) CreateDataset(ctx context.Context, key catalog.Key, meta
 }
 
 // prepareInputsAndOutputs reads the inputs and outputs of a task and returns them as core.LiteralMaps to be consumed by datacatalog.
-func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog.Key, reader io.OutputReader) (inputs *core.LiteralMap, outputs *core.LiteralMap, err error) {
-	inputs = &core.LiteralMap{}
-	outputs = &core.LiteralMap{}
+func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog.Key, reader io.OutputReader) (inputs *core.InputData, outputs *core.OutputData, err error) {
+	inputs = &core.InputData{}
+	outputs = &core.OutputData{}
 	if key.TypedInterface.Inputs != nil && len(key.TypedInterface.Inputs.Variables) != 0 {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
@@ -204,12 +207,12 @@ func (m *CatalogClient) prepareInputsAndOutputs(ctx context.Context, key catalog
 
 // CreateArtifact creates an Artifact in datacatalog including its associated ArtifactData and tags it with a hash of
 // the provided input values for retrieval.
-func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.InputData, outputs *core.OutputData, metadata catalog.Metadata) (catalog.Status, error) {
 	logger.Debugf(ctx, "Creating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
 	// Create the artifact for the execution that belongs in the task
-	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.Literals))
-	for name, value := range outputs.Literals {
+	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.GetOutputs().GetLiterals()))
+	for name, value := range outputs.GetOutputs().GetLiterals() {
 		artifactData := &datacatalog.ArtifactData{
 			Name:  name,
 			Value: value,
@@ -261,11 +264,11 @@ func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, dat
 }
 
 // UpdateArtifact overwrites the ArtifactData of an existing artifact with the provided data in datacatalog.
-func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.LiteralMap, outputs *core.LiteralMap, metadata catalog.Metadata) (catalog.Status, error) {
+func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, datasetID *datacatalog.DatasetID, inputs *core.InputData, outputs *core.OutputData, metadata catalog.Metadata) (catalog.Status, error) {
 	logger.Debugf(ctx, "Updating artifact for key %+v, dataset %+v and execution %+v", key, datasetID, metadata)
 
-	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.Literals))
-	for name, value := range outputs.Literals {
+	artifactDataList := make([]*datacatalog.ArtifactData, 0, len(outputs.GetOutputs().GetLiterals()))
+	for name, value := range outputs.GetOutputs().GetLiterals() {
 		artifactData := &datacatalog.ArtifactData{
 			Name:  name,
 			Value: value,
@@ -369,7 +372,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 		return nil, err
 	}
 
-	inputs := &core.LiteralMap{}
+	inputs := &core.InputData{}
 	if key.TypedInterface.Inputs != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
@@ -409,7 +412,7 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 		return err
 	}
 
-	inputs := &core.LiteralMap{}
+	inputs := &core.InputData{}
 	if key.TypedInterface.Inputs != nil {
 		retInputs, err := key.InputReader.Get(ctx)
 		if err != nil {
@@ -472,7 +475,13 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
 
-	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor,
+	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogClientTracer)
+	opts = append(opts, grpc.WithChainUnaryInterceptor(
+		grpcPrometheus.UnaryClientInterceptor,
+		otelgrpc.UnaryClientInterceptor(
+			otelgrpc.WithTracerProvider(tracerProvider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
+		),
 		retryInterceptor))
 	clientConn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {

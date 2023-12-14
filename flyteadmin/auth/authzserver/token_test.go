@@ -14,11 +14,9 @@ import (
 	"time"
 
 	jwtgo "github.com/golang-jwt/jwt/v4"
-
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 )
 

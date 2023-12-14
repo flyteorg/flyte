@@ -10,7 +10,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/rest"
-
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
@@ -100,14 +99,19 @@ func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error
 			return apiutil.NewDynamicRESTMapper(config, http.DefaultClient)
 		}
 	}
+
 	mapper, err := options.MapperProvider(config)
 	if err != nil {
 		return nil, err
 	}
 
 	if options.CacheOptions == nil {
-		options.CacheOptions = &cache.Options{Mapper: mapper}
+		options.CacheOptions = &cache.Options{
+			HTTPClient: http.DefaultClient,
+			Mapper:     mapper,
+		}
 	}
+
 	cache, err := cache.New(config, *options.CacheOptions)
 	if err != nil {
 		return nil, err
@@ -117,12 +121,12 @@ func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error
 		options.ClientOptions = &client.Options{Mapper: mapper}
 	}
 
-	fallbackClient, err := NewFallbackClientBuilder().Build(cache, config, *options.ClientOptions)
+	client, err := client.New(config, *options.ClientOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	return newKubeClient(fallbackClient, cache), nil
+	return newKubeClient(client, cache), nil
 }
 
 // NewDefaultKubeClient creates a new KubeClient with default options set.

@@ -3,12 +3,11 @@ package handler
 import (
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/golang/protobuf/proto"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestPhaseInfoQueued(t *testing.T) {

@@ -6,14 +6,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/stretchr/testify/assert"
-
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 func TestConstructGormArgs(t *testing.T) {

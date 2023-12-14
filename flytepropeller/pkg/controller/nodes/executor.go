@@ -21,11 +21,17 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -38,23 +44,13 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	errors2 "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/golang/protobuf/ptypes"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const cacheSerializedReason = "waiting on serialized cache"
@@ -109,7 +105,7 @@ type recursiveNodeExecutor struct {
 	metrics            *nodeMetrics
 }
 
-func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.LiteralMap) (interfaces.NodeStatus, error) {
+func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execContext executors.ExecutionContext, dag executors.DAGStructureWithStartNode, nl executors.NodeLookup, inputs *core.InputData) (interfaces.NodeStatus, error) {
 	startNode := dag.StartNode()
 	ctx = contextutils.WithNodeID(ctx, startNode.GetID())
 	if inputs == nil {
@@ -513,10 +509,20 @@ func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executor
 }
 
 func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx interfaces.NodeExecutionContext,
-	recovered *admin.NodeExecution, recoveredData *admin.NodeExecutionGetDataResponse) (*core.LiteralMap, error) {
+	recovered *admin.NodeExecution, recoveredData *admin.NodeExecutionGetDataResponse) (*core.InputData, error) {
 
-	nodeInputs := recoveredData.FullInputs
+	nodeInputs := recoveredData.InputData
 	if nodeInputs != nil {
+		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
+			c.metrics.InputsWriteFailure.Inc(ctx)
+			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
+			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
+		}
+	} else if recoveredData.FullInputs != nil {
+		nodeInputs = &core.InputData{
+			Inputs: recoveredData.FullInputs,
+		}
+
 		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
 			c.metrics.InputsWriteFailure.Inc(ctx)
 			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
@@ -524,10 +530,15 @@ func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx interfaces.NodeEx
 		}
 	} else if len(recovered.InputUri) > 0 {
 		// If the inputs are too large they won't be returned inline in the RecoverData call. We must fetch them before copying them.
-		nodeInputs = &core.LiteralMap{}
-		if recoveredData.FullInputs == nil {
-			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), nodeInputs); err != nil {
+		nodeInputs = &core.InputData{}
+		if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), nodeInputs); err != nil {
+			oldInputsFormat := &core.LiteralMap{}
+			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), oldInputsFormat); err != nil {
 				return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
+			}
+
+			nodeInputs = &core.InputData{
+				Inputs: oldInputsFormat,
 			}
 		}
 
@@ -735,7 +746,7 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 		// TODO: Performance problem, we maybe in a retry loop and do not need to resolve the inputs again.
 		// For now we will do this
 		node := nCtx.Node()
-		var nodeInputs *core.LiteralMap
+		var nodeInputs *core.InputData
 		if !node.IsStartNode() {
 			if nCtx.ExecutionContext().GetExecutionConfig().RecoveryExecution.WorkflowExecutionIdentifier != nil {
 				phaseInfo, err := c.attemptRecovery(ctx, nCtx)
@@ -743,13 +754,13 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 					return phaseInfo, err
 				}
 			}
+
 			nodeStatus := nCtx.NodeStatus()
 			dataDir := nodeStatus.GetDataDir()
 			t := c.metrics.NodeInputGatherLatency.Start(ctx)
 			defer t.Stop()
 			// Can execute
-			var err error
-			nodeInputs, err = Resolve(ctx, c.outputResolver, nCtx.ContextualNodeLookup(), node.GetID(), node.GetInputBindings())
+			nodeInputLiterals, err := Resolve(ctx, c.outputResolver, nCtx.ContextualNodeLookup(), node.GetID(), node.GetInputBindings())
 			// TODO we need to handle retryable, network errors here!!
 			if err != nil {
 				c.metrics.ResolutionFailure.Inc(ctx)
@@ -757,7 +768,11 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 				return handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, "BindingResolutionFailure", err.Error(), nil), nil
 			}
 
-			if nodeInputs != nil {
+			if nodeInputLiterals != nil {
+				nodeInputs = &core.InputData{
+					Inputs: nodeInputLiterals,
+				}
+
 				inputsFile := v1alpha1.GetInputsFile(dataDir)
 				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
@@ -945,7 +960,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 	}
 
 	var cacheStatus *catalog.Status
-	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); ok {
+	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && ok {
 		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
@@ -1301,6 +1316,9 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 }
 
 func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructure, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (interfaces.NodeStatus, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/handleNode")
+	defer span.End()
+
 	logger.Debugf(ctx, "Handling Node [%s]", nCtx.NodeID())
 	defer logger.Debugf(ctx, "Completed node [%s]", nCtx.NodeID())
 

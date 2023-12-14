@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-gormigrate/gormigrate/v2"
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/go-gormigrate/gormigrate/v2"
-	"gorm.io/gorm"
 )
 
 func withDB(ctx context.Context, do func(db *gorm.DB) error) error {

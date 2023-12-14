@@ -6,19 +6,19 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+	regErrors "github.com/pkg/errors"
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-
 	pluginMachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -31,16 +31,12 @@ import (
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/golang/protobuf/ptypes"
-
-	regErrors "github.com/pkg/errors"
 )
 
 const pluginContextKey = contextutils.Key("plugin")
@@ -521,6 +517,9 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 }
 
 func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.task.Handler/HandleTask")
+	defer span.End()
+
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
@@ -544,7 +543,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	// So now we will derive this from the plugin phase
 	// TODO @kumare re-evaluate this decision
 
-	var inputs *core.LiteralMap
+	var inputs *core.InputData
 	if ts.PluginPhase == pluginCore.PhaseUndefined && t.eventConfig.RawOutputPolicy == controllerConfig.RawOutputPolicyInline {
 		// The task should only reach undefined exactly once. Since we want to send the inputs inline at some point in the task execution flow (but not necessarily every event), we send them for this event transition only.
 		// The calls to read from the catalog below may call InputReader.Get subsequent times, but the underlying implementation uses a CachedInputReader that will
@@ -575,6 +574,12 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		}
 		if pluginTrns.IsPreviouslyObserved() {
 			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
+			logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+
+			// This is a hack to ensure that we do not re-evaluate the same node again in the same round.
+			if err := nCtx.NodeStateWriter().PutTaskNodeState(ts); err != nil {
+				return handler.UnknownTransition, err
+			}
 			return pluginTrns.FinalTransition(ctx)
 		}
 	}

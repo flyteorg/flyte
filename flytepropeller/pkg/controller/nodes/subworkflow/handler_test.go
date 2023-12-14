@@ -6,29 +6,27 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
-	mocks5 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery/mocks"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	mocks4 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	mocks4 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	execMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	mocks3 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	mocks5 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type workflowNodeStateHolder struct {

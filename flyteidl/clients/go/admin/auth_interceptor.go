@@ -109,7 +109,7 @@ func setHTTPClientContext(ctx context.Context, cfg *Config, proxyCredentialsFutu
 		transport.Proxy = http.ProxyURL(&cfg.HTTPProxyURL.URL)
 	}
 
-	if cfg.ProxyCommand != nil {
+	if cfg.ProxyCommand != nil && len(cfg.ProxyCommand) > 0 {
 		httpClient.Transport = &proxyAuthTransport{
 			transport:              transport,
 			proxyCredentialsFuture: proxyCredentialsFuture,

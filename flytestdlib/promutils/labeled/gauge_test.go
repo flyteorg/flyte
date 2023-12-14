@@ -5,12 +5,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/prometheus/client_golang/prometheus/testutil"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/prometheus/client_golang/prometheus/testutil"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestLabeledGauge(t *testing.T) {

@@ -3,21 +3,19 @@ package controller
 import (
 	"context"
 	"runtime/pprof"
+	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
-	"strings"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+	"k8s.io/utils/clock"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned/typed/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/clock"
-
-	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
 type gcMetrics struct {
@@ -33,7 +31,7 @@ type GarbageCollector struct {
 	namespaceClient           corev1.NamespaceInterface
 	ttlHours                  int
 	interval                  time.Duration
-	clk                       clock.Clock
+	clk                       clock.WithTicker
 	metrics                   *gcMetrics
 	namespace                 string
 	labelSelectorRequirements []v1.LabelSelectorRequirement
@@ -169,7 +167,7 @@ func (g *GarbageCollector) StartGC(ctx context.Context) error {
 	return nil
 }
 
-func NewGarbageCollector(cfg *config.Config, scope promutils.Scope, clk clock.Clock, namespaceClient corev1.NamespaceInterface, wfClient v1alpha1.FlyteworkflowV1alpha1Interface) (*GarbageCollector, error) {
+func NewGarbageCollector(cfg *config.Config, scope promutils.Scope, clk clock.WithTicker, namespaceClient corev1.NamespaceInterface, wfClient v1alpha1.FlyteworkflowV1alpha1Interface) (*GarbageCollector, error) {
 	ttl := 23
 	if cfg.MaxTTLInHours < 23 {
 		ttl = cfg.MaxTTLInHours

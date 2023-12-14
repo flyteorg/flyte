@@ -25,12 +25,13 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/golang/protobuf/ptypes"
+	"github.com/pkg/errors"
+
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/pkg/errors"
 )
 
 var alphaNumericOnly = regexp.MustCompile("[^a-zA-Z0-9_]+")
@@ -130,7 +131,7 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 	if err != nil {
 		return val, errors.Wrapf(err, "unable to read inputs")
 	}
-	if inputs == nil || inputs.Literals == nil {
+	if inputs == nil || inputs.GetInputs().GetLiterals() == nil {
 		return val, nil
 	}
 
@@ -153,8 +154,8 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 	return val, nil
 }
 
-func transformVarNameToStringVal(ctx context.Context, varName string, inputs *idlCore.LiteralMap) (string, error) {
-	inputVal, exists := inputs.Literals[varName]
+func transformVarNameToStringVal(ctx context.Context, varName string, inputs *idlCore.InputData) (string, error) {
+	inputVal, exists := inputs.GetInputs().GetLiterals()[varName]
 	if !exists {
 		return "", fmt.Errorf("requested input is not found [%s]", varName)
 	}

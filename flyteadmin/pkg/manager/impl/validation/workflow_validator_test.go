@@ -5,13 +5,13 @@ import (
 	"errors"
 	"testing"
 
-	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
-	"github.com/stretchr/testify/assert"
+	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var workflowConfig = testutils.GetApplicationConfigWithDefaultDomains()

@@ -114,6 +114,12 @@ message UnionType {
 message TypeStructure {
     // Must exactly match for types to be castable
     string tag = 1;
+    // dataclass_type only exists for dataclasses.
+    // This is used to resolve the type of the fields of dataclass
+    // The key is the field name, and the value is the literal type of the field
+    // e.g. For dataclass Foo, with fields a, and a is a string
+    // Foo.a will be resolved as a literal type of string from dataclass_type
+    map<string, LiteralType> dataclass_type = 2;
 }
 
 // TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.

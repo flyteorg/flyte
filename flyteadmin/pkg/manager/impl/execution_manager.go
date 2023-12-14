@@ -7,14 +7,6 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -41,6 +33,14 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const childContainerQueueKey = "child_queue"
@@ -164,11 +164,8 @@ func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *
 		LaunchPlan:   launchPlanName,
 		ResourceType: admin.MatchableResource_PLUGIN_OVERRIDE,
 	})
-	if err != nil {
-		ec, ok := err.(errors.FlyteAdminError)
-		if !ok || ec.Code() != codes.NotFound {
-			return nil, err
-		}
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		return nil, err
 	}
 	if override != nil && override.Attributes != nil && override.Attributes.GetPluginOverrides() != nil {
 		return override.Attributes.GetPluginOverrides().Overrides, nil
@@ -427,11 +424,9 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 		Domain:       request.Domain,
 		ResourceType: admin.MatchableResource_CLUSTER_ASSIGNMENT,
 	})
-	if err != nil {
-		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
-			logger.Errorf(ctx, "Failed to get cluster assignment overrides with error: %v", err)
-			return nil, err
-		}
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		logger.Errorf(ctx, "Failed to get cluster assignment overrides with error: %v", err)
+		return nil, err
 	}
 	if resource != nil && resource.Attributes.GetClusterAssignment() != nil {
 		return resource.Attributes.GetClusterAssignment(), nil
@@ -850,26 +845,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
 	}
 
-	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
-	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
-		Namespace:                namespace,
-		ExecutionID:              &workflowExecutionID,
-		ReferenceWorkflowName:    workflow.Id.Name,
-		ReferenceLaunchPlanName:  launchPlan.Id.Name,
-		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
-		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
-		ExecutionParameters:      executionParameters,
-	})
-
-	if err != nil {
-		m.systemMetrics.PropellerFailures.Inc()
-		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
-			request, workflowExecutionID, executionInputs, err)
-		return nil, nil, err
-	}
 	executionCreatedAt := time.Now()
 	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
-	m.systemMetrics.AcceptanceDelay.Observe(acceptanceDelay.Seconds())
 
 	// Request notification settings takes precedence over the launch plan settings.
 	// If there is no notification in the request and DisableAll is not true, use the settings from the launch plan.
@@ -884,7 +861,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
-	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
+	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
 		LaunchPlanID:        launchPlanModel.ID,
@@ -896,13 +873,34 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		WorkflowIdentifier:    workflow.Id,
 		ParentNodeExecutionID: parentNodeExecutionID,
 		SourceExecutionID:     sourceExecutionID,
-		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
 		SecurityContext:       executionConfig.SecurityContext,
 		LaunchEntity:          launchPlan.Id.ResourceType,
 		Namespace:             namespace,
+	}
+
+	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
+	execInfo, execErr := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
+		Namespace:                namespace,
+		ExecutionID:              &workflowExecutionID,
+		ReferenceWorkflowName:    workflow.Id.Name,
+		ReferenceLaunchPlanName:  launchPlan.Id.Name,
+		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
+		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
+		ExecutionParameters:      executionParameters,
 	})
+	if execErr != nil {
+		createExecModelInput.Error = execErr
+		m.systemMetrics.PropellerFailures.Inc()
+		logger.Infof(ctx, "failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
+			request, workflowExecutionID, executionInputs, execErr)
+	} else {
+		m.systemMetrics.AcceptanceDelay.Observe(acceptanceDelay.Seconds())
+		createExecModelInput.Cluster = execInfo.Cluster
+	}
+
+	executionModel, err := transformers.CreateExecutionModel(createExecModelInput)
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
 			workflowExecutionID, err)

@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/golang/glog"
+
 	"github.com/flyteorg/flyte/flyteadmin/cmd/entrypoints"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	"github.com/golang/glog"
 )
 
 func main() {

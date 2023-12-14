@@ -7,11 +7,9 @@ import (
 	"strconv"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/errorcollector"
-
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
@@ -22,7 +20,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/k8s"
-
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -172,7 +169,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 	arrayNodeState := nCtx.NodeStateReader().GetArrayNodeState()
 	currentArrayNodePhase := arrayNodeState.Phase
 
-	taskPhaseVersion := arrayNodeState.TaskPhaseVersion
+	incrementTaskPhaseVersion := false
 	eventRecorder := newArrayEventRecorder(nCtx.EventsRecorder())
 
 	switch currentArrayNodePhase {
@@ -184,7 +181,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		size := -1
-		for _, variable := range literalMap.Literals {
+		for _, variable := range literalMap.GetInputs().GetLiterals() {
 			literalType := validators.LiteralTypeForLiteral(variable)
 			switch literalType.Type.(type) {
 			case *idlcore.LiteralType_CollectionType:
@@ -249,6 +246,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		messageCollector := errorcollector.NewErrorMessageCollector()
 		for i, nodePhaseUint64 := range arrayNodeState.SubNodePhases.GetItems() {
 			nodePhase := v1alpha1.NodePhase(nodePhaseUint64)
+			taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(i))
 
 			// do not process nodes in terminal state
 			if isTerminalNodePhase(nodePhase) {
@@ -286,6 +284,11 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 			arrayNodeState.SubNodeRetryAttempts.SetItem(i, uint64(subNodeStatus.GetAttempts()))
 			arrayNodeState.SubNodeSystemFailures.SetItem(i, uint64(subNodeStatus.GetSystemFailures()))
+
+			// increment task phase version if subNode phase or task phase changed
+			if subNodeStatus.GetPhase() != nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != taskPhase {
+				incrementTaskPhaseVersion = true
+			}
 		}
 
 		// process phases of subNodes to determine overall `ArrayNode` phase
@@ -390,7 +393,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				}
 
 				// copy individual subNode output literals into a collection of output literals
-				for name, literal := range outputs.GetLiterals() {
+				for name, literal := range outputs.GetOutputs().GetLiterals() {
 					appendLiteral(name, literal, outputLiterals, len(arrayNodeState.SubNodePhases.GetItems()))
 				}
 			}
@@ -432,17 +435,15 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			taskPhase = idlcore.TaskExecution_FAILED
 		}
 
-		// need to increment taskPhaseVersion if arrayNodeState.Phase does not change, otherwise
-		// reset to 0. by incrementing this always we report an event and ensure processing
-		// every time the ArrayNode is evaluated. if this overhead becomes too large, we will need
-		// to revisit and only increment when any subNode state changes.
+		// if the ArrayNode phase has changed we need to reset the taskPhaseVersion to 0, otherwise
+		// increment it if we detect any changes in subNode state.
 		if currentArrayNodePhase != arrayNodeState.Phase {
 			arrayNodeState.TaskPhaseVersion = 0
-		} else {
-			arrayNodeState.TaskPhaseVersion = taskPhaseVersion + 1
+		} else if incrementTaskPhaseVersion {
+			arrayNodeState.TaskPhaseVersion = arrayNodeState.TaskPhaseVersion + 1
 		}
 
-		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, taskPhaseVersion, a.eventConfig); err != nil {
+		if err := eventRecorder.finalize(ctx, nCtx, taskPhase, arrayNodeState.TaskPhaseVersion, a.eventConfig); err != nil {
 			logger.Errorf(ctx, "ArrayNode event recording failed: [%s]", err.Error())
 			return handler.UnknownTransition, err
 		}
@@ -497,12 +498,19 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	taskPhase := int(arrayNodeState.SubNodeTaskPhases.GetItem(subNodeIndex))
 
 	// need to initialize the inputReader every time to ensure TaskHandler can access for cache lookups / population
-	inputLiteralMap, err := constructLiteralMap(ctx, nCtx.InputReader(), subNodeIndex)
+	inputs, err := nCtx.InputReader().Get(ctx)
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
 
-	inputReader := newStaticInputReader(nCtx.InputReader(), inputLiteralMap)
+	inputLiteralMap, err := constructLiteralMap(inputs.GetInputs(), subNodeIndex)
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+
+	inputReader := newStaticInputReader(nCtx.InputReader(), &idlcore.InputData{
+		Inputs: inputLiteralMap,
+	})
 
 	// wrap node lookup
 	subNodeSpec := *arrayNode.GetSubNodeSpec()

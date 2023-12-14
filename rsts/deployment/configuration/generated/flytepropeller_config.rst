@@ -12,6 +12,8 @@ Flyte Propeller Configuration
 
 - `logger <#section-logger>`_
 
+- `otel <#section-otel>`_
+
 - `plugins <#section-plugins>`_
 
 - `propeller <#section-propeller>`_
@@ -286,6 +288,18 @@ command ([]string)
 ------------------------------------------------------------------------------------------------------------------------
 
 Command for external authentication token generation
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  []
+  
+
+proxyCommand ([]string)
+------------------------------------------------------------------------------------------------------------------------
+
+Command for external proxy-authorization token generation
 
 **Default Value**: 
 
@@ -723,6 +737,75 @@ Sets logging format type.
   json
   
 
+Section: otel
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of exporter to configure [noop/file/jaeger].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+file (`otelutils.FileConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a file
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  filename: /tmp/trace.txt
+  
+
+jaeger (`otelutils.JaegerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a jaeger
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:14268/api/traces
+  
+
+otelutils.FileConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+filename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Filename to store exported telemetry traces
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /tmp/trace.txt
+  
+
+otelutils.JaegerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the jaeger telemtry trace ingestor
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:14268/api/traces
+  
+
 Section: plugins
 ========================================================================================================================
 
@@ -746,6 +829,9 @@ agent-service (`agent.Config`_)
       Value: 50
     ProjectScopeResourceConstraint:
       Value: 100
+  supportedTaskTypes:
+  - task_type_1
+  - task_type_2
   webApi:
     caching:
       maxSystemFailures: 5
@@ -896,6 +982,16 @@ databricks (`databricks.Config`_)
       qps: 10
   
 
+echo (`testing.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  sleep-duration: 0s
+  
+
 k8s (`config.K8sPluginConfig`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -931,7 +1027,11 @@ k8s (`config.K8sPluginConfig`_)
   default-tolerations: null
   delete-resource-on-finalize: false
   enable-host-networking-pod: null
+  gpu-device-node-label: k8s.amazonaws.com/accelerator
+  gpu-partition-size-node-label: k8s.amazonaws.com/gpu-partition-size
   gpu-resource-name: nvidia.com/gpu
+  gpu-unpartitioned-node-selector-requirement: null
+  gpu-unpartitioned-toleration: null
   image-pull-backoff-grace-period: 3m0s
   inject-finalizer: false
   interruptible-node-selector: null
@@ -940,6 +1040,7 @@ k8s (`config.K8sPluginConfig`_)
   non-interruptible-node-selector-requirement: null
   resource-tolerations: null
   scheduler-name: ""
+  send-object-events: false
   
 
 k8s-array (`k8s.Config`_)
@@ -1055,6 +1156,7 @@ ray (`ray.Config`_)
 .. code-block:: yaml
 
   dashboardHost: 0.0.0.0
+  dashboardURLTemplate: null
   defaults:
     headNode:
       ipAddress: $MY_POD_IP
@@ -1079,6 +1181,7 @@ ray (`ray.Config`_)
     stackdriver-logresourcename: ""
     stackdriver-template-uri: ""
     templates: null
+  logsSidecar: null
   remoteClusterConfig:
     auth:
       caCertPath: ""
@@ -1089,25 +1192,6 @@ ray (`ray.Config`_)
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
-  
-
-sagemaker (`config.Config (sagemaker)`_)
-------------------------------------------------------------------------------------------------------------------------
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  prebuiltAlgorithms:
-  - name: xgboost
-    regionalConfigs:
-    - region: us-east-1
-      versionConfigs:
-      - image: 683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3
-        version: "0.90"
-  region: us-east-1
-  roleAnnotationKey: ""
-  roleArn: default_role
   
 
 snowflake (`snowflake.Config`_)
@@ -1284,6 +1368,17 @@ agentForTaskTypes (map[string]string)
 .. code-block:: yaml
 
   null
+  
+
+supportedTaskTypes ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  - task_type_1
+  - task_type_2
   
 
 agent.Agent
@@ -2027,60 +2122,6 @@ destinationClusterConfigs ([]config.DestinationClusterConfig)
   []
   
 
-config.Config (sagemaker)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-roleArn (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-The role the SageMaker plugin uses to communicate with the SageMaker service
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  default_role
-  
-
-region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-The AWS region the SageMaker plugin communicates to
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  us-east-1
-  
-
-roleAnnotationKey (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Map key to use to lookup role from task annotations.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-prebuiltAlgorithms ([]config.PrebuiltAlgorithmConfig)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  - name: xgboost
-    regionalConfigs:
-    - region: us-east-1
-      versionConfigs:
-      - image: 683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3
-        version: "0.90"
-  
-
 config.K8sPluginConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2305,6 +2346,46 @@ image-pull-backoff-grace-period (`config.Duration`_)
   3m0s
   
 
+gpu-device-node-label (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  k8s.amazonaws.com/accelerator
+  
+
+gpu-partition-size-node-label (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  k8s.amazonaws.com/gpu-partition-size
+  
+
+gpu-unpartitioned-node-selector-requirement (v1.NodeSelectorRequirement)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+gpu-unpartitioned-toleration (v1.Toleration)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
 gpu-resource-name (string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2377,6 +2458,18 @@ Frequency of resyncing default pod templates
 .. code-block:: yaml
 
   30s
+  
+
+send-object-events (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+If true, will send k8s object events in TaskExecutionEvent updates.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.FlyteCoPilotConfig
@@ -3076,7 +3169,7 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-templates ([]logs.TemplateLogPluginConfig)
+templates ([]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3249,7 +3342,7 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-templates ([]logs.TemplateLogPluginConfig)
+templates ([]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3358,6 +3451,28 @@ logs (`logs.LogConfig`_)
   stackdriver-logresourcename: ""
   stackdriver-template-uri: ""
   templates: null
+  
+
+logsSidecar (v1.Container)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+dashboardURLTemplate (tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template for URL of Ray dashboard running on a head node.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 defaults (`ray.DefaultConfig`_)
@@ -3709,6 +3824,21 @@ All user logs across driver and executors.
   templates: null
   
 
+testing.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sleep-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Indicates the amount of time before transitioning to success
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
+  
+
 Section: propeller
 ========================================================================================================================
 
@@ -4000,7 +4130,9 @@ config for a workflow node
     node-active-deadline: 0s
     node-execution-deadline: 0s
     workflow-active-deadline: 0s
-  interruptible-failure-threshold: 1
+  default-max-attempts: 1
+  ignore-retry-cause: false
+  interruptible-failure-threshold: -1
   max-node-retries-system-failures: 3
   
 
@@ -4123,6 +4255,18 @@ Enable creation of the FlyteWorkflow CRD on startup
 .. code-block:: yaml
 
   "false"
+  
+
+array-node-event-version (int)
+------------------------------------------------------------------------------------------------------------------------
+
+ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "0"
   
 
 admin-launcher (`launchplan.AdminConfig`_)
@@ -4583,16 +4727,40 @@ Maximum number of retries per node for node failure due to infra issues
   "3"
   
 
-interruptible-failure-threshold (int64)
+interruptible-failure-threshold (int32)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-number of failures for a node to be still considered interruptible'
+number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "-1"
+  
+
+default-max-attempts (int32)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Default maximum number of attempts for a node
 
 **Default Value**: 
 
 .. code-block:: yaml
 
   "1"
+  
+
+ignore-retry-cause (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Ignore retry cause and count all attempts toward a node's max attempts
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
   
 
 config.DefaultDeadlines
@@ -5343,6 +5511,16 @@ requests (v1.ResourceList)
 
   cpu: 200m
   memory: 500Mi
+  
+
+claims ([]v1.ResourceClaim)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 config.GCPSecretManagerConfig

@@ -7,14 +7,12 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	viperLib "github.com/spf13/viper"
-
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/pflag"
+	viperLib "github.com/spf13/viper"
+
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type Viper interface {

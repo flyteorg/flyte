@@ -6,25 +6,22 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	eventErrors "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	workflowErrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore/mocks"
-
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	storagemocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type mockExecutor struct {

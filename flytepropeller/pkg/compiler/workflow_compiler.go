@@ -34,14 +34,14 @@ package compiler
 import (
 	"strings"
 
+	// #noSA1019
+	"github.com/golang/protobuf/proto"
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	v "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-
-	// #noSA1019
-	"github.com/golang/protobuf/proto"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 // Updates workflows and tasks references to reflect the needed ones for this workflow (ignoring subworkflows)
@@ -223,6 +223,12 @@ func (w workflowBuilder) ValidateWorkflow(fg *flyteWorkflow, errs errors.Compile
 		}
 
 		wf.AddEdges(n, c.EdgeDirectionBidirectional, errs.NewScope())
+	}
+
+	if fg.Template.FailureNode != nil {
+		failureNode := fg.Template.FailureNode
+		v.ValidateNode(&wf, wf.GetOrCreateNodeBuilder(failureNode), false, errs.NewScope())
+		wf.AddEdges(wf.GetOrCreateNodeBuilder(failureNode), c.EdgeDirectionUpstream, errs.NewScope())
 	}
 
 	// Add execution edges for orphan nodes that don't have any inward/outward edges.

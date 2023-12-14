@@ -36,10 +36,10 @@ type LaunchContext struct {
 // Executor interface to be implemented by the remote system that can allow workflow launching capabilities
 type Executor interface {
 	// Launch start an execution of a launchplan
-	Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error
+	Launch(ctx context.Context, launchCtx LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.InputData) error
 
 	// GetStatus retrieves status of a LaunchPlan execution
-	GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error)
+	GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.OutputData, error)
 
 	// Kill a remote execution
 	Kill(ctx context.Context, executionID *core.WorkflowExecutionIdentifier, reason string) error

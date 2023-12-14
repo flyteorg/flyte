@@ -4,13 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
 )
 
 var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
@@ -295,7 +294,7 @@ func TestValidateSchedule_NoSchedule(t *testing.T) {
 }
 
 func TestValidateSchedule_ArgNotFixed(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
@@ -314,7 +313,7 @@ func TestValidateSchedule_ArgNotFixed(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{},
 	}
@@ -325,7 +324,7 @@ func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
@@ -345,7 +344,7 @@ func TestValidateSchedule_KickoffTimeArgPointsAtWrongType(t *testing.T) {
 }
 
 func TestValidateSchedule_NoRequired(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {
@@ -364,7 +363,7 @@ func TestValidateSchedule_NoRequired(t *testing.T) {
 }
 
 func TestValidateSchedule_KickoffTimeBound(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
 	inputMap := &core.ParameterMap{
 		Parameters: map[string]*core.Parameter{
 			"foo": {

@@ -3,10 +3,10 @@ package validators
 import (
 	"fmt"
 
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
-	"google.golang.org/grpc/codes"
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 )
 
 const missingFieldFormat = "missing %s"

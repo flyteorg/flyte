@@ -3,10 +3,10 @@ package shardstrategy
 import (
 	"fmt"
 
+	v1 "k8s.io/api/core/v1"
+
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
-	v1 "k8s.io/api/core/v1"
 )
 
 // HashShardStrategy evenly assigns disjoint keyspace responsibilities over a collection of pods.

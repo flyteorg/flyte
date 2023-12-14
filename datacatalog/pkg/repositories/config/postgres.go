@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytestdlib/database"
-	stdlibLogger "github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+	"gorm.io/plugin/opentelemetry/tracing"
+
+	"github.com/flyteorg/flyte/flytestdlib/database"
+	stdlibLogger "github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (
@@ -76,6 +78,11 @@ func OpenDbConnection(ctx context.Context, config DbConnectionConfigProvider) (*
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogGormTracer)
+	if err := db.Use(tracing.NewPlugin(tracing.WithTracerProvider(tracerProvider), tracing.WithoutMetrics())); err != nil {
+		return nil, fmt.Errorf("failed to enable tracing for gorm db, %w", err)
 	}
 
 	return db, setupDbConnectionPool(db, &dbConfig)

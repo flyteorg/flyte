@@ -5,17 +5,17 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
 
 func TestExtractCurrentCondition(t *testing.T) {
@@ -220,8 +220,9 @@ func dummyPodSpec() v1.PodSpec {
 	return v1.PodSpec{
 		Containers: []v1.Container{
 			{
-				Name: "primary container",
-				Args: []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
+				Name:  "primary container",
+				Args:  []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"},
+				Image: "dummy-image",
 				Resources: v1.ResourceRequirements{
 					Limits: v1.ResourceList{
 						"cpu":    resource.MustParse("2"),
@@ -270,50 +271,21 @@ func TestOverrideContainerSpec(t *testing.T) {
 	podSpec := dummyPodSpec()
 	err := OverrideContainerSpec(
 		&podSpec, "primary container", "testing-image",
-		&core.Resources{
-			Requests: []*core.Resources_ResourceEntry{
-				{Name: core.Resources_CPU, Value: "250m"},
-			},
-			Limits: []*core.Resources_ResourceEntry{
-				{Name: core.Resources_CPU, Value: "500m"},
-			},
-		},
 		[]string{"python", "-m", "run.py"},
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(podSpec.Containers))
 	assert.Equal(t, "testing-image", podSpec.Containers[0].Image)
-	assert.NotNil(t, podSpec.Containers[0].Resources.Limits)
-	assert.NotNil(t, podSpec.Containers[0].Resources.Requests)
-	// verify resources not overridden if empty resources
-	assert.True(t, podSpec.Containers[0].Resources.Requests.Cpu().Equal(resource.MustParse("250m")))
-	assert.True(t, podSpec.Containers[0].Resources.Limits.Cpu().Equal(resource.MustParse("500m")))
 	assert.Equal(t, []string{"python", "-m", "run.py"}, podSpec.Containers[0].Args)
 }
 
 func TestOverrideContainerSpecEmptyFields(t *testing.T) {
 	podSpec := dummyPodSpec()
-	err := OverrideContainerSpec(&podSpec, "primary container", "", &core.Resources{}, []string{})
+	err := OverrideContainerSpec(&podSpec, "primary container", "", []string{})
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(podSpec.Containers))
-	assert.NotNil(t, podSpec.Containers[0].Resources.Limits)
-	assert.NotNil(t, podSpec.Containers[0].Resources.Requests)
-	// verify resources not overridden if empty resources
-	assert.True(t, podSpec.Containers[0].Resources.Requests.Cpu().Equal(resource.MustParse("1")))
-	assert.True(t, podSpec.Containers[0].Resources.Requests.Memory().Equal(resource.MustParse("100Mi")))
-	assert.True(t, podSpec.Containers[0].Resources.Limits.Cpu().Equal(resource.MustParse("2")))
-	assert.True(t, podSpec.Containers[0].Resources.Limits.Memory().Equal(resource.MustParse("200Mi")))
-}
-
-func TestOverrideContainerNilResources(t *testing.T) {
-	podSpec := dummyPodSpec()
-	podSpecCopy := podSpec.DeepCopy()
-
-	err := OverrideContainerSpec(&podSpec, "primary container", "", nil, []string{})
-	assert.NoError(t, err)
-	assert.Equal(t, 2, len(podSpec.Containers))
-	assert.Equal(t, podSpec.Containers[0].Resources.Limits, podSpecCopy.Containers[0].Resources.Limits)
-	assert.Equal(t, podSpec.Containers[0].Resources.Requests, podSpecCopy.Containers[0].Resources.Requests)
+	assert.Equal(t, "dummy-image", podSpec.Containers[0].Image)
+	assert.Equal(t, []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"}, podSpec.Containers[0].Args)
 }
 
 func dummyTaskContext() pluginsCore.TaskExecutionContext {

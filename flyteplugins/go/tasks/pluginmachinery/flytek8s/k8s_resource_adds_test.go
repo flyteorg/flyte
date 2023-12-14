@@ -6,15 +6,14 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	v12 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 )
 
 func TestGetExecutionEnvVars(t *testing.T) {
@@ -226,6 +225,10 @@ func (m mockTaskExecutionIdentifier) GetGeneratedNameWith(minLength, maxLength i
 
 func (m mockTaskExecutionIdentifier) GetGeneratedName() string {
 	return "task-exec-name"
+}
+
+func (m mockTaskExecutionIdentifier) GetUniqueNodeID() string {
+	return "unique-node-id"
 }
 
 func TestDecorateEnvVars(t *testing.T) {

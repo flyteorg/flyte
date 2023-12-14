@@ -6,18 +6,16 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/structpb"
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/stretchr/testify/assert"
-
-	"google.golang.org/protobuf/types/known/structpb"
-
-	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func getMockTaskResources() workflowengineInterfaces.TaskResources {

@@ -1,5 +1,7 @@
 
 flyteadmin:
+  serviceMonitor:
+    enabled: false
   service:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc

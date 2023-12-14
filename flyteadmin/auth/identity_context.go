@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
-	"k8s.io/apimachinery/pkg/util/sets"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 var (

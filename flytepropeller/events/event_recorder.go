@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/golang/protobuf/proto"
 )
 
 const MaxErrorMessageLength = 104857600 //100KB

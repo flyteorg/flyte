@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/golang/protobuf/proto"
 )
 
 // TODO: Add a counter that encompasses the publisher stats grouped by project and domain.

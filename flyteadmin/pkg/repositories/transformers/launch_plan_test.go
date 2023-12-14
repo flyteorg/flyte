@@ -4,14 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var active = int32(admin.LaunchPlanState_ACTIVE)
@@ -84,7 +84,18 @@ func TestToLaunchPlanModel(t *testing.T) {
 }
 
 func TestToLaunchPlanModelWithCronSchedule(t *testing.T) {
-	lpRequest := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
+
+	t.Run("deprecated cron schedule", func(t *testing.T) {
+		lpRequest := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
+		testLaunchPlanWithCronInternal(t, lpRequest)
+	})
+	t.Run("cron schedule", func(t *testing.T) {
+		lpRequest := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
+		testLaunchPlanWithCronInternal(t, lpRequest)
+	})
+}
+
+func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCreateRequest) {
 	lpRequest.Spec.DefaultInputs = expectedInputs
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")

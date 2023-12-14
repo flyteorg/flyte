@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // Implementation of NodeExecutionInterface.
@@ -23,7 +23,7 @@ type NodeExecutionRepo struct {
 
 func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeExecution) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&execution)
+	tx := r.db.WithContext(ctx).Omit("id").Create(&execution)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -34,7 +34,7 @@ func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeEx
 func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.NodeExecution{
+	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: input.NodeExecutionIdentifier.NodeId,
 			ExecutionKey: models.ExecutionKey{
@@ -66,7 +66,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.NodeExecution{
+	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: input.NodeExecutionIdentifier.NodeId,
 			ExecutionKey: models.ExecutionKey{
@@ -97,7 +97,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 
 func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.Model(&nodeExecution).Updates(nodeExecution)
+	tx := r.db.WithContext(ctx).Model(&nodeExecution).Updates(nodeExecution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
@@ -112,7 +112,7 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 		return interfaces.NodeExecutionCollectionOutput{}, err
 	}
 	var nodeExecutions []models.NodeExecution
-	tx := r.db.Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecutions")
+	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecutions")
 	// And add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// (this query isn't called for deletes).
 	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
@@ -144,7 +144,7 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.ExistsDuration.Start()
-	tx := r.db.Select(ID).Where(&models.NodeExecution{
+	tx := r.db.WithContext(ctx).Select(ID).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: input.NodeExecutionIdentifier.NodeId,
 			ExecutionKey: models.ExecutionKey{
@@ -163,7 +163,7 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExe
 
 func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
 	var err error
-	tx := r.db.Model(&models.NodeExecution{}).Preload("ChildNodeExecutions")
+	tx := r.db.WithContext(ctx).Model(&models.NodeExecution{}).Preload("ChildNodeExecutions")
 
 	// Add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// (this query isn't called for deletes).

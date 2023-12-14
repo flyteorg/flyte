@@ -2,7 +2,6 @@ package notifications
 
 import (
 	"fmt"
-
 	"strings"
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"

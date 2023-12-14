@@ -3,11 +3,11 @@ package k8s
 import (
 	"math"
 
+	"github.com/golang/protobuf/ptypes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/golang/protobuf/ptypes"
 )
 
 func refInt(i int) *int {

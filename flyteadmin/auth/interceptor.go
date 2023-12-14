@@ -3,10 +3,11 @@ package auth
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func BlanketAuthorization(ctx context.Context, req interface{}, _ *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (

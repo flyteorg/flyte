@@ -6,18 +6,16 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 	"os"
-
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
-	"context"
-
 	"sync"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
+
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 

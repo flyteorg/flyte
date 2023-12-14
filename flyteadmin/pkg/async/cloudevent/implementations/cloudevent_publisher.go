@@ -7,21 +7,16 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
-
 	cloudevents "github.com/cloudevents/sdk-go/v2"
-
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
-
+	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/golang/protobuf/proto"
 )
 
 const (

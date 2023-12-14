@@ -3,17 +3,14 @@ package athena
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-
-	pluginsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
-
 	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocation string) error {
@@ -34,16 +31,18 @@ func writeOutput(ctx context.Context, tCtx webapi.StatusContext, externalLocatio
 	}
 
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
-		&pb.LiteralMap{
-			Literals: map[string]*pb.Literal{
-				"results": {
-					Value: &pb.Literal_Scalar{
-						Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
-							Schema: &pb.Schema{
-								Uri:  externalLocation,
-								Type: resultsSchema.GetType().GetSchema(),
+		&pb.OutputData{
+			Outputs: &pb.LiteralMap{
+				Literals: map[string]*pb.Literal{
+					"results": {
+						Value: &pb.Literal_Scalar{
+							Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
+								Schema: &pb.Schema{
+									Uri:  externalLocation,
+									Type: resultsSchema.GetType().GetSchema(),
+								},
 							},
-						},
+							},
 						},
 					},
 				},

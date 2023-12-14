@@ -5,15 +5,14 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-
-	"gorm.io/gorm"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // Implementation of ExecutionInterface.
@@ -25,7 +24,7 @@ type ExecutionRepo struct {
 
 func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&input)
+	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -33,10 +32,10 @@ func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) erro
 	return nil
 }
 
-func (r *ExecutionRepo) Get(_ context.Context, input interfaces.Identifier) (models.Execution, error) {
+func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 	var execution models.Execution
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.Execution{
+	tx := r.db.WithContext(ctx).Where(&models.Execution{
 		ExecutionKey: models.ExecutionKey{
 			Project: input.Project,
 			Domain:  input.Domain,
@@ -59,7 +58,7 @@ func (r *ExecutionRepo) Get(_ context.Context, input interfaces.Identifier) (mod
 
 func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.Model(&execution).Updates(execution)
+	tx := r.db.WithContext(ctx).Model(&execution).Updates(execution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
@@ -67,7 +66,7 @@ func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) 
 	return nil
 }
 
-func (r *ExecutionRepo) List(_ context.Context, input interfaces.ListResourceInput) (
+func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.ExecutionCollectionOutput, error) {
 	var err error
 	// First validate input.
@@ -75,7 +74,7 @@ func (r *ExecutionRepo) List(_ context.Context, input interfaces.ListResourceInp
 		return interfaces.ExecutionCollectionOutput{}, err
 	}
 	var executions []models.Execution
-	tx := r.db.Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 	// And add join condition as required by user-specified filters (which can potentially include join table attrs).
 	if ok := input.JoinTableEntities[common.LaunchPlan]; ok {
 		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.launch_plan_id = %s.id",
@@ -120,7 +119,7 @@ func (r *ExecutionRepo) List(_ context.Context, input interfaces.ListResourceInp
 
 func (r *ExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
 	var err error
-	tx := r.db.Model(&models.Execution{})
+	tx := r.db.WithContext(ctx).Model(&models.Execution{})
 
 	// Add join condition as required by user-specified filters (which can potentially include join table attrs).
 	if ok := input.JoinTableEntities[common.LaunchPlan]; ok {

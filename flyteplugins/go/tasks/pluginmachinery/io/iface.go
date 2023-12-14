@@ -24,7 +24,7 @@ type InputReader interface {
 	InputFilePaths
 	// Get the inputs for this task as a literal map, an error is returned only in case of systemic errors.
 	// No outputs or void is indicated using *core.LiteralMap -> nil
-	Get(ctx context.Context) (*core.LiteralMap, error)
+	Get(ctx context.Context) (*core.InputData, error)
 }
 
 // OutputReader provides an abstracted OutputReader interface. The plugins are responsible to provide
@@ -40,7 +40,7 @@ type OutputReader interface {
 	// Exists returns true if the output exists false otherwise
 	Exists(ctx context.Context) (bool, error)
 	// Read returns the output -> *core.LiteralMap (nil if void), *ExecutionError if user error when reading the output and error to indicate system problems
-	Read(ctx context.Context) (*core.LiteralMap, *ExecutionError, error)
+	Read(ctx context.Context) (*core.OutputData, *ExecutionError, error)
 	// DeckExists checks if the deck file has been generated.
 	DeckExists(ctx context.Context) (bool, error)
 }

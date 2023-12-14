@@ -5,23 +5,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/mock"
-
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
-
+	"github.com/go-test/deep"
 	"github.com/stretchr/testify/assert"
-
+	"github.com/stretchr/testify/mock"
 	testing2 "k8s.io/utils/clock/testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/go-test/deep"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
 func init() {

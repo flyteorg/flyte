@@ -6,25 +6,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/datacatalog/mocks"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/golang/protobuf/ptypes"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/datacatalog/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
 func init() {
@@ -47,9 +45,11 @@ func newStringLiteral(value string) *core.Literal {
 	}
 }
 
-var sampleParameters = &core.LiteralMap{Literals: map[string]*core.Literal{
-	"out1": newStringLiteral("output1-stringval"),
-}}
+var sampleParameters = &core.OutputData{
+	Outputs: &core.LiteralMap{Literals: map[string]*core.Literal{
+		"out1": newStringLiteral("output1-stringval"),
+	}},
+}
 
 var variableMap = &core.VariableMap{
 	Variables: map[string]*core.Variable{
@@ -387,7 +387,7 @@ func TestCatalog_Get(t *testing.T) {
 		v, e, err := resp.GetOutputs().Read(ctx)
 		assert.NoError(t, err)
 		assert.Nil(t, e)
-		assert.Len(t, v.Literals, 0)
+		assert.Len(t, v.GetOutputs().GetLiterals(), 0)
 	})
 }
 

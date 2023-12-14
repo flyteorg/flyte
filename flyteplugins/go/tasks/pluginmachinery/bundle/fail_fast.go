@@ -6,9 +6,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-
 	pluginMachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 

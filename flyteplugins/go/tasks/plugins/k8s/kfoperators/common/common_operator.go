@@ -1,22 +1,25 @@
 package common
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
+	v1 "k8s.io/api/core/v1"
+	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
 	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
-	v1 "k8s.io/api/core/v1"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 const (
@@ -24,12 +27,6 @@ const (
 	MPITaskType        = "mpi"
 	PytorchTaskType    = "pytorch"
 )
-
-type ReplicaEntry struct {
-	PodSpec       *v1.PodSpec
-	ReplicaNum    int32
-	RestartPolicy commonOp.RestartPolicy
-}
 
 // ExtractCurrentCondition will return the first job condition for tensorflow/pytorch
 func ExtractCurrentCondition(jobConditions []commonOp.JobCondition) (commonOp.JobCondition, error) {
@@ -98,7 +95,7 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	namespace := objectMeta.Namespace
 
 	taskLogs := make([]*core.TaskLog, 0, 10)
-	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 
 	logPlugin, err := logs.InitializeLogPlugins(logs.GetLogConfig())
 
@@ -120,14 +117,14 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	if taskType == PytorchTaskType && hasMaster {
 		masterTaskLog, masterErr := logPlugin.GetTaskLogs(
 			tasklog.Input{
-				PodName:                 name + "-master-0",
-				Namespace:               namespace,
-				LogName:                 "master",
-				PodRFC3339StartTime:     RFC3999StartTime,
-				PodRFC3339FinishTime:    RFC3999FinishTime,
-				PodUnixStartTime:        startTime,
-				PodUnixFinishTime:       finishTime,
-				TaskExecutionIdentifier: &taskExecID,
+				PodName:              name + "-master-0",
+				Namespace:            namespace,
+				LogName:              "master",
+				PodRFC3339StartTime:  RFC3999StartTime,
+				PodRFC3339FinishTime: RFC3999FinishTime,
+				PodUnixStartTime:     startTime,
+				PodUnixFinishTime:    finishTime,
+				TaskExecutionID:      taskExecID,
 			},
 		)
 		if masterErr != nil {
@@ -139,13 +136,13 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	// get all workers log
 	for workerIndex := int32(0); workerIndex < workersCount; workerIndex++ {
 		workerLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:                 name + fmt.Sprintf("-worker-%d", workerIndex),
-			Namespace:               namespace,
-			PodRFC3339StartTime:     RFC3999StartTime,
-			PodRFC3339FinishTime:    RFC3999FinishTime,
-			PodUnixStartTime:        startTime,
-			PodUnixFinishTime:       finishTime,
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:              name + fmt.Sprintf("-worker-%d", workerIndex),
+			Namespace:            namespace,
+			PodRFC3339StartTime:  RFC3999StartTime,
+			PodRFC3339FinishTime: RFC3999FinishTime,
+			PodUnixStartTime:     startTime,
+			PodUnixFinishTime:    finishTime,
+			TaskExecutionID:      taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -160,9 +157,9 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	// get all parameter servers logs
 	for psReplicaIndex := int32(0); psReplicaIndex < psReplicasCount; psReplicaIndex++ {
 		psReplicaLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:                 name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
-			Namespace:               namespace,
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:         name + fmt.Sprintf("-psReplica-%d", psReplicaIndex),
+			Namespace:       namespace,
+			TaskExecutionID: taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -172,9 +169,9 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	// get chief worker log, and the max number of chief worker is 1
 	if chiefReplicasCount != 0 {
 		chiefReplicaLog, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:                 name + fmt.Sprintf("-chiefReplica-%d", 0),
-			Namespace:               namespace,
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:         name + fmt.Sprintf("-chiefReplica-%d", 0),
+			Namespace:       namespace,
+			TaskExecutionID: taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -184,9 +181,9 @@ func GetLogs(pluginContext k8s.PluginContext, taskType string, objectMeta meta_v
 	// get evaluator log, and the max number of evaluator is 1
 	if evaluatorReplicasCount != 0 {
 		evaluatorReplicasCount, err := logPlugin.GetTaskLogs(tasklog.Input{
-			PodName:                 name + fmt.Sprintf("-evaluatorReplica-%d", 0),
-			Namespace:               namespace,
-			TaskExecutionIdentifier: &taskExecID,
+			PodName:         name + fmt.Sprintf("-evaluatorReplica-%d", 0),
+			Namespace:       namespace,
+			TaskExecutionID: taskExecID,
 		})
 		if err != nil {
 			return nil, err
@@ -254,22 +251,12 @@ func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) commonOp.Res
 }
 
 // OverrideContainerSpec overrides the specified container's properties in the given podSpec. The function
-// updates the image, resources and command arguments of the container that matches the given containerName.
-func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image string, resources *core.Resources, args []string) error {
+// updates the image and command arguments of the container that matches the given containerName.
+func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image string, args []string) error {
 	for idx, c := range podSpec.Containers {
 		if c.Name == containerName {
 			if image != "" {
 				podSpec.Containers[idx].Image = image
-			}
-			if resources != nil {
-				// if resources requests and limits both not set, we will not override the resources
-				if len(resources.Requests) >= 1 || len(resources.Limits) >= 1 {
-					resources, err := flytek8s.ToK8sResourceRequirements(resources)
-					if err != nil {
-						return flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
-					}
-					podSpec.Containers[idx].Resources = *resources
-				}
 			}
 			if len(args) != 0 {
 				podSpec.Containers[idx].Args = args
@@ -277,4 +264,92 @@ func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image stri
 		}
 	}
 	return nil
+}
+
+func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, primaryContainerName string) (*commonOp.ReplicaSpec, error) {
+	podSpec, objectMeta, oldPrimaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+	if err != nil {
+		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
+	}
+
+	OverridePrimaryContainerName(podSpec, oldPrimaryContainerName, primaryContainerName)
+
+	cfg := config.GetK8sPluginConfig()
+	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
+	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
+
+	replicas := int32(0)
+	return &commonOp.ReplicaSpec{
+		Replicas: &replicas,
+		Template: v1.PodTemplateSpec{
+			ObjectMeta: *objectMeta,
+			Spec:       *podSpec,
+		},
+		RestartPolicy: commonOp.RestartPolicyNever,
+	}, nil
+}
+
+type kfDistributedReplicaSpec interface {
+	GetReplicas() int32
+	GetImage() string
+	GetResources() *core.Resources
+	GetRestartPolicy() kfplugins.RestartPolicy
+}
+
+type allowsCommandOverride interface {
+	GetCommand() []string
+}
+
+func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, rs kfDistributedReplicaSpec, primaryContainerName string, isMaster bool) (*commonOp.ReplicaSpec, error) {
+	taskCtxOptions := []flytek8s.PluginTaskExecutionContextOption{}
+	if rs != nil && rs.GetResources() != nil {
+		resources, err := flytek8s.ToK8sResourceRequirements(rs.GetResources())
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification on Resources [%v], Err: [%v]", resources, err.Error())
+		}
+		taskCtxOptions = append(taskCtxOptions, flytek8s.WithResources(resources))
+	}
+	newTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, taskCtxOptions...)
+	replicaSpec, err := ToReplicaSpec(ctx, newTaskCtx, primaryContainerName)
+	if err != nil {
+		return nil, err
+	}
+
+	// Master should have a single replica
+	if isMaster {
+		replicas := int32(1)
+		replicaSpec.Replicas = &replicas
+	}
+
+	if rs != nil {
+		var command []string
+		if v, ok := rs.(allowsCommandOverride); ok {
+			command = v.GetCommand()
+		}
+		if err := OverrideContainerSpec(
+			&replicaSpec.Template.Spec,
+			primaryContainerName,
+			rs.GetImage(),
+			command,
+		); err != nil {
+			return nil, err
+		}
+
+		replicaSpec.RestartPolicy = ParseRestartPolicy(rs.GetRestartPolicy())
+
+		if !isMaster {
+			replicas := rs.GetReplicas()
+			replicaSpec.Replicas = &replicas
+		}
+	}
+
+	return replicaSpec, nil
+}
+
+func GetReplicaCount(specs map[commonOp.ReplicaType]*commonOp.ReplicaSpec, replicaType commonOp.ReplicaType) *int32 {
+	if spec, ok := specs[replicaType]; ok && spec.Replicas != nil {
+		return spec.Replicas
+	}
+
+	return new(int32) // return 0 as default value
 }

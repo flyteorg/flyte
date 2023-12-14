@@ -3,12 +3,10 @@ package ioutils
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const (
@@ -26,11 +24,16 @@ type RemoteFileInputReader struct {
 	store storage.ProtobufStore
 }
 
-func (r RemoteFileInputReader) Get(ctx context.Context) (*core.LiteralMap, error) {
-	d := &core.LiteralMap{}
+func (r RemoteFileInputReader) Get(ctx context.Context) (*core.InputData, error) {
+	d := &core.InputData{}
 	if err := r.store.ReadProtobuf(ctx, r.InputFilePaths.GetInputPath(), d); err != nil {
-		// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
-		return nil, errors.Wrapf(ErrFailedRead, err, "failed to read data from dataDir [%v].", r.InputFilePaths.GetInputPath())
+		oldFormat := &core.LiteralMap{}
+		if err := r.store.ReadProtobuf(ctx, r.InputFilePaths.GetInputPath(), oldFormat); err != nil {
+			// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
+			return nil, errors.Wrapf(ErrFailedRead, err, "failed to read data from dataDir [%v].", r.InputFilePaths.GetInputPath())
+		}
+
+		d.Inputs = oldFormat
 	}
 
 	return d, nil

@@ -26,8 +26,8 @@ func (_m OutputResolver_ExtractOutput) Return(values *core.Literal, err error) *
 	return &OutputResolver_ExtractOutput{Call: _m.Call.Return(values, err)}
 }
 
-func (_m *OutputResolver) OnExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode, bindToVar string) *OutputResolver_ExtractOutput {
-	c_call := _m.On("ExtractOutput", ctx, nl, n, bindToVar)
+func (_m *OutputResolver) OnExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode, bindToVar string, bindAttrPath []*core.PromiseAttribute) *OutputResolver_ExtractOutput {
+	c_call := _m.On("ExtractOutput", ctx, nl, n, bindToVar, bindAttrPath)
 	return &OutputResolver_ExtractOutput{Call: c_call}
 }
 
@@ -36,13 +36,13 @@ func (_m *OutputResolver) OnExtractOutputMatch(matchers ...interface{}) *OutputR
 	return &OutputResolver_ExtractOutput{Call: c_call}
 }
 
-// ExtractOutput provides a mock function with given fields: ctx, nl, n, bindToVar
-func (_m *OutputResolver) ExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode, bindToVar string) (*core.Literal, error) {
-	ret := _m.Called(ctx, nl, n, bindToVar)
+// ExtractOutput provides a mock function with given fields: ctx, nl, n, bindToVar, bindAttrPath
+func (_m *OutputResolver) ExtractOutput(ctx context.Context, nl executors.NodeLookup, n v1alpha1.ExecutableNode, bindToVar string, bindAttrPath []*core.PromiseAttribute) (*core.Literal, error) {
+	ret := _m.Called(ctx, nl, n, bindToVar, bindAttrPath)
 
 	var r0 *core.Literal
-	if rf, ok := ret.Get(0).(func(context.Context, executors.NodeLookup, v1alpha1.ExecutableNode, string) *core.Literal); ok {
-		r0 = rf(ctx, nl, n, bindToVar)
+	if rf, ok := ret.Get(0).(func(context.Context, executors.NodeLookup, v1alpha1.ExecutableNode, string, []*core.PromiseAttribute) *core.Literal); ok {
+		r0 = rf(ctx, nl, n, bindToVar, bindAttrPath)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*core.Literal)
@@ -50,8 +50,8 @@ func (_m *OutputResolver) ExtractOutput(ctx context.Context, nl executors.NodeLo
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, executors.NodeLookup, v1alpha1.ExecutableNode, string) error); ok {
-		r1 = rf(ctx, nl, n, bindToVar)
+	if rf, ok := ret.Get(1).(func(context.Context, executors.NodeLookup, v1alpha1.ExecutableNode, string, []*core.PromiseAttribute) error); ok {
+		r1 = rf(ctx, nl, n, bindToVar, bindAttrPath)
 	} else {
 		r1 = ret.Error(1)
 	}

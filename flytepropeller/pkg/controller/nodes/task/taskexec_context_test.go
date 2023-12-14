@@ -5,46 +5,54 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
-	"k8s.io/apimachinery/pkg/api/resource"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
-	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
-	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
+	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 	nodeMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/codex"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func TestHandler_newTaskExecutionContext(t *testing.T) {
-	wfExecID := &core.WorkflowExecutionIdentifier{
+type dummyPluginState struct {
+	A int
+}
+
+var (
+	wfExecID = &core.WorkflowExecutionIdentifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
 	}
+	taskID    = &core.Identifier{}
+	nodeID    = "n1"
+	resources = &corev1.ResourceRequirements{
+		Requests: make(corev1.ResourceList),
+		Limits:   make(corev1.ResourceList),
+	}
+	dummyPluginStateA = 45
+)
 
-	nodeID := "n1"
-
+func dummyNodeExecutionContext(t *testing.T, parentInfo executors.ImmutableParentInfo, eventVersion v1alpha1.EventVersion) interfaces.NodeExecutionContext {
 	nm := &nodeMocks.NodeExecutionMetadata{}
 	nm.OnGetAnnotations().Return(map[string]string{})
 	nm.OnGetNodeExecutionID().Return(&core.NodeExecutionIdentifier{
@@ -60,7 +68,6 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 		Name: "name",
 	})
 
-	taskID := &core.Identifier{}
 	tr := &nodeMocks.TaskReader{}
 	tr.OnGetTaskID().Return(taskID)
 
@@ -68,12 +75,8 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	ns.OnGetDataDir().Return("data-dir")
 	ns.OnGetOutputDir().Return("output-dir")
 
-	res := &corev1.ResourceRequirements{
-		Requests: make(corev1.ResourceList),
-		Limits:   make(corev1.ResourceList),
-	}
 	n := &flyteMocks.ExecutableNode{}
-	n.OnGetResources().Return(res)
+	n.OnGetResources().Return(resources)
 	ma := 5
 	n.OnGetRetryStrategy().Return(&v1alpha1.RetryStrategy{MinAttempts: &ma})
 
@@ -92,8 +95,8 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 
 	executionContext := &mocks2.ExecutionContext{}
 	executionContext.OnGetExecutionConfig().Return(v1alpha1.ExecutionConfig{})
-	executionContext.OnGetParentInfo().Return(nil)
-	executionContext.OnGetEventVersion().Return(v1alpha1.EventVersion0)
+	executionContext.OnGetParentInfo().Return(parentInfo)
+	executionContext.OnGetEventVersion().Return(eventVersion)
 	nCtx.OnExecutionContext().Return(executionContext)
 
 	ds, err := storage.NewDataStore(
@@ -106,12 +109,8 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	nCtx.OnDataStore().Return(ds)
 
 	st := bytes.NewBuffer([]byte{})
-	a := 45
-	type test struct {
-		A int
-	}
 	codex := codex.GobStateCodec{}
-	assert.NoError(t, codex.Encode(test{A: a}, st))
+	assert.NoError(t, codex.Encode(dummyPluginState{A: dummyPluginStateA}, st))
 	nr := &nodeMocks.NodeStateReader{}
 	nr.OnGetTaskNodeState().Return(handler.TaskNodeState{
 		PluginState: st.Bytes(),
@@ -119,28 +118,39 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	nCtx.OnNodeStateReader().Return(nr)
 	nCtx.OnRawOutputPrefix().Return("s3://sandbox/")
 	nCtx.OnOutputShardSelector().Return(ioutils.NewConstantShardSelector([]string{"x"}))
+	return nCtx
+}
 
+func dummyPlugin() pluginCore.Plugin {
+	p := &pluginCoreMocks.Plugin{}
+	p.On("GetID").Return("plugin1")
+	p.OnGetProperties().Return(pluginCore.PluginProperties{})
+	return p
+}
+
+func dummyHandler() *Handler {
 	noopRm := CreateNoopResourceManager(context.TODO(), promutils.NewTestScope())
-
 	c := &mocks.Client{}
-	tk := &Handler{
+	return &Handler{
 		catalog:         c,
 		secretManager:   secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig()),
 		resourceManager: noopRm,
 	}
+}
 
-	p := &pluginCoreMocks.Plugin{}
-	p.On("GetID").Return("plugin1")
-	p.OnGetProperties().Return(pluginCore.PluginProperties{})
+func TestHandler_newTaskExecutionContext(t *testing.T) {
+	nCtx := dummyNodeExecutionContext(t, nil, v1alpha1.EventVersion0)
+	p := dummyPlugin()
+	tk := dummyHandler()
 	got, err := tk.newTaskExecutionContext(context.TODO(), nCtx, p)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 
-	f := &test{}
+	f := &dummyPluginState{}
 	v, err := got.PluginStateReader().Get(f)
 	assert.NoError(t, err)
 	assert.Equal(t, v, uint8(0))
-	assert.Equal(t, f.A, a)
+	assert.Equal(t, f.A, dummyPluginStateA)
 
 	// Try writing new state
 	type test2 struct {
@@ -156,13 +166,14 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.NotNil(t, got.SecretManager())
 
 	assert.NotNil(t, got.OutputWriter())
-	assert.Equal(t, got.TaskExecutionMetadata().GetOverrides().GetResources(), res)
+	assert.Equal(t, got.TaskExecutionMetadata().GetOverrides().GetResources(), resources)
 
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), "name-n1-1")
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId, taskID)
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().RetryAttempt, uint32(1))
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetNodeId(), nodeID)
 	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetID().NodeExecutionId.GetExecutionId(), wfExecID)
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetUniqueNodeID(), nodeID)
 
 	assert.EqualValues(t, got.ResourceManager().(resourcemanager.TaskResourceManager).GetResourcePoolInfo(), make([]*event.ResourcePoolInfo, 0))
 
@@ -198,6 +209,22 @@ func TestHandler_newTaskExecutionContext(t *testing.T) {
 	assert.NotNil(t, anotherTaskExecCtx.sm)
 	assert.NotNil(t, anotherTaskExecCtx.tm)
 	assert.NotNil(t, anotherTaskExecCtx.tr)
+}
+
+func TestHandler_newTaskExecutionContext_taskExecutionID_WithParentInfo(t *testing.T) {
+	parentInfo := &mocks2.ImmutableParentInfo{}
+	parentInfo.OnGetUniqueID().Return("n0")
+	parentInfo.OnCurrentAttempt().Return(uint32(2))
+
+	nCtx := dummyNodeExecutionContext(t, parentInfo, v1alpha1.EventVersion1)
+	p := dummyPlugin()
+	tk := dummyHandler()
+	got, err := tk.newTaskExecutionContext(context.TODO(), nCtx, p)
+	assert.NoError(t, err)
+	assert.NotNil(t, got)
+
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), "name-n0-2-n1-1")
+	assert.Equal(t, got.TaskExecutionMetadata().GetTaskExecutionID().GetUniqueNodeID(), "n0-2-n1")
 }
 
 func TestGetGeneratedNameWith(t *testing.T) {

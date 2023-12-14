@@ -3,13 +3,13 @@ package bigquery
 import (
 	"strconv"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"google.golang.org/api/bigquery/v2"
 
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	structpb "github.com/golang/protobuf/ptypes/struct"
-	"google.golang.org/api/bigquery/v2"
 )
 
 type QueryJobConfig struct {
@@ -154,8 +154,8 @@ func unmarshalQueryJobConfig(structObj *structpb.Struct) (*QueryJobConfig, error
 	return &queryJobConfig, nil
 }
 
-func getJobConfigurationQuery(custom *QueryJobConfig, inputs *flyteIdlCore.LiteralMap) (*bigquery.JobConfigurationQuery, error) {
-	queryParameters, err := getQueryParameters(inputs.Literals)
+func getJobConfigurationQuery(custom *QueryJobConfig, inputs *flyteIdlCore.InputData) (*bigquery.JobConfigurationQuery, error) {
+	queryParameters, err := getQueryParameters(inputs.GetInputs().GetLiterals())
 
 	if err != nil {
 		return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "unable build query parameters [%v]", err.Error())

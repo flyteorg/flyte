@@ -2,32 +2,23 @@ package presto
 
 import (
 	"context"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"fmt"
+	"time"
 
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	"fmt"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
-
-	"time"
-
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type ExecutionPhase int
@@ -452,16 +443,18 @@ func writeOutput(ctx context.Context, tCtx core.TaskExecutionContext, externalLo
 	results := taskTemplate.Interface.Outputs.Variables["results"]
 
 	return tCtx.OutputWriter().Put(ctx, ioutils.NewInMemoryOutputReader(
-		&pb.LiteralMap{
-			Literals: map[string]*pb.Literal{
-				"results": {
-					Value: &pb.Literal_Scalar{
-						Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
-							Schema: &pb.Schema{
-								Uri:  externalLocation,
-								Type: results.GetType().GetSchema(),
+		&pb.OutputData{
+			Outputs: &pb.LiteralMap{
+				Literals: map[string]*pb.Literal{
+					"results": {
+						Value: &pb.Literal_Scalar{
+							Scalar: &pb.Scalar{Value: &pb.Scalar_Schema{
+								Schema: &pb.Schema{
+									Uri:  externalLocation,
+									Type: results.GetType().GetSchema(),
+								},
 							},
-						},
+							},
 						},
 					},
 				},

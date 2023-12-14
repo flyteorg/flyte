@@ -2,11 +2,13 @@ package k8s
 
 import (
 	"context"
+	"fmt"
 	"k8s.io/client-go/tools/cache"
 	"sort"
 	"sync"
 	"time"
 
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -15,8 +17,6 @@ import (
 	"k8s.io/client-go/informers"
 	informerEventsv1 "k8s.io/client-go/informers/events/v1"
 	"k8s.io/client-go/kubernetes"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type EventWatcher interface {
@@ -117,7 +117,11 @@ func NewEventWatcher(ctx context.Context, gvk schema.GroupVersionKind, kubeClien
 	watcher := &eventWatcher{
 		informer: eventInformer,
 	}
-	eventInformer.Informer().AddEventHandler(watcher)
+
+	_, err := eventInformer.Informer().AddEventHandler(watcher)
+	if err != nil {
+		return nil, fmt.Errorf("failed to add event handler: %w", err)
+	}
 
 	go eventInformer.Informer().Run(ctx.Done())
 	logger.Debugf(ctx, "Started informer for [%s] events", gvk.Kind)

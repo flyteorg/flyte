@@ -4,10 +4,10 @@ import (
 	"context"
 	"sync"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var DefaultPodTemplateStore PodTemplateStore = NewPodTemplateStore()

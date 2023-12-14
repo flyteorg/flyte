@@ -1,9 +1,12 @@
 package config
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/config"
+	"os"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 //go:generate enumer --type=SecretManagerType --trimprefix=SecretManagerType -json -yaml
@@ -100,6 +103,10 @@ type Config struct {
 	AWSSecretManagerConfig   AWSSecretManagerConfig   `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
 	GCPSecretManagerConfig   GCPSecretManagerConfig   `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
 	VaultSecretManagerConfig VaultSecretManagerConfig `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
+}
+
+func (c Config) ExpandCertDir() string {
+	return os.ExpandEnv(c.CertDir)
 }
 
 type AWSSecretManagerConfig struct {

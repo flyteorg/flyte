@@ -9,8 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -18,6 +16,8 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (

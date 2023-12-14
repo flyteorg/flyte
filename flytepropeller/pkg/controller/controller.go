@@ -9,12 +9,28 @@ import (
 	"runtime/pprof"
 	"time"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	"github.com/pkg/errors"
+	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/grpc"
+	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
+	"google.golang.org/grpc/resolver"
+	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	k8sInformers "k8s.io/client-go/informers"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
+	"k8s.io/client-go/tools/leaderelection"
+	"k8s.io/client-go/tools/record"
+	"k8s.io/utils/clock"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -34,37 +50,13 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	leader "github.com/flyteorg/flyte/flytepropeller/pkg/leaderelection"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	stdErrs "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	k8sResolver "github.com/flyteorg/flyte/flytestdlib/resolver"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-
-	"github.com/pkg/errors"
-
-	"github.com/prometheus/client_golang/prometheus"
-
-	"google.golang.org/grpc"
-	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
-
-	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
-
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/utils/clock"
-
-	k8sInformers "k8s.io/client-go/informers"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/tools/leaderelection"
-	"k8s.io/client-go/tools/record"
-
-	"sigs.k8s.io/controller-runtime/pkg/manager"
 )
 
 const (
@@ -466,10 +458,17 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	logger.Info(ctx, "Setting up event handlers")
 	// Set up an event handler for when FlyteWorkflow resources change
-	flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
+	_, err = flyteworkflowInformer.Informer().AddEventHandler(controller.getWorkflowUpdatesHandler())
+	if err != nil {
+		return nil, fmt.Errorf("failed to register event handler for FlyteWorkflow resource changes: %w", err)
+	}
 
 	updateHandler := flytek8s.GetPodTemplateUpdatesHandler(&flytek8s.DefaultPodTemplateStore)
-	podTemplateInformer.Informer().AddEventHandler(updateHandler)
+	_, err = podTemplateInformer.Informer().AddEventHandler(updateHandler)
+	if err != nil {
+		return nil, fmt.Errorf("failed to register event handler for PodTemplate resource changes: %w", err)
+	}
+
 	return controller, nil
 }
 
@@ -526,8 +525,7 @@ func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []inform
 	return opts
 }
 
-func CreateControllerManager(ctx context.Context, cfg *config.Config, options manager.Options) (*manager.Manager, error) {
-
+func CreateControllerManager(ctx context.Context, cfg *config.Config, options manager.Options) (manager.Manager, error) {
 	_, kubecfg, err := utils.GetKubeConfig(ctx, cfg)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error building Kubernetes Clientset")
@@ -537,22 +535,23 @@ func CreateControllerManager(ctx context.Context, cfg *config.Config, options ma
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to initialize controller-runtime manager")
 	}
-	return &mgr, nil
+
+	return mgr, nil
 }
 
 // StartControllerManager Start controller runtime manager to start listening to resource changes.
 // K8sPluginManager uses controller runtime to create informers for the CRDs being monitored by plugins. The informer
 // EventHandler enqueues the owner workflow for reevaluation. These informer events allow propeller to detect
 // workflow changes faster than the default sync interval for workflow CRDs.
-func StartControllerManager(ctx context.Context, mgr *manager.Manager) error {
+func StartControllerManager(ctx context.Context, mgr manager.Manager) error {
 	ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
 	pprof.SetGoroutineLabels(ctx)
 	logger.Infof(ctx, "Starting controller-runtime manager")
-	return (*mgr).Start(ctx)
+	return mgr.Start(ctx)
 }
 
 // StartController creates a new FlytePropeller Controller and starts it
-func StartController(ctx context.Context, cfg *config.Config, defaultNamespace string, mgr *manager.Manager, scope *promutils.Scope) error {
+func StartController(ctx context.Context, cfg *config.Config, defaultNamespace string, mgr manager.Manager, scope *promutils.Scope) error {
 	// Setup cancel on the context
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -561,6 +560,8 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 	if err != nil {
 		return errors.Wrapf(err, "error building Kubernetes Clientset")
 	}
+
+	resolver.Register(k8sResolver.NewBuilder(ctx, kubeClient, k8sResolver.Schema))
 
 	flyteworkflowClient, err := clientset.NewForConfig(kubecfg)
 	if err != nil {
@@ -590,7 +591,7 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 
 	informerFactory := k8sInformers.NewSharedInformerFactoryWithOptions(kubeClient, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateResync.Duration)
 
-	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, *mgr, *scope)
+	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, mgr, *scope)
 	if err != nil {
 		return errors.Wrap(err, "failed to start FlytePropeller")
 	} else if c == nil {

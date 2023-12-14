@@ -3,7 +3,6 @@ package google
 import (
 	"context"
 
-	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/impersonate"
@@ -11,6 +10,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+
+	pluginmachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 )
 
 const (

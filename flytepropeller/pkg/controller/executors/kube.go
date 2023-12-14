@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"k8s.io/client-go/rest"
-
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 //go:generate mockery -name Client -case=underscore
@@ -24,57 +23,17 @@ type Client interface {
 	GetCache() cache.Cache
 }
 
-// fallbackClientReader reads from the cache first and if not found then reads from the configured reader, which
-// directly reads from the API
-type fallbackClientReader struct {
-	orderedClients []client.Reader
-}
-
-func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.Get(ctx, key, out); err == nil {
-			return nil
-		}
-	}
-
-	return
-}
-
-func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.List(ctx, list, opts...); err == nil {
-			return nil
-		}
-	}
-
-	return
-}
-
 // ClientBuilder builder is the interface for the client builder.
 type ClientBuilder interface {
-	// WithUncached takes a list of runtime objects (plain or lists) that users don't want to cache
-	// for this client. This function can be called multiple times, it should append to an internal slice.
-	WithUncached(objs ...client.Object) ClientBuilder
-
 	// Build returns a new client.
 	Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error)
 }
 
 type FallbackClientBuilder struct {
-	uncached []client.Object
-	scope    promutils.Scope
-}
-
-func (f *FallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilder {
-	f.uncached = append(f.uncached, objs...)
-	return f
+	scope promutils.Scope
 }
 
 func (f *FallbackClientBuilder) Build(_ cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
-	if len(f.uncached) > 0 {
-		options.Cache.DisableFor = f.uncached
-	}
-
 	return client.New(config, options)
 }
 

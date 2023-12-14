@@ -3,12 +3,12 @@ package validators
 import (
 	"reflect"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	flyte "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	c "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"k8s.io/apimachinery/pkg/util/sets"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/typing"
 )
 
 func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, binding *flyte.BindingData,
@@ -122,6 +122,28 @@ func validateBinding(w c.WorkflowBuilder, nodeID c.NodeID, nodeParam string, bin
 						errs.Collect(errors.NewMismatchingTypesErr(nodeID, val.Promise.Var, param.Type.String(), expectedType.String()))
 					} else {
 						sourceType = cType
+					}
+				}
+
+				// If the variable has an attribute path. Extract the type of the last attribute.
+				for _, attr := range val.Promise.AttrPath {
+					var tmpType *flyte.LiteralType
+					var exist bool
+
+					if sourceType.GetCollectionType() != nil {
+						sourceType = sourceType.GetCollectionType()
+					} else if sourceType.GetMapValueType() != nil {
+						sourceType = sourceType.GetMapValueType()
+					} else if sourceType.GetStructure() != nil && sourceType.GetStructure().GetDataclassType() != nil {
+
+						tmpType, exist = sourceType.GetStructure().GetDataclassType()[attr.GetStringValue()]
+
+						if !exist {
+							// the error should output the sourceType instead of tmpType because tmpType is nil
+							errs.Collect(errors.NewFieldNotFoundErr(nodeID, val.Promise.Var, sourceType.String(), attr.GetStringValue()))
+							return nil, nil, !errs.HasErrors()
+						}
+						sourceType = tmpType
 					}
 				}
 

@@ -6,21 +6,17 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
-
-	"github.com/stretchr/testify/assert"
-
+	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func Test_writeOutput(t *testing.T) {
@@ -94,16 +90,18 @@ func Test_writeOutput(t *testing.T) {
 		ow := &mocks3.OutputWriter{}
 		externalLocation := "s3://my-external-bucket/key"
 		ow.OnPut(ctx, ioutils.NewInMemoryOutputReader(
-			&pb.LiteralMap{
-				Literals: map[string]*pb.Literal{
-					"results": {
-						Value: &pb.Literal_Scalar{
-							Scalar: &pb.Scalar{
-								Value: &pb.Scalar_Schema{
-									Schema: &pb.Schema{
-										Uri: externalLocation,
-										Type: &core.SchemaType{
-											Columns: []*core.SchemaType_SchemaColumn{},
+			&pb.OutputData{
+				Outputs: &pb.LiteralMap{
+					Literals: map[string]*pb.Literal{
+						"results": {
+							Value: &pb.Literal_Scalar{
+								Scalar: &pb.Scalar{
+									Value: &pb.Scalar_Schema{
+										Schema: &pb.Schema{
+											Uri: externalLocation,
+											Type: &core.SchemaType{
+												Columns: []*core.SchemaType_SchemaColumn{},
+											},
 										},
 									},
 								},

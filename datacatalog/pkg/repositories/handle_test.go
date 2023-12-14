@@ -2,17 +2,16 @@ package repositories
 
 import (
 	"context"
+	"database/sql/driver"
 	"path"
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/config"
-	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/stretchr/testify/assert"
 
-	"database/sql/driver"
-
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/config"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/utils"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 )
 
 func TestCreateDB(t *testing.T) {

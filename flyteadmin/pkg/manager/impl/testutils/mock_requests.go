@@ -1,10 +1,11 @@
 package testutils
 
 import (
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/golang/protobuf/proto"
 )
 
 func GetValidTaskRequest() admin.TaskCreateRequest {
@@ -163,11 +164,24 @@ func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
 	}
 }
 
-func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+func GetLaunchPlanRequestWithDeprecatedCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
 	lpRequest := GetLaunchPlanRequest()
 	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
 		Schedule: &admin.Schedule{
 			ScheduleExpression:  &admin.Schedule_CronExpression{CronExpression: testCronExpr},
+			KickoffTimeInputArg: "",
+		},
+	}
+	return lpRequest
+}
+
+func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+	lpRequest := GetLaunchPlanRequest()
+	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
+		Schedule: &admin.Schedule{
+			ScheduleExpression: &admin.Schedule_CronSchedule{CronSchedule: &admin.CronSchedule{
+				Schedule: testCronExpr,
+			}},
 			KickoffTimeInputArg: "",
 		},
 	}

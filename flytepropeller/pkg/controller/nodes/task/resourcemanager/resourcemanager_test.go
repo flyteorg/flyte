@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	core2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestComposeTokenPrefix(t *testing.T) {

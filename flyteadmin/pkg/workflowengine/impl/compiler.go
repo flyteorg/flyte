@@ -1,12 +1,13 @@
 package impl
 
 import (
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
-	"google.golang.org/grpc/codes"
 )
 
 type workflowCompiler struct {

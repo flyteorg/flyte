@@ -15,13 +15,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	s32 "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/flyteorg/stow"
-	"github.com/flyteorg/stow/azure"
-	"github.com/flyteorg/stow/google"
-	"github.com/flyteorg/stow/local"
-	"github.com/flyteorg/stow/oracle"
-	"github.com/flyteorg/stow/s3"
-	"github.com/flyteorg/stow/swift"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
@@ -29,6 +22,13 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/stow"
+	"github.com/flyteorg/stow/azure"
+	"github.com/flyteorg/stow/google"
+	"github.com/flyteorg/stow/local"
+	"github.com/flyteorg/stow/oracle"
+	"github.com/flyteorg/stow/s3"
+	"github.com/flyteorg/stow/swift"
 )
 
 type mockStowLoc struct {
@@ -274,7 +274,7 @@ func TestStowStore_ReadRaw(t *testing.T) {
 			},
 		}, nil, false, metrics)
 		assert.NoError(t, err)
-		dataReference := writeTestFileWithSize(ctx, t, s, "s3://container/path", 3*MiB)
+		dataReference := writeTestFileWithSize(ctx, t, s, "s3://container/path", 2*MiB+1)
 		_, err = s.ReadRaw(ctx, dataReference)
 		assert.Error(t, err)
 		assert.True(t, IsExceedsLimit(err))

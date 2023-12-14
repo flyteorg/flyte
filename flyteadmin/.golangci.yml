@@ -10,6 +10,7 @@ linters:
     - deadcode
     - errcheck
     - gas
+    - gci
     - goconst
     - goimports
     - golint
@@ -25,3 +26,13 @@ linters:
     - unparam
     - unused
     - varcheck
+
+linters-settings:
+  gci:
+    custom-order: true
+    sections:
+      - standard
+      - default
+      - prefix(github.com/flyteorg)
+    skip-generated: true
+

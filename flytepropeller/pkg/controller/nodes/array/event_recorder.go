@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/golang/protobuf/ptypes"
 )
 
 type arrayEventRecorder interface {
@@ -119,9 +120,37 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		OccurredAt:            occurredAt,
 		Metadata: &event.TaskExecutionMetadata{
 			ExternalResources: e.externalResources,
+			PluginIdentifier:  "container",
 		},
 		TaskType:     "k8s-array",
 		EventVersion: 1,
+	}
+
+	// only attach input values if taskPhase is QUEUED meaning this the first evaluation
+	if taskPhase == idlcore.TaskExecution_QUEUED {
+		if eventConfig.RawOutputPolicy == config.RawOutputPolicyInline {
+			// pass inputs by value
+			literalMap, err := nCtx.InputReader().Get(ctx)
+			if err != nil {
+				return err
+			}
+
+			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputData{
+				InputData: literalMap,
+			}
+		} else {
+			// pass inputs by reference
+			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputUri{
+				InputUri: nCtx.InputReader().GetInputPath().String(),
+			}
+		}
+	}
+
+	// only attach output uri if taskPhase is SUCCEEDED
+	if taskPhase == idlcore.TaskExecution_SUCCEEDED {
+		taskExecutionEvent.OutputResult = &event.TaskExecutionEvent_OutputUri{
+			OutputUri: v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir()).String(),
+		}
 	}
 
 	// record TaskExecutionEvent

@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-
 	"golang.org/x/oauth2"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 //go:generate mockery -name=CookieHandler -output=mocks/ -case=underscore

@@ -48,3 +48,18 @@ func TestNewTestNodeLookup(t *testing.T) {
 	assert.False(t, ok)
 	assert.NotEqual(t, ns, nl.GetNodeExecutionStatus(context.TODO(), "n"))
 }
+
+func TestToNodeAndFromNode(t *testing.T) {
+	n := &mocks.ExecutableNode{}
+	ns := &mocks.ExecutableNodeStatus{}
+	nl := NewTestNodeLookup(map[string]v1alpha1.ExecutableNode{"n1": n}, map[string]v1alpha1.ExecutableNodeStatus{"n1": ns})
+
+	nodeIds, err := nl.ToNode("n1")
+	assert.Nil(t, nodeIds)
+	assert.Nil(t, err)
+
+	nodeIds, err = nl.FromNode("n1")
+	assert.Nil(t, nodeIds)
+	assert.Nil(t, err)
+
+}

@@ -7,24 +7,22 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/profutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/klog"
 
 	"github.com/flyteorg/flyte/flytepropeller/manager"
 	managerConfig "github.com/flyteorg/flyte/flytepropeller/manager/config"
 	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/klog"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/profutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/version"
 )
 
 const (

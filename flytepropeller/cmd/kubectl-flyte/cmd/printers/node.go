@@ -9,9 +9,9 @@ import (
 
 	gotree "github.com/DiSiqueira/GoTree"
 	"github.com/fatih/color"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 )

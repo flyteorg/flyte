@@ -33,16 +33,16 @@ func GetInputReader(tCtx core.TaskExecutionContext, taskTemplate *idlCore.TaskTe
 // StaticInputReader complies with the io.InputReader interface but has the input already populated.
 type StaticInputReader struct {
 	io.InputFilePaths
-	input *idlCore.LiteralMap
+	input *idlCore.InputData
 }
 
-func NewStaticInputReader(inputPaths io.InputFilePaths, input *idlCore.LiteralMap) StaticInputReader {
+func NewStaticInputReader(inputPaths io.InputFilePaths, input *idlCore.InputData) StaticInputReader {
 	return StaticInputReader{
 		InputFilePaths: inputPaths,
 		input:          input,
 	}
 }
 
-func (i StaticInputReader) Get(_ context.Context) (*idlCore.LiteralMap, error) {
+func (i StaticInputReader) Get(_ context.Context) (*idlCore.InputData, error) {
 	return i.input, nil
 }

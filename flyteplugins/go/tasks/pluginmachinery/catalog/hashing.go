@@ -55,8 +55,10 @@ func hashify(literal *core.Literal) *core.Literal {
 	return literal
 }
 
-func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap) (string, error) {
-	if literalMap == nil || len(literalMap.Literals) == 0 {
+func HashLiteralMap(ctx context.Context, inputData *core.InputData) (string, error) {
+	// TODO (haytham): We should hash everything in the inputData proto.
+	literalMap := inputData.GetInputs()
+	if literalMap == nil || len(literalMap.GetLiterals()) == 0 {
 		literalMap = &emptyLiteralMap
 	}
 
@@ -66,6 +68,7 @@ func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap) (string, e
 	for name, literal := range literalMap.Literals {
 		hashifiedLiteralMap[name] = hashify(literal)
 	}
+
 	hashifiedInputs := &core.LiteralMap{
 		Literals: hashifiedLiteralMap,
 	}

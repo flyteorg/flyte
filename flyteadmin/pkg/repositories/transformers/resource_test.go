@@ -4,17 +4,15 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
-
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"google.golang.org/grpc/codes"
-
-	"github.com/stretchr/testify/assert"
 )
 
 const resourceProject = "project"

@@ -2,11 +2,12 @@ from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import tasks_pb2 as _tasks_pb2
 from flyteidl.core import interface_pb2 as _interface_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
+from flyteidl.core import execution_pb2 as _execution_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -89,10 +90,12 @@ class GetTaskRequest(_message.Message):
     def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ...) -> None: ...
 
 class GetTaskResponse(_message.Message):
-    __slots__ = ["resource"]
+    __slots__ = ["resource", "log_links"]
     RESOURCE_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     resource: Resource
-    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
+    log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
+    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class Resource(_message.Message):
     __slots__ = ["state", "deprecated_outputs", "outputs", "message"]

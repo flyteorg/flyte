@@ -6,23 +6,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
-	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
-
-	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 	commonOp "github.com/kubeflow/common/pkg/apis/common/v1"
 	kubeflowv1 "github.com/kubeflow/training-operator/pkg/apis/kubeflow.org/v1"
-	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	kfplugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins/kubeflow"
+	flyteerr "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/k8s/kfoperators/common"
 )
 
 const workerSpecCommandKey = "worker_spec_command"
@@ -58,24 +55,10 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "nil task specification")
 	}
 
-	podSpec, objectMeta, primaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
-	if err != nil {
-		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
-	}
-	common.OverridePrimaryContainerName(podSpec, primaryContainerName, kubeflowv1.MPIJobDefaultContainerName)
-
-	var launcherReplica = common.ReplicaEntry{
-		ReplicaNum:    int32(1),
-		PodSpec:       podSpec.DeepCopy(),
-		RestartPolicy: commonOp.RestartPolicyNever,
-	}
-	var workerReplica = common.ReplicaEntry{
-		ReplicaNum:    int32(0),
-		PodSpec:       podSpec.DeepCopy(),
-		RestartPolicy: commonOp.RestartPolicyNever,
-	}
 	slots := int32(1)
 	runPolicy := commonOp.RunPolicy{}
+
+	var launcherReplicaSpec, workerReplicaSpec *commonOp.ReplicaSpec
 
 	if taskTemplate.TaskTypeVersion == 0 {
 		mpiTaskExtraArgs := plugins.DistributedMPITrainingTask{}
@@ -84,8 +67,21 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		workerReplica.ReplicaNum = mpiTaskExtraArgs.GetNumWorkers()
-		launcherReplica.ReplicaNum = mpiTaskExtraArgs.GetNumLauncherReplicas()
+		replicaSpec, err := common.ToReplicaSpec(ctx, taskCtx, kubeflowv1.MPIJobDefaultContainerName)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create replica spec: [%v]", err.Error())
+		}
+		launcherReplicaSpec = replicaSpec.DeepCopy()
+		// TODO (jeev): Is this even a valid configuration. Can there be more than 1
+		// launcher? TaskTypeVersion 1 does not support overriding this value.
+		launcherReplicas := mpiTaskExtraArgs.GetNumLauncherReplicas()
+		if launcherReplicas < 1 {
+			launcherReplicas = 1
+		}
+		launcherReplicaSpec.Replicas = &launcherReplicas
+		workerReplicaSpec = replicaSpec.DeepCopy()
+		workerReplicas := mpiTaskExtraArgs.GetNumWorkers()
+		workerReplicaSpec.Replicas = &workerReplicas
 		slots = mpiTaskExtraArgs.GetSlots()
 
 		// V1 requires passing worker command as template config parameter
@@ -95,10 +91,10 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			workerSpecCommand = strings.Split(val, " ")
 		}
 
-		for k := range workerReplica.PodSpec.Containers {
-			if workerReplica.PodSpec.Containers[k].Name == kubeflowv1.MPIJobDefaultContainerName {
-				workerReplica.PodSpec.Containers[k].Args = workerSpecCommand
-				workerReplica.PodSpec.Containers[k].Command = []string{}
+		for k := range workerReplicaSpec.Template.Spec.Containers {
+			if workerReplicaSpec.Template.Spec.Containers[k].Name == kubeflowv1.MPIJobDefaultContainerName {
+				workerReplicaSpec.Template.Spec.Containers[k].Args = workerSpecCommand
+				workerReplicaSpec.Template.Spec.Containers[k].Command = []string{}
 			}
 		}
 
@@ -110,36 +106,14 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "invalid TaskSpecification [%v], Err: [%v]", taskTemplate.GetCustom(), err.Error())
 		}
 
-		launcherReplicaSpec := kfMPITaskExtraArgs.GetLauncherReplicas()
-		if launcherReplicaSpec != nil {
-			// flyte commands will be passed as args to the container
-			err = common.OverrideContainerSpec(
-				launcherReplica.PodSpec,
-				kubeflowv1.MPIJobDefaultContainerName,
-				launcherReplicaSpec.GetImage(),
-				launcherReplicaSpec.GetResources(),
-				launcherReplicaSpec.GetCommand(),
-			)
-			if err != nil {
-				return nil, err
-			}
-			launcherReplica.RestartPolicy = common.ParseRestartPolicy(launcherReplicaSpec.GetRestartPolicy())
+		launcherReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfMPITaskExtraArgs.GetLauncherReplicas(), kubeflowv1.MPIJobDefaultContainerName, true)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create launcher replica spec: [%v]", err.Error())
 		}
 
-		workerReplicaSpec := kfMPITaskExtraArgs.GetWorkerReplicas()
-		if workerReplicaSpec != nil {
-			err = common.OverrideContainerSpec(
-				workerReplica.PodSpec,
-				kubeflowv1.MPIJobDefaultContainerName,
-				workerReplicaSpec.GetImage(),
-				workerReplicaSpec.GetResources(),
-				workerReplicaSpec.GetCommand(),
-			)
-			if err != nil {
-				return nil, err
-			}
-			workerReplica.RestartPolicy = common.ParseRestartPolicy(workerReplicaSpec.GetRestartPolicy())
-			workerReplica.ReplicaNum = workerReplicaSpec.GetReplicas()
+		workerReplicaSpec, err = common.ToReplicaSpecWithOverrides(ctx, taskCtx, kfMPITaskExtraArgs.GetWorkerReplicas(), kubeflowv1.MPIJobDefaultContainerName, false)
+		if err != nil {
+			return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create worker replica spec: [%v]", err.Error())
 		}
 
 		if kfMPITaskExtraArgs.GetRunPolicy() != nil {
@@ -151,37 +125,19 @@ func (mpiOperatorResourceHandler) BuildResource(ctx context.Context, taskCtx plu
 			"Invalid TaskSpecification, unsupported task template version [%v] key", taskTemplate.TaskTypeVersion)
 	}
 
-	if workerReplica.ReplicaNum == 0 {
-		return nil, fmt.Errorf("number of worker should be more then 0")
+	if *workerReplicaSpec.Replicas <= 0 {
+		return nil, fmt.Errorf("number of workers must be greater than 0")
 	}
-	if launcherReplica.ReplicaNum == 0 {
-		return nil, fmt.Errorf("number of launch worker should be more then 0")
+	if *launcherReplicaSpec.Replicas <= 0 {
+		return nil, fmt.Errorf("number of launchers must be greater than 0")
 	}
-
-	cfg := config.GetK8sPluginConfig()
-	objectMeta.Annotations = utils.UnionMaps(cfg.DefaultAnnotations, objectMeta.Annotations, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations()))
-	objectMeta.Labels = utils.UnionMaps(cfg.DefaultLabels, objectMeta.Labels, utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels()))
 
 	jobSpec := kubeflowv1.MPIJobSpec{
 		SlotsPerWorker: &slots,
 		RunPolicy:      runPolicy,
 		MPIReplicaSpecs: map[commonOp.ReplicaType]*commonOp.ReplicaSpec{
-			kubeflowv1.MPIJobReplicaTypeLauncher: {
-				Replicas: &launcherReplica.ReplicaNum,
-				Template: v1.PodTemplateSpec{
-					ObjectMeta: *objectMeta,
-					Spec:       *launcherReplica.PodSpec,
-				},
-				RestartPolicy: launcherReplica.RestartPolicy,
-			},
-			kubeflowv1.MPIJobReplicaTypeWorker: {
-				Replicas: &workerReplica.ReplicaNum,
-				Template: v1.PodTemplateSpec{
-					ObjectMeta: *objectMeta,
-					Spec:       *workerReplica.PodSpec,
-				},
-				RestartPolicy: workerReplica.RestartPolicy,
-			},
+			kubeflowv1.MPIJobReplicaTypeLauncher: launcherReplicaSpec,
+			kubeflowv1.MPIJobReplicaTypeWorker:   workerReplicaSpec,
 		},
 	}
 
@@ -206,8 +162,8 @@ func (mpiOperatorResourceHandler) GetTaskPhase(_ context.Context, pluginContext 
 		return pluginsCore.PhaseInfoUndefined, fmt.Errorf("failed to convert resource data type")
 	}
 
-	numWorkers = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeWorker].Replicas
-	numLauncherReplicas = app.Spec.MPIReplicaSpecs[kubeflowv1.MPIJobReplicaTypeLauncher].Replicas
+	numWorkers = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeWorker)
+	numLauncherReplicas = common.GetReplicaCount(app.Spec.MPIReplicaSpecs, kubeflowv1.MPIJobReplicaTypeLauncher)
 
 	taskLogs, err := common.GetLogs(pluginContext, common.MPITaskType, app.ObjectMeta, false,
 		*numWorkers, *numLauncherReplicas, 0, 0)

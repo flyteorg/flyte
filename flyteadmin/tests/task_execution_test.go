@@ -9,27 +9,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/golang/protobuf/ptypes/timestamp"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/stretchr/testify/assert"
-
-	"google.golang.org/grpc"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const taskExecInputURI = "s3://flyte/metadata/admin/input/uri"

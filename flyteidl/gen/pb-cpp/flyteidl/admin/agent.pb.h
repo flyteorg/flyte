@@ -39,6 +39,7 @@
 #include "flyteidl/core/tasks.pb.h"
 #include "flyteidl/core/interface.pb.h"
 #include "flyteidl/core/identifier.pb.h"
+#include "flyteidl/core/execution.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto
@@ -910,6 +911,18 @@ class GetTaskResponse final :
 
   // accessors -------------------------------------------------------
 
+  // repeated .flyteidl.core.TaskLog log_links = 2;
+  int log_links_size() const;
+  void clear_log_links();
+  static const int kLogLinksFieldNumber = 2;
+  ::flyteidl::core::TaskLog* mutable_log_links(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
+      mutable_log_links();
+  const ::flyteidl::core::TaskLog& log_links(int index) const;
+  ::flyteidl::core::TaskLog* add_log_links();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
+      log_links() const;
+
   // .flyteidl.admin.Resource resource = 1;
   bool has_resource() const;
   void clear_resource();
@@ -924,6 +937,7 @@ class GetTaskResponse final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > log_links_;
   ::flyteidl::admin::Resource* resource_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
@@ -2000,6 +2014,33 @@ inline void GetTaskResponse::set_allocated_resource(::flyteidl::admin::Resource*
   }
   resource_ = resource;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskResponse.resource)
+}
+
+// repeated .flyteidl.core.TaskLog log_links = 2;
+inline int GetTaskResponse::log_links_size() const {
+  return log_links_.size();
+}
+inline ::flyteidl::core::TaskLog* GetTaskResponse::mutable_log_links(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
+GetTaskResponse::mutable_log_links() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.GetTaskResponse.log_links)
+  return &log_links_;
+}
+inline const ::flyteidl::core::TaskLog& GetTaskResponse::log_links(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_.Get(index);
+}
+inline ::flyteidl::core::TaskLog* GetTaskResponse::add_log_links() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
+GetTaskResponse::log_links() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.GetTaskResponse.log_links)
+  return log_links_;
 }
 
 // -------------------------------------------------------------------

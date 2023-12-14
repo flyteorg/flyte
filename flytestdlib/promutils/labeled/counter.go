@@ -3,11 +3,11 @@ package labeled
 import (
 	"context"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 // Counter represents a counter labeled with values from the context. See labeled.SetMetricsKeys for information about to

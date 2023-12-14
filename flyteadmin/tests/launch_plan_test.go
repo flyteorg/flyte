@@ -11,13 +11,12 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
-
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
 )
 
 var launchPlanIdentifier = core.Identifier{

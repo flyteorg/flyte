@@ -1,9 +1,10 @@
 package compiler
 
 import (
+	"k8s.io/apimachinery/pkg/util/sets"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func toInterfaceProviderMap(tasks []common.InterfaceProvider) map[string]common.InterfaceProvider {

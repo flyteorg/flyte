@@ -4,13 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-
 	"github.com/go-test/deep"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
 	corev1 "k8s.io/api/core/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 )
 
 func TestAWSSecretManagerInjector_Inject(t *testing.T) {

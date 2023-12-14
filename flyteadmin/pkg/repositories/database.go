@@ -8,14 +8,15 @@ import (
 	"os"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/database"
-
-	"gorm.io/driver/sqlite"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/jackc/pgconn"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/plugin/opentelemetry/tracing"
+
+	"github.com/flyteorg/flyte/flytestdlib/database"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 )
 
 const pqInvalidDBCode = "3D000"
@@ -101,6 +102,11 @@ func GetDB(ctx context.Context, dbConfig *database.DbConfig, logConfig *logger.C
 		}
 	default:
 		return nil, fmt.Errorf("unrecognized database config, %v. Supported only postgres and sqlite", dbConfig)
+	}
+
+	tracerProvider := otelutils.GetTracerProvider(otelutils.AdminGormTracer)
+	if err := gormDb.Use(tracing.NewPlugin(tracing.WithTracerProvider(tracerProvider), tracing.WithoutMetrics())); err != nil {
+		return nil, fmt.Errorf("failed to enable tracing for gorm db, %w", err)
 	}
 
 	// Setup connection pool settings

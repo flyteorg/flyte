@@ -468,7 +468,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.9.4"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.6"
       k8s-array:
         logs:
           config:
@@ -816,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: R2JRWFVRYThnRFVLbHpuSA==
+  haSharedSecret: ZnNFaHlpM01FZjRaQmNJSA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1246,7 +1246,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: b765a68950c83acd0c069dac2a6569cf2b0f0f76a2760eea3561d1d04d6be831
+        checksum/configuration: 6755bdc74789d7e2a80161a9f811e41ea3c0cf12bab5cb0820c7c8539b4b88fe
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1273,6 +1273,7 @@ spec:
           httpGet:
             path: /healthcheck
             port: http
+          initialDelaySeconds: 30
         name: flyte
         ports:
         - containerPort: 8088
@@ -1285,6 +1286,7 @@ spec:
           httpGet:
             path: /healthcheck
             port: http
+          initialDelaySeconds: 30
         volumeMounts:
         - mountPath: /etc/flyte/cluster-resource-templates
           name: cluster-resource-templates
@@ -1409,7 +1411,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 0ee1553aec7c03152a0a44e7b1a82985795774412a779f7b607a57e59f42c8ef
+        checksum/secret: 727daf2e5024ea4e541b87b717e6f9a8706552e0ae461f82b2e5260ad564766c
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1697,10 +1699,17 @@ spec:
       containers:
       - image: envoyproxy/envoy:sandbox
         imagePullPolicy: Never
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: http
         name: proxy
         ports:
         - containerPort: 8000
           name: http
+        readinessProbe:
+          tcpSocket:
+            port: http
         volumeMounts:
         - mountPath: /etc/envoy
           name: config
@@ -1727,7 +1736,6 @@ spec:
       app.kubernetes.io/name: flyteagent
   template:
     metadata:
-      annotations: null
       labels:
         app.kubernetes.io/instance: flyteagent
         app.kubernetes.io/managed-by: Helm
@@ -1738,7 +1746,14 @@ spec:
       - command:
         - pyflyte
         - serve
-        image: ghcr.io/flyteorg/flyteagent:1.9.1
+        env:
+        - name: FLYTE_AWS_ENDPOINT
+          value: http://flyte-sandbox-minio.flyte:9000
+        - name: FLYTE_AWS_ACCESS_KEY_ID
+          value: minio
+        - name: FLYTE_AWS_SECRET_ACCESS_KEY
+          value: miniostorage
+        image: ghcr.io/flyteorg/flyteagent:1.10.1
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

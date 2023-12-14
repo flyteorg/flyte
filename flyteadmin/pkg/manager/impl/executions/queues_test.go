@@ -4,20 +4,18 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const testProject = "project"

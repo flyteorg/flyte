@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/go-test/deep"
+	corev1 "k8s.io/api/core/v1"
 
 	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	corev1 "k8s.io/api/core/v1"
 )
 
 func TestK8sSecretInjector_Inject(t *testing.T) {

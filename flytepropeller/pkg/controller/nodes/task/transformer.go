@@ -72,7 +72,7 @@ func getParentNodeExecIDForTask(taskExecID *core.TaskExecutionIdentifier, execCo
 type ToTaskExecutionEventInputs struct {
 	TaskExecContext       pluginCore.TaskExecutionContext
 	InputReader           io.InputFilePaths
-	Inputs                *core.LiteralMap
+	Inputs                *core.InputData
 	EventConfig           *config.EventConfig
 	OutputWriter          io.OutputFilePaths
 	Info                  pluginCore.PhaseInfo

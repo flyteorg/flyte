@@ -5,9 +5,9 @@ import (
 
 	"github.com/go-test/deep"
 	_struct "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestComputeRetryStrategy(t *testing.T) {

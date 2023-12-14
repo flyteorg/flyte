@@ -10,29 +10,26 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (
 	ErrSystem       errors.ErrorCode = "System"
 	post            string           = "POST"
 	get             string           = "GET"
-	databricksAPI   string           = "/api/2.0/jobs/runs"
+	databricksAPI   string           = "/api/2.1/jobs/runs"
 	newCluster      string           = "new_cluster"
 	dockerImage     string           = "docker_image"
 	sparkConfig     string           = "spark_conf"
@@ -117,10 +114,15 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, fmt.Errorf("failed to unmarshal databricksJob: %v: %v", sparkJob.DatabricksConf, err)
 	}
 
-	if _, ok := databricksJob[newCluster]; ok {
-		databricksJob[newCluster].(map[string]interface{})[dockerImage] = map[string]string{url: container.Image}
-		if len(sparkJob.SparkConf) != 0 {
-			databricksJob[newCluster].(map[string]interface{})[sparkConfig] = sparkJob.SparkConf
+	// If "existing_cluster_id" is in databricks_job, then we don't need to set "new_cluster"
+	// Refer the docs here: https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#request-structure
+	if clusterConfig, ok := databricksJob[newCluster].(map[string]interface{}); ok {
+		if dockerConfig, ok := clusterConfig[dockerImage].(map[string]interface{}); !ok || dockerConfig[url] == nil {
+			clusterConfig[dockerImage] = map[string]string{url: container.Image}
+		}
+
+		if clusterConfig[sparkConfig] == nil && len(sparkJob.SparkConf) != 0 {
+			clusterConfig[sparkConfig] = sparkJob.SparkConf
 		}
 	}
 	databricksJob[sparkPythonTask] = map[string]interface{}{pythonFile: p.cfg.EntrypointFile, parameters: modifiedArgs}
@@ -144,7 +146,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err,
 			"Unable to fetch statementHandle from http response")
 	}
-	runID := fmt.Sprintf("%v", data["run_id"])
+	runID := fmt.Sprintf("%.0f", data["run_id"])
 
 	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
 		ResourceWrapper{StatusCode: resp.StatusCode}, nil
@@ -159,6 +161,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 	resp, err := p.client.Do(req)
+	logger.Debugf(ctx, "Get databricks job response", "resp", resp)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get databricks job status [%v]", resp)
 		return nil, err
@@ -224,7 +227,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case http.StatusAccepted:
 		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
 	case http.StatusOK:
-		if lifeCycleState == "TERMINATED" {
+		if lifeCycleState == "TERMINATED" || lifeCycleState == "TERMINATING" || lifeCycleState == "INTERNAL_ERROR" {
 			if resultState == "SUCCESS" {
 				if err := writeOutput(ctx, taskCtx); err != nil {
 					pluginsCore.PhaseInfoFailure(string(rune(statusCode)), "failed to write output", taskInfo)
@@ -233,6 +236,11 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 			}
 			return pluginsCore.PhaseInfoFailure(string(rune(statusCode)), message, taskInfo), nil
 		}
+
+		if lifeCycleState == "PENDING" {
+			return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
+		}
+
 		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
 	case http.StatusBadRequest:
 		fallthrough
@@ -280,7 +288,7 @@ func buildRequest(
 	var err error
 	if isCancel {
 		databricksURL += "/cancel"
-		data = []byte(fmt.Sprintf("{ run_id: %v }", runID))
+		data = []byte(fmt.Sprintf("{ \"run_id\": %v }", runID))
 	} else if method == post {
 		databricksURL += "/submit"
 		mJSON, err := json.Marshal(databricksJob)

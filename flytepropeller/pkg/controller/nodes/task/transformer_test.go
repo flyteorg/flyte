@@ -4,27 +4,23 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/ptypes"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	mocks2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	nodemocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const containerTaskType = "container"
@@ -71,6 +67,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	generatedName := "generated_name"
 	tID.OnGetGeneratedName().Return(generatedName)
 	tID.OnGetID().Return(*id)
+	tID.OnGetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
@@ -265,6 +262,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	generatedName := "generated_name"
 	tID.OnGetGeneratedName().Return(generatedName)
 	tID.OnGetID().Return(*id)
+	tID.OnGetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)

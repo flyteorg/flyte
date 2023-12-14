@@ -3,9 +3,9 @@ package array
 import (
 	"testing"
 
-	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/stretchr/testify/assert"
+
+	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestAppendLiteral(t *testing.T) {

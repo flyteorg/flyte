@@ -4,11 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGetCloudEventPublisher(t *testing.T) {
