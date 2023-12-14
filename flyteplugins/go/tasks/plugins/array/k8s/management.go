@@ -335,10 +335,13 @@ func TerminateSubTasksOnAbort(ctx context.Context, tCtx core.TaskExecutionContex
 	taskInfo := &core.TaskInfo{
 		ExternalResources: externalResources,
 	}
-	phaseInfo := core.PhaseInfoFailureWithCleanup(core.PhasePermanentFailure.String(), "Array subtasks were aborted", taskInfo)
-	err = tCtx.EventsRecorder().RecordRaw(ctx, phaseInfo)
+	executionErr := &idlCore.ExecutionError{
+		Code:    "ArraySubtasksAborted",
+		Message: "Array subtasks were aborted",
+	}
+	phaseInfo := core.PhaseInfoFailed(core.PhaseAborted, executionErr, taskInfo)
 
-	return err
+	return tCtx.EventsRecorder().RecordRaw(ctx, phaseInfo)
 }
 
 // TerminateSubTasks performs operations to gracefully terminate all subtasks. This may include
@@ -362,30 +365,29 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 			// we can use RetryAttempts if it has been initialized, otherwise stay with default 0
 			retryAttempt = currentState.RetryAttempts.GetItem(childIdx)
 		}
+
+		// return immediately if subtask has completed or not yet started
+		if existingPhase.IsTerminal() || existingPhase == core.PhaseUndefined {
+			continue
+		}
+
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, currentState.GetIndexesToCache())
 		stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, 0)
 		if err != nil {
 			return currentState, externalResources, err
 		}
 
-		isAbortedSubtask := false
-		if !existingPhase.IsTerminal() && existingPhase != core.PhaseUndefined {
-			// only terminate subtask  if it has completed or has not yet started
-			err = terminateFunction(ctx, stCtx, config, kubeClient)
-			if err != nil {
-				messageCollector.Collect(childIdx, err.Error())
-			} else {
-				isAbortedSubtask = true
-			}
+		err = terminateFunction(ctx, stCtx, config, kubeClient)
+		if err != nil {
+			messageCollector.Collect(childIdx, err.Error())
+		} else {
+			externalResources = append(externalResources, &core.ExternalResource{
+				ExternalID:       stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Index:            uint32(originalIdx),
+				RetryAttempt:     uint32(retryAttempt),
+				Phase:            core.PhaseAborted,
+			})
 		}
-
-		externalResources = append(externalResources, &core.ExternalResource{
-			ExternalID:       stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
-			Index:            uint32(originalIdx),
-			RetryAttempt:     uint32(retryAttempt),
-			Phase:            existingPhase,
-			IsAbortedSubtask: isAbortedSubtask,
-		})
 	}
 
 	if messageCollector.Length() > 0 {
