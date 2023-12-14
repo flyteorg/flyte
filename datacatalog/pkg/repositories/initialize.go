@@ -3,6 +3,7 @@ package repositories
 import (
 	"context"
 	"errors"
+	"net"
 	"reflect"
 
 	"github.com/jackc/pgconn"
@@ -37,8 +38,10 @@ func Migrate(ctx context.Context) error {
 				err)
 			panic(err)
 		}
-		pqError := cErr.Unwrap().(*pgconn.PgError)
-		if pqError.Code == pqInvalidDBCode {
+
+		conError := &net.OpError{}
+		pqError := &pgconn.PgError{}
+		if errors.As(cErr.Unwrap(), &pqError) && pqError.Code == pqInvalidDBCode {
 			logger.Warningf(ctx, "Database [%v] does not exist, trying to create it now", dbName)
 
 			dbConfigValues.Postgres.DbName = defaultDB
@@ -62,6 +65,8 @@ func Migrate(ctx context.Context) error {
 				logger.Errorf(ctx, "Failed to connect DB err %v", err)
 				panic(err)
 			}
+		} else if errors.As(cErr.Unwrap(), &conError) {
+			logger.Errorf(ctx, "Failing to connect to DB %v, err %v", dbName, conError)
 		} else {
 			logger.Errorf(ctx, "Failed to connect DB err %v", err)
 			panic(err)
