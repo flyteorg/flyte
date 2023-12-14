@@ -151,7 +151,7 @@ def import_projects(app: Sphinx, config: Config):
                 # If tags don't exist just use the current commit. This occurs
                 # when the git repo is a shallow clone.
                 tag_str = "dev"
-                commit = repo.head.commit
+                commit = str(repo.head.commit)[:7]
             else:
                 tag = tags[-1]
                 tag_str = str(tag)
