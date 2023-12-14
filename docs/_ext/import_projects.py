@@ -145,12 +145,20 @@ def import_projects(app: Sphinx, config: Config):
         local_docs_path = local_dir / project.docs_path
         dest_docs_dir = srcdir / project.dest
 
-        # use the latest git tag when building docs
         if repo:
             tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
-            tag = tags[-1]
-            update_html_context(project, str(tag), str(tag.commit)[:7], config)
-            repo.git.checkout(str(tag))
+            if not tags:
+                # If tags don't exist just use the current commit. This occurs
+                # when the git repo is a shallow clone.
+                tag_str = "dev"
+                commit = repo.head.commit
+            else:
+                tag = tags[-1]
+                tag_str = str(tag)
+                commit = str(tag.commit)[:7]
+                repo.git.checkout(tag_str)
+
+            update_html_context(project, tag_str, commit, config)
 
         if project.refresh or not dest_docs_dir.exists():
             shutil.rmtree(dest_docs_dir, ignore_errors=True)
