@@ -300,7 +300,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseRunning
 			msg := "running"
-			ns.UpdatePhase(p, n, msg, false, nil)
+			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
 
 			assert.Equal(t, *ns.LastUpdatedAt, n)
 			assert.Nil(t, ns.QueuedAt)
@@ -312,11 +312,27 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			assert.Nil(t, ns.Error)
 		})
 
+		t.Run("non-terminal-timing-out", func(t *testing.T) {
+			ns := NodeStatus{}
+			p := NodePhaseTimingOut
+			msg := "timing-out"
+			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+
+			assert.Equal(t, *ns.LastUpdatedAt, n)
+			assert.Nil(t, ns.QueuedAt)
+			assert.Nil(t, ns.LastAttemptStartedAt)
+			assert.Nil(t, ns.StartedAt)
+			assert.Nil(t, ns.StoppedAt)
+			assert.Equal(t, p, ns.Phase)
+			assert.Equal(t, msg, ns.Message)
+			assert.Nil(t, ns.Error)
+		})
+
 		t.Run("terminal-success", func(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseSucceeded
 			msg := success
-			ns.UpdatePhase(p, n, msg, false, nil)
+			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
 
 			assert.Nil(t, ns.LastUpdatedAt)
 			assert.Nil(t, ns.QueuedAt)
@@ -332,7 +348,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseSucceeded
 			msg := success
-			ns.UpdatePhase(p, n, msg, false, nil)
+			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
 
 			assert.Nil(t, ns.LastUpdatedAt)
 			assert.Nil(t, ns.QueuedAt)
@@ -358,7 +374,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			}
 			p := NodePhaseSucceeded
 			msg := success
-			ns.UpdatePhase(p, n, msg, false, nil)
+			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
 
 			assert.Nil(t, ns.LastUpdatedAt)
 			assert.Nil(t, ns.QueuedAt)
@@ -390,7 +406,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			n2 := metav1.NewTime(time.Now())
 			p := NodePhaseRunning
 			msg := "running"
-			ns.UpdatePhase(p, n2, msg, false, nil)
+			ns.UpdatePhase(p, n2, msg, clearStateOnAnyTermination, nil)
 
 			assert.Equal(t, *ns.LastUpdatedAt, n2)
 			assert.Equal(t, *ns.QueuedAt, n)
