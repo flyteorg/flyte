@@ -36,6 +36,8 @@ const (
 	PhasePermanentFailure
 	// Indicates the task is waiting for the cache to be populated so it can reuse results
 	PhaseWaitingForCache
+	// Indicate the task has been aborted
+	PhaseAborted
 )
 
 var Phases = []Phase{
@@ -49,11 +51,12 @@ var Phases = []Phase{
 	PhaseRetryableFailure,
 	PhasePermanentFailure,
 	PhaseWaitingForCache,
+	PhaseAborted,
 }
 
 // Returns true if the given phase is failure, retryable failure or success
 func (p Phase) IsTerminal() bool {
-	return p.IsFailure() || p.IsSuccess()
+	return p.IsFailure() || p.IsSuccess() || p.IsAborted()
 }
 
 func (p Phase) IsFailure() bool {
@@ -62,6 +65,10 @@ func (p Phase) IsFailure() bool {
 
 func (p Phase) IsSuccess() bool {
 	return p == PhaseSuccess
+}
+
+func (p Phase) IsAborted() bool {
+	return p == PhaseAborted
 }
 
 func (p Phase) IsWaitingForResources() bool {
@@ -82,8 +89,6 @@ type ExternalResource struct {
 	RetryAttempt uint32
 	// Phase (if exists) associated with the external resource
 	Phase Phase
-	// Indicates if external resource is a subtask getting aborted
-	IsAbortedSubtask bool
 }
 
 type ReasonInfo struct {
