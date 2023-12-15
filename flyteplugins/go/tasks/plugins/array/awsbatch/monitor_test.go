@@ -248,7 +248,7 @@ func TestCheckSubTasksState(t *testing.T) {
 
 		newState, err := CheckSubTasksState(ctx, tCtx, jobStore, &config.Config{}, &State{
 			State: &arrayCore.State{
-				CurrentPhase:         arrayCore.PhaseWriteToDiscoveryThenFail,
+				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
 				ExecutionArraySize:   2,
 				OriginalArraySize:    2,
 				OriginalMinSuccesses: 2,
@@ -264,6 +264,6 @@ func TestCheckSubTasksState(t *testing.T) {
 
 		assert.NoError(t, err)
 		p, _ := newState.GetPhase()
-		assert.Equal(t, arrayCore.PhaseWriteToDiscoveryThenFail, p)
+		assert.Equal(t, arrayCore.PhaseAbortSubTasks, p)
 	})
 }
