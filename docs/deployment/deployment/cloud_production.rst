@@ -30,27 +30,15 @@ To turn on ingress, update your ``values.yaml`` file to include the following bl
       .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
          :caption: charts/flyte-binary/eks-production.yaml
          :language: yaml
-         :lines: 127-135
+         :lines: 93-102 
 
    .. group-tab:: ``flyte-binary``/ on EKS using ALB 
 
-      .. code-block:: yaml
-
-         ingress:
-           create: true
-           commonAnnotations:
-             alb.ingress.kubernetes.io/certificate-arn: '<your-SSL-certificate-ARN>'
-             alb.ingress.kubernetes.io/group.name: flyte
-             alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
-             alb.ingress.kubernetes.io/scheme: internet-facing
-             alb.ingress.kubernetes.io/ssl-redirect: '443'
-             alb.ingress.kubernetes.io/target-type: ip
-             kubernetes.io/ingress.class: alb
-           httpAnnotations:
-             alb.ingress.kubernetes.io/actions.app-root: '{"Type": "redirect", "RedirectConfig": {"Path": "/console", "StatusCode": "HTTP_302"}}'
-           grpcAnnotations:
-             alb.ingress.kubernetes.io/backend-protocol-version: GRPC 
-           host: <your-URL> #use a DNS CNAME pointing to your ALB
+      .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
+         :caption: charts/flyte-binary/eks-production.yaml
+         :language: yaml
+         :lines: 106-118 
+     
 
    .. group-tab:: ``flyte-core`` on GCP using NGINX  
 
