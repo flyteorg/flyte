@@ -89,15 +89,17 @@ var flyteWf = &v1alpha1.FlyteWorkflow{
 	},
 }
 
-var testInputs = &core.LiteralMap{
-	Literals: map[string]*core.Literal{
-		"foo": {
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_Integer{
-								Integer: 4,
+var testInputs = &core.InputData{
+	Inputs: &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 4,
+								},
 							},
 						},
 					},
@@ -156,7 +158,7 @@ func TestExecute(t *testing.T) {
 	}
 	mockBuilder.OnBuildMatch(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
 		return proto.Equal(wfClosure, &workflowClosure)
-	}), mock.MatchedBy(func(inputs *core.LiteralMap) bool {
+	}), mock.MatchedBy(func(inputs *core.InputData) bool {
 		return proto.Equal(inputs, testInputs)
 	}), mock.MatchedBy(func(executionID *core.WorkflowExecutionIdentifier) bool {
 		return proto.Equal(executionID, execID)
@@ -174,7 +176,7 @@ func TestExecute(t *testing.T) {
 		ReferenceLaunchPlanName: "ref_lp_name",
 		WorkflowClosure:         &workflowClosure,
 		ExecutionParameters: interfaces.ExecutionParameters{
-			Inputs: testInputs,
+			InputData: testInputs,
 			ExecutionConfig: &admin.WorkflowExecutionConfig{
 				SecurityContext: &core.SecurityContext{
 					RunAs: &core.Identity{
@@ -374,7 +376,7 @@ func TestExecute_OffloadWorkflowClosure(t *testing.T) {
 	}
 	mockBuilder.OnBuildMatch(mock.MatchedBy(func(wfClosure *core.CompiledWorkflowClosure) bool {
 		return proto.Equal(wfClosure, &workflowClosure)
-	}), mock.MatchedBy(func(inputs *core.LiteralMap) bool {
+	}), mock.MatchedBy(func(inputs *core.InputData) bool {
 		return proto.Equal(inputs, testInputs)
 	}), mock.MatchedBy(func(executionID *core.WorkflowExecutionIdentifier) bool {
 		return proto.Equal(executionID, execID)
@@ -396,7 +398,7 @@ func TestExecute_OffloadWorkflowClosure(t *testing.T) {
 		ReferenceLaunchPlanName: "ref_lp_name",
 		WorkflowClosure:         &workflowClosure,
 		ExecutionParameters: interfaces.ExecutionParameters{
-			Inputs: testInputs,
+			InputData: testInputs,
 			ExecutionConfig: &admin.WorkflowExecutionConfig{
 				SecurityContext: &core.SecurityContext{
 					RunAs: &core.Identity{

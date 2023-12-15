@@ -482,9 +482,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
-		request.Inputs,
-		launchPlan.Spec.FixedInputs,
-		launchPlan.Closure.ExpectedInputs,
+		request.GetInputData(),
+		request.GetInputs(),
+		launchPlan.Spec.GetFixedInputData(),
+		launchPlan.Spec.GetFixedInputs(),
+		launchPlan.Spec.GetDefaultInputs(),
 	)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
@@ -565,13 +567,13 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:              executionInputs,
+		InputData:           executionInputs,
 		AcceptedAt:          requestedAt,
 		Labels:              labels,
 		Annotations:         annotations,
 		ExecutionConfig:     executionConfig,
 		TaskResources:       &platformTaskResources,
-		EventVersion:        m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
+		EventVersion:        m.config.ApplicationConfiguration().GetTopLevelConfig().GetEventVersion(),
 		RoleNameKey:         m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
 		RawOutputDataConfig: rawOutputDataConfig,
 		ClusterAssignment:   clusterAssignment,
@@ -719,10 +721,13 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
 		return nil, nil, err
 	}
+
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
-		request.Inputs,
-		launchPlan.Spec.FixedInputs,
-		launchPlan.Closure.ExpectedInputs,
+		request.GetInputData(),
+		request.GetInputs(),
+		launchPlan.GetSpec().GetFixedInputData(),
+		launchPlan.GetSpec().GetFixedInputs(),
+		launchPlan.GetClosure().GetExpectedInputs(),
 	)
 
 	if err != nil {
@@ -784,6 +789,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		return nil, nil, err
 	}
+
 	userInputsURI, err := common.OffloadData(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
 		return nil, nil, err
@@ -820,7 +826,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:              executionInputs,
+		InputData:           executionInputs,
 		AcceptedAt:          requestedAt,
 		Labels:              labels,
 		Annotations:         annotations,

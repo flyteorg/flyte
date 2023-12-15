@@ -120,11 +120,17 @@ message LiteralMap {
     map<string, Literal> literals = 1;
 }
 
+// InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to
+// their values.
 message InputData {
+    // A map of input variables to their values.
     LiteralMap inputs = 1;
 }
 
+// OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to
+// their values.
 message OutputData {
+    // A map of output variables to their values.
     LiteralMap outputs = 1;
 }
 

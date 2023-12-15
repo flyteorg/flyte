@@ -19,6 +19,11 @@ func (i arrayJobInputReader) GetInputPath() storage.DataReference {
 	return i.GetInputPrefixPath()
 }
 
+// GetInputDataPath overrides the inputpath to return the prefix path for array jobs
+func (i arrayJobInputReader) GetInputDataPath() storage.DataReference {
+	return i.GetInputPrefixPath()
+}
+
 func GetInputReader(tCtx core.TaskExecutionContext, taskTemplate *idlCore.TaskTemplate) io.InputReader {
 	if taskTemplate.GetTaskTypeVersion() == 0 && taskTemplate.Type != AwsBatchTaskType {
 		// Prior to task type version == 1, dynamic type tasks (including array tasks) would write input files for each

@@ -77,7 +77,9 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 }
 
 func CheckAndFetchInputsForExecution(
-	userInputs *core.LiteralMap, fixedInputs *core.LiteralMap, expectedInputs *core.ParameterMap) (*core.LiteralMap, error) {
+	userInputsData *core.InputData, userInputs *core.LiteralMap,
+	fixedInputsData *core.InputData, fixedInputs *core.LiteralMap,
+	expectedInputs *core.ParameterMap) (*core.InputData, error) {
 
 	executionInputMap := map[string]*core.Literal{}
 	expectedInputMap := map[string]*core.Parameter{}
@@ -86,11 +88,21 @@ func CheckAndFetchInputsForExecution(
 		expectedInputMap = expectedInputs.GetParameters()
 	}
 
-	if userInputs != nil && len(userInputs.GetLiterals()) > 0 {
+	if literals := userInputsData.GetInputs().GetLiterals(); len(literals) > 0 {
+		for name, value := range literals {
+			if _, ok := expectedInputMap[name]; !ok {
+				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input %s", name)
+			}
+
+			executionInputMap[name] = value
+		}
+		// DEPRECATED: Remove this block once the deprecated field is removed from the API.
+	} else if userInputs != nil && len(userInputs.GetLiterals()) > 0 {
 		for name, value := range userInputs.GetLiterals() {
 			if _, ok := expectedInputMap[name]; !ok {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input %s", name)
 			}
+
 			executionInputMap[name] = value
 		}
 	}
@@ -109,7 +121,15 @@ func CheckAndFetchInputsForExecution(
 		}
 	}
 
-	if fixedInputs != nil && len(fixedInputs.GetLiterals()) > 0 {
+	if literals := fixedInputsData.GetInputs().GetLiterals(); len(literals) > 0 {
+		for name, fixedInput := range literals {
+			if _, ok := executionInputMap[name]; ok {
+				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s %s cannot be overridden", shared.FixedInputs, name)
+			}
+			executionInputMap[name] = fixedInput
+		}
+		// DEPRECATED: Remove this block once the deprecated field is removed from the API.
+	} else if fixedInputs != nil && len(fixedInputs.GetLiterals()) > 0 {
 		for name, fixedInput := range fixedInputs.GetLiterals() {
 			if _, ok := executionInputMap[name]; ok {
 				return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "%s %s cannot be overridden", shared.FixedInputs, name)
@@ -118,8 +138,10 @@ func CheckAndFetchInputsForExecution(
 		}
 	}
 
-	return &core.LiteralMap{
-		Literals: executionInputMap,
+	return &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: executionInputMap,
+		},
 	}, nil
 }
 
@@ -146,10 +168,10 @@ func ValidateCreateWorkflowEventRequest(request admin.WorkflowExecutionEventRequ
 			"Workflow event handler request event doesn't have an execution id - %v", request.Event)
 	}
 
-	outputData := request.Event.GetOutputData()
+	outputData := request.GetEvent().GetOutputData()
 	if outputData == nil {
 		outputData = &core.OutputData{
-			Outputs: request.Event.GetDeprecatedOutputData(),
+			Outputs: request.GetEvent().GetDeprecatedOutputData(),
 		}
 	}
 

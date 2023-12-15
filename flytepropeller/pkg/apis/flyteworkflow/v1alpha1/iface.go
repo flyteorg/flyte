@@ -558,6 +558,10 @@ func GetInputsFile(inputDir DataReference) DataReference {
 	return inputDir + "/inputs.pb"
 }
 
+func GetInputDataFile(inputDir DataReference) DataReference {
+	return inputDir + "/inputs_data.pb"
+}
+
 func GetDeckFile(inputDir DataReference) DataReference {
 	return inputDir + "/deck.html"
 }

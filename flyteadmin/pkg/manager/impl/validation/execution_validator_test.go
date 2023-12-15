@@ -70,8 +70,10 @@ func TestGetExecutionInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
 	expectedMap := core.LiteralMap{
@@ -94,8 +96,10 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
 	assert.EqualError(t, err, "invalid foo input wrong type. Expected simple:STRING , but got simple:INTEGER ")
@@ -111,8 +115,10 @@ func TestValidateExecInputsExtraInputs(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
 	assert.EqualError(t, err, "invalid input foo-extra")
@@ -128,8 +134,10 @@ func TestValidateExecInputsOverrideFixed(t *testing.T) {
 		},
 	}
 	_, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
 	assert.EqualError(t, err, "invalid input bar")
@@ -140,8 +148,10 @@ func TestValidateExecEmptyInputs(t *testing.T) {
 	lpRequest := testutils.GetLaunchPlanRequest()
 	executionRequest.Inputs = nil
 	actualInputs, err := CheckAndFetchInputsForExecution(
-		executionRequest.Inputs,
-		lpRequest.Spec.FixedInputs,
+		executionRequest.GetInputData(),
+		executionRequest.GetInputs(),
+		lpRequest.Spec.GetFixedInputData(),
+		lpRequest.Spec.GetFixedInputs(),
 		lpRequest.Spec.DefaultInputs,
 	)
 	expectedMap := core.LiteralMap{

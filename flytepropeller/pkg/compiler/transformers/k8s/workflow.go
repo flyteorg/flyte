@@ -160,7 +160,7 @@ func generateName(wfID *core.Identifier, execID *core.WorkflowExecutionIdentifie
 }
 
 // BuildFlyteWorkflow builds v1alpha1.FlyteWorkflow resource. Returned error, if not nil, is of type errors.CompilerErrors.
-func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.LiteralMap,
+func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.InputData,
 	executionID *core.WorkflowExecutionIdentifier, namespace string) (*v1alpha1.FlyteWorkflow, error) {
 
 	errs := errors.NewCompileErrors()
@@ -219,7 +219,8 @@ func BuildFlyteWorkflow(wfClosure *core.CompiledWorkflowClosure, inputs *core.Li
 			Namespace: namespace,
 			Labels:    map[string]string{},
 		},
-		Inputs:       &v1alpha1.Inputs{LiteralMap: inputs},
+		Inputs:       &v1alpha1.Inputs{LiteralMap: inputs.GetInputs()},
+		InputData:    &v1alpha1.InputData{InputData: inputs},
 		WorkflowSpec: primarySpec,
 		SubWorkflows: subwfs,
 		Tasks:        buildTasks(tasks, errs.NewScope()),

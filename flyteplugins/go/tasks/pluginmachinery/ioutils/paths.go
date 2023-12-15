@@ -10,6 +10,8 @@ import (
 const (
 	// InputsSuffix specifies the name of the file that contains the task inputs in the form core.LiteralMap
 	InputsSuffix = "inputs.pb"
+	// InputDataSuffix specifies the name of the file that contains the task inputs in the form core.LiteralMap
+	InputDataSuffix = "input_data.pb"
 	// TaskTemplateSuffix In case a task requests for a task template, it is passed into the task using this filename.
 	// The format is of type core.TaskTemplate
 	TaskTemplateSuffix = "task.pb"

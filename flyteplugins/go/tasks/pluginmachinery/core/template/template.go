@@ -40,6 +40,7 @@ var startsWithAlpha = regexp.MustCompile("^[^a-zA-Z_]+")
 // Regexes for Supported templates
 var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
 var inputPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
+var inputDataFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputData\s*}}`)
 var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
 var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
 var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
@@ -103,8 +104,8 @@ func Render(ctx context.Context, inputTemplate []string, params Parameters) ([]s
 }
 
 func render(ctx context.Context, inputTemplate string, params Parameters, perRetryKey string) (string, error) {
-
 	val := inputFileRegex.ReplaceAllString(inputTemplate, params.Inputs.GetInputPath().String())
+	val = inputDataFileRegex.ReplaceAllString(val, params.Inputs.GetInputDataPath().String())
 	val = outputRegex.ReplaceAllString(val, params.OutputPath.GetOutputPrefixPath().String())
 	val = inputPrefixRegex.ReplaceAllString(val, params.Inputs.GetInputPrefixPath().String())
 	val = rawOutputDataPrefixRegex.ReplaceAllString(val, params.OutputPath.GetRawOutputPrefix().String())

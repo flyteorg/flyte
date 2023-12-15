@@ -248,7 +248,8 @@ func UpdateExecutionModelState(
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
 			uri, err := common.OffloadData(ctx, storageClient, outputData,
-				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
+				request.GetEvent().GetExecutionId().GetProject(), request.GetEvent().GetExecutionId().GetDomain(),
+				request.GetEvent().GetExecutionId().GetName(), OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}
@@ -260,18 +261,19 @@ func UpdateExecutionModelState(
 				},
 			}
 		}
-	} else if request.Event.GetDeprecatedOutputData() != nil {
+	} else if deprecatedOutputData := request.GetEvent().GetDeprecatedOutputData(); deprecatedOutputData != nil {
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
 			executionClosure.OutputResult = &admin.ExecutionClosure_FullOutputs{
 				FullOutputs: &core.OutputData{
-					Outputs: request.Event.GetDeprecatedOutputData(),
+					Outputs: deprecatedOutputData,
 				},
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadData(ctx, storageClient, &core.OutputData{Outputs: request.Event.GetDeprecatedOutputData()},
-				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
+			uri, err := common.OffloadData(ctx, storageClient, &core.OutputData{Outputs: deprecatedOutputData},
+				request.GetEvent().GetExecutionId().GetProject(), request.GetEvent().GetExecutionId().GetDomain(),
+				request.GetEvent().GetExecutionId().GetName(), OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}

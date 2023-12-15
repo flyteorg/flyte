@@ -119,6 +119,7 @@ func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execC
 	if len(nodeStatus.GetDataDir()) == 0 {
 		return interfaces.NodeStatusUndefined, errors.Errorf(errors.IllegalStateError, startNode.GetID(), "no data-dir set, cannot store inputs")
 	}
+
 	outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
 
 	so := storage.Options{}
@@ -513,40 +514,35 @@ func (c *nodeExecutor) recoverInputs(ctx context.Context, nCtx interfaces.NodeEx
 
 	nodeInputs := recoveredData.InputData
 	if nodeInputs != nil {
-		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
-			c.metrics.InputsWriteFailure.Inc(ctx)
-			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
-			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
-		}
 	} else if recoveredData.FullInputs != nil {
 		nodeInputs = &core.InputData{
 			Inputs: recoveredData.FullInputs,
 		}
-
-		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
-			c.metrics.InputsWriteFailure.Inc(ctx)
-			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
-			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
-		}
 	} else if len(recovered.InputUri) > 0 {
 		// If the inputs are too large they won't be returned inline in the RecoverData call. We must fetch them before copying them.
 		nodeInputs = &core.InputData{}
-		if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), nodeInputs); err != nil {
-			oldInputsFormat := &core.LiteralMap{}
-			if err := c.store.ReadProtobuf(ctx, storage.DataReference(recovered.InputUri), oldInputsFormat); err != nil {
-				return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
-			}
-
+		oldNodeInputs := &core.LiteralMap{}
+		if msgIndex, err := c.store.ReadProtobufAny(ctx, storage.DataReference(recovered.InputUri), nodeInputs, oldNodeInputs); err != nil {
+			return nil, errors.Wrapf(errors.InputsNotFoundError, nCtx.NodeID(), err, "failed to read data from dataDir [%v].", recovered.InputUri)
+		} else if msgIndex == 1 { // LiteralMap
 			nodeInputs = &core.InputData{
-				Inputs: oldInputsFormat,
+				Inputs: oldNodeInputs,
 			}
 		}
+	}
 
-		if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs); err != nil {
-			c.metrics.InputsWriteFailure.Inc(ctx)
-			logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
-			return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
-		}
+	// Write old inputs format
+	if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputPath(), storage.Options{}, nodeInputs.GetInputs()); err != nil {
+		c.metrics.InputsWriteFailure.Inc(ctx)
+		logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputPath())
+		return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputPath())
+	}
+
+	// Write new inputs format
+	if err := c.store.WriteProtobuf(ctx, nCtx.InputReader().GetInputDataPath(), storage.Options{}, nodeInputs); err != nil {
+		c.metrics.InputsWriteFailure.Inc(ctx)
+		logger.Errorf(ctx, "Failed to move recovered inputs for Node. Error [%v]. InputsFile [%s]", err, nCtx.InputReader().GetInputDataPath())
+		return nil, errors.Wrapf(errors.StorageError, nCtx.NodeID(), err, "Failed to store inputs for Node. InputsFile [%s]", nCtx.InputReader().GetInputDataPath())
 	}
 
 	return nodeInputs, nil
@@ -774,7 +770,15 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 				}
 
 				inputsFile := v1alpha1.GetInputsFile(dataDir)
-				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
+				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs.GetInputs()); err != nil {
+					c.metrics.InputsWriteFailure.Inc(ctx)
+					logger.Errorf(ctx, "Failed to store inputs for Node. Error [%v]. InputsFile [%s]", err, inputsFile)
+					return handler.PhaseInfoUndefined, errors.Wrapf(
+						errors.StorageError, node.GetID(), err, "Failed to store inputs for Node. InputsFile [%s]", inputsFile)
+				}
+
+				inputDataFile := v1alpha1.GetInputDataFile(dataDir)
+				if err := c.store.WriteProtobuf(ctx, inputDataFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
 					logger.Errorf(ctx, "Failed to store inputs for Node. Error [%v]. InputsFile [%s]", err, inputsFile)
 					return handler.PhaseInfoUndefined, errors.Wrapf(

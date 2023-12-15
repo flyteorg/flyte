@@ -51,10 +51,10 @@ func ValidateNodeExecutionEventRequest(request *admin.NodeExecutionEventRequest,
 		}
 	}
 
-	outputData := request.Event.GetOutputData()
+	outputData := request.GetEvent().GetOutputData()
 	if outputData == nil {
 		outputData = &core.OutputData{
-			Outputs: request.Event.GetDeprecatedOutputData(),
+			Outputs: request.GetEvent().GetDeprecatedOutputData(),
 		}
 	}
 

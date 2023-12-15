@@ -32,7 +32,7 @@ type DefaultProtobufStore struct {
 	metrics *protoMetrics
 }
 
-func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference DataReference, msg ...proto.Message) (int, error) {
+func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference DataReference, msg ...proto.Message) (msgIndex int, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.DefaultProtobufStore/ReadProtobuf")
 	defer span.End()
 

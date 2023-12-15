@@ -22,7 +22,7 @@ type flyteWorkflowBuilder struct {
 }
 
 func (b *flyteWorkflowBuilder) Build(
-	wfClosure *core.CompiledWorkflowClosure, inputs *core.LiteralMap, executionID *core.WorkflowExecutionIdentifier,
+	wfClosure *core.CompiledWorkflowClosure, inputs *core.InputData, executionID *core.WorkflowExecutionIdentifier,
 	namespace string) (*v1alpha1.FlyteWorkflow, error) {
 	flyteWorkflow, err := k8s.BuildFlyteWorkflow(wfClosure, inputs, executionID, namespace)
 	if err != nil {

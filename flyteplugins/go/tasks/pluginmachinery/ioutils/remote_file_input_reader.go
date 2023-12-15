@@ -2,7 +2,6 @@ package ioutils
 
 import (
 	"context"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
@@ -15,7 +14,7 @@ const (
 
 var (
 	// Ensure we get an early build break if interface changes and these classes do not conform.
-	_ io.InputFilePaths = SimpleInputFilePath{}
+	_ io.InputFilePaths = &SimpleInputFilePath{}
 	_ io.InputReader    = RemoteFileInputReader{}
 )
 
@@ -49,19 +48,23 @@ func NewRemoteFileInputReader(_ context.Context, store storage.ProtobufStore, in
 
 type SimpleInputFilePath struct {
 	pathPrefix storage.DataReference
-	store      storage.ReferenceConstructor
+	store      *storage.DataStore
 }
 
-func (s SimpleInputFilePath) GetInputPrefixPath() storage.DataReference {
+func (s *SimpleInputFilePath) GetInputPrefixPath() storage.DataReference {
 	return s.pathPrefix
 }
 
-func (s SimpleInputFilePath) GetInputPath() storage.DataReference {
+func (s *SimpleInputFilePath) GetInputPath() storage.DataReference {
 	return constructPath(s.store, s.pathPrefix, InputsSuffix)
 }
 
-func NewInputFilePaths(_ context.Context, store storage.ReferenceConstructor, inputPathPrefix storage.DataReference) SimpleInputFilePath {
-	return SimpleInputFilePath{
+func (s *SimpleInputFilePath) GetInputDataPath() storage.DataReference {
+	return constructPath(s.store, s.pathPrefix, InputDataSuffix)
+}
+
+func NewInputFilePaths(_ context.Context, store *storage.DataStore, inputPathPrefix storage.DataReference) *SimpleInputFilePath {
+	return &SimpleInputFilePath{
 		store:      store,
 		pathPrefix: inputPathPrefix,
 	}

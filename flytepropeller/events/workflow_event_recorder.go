@@ -2,6 +2,7 @@ package events
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"strings"
 
 	"google.golang.org/grpc/codes"
@@ -49,15 +50,15 @@ func (r *workflowEventRecorder) RecordWorkflowEvent(ctx context.Context, ev *eve
 	var origEvent = ev
 	var rawOutputPolicy = eventConfig.RawOutputPolicy
 	if rawOutputPolicy == config.RawOutputPolicyInline && len(ev.GetOutputUri()) > 0 {
-		outputsLit := &core.LiteralMap{}
 		outputs := &core.OutputData{}
-		i, err := r.store.ReadProtobufAny(ctx, storage.DataReference(ev.GetOutputUri()), outputs, outputsLit)
+		outputsLit := &core.LiteralMap{}
+		msgIndex, err := r.store.ReadProtobufAny(ctx, storage.DataReference(ev.GetOutputUri()), outputs, outputsLit)
 		if err != nil {
 			// Fall back to forwarding along outputs by reference when we can't fetch them.
 			logger.Warnf(ctx, "failed to fetch outputs by ref [%s] to send inline with err: %v", ev.GetOutputUri(), err)
 			rawOutputPolicy = config.RawOutputPolicyReference
-		} else if ev.EventVersion < 3 {
-			if i == 0 {
+		} else if ev.EventVersion < int32(v1alpha1.EventVersion3) {
+			if msgIndex == 0 {
 				outputsLit = outputs.Outputs
 			}
 
@@ -65,7 +66,7 @@ func (r *workflowEventRecorder) RecordWorkflowEvent(ctx context.Context, ev *eve
 				DeprecatedOutputData: outputsLit,
 			}
 		} else {
-			if i == 0 {
+			if msgIndex == 0 {
 				outputs = &core.OutputData{
 					Outputs: outputsLit,
 				}

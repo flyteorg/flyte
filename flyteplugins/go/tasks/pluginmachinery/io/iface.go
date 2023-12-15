@@ -15,8 +15,12 @@ import (
 type InputFilePaths interface {
 	// GetInputPrefixPath returns the inputs file path, minus the protobuf file name.
 	GetInputPrefixPath() storage.DataReference
-	// GetInputPath returns a path for where the protobuf encoded inputs of type `core.LiteralMap` can be found. The returned value is an URN in the configured storage backend
+	// GetInputPath returns a path for where the protobuf encoded inputs of type `core.LiteralMap` can be found.
+	// The returned value is a URN in the configured storage backend
 	GetInputPath() storage.DataReference
+	// GetInputDataPath returns a path for where the protobuf encoded inputs of type `core.InputData` can be found.
+	// The returned value is a URN in the configured storage backend
+	GetInputDataPath() storage.DataReference
 }
 
 // InputReader provides a method to access the inputs for a task execution within the plugin's Task Context
