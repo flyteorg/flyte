@@ -16547,6 +16547,19 @@ public final class Common {
      */
     flyteidl.admin.Common.SlackNotificationOrBuilder getSlackOrBuilder();
 
+    /**
+     * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+     */
+    boolean hasWebhook();
+    /**
+     * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+     */
+    flyteidl.admin.Common.WebhookNotification getWebhook();
+    /**
+     * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+     */
+    flyteidl.admin.Common.WebhookNotificationOrBuilder getWebhookOrBuilder();
+
     public flyteidl.admin.Common.Notification.TypeCase getTypeCase();
   }
   /**
@@ -16660,6 +16673,20 @@ public final class Common {
               typeCase_ = 4;
               break;
             }
+            case 42: {
+              flyteidl.admin.Common.WebhookNotification.Builder subBuilder = null;
+              if (typeCase_ == 5) {
+                subBuilder = ((flyteidl.admin.Common.WebhookNotification) type_).toBuilder();
+              }
+              type_ =
+                  input.readMessage(flyteidl.admin.Common.WebhookNotification.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.Common.WebhookNotification) type_);
+                type_ = subBuilder.buildPartial();
+              }
+              typeCase_ = 5;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -16703,6 +16730,7 @@ public final class Common {
       EMAIL(2),
       PAGER_DUTY(3),
       SLACK(4),
+      WEBHOOK(5),
       TYPE_NOT_SET(0);
       private final int value;
       private TypeCase(int value) {
@@ -16721,6 +16749,7 @@ public final class Common {
           case 2: return EMAIL;
           case 3: return PAGER_DUTY;
           case 4: return SLACK;
+          case 5: return WEBHOOK;
           case 0: return TYPE_NOT_SET;
           default: return null;
         }
@@ -16885,6 +16914,32 @@ public final class Common {
       return flyteidl.admin.Common.SlackNotification.getDefaultInstance();
     }
 
+    public static final int WEBHOOK_FIELD_NUMBER = 5;
+    /**
+     * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+     */
+    public boolean hasWebhook() {
+      return typeCase_ == 5;
+    }
+    /**
+     * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+     */
+    public flyteidl.admin.Common.WebhookNotification getWebhook() {
+      if (typeCase_ == 5) {
+         return (flyteidl.admin.Common.WebhookNotification) type_;
+      }
+      return flyteidl.admin.Common.WebhookNotification.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+     */
+    public flyteidl.admin.Common.WebhookNotificationOrBuilder getWebhookOrBuilder() {
+      if (typeCase_ == 5) {
+         return (flyteidl.admin.Common.WebhookNotification) type_;
+      }
+      return flyteidl.admin.Common.WebhookNotification.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -16915,6 +16970,9 @@ public final class Common {
       }
       if (typeCase_ == 4) {
         output.writeMessage(4, (flyteidl.admin.Common.SlackNotification) type_);
+      }
+      if (typeCase_ == 5) {
+        output.writeMessage(5, (flyteidl.admin.Common.WebhookNotification) type_);
       }
       unknownFields.writeTo(output);
     }
@@ -16949,6 +17007,10 @@ public final class Common {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, (flyteidl.admin.Common.SlackNotification) type_);
       }
+      if (typeCase_ == 5) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, (flyteidl.admin.Common.WebhookNotification) type_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -16978,6 +17040,10 @@ public final class Common {
         case 4:
           if (!getSlack()
               .equals(other.getSlack())) return false;
+          break;
+        case 5:
+          if (!getWebhook()
+              .equals(other.getWebhook())) return false;
           break;
         case 0:
         default:
@@ -17009,6 +17075,10 @@ public final class Common {
         case 4:
           hash = (37 * hash) + SLACK_FIELD_NUMBER;
           hash = (53 * hash) + getSlack().hashCode();
+          break;
+        case 5:
+          hash = (37 * hash) + WEBHOOK_FIELD_NUMBER;
+          hash = (53 * hash) + getWebhook().hashCode();
           break;
         case 0:
         default:
@@ -17210,6 +17280,13 @@ public final class Common {
             result.type_ = slackBuilder_.build();
           }
         }
+        if (typeCase_ == 5) {
+          if (webhookBuilder_ == null) {
+            result.type_ = type_;
+          } else {
+            result.type_ = webhookBuilder_.build();
+          }
+        }
         result.bitField0_ = to_bitField0_;
         result.typeCase_ = typeCase_;
         onBuilt();
@@ -17281,6 +17358,10 @@ public final class Common {
           }
           case SLACK: {
             mergeSlack(other.getSlack());
+            break;
+          }
+          case WEBHOOK: {
+            mergeWebhook(other.getWebhook());
             break;
           }
           case TYPE_NOT_SET: {
@@ -17916,6 +17997,142 @@ public final class Common {
         typeCase_ = 4;
         onChanged();;
         return slackBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.WebhookNotification, flyteidl.admin.Common.WebhookNotification.Builder, flyteidl.admin.Common.WebhookNotificationOrBuilder> webhookBuilder_;
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public boolean hasWebhook() {
+        return typeCase_ == 5;
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public flyteidl.admin.Common.WebhookNotification getWebhook() {
+        if (webhookBuilder_ == null) {
+          if (typeCase_ == 5) {
+            return (flyteidl.admin.Common.WebhookNotification) type_;
+          }
+          return flyteidl.admin.Common.WebhookNotification.getDefaultInstance();
+        } else {
+          if (typeCase_ == 5) {
+            return webhookBuilder_.getMessage();
+          }
+          return flyteidl.admin.Common.WebhookNotification.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public Builder setWebhook(flyteidl.admin.Common.WebhookNotification value) {
+        if (webhookBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          type_ = value;
+          onChanged();
+        } else {
+          webhookBuilder_.setMessage(value);
+        }
+        typeCase_ = 5;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public Builder setWebhook(
+          flyteidl.admin.Common.WebhookNotification.Builder builderForValue) {
+        if (webhookBuilder_ == null) {
+          type_ = builderForValue.build();
+          onChanged();
+        } else {
+          webhookBuilder_.setMessage(builderForValue.build());
+        }
+        typeCase_ = 5;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public Builder mergeWebhook(flyteidl.admin.Common.WebhookNotification value) {
+        if (webhookBuilder_ == null) {
+          if (typeCase_ == 5 &&
+              type_ != flyteidl.admin.Common.WebhookNotification.getDefaultInstance()) {
+            type_ = flyteidl.admin.Common.WebhookNotification.newBuilder((flyteidl.admin.Common.WebhookNotification) type_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            type_ = value;
+          }
+          onChanged();
+        } else {
+          if (typeCase_ == 5) {
+            webhookBuilder_.mergeFrom(value);
+          }
+          webhookBuilder_.setMessage(value);
+        }
+        typeCase_ = 5;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public Builder clearWebhook() {
+        if (webhookBuilder_ == null) {
+          if (typeCase_ == 5) {
+            typeCase_ = 0;
+            type_ = null;
+            onChanged();
+          }
+        } else {
+          if (typeCase_ == 5) {
+            typeCase_ = 0;
+            type_ = null;
+          }
+          webhookBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public flyteidl.admin.Common.WebhookNotification.Builder getWebhookBuilder() {
+        return getWebhookFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      public flyteidl.admin.Common.WebhookNotificationOrBuilder getWebhookOrBuilder() {
+        if ((typeCase_ == 5) && (webhookBuilder_ != null)) {
+          return webhookBuilder_.getMessageOrBuilder();
+        } else {
+          if (typeCase_ == 5) {
+            return (flyteidl.admin.Common.WebhookNotification) type_;
+          }
+          return flyteidl.admin.Common.WebhookNotification.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.WebhookNotification webhook = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.WebhookNotification, flyteidl.admin.Common.WebhookNotification.Builder, flyteidl.admin.Common.WebhookNotificationOrBuilder> 
+          getWebhookFieldBuilder() {
+        if (webhookBuilder_ == null) {
+          if (!(typeCase_ == 5)) {
+            type_ = flyteidl.admin.Common.WebhookNotification.getDefaultInstance();
+          }
+          webhookBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.WebhookNotification, flyteidl.admin.Common.WebhookNotification.Builder, flyteidl.admin.Common.WebhookNotificationOrBuilder>(
+                  (flyteidl.admin.Common.WebhookNotification) type_,
+                  getParentForChildren(),
+                  isClean());
+          type_ = null;
+        }
+        typeCase_ = 5;
+        onChanged();;
+        return webhookBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -23544,30 +23761,31 @@ public final class Common {
       "on\022\024\n\014webhook_name\030\001 \001(\t\022/\n\007message\030\002 \001(" +
       "\0132\036.flyteidl.admin.WebhookMessage\"-\n\021Sla" +
       "ckNotification\022\030\n\020recipients_email\030\001 \003(\t" +
-      "\"\363\001\n\014Notification\0226\n\006phases\030\001 \003(\0162&.flyt" +
+      "\"\253\002\n\014Notification\0226\n\006phases\030\001 \003(\0162&.flyt" +
       "eidl.core.WorkflowExecution.Phase\0222\n\005ema" +
       "il\030\002 \001(\0132!.flyteidl.admin.EmailNotificat" +
       "ionH\000\022;\n\npager_duty\030\003 \001(\0132%.flyteidl.adm" +
       "in.PagerDutyNotificationH\000\0222\n\005slack\030\004 \001(" +
-      "\0132!.flyteidl.admin.SlackNotificationH\000B\006" +
-      "\n\004type\")\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r\n\005bytes\030" +
-      "\002 \001(\003:\002\030\001\"k\n\006Labels\0222\n\006values\030\001 \003(\0132\".fl" +
-      "yteidl.admin.Labels.ValuesEntry\032-\n\013Value" +
-      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"u" +
-      "\n\013Annotations\0227\n\006values\030\001 \003(\0132\'.flyteidl" +
-      ".admin.Annotations.ValuesEntry\032-\n\013Values" +
-      "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"3\n" +
-      "\004Envs\022+\n\006values\030\001 \003(\0132\033.flyteidl.core.Ke" +
-      "yValuePair\"N\n\010AuthRole\022\032\n\022assumable_iam_" +
-      "role\030\001 \001(\t\022\"\n\032kubernetes_service_account" +
-      "\030\002 \001(\t:\002\030\001\"5\n\023RawOutputDataConfig\022\036\n\026out" +
-      "put_location_prefix\030\001 \001(\t\":\n\tFlyteURLs\022\016" +
-      "\n\006inputs\030\001 \001(\t\022\017\n\007outputs\030\002 \001(\t\022\014\n\004deck\030" +
-      "\003 \001(\t*\\\n\020NamedEntityState\022\027\n\023NAMED_ENTIT" +
-      "Y_ACTIVE\020\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001\022\024\n" +
-      "\020SYSTEM_GENERATED\020\002B=Z;github.com/flyteo" +
-      "rg/flyte/flyteidl/gen/pb-go/flyteidl/adm" +
-      "inb\006proto3"
+      "\0132!.flyteidl.admin.SlackNotificationH\000\0226" +
+      "\n\007webhook\030\005 \001(\0132#.flyteidl.admin.Webhook" +
+      "NotificationH\000B\006\n\004type\")\n\007UrlBlob\022\013\n\003url" +
+      "\030\001 \001(\t\022\r\n\005bytes\030\002 \001(\003:\002\030\001\"k\n\006Labels\0222\n\006v" +
+      "alues\030\001 \003(\0132\".flyteidl.admin.Labels.Valu" +
+      "esEntry\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005v" +
+      "alue\030\002 \001(\t:\0028\001\"u\n\013Annotations\0227\n\006values\030" +
+      "\001 \003(\0132\'.flyteidl.admin.Annotations.Value" +
+      "sEntry\032-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
+      "lue\030\002 \001(\t:\0028\001\"3\n\004Envs\022+\n\006values\030\001 \003(\0132\033." +
+      "flyteidl.core.KeyValuePair\"N\n\010AuthRole\022\032" +
+      "\n\022assumable_iam_role\030\001 \001(\t\022\"\n\032kubernetes" +
+      "_service_account\030\002 \001(\t:\002\030\001\"5\n\023RawOutputD" +
+      "ataConfig\022\036\n\026output_location_prefix\030\001 \001(" +
+      "\t\":\n\tFlyteURLs\022\016\n\006inputs\030\001 \001(\t\022\017\n\007output" +
+      "s\030\002 \001(\t\022\014\n\004deck\030\003 \001(\t*\\\n\020NamedEntityStat" +
+      "e\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTI" +
+      "TY_ARCHIVED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B=Z;g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -23693,7 +23911,7 @@ public final class Common {
     internal_static_flyteidl_admin_Notification_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Notification_descriptor,
-        new java.lang.String[] { "Phases", "Email", "PagerDuty", "Slack", "Type", });
+        new java.lang.String[] { "Phases", "Email", "PagerDuty", "Slack", "Webhook", "Type", });
     internal_static_flyteidl_admin_UrlBlob_descriptor =
       getDescriptor().getMessageTypes().get(18);
     internal_static_flyteidl_admin_UrlBlob_fieldAccessorTable = new

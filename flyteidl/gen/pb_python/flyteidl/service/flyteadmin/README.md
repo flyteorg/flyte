@@ -238,6 +238,8 @@ Class | Method | HTTP request | Description
  - [AdminTaskSpec](docs/AdminTaskSpec.md)
  - [AdminUrlBlob](docs/AdminUrlBlob.md)
  - [AdminVersion](docs/AdminVersion.md)
+ - [AdminWebhookMessage](docs/AdminWebhookMessage.md)
+ - [AdminWebhookNotification](docs/AdminWebhookNotification.md)
  - [AdminWorkflow](docs/AdminWorkflow.md)
  - [AdminWorkflowAttributes](docs/AdminWorkflowAttributes.md)
  - [AdminWorkflowAttributesDeleteRequest](docs/AdminWorkflowAttributesDeleteRequest.md)

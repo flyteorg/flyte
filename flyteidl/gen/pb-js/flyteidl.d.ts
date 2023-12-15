@@ -9469,6 +9469,9 @@ export namespace flyteidl {
 
             /** Notification slack */
             slack?: (flyteidl.admin.ISlackNotification|null);
+
+            /** Notification webhook */
+            webhook?: (flyteidl.admin.IWebhookNotification|null);
         }
 
         /** Represents a Notification. */
@@ -9492,8 +9495,11 @@ export namespace flyteidl {
             /** Notification slack. */
             public slack?: (flyteidl.admin.ISlackNotification|null);
 
+            /** Notification webhook. */
+            public webhook?: (flyteidl.admin.IWebhookNotification|null);
+
             /** Notification type. */
-            public type?: ("email"|"pagerDuty"|"slack");
+            public type?: ("email"|"pagerDuty"|"slack"|"webhook");
 
             /**
              * Creates a new Notification instance using the specified properties.

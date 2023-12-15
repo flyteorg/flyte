@@ -22925,6 +22925,7 @@
                  * @property {flyteidl.admin.IEmailNotification|null} [email] Notification email
                  * @property {flyteidl.admin.IPagerDutyNotification|null} [pagerDuty] Notification pagerDuty
                  * @property {flyteidl.admin.ISlackNotification|null} [slack] Notification slack
+                 * @property {flyteidl.admin.IWebhookNotification|null} [webhook] Notification webhook
                  */
     
                 /**
@@ -22975,17 +22976,25 @@
                  */
                 Notification.prototype.slack = null;
     
+                /**
+                 * Notification webhook.
+                 * @member {flyteidl.admin.IWebhookNotification|null|undefined} webhook
+                 * @memberof flyteidl.admin.Notification
+                 * @instance
+                 */
+                Notification.prototype.webhook = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * Notification type.
-                 * @member {"email"|"pagerDuty"|"slack"|undefined} type
+                 * @member {"email"|"pagerDuty"|"slack"|"webhook"|undefined} type
                  * @memberof flyteidl.admin.Notification
                  * @instance
                  */
                 Object.defineProperty(Notification.prototype, "type", {
-                    get: $util.oneOfGetter($oneOfFields = ["email", "pagerDuty", "slack"]),
+                    get: $util.oneOfGetter($oneOfFields = ["email", "pagerDuty", "slack", "webhook"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -23025,6 +23034,8 @@
                         $root.flyteidl.admin.PagerDutyNotification.encode(message.pagerDuty, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.slack != null && message.hasOwnProperty("slack"))
                         $root.flyteidl.admin.SlackNotification.encode(message.slack, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.webhook != null && message.hasOwnProperty("webhook"))
+                        $root.flyteidl.admin.WebhookNotification.encode(message.webhook, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -23064,6 +23075,9 @@
                             break;
                         case 4:
                             message.slack = $root.flyteidl.admin.SlackNotification.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.webhook = $root.flyteidl.admin.WebhookNotification.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23131,6 +23145,16 @@
                             var error = $root.flyteidl.admin.SlackNotification.verify(message.slack);
                             if (error)
                                 return "slack." + error;
+                        }
+                    }
+                    if (message.webhook != null && message.hasOwnProperty("webhook")) {
+                        if (properties.type === 1)
+                            return "type: multiple values";
+                        properties.type = 1;
+                        {
+                            var error = $root.flyteidl.admin.WebhookNotification.verify(message.webhook);
+                            if (error)
+                                return "webhook." + error;
                         }
                     }
                     return null;

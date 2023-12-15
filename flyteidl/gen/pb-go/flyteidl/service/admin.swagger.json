@@ -4720,6 +4720,9 @@
         },
         "slack": {
           "$ref": "#/definitions/adminSlackNotification"
+        },
+        "webhook": {
+          "$ref": "#/definitions/adminWebhookNotification"
         }
       },
       "description": "Represents a structure for notifications based on execution status.\nThe notification content is configured within flyte admin but can be templatized.\nFuture iterations could expose configuring notifications with custom content."
@@ -5319,6 +5322,30 @@
         }
       },
       "title": "Provides Version information for a component"
+    },
+    "adminWebhookMessage": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string",
+          "description": "The content of webhook request."
+        }
+      },
+      "description": "Represents the content that will be sent to a webhook endpoint."
+    },
+    "adminWebhookNotification": {
+      "type": "object",
+      "properties": {
+        "webhook_name": {
+          "type": "string",
+          "description": "+required\nThe webhook that is already registered to the flyteadmin."
+        },
+        "message": {
+          "$ref": "#/definitions/adminWebhookMessage",
+          "title": "The message to send to the webhook. if not specified, use default payload defined in flyteadmin.\n+optional"
+        }
+      },
+      "description": "Defines a webhook notification specification."
     },
     "adminWorkflow": {
       "type": "object",

@@ -1417,6 +1417,18 @@ func (m *Notification) Validate() error {
 			}
 		}
 
+	case *Notification_Webhook:
+
+		if v, ok := interface{}(m.GetWebhook()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NotificationValidationError{
+					field:  "Webhook",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

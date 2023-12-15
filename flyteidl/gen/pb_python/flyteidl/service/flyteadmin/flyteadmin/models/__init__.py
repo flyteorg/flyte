@@ -122,6 +122,8 @@ from flyteadmin.models.admin_task_resource_spec import AdminTaskResourceSpec
 from flyteadmin.models.admin_task_spec import AdminTaskSpec
 from flyteadmin.models.admin_url_blob import AdminUrlBlob
 from flyteadmin.models.admin_version import AdminVersion
+from flyteadmin.models.admin_webhook_message import AdminWebhookMessage
+from flyteadmin.models.admin_webhook_notification import AdminWebhookNotification
 from flyteadmin.models.admin_workflow import AdminWorkflow
 from flyteadmin.models.admin_workflow_attributes import AdminWorkflowAttributes
 from flyteadmin.models.admin_workflow_attributes_delete_request import AdminWorkflowAttributesDeleteRequest

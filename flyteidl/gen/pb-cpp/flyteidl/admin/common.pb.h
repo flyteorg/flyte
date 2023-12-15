@@ -2606,6 +2606,7 @@ class Notification final :
     kEmail = 2,
     kPagerDuty = 3,
     kSlack = 4,
+    kWebhook = 5,
     TYPE_NOT_SET = 0,
   };
 
@@ -2709,6 +2710,15 @@ class Notification final :
   ::flyteidl::admin::SlackNotification* mutable_slack();
   void set_allocated_slack(::flyteidl::admin::SlackNotification* slack);
 
+  // .flyteidl.admin.WebhookNotification webhook = 5;
+  bool has_webhook() const;
+  void clear_webhook();
+  static const int kWebhookFieldNumber = 5;
+  const ::flyteidl::admin::WebhookNotification& webhook() const;
+  ::flyteidl::admin::WebhookNotification* release_webhook();
+  ::flyteidl::admin::WebhookNotification* mutable_webhook();
+  void set_allocated_webhook(::flyteidl::admin::WebhookNotification* webhook);
+
   void clear_type();
   TypeCase type_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Notification)
@@ -2717,6 +2727,7 @@ class Notification final :
   void set_has_email();
   void set_has_pager_duty();
   void set_has_slack();
+  void set_has_webhook();
 
   inline bool has_type() const;
   inline void clear_has_type();
@@ -2729,6 +2740,7 @@ class Notification final :
     ::flyteidl::admin::EmailNotification* email_;
     ::flyteidl::admin::PagerDutyNotification* pager_duty_;
     ::flyteidl::admin::SlackNotification* slack_;
+    ::flyteidl::admin::WebhookNotification* webhook_;
   } type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -5801,6 +5813,47 @@ inline ::flyteidl::admin::SlackNotification* Notification::mutable_slack() {
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.Notification.slack)
   return type_.slack_;
+}
+
+// .flyteidl.admin.WebhookNotification webhook = 5;
+inline bool Notification::has_webhook() const {
+  return type_case() == kWebhook;
+}
+inline void Notification::set_has_webhook() {
+  _oneof_case_[0] = kWebhook;
+}
+inline void Notification::clear_webhook() {
+  if (has_webhook()) {
+    delete type_.webhook_;
+    clear_has_type();
+  }
+}
+inline ::flyteidl::admin::WebhookNotification* Notification::release_webhook() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Notification.webhook)
+  if (has_webhook()) {
+    clear_has_type();
+      ::flyteidl::admin::WebhookNotification* temp = type_.webhook_;
+    type_.webhook_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::admin::WebhookNotification& Notification::webhook() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Notification.webhook)
+  return has_webhook()
+      ? *type_.webhook_
+      : *reinterpret_cast< ::flyteidl::admin::WebhookNotification*>(&::flyteidl::admin::_WebhookNotification_default_instance_);
+}
+inline ::flyteidl::admin::WebhookNotification* Notification::mutable_webhook() {
+  if (!has_webhook()) {
+    clear_type();
+    set_has_webhook();
+    type_.webhook_ = CreateMaybeMessage< ::flyteidl::admin::WebhookNotification >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Notification.webhook)
+  return type_.webhook_;
 }
 
 inline bool Notification::has_type() const {

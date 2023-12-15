@@ -19,6 +19,7 @@ import six
 from flyteadmin.models.admin_email_notification import AdminEmailNotification  # noqa: F401,E501
 from flyteadmin.models.admin_pager_duty_notification import AdminPagerDutyNotification  # noqa: F401,E501
 from flyteadmin.models.admin_slack_notification import AdminSlackNotification  # noqa: F401,E501
+from flyteadmin.models.admin_webhook_notification import AdminWebhookNotification  # noqa: F401,E501
 from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase  # noqa: F401,E501
 
 
@@ -39,23 +40,26 @@ class AdminNotification(object):
         'phases': 'list[CoreWorkflowExecutionPhase]',
         'email': 'AdminEmailNotification',
         'pager_duty': 'AdminPagerDutyNotification',
-        'slack': 'AdminSlackNotification'
+        'slack': 'AdminSlackNotification',
+        'webhook': 'AdminWebhookNotification'
     }
 
     attribute_map = {
         'phases': 'phases',
         'email': 'email',
         'pager_duty': 'pager_duty',
-        'slack': 'slack'
+        'slack': 'slack',
+        'webhook': 'webhook'
     }
 
-    def __init__(self, phases=None, email=None, pager_duty=None, slack=None):  # noqa: E501
+    def __init__(self, phases=None, email=None, pager_duty=None, slack=None, webhook=None):  # noqa: E501
         """AdminNotification - a model defined in Swagger"""  # noqa: E501
 
         self._phases = None
         self._email = None
         self._pager_duty = None
         self._slack = None
+        self._webhook = None
         self.discriminator = None
 
         if phases is not None:
@@ -66,6 +70,8 @@ class AdminNotification(object):
             self.pager_duty = pager_duty
         if slack is not None:
             self.slack = slack
+        if webhook is not None:
+            self.webhook = webhook
 
     @property
     def phases(self):
@@ -150,6 +156,27 @@ class AdminNotification(object):
         """
 
         self._slack = slack
+
+    @property
+    def webhook(self):
+        """Gets the webhook of this AdminNotification.  # noqa: E501
+
+
+        :return: The webhook of this AdminNotification.  # noqa: E501
+        :rtype: AdminWebhookNotification
+        """
+        return self._webhook
+
+    @webhook.setter
+    def webhook(self, webhook):
+        """Sets the webhook of this AdminNotification.
+
+
+        :param webhook: The webhook of this AdminNotification.  # noqa: E501
+        :type: AdminWebhookNotification
+        """
+
+        self._webhook = webhook
 
     def to_dict(self):
         """Returns the model properties as a dict"""

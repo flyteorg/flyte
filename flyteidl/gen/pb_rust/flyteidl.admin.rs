@@ -475,7 +475,7 @@ pub struct Notification {
     pub phases: ::prost::alloc::vec::Vec<i32>,
     /// The type of notification to trigger.
     /// +required
-    #[prost(oneof="notification::Type", tags="2, 3, 4")]
+    #[prost(oneof="notification::Type", tags="2, 3, 4, 5")]
     pub r#type: ::core::option::Option<notification::Type>,
 }
 /// Nested message and enum types in `Notification`.
@@ -491,6 +491,8 @@ pub mod notification {
         PagerDuty(super::PagerDutyNotification),
         #[prost(message, tag="4")]
         Slack(super::SlackNotification),
+        #[prost(message, tag="5")]
+        Webhook(super::WebhookNotification),
     }
 }
 /// Represents a string url and associated metadata used throughout the platform.
