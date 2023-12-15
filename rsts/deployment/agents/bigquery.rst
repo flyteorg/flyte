@@ -20,30 +20,39 @@ Specify agent configuration
 
 .. tabs::
 
-  .. group-tab:: Flyte binary
+    .. group-tab:: Flyte binary
 
-    Edit the relevant YAML file to specify the agent.
+      Edit the relevant YAML file to specify the agent.
 
-    .. code-block:: yaml
-      :emphasize-lines: 7,11
+      .. code-block:: bash
 
-      tasks:
-        task-plugins:
-          enabled-plugins:
-            - container
-            - sidecar
-            - k8s-array
-            - bigquery
-          default-for-task-types:
-            - container: container
-            - container_array: k8s-array
-            - bigquery_query_job_task: agent-service
+        kubectl edit configmap flyte-sandbox-config -n flyte
 
-  .. group-tab:: Flyte core
+      .. code-block:: yaml
+        :emphasize-lines: 7,11,16
+  
+        tasks:
+          task-plugins:
+            enabled-plugins:
+              - container
+              - sidecar
+              - k8s-array
+              - agent-service
+            default-for-task-types:
+              - container: container
+              - container_array: k8s-array
+              - bigquery_query_job_task: agent-service
+        
+        plugins:
+          agent-service:
+            supportedTaskTypes:
+            - bigquery_query_job_task
 
-    Create a file named ``values-override.yaml`` and add the following configuration to it.
+    .. group-tab:: Flyte core
 
-    .. code-block:: yaml
+      Create a file named ``values-override.yaml`` and add the following configuration to it.
+
+      .. code-block:: yaml
 
         configmap:
           enabled_plugins:
@@ -56,12 +65,16 @@ Specify agent configuration
                   - container
                   - sidecar
                   - k8s-array
-                  - bigquery
+                  - agent-service
                 default-for-task-types:
                   container: container
                   sidecar: sidecar
                   container_array: k8s-array
                   bigquery_query_job_task: agent-service
+            plugins:
+              agent-service:
+                supportedTaskTypes:
+                - bigquery_query_job_task
 
 Ensure that the propeller has the correct service account for BigQuery.
 
@@ -89,3 +102,5 @@ Upgrade the Flyte Helm release
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
+
+For bigquery plugin on the Flyte cluster, please refer to `Bigquery Plugin Example <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/bigquery_plugin/bigquery.html>`_

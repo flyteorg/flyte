@@ -457,7 +457,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.9.37"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.6"
       k8s-array:
         logs:
           config:
@@ -805,7 +805,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: UUREcXo3a1VGNnlyc1RCWg==
+  haSharedSecret: UlI4aW9PaVFzcFpyRzhkTA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1203,7 +1203,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: b051b935f0b2cf878f2f2f2ed160c017053123ab4d8d46d2214084233a5623c5
+        checksum/configuration: 6755bdc74789d7e2a80161a9f811e41ea3c0cf12bab5cb0820c7c8539b4b88fe
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1230,6 +1230,7 @@ spec:
           httpGet:
             path: /healthcheck
             port: http
+          initialDelaySeconds: 30
         name: flyte
         ports:
         - containerPort: 8088
@@ -1242,6 +1243,7 @@ spec:
           httpGet:
             path: /healthcheck
             port: http
+          initialDelaySeconds: 30
         volumeMounts:
         - mountPath: /etc/flyte/cluster-resource-templates
           name: cluster-resource-templates
@@ -1366,7 +1368,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: cfe2089fc583f69d068c3b3d56e875082a5d926c70b00b32f094d587df7396a5
+        checksum/secret: cb0b9e32c83fba67eefca5b8cd0a3375b07f5d5d29f6dab9a092f91ccf7bd200
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1654,10 +1656,17 @@ spec:
       containers:
       - image: envoyproxy/envoy:sandbox
         imagePullPolicy: Never
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: http
         name: proxy
         ports:
         - containerPort: 8000
           name: http
+        readinessProbe:
+          tcpSocket:
+            port: http
         volumeMounts:
         - mountPath: /etc/envoy
           name: config

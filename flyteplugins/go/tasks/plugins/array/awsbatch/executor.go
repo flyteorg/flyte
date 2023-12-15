@@ -78,6 +78,9 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 
 	case arrayCore.PhaseAssembleFinalOutput:
 		pluginState.State, err = array.AssembleFinalOutputs(ctx, e.outputAssembler, tCtx, arrayCore.PhaseSuccess, version+1, pluginState.State)
+	
+	case arrayCore.PhaseAbortSubTasks:
+		fallthrough
 
 	case arrayCore.PhaseWriteToDiscoveryThenFail:
 		pluginState.State, externalResources, err = array.WriteToDiscovery(ctx, tCtx, pluginState.State, arrayCore.PhaseAssembleFinalError, version+1)

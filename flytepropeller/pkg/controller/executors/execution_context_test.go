@@ -63,3 +63,32 @@ func TestExecutionContext(t *testing.T) {
 	assert.Equal(t, typed.TaskDetailsGetter, taskGetter)
 	assert.Equal(t, typed.GetParentInfo(), immutableParentInfo2)
 }
+
+func TestParentExecutionInfo_GetUniqueID(t *testing.T) {
+	expectedID := "testID"
+	parentInfo := NewParentInfo(expectedID, 1)
+	assert.Equal(t, expectedID, parentInfo.GetUniqueID())
+}
+
+func TestParentExecutionInfo_CurrentAttempt(t *testing.T) {
+	expectedAttempt := uint32(123465)
+	parentInfo := NewParentInfo("testID", expectedAttempt)
+	assert.Equal(t, expectedAttempt, parentInfo.CurrentAttempt())
+}
+
+func TestControlFlow_ControlFlowParallelism(t *testing.T) {
+	cFlow := InitializeControlFlow().(*controlFlow)
+	assert.Equal(t, uint32(0), cFlow.CurrentParallelism())
+	cFlow.IncrementParallelism()
+	assert.Equal(t, uint32(1), cFlow.CurrentParallelism())
+	cFlow.IncrementParallelism()
+	assert.Equal(t, uint32(2), cFlow.CurrentParallelism())
+}
+
+func TestNewParentInfo(t *testing.T) {
+	expectedID := "testID"
+	expectedAttempt := uint32(123465)
+	parentInfo := NewParentInfo(expectedID, expectedAttempt).(*parentExecutionInfo)
+	assert.Equal(t, expectedID, parentInfo.uniqueID)
+	assert.Equal(t, expectedAttempt, parentInfo.currentAttempts)
+}

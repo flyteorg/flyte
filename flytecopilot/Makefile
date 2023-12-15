@@ -24,3 +24,7 @@ compile:
 cross_compile:
 	@mkdir -p ./artifacts/cross
 	GOOS=linux GOARCH=amd64 go build -o ./artifacts/flyte-copilot .
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy

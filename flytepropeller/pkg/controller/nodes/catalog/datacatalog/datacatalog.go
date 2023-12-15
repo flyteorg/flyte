@@ -10,6 +10,8 @@ import (
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -22,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 )
 
 var (
@@ -472,7 +475,13 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
 
-	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor,
+	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogClientTracer)
+	opts = append(opts, grpc.WithChainUnaryInterceptor(
+		grpcPrometheus.UnaryClientInterceptor,
+		otelgrpc.UnaryClientInterceptor(
+			otelgrpc.WithTracerProvider(tracerProvider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
+		),
 		retryInterceptor))
 	clientConn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {

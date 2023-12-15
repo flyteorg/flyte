@@ -114,3 +114,35 @@ func (_m *TaskExecutionID) GetID() flyteidlcore.TaskExecutionIdentifier {
 
 	return r0
 }
+
+type TaskExecutionID_GetUniqueNodeID struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionID_GetUniqueNodeID) Return(_a0 string) *TaskExecutionID_GetUniqueNodeID {
+	return &TaskExecutionID_GetUniqueNodeID{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionID) OnGetUniqueNodeID() *TaskExecutionID_GetUniqueNodeID {
+	c_call := _m.On("GetUniqueNodeID")
+	return &TaskExecutionID_GetUniqueNodeID{Call: c_call}
+}
+
+func (_m *TaskExecutionID) OnGetUniqueNodeIDMatch(matchers ...interface{}) *TaskExecutionID_GetUniqueNodeID {
+	c_call := _m.On("GetUniqueNodeID", matchers...)
+	return &TaskExecutionID_GetUniqueNodeID{Call: c_call}
+}
+
+// GetUniqueNodeID provides a mock function with given fields:
+func (_m *TaskExecutionID) GetUniqueNodeID() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	return r0
+}

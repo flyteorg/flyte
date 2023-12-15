@@ -3,6 +3,7 @@ package single
 import (
 	"context"
 	"net/http"
+	"os"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
@@ -17,12 +18,12 @@ import (
 	adminScheduler "github.com/flyteorg/flyte/flyteadmin/scheduler"
 	propellerEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	webhookEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -40,6 +41,7 @@ import (
 )
 
 const defaultNamespace = "all"
+const propellerDefaultNamespace = "flyte"
 
 func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 	if err := datacatalogRepo.Migrate(ctx); err != nil {
@@ -120,15 +122,28 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
+		NewCache: func(config *rest.Config, options cache.Options) (cache.Cache, error) {
+			k8sCache, err := cache.New(config, options)
+			if err != nil {
+				return k8sCache, err
+			}
+
+			return otelutils.WrapK8sCache(k8sCache), nil
+		},
 		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(nil, config, options)
+			k8sClient, err := client.New(config, options)
+			if err != nil {
+				return k8sClient, err
+			}
+
+			return otelutils.WrapK8sClient(k8sClient), nil
 		},
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
 		},
 		WebhookServer: ctrlWebhook.NewServer(ctrlWebhook.Options{
-			CertDir: webhookConfig.GetConfig().CertDir,
+			CertDir: webhookConfig.GetConfig().ExpandCertDir(),
 			Port:    webhookConfig.GetConfig().ListenPort,
 		}),
 	}
@@ -149,7 +164,13 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 				return err
 			}
 			logger.Infof(childCtx, "Starting Webhook server...")
-			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerCfg, webhookConfig.GetConfig(), defaultNamespace, &propellerScope, mgr)
+			// set default namespace for pod template store
+			podNamespace, found := os.LookupEnv(webhookEntrypoint.PodNamespaceEnvVar)
+			if !found {
+				podNamespace = propellerDefaultNamespace
+			}
+
+			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerCfg, webhookConfig.GetConfig(), podNamespace, &propellerScope, mgr)
 		})
 	}
 
@@ -190,6 +211,15 @@ var startCmd = &cobra.Command{
 		ctx := context.Background()
 		g, childCtx := errgroup.WithContext(ctx)
 		cfg := GetConfig()
+
+		for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.AdminGormTracer, otelutils.AdminServerTracer,
+			otelutils.BlobstoreClientTracer, otelutils.DataCatalogClientTracer, otelutils.DataCatalogGormTracer,
+			otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+				return err
+			}
+		}
 
 		if !cfg.Admin.Disabled {
 			g.Go(func() error {

@@ -35,7 +35,7 @@ func (r *reservationRepo) Create(ctx context.Context, reservation models.Reserva
 	timer := r.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
-	result := r.db.Clauses(clause.OnConflict{DoNothing: true}).Create(&reservation)
+	result := r.db.WithContext(ctx).Clauses(clause.OnConflict{DoNothing: true}).Create(&reservation)
 	if result.Error != nil {
 		return r.errorTransformer.ToDataCatalogError(result.Error)
 	}
@@ -53,7 +53,7 @@ func (r *reservationRepo) Delete(ctx context.Context, reservationKey models.Rese
 
 	var reservation models.Reservation
 
-	result := r.db.Where(&models.Reservation{
+	result := r.db.WithContext(ctx).Where(&models.Reservation{
 		ReservationKey: reservationKey,
 		OwnerID:        ownerID,
 	}).Delete(&reservation)
@@ -83,7 +83,7 @@ func (r *reservationRepo) Get(ctx context.Context, reservationKey models.Reserva
 
 	var reservation models.Reservation
 
-	result := r.db.Where(&models.Reservation{
+	result := r.db.WithContext(ctx).Where(&models.Reservation{
 		ReservationKey: reservationKey,
 	}).Take(&reservation)
 
@@ -98,7 +98,7 @@ func (r *reservationRepo) Update(ctx context.Context, reservation models.Reserva
 	timer := r.repoMetrics.UpdateDuration.Start(ctx)
 	defer timer.Stop()
 
-	result := r.db.Model(&models.Reservation{
+	result := r.db.WithContext(ctx).Model(&models.Reservation{
 		ReservationKey: reservation.ReservationKey,
 	}).Where("expires_at<=? OR owner_id=?", now, reservation.OwnerID).Updates(reservation)
 	if result.Error != nil {

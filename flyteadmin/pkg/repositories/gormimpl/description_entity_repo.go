@@ -28,7 +28,7 @@ func (r *DescriptionEntityRepo) Get(ctx context.Context, input interfaces.GetDes
 		return models.DescriptionEntity{}, err
 	}
 
-	tx := r.db.Table(descriptionEntityTableName)
+	tx := r.db.WithContext(ctx).Table(descriptionEntityTableName)
 	// Apply filters
 	tx, err = applyFilters(tx, filters, nil)
 	if err != nil {
@@ -53,7 +53,7 @@ func (r *DescriptionEntityRepo) List(
 		return interfaces.DescriptionEntityCollectionOutput{}, err
 	}
 	var descriptionEntities []models.DescriptionEntity
-	tx := r.db.Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)

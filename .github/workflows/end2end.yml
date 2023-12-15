@@ -79,17 +79,7 @@ jobs:
       - name: Register P0 tests
         if: ${{ inputs.priorities == 'P0' }}
         run: |
-          for f in \
-                  basics/basics/hello_world.py \
-                  basics/basics/workflow.py \
-                  basics/basics/named_outputs.py \
-                  advanced_composition/advanced_composition/chain_entities.py \
-                  advanced_composition/advanced_composition/dynamics.py \
-                  advanced_composition/advanced_composition/map_task.py \
-                  advanced_composition/advanced_composition/subworkflows.py \
-                  data_types_and_io/data_types_and_io/custom_objects.py \
-                  data_types_and_io/data_types_and_io/schema.py \
-                  data_types_and_io/data_types_and_io/typed_schema.py ;
+          while read -r line;
           do
               pyflyte --config ./boilerplate/flyte/end2end/functional-test-config.yaml \
                   register \
@@ -97,8 +87,8 @@ jobs:
                   --domain development \
                   --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
-                  flytesnacks/examples/$f;
-          done
+                  flytesnacks/$line;
+          done < flytesnacks/flyte_tests.txt
       - name: Register all flytesnacks examples
         if: ${{ inputs.priorities != 'P0' }}
         uses: unionai/flyte-register-action@v0.0.2

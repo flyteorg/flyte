@@ -4,6 +4,7 @@ import (
 	"regexp"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 //go:generate enumer --type=TemplateScheme --trimprefix=TemplateScheme -json -yaml
@@ -14,6 +15,9 @@ const (
 	TemplateSchemePod TemplateScheme = iota
 	TemplateSchemeTaskExecution
 )
+
+// TemplateURI is a URI that accepts templates. See: go/tasks/pluginmachinery/tasklog/template.go for available templates.
+type TemplateURI = string
 
 type TemplateVar struct {
 	Regex *regexp.Regexp
@@ -42,7 +46,7 @@ type Input struct {
 	PodUnixStartTime          int64
 	PodUnixFinishTime         int64
 	PodUID                    string
-	TaskExecutionIdentifier   *core.TaskExecutionIdentifier
+	TaskExecutionID           pluginsCore.TaskExecutionID
 	ExtraTemplateVarsByScheme *TemplateVarsByScheme
 }
 
@@ -55,4 +59,11 @@ type Output struct {
 type Plugin interface {
 	// Generates a TaskLog object given necessary computation information
 	GetTaskLogs(i Input) (logs Output, err error)
+}
+
+type TemplateLogPlugin struct {
+	DisplayName   string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
+	TemplateURIs  []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`
+	MessageFormat core.TaskLog_MessageFormat `json:"messageFormat" pflag:",Log Message Format."`
+	Scheme        TemplateScheme             `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
 }

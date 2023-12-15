@@ -67,6 +67,7 @@ func TestToTaskExecutionEvent(t *testing.T) {
 	generatedName := "generated_name"
 	tID.OnGetGeneratedName().Return(generatedName)
 	tID.OnGetID().Return(*id)
+	tID.OnGetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
@@ -261,6 +262,7 @@ func TestToTaskExecutionEventWithParent(t *testing.T) {
 	generatedName := "generated_name"
 	tID.OnGetGeneratedName().Return(generatedName)
 	tID.OnGetID().Return(*id)
+	tID.OnGetUniqueNodeID().Return("unique-node-id")
 
 	tMeta := &pluginMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)

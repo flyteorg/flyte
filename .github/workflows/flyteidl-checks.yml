@@ -6,15 +6,11 @@ concurrency:
 
 on:
   pull_request:
-    paths:
-      - 'flyteidl/**'
   push:
     branches:
       - master
-    paths:
-      - 'flyteidl/**'
 env:
-  GO_VERSION: "1.19"
+  GO_VERSION: "1.21"
 jobs:
   unpack-envvars:
     runs-on: ubuntu-latest

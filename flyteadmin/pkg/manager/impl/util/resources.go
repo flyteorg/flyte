@@ -6,6 +6,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/api/resource"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
@@ -100,7 +101,7 @@ func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager 
 	}
 
 	resource, err := resourceManager.GetResource(ctx, request)
-	if err != nil {
+	if err != nil && !errors.IsDoesNotExistError(err) {
 		logger.Infof(ctx, "Failed to fetch override values when assigning task resource default values for [%+v]: %v",
 			id, err)
 	}
