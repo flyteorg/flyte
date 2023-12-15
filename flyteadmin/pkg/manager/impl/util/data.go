@@ -52,7 +52,12 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the input data.
-			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
+			if remoteDataConfig.SignedURL.Enabled {
+				logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
+			} else {
+				logger.Errorf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
+				return nil, nil, err
+			}
 		}
 	}
 	return &fullInputs, &inputsURLBlob, nil
@@ -123,7 +128,12 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the output data.
-			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
+			if remoteDataConfig.SignedURL.Enabled {
+				logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
+			} else {
+				logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
+				return nil, nil, err
+			}
 		}
 	}
 

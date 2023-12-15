@@ -14,6 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
@@ -135,6 +136,11 @@ func TestGetInputs(t *testing.T) {
 		_ = proto.Unmarshal(marshalled, msg)
 		return nil
 	}
+	mockStorageReadFailure := commonMocks.GetMockStorageClient()
+	mockStorageReadFailure.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		return errors.Errorf("error", "error")
+	}
 
 	t.Run("should sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
@@ -153,6 +159,23 @@ func TestGetInputs(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
 		assert.Empty(t, inputURLBlob)
+	})
+	t.Run("storage read fails with signed URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: true,
+		}
+		_, outputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, inputsURI)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
+	})
+	t.Run("storage read fails without signed URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: false,
+		}
+		fullOutputs, outputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, inputsURI)
+		assert.Error(t, err)
+		assert.Nil(t, fullOutputs)
+		assert.Nil(t, outputURLBlob)
 	})
 }
 
@@ -178,6 +201,11 @@ func TestGetOutputs(t *testing.T) {
 		marshalled, _ := proto.Marshal(testLiteralMap)
 		_ = proto.Unmarshal(marshalled, msg)
 		return nil
+	}
+	mockStorageReadFailure := commonMocks.GetMockStorageClient()
+	mockStorageReadFailure.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		return errors.Errorf("error", "error")
 	}
 	closure := &admin.NodeExecutionClosure{
 		OutputResult: &admin.NodeExecutionClosure_OutputUri{
@@ -229,6 +257,23 @@ func TestGetOutputs(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 		assert.Empty(t, outputURLBlob)
+	})
+	t.Run("storage read fails with signed URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: true,
+		}
+		_, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
+	})
+	t.Run("storage read fails without signed URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{
+			Enabled: false,
+		}
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
+		assert.Error(t, err)
+		assert.Nil(t, fullOutputs)
+		assert.Nil(t, outputURLBlob)
 	})
 }
 
