@@ -261,6 +261,7 @@ message Notification {
         EmailNotification email = 2;
         PagerDutyNotification pager_duty = 3;
         SlackNotification slack = 4;
+        WebhookNotification webhook = 5;
     }
 
 }
