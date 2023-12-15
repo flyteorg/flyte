@@ -13,7 +13,7 @@ beautifulsoup4==4.10.0
     #   furo
     #   sphinx-code-include
     #   sphinx-material
-certifi==2021.10.8
+certifi==2023.7.22
     # via requests
 charset-normalizer==2.0.10
     # via requests
