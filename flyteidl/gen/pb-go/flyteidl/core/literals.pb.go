@@ -900,7 +900,10 @@ func (m *LiteralMap) GetLiterals() map[string]*Literal {
 	return nil
 }
 
+// InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to
+// their values.
 type InputData struct {
+	// A map of input variables to their values.
 	Inputs               *LiteralMap `protobuf:"bytes,1,opt,name=inputs,proto3" json:"inputs,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`
@@ -939,7 +942,10 @@ func (m *InputData) GetInputs() *LiteralMap {
 	return nil
 }
 
+// OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to
+// their values.
 type OutputData struct {
+	// A map of output variables to their values.
 	Outputs              *LiteralMap `protobuf:"bytes,1,opt,name=outputs,proto3" json:"outputs,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
 	XXX_unrecognized     []byte      `json:"-"`

@@ -53,6 +53,7 @@ class CoreInputData(object):
     def inputs(self):
         """Gets the inputs of this CoreInputData.  # noqa: E501
 
+        A map of input variables to their values.  # noqa: E501
 
         :return: The inputs of this CoreInputData.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -63,6 +64,7 @@ class CoreInputData(object):
     def inputs(self, inputs):
         """Sets the inputs of this CoreInputData.
 
+        A map of input variables to their values.  # noqa: E501
 
         :param inputs: The inputs of this CoreInputData.  # noqa: E501
         :type: CoreLiteralMap

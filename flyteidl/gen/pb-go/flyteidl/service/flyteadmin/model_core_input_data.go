@@ -9,6 +9,8 @@
 
 package flyteadmin
 
+// InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to their values.
 type CoreInputData struct {
+	// A map of input variables to their values.
 	Inputs *CoreLiteralMap `json:"inputs,omitempty"`
 }

@@ -518,15 +518,21 @@ pub struct LiteralMap {
     #[prost(map="string, message", tag="1")]
     pub literals: ::std::collections::HashMap<::prost::alloc::string::String, Literal>,
 }
+/// InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to
+/// their values.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct InputData {
+    /// A map of input variables to their values.
     #[prost(message, optional, tag="1")]
     pub inputs: ::core::option::Option<LiteralMap>,
 }
+/// OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to
+/// their values.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct OutputData {
+    /// A map of output variables to their values.
     #[prost(message, optional, tag="1")]
     pub outputs: ::core::option::Option<LiteralMap>,
 }

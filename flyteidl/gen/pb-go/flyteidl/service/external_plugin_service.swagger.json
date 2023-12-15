@@ -422,9 +422,11 @@
       "type": "object",
       "properties": {
         "inputs": {
-          "$ref": "#/definitions/coreLiteralMap"
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of input variables to their values."
         }
-      }
+      },
+      "description": "InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to\ntheir values."
     },
     "coreK8sObjectMetadata": {
       "type": "object",
@@ -626,9 +628,11 @@
       "type": "object",
       "properties": {
         "outputs": {
-          "$ref": "#/definitions/coreLiteralMap"
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of output variables to their values."
         }
-      }
+      },
+      "description": "OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to\ntheir values."
     },
     "corePrimitive": {
       "type": "object",

@@ -12,6 +12,38 @@ type InputFilePaths struct {
 	mock.Mock
 }
 
+type InputFilePaths_GetInputDataPath struct {
+	*mock.Call
+}
+
+func (_m InputFilePaths_GetInputDataPath) Return(_a0 storage.DataReference) *InputFilePaths_GetInputDataPath {
+	return &InputFilePaths_GetInputDataPath{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *InputFilePaths) OnGetInputDataPath() *InputFilePaths_GetInputDataPath {
+	c_call := _m.On("GetInputDataPath")
+	return &InputFilePaths_GetInputDataPath{Call: c_call}
+}
+
+func (_m *InputFilePaths) OnGetInputDataPathMatch(matchers ...interface{}) *InputFilePaths_GetInputDataPath {
+	c_call := _m.On("GetInputDataPath", matchers...)
+	return &InputFilePaths_GetInputDataPath{Call: c_call}
+}
+
+// GetInputDataPath provides a mock function with given fields:
+func (_m *InputFilePaths) GetInputDataPath() storage.DataReference {
+	ret := _m.Called()
+
+	var r0 storage.DataReference
+	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(storage.DataReference)
+	}
+
+	return r0
+}
+
 type InputFilePaths_GetInputPath struct {
 	*mock.Call
 }

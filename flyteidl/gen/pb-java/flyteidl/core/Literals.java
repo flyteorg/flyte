@@ -12309,19 +12309,36 @@ public final class Literals {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * A map of input variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
      */
     boolean hasInputs();
     /**
+     * <pre>
+     * A map of input variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
      */
     flyteidl.core.Literals.LiteralMap getInputs();
     /**
+     * <pre>
+     * A map of input variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
      */
     flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder();
   }
   /**
+   * <pre>
+   * InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to
+   * their values.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.core.InputData}
    */
   public  static final class InputData extends
@@ -12408,18 +12425,30 @@ public final class Literals {
     public static final int INPUTS_FIELD_NUMBER = 1;
     private flyteidl.core.Literals.LiteralMap inputs_;
     /**
+     * <pre>
+     * A map of input variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
      */
     public boolean hasInputs() {
       return inputs_ != null;
     }
     /**
+     * <pre>
+     * A map of input variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
      */
     public flyteidl.core.Literals.LiteralMap getInputs() {
       return inputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputs_;
     }
     /**
+     * <pre>
+     * A map of input variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
      */
     public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
@@ -12587,6 +12616,11 @@ public final class Literals {
       return builder;
     }
     /**
+     * <pre>
+     * InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to
+     * their values.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.core.InputData}
      */
     public static final class Builder extends
@@ -12745,12 +12779,20 @@ public final class Literals {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputsBuilder_;
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public boolean hasInputs() {
         return inputsBuilder_ != null || inputs_ != null;
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public flyteidl.core.Literals.LiteralMap getInputs() {
@@ -12761,6 +12803,10 @@ public final class Literals {
         }
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public Builder setInputs(flyteidl.core.Literals.LiteralMap value) {
@@ -12777,6 +12823,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public Builder setInputs(
@@ -12791,6 +12841,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public Builder mergeInputs(flyteidl.core.Literals.LiteralMap value) {
@@ -12809,6 +12863,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public Builder clearInputs() {
@@ -12823,6 +12881,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public flyteidl.core.Literals.LiteralMap.Builder getInputsBuilder() {
@@ -12831,6 +12893,10 @@ public final class Literals {
         return getInputsFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       public flyteidl.core.Literals.LiteralMapOrBuilder getInputsOrBuilder() {
@@ -12842,6 +12908,10 @@ public final class Literals {
         }
       }
       /**
+       * <pre>
+       * A map of input variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap inputs = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -12915,19 +12985,36 @@ public final class Literals {
       com.google.protobuf.MessageOrBuilder {
 
     /**
+     * <pre>
+     * A map of output variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
      */
     boolean hasOutputs();
     /**
+     * <pre>
+     * A map of output variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
      */
     flyteidl.core.Literals.LiteralMap getOutputs();
     /**
+     * <pre>
+     * A map of output variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
      */
     flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder();
   }
   /**
+   * <pre>
+   * OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to
+   * their values.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.core.OutputData}
    */
   public  static final class OutputData extends
@@ -13014,18 +13101,30 @@ public final class Literals {
     public static final int OUTPUTS_FIELD_NUMBER = 1;
     private flyteidl.core.Literals.LiteralMap outputs_;
     /**
+     * <pre>
+     * A map of output variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
      */
     public boolean hasOutputs() {
       return outputs_ != null;
     }
     /**
+     * <pre>
+     * A map of output variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
      */
     public flyteidl.core.Literals.LiteralMap getOutputs() {
       return outputs_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputs_;
     }
     /**
+     * <pre>
+     * A map of output variables to their values.
+     * </pre>
+     *
      * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
      */
     public flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder() {
@@ -13193,6 +13292,11 @@ public final class Literals {
       return builder;
     }
     /**
+     * <pre>
+     * OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to
+     * their values.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.core.OutputData}
      */
     public static final class Builder extends
@@ -13351,12 +13455,20 @@ public final class Literals {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputsBuilder_;
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public boolean hasOutputs() {
         return outputsBuilder_ != null || outputs_ != null;
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public flyteidl.core.Literals.LiteralMap getOutputs() {
@@ -13367,6 +13479,10 @@ public final class Literals {
         }
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public Builder setOutputs(flyteidl.core.Literals.LiteralMap value) {
@@ -13383,6 +13499,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public Builder setOutputs(
@@ -13397,6 +13517,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public Builder mergeOutputs(flyteidl.core.Literals.LiteralMap value) {
@@ -13415,6 +13539,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public Builder clearOutputs() {
@@ -13429,6 +13557,10 @@ public final class Literals {
         return this;
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public flyteidl.core.Literals.LiteralMap.Builder getOutputsBuilder() {
@@ -13437,6 +13569,10 @@ public final class Literals {
         return getOutputsFieldBuilder().getBuilder();
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       public flyteidl.core.Literals.LiteralMapOrBuilder getOutputsOrBuilder() {
@@ -13448,6 +13584,10 @@ public final class Literals {
         }
       }
       /**
+       * <pre>
+       * A map of output variables to their values.
+       * </pre>
+       *
        * <code>.flyteidl.core.LiteralMap outputs = 1;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<

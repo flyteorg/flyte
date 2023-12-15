@@ -53,6 +53,7 @@ class CoreOutputData(object):
     def outputs(self):
         """Gets the outputs of this CoreOutputData.  # noqa: E501
 
+        A map of output variables to their values.  # noqa: E501
 
         :return: The outputs of this CoreOutputData.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -63,6 +64,7 @@ class CoreOutputData(object):
     def outputs(self, outputs):
         """Sets the outputs of this CoreOutputData.
 
+        A map of output variables to their values.  # noqa: E501
 
         :param outputs: The outputs of this CoreOutputData.  # noqa: E501
         :type: CoreLiteralMap

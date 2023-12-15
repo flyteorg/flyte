@@ -9,6 +9,8 @@
 
 package flyteadmin
 
+// OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to their values.
 type CoreOutputData struct {
+	// A map of output variables to their values.
 	Outputs *CoreLiteralMap `json:"outputs,omitempty"`
 }
