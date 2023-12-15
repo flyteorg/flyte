@@ -12,8 +12,8 @@ build:
     post_install:
       - conda-lock install --name $READTHEDOCS_VERSION monodocs-environment.lock.yaml
       - conda info
-      - conda list
       - conda env list
+      - conda list
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
