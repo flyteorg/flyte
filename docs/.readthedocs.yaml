@@ -10,7 +10,8 @@ build:
     python: "mambaforge-22.9"
   jobs:
     post_install:
-      - conda-lock install --name $READTHEDOCS_VERSION_NAME monodocs-environment.lock.yaml
+      - conda install --name $READTHEDOCS_VERSION -c conda-forge readthedocs-sphinx-ext -y
+      - conda-lock install --name $READTHEDOCS_VERSION monodocs-environment.lock.yaml
       - conda info
       - conda env list
 
