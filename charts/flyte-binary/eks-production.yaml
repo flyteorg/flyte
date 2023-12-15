@@ -90,15 +90,27 @@ clusterResourceTemplates:
           eks.amazonaws.com/role-arn: '{{ defaultIamRole }}'
 ingress:
   create: true
+  ##-- Uncomment the following section if you plan to use NGINX Ingress Controller
+  #ingressClassName: nginx
+  #commonAnnotations:
+  #  ingress.kubernetes.io/rewrite-target: /
+  #  nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  #httpAnnotations:
+  #  nginx.ingress.kubernetes.io/app-root: /console
+  #grpcAnnotations:
+  #  nginx.ingress.kubernetes.io/backend-protocol: GRPC
+  #host: <your-Flyte-URL> # change for the URL you'll use to connect to Flyte
+  ## ---
+  
+  #This section assumes you are using the ALB Ingress controller.
+  ingressClassName: alb
   commonAnnotations:
-    #This section assumes you are using the ALB Ingress controller
     alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:<AWS-REGION>:<AWS-ACCOUNT-ID>:certificate/<CERTIFICATE-ID>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/ssl-redirect: '443'
     alb.ingress.kubernetes.io/target-type: ip
-    kubernetes.io/ingress.class: alb
   httpAnnotations:
     alb.ingress.kubernetes.io/actions.app-root: '{"Type": "redirect", "RedirectConfig": {"Path": "/console", "StatusCode": "HTTP_302"}}'
   grpcAnnotations:
