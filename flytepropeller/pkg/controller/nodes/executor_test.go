@@ -565,7 +565,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			},
 		}
 
-		setupNodePhase := func(n0Phase, n2Phase, expectedN2Phase v1alpha1.NodePhase) (*mocks.ExecutableWorkflow, *mocks.ExecutableNodeStatus) {
+		setupNodePhase := func(n0Phase, n2Phase, expectedN2Phase v1alpha1.NodePhase, expectedClearStateOnAnyTermination bool) (*mocks.ExecutableWorkflow, *mocks.ExecutableNodeStatus) {
 			taskID := "id"
 			taskID0 := "id1"
 			// Setup
@@ -582,8 +582,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 			mockN2Status.OnGetStoppedAt().Return(nil)
 			var ee *core.ExecutionError
-			// TODO: Add tests case with clearStateOnAnyTermination=true
-			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), false, ee)
+			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), expectedClearStateOnAnyTermination, ee)
 			mockN2Status.OnIsDirty().Return(false)
 			mockN2Status.OnGetTaskNodeStatus().Return(nil)
 			mockN2Status.On("ClearDynamicNodeStatus").Return(nil)
@@ -660,17 +659,21 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		}
 
 		tests := []struct {
-			name              string
-			currentNodePhase  v1alpha1.NodePhase
-			parentNodePhase   v1alpha1.NodePhase
-			expectedNodePhase v1alpha1.NodePhase
-			expectedPhase     interfaces.NodePhase
-			expectedError     bool
-			updateCalled      bool
+			name                       string
+			currentNodePhase           v1alpha1.NodePhase
+			parentNodePhase            v1alpha1.NodePhase
+			clearStateOnAnyTermination bool
+			expectedNodePhase          v1alpha1.NodePhase
+			expectedPhase              interfaces.NodePhase
+			expectedError              bool
+			updateCalled               bool
 		}{
-			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
-			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
-			{"notYetStarted->queued", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
+			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, false, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
+			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, false, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
+			{"notYetStarted->queued", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, false, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
+			{"notYetStarted->skipped clearStateOnAnyTermination", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, true, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
+			{"notYetStarted->skipped clearStateOnAnyTermination", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, true, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
+			{"notYetStarted->queued clearStateOnAnyTermination", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, true, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
 		}
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
@@ -685,12 +688,14 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				h.OnFinalizeRequired().Return(false)
 				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
-				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase)
+				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase, test.clearStateOnAnyTermination)
 				startNode := mockWf.StartNode()
 				store := createInmemoryDataStore(t, promutils.NewTestScope())
 
 				adminClient := launchplan.NewFailFastLaunchPlanExecutor()
-				execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+				nodeConfig := config.GetConfig().NodeConfig
+				nodeConfig.ClearStateOnAnyTermination = test.clearStateOnAnyTermination
+				execIface, err := NewExecutor(ctx, nodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
 					10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
