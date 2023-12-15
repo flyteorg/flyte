@@ -104,37 +104,6 @@ ingress:
   grpcAnnotations:
     alb.ingress.kubernetes.io/backend-protocol-version: GRPC 
   host: flyte.mydomain.com #replace with your fully-qualified domain name
-rbac:
-  extraRules:
-    - apiGroups:
-      - ""
-      resources:
-      - pods
-      - services
-      - configmaps
-      verbs:
-      - "*"
-    - apiGroups:
-      - ""
-      resources:
-      - serviceaccounts
-      verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
-    - apiGroups:
-      - rbac.authorization.k8s.io
-      resources:
-      - rolebindings
-      - roles
-      verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
 serviceAccount:
   create: true
   annotations:
