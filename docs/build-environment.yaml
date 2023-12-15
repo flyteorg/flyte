@@ -4,3 +4,4 @@ channels:
 dependencies:
   - python=3.10
   - conda-lock
+  - readthedocs-sphinx-ext
