@@ -1492,28 +1492,6 @@ class Agent final :
   const ::google::protobuf::RepeatedPtrField<::std::string>& supported_task_types() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_supported_task_types();
 
-  // repeated string secret_names = 4;
-  int secret_names_size() const;
-  void clear_secret_names();
-  static const int kSecretNamesFieldNumber = 4;
-  const ::std::string& secret_names(int index) const;
-  ::std::string* mutable_secret_names(int index);
-  void set_secret_names(int index, const ::std::string& value);
-  #if LANG_CXX11
-  void set_secret_names(int index, ::std::string&& value);
-  #endif
-  void set_secret_names(int index, const char* value);
-  void set_secret_names(int index, const char* value, size_t size);
-  ::std::string* add_secret_names();
-  void add_secret_names(const ::std::string& value);
-  #if LANG_CXX11
-  void add_secret_names(::std::string&& value);
-  #endif
-  void add_secret_names(const char* value);
-  void add_secret_names(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& secret_names() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_secret_names();
-
   // string name = 1;
   void clear_name();
   static const int kNameFieldNumber = 1;
@@ -1540,7 +1518,6 @@ class Agent final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> supported_task_types_;
-  ::google::protobuf::RepeatedPtrField<::std::string> secret_names_;
   ::google::protobuf::internal::ArenaStringPtr name_;
   bool is_sync_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -3061,75 +3038,6 @@ inline void Agent::set_is_sync(bool value) {
   
   is_sync_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.is_sync)
-}
-
-// repeated string secret_names = 4;
-inline int Agent::secret_names_size() const {
-  return secret_names_.size();
-}
-inline void Agent::clear_secret_names() {
-  secret_names_.Clear();
-}
-inline const ::std::string& Agent::secret_names(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.secret_names)
-  return secret_names_.Get(index);
-}
-inline ::std::string* Agent::mutable_secret_names(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Agent.secret_names)
-  return secret_names_.Mutable(index);
-}
-inline void Agent::set_secret_names(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.secret_names)
-  secret_names_.Mutable(index)->assign(value);
-}
-#if LANG_CXX11
-inline void Agent::set_secret_names(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.secret_names)
-  secret_names_.Mutable(index)->assign(std::move(value));
-}
-#endif
-inline void Agent::set_secret_names(int index, const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  secret_names_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Agent.secret_names)
-}
-inline void Agent::set_secret_names(int index, const char* value, size_t size) {
-  secret_names_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Agent.secret_names)
-}
-inline ::std::string* Agent::add_secret_names() {
-  // @@protoc_insertion_point(field_add_mutable:flyteidl.admin.Agent.secret_names)
-  return secret_names_.Add();
-}
-inline void Agent::add_secret_names(const ::std::string& value) {
-  secret_names_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:flyteidl.admin.Agent.secret_names)
-}
-#if LANG_CXX11
-inline void Agent::add_secret_names(::std::string&& value) {
-  secret_names_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:flyteidl.admin.Agent.secret_names)
-}
-#endif
-inline void Agent::add_secret_names(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  secret_names_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:flyteidl.admin.Agent.secret_names)
-}
-inline void Agent::add_secret_names(const char* value, size_t size) {
-  secret_names_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:flyteidl.admin.Agent.secret_names)
-}
-inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-Agent::secret_names() const {
-  // @@protoc_insertion_point(field_list:flyteidl.admin.Agent.secret_names)
-  return secret_names_;
-}
-inline ::google::protobuf::RepeatedPtrField<::std::string>*
-Agent::mutable_secret_names() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.Agent.secret_names)
-  return &secret_names_;
 }
 
 // -------------------------------------------------------------------

@@ -8463,41 +8463,6 @@ public final class AgentOuterClass {
      * <code>bool is_sync = 3;</code>
      */
     boolean getIsSync();
-
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    java.util.List<java.lang.String>
-        getSecretNamesList();
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    int getSecretNamesCount();
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    java.lang.String getSecretNames(int index);
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    com.google.protobuf.ByteString
-        getSecretNamesBytes(int index);
   }
   /**
    * <pre>
@@ -8518,7 +8483,6 @@ public final class AgentOuterClass {
     private Agent() {
       name_ = "";
       supportedTaskTypes_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -8565,15 +8529,6 @@ public final class AgentOuterClass {
               isSync_ = input.readBool();
               break;
             }
-            case 34: {
-              java.lang.String s = input.readStringRequireUtf8();
-              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
-                secretNames_ = new com.google.protobuf.LazyStringArrayList();
-                mutable_bitField0_ |= 0x00000008;
-              }
-              secretNames_.add(s);
-              break;
-            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -8591,9 +8546,6 @@ public final class AgentOuterClass {
       } finally {
         if (((mutable_bitField0_ & 0x00000002) != 0)) {
           supportedTaskTypes_ = supportedTaskTypes_.getUnmodifiableView();
-        }
-        if (((mutable_bitField0_ & 0x00000008) != 0)) {
-          secretNames_ = secretNames_.getUnmodifiableView();
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -8713,51 +8665,6 @@ public final class AgentOuterClass {
       return isSync_;
     }
 
-    public static final int SECRET_NAMES_FIELD_NUMBER = 4;
-    private com.google.protobuf.LazyStringList secretNames_;
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    public com.google.protobuf.ProtocolStringList
-        getSecretNamesList() {
-      return secretNames_;
-    }
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    public int getSecretNamesCount() {
-      return secretNames_.size();
-    }
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    public java.lang.String getSecretNames(int index) {
-      return secretNames_.get(index);
-    }
-    /**
-     * <pre>
-     * SecretNames is a list of secrets the agent requires to execute tasks.
-     * </pre>
-     *
-     * <code>repeated string secret_names = 4;</code>
-     */
-    public com.google.protobuf.ByteString
-        getSecretNamesBytes(int index) {
-      return secretNames_.getByteString(index);
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -8780,9 +8687,6 @@ public final class AgentOuterClass {
       }
       if (isSync_ != false) {
         output.writeBool(3, isSync_);
-      }
-      for (int i = 0; i < secretNames_.size(); i++) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, secretNames_.getRaw(i));
       }
       unknownFields.writeTo(output);
     }
@@ -8808,14 +8712,6 @@ public final class AgentOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(3, isSync_);
       }
-      {
-        int dataSize = 0;
-        for (int i = 0; i < secretNames_.size(); i++) {
-          dataSize += computeStringSizeNoTag(secretNames_.getRaw(i));
-        }
-        size += dataSize;
-        size += 1 * getSecretNamesList().size();
-      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -8837,8 +8733,6 @@ public final class AgentOuterClass {
           .equals(other.getSupportedTaskTypesList())) return false;
       if (getIsSync()
           != other.getIsSync()) return false;
-      if (!getSecretNamesList()
-          .equals(other.getSecretNamesList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -8859,10 +8753,6 @@ public final class AgentOuterClass {
       hash = (37 * hash) + IS_SYNC_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getIsSync());
-      if (getSecretNamesCount() > 0) {
-        hash = (37 * hash) + SECRET_NAMES_FIELD_NUMBER;
-        hash = (53 * hash) + getSecretNamesList().hashCode();
-      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -9006,8 +8896,6 @@ public final class AgentOuterClass {
         bitField0_ = (bitField0_ & ~0x00000002);
         isSync_ = false;
 
-        secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -9043,11 +8931,6 @@ public final class AgentOuterClass {
         }
         result.supportedTaskTypes_ = supportedTaskTypes_;
         result.isSync_ = isSync_;
-        if (((bitField0_ & 0x00000008) != 0)) {
-          secretNames_ = secretNames_.getUnmodifiableView();
-          bitField0_ = (bitField0_ & ~0x00000008);
-        }
-        result.secretNames_ = secretNames_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -9113,16 +8996,6 @@ public final class AgentOuterClass {
         }
         if (other.getIsSync() != false) {
           setIsSync(other.getIsSync());
-        }
-        if (!other.secretNames_.isEmpty()) {
-          if (secretNames_.isEmpty()) {
-            secretNames_ = other.secretNames_;
-            bitField0_ = (bitField0_ & ~0x00000008);
-          } else {
-            ensureSecretNamesIsMutable();
-            secretNames_.addAll(other.secretNames_);
-          }
-          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -9407,136 +9280,6 @@ public final class AgentOuterClass {
       public Builder clearIsSync() {
         
         isSync_ = false;
-        onChanged();
-        return this;
-      }
-
-      private com.google.protobuf.LazyStringList secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureSecretNamesIsMutable() {
-        if (!((bitField0_ & 0x00000008) != 0)) {
-          secretNames_ = new com.google.protobuf.LazyStringArrayList(secretNames_);
-          bitField0_ |= 0x00000008;
-         }
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public com.google.protobuf.ProtocolStringList
-          getSecretNamesList() {
-        return secretNames_.getUnmodifiableView();
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public int getSecretNamesCount() {
-        return secretNames_.size();
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public java.lang.String getSecretNames(int index) {
-        return secretNames_.get(index);
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public com.google.protobuf.ByteString
-          getSecretNamesBytes(int index) {
-        return secretNames_.getByteString(index);
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public Builder setSecretNames(
-          int index, java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureSecretNamesIsMutable();
-        secretNames_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public Builder addSecretNames(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  ensureSecretNamesIsMutable();
-        secretNames_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public Builder addAllSecretNames(
-          java.lang.Iterable<java.lang.String> values) {
-        ensureSecretNamesIsMutable();
-        com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, secretNames_);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public Builder clearSecretNames() {
-        secretNames_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-        bitField0_ = (bitField0_ & ~0x00000008);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * SecretNames is a list of secrets the agent requires to execute tasks.
-       * </pre>
-       *
-       * <code>repeated string secret_names = 4;</code>
-       */
-      public Builder addSecretNamesBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        ensureSecretNamesIsMutable();
-        secretNames_.add(value);
         onChanged();
         return this;
       }
@@ -12138,18 +11881,17 @@ public final class AgentOuterClass {
       "\007outputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa" +
       "p\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskRequest\022" +
       "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(" +
-      "\014\"\024\n\022DeleteTaskResponse\"Z\n\005Agent\022\014\n\004name" +
+      "\014\"\024\n\022DeleteTaskResponse\"D\n\005Agent\022\014\n\004name" +
       "\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \003(\t\022\017\n\007" +
-      "is_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017G" +
-      "etAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgent" +
-      "Response\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin" +
-      ".Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgent" +
-      "sResponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.adm" +
-      "in.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000" +
-      "\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007" +
-      "RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/f" +
-      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
-      "l/adminb\006proto3"
+      "is_sync\030\003 \001(\010\"\037\n\017GetAgentRequest\022\014\n\004name" +
+      "\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005agent\030\001 \001(" +
+      "\0132\025.flyteidl.admin.Agent\"\023\n\021ListAgentsRe" +
+      "quest\";\n\022ListAgentsResponse\022%\n\006agents\030\001 " +
+      "\003(\0132\025.flyteidl.admin.Agent*^\n\005State\022\025\n\021R" +
+      "ETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020" +
+      "\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED" +
+      "\020\004B=Z;github.com/flyteorg/flyte/flyteidl" +
+      "/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12245,7 +11987,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_Agent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Agent_descriptor,
-        new java.lang.String[] { "Name", "SupportedTaskTypes", "IsSync", "SecretNames", });
+        new java.lang.String[] { "Name", "SupportedTaskTypes", "IsSync", });
     internal_static_flyteidl_admin_GetAgentRequest_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_GetAgentRequest_fieldAccessorTable = new

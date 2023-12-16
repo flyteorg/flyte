@@ -8370,9 +8370,6 @@ export namespace flyteidl {
 
             /** Agent isSync */
             isSync?: (boolean|null);
-
-            /** Agent secretNames */
-            secretNames?: (string[]|null);
         }
 
         /** Represents an Agent. */
@@ -8392,9 +8389,6 @@ export namespace flyteidl {
 
             /** Agent isSync. */
             public isSync: boolean;
-
-            /** Agent secretNames. */
-            public secretNames: string[];
 
             /**
              * Creates a new Agent instance using the specified properties.

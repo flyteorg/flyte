@@ -476,7 +476,6 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, name_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, supported_task_types_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, is_sync_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Agent, secret_names_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetAgentRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -515,10 +514,10 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 85, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
   { 92, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
   { 97, -1, sizeof(::flyteidl::admin::Agent)},
-  { 106, -1, sizeof(::flyteidl::admin::GetAgentRequest)},
-  { 112, -1, sizeof(::flyteidl::admin::GetAgentResponse)},
-  { 118, -1, sizeof(::flyteidl::admin::ListAgentsRequest)},
-  { 123, -1, sizeof(::flyteidl::admin::ListAgentsResponse)},
+  { 105, -1, sizeof(::flyteidl::admin::GetAgentRequest)},
+  { 111, -1, sizeof(::flyteidl::admin::GetAgentResponse)},
+  { 117, -1, sizeof(::flyteidl::admin::ListAgentsRequest)},
+  { 122, -1, sizeof(::flyteidl::admin::ListAgentsResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -584,23 +583,22 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "\007outputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa"
   "p\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskRequest\022"
   "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001("
-  "\014\"\024\n\022DeleteTaskResponse\"Z\n\005Agent\022\014\n\004name"
+  "\014\"\024\n\022DeleteTaskResponse\"D\n\005Agent\022\014\n\004name"
   "\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \003(\t\022\017\n\007"
-  "is_sync\030\003 \001(\010\022\024\n\014secret_names\030\004 \003(\t\"\037\n\017G"
-  "etAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgent"
-  "Response\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin"
-  ".Agent\"\023\n\021ListAgentsRequest\";\n\022ListAgent"
-  "sResponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.adm"
-  "in.Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000"
-  "\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007"
-  "RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/f"
-  "lyteorg/flyte/flyteidl/gen/pb-go/flyteid"
-  "l/adminb\006proto3"
+  "is_sync\030\003 \001(\010\"\037\n\017GetAgentRequest\022\014\n\004name"
+  "\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005agent\030\001 \001("
+  "\0132\025.flyteidl.admin.Agent\"\023\n\021ListAgentsRe"
+  "quest\";\n\022ListAgentsResponse\022%\n\006agents\030\001 "
+  "\003(\0132\025.flyteidl.admin.Agent*^\n\005State\022\025\n\021R"
+  "ETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020"
+  "\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED"
+  "\020\004B=Z;github.com/flyteorg/flyte/flyteidl"
+  "/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1895,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1873,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -4390,7 +4388,6 @@ class Agent::HasBitSetters {
 const int Agent::kNameFieldNumber;
 const int Agent::kSupportedTaskTypesFieldNumber;
 const int Agent::kIsSyncFieldNumber;
-const int Agent::kSecretNamesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Agent::Agent()
@@ -4401,8 +4398,7 @@ Agent::Agent()
 Agent::Agent(const Agent& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      supported_task_types_(from.supported_task_types_),
-      secret_names_(from.secret_names_) {
+      supported_task_types_(from.supported_task_types_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.name().size() > 0) {
@@ -4444,7 +4440,6 @@ void Agent::Clear() {
   (void) cached_has_bits;
 
   supported_task_types_.Clear();
-  secret_names_.Clear();
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   is_sync_ = false;
   _internal_metadata_.Clear();
@@ -4503,25 +4498,6 @@ const char* Agent::_InternalParse(const char* begin, const char* end, void* obje
         if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
         msg->set_is_sync(::google::protobuf::internal::ReadVarint(&ptr));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // repeated string secret_names = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          ctx->extra_parse_data().SetFieldName("flyteidl.admin.Agent.secret_names");
-          object = msg->add_secret_names();
-          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-            goto string_till_end;
-          }
-          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-          ptr += size;
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
         break;
       }
       default: {
@@ -4602,22 +4578,6 @@ bool Agent::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated string secret_names = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->add_secret_names()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->secret_names(this->secret_names_size() - 1).data(),
-            static_cast<int>(this->secret_names(this->secret_names_size() - 1).length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.admin.Agent.secret_names"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -4670,16 +4630,6 @@ void Agent::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteBool(3, this->is_sync(), output);
   }
 
-  // repeated string secret_names = 4;
-  for (int i = 0, n = this->secret_names_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->secret_names(i).data(), static_cast<int>(this->secret_names(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.secret_names");
-    ::google::protobuf::internal::WireFormatLite::WriteString(
-      4, this->secret_names(i), output);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -4719,16 +4669,6 @@ void Agent::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(3, this->is_sync(), target);
   }
 
-  // repeated string secret_names = 4;
-  for (int i = 0, n = this->secret_names_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->secret_names(i).data(), static_cast<int>(this->secret_names(i).length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.admin.Agent.secret_names");
-    target = ::google::protobuf::internal::WireFormatLite::
-      WriteStringToArray(4, this->secret_names(i), target);
-  }
-
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -4756,14 +4696,6 @@ size_t Agent::ByteSizeLong() const {
   for (int i = 0, n = this->supported_task_types_size(); i < n; i++) {
     total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
       this->supported_task_types(i));
-  }
-
-  // repeated string secret_names = 4;
-  total_size += 1 *
-      ::google::protobuf::internal::FromIntSize(this->secret_names_size());
-  for (int i = 0, n = this->secret_names_size(); i < n; i++) {
-    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
-      this->secret_names(i));
   }
 
   // string name = 1;
@@ -4806,7 +4738,6 @@ void Agent::MergeFrom(const Agent& from) {
   (void) cached_has_bits;
 
   supported_task_types_.MergeFrom(from.supported_task_types_);
-  secret_names_.MergeFrom(from.secret_names_);
   if (from.name().size() > 0) {
 
     name_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.name_);
@@ -4842,7 +4773,6 @@ void Agent::InternalSwap(Agent* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   supported_task_types_.InternalSwap(CastToBase(&other->supported_task_types_));
-  secret_names_.InternalSwap(CastToBase(&other->secret_names_));
   name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(is_sync_, other->is_sync_);

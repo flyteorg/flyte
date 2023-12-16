@@ -119,9 +119,6 @@ pub struct Agent {
     /// IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
     #[prost(bool, tag="3")]
     pub is_sync: bool,
-    /// SecretNames is a list of secrets the agent requires to execute tasks.
-    #[prost(string, repeated, tag="4")]
-    pub secret_names: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
 }
 /// A request to get an agent.
 #[allow(clippy::derive_partial_eq_without_eq)]

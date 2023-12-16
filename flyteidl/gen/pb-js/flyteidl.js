@@ -20419,7 +20419,6 @@
                  * @property {string|null} [name] Agent name
                  * @property {Array.<string>|null} [supportedTaskTypes] Agent supportedTaskTypes
                  * @property {boolean|null} [isSync] Agent isSync
-                 * @property {Array.<string>|null} [secretNames] Agent secretNames
                  */
     
                 /**
@@ -20432,7 +20431,6 @@
                  */
                 function Agent(properties) {
                     this.supportedTaskTypes = [];
-                    this.secretNames = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -20462,14 +20460,6 @@
                  * @instance
                  */
                 Agent.prototype.isSync = false;
-    
-                /**
-                 * Agent secretNames.
-                 * @member {Array.<string>} secretNames
-                 * @memberof flyteidl.admin.Agent
-                 * @instance
-                 */
-                Agent.prototype.secretNames = $util.emptyArray;
     
                 /**
                  * Creates a new Agent instance using the specified properties.
@@ -20502,9 +20492,6 @@
                             writer.uint32(/* id 2, wireType 2 =*/18).string(message.supportedTaskTypes[i]);
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isSync);
-                    if (message.secretNames != null && message.secretNames.length)
-                        for (var i = 0; i < message.secretNames.length; ++i)
-                            writer.uint32(/* id 4, wireType 2 =*/34).string(message.secretNames[i]);
                     return writer;
                 };
     
@@ -20536,11 +20523,6 @@
                             break;
                         case 3:
                             message.isSync = reader.bool();
-                            break;
-                        case 4:
-                            if (!(message.secretNames && message.secretNames.length))
-                                message.secretNames = [];
-                            message.secretNames.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20574,13 +20556,6 @@
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         if (typeof message.isSync !== "boolean")
                             return "isSync: boolean expected";
-                    if (message.secretNames != null && message.hasOwnProperty("secretNames")) {
-                        if (!Array.isArray(message.secretNames))
-                            return "secretNames: array expected";
-                        for (var i = 0; i < message.secretNames.length; ++i)
-                            if (!$util.isString(message.secretNames[i]))
-                                return "secretNames: string[] expected";
-                    }
                     return null;
                 };
     
