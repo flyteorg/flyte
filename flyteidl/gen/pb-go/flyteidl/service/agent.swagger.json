@@ -163,6 +163,15 @@
         }
       }
     },
+    "TaskLogMessageFormat": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CSV",
+        "JSON"
+      ],
+      "default": "UNKNOWN"
+    },
     "adminCreateTaskResponse": {
       "type": "object",
       "properties": {
@@ -183,6 +192,13 @@
       "properties": {
         "resource": {
           "$ref": "#/definitions/adminResource"
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
         }
       },
       "description": "Response to get an individual task resource."
@@ -950,6 +966,24 @@
         }
       },
       "description": "Encapsulation of fields that identify a Flyte task execution entity."
+    },
+    "coreTaskLog": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "message_format": {
+          "$ref": "#/definitions/TaskLogMessageFormat"
+        },
+        "ttl": {
+          "type": "string"
+        }
+      },
+      "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
     },
     "coreTaskMetadata": {
       "type": "object",

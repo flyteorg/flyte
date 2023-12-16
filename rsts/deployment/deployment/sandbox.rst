@@ -78,12 +78,10 @@ who wish to dig deeper into the storage layer.
       🐋 Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000
       📂 The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console
 
-Configuration
-______________
+Flytectl/Flyte-remote Configuration
+___________________________________
 
-The ``config-sandbox.yaml`` file contains configuration for **FlyteAdmin**,
-which is the Flyte cluster backend component that processes all client requests
-such as workflow executions. The default values are enough to let you connect and use Flyte:
+The ``config-sandbox.yaml`` file contains configuration for clients  to communicate with **FlyteAdmin**, which is the Flyte cluster backend component that processes all client requests such as workflow executions. The default values are enough to let you connect and use Flyte:
 
 
 .. code-block:: yaml
@@ -107,6 +105,40 @@ such as workflow executions. The default values are enough to let you connect an
    Learn more about the configuration settings in the
    {ref}`Deployment Guide <flyte:flyteadmin-config-specification>`
 
+Flyte Cluster Configuration
+___________________________
+
+Flyte Sandbox ships with a reasonable default configuration. However, you can specify overrides as necessary to fit your use case, in the ``~/.flyte/sandbox/config.yaml`` file. See the following example for enabling the Ray plugin (requires `kuberay-operator <https://github.com/ray-project/kuberay>`__ to also be installed):
+
+.. code-block:: shell
+
+   > cat ~/.flyte/sandbox/config.yaml
+   tasks:
+     task-plugins:
+       default-for-task-types:
+         ray: ray
+       enabled-plugins:
+       - container
+       - sidecar
+       - k8s-array
+       - agent-service
+       - ray
+   plugins:
+     ray:
+       ttlSecondsAfterFinished: 60
+
+You can also specify additional cluster resource templates in the ``~/.flyte/sandbox/cluster-resource-templates`` directory. See the following example:
+
+.. code-block:: shell
+
+   > cat ~/.flyte/sandbox/cluster-resource-templates/001-serviceaccount.yaml
+   apiVersion: v1
+   kind: ServiceAccount
+   metadata:
+     name: flyte-worker
+     namespace: {{ namespace }}
+
+Once you are happy with the changes, simply run ``flytectl demo reload`` to trigger a reload of the sandbox with the updated configuration.
 
 Now that you have the sandbox cluster running, you can now go to the :ref:`User Guide <cookbook:userguide>` or
 :ref:`Tutorials <cookbook:tutorials>` to run tasks and workflows written in ``flytekit``, the Python SDK for Flyte.

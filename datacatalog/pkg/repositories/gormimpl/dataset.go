@@ -33,7 +33,7 @@ func (h *dataSetRepo) Create(ctx context.Context, in models.Dataset) error {
 	timer := h.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
-	result := h.db.Create(&in)
+	result := h.db.WithContext(ctx).Create(&in)
 	if result.Error != nil {
 		return h.errorTransformer.ToDataCatalogError(result.Error)
 	}
@@ -46,8 +46,8 @@ func (h *dataSetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dat
 	defer timer.Stop()
 
 	var ds models.Dataset
-	result := h.db.Preload("PartitionKeys", func(db *gorm.DB) *gorm.DB {
-		return db.Order("partition_keys.created_at ASC") // preserve the order in which the partitions were created
+	result := h.db.WithContext(ctx).Preload("PartitionKeys", func(db *gorm.DB) *gorm.DB {
+		return db.WithContext(ctx).Order("partition_keys.created_at ASC") // preserve the order in which the partitions were created
 	}).First(&ds, &models.Dataset{DatasetKey: in})
 
 	if result.Error != nil {
