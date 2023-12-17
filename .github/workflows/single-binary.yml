@@ -170,7 +170,7 @@ jobs:
               cpu: "0"
               memory: "0"
           EOF
-          flytectl demo start --image flyte-sandbox-bundled:local --disable-agent --imagePullPolicy Never
+          flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
