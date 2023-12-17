@@ -336,7 +336,7 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 		agentRegistry[taskType][false] = cfg.Agents[agentID]
 	}
 
-	if cfg.DefaultAgent.Endpoint != "" {
+	if len(cfg.DefaultAgent.Endpoint) == 0 {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
