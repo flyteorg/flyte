@@ -50,7 +50,7 @@ struct TableStruct_flyteidl_2fadmin_2fagent_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[17]
+  static const ::google::protobuf::internal::ParseTable schema[16]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -65,9 +65,6 @@ extern AgentDefaultTypeInternal _Agent_default_instance_;
 class CreateTaskRequest;
 class CreateTaskRequestDefaultTypeInternal;
 extern CreateTaskRequestDefaultTypeInternal _CreateTaskRequest_default_instance_;
-class CreateTaskRequest_SecretsEntry_DoNotUse;
-class CreateTaskRequest_SecretsEntry_DoNotUseDefaultTypeInternal;
-extern CreateTaskRequest_SecretsEntry_DoNotUseDefaultTypeInternal _CreateTaskRequest_SecretsEntry_DoNotUse_default_instance_;
 class CreateTaskResponse;
 class CreateTaskResponseDefaultTypeInternal;
 extern CreateTaskResponseDefaultTypeInternal _CreateTaskResponse_default_instance_;
@@ -116,7 +113,6 @@ namespace google {
 namespace protobuf {
 template<> ::flyteidl::admin::Agent* Arena::CreateMaybeMessage<::flyteidl::admin::Agent>(Arena*);
 template<> ::flyteidl::admin::CreateTaskRequest* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskRequest>(Arena*);
-template<> ::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskRequest_SecretsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::admin::CreateTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::CreateTaskResponse>(Arena*);
 template<> ::flyteidl::admin::DeleteTaskRequest* Arena::CreateMaybeMessage<::flyteidl::admin::DeleteTaskRequest>(Arena*);
 template<> ::flyteidl::admin::DeleteTaskResponse* Arena::CreateMaybeMessage<::flyteidl::admin::DeleteTaskResponse>(Arena*);
@@ -425,30 +421,6 @@ class TaskExecutionMetadata final :
 };
 // -------------------------------------------------------------------
 
-class CreateTaskRequest_SecretsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<CreateTaskRequest_SecretsEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > {
-public:
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  typedef ::google::protobuf::internal::MapEntry<CreateTaskRequest_SecretsEntry_DoNotUse, 
-    ::std::string, ::std::string,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-    0 > SuperType;
-  CreateTaskRequest_SecretsEntry_DoNotUse();
-  CreateTaskRequest_SecretsEntry_DoNotUse(::google::protobuf::Arena* arena);
-  void MergeFrom(const CreateTaskRequest_SecretsEntry_DoNotUse& other);
-  static const CreateTaskRequest_SecretsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const CreateTaskRequest_SecretsEntry_DoNotUse*>(&_CreateTaskRequest_SecretsEntry_DoNotUse_default_instance_); }
-  void MergeFrom(const ::google::protobuf::Message& other) final;
-  ::google::protobuf::Metadata GetMetadata() const;
-};
-
-// -------------------------------------------------------------------
-
 class CreateTaskRequest final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.CreateTaskRequest) */ {
  public:
@@ -487,7 +459,7 @@ class CreateTaskRequest final :
                &_CreateTaskRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    4;
 
   void Swap(CreateTaskRequest* other);
   friend void swap(CreateTaskRequest& a, CreateTaskRequest& b) {
@@ -542,17 +514,7 @@ class CreateTaskRequest final :
 
   // nested types ----------------------------------------------------
 
-
   // accessors -------------------------------------------------------
-
-  // map<string, string> secrets = 5;
-  int secrets_size() const;
-  void clear_secrets();
-  static const int kSecretsFieldNumber = 5;
-  const ::google::protobuf::Map< ::std::string, ::std::string >&
-      secrets() const;
-  ::google::protobuf::Map< ::std::string, ::std::string >*
-      mutable_secrets();
 
   // string output_prefix = 3;
   void clear_output_prefix();
@@ -600,12 +562,6 @@ class CreateTaskRequest final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::MapField<
-      CreateTaskRequest_SecretsEntry_DoNotUse,
-      ::std::string, ::std::string,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
-      0 > secrets_;
   ::google::protobuf::internal::ArenaStringPtr output_prefix_;
   ::flyteidl::core::LiteralMap* inputs_;
   ::flyteidl::core::TaskTemplate* template__;
@@ -653,7 +609,7 @@ class CreateTaskResponse final :
                &_CreateTaskResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    5;
 
   void Swap(CreateTaskResponse* other);
   friend void swap(CreateTaskResponse& a, CreateTaskResponse& b) {
@@ -773,7 +729,7 @@ class GetTaskRequest final :
                &_GetTaskRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(GetTaskRequest* other);
   friend void swap(GetTaskRequest& a, GetTaskRequest& b) {
@@ -908,7 +864,7 @@ class GetTaskResponse final :
                &_GetTaskResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    7;
 
   void Swap(GetTaskResponse* other);
   friend void swap(GetTaskResponse& a, GetTaskResponse& b) {
@@ -1036,7 +992,7 @@ class Resource final :
                &_Resource_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    8;
 
   void Swap(Resource* other);
   friend void swap(Resource& a, Resource& b) {
@@ -1173,7 +1129,7 @@ class DeleteTaskRequest final :
                &_DeleteTaskRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    9;
 
   void Swap(DeleteTaskRequest* other);
   friend void swap(DeleteTaskRequest& a, DeleteTaskRequest& b) {
@@ -1308,7 +1264,7 @@ class DeleteTaskResponse final :
                &_DeleteTaskResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    10;
 
   void Swap(DeleteTaskResponse* other);
   friend void swap(DeleteTaskResponse& a, DeleteTaskResponse& b) {
@@ -1413,7 +1369,7 @@ class Agent final :
                &_Agent_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    11;
 
   void Swap(Agent* other);
   friend void swap(Agent& a, Agent& b) {
@@ -1563,7 +1519,7 @@ class GetAgentRequest final :
                &_GetAgentRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    12;
 
   void Swap(GetAgentRequest* other);
   friend void swap(GetAgentRequest& a, GetAgentRequest& b) {
@@ -1683,7 +1639,7 @@ class GetAgentResponse final :
                &_GetAgentResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    13;
 
   void Swap(GetAgentResponse* other);
   friend void swap(GetAgentResponse& a, GetAgentResponse& b) {
@@ -1798,7 +1754,7 @@ class ListAgentsRequest final :
                &_ListAgentsRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    14;
 
   void Swap(ListAgentsRequest* other);
   friend void swap(ListAgentsRequest& a, ListAgentsRequest& b) {
@@ -1903,7 +1859,7 @@ class ListAgentsResponse final :
                &_ListAgentsResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    15;
 
   void Swap(ListAgentsResponse* other);
   friend void swap(ListAgentsResponse& a, ListAgentsResponse& b) {
@@ -2205,8 +2161,6 @@ TaskExecutionMetadata::mutable_environment_variables() {
 
 // -------------------------------------------------------------------
 
-// -------------------------------------------------------------------
-
 // CreateTaskRequest
 
 // .flyteidl.core.LiteralMap inputs = 1;
@@ -2401,24 +2355,6 @@ inline void CreateTaskRequest::set_allocated_task_execution_metadata(::flyteidl:
   }
   task_execution_metadata_ = task_execution_metadata;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.CreateTaskRequest.task_execution_metadata)
-}
-
-// map<string, string> secrets = 5;
-inline int CreateTaskRequest::secrets_size() const {
-  return secrets_.size();
-}
-inline void CreateTaskRequest::clear_secrets() {
-  secrets_.Clear();
-}
-inline const ::google::protobuf::Map< ::std::string, ::std::string >&
-CreateTaskRequest::secrets() const {
-  // @@protoc_insertion_point(field_map:flyteidl.admin.CreateTaskRequest.secrets)
-  return secrets_.GetMap();
-}
-inline ::google::protobuf::Map< ::std::string, ::std::string >*
-CreateTaskRequest::mutable_secrets() {
-  // @@protoc_insertion_point(field_mutable_map:flyteidl.admin.CreateTaskRequest.secrets)
-  return secrets_.MutableMap();
 }
 
 // -------------------------------------------------------------------
@@ -3193,8 +3129,6 @@ ListAgentsResponse::agents() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

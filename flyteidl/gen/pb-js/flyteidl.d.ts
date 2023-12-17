@@ -7961,9 +7961,6 @@ export namespace flyteidl {
 
             /** CreateTaskRequest taskExecutionMetadata */
             taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
-
-            /** CreateTaskRequest secrets */
-            secrets?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CreateTaskRequest. */
@@ -7986,9 +7983,6 @@ export namespace flyteidl {
 
             /** CreateTaskRequest taskExecutionMetadata. */
             public taskExecutionMetadata?: (flyteidl.admin.ITaskExecutionMetadata|null);
-
-            /** CreateTaskRequest secrets. */
-            public secrets: { [k: string]: string };
 
             /**
              * Creates a new CreateTaskRequest instance using the specified properties.

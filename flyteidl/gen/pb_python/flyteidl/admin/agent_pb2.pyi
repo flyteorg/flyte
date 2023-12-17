@@ -62,25 +62,16 @@ class TaskExecutionMetadata(_message.Message):
     def __init__(self, task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., namespace: _Optional[str] = ..., labels: _Optional[_Mapping[str, str]] = ..., annotations: _Optional[_Mapping[str, str]] = ..., k8s_service_account: _Optional[str] = ..., environment_variables: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class CreateTaskRequest(_message.Message):
-    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata", "secrets"]
-    class SecretsEntry(_message.Message):
-        __slots__ = ["key", "value"]
-        KEY_FIELD_NUMBER: _ClassVar[int]
-        VALUE_FIELD_NUMBER: _ClassVar[int]
-        key: str
-        value: str
-        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    __slots__ = ["inputs", "template", "output_prefix", "task_execution_metadata"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
     TASK_EXECUTION_METADATA_FIELD_NUMBER: _ClassVar[int]
-    SECRETS_FIELD_NUMBER: _ClassVar[int]
     inputs: _literals_pb2.LiteralMap
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
     task_execution_metadata: TaskExecutionMetadata
-    secrets: _containers.ScalarMap[str, str]
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ..., secrets: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
     __slots__ = ["resource_meta"]

@@ -2327,70 +2327,6 @@ public final class AgentOuterClass {
      * <code>.flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 4;</code>
      */
     flyteidl.admin.AgentOuterClass.TaskExecutionMetadataOrBuilder getTaskExecutionMetadataOrBuilder();
-
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-    int getSecretsCount();
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-    boolean containsSecrets(
-        java.lang.String key);
-    /**
-     * Use {@link #getSecretsMap()} instead.
-     */
-    @java.lang.Deprecated
-    java.util.Map<java.lang.String, java.lang.String>
-    getSecrets();
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-    java.util.Map<java.lang.String, java.lang.String>
-    getSecretsMap();
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-
-    java.lang.String getSecretsOrDefault(
-        java.lang.String key,
-        java.lang.String defaultValue);
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-
-    java.lang.String getSecretsOrThrow(
-        java.lang.String key);
   }
   /**
    * <pre>
@@ -2481,19 +2417,6 @@ public final class AgentOuterClass {
 
               break;
             }
-            case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
-                secrets_ = com.google.protobuf.MapField.newMapField(
-                    SecretsDefaultEntryHolder.defaultEntry);
-                mutable_bitField0_ |= 0x00000010;
-              }
-              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-              secrets__ = input.readMessage(
-                  SecretsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
-              secrets_.getMutableMap().put(
-                  secrets__.getKey(), secrets__.getValue());
-              break;
-            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2518,18 +2441,6 @@ public final class AgentOuterClass {
       return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_CreateTaskRequest_descriptor;
     }
 
-    @SuppressWarnings({"rawtypes"})
-    @java.lang.Override
-    protected com.google.protobuf.MapField internalGetMapField(
-        int number) {
-      switch (number) {
-        case 5:
-          return internalGetSecrets();
-        default:
-          throw new RuntimeException(
-              "Invalid map field number: " + number);
-      }
-    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -2538,7 +2449,6 @@ public final class AgentOuterClass {
               flyteidl.admin.AgentOuterClass.CreateTaskRequest.class, flyteidl.admin.AgentOuterClass.CreateTaskRequest.Builder.class);
     }
 
-    private int bitField0_;
     public static final int INPUTS_FIELD_NUMBER = 1;
     private flyteidl.core.Literals.LiteralMap inputs_;
     /**
@@ -2686,106 +2596,6 @@ public final class AgentOuterClass {
       return getTaskExecutionMetadata();
     }
 
-    public static final int SECRETS_FIELD_NUMBER = 5;
-    private static final class SecretsDefaultEntryHolder {
-      static final com.google.protobuf.MapEntry<
-          java.lang.String, java.lang.String> defaultEntry =
-              com.google.protobuf.MapEntry
-              .<java.lang.String, java.lang.String>newDefaultInstance(
-                  flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor, 
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "",
-                  com.google.protobuf.WireFormat.FieldType.STRING,
-                  "");
-    }
-    private com.google.protobuf.MapField<
-        java.lang.String, java.lang.String> secrets_;
-    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-    internalGetSecrets() {
-      if (secrets_ == null) {
-        return com.google.protobuf.MapField.emptyMapField(
-            SecretsDefaultEntryHolder.defaultEntry);
-      }
-      return secrets_;
-    }
-
-    public int getSecretsCount() {
-      return internalGetSecrets().getMap().size();
-    }
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-
-    public boolean containsSecrets(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      return internalGetSecrets().getMap().containsKey(key);
-    }
-    /**
-     * Use {@link #getSecretsMap()} instead.
-     */
-    @java.lang.Deprecated
-    public java.util.Map<java.lang.String, java.lang.String> getSecrets() {
-      return getSecretsMap();
-    }
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-
-    public java.util.Map<java.lang.String, java.lang.String> getSecretsMap() {
-      return internalGetSecrets().getMap();
-    }
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-
-    public java.lang.String getSecretsOrDefault(
-        java.lang.String key,
-        java.lang.String defaultValue) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetSecrets().getMap();
-      return map.containsKey(key) ? map.get(key) : defaultValue;
-    }
-    /**
-     * <pre>
-     * Secret to be passed to the agent.
-     * Key is the name of the secret in secret manager.
-     * Value is the actual secret value.
-     * </pre>
-     *
-     * <code>map&lt;string, string&gt; secrets = 5;</code>
-     */
-
-    public java.lang.String getSecretsOrThrow(
-        java.lang.String key) {
-      if (key == null) { throw new java.lang.NullPointerException(); }
-      java.util.Map<java.lang.String, java.lang.String> map =
-          internalGetSecrets().getMap();
-      if (!map.containsKey(key)) {
-        throw new java.lang.IllegalArgumentException();
-      }
-      return map.get(key);
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2812,12 +2622,6 @@ public final class AgentOuterClass {
       if (taskExecutionMetadata_ != null) {
         output.writeMessage(4, getTaskExecutionMetadata());
       }
-      com.google.protobuf.GeneratedMessageV3
-        .serializeStringMapTo(
-          output,
-          internalGetSecrets(),
-          SecretsDefaultEntryHolder.defaultEntry,
-          5);
       unknownFields.writeTo(output);
     }
 
@@ -2841,16 +2645,6 @@ public final class AgentOuterClass {
       if (taskExecutionMetadata_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getTaskExecutionMetadata());
-      }
-      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
-           : internalGetSecrets().getMap().entrySet()) {
-        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
-        secrets__ = SecretsDefaultEntryHolder.defaultEntry.newBuilderForType()
-            .setKey(entry.getKey())
-            .setValue(entry.getValue())
-            .build();
-        size += com.google.protobuf.CodedOutputStream
-            .computeMessageSize(5, secrets__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2884,8 +2678,6 @@ public final class AgentOuterClass {
         if (!getTaskExecutionMetadata()
             .equals(other.getTaskExecutionMetadata())) return false;
       }
-      if (!internalGetSecrets().equals(
-          other.internalGetSecrets())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2910,10 +2702,6 @@ public final class AgentOuterClass {
       if (hasTaskExecutionMetadata()) {
         hash = (37 * hash) + TASK_EXECUTION_METADATA_FIELD_NUMBER;
         hash = (53 * hash) + getTaskExecutionMetadata().hashCode();
-      }
-      if (!internalGetSecrets().getMap().isEmpty()) {
-        hash = (37 * hash) + SECRETS_FIELD_NUMBER;
-        hash = (53 * hash) + internalGetSecrets().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -3026,28 +2814,6 @@ public final class AgentOuterClass {
         return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_CreateTaskRequest_descriptor;
       }
 
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapField internalGetMapField(
-          int number) {
-        switch (number) {
-          case 5:
-            return internalGetSecrets();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
-      @SuppressWarnings({"rawtypes"})
-      protected com.google.protobuf.MapField internalGetMutableMapField(
-          int number) {
-        switch (number) {
-          case 5:
-            return internalGetMutableSecrets();
-          default:
-            throw new RuntimeException(
-                "Invalid map field number: " + number);
-        }
-      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -3094,7 +2860,6 @@ public final class AgentOuterClass {
           taskExecutionMetadata_ = null;
           taskExecutionMetadataBuilder_ = null;
         }
-        internalGetMutableSecrets().clear();
         return this;
       }
 
@@ -3121,8 +2886,6 @@ public final class AgentOuterClass {
       @java.lang.Override
       public flyteidl.admin.AgentOuterClass.CreateTaskRequest buildPartial() {
         flyteidl.admin.AgentOuterClass.CreateTaskRequest result = new flyteidl.admin.AgentOuterClass.CreateTaskRequest(this);
-        int from_bitField0_ = bitField0_;
-        int to_bitField0_ = 0;
         if (inputsBuilder_ == null) {
           result.inputs_ = inputs_;
         } else {
@@ -3139,9 +2902,6 @@ public final class AgentOuterClass {
         } else {
           result.taskExecutionMetadata_ = taskExecutionMetadataBuilder_.build();
         }
-        result.secrets_ = internalGetSecrets();
-        result.secrets_.makeImmutable();
-        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -3203,8 +2963,6 @@ public final class AgentOuterClass {
         if (other.hasTaskExecutionMetadata()) {
           mergeTaskExecutionMetadata(other.getTaskExecutionMetadata());
         }
-        internalGetMutableSecrets().mergeFrom(
-            other.internalGetSecrets());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -3233,7 +2991,6 @@ public final class AgentOuterClass {
         }
         return this;
       }
-      private int bitField0_;
 
       private flyteidl.core.Literals.LiteralMap inputs_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -3799,171 +3556,6 @@ public final class AgentOuterClass {
           taskExecutionMetadata_ = null;
         }
         return taskExecutionMetadataBuilder_;
-      }
-
-      private com.google.protobuf.MapField<
-          java.lang.String, java.lang.String> secrets_;
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetSecrets() {
-        if (secrets_ == null) {
-          return com.google.protobuf.MapField.emptyMapField(
-              SecretsDefaultEntryHolder.defaultEntry);
-        }
-        return secrets_;
-      }
-      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
-      internalGetMutableSecrets() {
-        onChanged();;
-        if (secrets_ == null) {
-          secrets_ = com.google.protobuf.MapField.newMapField(
-              SecretsDefaultEntryHolder.defaultEntry);
-        }
-        if (!secrets_.isMutable()) {
-          secrets_ = secrets_.copy();
-        }
-        return secrets_;
-      }
-
-      public int getSecretsCount() {
-        return internalGetSecrets().getMap().size();
-      }
-      /**
-       * <pre>
-       * Secret to be passed to the agent.
-       * Key is the name of the secret in secret manager.
-       * Value is the actual secret value.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; secrets = 5;</code>
-       */
-
-      public boolean containsSecrets(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        return internalGetSecrets().getMap().containsKey(key);
-      }
-      /**
-       * Use {@link #getSecretsMap()} instead.
-       */
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String> getSecrets() {
-        return getSecretsMap();
-      }
-      /**
-       * <pre>
-       * Secret to be passed to the agent.
-       * Key is the name of the secret in secret manager.
-       * Value is the actual secret value.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; secrets = 5;</code>
-       */
-
-      public java.util.Map<java.lang.String, java.lang.String> getSecretsMap() {
-        return internalGetSecrets().getMap();
-      }
-      /**
-       * <pre>
-       * Secret to be passed to the agent.
-       * Key is the name of the secret in secret manager.
-       * Value is the actual secret value.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; secrets = 5;</code>
-       */
-
-      public java.lang.String getSecretsOrDefault(
-          java.lang.String key,
-          java.lang.String defaultValue) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetSecrets().getMap();
-        return map.containsKey(key) ? map.get(key) : defaultValue;
-      }
-      /**
-       * <pre>
-       * Secret to be passed to the agent.
-       * Key is the name of the secret in secret manager.
-       * Value is the actual secret value.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; secrets = 5;</code>
-       */
-
-      public java.lang.String getSecretsOrThrow(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        java.util.Map<java.lang.String, java.lang.String> map =
-            internalGetSecrets().getMap();
-        if (!map.containsKey(key)) {
-          throw new java.lang.IllegalArgumentException();
-        }
-        return map.get(key);
-      }
-
-      public Builder clearSecrets() {
-        internalGetMutableSecrets().getMutableMap()
-            .clear();
-        return this;
-      }
-      /**
-       * <pre>
-       * Secret to be passed to the agent.
-       * Key is the name of the secret in secret manager.
-       * Value is the actual secret value.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; secrets = 5;</code>
-       */
-
-      public Builder removeSecrets(
-          java.lang.String key) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableSecrets().getMutableMap()
-            .remove(key);
-        return this;
-      }
-      /**
-       * Use alternate mutation accessors instead.
-       */
-      @java.lang.Deprecated
-      public java.util.Map<java.lang.String, java.lang.String>
-      getMutableSecrets() {
-        return internalGetMutableSecrets().getMutableMap();
-      }
-      /**
-       * <pre>
-       * Secret to be passed to the agent.
-       * Key is the name of the secret in secret manager.
-       * Value is the actual secret value.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; secrets = 5;</code>
-       */
-      public Builder putSecrets(
-          java.lang.String key,
-          java.lang.String value) {
-        if (key == null) { throw new java.lang.NullPointerException(); }
-        if (value == null) { throw new java.lang.NullPointerException(); }
-        internalGetMutableSecrets().getMutableMap()
-            .put(key, value);
-        return this;
-      }
-      /**
-       * <pre>
-       * Secret to be passed to the agent.
-       * Key is the name of the secret in secret manager.
-       * Value is the actual secret value.
-       * </pre>
-       *
-       * <code>map&lt;string, string&gt; secrets = 5;</code>
-       */
-
-      public Builder putAllSecrets(
-          java.util.Map<java.lang.String, java.lang.String> values) {
-        internalGetMutableSecrets().getMutableMap()
-            .putAll(values);
-        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -11777,11 +11369,6 @@ public final class AgentOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_CreateTaskRequest_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_CreateTaskResponse_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -11863,35 +11450,32 @@ public final class AgentOuterClass {
       " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEn" +
       "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031E" +
       "nvironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-      "\005value\030\002 \001(\t:\0028\001\"\275\002\n\021CreateTaskRequest\022)" +
+      "\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTaskRequest\022)" +
       "\n\006inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMa" +
       "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task" +
       "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_" +
       "execution_metadata\030\004 \001(\0132%.flyteidl.admi" +
-      "n.TaskExecutionMetadata\022?\n\007secrets\030\005 \003(\013" +
-      "2..flyteidl.admin.CreateTaskRequest.Secr" +
-      "etsEntry\032.\n\014SecretsEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-      "\005value\030\002 \001(\t:\0028\001\"+\n\022CreateTaskResponse\022\025" +
-      "\n\rresource_meta\030\001 \001(\014\":\n\016GetTaskRequest\022" +
-      "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(" +
-      "\014\"h\n\017GetTaskResponse\022*\n\010resource\030\001 \001(\0132\030" +
-      ".flyteidl.admin.Resource\022)\n\tlog_links\030\002 " +
-      "\003(\0132\026.flyteidl.core.TaskLog\"m\n\010Resource\022" +
-      "$\n\005state\030\001 \001(\0162\025.flyteidl.admin.State\022*\n" +
-      "\007outputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa" +
-      "p\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskRequest\022" +
-      "\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(" +
-      "\014\"\024\n\022DeleteTaskResponse\"D\n\005Agent\022\014\n\004name" +
-      "\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \003(\t\022\017\n\007" +
-      "is_sync\030\003 \001(\010\"\037\n\017GetAgentRequest\022\014\n\004name" +
-      "\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005agent\030\001 \001(" +
-      "\0132\025.flyteidl.admin.Agent\"\023\n\021ListAgentsRe" +
-      "quest\";\n\022ListAgentsResponse\022%\n\006agents\030\001 " +
-      "\003(\0132\025.flyteidl.admin.Agent*^\n\005State\022\025\n\021R" +
-      "ETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020" +
-      "\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED" +
-      "\020\004B=Z;github.com/flyteorg/flyte/flyteidl" +
-      "/gen/pb-go/flyteidl/adminb\006proto3"
+      "n.TaskExecutionMetadata\"+\n\022CreateTaskRes" +
+      "ponse\022\025\n\rresource_meta\030\001 \001(\014\":\n\016GetTaskR" +
+      "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me" +
+      "ta\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030" +
+      "\001 \001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_l" +
+      "inks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"m\n\010Re" +
+      "source\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin.S" +
+      "tate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Li" +
+      "teralMap\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskR" +
+      "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me" +
+      "ta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"D\n\005Agent\022" +
+      "\014\n\004name\030\001 \001(\t\022\034\n\024supported_task_types\030\002 " +
+      "\003(\t\022\017\n\007is_sync\030\003 \001(\010\"\037\n\017GetAgentRequest\022" +
+      "\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005age" +
+      "nt\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListA" +
+      "gentsRequest\";\n\022ListAgentsResponse\022%\n\006ag" +
+      "ents\030\001 \003(\0132\025.flyteidl.admin.Agent*^\n\005Sta" +
+      "te\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_F" +
+      "AILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSU" +
+      "CCEEDED\020\004B=Z;github.com/flyteorg/flyte/f" +
+      "lyteidl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11939,13 +11523,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_CreateTaskRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_CreateTaskRequest_descriptor,
-        new java.lang.String[] { "Inputs", "Template", "OutputPrefix", "TaskExecutionMetadata", "Secrets", });
-    internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor =
-      internal_static_flyteidl_admin_CreateTaskRequest_descriptor.getNestedTypes().get(0);
-    internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_admin_CreateTaskRequest_SecretsEntry_descriptor,
-        new java.lang.String[] { "Key", "Value", });
+        new java.lang.String[] { "Inputs", "Template", "OutputPrefix", "TaskExecutionMetadata", });
     internal_static_flyteidl_admin_CreateTaskResponse_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_CreateTaskResponse_fieldAccessorTable = new

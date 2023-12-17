@@ -19474,7 +19474,6 @@
                  * @property {flyteidl.core.ITaskTemplate|null} [template] CreateTaskRequest template
                  * @property {string|null} [outputPrefix] CreateTaskRequest outputPrefix
                  * @property {flyteidl.admin.ITaskExecutionMetadata|null} [taskExecutionMetadata] CreateTaskRequest taskExecutionMetadata
-                 * @property {Object.<string,string>|null} [secrets] CreateTaskRequest secrets
                  */
     
                 /**
@@ -19486,7 +19485,6 @@
                  * @param {flyteidl.admin.ICreateTaskRequest=} [properties] Properties to set
                  */
                 function CreateTaskRequest(properties) {
-                    this.secrets = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19526,14 +19524,6 @@
                 CreateTaskRequest.prototype.taskExecutionMetadata = null;
     
                 /**
-                 * CreateTaskRequest secrets.
-                 * @member {Object.<string,string>} secrets
-                 * @memberof flyteidl.admin.CreateTaskRequest
-                 * @instance
-                 */
-                CreateTaskRequest.prototype.secrets = $util.emptyObject;
-    
-                /**
                  * Creates a new CreateTaskRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.CreateTaskRequest
@@ -19565,9 +19555,6 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.outputPrefix);
                     if (message.taskExecutionMetadata != null && message.hasOwnProperty("taskExecutionMetadata"))
                         $root.flyteidl.admin.TaskExecutionMetadata.encode(message.taskExecutionMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.secrets != null && message.hasOwnProperty("secrets"))
-                        for (var keys = Object.keys(message.secrets), i = 0; i < keys.length; ++i)
-                            writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.secrets[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -19585,7 +19572,7 @@
                 CreateTaskRequest.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.CreateTaskRequest(), key;
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.CreateTaskRequest();
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -19600,14 +19587,6 @@
                             break;
                         case 4:
                             message.taskExecutionMetadata = $root.flyteidl.admin.TaskExecutionMetadata.decode(reader, reader.uint32());
-                            break;
-                        case 5:
-                            reader.skip().pos++;
-                            if (message.secrets === $util.emptyObject)
-                                message.secrets = {};
-                            key = reader.string();
-                            reader.pos++;
-                            message.secrets[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -19645,14 +19624,6 @@
                         var error = $root.flyteidl.admin.TaskExecutionMetadata.verify(message.taskExecutionMetadata);
                         if (error)
                             return "taskExecutionMetadata." + error;
-                    }
-                    if (message.secrets != null && message.hasOwnProperty("secrets")) {
-                        if (!$util.isObject(message.secrets))
-                            return "secrets: object expected";
-                        var key = Object.keys(message.secrets);
-                        for (var i = 0; i < key.length; ++i)
-                            if (!$util.isString(message.secrets[key[i]]))
-                                return "secrets: string{k:string} expected";
                     }
                     return null;
                 };

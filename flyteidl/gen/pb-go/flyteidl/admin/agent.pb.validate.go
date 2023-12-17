@@ -163,8 +163,6 @@ func (m *CreateTaskRequest) Validate() error {
 		}
 	}
 
-	// no validation rules for Secrets
-
 	return nil
 }
 

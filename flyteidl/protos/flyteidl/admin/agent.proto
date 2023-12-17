@@ -46,10 +46,6 @@ message CreateTaskRequest {
   string output_prefix = 3;
   // subset of runtime task execution metadata.
   TaskExecutionMetadata task_execution_metadata = 4;
-  // Secret to be passed to the agent.
-  // Key is the name of the secret in secret manager.
-  // Value is the actual secret value.
-  map<string, string> secrets = 5;
 }
 
 // Represents a create response structure.

@@ -40,11 +40,6 @@ pub struct CreateTaskRequest {
     /// subset of runtime task execution metadata.
     #[prost(message, optional, tag="4")]
     pub task_execution_metadata: ::core::option::Option<TaskExecutionMetadata>,
-    /// Secret to be passed to the agent.
-    /// Key is the name of the secret in secret manager.
-    /// Value is the actual secret value.
-    #[prost(map="string, string", tag="5")]
-    pub secrets: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Represents a create response structure.
 #[allow(clippy::derive_partial_eq_without_eq)]
