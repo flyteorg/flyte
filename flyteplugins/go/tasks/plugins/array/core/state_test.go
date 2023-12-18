@@ -291,7 +291,7 @@ func TestSummaryToPhase(t *testing.T) {
 	}{
 		{
 			"FailOnTooFewTasks",
-			PhaseWriteToDiscoveryThenFail,
+			PhaseAbortSubTasks,
 			map[core.Phase]int64{},
 		},
 		{
@@ -304,7 +304,7 @@ func TestSummaryToPhase(t *testing.T) {
 		},
 		{
 			"FailOnTooManyPermanentFailures",
-			PhaseWriteToDiscoveryThenFail,
+			PhaseAbortSubTasks,
 			map[core.Phase]int64{
 				core.PhasePermanentFailure: 1,
 				core.PhaseSuccess:          9,
@@ -335,7 +335,7 @@ func TestSummaryToPhase(t *testing.T) {
 		},
 		{
 			"FailedToRetry",
-			PhaseWriteToDiscoveryThenFail,
+			PhaseAbortSubTasks,
 			map[core.Phase]int64{
 				core.PhaseSuccess:          5,
 				core.PhasePermanentFailure: 5,

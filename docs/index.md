@@ -79,12 +79,12 @@ contribute its architecture and design. You can also access the
 * - {doc}`🔤 Intro to Flyte <introduction>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
-* - {doc}`📖 User Guide <userguide>`
+* - {doc}`📖 User Guide <flytesnacks/userguide>`
   - A comprehensive view of Flyte's functionality for data and ML practitioners.
-* - {doc}`📚 Tutorials <tutorials>`
+* - {doc}`📚 Tutorials <flytesnacks/tutorials>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,
     bioinformatics, and more.
-* - {doc}`🔌 Integrations <integrations>`
+* - {doc}`🔌 Integrations <flytesnacks/integrations>`
   - Leverage a rich ecosystem of third-party tools and libraries to make your
     Flyte workflows even more effective.
 * - {ref}`🚀 Deployment Guide <deployment>`
@@ -145,9 +145,9 @@ Core Use Cases <flytesnacks/getting_started/core_use_cases>
 :name: examples-guides
 :hidden:
 
-User Guide <userguide>
-Tutorials <tutorials>
-Integrations <integrations>
+User Guide <flytesnacks/userguide>
+Tutorials <flytesnacks/tutorials>
+Integrations <flytesnacks/integrations>
 ```
 
 ```{toctree}
