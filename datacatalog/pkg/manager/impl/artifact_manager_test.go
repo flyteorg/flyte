@@ -644,6 +644,7 @@ func TestUpdateArtifact(t *testing.T) {
 			KeyMap: map[string]string{"key2": "value2"},
 		}
 		serializedMetadata, err := transformers.SerializedMetadata(metaData)
+		assert.NoError(t, err)
 
 		dcRepo.MockArtifactRepo.On("Update",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
@@ -717,6 +718,7 @@ func TestUpdateArtifact(t *testing.T) {
 			KeyMap: map[string]string{"key2": "value2"},
 		}
 		serializedMetadata, err := transformers.SerializedMetadata(metaData)
+		assert.NoError(t, err)
 
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockArtifactRepo.On("Update",
