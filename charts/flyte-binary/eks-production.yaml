@@ -3,7 +3,7 @@ configuration:
     username: postgres
     password: <DB_PASSWORD>
     host: <RDS_HOST_DNS>
-    dbname: flyteadmin
+    dbname: flyte
   storage:
     #Learn more about how Flyte handles data: https://docs.flyte.org/en/latest/concepts/data_management.html
     metadataContainer: <BUCKET_NAME>
