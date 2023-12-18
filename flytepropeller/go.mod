@@ -149,6 +149,7 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
+<<<<<<< HEAD
 replace (
 	github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
 	github.com/flyteorg/flyte/flyteidl => ../flyteidl
@@ -160,3 +161,8 @@ replace (
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20230905202853-d090da108d2f
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
 )
+=======
+replace github.com/aws/amazon-sagemaker-operator-for-k8s => github.com/aws/amazon-sagemaker-operator-for-k8s v1.0.1-0.20210303003444-0fb33b1fd49d
+
+replace github.com/flyteorg/flyteidl => /home/geert/git/flyte/flyteidl
+>>>>>>> flytepropeller/feat-add-optional-environment-variable-name-to-secret
