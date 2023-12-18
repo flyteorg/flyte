@@ -12,4 +12,5 @@ resources:
 - ../namespace.yaml
 
 patchesStrategicMerge:
-  - patch.yaml
+  - add-agent-secret-patch.yaml
+  - enable-agent-service-patch.yaml
