@@ -13,7 +13,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytestdlib/pbhash"
-	"golang.org/x/exp/slices"
 )
 
 const cachedTaskTag = "flyte_cached"
@@ -116,20 +115,8 @@ func generateTaskSignatureHash(ctx context.Context, taskInterface core.TypedInte
 }
 
 // Generate a tag by hashing the input values which are not in cacheIgnoreInputVars
-func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap, cacheIgnoreInputVars *[]string) (string, error) {
-	var inputsAfterIgnore *core.LiteralMap
-	if cacheIgnoreInputVars != nil {
-		inputsAfterIgnore = &core.LiteralMap{Literals: make(map[string]*core.Literal)}
-		for name, literal := range inputs.Literals {
-			if slices.Contains(*cacheIgnoreInputVars, name) {
-				continue
-			}
-			inputsAfterIgnore.Literals[name] = literal
-		}
-	} else {
-		inputsAfterIgnore = inputs
-	}
-	hashString, err := catalog.HashLiteralMap(ctx, inputsAfterIgnore)
+func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap, cacheIgnoreInputVars []string) (string, error) {
+	hashString, err := catalog.HashLiteralMap(ctx, inputs, cacheIgnoreInputVars)
 	if err != nil {
 		return "", err
 	}

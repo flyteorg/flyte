@@ -114,7 +114,7 @@ func TestGenerateArtifactTagNameWithIgnore(t *testing.T) {
 	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2, "3": 3})
 	assert.NoError(t, err)
 	cacheIgnoreInputVars := []string{"3"}
-	tag, err := GenerateArtifactTagName(context.TODO(), literalMap, &cacheIgnoreInputVars)
+	tag, err := GenerateArtifactTagName(context.TODO(), literalMap, cacheIgnoreInputVars)
 	assert.NoError(t, err)
 	assert.Equal(t, "flyte_cached-GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", tag)
 }

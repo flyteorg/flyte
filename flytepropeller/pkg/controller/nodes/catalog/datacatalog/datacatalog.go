@@ -108,7 +108,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		inputs = retInputs
 	}
 
-	tag, err := GenerateArtifactTagName(ctx, inputs, &key.CacheIgnoreInputVars)
+	tag, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		logger.Errorf(ctx, "DataCatalog failed to generate tag for inputs %+v, err: %+v", inputs, err)
 		return catalog.Entry{}, err
@@ -233,7 +233,7 @@ func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, dat
 	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %+v", cachedArtifact.Id, len(artifactDataList), metadata)
 
 	// Tag the artifact since it is the cached artifact
-	tagName, err := GenerateArtifactTagName(ctx, inputs, &key.CacheIgnoreInputVars)
+	tagName, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to generate tag for artifact %+v, err: %+v", cachedArtifact.Id, err)
 		return catalog.Status{}, err
@@ -273,7 +273,7 @@ func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, dat
 		artifactDataList = append(artifactDataList, artifactData)
 	}
 
-	tagName, err := GenerateArtifactTagName(ctx, inputs, &key.CacheIgnoreInputVars)
+	tagName, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to generate artifact tag name for key %+v, dataset %+v and execution %+v, err: %+v", key, datasetID, metadata, err)
 		return catalog.Status{}, err
@@ -378,7 +378,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 		inputs = retInputs
 	}
 
-	tag, err := GenerateArtifactTagName(ctx, inputs, &key.CacheIgnoreInputVars)
+	tag, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		return nil, err
 	}
@@ -418,7 +418,7 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 		inputs = retInputs
 	}
 
-	tag, err := GenerateArtifactTagName(ctx, inputs, &key.CacheIgnoreInputVars)
+	tag, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		return err
 	}
