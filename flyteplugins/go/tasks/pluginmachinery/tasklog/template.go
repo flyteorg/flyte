@@ -208,7 +208,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	for _, templateURI := range p.TemplateURIs {
 		// Skip Flyin logs if plugin is enabled but no metadata is defined in input's task template.
 		// This is to prevent Flyin logs from being generated for tasks that don't have a Flyin metadata section.
-		if p.DisplayName == "Flyin Logs" && isFlyin == false {
+		if p.DisplayName == "Flyin Logs" && isFlyin {
 			continue
 		}
 		taskLogs = append(taskLogs, &core.TaskLog{
