@@ -42,7 +42,7 @@ Chart for basic single Flyte executable deployment
 | configuration.auth.oidc.clientId | string | `""` |  |
 | configuration.auth.oidc.clientSecret | string | `""` |  |
 | configuration.co-pilot.image.repository | string | `"cr.flyte.org/flyteorg/flytecopilot"` |  |
-| configuration.co-pilot.image.tag | string | `"v1.9.37"` |  |
+| configuration.co-pilot.image.tag | string | `"v1.10.6"` |  |
 | configuration.database.dbname | string | `"flyte"` |  |
 | configuration.database.host | string | `"127.0.0.1"` |  |
 | configuration.database.options | string | `"sslmode=disable"` |  |
@@ -66,6 +66,10 @@ Chart for basic single Flyte executable deployment
 | configuration.logging.plugins.stackdriver.templateUri | string | `""` |  |
 | configuration.storage.metadataContainer | string | `"my-organization-flyte-container"` |  |
 | configuration.storage.provider | string | `"s3"` |  |
+| configuration.storage.providerConfig.azure.account | string | `"storage-account-name"` |  |
+| configuration.storage.providerConfig.azure.configDomainSuffix | string | `""` |  |
+| configuration.storage.providerConfig.azure.configUploadConcurrency | int | `4` |  |
+| configuration.storage.providerConfig.azure.key | string | `""` |  |
 | configuration.storage.providerConfig.gcs.project | string | `"my-organization-gcp-project"` |  |
 | configuration.storage.providerConfig.s3.accessKey | string | `""` |  |
 | configuration.storage.providerConfig.s3.authType | string | `"iam"` |  |

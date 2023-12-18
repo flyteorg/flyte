@@ -86,3 +86,7 @@ seed_projects:
 	go run cmd/main.go migrate seed-projects project admintests flytekit --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
 all: compile
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy
