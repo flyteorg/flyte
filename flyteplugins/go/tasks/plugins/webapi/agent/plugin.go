@@ -352,8 +352,8 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 
 		res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
-			grpc_status, ok := status.FromError(err)
-			if grpc_status.Code() == codes.Unimplemented {
+			grpcStatus, ok := status.FromError(err)
+			if grpcStatus.Code() == codes.Unimplemented {
 				// we should not panic here, as we want to continue to support old agent settings
 				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployment)
 				continue
