@@ -58,6 +58,7 @@ dependencies:
   - vaex-core                   # vaex
 
   - pip:
+    - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
     - sphinx_markdown_tables
