@@ -365,15 +365,26 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 	}
 
 	if dataLoadingConfig != nil {
-		if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
-			primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
+		if err := AddCoPilotNannyToContainer(ctx,
+			config.GetK8sPluginConfig().CoPilot,
+			primaryContainer,
+			taskTemplate.GetInterface(),
+			tCtx.TaskExecutionMetadata(),
+			tCtx.InputReader(),
+			tCtx.OutputWriter(),
+			dataLoadingConfig,
+		); err != nil {
 			return nil, nil, err
 		}
+		// if err := AddCoPilotToContainer(ctx, config.GetK8sPluginConfig().CoPilot,
+		// 	primaryContainer, taskTemplate.Interface, dataLoadingConfig); err != nil {
+		// 	return nil, nil, err
+		// }
 
-		if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
-			tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig); err != nil {
-			return nil, nil, err
-		}
+		// if err := AddCoPilotToPod(ctx, config.GetK8sPluginConfig().CoPilot, podSpec, taskTemplate.GetInterface(),
+		// 	tCtx.TaskExecutionMetadata(), tCtx.InputReader(), tCtx.OutputWriter(), dataLoadingConfig); err != nil {
+		// 	return nil, nil, err
+		// }
 	}
 
 	// update primaryContainer and PodSpec with k8s plugin configuration, etc

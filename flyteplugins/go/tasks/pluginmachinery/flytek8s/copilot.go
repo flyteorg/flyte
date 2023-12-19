@@ -161,6 +161,59 @@ func CalculateStorageSize(requirements *v1.ResourceRequirements) *resource.Quant
 	return nil
 }
 
+func AddCoPilotNannyToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c *v1.Container, iface *core.TypedInterface, taskExecMetadata core2.TaskExecutionMetadata, inputPaths io.InputFilePaths, outputPaths io.OutputFilePaths, pilot *core.DataLoadingConfig) error {
+	if pilot == nil || !pilot.Enabled {
+		return nil
+	}
+	if iface == nil {
+		return nil
+	}
+	ifaceBytes, err := proto.Marshal(iface)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal given core.TypedInterface")
+	}
+	ifaceInputsBytes, err := proto.Marshal(iface.Inputs)
+	if err != nil {
+		return errors.Wrap(err, "failed to marshal given input interface")
+	}
+	inPath := cfg.DefaultInputDataPath
+	if pilot.GetInputPath() != "" {
+		inPath = pilot.GetInputPath()
+	}
+	outPath := cfg.DefaultOutputPath
+	if pilot.GetOutputPath() != "" {
+		outPath = pilot.GetOutputPath()
+	}
+	logger.Infof(ctx, "Enabling CoPilot Nanny on main container [%s]", c.Name)
+	args := append(c.Command, c.Args...)
+	c.Command = append(
+		CopilotCommandArgs(storage.GetConfig()),
+		[]string{
+			"nanny",
+			"--input-interface",
+			base64.StdEncoding.EncodeToString(ifaceInputsBytes),
+			"--to-local-dir",
+			inPath,
+			"--format",
+			pilot.Format.String(),
+			"--from-local-dir",
+			outPath,
+			"--from-remote",
+			inputPaths.GetInputPath().String(),
+			"--to-output-prefix",
+			outputPaths.GetOutputPrefixPath().String(),
+			"--to-raw-output",
+			outputPaths.GetRawOutputPrefix().String(),
+			"--interface",
+			base64.StdEncoding.EncodeToString(ifaceBytes),
+			"--",
+		}...,
+	)
+	c.Args = args
+
+	return nil
+}
+
 func AddCoPilotToContainer(ctx context.Context, cfg config.FlyteCoPilotConfig, c *v1.Container, iFace *core.TypedInterface, pilot *core.DataLoadingConfig) error {
 	if pilot == nil || !pilot.Enabled {
 		return nil
