@@ -57,12 +57,13 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agent, _ := getFinalAgent("spark", &cfg)
-		assert.Equal(t, cfg.Agents["spark_agent"].Endpoint, agent.Endpoint)
-		agent, _ = getFinalAgent("foo", &cfg)
-		assert.Equal(t, cfg.DefaultAgent.Endpoint, agent.Endpoint)
-		_, err := getFinalAgent("bar", &cfg)
-		assert.NotNil(t, err)
+		agentRegistry := map[string]*Agent{"spark": {Endpoint: "localhost:80"}}
+		agent := getFinalAgent("spark", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, "localhost:80")
+		agent = getFinalAgent("foo", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
+		agent = getFinalAgent("bar", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
 	t.Run("test getAgentMetadataClientFunc", func(t *testing.T) {

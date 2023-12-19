@@ -94,10 +94,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to find agent agent with error: %v", err)
-	}
+	agent := getFinalAgent(taskTemplate.Type, p.cfg, p.agentRegistry)
 
 	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
@@ -129,7 +126,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 
-	agent, err := getFinalAgent(metadata.TaskType, p.cfg)
+	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find agent with error: %v", err)
 	}
@@ -161,10 +158,8 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 
-	agent, err := getFinalAgent(metadata.TaskType, p.cfg)
-	if err != nil {
-		return fmt.Errorf("failed to find agent agent with error: %v", err)
-	}
+	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
+
 	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return fmt.Errorf("failed to connect to agent with error: %v", err)
@@ -223,15 +218,12 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType string, cfg *Config) (*Agent, error) {
-	if id, exists := cfg.AgentForTaskTypes[taskType]; exists {
-		if agent, exists := cfg.Agents[id]; exists {
-			return agent, nil
-		}
-		return nil, fmt.Errorf("no agent definition found for ID %s that matches task type %s", id, taskType)
+func getFinalAgent(taskType string, cfg *Config, agentRegistry map[string]*Agent) *Agent {
+	if agent, exists := agentRegistry[taskType]; exists {
+		return agent
 	}
 
-	return &cfg.DefaultAgent, nil
+	return &cfg.DefaultAgent
 }
 
 func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (*grpc.ClientConn, error) {
