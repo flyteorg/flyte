@@ -6,14 +6,6 @@ concurrency:
 
 on:
   pull_request:
-    paths:
-      - .github/workflows/single-binary.yml
-      - charts/flyte-binary/**
-      - charts/flyte-sandbox/**
-      - cmd/**
-      - docker/sandbox-bundled/**
-      - Dockerfile
-      - go.*
   push:
     branches:
       - master

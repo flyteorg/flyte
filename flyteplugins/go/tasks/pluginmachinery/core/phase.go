@@ -36,6 +36,8 @@ const (
 	PhasePermanentFailure
 	// Indicates the task is waiting for the cache to be populated so it can reuse results
 	PhaseWaitingForCache
+	// Indicate the task has been aborted
+	PhaseAborted
 )
 
 var Phases = []Phase{
@@ -49,11 +51,12 @@ var Phases = []Phase{
 	PhaseRetryableFailure,
 	PhasePermanentFailure,
 	PhaseWaitingForCache,
+	PhaseAborted,
 }
 
 // Returns true if the given phase is failure, retryable failure or success
 func (p Phase) IsTerminal() bool {
-	return p.IsFailure() || p.IsSuccess()
+	return p.IsFailure() || p.IsSuccess() || p.IsAborted()
 }
 
 func (p Phase) IsFailure() bool {
@@ -62,6 +65,10 @@ func (p Phase) IsFailure() bool {
 
 func (p Phase) IsSuccess() bool {
 	return p == PhaseSuccess
+}
+
+func (p Phase) IsAborted() bool {
+	return p == PhaseAborted
 }
 
 func (p Phase) IsWaitingForResources() bool {
@@ -257,8 +264,16 @@ func PhaseInfoSystemFailure(code, reason string, info *TaskInfo) PhaseInfo {
 	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info)
 }
 
+func PhaseInfoSystemFailureWithCleanup(code, reason string, info *TaskInfo) PhaseInfo {
+	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info, true)
+}
+
 func PhaseInfoFailure(code, reason string, info *TaskInfo) PhaseInfo {
 	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info)
+}
+
+func PhaseInfoFailureWithCleanup(code, reason string, info *TaskInfo) PhaseInfo {
+	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info, true)
 }
 
 func PhaseInfoRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
