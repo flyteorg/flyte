@@ -193,7 +193,6 @@ func TestInitializeAgentRegistry(t *testing.T) {
 			{
 				Name:               "test-agent",
 				SupportedTaskTypes: []string{"task1", "task2", "task3"},
-				IsSync:             false,
 			},
 		},
 	}
