@@ -52,6 +52,7 @@ func (n *NannyOptions) Exec(ctx context.Context, args []string) error {
 	}
 
 	// Download inputs
+	os.MkdirAll(n.inputDirectoryPath, 0755)
 	downloadOpts := &DownloadOptions{
 		RootOptions:         n.RootOptions,
 		remoteInputsPath:    n.remoteInputsPath,
@@ -73,6 +74,7 @@ func (n *NannyOptions) Exec(ctx context.Context, args []string) error {
 	}
 
 	// Upload outputs
+	os.MkdirAll(n.outputDirectoryPath, 0755)
 	uploadOpts := &UploadOptions{
 		RootOptions:            n.RootOptions,
 		remoteOutputsPrefix:    n.remoteOutputsPrefix,
