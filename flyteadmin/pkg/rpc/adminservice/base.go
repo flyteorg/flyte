@@ -98,18 +98,21 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
 	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
+	webhookPublisher := webhook.NewWehbook(*configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
 	}()
 
-	webhookProcessors := webhook.NewWebhookProcessors(repo, *configuration.ApplicationConfiguration().GetWebhookNotificationConfig(), adminScope)
-	go func() {
-		logger.Info(ctx, "Started processing webhook events.")
-		for _, webhookProcessor := range webhookProcessors {
-			webhookProcessor.StartProcessing()
-		}
-	}()
+	// appConfig := configuration.ApplicationConfiguration()
+
+	// webhookProcessors := webhook.NewWebhookProcessors(repo, *appConfig.GetWebhookNotificationConfig(), adminScope)
+	// go func() {
+	// 	logger.Info(ctx, "Started processing webhook events.")
+	// 	for _, webhookProcessor := range webhookProcessors {
+	// 		webhookProcessor.StartProcessing()
+	// 	}
+	// }()
 
 	// Configure workflow scheduler async processes.
 	schedulerConfig := configuration.ApplicationConfiguration().GetSchedulerConfig()
@@ -147,7 +150,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, webhookPublisher)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)

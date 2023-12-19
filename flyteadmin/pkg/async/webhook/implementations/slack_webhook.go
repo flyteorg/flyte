@@ -3,9 +3,11 @@ package implementations
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
@@ -28,15 +30,24 @@ func (s *SlackWebhook) GetConfig() runtimeInterfaces.WebHookConfig {
 	return s.Config
 }
 
-func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookMessage) error {
+func (s *SlackWebhook) Post(ctx context.Context, payload admin.WebhookMessage, webhookName string) error {
 	sm := secretmanager.NewFileEnvSecretManager(secretmanager.GetConfig())
 	webhookURL, err := sm.Get(ctx, s.Config.URLSecretName)
+	webhookURL = strings.TrimSpace(webhookURL)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get url from secret manager with error: %v", err)
 		return err
 	}
-	data := []byte(fmt.Sprintf("{'text': '%s'}", payload.Body))
-	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(data))
+
+	messageKey := "text"
+	data := map[string]string{
+		messageKey: payload.Body,
+		"channel":  "channel-name",
+	}
+
+	jsonData, err := json.Marshal(data)
+
+	request, err := http.NewRequest("POST", webhookURL, bytes.NewBuffer(jsonData))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create request to Slack webhook with error: %v", err)
 		return err

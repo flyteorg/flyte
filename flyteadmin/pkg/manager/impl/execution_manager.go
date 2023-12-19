@@ -16,8 +16,8 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
+	webhookInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/webhook/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -82,6 +82,7 @@ type ExecutionManager struct {
 	systemMetrics             executionSystemMetrics
 	userMetrics               executionUserMetrics
 	notificationClient        notificationInterfaces.Publisher
+	webhookClient             webhookInterfaces.Webhook
 	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
 	namedEntityManager        interfaces.NamedEntityInterface
@@ -1282,12 +1283,10 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 		}
 	}
 
-	go func() {
-		if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
-			m.systemMetrics.PublishEventError.Inc()
-			logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
-		}
-	}()
+	if err := m.eventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+		m.systemMetrics.PublishEventError.Inc()
+		logger.Infof(ctx, "error publishing event [%+v] with err: [%v]", request.RequestId, err)
+	}
 
 	go func() {
 		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
@@ -1513,12 +1512,16 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request adm
 		// Currently all three supported notifications use email underneath to send the notification.
 		// Convert Slack and PagerDuty into an EmailNotification type.
 		var emailNotification admin.EmailNotification
+		var webhookNotification admin.WebhookNotification
 		if notification.GetEmail() != nil {
 			emailNotification.RecipientsEmail = notification.GetEmail().GetRecipientsEmail()
 		} else if notification.GetPagerDuty() != nil {
 			emailNotification.RecipientsEmail = notification.GetPagerDuty().GetRecipientsEmail()
 		} else if notification.GetSlack() != nil {
 			emailNotification.RecipientsEmail = notification.GetSlack().GetRecipientsEmail()
+		} else if notification.GetWebhook() != nil {
+			webhookNotification.WebhookName = notification.GetWebhook().GetWebhookName()
+			webhookNotification.Message = notification.GetWebhook().GetMessage()
 		} else {
 			logger.Debugf(ctx, "failed to publish notification, encountered unrecognized type: %v", notification.Type)
 			m.systemMetrics.UnexpectedDataError.Inc()
@@ -1527,17 +1530,19 @@ func (m *ExecutionManager) publishNotifications(ctx context.Context, request adm
 				notification.Type, request.Event.ExecutionId)
 		}
 
-		// Convert the email Notification into an email message to be published.
-		// Currently there are no possible errors while creating an email message.
-		// Once customizable content is specified, errors are possible.
-		email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
-			*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
-		// Errors seen while publishing a message are considered non-fatal to the method and will not result
-		// in the method returning an error.
-		if err = m.notificationClient.Publish(ctx, proto.MessageName(&emailNotification), email); err != nil {
-			m.systemMetrics.PublishNotificationError.Inc()
-			logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
-		}
+		m.webhookClient.Post(ctx, *webhookNotification.Message, webhookNotification.WebhookName)
+
+		// // Convert the email Notification into an email message to be published.
+		// // Currently there are no possible errors while creating an email message.
+		// // Once customizable content is specified, errors are possible.
+		// email := notifications.ToEmailMessageFromWorkflowExecutionEvent(
+		// 	*m.config.ApplicationConfiguration().GetNotificationsConfig(), emailNotification, request, adminExecution)
+		// // Errors seen while publishing a message are considered non-fatal to the method and will not result
+		// // in the method returning an error.
+		// if err = m.notificationClient.Publish(ctx, proto.MessageName(&emailNotification), email); err != nil {
+		// 	m.systemMetrics.PublishNotificationError.Inc()
+		// 	logger.Infof(ctx, "error publishing email notification [%+v] with err: [%v]", notification, err)
+		// }
 	}
 	return nil
 }
@@ -1626,7 +1631,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
-	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
+	eventWriter eventWriter.WorkflowExecutionEventWriter, webhookPublisher webhookInterfaces.Webhook) interfaces.ExecutionInterface {
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 
@@ -1650,6 +1655,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		systemMetrics:             systemMetrics,
 		userMetrics:               userMetrics,
 		notificationClient:        publisher,
+		webhookClient:             webhookPublisher,
 		urlData:                   urlData,
 		workflowManager:           workflowManager,
 		namedEntityManager:        namedEntityManager,

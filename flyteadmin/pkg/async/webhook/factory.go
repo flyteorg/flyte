@@ -90,3 +90,7 @@ func NewWebhookProcessors(db repoInterfaces.Repository, config runtimeInterfaces
 	}
 	return processors
 }
+
+func NewWehbook(config runtimeInterfaces.WebhookNotificationsConfig, scope promutils.Scope) webhookInterfaces.Webhook {
+	return GetWebhook(config.WebhooksConfig[0], scope)
+}

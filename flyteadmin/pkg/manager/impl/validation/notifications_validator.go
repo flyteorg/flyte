@@ -19,6 +19,13 @@ func validateRecipientsEmail(recipients []string) error {
 	return nil
 }
 
+func validateWebhookNotification(name string) error {
+	if len(name) == 0 {
+		return shared.GetMissingArgumentError("name")
+	}
+	return nil
+}
+
 func validateNotifications(notifications []*admin.Notification) error {
 	for _, notif := range notifications {
 		switch {
@@ -32,6 +39,10 @@ func validateNotifications(notifications []*admin.Notification) error {
 			}
 		case notif.GetPagerDuty() != nil:
 			if err := validateRecipientsEmail(notif.GetPagerDuty().RecipientsEmail); err != nil {
+				return err
+			}
+		case notif.GetWebhook() != nil:
+			if err := validateWebhookNotification(notif.GetWebhook().GetWebhookName()); err != nil {
 				return err
 			}
 		default:
