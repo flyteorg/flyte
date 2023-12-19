@@ -41,8 +41,10 @@ func TestUploadOptions_Upload(t *testing.T) {
 			remoteOutputsPrefix: outputPath,
 			metadataFormat:      core.DataLoadingConfig_JSON.String(),
 			uploadMode:          core.IOStrategy_UPLOAD_ON_EXIT.String(),
-			startWatcherType:    containerwatcher.WatcherTypeFile,
-			localDirectoryPath:  tmpDir,
+			startWatcherFn: func(ctx context.Context, u *UploadOptions) (containerwatcher.Watcher, error) {
+				return u.createWatcher(ctx, containerwatcher.WatcherTypeFile)
+			},
+			localDirectoryPath: tmpDir,
 		}
 
 		assert.NoError(t, uopts.Sidecar(ctx))
@@ -80,10 +82,14 @@ func TestUploadOptions_Upload(t *testing.T) {
 			remoteOutputsPrefix: outputPath,
 			metadataFormat:      core.DataLoadingConfig_JSON.String(),
 			uploadMode:          core.IOStrategy_UPLOAD_ON_EXIT.String(),
-			startWatcherType:    containerwatcher.WatcherTypeNoop,
-			exitWatcherType:     containerwatcher.WatcherTypeFile,
-			typedInterface:      d,
-			localDirectoryPath:  tmpDir,
+			startWatcherFn: func(ctx context.Context, u *UploadOptions) (containerwatcher.Watcher, error) {
+				return u.createWatcher(ctx, containerwatcher.WatcherTypeNoop)
+			},
+			exitWatcherFn: func(ctx context.Context, u *UploadOptions) (containerwatcher.Watcher, error) {
+				return u.createWatcher(ctx, containerwatcher.WatcherTypeFile)
+			},
+			typedInterface:     d,
+			localDirectoryPath: tmpDir,
 		}
 
 		success := path.Join(tmpDir, SuccessFile)
