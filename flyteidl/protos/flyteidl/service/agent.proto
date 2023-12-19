@@ -5,9 +5,6 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/servi
 import "flyteidl/admin/agent.proto";
 
 // AgentService defines an RPC Service that allows propeller to send the request to the agent server.
-// It can handle asynchronous tasks and synchronous tasks.
-// Asynchronous tasks are for tasks running long, for example running query job.
-// Synchronous tasks are for tasks running quick, for example, you want to execute something really fast, or even retrieving some metadata from a backend service.
 service AsyncAgentService {
   // Send a task create request to the agent server.
   rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){};

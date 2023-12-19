@@ -20,9 +20,6 @@ import (
 
 // A Lazy loading function, that will load the plugin. Plugins should be initialized in this method. It is guaranteed
 // that the plugin loader will be called before any Handle/Abort/Finalize functions are invoked
-// Although the function returns an AsyncPlugin, it internally handles type casting to convert it to a SyncPlugin as needed.
-// This approach is used in flyteplugins/go/tasks/pluginmachinery/internal/webapi/core.go.
-// Ideally, changing the return type of the PluginLoader to a more generic 'Plugin' would be preferable. However, this change is currently not feasible without introducing breaking changes to existing plugins. Thus, the current implementation prioritizes compatibility with existing plugins.
 type PluginLoader func(ctx context.Context, iCtx PluginSetupContext) (AsyncPlugin, error)
 
 // PluginEntry is a structure that is used to indicate to the system a K8s plugin

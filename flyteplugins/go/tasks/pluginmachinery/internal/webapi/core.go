@@ -74,10 +74,6 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	var nextState *State
 	var phaseInfo core.PhaseInfo
 
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
 	switch incomingState.Phase {
 	case PhaseNotStarted:
 		if len(c.p.GetConfig().ResourceQuotas) > 0 {
