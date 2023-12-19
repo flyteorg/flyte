@@ -9,9 +9,11 @@ import (
 
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -36,7 +38,7 @@ type Plugin struct {
 	cfg             *Config
 	getClient       GetClientFunc
 	connectionCache map[*Agent]*grpc.ClientConn
-	agentRegistry   map[string]map[bool]*Agent // map[taskType][isSync] => Agent
+	agentRegistry   map[string]*Agent // map[taskType] => Agent
 }
 
 type ResourceWrapper struct {
@@ -326,14 +328,13 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, getAgentMetadataClientFunc GetAgentMetadataClientFunc) (map[string]map[bool]*Agent, error) {
-	agentRegistry := make(map[string]map[bool]*Agent)
+func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, getAgentMetadataClientFunc GetAgentMetadataClientFunc) (map[string]*Agent, error) {
+	agentRegistry := make(map[string]*Agent)
 	var agentDeployments []*Agent
 
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {
-		agentRegistry[taskType] = make(map[bool]*Agent)
-		agentRegistry[taskType][false] = cfg.Agents[agentID]
+		agentRegistry[taskType] = cfg.Agents[agentID]
 	}
 
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
@@ -351,19 +352,25 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 
 		res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
+			grpc_status, ok := status.FromError(err)
+			if grpc_status.Code() == codes.Unimplemented {
+				// we should not panic here, as we want to continue to support old agent settings
+				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployment)
+				continue
+			}
+
+			if !ok {
+				return nil, fmt.Errorf("failed to list agent with a non-gRPC error : [%v]", err)
+			}
+
 			return nil, fmt.Errorf("failed to list agent with error: [%v]", err)
 		}
 
 		agents := res.GetAgents()
 		for _, agent := range agents {
 			supportedTaskTypes := agent.SupportedTaskTypes
-			isSync := agent.IsSync
-
 			for _, supportedTaskType := range supportedTaskTypes {
-				if _, ok := agentRegistry[supportedTaskType]; !ok {
-					agentRegistry[supportedTaskType] = make(map[bool]*Agent)
-				}
-				agentRegistry[supportedTaskType][isSync] = agentDeployment
+				agentRegistry[supportedTaskType] = agentDeployment
 			}
 		}
 	}
