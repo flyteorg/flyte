@@ -122,3 +122,33 @@ class DeleteTaskRequest(_message.Message):
 class DeleteTaskResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class Agent(_message.Message):
+    __slots__ = ["name", "supported_task_types"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    supported_task_types: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class GetAgentRequest(_message.Message):
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    def __init__(self, name: _Optional[str] = ...) -> None: ...
+
+class GetAgentResponse(_message.Message):
+    __slots__ = ["agent"]
+    AGENT_FIELD_NUMBER: _ClassVar[int]
+    agent: Agent
+    def __init__(self, agent: _Optional[_Union[Agent, _Mapping]] = ...) -> None: ...
+
+class ListAgentsRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ListAgentsResponse(_message.Message):
+    __slots__ = ["agents"]
+    AGENTS_FIELD_NUMBER: _ClassVar[int]
+    agents: _containers.RepeatedCompositeFieldContainer[Agent]
+    def __init__(self, agents: _Optional[_Iterable[_Union[Agent, _Mapping]]] = ...) -> None: ...
