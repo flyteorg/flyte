@@ -226,6 +226,13 @@
         "message": {
           "type": "string",
           "description": "A descriptive message for the current state. e.g. waiting for cluster."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
         }
       }
     },
@@ -692,16 +699,6 @@
       "default": "CLIENT_CREDENTIALS",
       "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
     },
-    "corePluginMetadata": {
-      "type": "object",
-      "properties": {
-        "is_sync_plugin": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "+optional It can be used to decide use sync plugin or async plugin during runtime."
-        }
-      }
-    },
     "corePrimitive": {
       "type": "object",
       "properties": {
@@ -787,10 +784,6 @@
         "flavor": {
           "type": "string",
           "description": "+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
-        },
-        "plugin_metadata": {
-          "$ref": "#/definitions/corePluginMetadata",
-          "description": "+optional It can be used to provide extra information for the plugin."
         }
       },
       "description": "Runtime information. This is loosely defined to allow for extensibility."

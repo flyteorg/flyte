@@ -5,7 +5,7 @@ import grpc
 from flyteidl.admin import agent_pb2 as flyteidl_dot_admin_dot_agent__pb2
 
 
-class AgentServiceStub(object):
+class AsyncAgentServiceStub(object):
     """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
     It can handle asynchronous tasks and synchronous tasks.
     Asynchronous tasks are for tasks running long, for example running query job.
@@ -19,23 +19,23 @@ class AgentServiceStub(object):
             channel: A grpc.Channel.
         """
         self.CreateTask = channel.unary_unary(
-                '/flyteidl.service.AgentService/CreateTask',
+                '/flyteidl.service.AsyncAgentService/CreateTask',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.CreateTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.CreateTaskResponse.FromString,
                 )
         self.GetTask = channel.unary_unary(
-                '/flyteidl.service.AgentService/GetTask',
+                '/flyteidl.service.AsyncAgentService/GetTask',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskResponse.FromString,
                 )
         self.DeleteTask = channel.unary_unary(
-                '/flyteidl.service.AgentService/DeleteTask',
+                '/flyteidl.service.AsyncAgentService/DeleteTask',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
                 )
 
 
-class AgentServiceServicer(object):
+class AsyncAgentServiceServicer(object):
     """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
     It can handle asynchronous tasks and synchronous tasks.
     Asynchronous tasks are for tasks running long, for example running query job.
@@ -64,7 +64,7 @@ class AgentServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-def add_AgentServiceServicer_to_server(servicer, server):
+def add_AsyncAgentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'CreateTask': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateTask,
@@ -83,12 +83,12 @@ def add_AgentServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'flyteidl.service.AgentService', rpc_method_handlers)
+            'flyteidl.service.AsyncAgentService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class AgentService(object):
+class AsyncAgentService(object):
     """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
     It can handle asynchronous tasks and synchronous tasks.
     Asynchronous tasks are for tasks running long, for example running query job.
@@ -106,7 +106,7 @@ class AgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentService/CreateTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/CreateTask',
             flyteidl_dot_admin_dot_agent__pb2.CreateTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.CreateTaskResponse.FromString,
             options, channel_credentials,
@@ -123,7 +123,7 @@ class AgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentService/GetTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/GetTask',
             flyteidl_dot_admin_dot_agent__pb2.GetTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.GetTaskResponse.FromString,
             options, channel_credentials,
@@ -140,7 +140,7 @@ class AgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentService/DeleteTask',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/DeleteTask',
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
             options, channel_credentials,

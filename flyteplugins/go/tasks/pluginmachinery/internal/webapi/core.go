@@ -8,7 +8,6 @@ import (
 
 	"k8s.io/utils/clock"
 
-	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
@@ -33,7 +32,7 @@ const (
 
 type CorePlugin struct {
 	id             string
-	p              webapi.Plugin
+	p              webapi.AsyncPlugin
 	cache          cache.AutoRefresh
 	tokenAllocator tokenAllocator
 	metrics        Metrics
@@ -66,37 +65,7 @@ func (c CorePlugin) GetProperties() core.PluginProperties {
 	return core.PluginProperties{}
 }
 
-func (c CorePlugin) toSyncPlugin() (webapi.SyncPlugin, error) {
-	plugin, ok := c.p.(webapi.SyncPlugin)
-	if !ok {
-		return nil, fmt.Errorf("core plugin does not implement the sync plugin interface")
-	}
-	return plugin, nil
-}
-
-func (c CorePlugin) toAsyncPlugin() (webapi.AsyncPlugin, error) {
-	plugin, ok := c.p.(webapi.AsyncPlugin)
-	if !ok {
-		return nil, fmt.Errorf("core plugin does not implement the async plugin interface")
-	}
-	return plugin, nil
-}
-
-func (c CorePlugin) syncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	plugin, err := c.toSyncPlugin()
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
-	phaseInfo, err := plugin.Do(ctx, tCtx)
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
-	return core.DoTransition(phaseInfo), nil
-}
-
-func (c CorePlugin) asyncHandle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
+func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
 	if err != nil {
 		return core.UnknownTransition, err
@@ -105,7 +74,6 @@ func (c CorePlugin) asyncHandle(ctx context.Context, tCtx core.TaskExecutionCont
 	var nextState *State
 	var phaseInfo core.PhaseInfo
 
-	plugin, err := c.toAsyncPlugin()
 	if err != nil {
 		return core.UnknownTransition, err
 	}
@@ -113,14 +81,14 @@ func (c CorePlugin) asyncHandle(ctx context.Context, tCtx core.TaskExecutionCont
 	switch incomingState.Phase {
 	case PhaseNotStarted:
 		if len(c.p.GetConfig().ResourceQuotas) > 0 {
-			nextState, phaseInfo, err = c.tokenAllocator.allocateToken(ctx, plugin, tCtx, &incomingState, c.metrics)
+			nextState, phaseInfo, err = c.tokenAllocator.allocateToken(ctx, c.p, tCtx, &incomingState, c.metrics)
 		} else {
-			nextState, phaseInfo, err = launch(ctx, plugin, tCtx, c.cache, &incomingState)
+			nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
 		}
 	case PhaseAllocationTokenAcquired:
-		nextState, phaseInfo, err = launch(ctx, plugin, tCtx, c.cache, &incomingState)
+		nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
 	case PhaseResourcesCreated:
-		nextState, phaseInfo, err = monitor(ctx, tCtx, plugin, c.cache, &incomingState)
+		nextState, phaseInfo, err = monitor(ctx, tCtx, c.p, c.cache, &incomingState)
 	}
 
 	if err != nil {
@@ -134,44 +102,6 @@ func (c CorePlugin) asyncHandle(ctx context.Context, tCtx core.TaskExecutionCont
 	return core.DoTransition(phaseInfo), nil
 }
 
-func (c CorePlugin) useSyncPlugin(taskTemplate *flyteIdlCore.TaskTemplate) bool {
-	// Use the sync plugin to execute the task if the task template set is_sync_plugin as True.
-	// Assume the plugin is an async plugin by default.
-	// This helps maintain backward compatibility with existing implementations that
-	// expect an async plugin by default, thereby avoiding breaking changes.
-	metadata := taskTemplate.GetMetadata()
-	if metadata != nil {
-		runtime := metadata.GetRuntime()
-		if runtime != nil {
-			pluginMetadata := runtime.GetPluginMetadata()
-			if pluginMetadata != nil {
-				return pluginMetadata.GetIsSyncPlugin()
-			}
-		}
-	}
-
-	return false
-}
-
-func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (core.Transition, error) {
-	taskTemplate, err := tCtx.TaskReader().Read(ctx)
-	if err != nil {
-		return core.UnknownTransition, err
-	}
-
-	var phase core.Transition
-	if c.useSyncPlugin(taskTemplate) {
-		phase, err = c.syncHandle(ctx, tCtx)
-	} else {
-		phase, err = c.asyncHandle(ctx, tCtx)
-	}
-	if err != nil {
-		logger.Errorf(ctx, "failed to run [%v] task with err: [%v]", taskTemplate.GetType(), err)
-	}
-
-	return phase, err
-}
-
 func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) error {
 	incomingState, err := c.unmarshalState(ctx, tCtx.PluginStateReader())
 	if err != nil {
@@ -180,12 +110,7 @@ func (c CorePlugin) Abort(ctx context.Context, tCtx core.TaskExecutionContext) e
 
 	logger.Infof(ctx, "Attempting to abort resource [%v].", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID())
 
-	plugin, err := c.toAsyncPlugin()
-	if err != nil {
-		return err
-	}
-
-	err = plugin.Delete(ctx, newPluginContext(incomingState.ResourceMeta, nil, "Aborted", tCtx))
+	err = c.p.Delete(ctx, newPluginContext(incomingState.ResourceMeta, nil, "Aborted", tCtx))
 	if err != nil {
 		logger.Errorf(ctx, "Failed to abort some resources [%v]. Error: %v",
 			tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(), err)
@@ -204,12 +129,7 @@ func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext
 	logger.Infof(ctx, "Attempting to finalize resource [%v].",
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
 
-	plugin, err := c.toAsyncPlugin()
-	if err != nil {
-		return err
-	}
-
-	return c.tokenAllocator.releaseToken(ctx, plugin, tCtx, c.metrics)
+	return c.tokenAllocator.releaseToken(ctx, c.p, tCtx, c.metrics)
 }
 
 func validateRangeInt(fieldName string, min, max, provided int) error {

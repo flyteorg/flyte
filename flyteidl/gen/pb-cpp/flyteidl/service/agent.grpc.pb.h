@@ -44,10 +44,10 @@ namespace service {
 // It can handle asynchronous tasks and synchronous tasks.
 // Asynchronous tasks are for tasks running long, for example running query job.
 // Synchronous tasks are for tasks running quick, for example, you want to execute something really fast, or even retrieving some metadata from a backend service.
-class AgentService final {
+class AsyncAgentService final {
  public:
   static constexpr char const* service_full_name() {
-    return "flyteidl.service.AgentService";
+    return "flyteidl.service.AsyncAgentService";
   }
   class StubInterface {
    public:

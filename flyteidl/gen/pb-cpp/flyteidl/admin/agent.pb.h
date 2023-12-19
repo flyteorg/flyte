@@ -1073,6 +1073,18 @@ class Resource final :
 
   // accessors -------------------------------------------------------
 
+  // repeated .flyteidl.core.TaskLog log_links = 4;
+  int log_links_size() const;
+  void clear_log_links();
+  static const int kLogLinksFieldNumber = 4;
+  ::flyteidl::core::TaskLog* mutable_log_links(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
+      mutable_log_links();
+  const ::flyteidl::core::TaskLog& log_links(int index) const;
+  ::flyteidl::core::TaskLog* add_log_links();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
+      log_links() const;
+
   // string message = 3;
   void clear_message();
   static const int kMessageFieldNumber = 3;
@@ -1107,6 +1119,7 @@ class Resource final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > log_links_;
   ::google::protobuf::internal::ArenaStringPtr message_;
   ::flyteidl::core::LiteralMap* outputs_;
   int state_;
@@ -2252,6 +2265,33 @@ inline void Resource::set_allocated_message(::std::string* message) {
   }
   message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Resource.message)
+}
+
+// repeated .flyteidl.core.TaskLog log_links = 4;
+inline int Resource::log_links_size() const {
+  return log_links_.size();
+}
+inline ::flyteidl::core::TaskLog* Resource::mutable_log_links(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Resource.log_links)
+  return log_links_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
+Resource::mutable_log_links() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.Resource.log_links)
+  return &log_links_;
+}
+inline const ::flyteidl::core::TaskLog& Resource::log_links(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Resource.log_links)
+  return log_links_.Get(index);
+}
+inline ::flyteidl::core::TaskLog* Resource::add_log_links() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.Resource.log_links)
+  return log_links_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
+Resource::log_links() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.Resource.log_links)
+  return log_links_;
 }
 
 // -------------------------------------------------------------------

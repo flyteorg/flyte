@@ -84,14 +84,6 @@ message RuntimeMetadata {
 
     //+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
     string flavor = 3;
-
-    //+optional It can be used to provide extra information for the plugin.
-    PluginMetadata plugin_metadata = 4;
-}
-
-message PluginMetadata {
-    //+optional It can be used to decide use sync plugin or async plugin during runtime.
-    bool is_sync_plugin = 1;
 }
 
 // Task Metadata

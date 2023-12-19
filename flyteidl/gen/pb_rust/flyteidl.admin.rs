@@ -101,6 +101,9 @@ pub struct Resource {
     /// A descriptive message for the current state. e.g. waiting for cluster.
     #[prost(string, tag="3")]
     pub message: ::prost::alloc::string::String,
+    /// log information for the task execution.
+    #[prost(message, repeated, tag="4")]
+    pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -24,16 +24,16 @@ public final class Agent {
   static {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/service/agent.proto\022\020flyteidl" +
-      ".service\032\032flyteidl/admin/agent.proto2\212\002\n" +
-      "\014AgentService\022U\n\nCreateTask\022!.flyteidl.a" +
-      "dmin.CreateTaskRequest\032\".flyteidl.admin." +
-      "CreateTaskResponse\"\000\022L\n\007GetTask\022\036.flytei" +
-      "dl.admin.GetTaskRequest\032\037.flyteidl.admin" +
-      ".GetTaskResponse\"\000\022U\n\nDeleteTask\022!.flyte" +
-      "idl.admin.DeleteTaskRequest\032\".flyteidl.a" +
-      "dmin.DeleteTaskResponse\"\000B?Z=github.com/" +
-      "flyteorg/flyte/flyteidl/gen/pb-go/flytei" +
-      "dl/serviceb\006proto3"
+      ".service\032\032flyteidl/admin/agent.proto2\217\002\n" +
+      "\021AsyncAgentService\022U\n\nCreateTask\022!.flyte" +
+      "idl.admin.CreateTaskRequest\032\".flyteidl.a" +
+      "dmin.CreateTaskResponse\"\000\022L\n\007GetTask\022\036.f" +
+      "lyteidl.admin.GetTaskRequest\032\037.flyteidl." +
+      "admin.GetTaskResponse\"\000\022U\n\nDeleteTask\022!." +
+      "flyteidl.admin.DeleteTaskRequest\032\".flyte" +
+      "idl.admin.DeleteTaskResponse\"\000B?Z=github" +
+      ".com/flyteorg/flyte/flyteidl/gen/pb-go/f" +
+      "lyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

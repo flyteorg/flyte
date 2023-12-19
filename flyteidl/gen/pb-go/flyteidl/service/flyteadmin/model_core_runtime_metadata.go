@@ -17,6 +17,4 @@ type CoreRuntimeMetadata struct {
 	Version string `json:"version,omitempty"`
 	// +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
 	Flavor string `json:"flavor,omitempty"`
-	// +optional It can be used to provide extra information for the plugin.
-	PluginMetadata *CorePluginMetadata `json:"plugin_metadata,omitempty"`
 }

@@ -100,11 +100,6 @@ type StatusContext interface {
 type ResourceMeta = interface{}
 type Resource = interface{}
 
-// A plugin interface for type casting in flyteplugins/go/tasks/pluginmachinery/internal/webapi/core.go
-type Plugin interface {
-	GetConfig() PluginConfig
-}
-
 // AsyncPlugin defines the interface for plugins that call Async Web APIs.
 type AsyncPlugin interface {
 	// GetConfig gets the loaded plugin config. This will be used to control the interactions with the remote service.

@@ -6548,16 +6548,6 @@
       },
       "description": "A map of Parameters."
     },
-    "corePluginMetadata": {
-      "type": "object",
-      "properties": {
-        "is_sync_plugin": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "+optional It can be used to decide use sync plugin or async plugin during runtime."
-        }
-      }
-    },
     "corePrimitive": {
       "type": "object",
       "properties": {
@@ -6677,10 +6667,6 @@
         "flavor": {
           "type": "string",
           "description": "+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
-        },
-        "plugin_metadata": {
-          "$ref": "#/definitions/corePluginMetadata",
-          "description": "+optional It can be used to provide extra information for the plugin."
         }
       },
       "description": "Runtime information. This is loosely defined to allow for extensibility."

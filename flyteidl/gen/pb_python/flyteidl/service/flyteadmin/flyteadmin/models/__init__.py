@@ -199,7 +199,6 @@ from flyteadmin.models.core_operand import CoreOperand
 from flyteadmin.models.core_output_reference import CoreOutputReference
 from flyteadmin.models.core_parameter import CoreParameter
 from flyteadmin.models.core_parameter_map import CoreParameterMap
-from flyteadmin.models.core_plugin_metadata import CorePluginMetadata
 from flyteadmin.models.core_primitive import CorePrimitive
 from flyteadmin.models.core_promise_attribute import CorePromiseAttribute
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService

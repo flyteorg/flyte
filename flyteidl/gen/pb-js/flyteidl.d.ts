@@ -5293,9 +5293,6 @@ export namespace flyteidl {
 
             /** RuntimeMetadata flavor */
             flavor?: (string|null);
-
-            /** RuntimeMetadata pluginMetadata */
-            pluginMetadata?: (flyteidl.core.IPluginMetadata|null);
         }
 
         /** Represents a RuntimeMetadata. */
@@ -5315,9 +5312,6 @@ export namespace flyteidl {
 
             /** RuntimeMetadata flavor. */
             public flavor: string;
-
-            /** RuntimeMetadata pluginMetadata. */
-            public pluginMetadata?: (flyteidl.core.IPluginMetadata|null);
 
             /**
              * Creates a new RuntimeMetadata instance using the specified properties.
@@ -5359,58 +5353,6 @@ export namespace flyteidl {
                 OTHER = 0,
                 FLYTE_SDK = 1
             }
-        }
-
-        /** Properties of a PluginMetadata. */
-        interface IPluginMetadata {
-
-            /** PluginMetadata isSyncPlugin */
-            isSyncPlugin?: (boolean|null);
-        }
-
-        /** Represents a PluginMetadata. */
-        class PluginMetadata implements IPluginMetadata {
-
-            /**
-             * Constructs a new PluginMetadata.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.IPluginMetadata);
-
-            /** PluginMetadata isSyncPlugin. */
-            public isSyncPlugin: boolean;
-
-            /**
-             * Creates a new PluginMetadata instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns PluginMetadata instance
-             */
-            public static create(properties?: flyteidl.core.IPluginMetadata): flyteidl.core.PluginMetadata;
-
-            /**
-             * Encodes the specified PluginMetadata message. Does not implicitly {@link flyteidl.core.PluginMetadata.verify|verify} messages.
-             * @param message PluginMetadata message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.IPluginMetadata, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a PluginMetadata message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns PluginMetadata
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.PluginMetadata;
-
-            /**
-             * Verifies a PluginMetadata message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
         }
 
         /** Properties of a TaskMetadata. */
@@ -8269,6 +8211,9 @@ export namespace flyteidl {
 
             /** Resource message */
             message?: (string|null);
+
+            /** Resource logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a Resource. */
@@ -8288,6 +8233,9 @@ export namespace flyteidl {
 
             /** Resource message. */
             public message: string;
+
+            /** Resource logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -19716,11 +19664,11 @@ export namespace flyteidl {
             type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
         }
 
-        /** Represents an AgentService */
-        class AgentService extends $protobuf.rpc.Service {
+        /** Represents an AsyncAgentService */
+        class AsyncAgentService extends $protobuf.rpc.Service {
 
             /**
-             * Constructs a new AgentService service.
+             * Constructs a new AsyncAgentService service.
              * @param rpcImpl RPC implementation
              * @param [requestDelimited=false] Whether requests are length-delimited
              * @param [responseDelimited=false] Whether responses are length-delimited
@@ -19728,20 +19676,20 @@ export namespace flyteidl {
             constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
 
             /**
-             * Creates new AgentService service using the specified rpc implementation.
+             * Creates new AsyncAgentService service using the specified rpc implementation.
              * @param rpcImpl RPC implementation
              * @param [requestDelimited=false] Whether requests are length-delimited
              * @param [responseDelimited=false] Whether responses are length-delimited
              * @returns RPC service. Useful where requests and/or responses are streamed.
              */
-            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AgentService;
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AsyncAgentService;
 
             /**
              * Calls CreateTask.
              * @param request CreateTaskRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and CreateTaskResponse
              */
-            public createTask(request: flyteidl.admin.ICreateTaskRequest, callback: flyteidl.service.AgentService.CreateTaskCallback): void;
+            public createTask(request: flyteidl.admin.ICreateTaskRequest, callback: flyteidl.service.AsyncAgentService.CreateTaskCallback): void;
 
             /**
              * Calls CreateTask.
@@ -19755,7 +19703,7 @@ export namespace flyteidl {
              * @param request GetTaskRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and GetTaskResponse
              */
-            public getTask(request: flyteidl.admin.IGetTaskRequest, callback: flyteidl.service.AgentService.GetTaskCallback): void;
+            public getTask(request: flyteidl.admin.IGetTaskRequest, callback: flyteidl.service.AsyncAgentService.GetTaskCallback): void;
 
             /**
              * Calls GetTask.
@@ -19769,7 +19717,7 @@ export namespace flyteidl {
              * @param request DeleteTaskRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and DeleteTaskResponse
              */
-            public deleteTask(request: flyteidl.admin.IDeleteTaskRequest, callback: flyteidl.service.AgentService.DeleteTaskCallback): void;
+            public deleteTask(request: flyteidl.admin.IDeleteTaskRequest, callback: flyteidl.service.AsyncAgentService.DeleteTaskCallback): void;
 
             /**
              * Calls DeleteTask.
@@ -19779,24 +19727,24 @@ export namespace flyteidl {
             public deleteTask(request: flyteidl.admin.IDeleteTaskRequest): Promise<flyteidl.admin.DeleteTaskResponse>;
         }
 
-        namespace AgentService {
+        namespace AsyncAgentService {
 
             /**
-             * Callback as used by {@link flyteidl.service.AgentService#createTask}.
+             * Callback as used by {@link flyteidl.service.AsyncAgentService#createTask}.
              * @param error Error, if any
              * @param [response] CreateTaskResponse
              */
             type CreateTaskCallback = (error: (Error|null), response?: flyteidl.admin.CreateTaskResponse) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AgentService#getTask}.
+             * Callback as used by {@link flyteidl.service.AsyncAgentService#getTask}.
              * @param error Error, if any
              * @param [response] GetTaskResponse
              */
             type GetTaskCallback = (error: (Error|null), response?: flyteidl.admin.GetTaskResponse) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AgentService#deleteTask}.
+             * Callback as used by {@link flyteidl.service.AsyncAgentService#deleteTask}.
              * @param error Error, if any
              * @param [response] DeleteTaskResponse
              */

@@ -51,7 +51,7 @@ struct TableStruct_flyteidl_2fcore_2ftasks_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[19]
+  static const ::google::protobuf::internal::ParseTable schema[18]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -90,9 +90,6 @@ extern K8sObjectMetadata_LabelsEntry_DoNotUseDefaultTypeInternal _K8sObjectMetad
 class K8sPod;
 class K8sPodDefaultTypeInternal;
 extern K8sPodDefaultTypeInternal _K8sPod_default_instance_;
-class PluginMetadata;
-class PluginMetadataDefaultTypeInternal;
-extern PluginMetadataDefaultTypeInternal _PluginMetadata_default_instance_;
 class Resources;
 class ResourcesDefaultTypeInternal;
 extern ResourcesDefaultTypeInternal _Resources_default_instance_;
@@ -131,7 +128,6 @@ template<> ::flyteidl::core::K8sObjectMetadata* Arena::CreateMaybeMessage<::flyt
 template<> ::flyteidl::core::K8sObjectMetadata_AnnotationsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::K8sObjectMetadata_AnnotationsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::K8sObjectMetadata_LabelsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::K8sObjectMetadata_LabelsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::K8sPod* Arena::CreateMaybeMessage<::flyteidl::core::K8sPod>(Arena*);
-template<> ::flyteidl::core::PluginMetadata* Arena::CreateMaybeMessage<::flyteidl::core::PluginMetadata>(Arena*);
 template<> ::flyteidl::core::Resources* Arena::CreateMaybeMessage<::flyteidl::core::Resources>(Arena*);
 template<> ::flyteidl::core::Resources_ResourceEntry* Arena::CreateMaybeMessage<::flyteidl::core::Resources_ResourceEntry>(Arena*);
 template<> ::flyteidl::core::RuntimeMetadata* Arena::CreateMaybeMessage<::flyteidl::core::RuntimeMetadata>(Arena*);
@@ -1030,15 +1026,6 @@ class RuntimeMetadata final :
   ::std::string* release_flavor();
   void set_allocated_flavor(::std::string* flavor);
 
-  // .flyteidl.core.PluginMetadata plugin_metadata = 4;
-  bool has_plugin_metadata() const;
-  void clear_plugin_metadata();
-  static const int kPluginMetadataFieldNumber = 4;
-  const ::flyteidl::core::PluginMetadata& plugin_metadata() const;
-  ::flyteidl::core::PluginMetadata* release_plugin_metadata();
-  ::flyteidl::core::PluginMetadata* mutable_plugin_metadata();
-  void set_allocated_plugin_metadata(::flyteidl::core::PluginMetadata* plugin_metadata);
-
   // .flyteidl.core.RuntimeMetadata.RuntimeType type = 1;
   void clear_type();
   static const int kTypeFieldNumber = 1;
@@ -1052,120 +1039,7 @@ class RuntimeMetadata final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr version_;
   ::google::protobuf::internal::ArenaStringPtr flavor_;
-  ::flyteidl::core::PluginMetadata* plugin_metadata_;
   int type_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
-};
-// -------------------------------------------------------------------
-
-class PluginMetadata final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.PluginMetadata) */ {
- public:
-  PluginMetadata();
-  virtual ~PluginMetadata();
-
-  PluginMetadata(const PluginMetadata& from);
-
-  inline PluginMetadata& operator=(const PluginMetadata& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  PluginMetadata(PluginMetadata&& from) noexcept
-    : PluginMetadata() {
-    *this = ::std::move(from);
-  }
-
-  inline PluginMetadata& operator=(PluginMetadata&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const PluginMetadata& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const PluginMetadata* internal_default_instance() {
-    return reinterpret_cast<const PluginMetadata*>(
-               &_PluginMetadata_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    5;
-
-  void Swap(PluginMetadata* other);
-  friend void swap(PluginMetadata& a, PluginMetadata& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline PluginMetadata* New() const final {
-    return CreateMaybeMessage<PluginMetadata>(nullptr);
-  }
-
-  PluginMetadata* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<PluginMetadata>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const PluginMetadata& from);
-  void MergeFrom(const PluginMetadata& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(PluginMetadata* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // bool is_sync_plugin = 1;
-  void clear_is_sync_plugin();
-  static const int kIsSyncPluginFieldNumber = 1;
-  bool is_sync_plugin() const;
-  void set_is_sync_plugin(bool value);
-
-  // @@protoc_insertion_point(class_scope:flyteidl.core.PluginMetadata)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  bool is_sync_plugin_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2ftasks_2eproto;
 };
@@ -1238,7 +1112,7 @@ class TaskMetadata final :
                &_TaskMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(TaskMetadata* other);
   friend void swap(TaskMetadata& a, TaskMetadata& b) {
@@ -1507,7 +1381,7 @@ class TaskTemplate final :
                &_TaskTemplate_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    8;
 
   void Swap(TaskTemplate* other);
   friend void swap(TaskTemplate& a, TaskTemplate& b) {
@@ -1753,7 +1627,7 @@ class ContainerPort final :
                &_ContainerPort_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    9;
 
   void Swap(ContainerPort* other);
   friend void swap(ContainerPort& a, ContainerPort& b) {
@@ -1865,7 +1739,7 @@ class Container final :
                &_Container_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    10;
 
   void Swap(Container* other);
   friend void swap(Container& a, Container& b) {
@@ -2129,7 +2003,7 @@ class IOStrategy final :
                &_IOStrategy_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    11;
 
   void Swap(IOStrategy* other);
   friend void swap(IOStrategy& a, IOStrategy& b) {
@@ -2304,7 +2178,7 @@ class DataLoadingConfig final :
                &_DataLoadingConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    12;
 
   void Swap(DataLoadingConfig* other);
   friend void swap(DataLoadingConfig& a, DataLoadingConfig& b) {
@@ -2491,7 +2365,7 @@ class K8sPod final :
                &_K8sPod_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    13;
 
   void Swap(K8sPod* other);
   friend void swap(K8sPod& a, K8sPod& b) {
@@ -2674,7 +2548,7 @@ class K8sObjectMetadata final :
                &_K8sObjectMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    16;
 
   void Swap(K8sObjectMetadata* other);
   friend void swap(K8sObjectMetadata& a, K8sObjectMetadata& b) {
@@ -2810,7 +2684,7 @@ class Sql final :
                &_Sql_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    17;
 
   void Swap(Sql* other);
   friend void swap(Sql& a, Sql& b) {
@@ -3433,75 +3307,6 @@ inline void RuntimeMetadata::set_allocated_flavor(::std::string* flavor) {
   }
   flavor_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), flavor);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.RuntimeMetadata.flavor)
-}
-
-// .flyteidl.core.PluginMetadata plugin_metadata = 4;
-inline bool RuntimeMetadata::has_plugin_metadata() const {
-  return this != internal_default_instance() && plugin_metadata_ != nullptr;
-}
-inline void RuntimeMetadata::clear_plugin_metadata() {
-  if (GetArenaNoVirtual() == nullptr && plugin_metadata_ != nullptr) {
-    delete plugin_metadata_;
-  }
-  plugin_metadata_ = nullptr;
-}
-inline const ::flyteidl::core::PluginMetadata& RuntimeMetadata::plugin_metadata() const {
-  const ::flyteidl::core::PluginMetadata* p = plugin_metadata_;
-  // @@protoc_insertion_point(field_get:flyteidl.core.RuntimeMetadata.plugin_metadata)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::PluginMetadata*>(
-      &::flyteidl::core::_PluginMetadata_default_instance_);
-}
-inline ::flyteidl::core::PluginMetadata* RuntimeMetadata::release_plugin_metadata() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.RuntimeMetadata.plugin_metadata)
-  
-  ::flyteidl::core::PluginMetadata* temp = plugin_metadata_;
-  plugin_metadata_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::PluginMetadata* RuntimeMetadata::mutable_plugin_metadata() {
-  
-  if (plugin_metadata_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::PluginMetadata>(GetArenaNoVirtual());
-    plugin_metadata_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.RuntimeMetadata.plugin_metadata)
-  return plugin_metadata_;
-}
-inline void RuntimeMetadata::set_allocated_plugin_metadata(::flyteidl::core::PluginMetadata* plugin_metadata) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete plugin_metadata_;
-  }
-  if (plugin_metadata) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      plugin_metadata = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, plugin_metadata, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  plugin_metadata_ = plugin_metadata;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.RuntimeMetadata.plugin_metadata)
-}
-
-// -------------------------------------------------------------------
-
-// PluginMetadata
-
-// bool is_sync_plugin = 1;
-inline void PluginMetadata::clear_is_sync_plugin() {
-  is_sync_plugin_ = false;
-}
-inline bool PluginMetadata::is_sync_plugin() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.PluginMetadata.is_sync_plugin)
-  return is_sync_plugin_;
-}
-inline void PluginMetadata::set_is_sync_plugin(bool value) {
-  
-  is_sync_plugin_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.core.PluginMetadata.is_sync_plugin)
 }
 
 // -------------------------------------------------------------------
@@ -5319,8 +5124,6 @@ inline void Sql::set_dialect(::flyteidl::core::Sql_Dialect value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

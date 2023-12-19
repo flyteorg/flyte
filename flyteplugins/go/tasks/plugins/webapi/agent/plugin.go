@@ -27,7 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentServiceClient, error)
+type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
 
 type Plugin struct {
 	metricScope     promutils.Scope
@@ -59,66 +59,6 @@ func (p Plugin) ResourceRequirements(_ context.Context, _ webapi.TaskExecutionCo
 
 	// Resource requirements are assumed to be the same.
 	return "default", p.cfg.ResourceConstraints, nil
-}
-
-type pluginContext struct {
-	webapi.TaskExecutionContext
-	resource webapi.Resource
-}
-
-func (p pluginContext) Resource() webapi.Resource {
-	return p.resource
-}
-
-func (p pluginContext) ResourceMeta() webapi.ResourceMeta {
-	return nil
-}
-
-func (p Plugin) Do(ctx context.Context, taskCtx webapi.TaskExecutionContext) (phase core.PhaseInfo, err error) {
-	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
-	if err != nil {
-		return core.PhaseInfoUndefined, err
-	}
-
-	inputs, err := taskCtx.InputReader().Get(ctx)
-	if err != nil {
-		return core.PhaseInfoUndefined, err
-	}
-
-	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
-
-	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
-	if err != nil {
-		return core.PhaseInfoUndefined, fmt.Errorf("failed to find agent agent with error: %v", err)
-	}
-
-	client, err := p.getClient(ctx, agent, p.connectionCache)
-	if err != nil {
-		return core.PhaseInfoUndefined, fmt.Errorf("failed to connect to agent with error: %v", err)
-	}
-
-	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
-	defer cancel()
-
-	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
-	if err != nil {
-		return core.PhaseInfoUndefined, err
-	}
-
-	resource := res.GetResource()
-	if resource == nil {
-		return core.PhaseInfoUndefined, fmt.Errorf("agent sync task returned nil resource, please check the agent implementation")
-	}
-
-	resourceWrapper := ResourceWrapper{
-		State:    resource.State,
-		Outputs:  resource.Outputs,
-		Message:  resource.Message,
-		LogLinks: res.LogLinks,
-	}
-
-	return p.Status(ctx, pluginContext{TaskExecutionContext: taskCtx, resource: resourceWrapper})
 }
 
 func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta,
@@ -172,12 +112,21 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		taskTemplate.GetContainer().Args = argTemplate
 	}
 
+	resource := ResourceWrapper{State: admin.State_RUNNING}
+
+	if res.GetResource() != nil {
+		resource.State = res.GetResource().State
+		resource.Outputs = res.GetResource().Outputs
+		resource.Message = res.GetResource().Message
+		resource.LogLinks = res.GetResource().LogLinks
+	}
+
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		Token:             "",
 		TaskType:          taskTemplate.Type,
-	}, ResourceWrapper{State: admin.State_RUNNING}, nil
+	}, resource, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
@@ -334,13 +283,13 @@ func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*A
 	return conn, nil
 }
 
-func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentServiceClient, error) {
+func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 	conn, err := getGrpcConnection(ctx, agent, connectionCache)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.NewAgentServiceClient(conn), nil
+	return service.NewAsyncAgentServiceClient(conn), nil
 }
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {

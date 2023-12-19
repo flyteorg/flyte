@@ -1067,9 +1067,6 @@ pub struct RuntimeMetadata {
     /// +optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.).
     #[prost(string, tag="3")]
     pub flavor: ::prost::alloc::string::String,
-    /// +optional It can be used to provide extra information for the plugin.
-    #[prost(message, optional, tag="4")]
-    pub plugin_metadata: ::core::option::Option<PluginMetadata>,
 }
 /// Nested message and enum types in `RuntimeMetadata`.
 pub mod runtime_metadata {
@@ -1099,13 +1096,6 @@ pub mod runtime_metadata {
             }
         }
     }
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct PluginMetadata {
-    /// +optional It can be used to decide use sync plugin or async plugin during runtime.
-    #[prost(bool, tag="1")]
-    pub is_sync_plugin: bool,
 }
 /// Task Metadata
 #[allow(clippy::derive_partial_eq_without_eq)]

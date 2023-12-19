@@ -12614,7 +12614,6 @@
                  * @property {flyteidl.core.RuntimeMetadata.RuntimeType|null} [type] RuntimeMetadata type
                  * @property {string|null} [version] RuntimeMetadata version
                  * @property {string|null} [flavor] RuntimeMetadata flavor
-                 * @property {flyteidl.core.IPluginMetadata|null} [pluginMetadata] RuntimeMetadata pluginMetadata
                  */
     
                 /**
@@ -12657,14 +12656,6 @@
                 RuntimeMetadata.prototype.flavor = "";
     
                 /**
-                 * RuntimeMetadata pluginMetadata.
-                 * @member {flyteidl.core.IPluginMetadata|null|undefined} pluginMetadata
-                 * @memberof flyteidl.core.RuntimeMetadata
-                 * @instance
-                 */
-                RuntimeMetadata.prototype.pluginMetadata = null;
-    
-                /**
                  * Creates a new RuntimeMetadata instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.RuntimeMetadata
@@ -12694,8 +12685,6 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.version);
                     if (message.flavor != null && message.hasOwnProperty("flavor"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.flavor);
-                    if (message.pluginMetadata != null && message.hasOwnProperty("pluginMetadata"))
-                        $root.flyteidl.core.PluginMetadata.encode(message.pluginMetadata, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -12725,9 +12714,6 @@
                             break;
                         case 3:
                             message.flavor = reader.string();
-                            break;
-                        case 4:
-                            message.pluginMetadata = $root.flyteidl.core.PluginMetadata.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12762,11 +12748,6 @@
                     if (message.flavor != null && message.hasOwnProperty("flavor"))
                         if (!$util.isString(message.flavor))
                             return "flavor: string expected";
-                    if (message.pluginMetadata != null && message.hasOwnProperty("pluginMetadata")) {
-                        var error = $root.flyteidl.core.PluginMetadata.verify(message.pluginMetadata);
-                        if (error)
-                            return "pluginMetadata." + error;
-                    }
                     return null;
                 };
     
@@ -12785,116 +12766,6 @@
                 })();
     
                 return RuntimeMetadata;
-            })();
-    
-            core.PluginMetadata = (function() {
-    
-                /**
-                 * Properties of a PluginMetadata.
-                 * @memberof flyteidl.core
-                 * @interface IPluginMetadata
-                 * @property {boolean|null} [isSyncPlugin] PluginMetadata isSyncPlugin
-                 */
-    
-                /**
-                 * Constructs a new PluginMetadata.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents a PluginMetadata.
-                 * @implements IPluginMetadata
-                 * @constructor
-                 * @param {flyteidl.core.IPluginMetadata=} [properties] Properties to set
-                 */
-                function PluginMetadata(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * PluginMetadata isSyncPlugin.
-                 * @member {boolean} isSyncPlugin
-                 * @memberof flyteidl.core.PluginMetadata
-                 * @instance
-                 */
-                PluginMetadata.prototype.isSyncPlugin = false;
-    
-                /**
-                 * Creates a new PluginMetadata instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.PluginMetadata
-                 * @static
-                 * @param {flyteidl.core.IPluginMetadata=} [properties] Properties to set
-                 * @returns {flyteidl.core.PluginMetadata} PluginMetadata instance
-                 */
-                PluginMetadata.create = function create(properties) {
-                    return new PluginMetadata(properties);
-                };
-    
-                /**
-                 * Encodes the specified PluginMetadata message. Does not implicitly {@link flyteidl.core.PluginMetadata.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.PluginMetadata
-                 * @static
-                 * @param {flyteidl.core.IPluginMetadata} message PluginMetadata message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                PluginMetadata.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).bool(message.isSyncPlugin);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a PluginMetadata message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.PluginMetadata
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.PluginMetadata} PluginMetadata
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                PluginMetadata.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.PluginMetadata();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.isSyncPlugin = reader.bool();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a PluginMetadata message.
-                 * @function verify
-                 * @memberof flyteidl.core.PluginMetadata
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                PluginMetadata.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.isSyncPlugin != null && message.hasOwnProperty("isSyncPlugin"))
-                        if (typeof message.isSyncPlugin !== "boolean")
-                            return "isSyncPlugin: boolean expected";
-                    return null;
-                };
-    
-                return PluginMetadata;
             })();
     
             core.TaskMetadata = (function() {
@@ -20213,6 +20084,7 @@
                  * @property {flyteidl.admin.State|null} [state] Resource state
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
                  * @property {string|null} [message] Resource message
+                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
                  */
     
                 /**
@@ -20224,6 +20096,7 @@
                  * @param {flyteidl.admin.IResource=} [properties] Properties to set
                  */
                 function Resource(properties) {
+                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -20255,6 +20128,14 @@
                 Resource.prototype.message = "";
     
                 /**
+                 * Resource logLinks.
+                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.logLinks = $util.emptyArray;
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -20284,6 +20165,9 @@
                         $root.flyteidl.core.LiteralMap.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.message != null && message.hasOwnProperty("message"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.message);
+                    if (message.logLinks != null && message.logLinks.length)
+                        for (var i = 0; i < message.logLinks.length; ++i)
+                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -20313,6 +20197,11 @@
                             break;
                         case 3:
                             message.message = reader.string();
+                            break;
+                        case 4:
+                            if (!(message.logLinks && message.logLinks.length))
+                                message.logLinks = [];
+                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20352,6 +20241,15 @@
                     if (message.message != null && message.hasOwnProperty("message"))
                         if (!$util.isString(message.message))
                             return "message: string expected";
+                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
+                        if (!Array.isArray(message.logLinks))
+                            return "logLinks: array expected";
+                        for (var i = 0; i < message.logLinks.length; ++i) {
+                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
+                            if (error)
+                                return "logLinks." + error;
+                        }
+                    }
                     return null;
                 };
     
@@ -46212,41 +46110,41 @@
                 return AdminService;
             })();
     
-            service.AgentService = (function() {
+            service.AsyncAgentService = (function() {
     
                 /**
-                 * Constructs a new AgentService service.
+                 * Constructs a new AsyncAgentService service.
                  * @memberof flyteidl.service
-                 * @classdesc Represents an AgentService
+                 * @classdesc Represents an AsyncAgentService
                  * @extends $protobuf.rpc.Service
                  * @constructor
                  * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
                  * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
                  * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
                  */
-                function AgentService(rpcImpl, requestDelimited, responseDelimited) {
+                function AsyncAgentService(rpcImpl, requestDelimited, responseDelimited) {
                     $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
                 }
     
-                (AgentService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = AgentService;
+                (AsyncAgentService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = AsyncAgentService;
     
                 /**
-                 * Creates new AgentService service using the specified rpc implementation.
+                 * Creates new AsyncAgentService service using the specified rpc implementation.
                  * @function create
-                 * @memberof flyteidl.service.AgentService
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @static
                  * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
                  * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
                  * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
-                 * @returns {AgentService} RPC service. Useful where requests and/or responses are streamed.
+                 * @returns {AsyncAgentService} RPC service. Useful where requests and/or responses are streamed.
                  */
-                AgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                AsyncAgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
                     return new this(rpcImpl, requestDelimited, responseDelimited);
                 };
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AgentService#createTask}.
-                 * @memberof flyteidl.service.AgentService
+                 * Callback as used by {@link flyteidl.service.AsyncAgentService#createTask}.
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @typedef CreateTaskCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
@@ -46256,21 +46154,21 @@
                 /**
                  * Calls CreateTask.
                  * @function createTask
-                 * @memberof flyteidl.service.AgentService
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @instance
                  * @param {flyteidl.admin.ICreateTaskRequest} request CreateTaskRequest message or plain object
-                 * @param {flyteidl.service.AgentService.CreateTaskCallback} callback Node-style callback called with the error, if any, and CreateTaskResponse
+                 * @param {flyteidl.service.AsyncAgentService.CreateTaskCallback} callback Node-style callback called with the error, if any, and CreateTaskResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AgentService.prototype.createTask = function createTask(request, callback) {
+                Object.defineProperty(AsyncAgentService.prototype.createTask = function createTask(request, callback) {
                     return this.rpcCall(createTask, $root.flyteidl.admin.CreateTaskRequest, $root.flyteidl.admin.CreateTaskResponse, request, callback);
                 }, "name", { value: "CreateTask" });
     
                 /**
                  * Calls CreateTask.
                  * @function createTask
-                 * @memberof flyteidl.service.AgentService
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @instance
                  * @param {flyteidl.admin.ICreateTaskRequest} request CreateTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.CreateTaskResponse>} Promise
@@ -46278,8 +46176,8 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AgentService#getTask}.
-                 * @memberof flyteidl.service.AgentService
+                 * Callback as used by {@link flyteidl.service.AsyncAgentService#getTask}.
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @typedef GetTaskCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
@@ -46289,21 +46187,21 @@
                 /**
                  * Calls GetTask.
                  * @function getTask
-                 * @memberof flyteidl.service.AgentService
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @instance
                  * @param {flyteidl.admin.IGetTaskRequest} request GetTaskRequest message or plain object
-                 * @param {flyteidl.service.AgentService.GetTaskCallback} callback Node-style callback called with the error, if any, and GetTaskResponse
+                 * @param {flyteidl.service.AsyncAgentService.GetTaskCallback} callback Node-style callback called with the error, if any, and GetTaskResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AgentService.prototype.getTask = function getTask(request, callback) {
+                Object.defineProperty(AsyncAgentService.prototype.getTask = function getTask(request, callback) {
                     return this.rpcCall(getTask, $root.flyteidl.admin.GetTaskRequest, $root.flyteidl.admin.GetTaskResponse, request, callback);
                 }, "name", { value: "GetTask" });
     
                 /**
                  * Calls GetTask.
                  * @function getTask
-                 * @memberof flyteidl.service.AgentService
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @instance
                  * @param {flyteidl.admin.IGetTaskRequest} request GetTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.GetTaskResponse>} Promise
@@ -46311,8 +46209,8 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AgentService#deleteTask}.
-                 * @memberof flyteidl.service.AgentService
+                 * Callback as used by {@link flyteidl.service.AsyncAgentService#deleteTask}.
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @typedef DeleteTaskCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
@@ -46322,28 +46220,28 @@
                 /**
                  * Calls DeleteTask.
                  * @function deleteTask
-                 * @memberof flyteidl.service.AgentService
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @instance
                  * @param {flyteidl.admin.IDeleteTaskRequest} request DeleteTaskRequest message or plain object
-                 * @param {flyteidl.service.AgentService.DeleteTaskCallback} callback Node-style callback called with the error, if any, and DeleteTaskResponse
+                 * @param {flyteidl.service.AsyncAgentService.DeleteTaskCallback} callback Node-style callback called with the error, if any, and DeleteTaskResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AgentService.prototype.deleteTask = function deleteTask(request, callback) {
+                Object.defineProperty(AsyncAgentService.prototype.deleteTask = function deleteTask(request, callback) {
                     return this.rpcCall(deleteTask, $root.flyteidl.admin.DeleteTaskRequest, $root.flyteidl.admin.DeleteTaskResponse, request, callback);
                 }, "name", { value: "DeleteTask" });
     
                 /**
                  * Calls DeleteTask.
                  * @function deleteTask
-                 * @memberof flyteidl.service.AgentService
+                 * @memberof flyteidl.service.AsyncAgentService
                  * @instance
                  * @param {flyteidl.admin.IDeleteTaskRequest} request DeleteTaskRequest message or plain object
                  * @returns {Promise<flyteidl.admin.DeleteTaskResponse>} Promise
                  * @variation 2
                  */
     
-                return AgentService;
+                return AsyncAgentService;
             })();
     
             service.OAuth2MetadataRequest = (function() {

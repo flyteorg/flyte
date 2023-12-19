@@ -84,6 +84,8 @@ message Resource {
   core.LiteralMap outputs = 2;
   // A descriptive message for the current state. e.g. waiting for cluster.
   string message = 3;
+  // log information for the task execution.
+  repeated core.TaskLog log_links = 4;
 }
 
 // A message used to delete a task.

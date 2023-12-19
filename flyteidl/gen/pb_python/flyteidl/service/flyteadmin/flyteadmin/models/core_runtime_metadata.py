@@ -16,7 +16,6 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_plugin_metadata import CorePluginMetadata  # noqa: F401,E501
 from flyteadmin.models.runtime_metadata_runtime_type import RuntimeMetadataRuntimeType  # noqa: F401,E501
 
 
@@ -36,24 +35,21 @@ class CoreRuntimeMetadata(object):
     swagger_types = {
         'type': 'RuntimeMetadataRuntimeType',
         'version': 'str',
-        'flavor': 'str',
-        'plugin_metadata': 'CorePluginMetadata'
+        'flavor': 'str'
     }
 
     attribute_map = {
         'type': 'type',
         'version': 'version',
-        'flavor': 'flavor',
-        'plugin_metadata': 'plugin_metadata'
+        'flavor': 'flavor'
     }
 
-    def __init__(self, type=None, version=None, flavor=None, plugin_metadata=None):  # noqa: E501
+    def __init__(self, type=None, version=None, flavor=None):  # noqa: E501
         """CoreRuntimeMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._type = None
         self._version = None
         self._flavor = None
-        self._plugin_metadata = None
         self.discriminator = None
 
         if type is not None:
@@ -62,8 +58,6 @@ class CoreRuntimeMetadata(object):
             self.version = version
         if flavor is not None:
             self.flavor = flavor
-        if plugin_metadata is not None:
-            self.plugin_metadata = plugin_metadata
 
     @property
     def type(self):
@@ -133,29 +127,6 @@ class CoreRuntimeMetadata(object):
         """
 
         self._flavor = flavor
-
-    @property
-    def plugin_metadata(self):
-        """Gets the plugin_metadata of this CoreRuntimeMetadata.  # noqa: E501
-
-        +optional It can be used to provide extra information for the plugin.  # noqa: E501
-
-        :return: The plugin_metadata of this CoreRuntimeMetadata.  # noqa: E501
-        :rtype: CorePluginMetadata
-        """
-        return self._plugin_metadata
-
-    @plugin_metadata.setter
-    def plugin_metadata(self, plugin_metadata):
-        """Sets the plugin_metadata of this CoreRuntimeMetadata.
-
-        +optional It can be used to provide extra information for the plugin.  # noqa: E501
-
-        :param plugin_metadata: The plugin_metadata of this CoreRuntimeMetadata.  # noqa: E501
-        :type: CorePluginMetadata
-        """
-
-        self._plugin_metadata = plugin_metadata
 
     def to_dict(self):
         """Returns the model properties as a dict"""
