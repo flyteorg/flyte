@@ -1462,12 +1462,6 @@ class Agent final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
-  // bool is_sync = 3;
-  void clear_is_sync();
-  static const int kIsSyncFieldNumber = 3;
-  bool is_sync() const;
-  void set_is_sync(bool value);
-
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Agent)
  private:
   class HasBitSetters;
@@ -1475,7 +1469,6 @@ class Agent final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> supported_task_types_;
   ::google::protobuf::internal::ArenaStringPtr name_;
-  bool is_sync_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
 };
@@ -2960,20 +2953,6 @@ inline ::google::protobuf::RepeatedPtrField<::std::string>*
 Agent::mutable_supported_task_types() {
   // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.Agent.supported_task_types)
   return &supported_task_types_;
-}
-
-// bool is_sync = 3;
-inline void Agent::clear_is_sync() {
-  is_sync_ = false;
-}
-inline bool Agent::is_sync() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.Agent.is_sync)
-  return is_sync_;
-}
-inline void Agent::set_is_sync(bool value) {
-  
-  is_sync_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.admin.Agent.is_sync)
 }
 
 // -------------------------------------------------------------------

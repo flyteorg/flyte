@@ -8361,9 +8361,6 @@ export namespace flyteidl {
 
             /** Agent supportedTaskTypes */
             supportedTaskTypes?: (string[]|null);
-
-            /** Agent isSync */
-            isSync?: (boolean|null);
         }
 
         /** Represents an Agent. */
@@ -8380,9 +8377,6 @@ export namespace flyteidl {
 
             /** Agent supportedTaskTypes. */
             public supportedTaskTypes: string[];
-
-            /** Agent isSync. */
-            public isSync: boolean;
 
             /**
              * Creates a new Agent instance using the specified properties.

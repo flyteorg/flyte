@@ -118,14 +118,12 @@ class DeleteTaskResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class Agent(_message.Message):
-    __slots__ = ["name", "supported_task_types", "is_sync"]
+    __slots__ = ["name", "supported_task_types"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
-    IS_SYNC_FIELD_NUMBER: _ClassVar[int]
     name: str
     supported_task_types: _containers.RepeatedScalarFieldContainer[str]
-    is_sync: bool
-    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[_Iterable[str]] = ..., is_sync: bool = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class GetAgentRequest(_message.Message):
     __slots__ = ["name"]

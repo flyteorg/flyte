@@ -20389,7 +20389,6 @@
                  * @interface IAgent
                  * @property {string|null} [name] Agent name
                  * @property {Array.<string>|null} [supportedTaskTypes] Agent supportedTaskTypes
-                 * @property {boolean|null} [isSync] Agent isSync
                  */
     
                 /**
@@ -20425,14 +20424,6 @@
                 Agent.prototype.supportedTaskTypes = $util.emptyArray;
     
                 /**
-                 * Agent isSync.
-                 * @member {boolean} isSync
-                 * @memberof flyteidl.admin.Agent
-                 * @instance
-                 */
-                Agent.prototype.isSync = false;
-    
-                /**
                  * Creates a new Agent instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Agent
@@ -20461,8 +20452,6 @@
                     if (message.supportedTaskTypes != null && message.supportedTaskTypes.length)
                         for (var i = 0; i < message.supportedTaskTypes.length; ++i)
                             writer.uint32(/* id 2, wireType 2 =*/18).string(message.supportedTaskTypes[i]);
-                    if (message.isSync != null && message.hasOwnProperty("isSync"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isSync);
                     return writer;
                 };
     
@@ -20491,9 +20480,6 @@
                             if (!(message.supportedTaskTypes && message.supportedTaskTypes.length))
                                 message.supportedTaskTypes = [];
                             message.supportedTaskTypes.push(reader.string());
-                            break;
-                        case 3:
-                            message.isSync = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20524,9 +20510,6 @@
                             if (!$util.isString(message.supportedTaskTypes[i]))
                                 return "supportedTaskTypes: string[] expected";
                     }
-                    if (message.isSync != null && message.hasOwnProperty("isSync"))
-                        if (typeof message.isSync !== "boolean")
-                            return "isSync: boolean expected";
                     return null;
                 };
     

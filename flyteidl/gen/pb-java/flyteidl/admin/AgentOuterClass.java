@@ -8046,15 +8046,6 @@ public final class AgentOuterClass {
      */
     com.google.protobuf.ByteString
         getSupportedTaskTypesBytes(int index);
-
-    /**
-     * <pre>
-     * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
-     * </pre>
-     *
-     * <code>bool is_sync = 3;</code>
-     */
-    boolean getIsSync();
   }
   /**
    * <pre>
@@ -8114,11 +8105,6 @@ public final class AgentOuterClass {
                 mutable_bitField0_ |= 0x00000002;
               }
               supportedTaskTypes_.add(s);
-              break;
-            }
-            case 24: {
-
-              isSync_ = input.readBool();
               break;
             }
             default: {
@@ -8244,19 +8230,6 @@ public final class AgentOuterClass {
       return supportedTaskTypes_.getByteString(index);
     }
 
-    public static final int IS_SYNC_FIELD_NUMBER = 3;
-    private boolean isSync_;
-    /**
-     * <pre>
-     * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
-     * </pre>
-     *
-     * <code>bool is_sync = 3;</code>
-     */
-    public boolean getIsSync() {
-      return isSync_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -8276,9 +8249,6 @@ public final class AgentOuterClass {
       }
       for (int i = 0; i < supportedTaskTypes_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, supportedTaskTypes_.getRaw(i));
-      }
-      if (isSync_ != false) {
-        output.writeBool(3, isSync_);
       }
       unknownFields.writeTo(output);
     }
@@ -8300,10 +8270,6 @@ public final class AgentOuterClass {
         size += dataSize;
         size += 1 * getSupportedTaskTypesList().size();
       }
-      if (isSync_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, isSync_);
-      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -8323,8 +8289,6 @@ public final class AgentOuterClass {
           .equals(other.getName())) return false;
       if (!getSupportedTaskTypesList()
           .equals(other.getSupportedTaskTypesList())) return false;
-      if (getIsSync()
-          != other.getIsSync()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -8342,9 +8306,6 @@ public final class AgentOuterClass {
         hash = (37 * hash) + SUPPORTED_TASK_TYPES_FIELD_NUMBER;
         hash = (53 * hash) + getSupportedTaskTypesList().hashCode();
       }
-      hash = (37 * hash) + IS_SYNC_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getIsSync());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -8486,8 +8447,6 @@ public final class AgentOuterClass {
 
         supportedTaskTypes_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
-        isSync_ = false;
-
         return this;
       }
 
@@ -8522,7 +8481,6 @@ public final class AgentOuterClass {
           bitField0_ = (bitField0_ & ~0x00000002);
         }
         result.supportedTaskTypes_ = supportedTaskTypes_;
-        result.isSync_ = isSync_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -8585,9 +8543,6 @@ public final class AgentOuterClass {
             supportedTaskTypes_.addAll(other.supportedTaskTypes_);
           }
           onChanged();
-        }
-        if (other.getIsSync() != false) {
-          setIsSync(other.getIsSync());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -8834,44 +8789,6 @@ public final class AgentOuterClass {
   checkByteStringIsUtf8(value);
         ensureSupportedTaskTypesIsMutable();
         supportedTaskTypes_.add(value);
-        onChanged();
-        return this;
-      }
-
-      private boolean isSync_ ;
-      /**
-       * <pre>
-       * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
-       * </pre>
-       *
-       * <code>bool is_sync = 3;</code>
-       */
-      public boolean getIsSync() {
-        return isSync_;
-      }
-      /**
-       * <pre>
-       * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
-       * </pre>
-       *
-       * <code>bool is_sync = 3;</code>
-       */
-      public Builder setIsSync(boolean value) {
-        
-        isSync_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress.
-       * </pre>
-       *
-       * <code>bool is_sync = 3;</code>
-       */
-      public Builder clearIsSync() {
-        
-        isSync_ = false;
         onChanged();
         return this;
       }
@@ -11465,17 +11382,17 @@ public final class AgentOuterClass {
       "tate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Li" +
       "teralMap\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskR" +
       "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me" +
-      "ta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"D\n\005Agent\022" +
+      "ta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"3\n\005Agent\022" +
       "\014\n\004name\030\001 \001(\t\022\034\n\024supported_task_types\030\002 " +
-      "\003(\t\022\017\n\007is_sync\030\003 \001(\010\"\037\n\017GetAgentRequest\022" +
-      "\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005age" +
-      "nt\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListA" +
-      "gentsRequest\";\n\022ListAgentsResponse\022%\n\006ag" +
-      "ents\030\001 \003(\0132\025.flyteidl.admin.Agent*^\n\005Sta" +
-      "te\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_F" +
-      "AILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSU" +
-      "CCEEDED\020\004B=Z;github.com/flyteorg/flyte/f" +
-      "lyteidl/gen/pb-go/flyteidl/adminb\006proto3"
+      "\003(\t\"\037\n\017GetAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020" +
+      "GetAgentResponse\022$\n\005agent\030\001 \001(\0132\025.flytei" +
+      "dl.admin.Agent\"\023\n\021ListAgentsRequest\";\n\022L" +
+      "istAgentsResponse\022%\n\006agents\030\001 \003(\0132\025.flyt" +
+      "eidl.admin.Agent*^\n\005State\022\025\n\021RETRYABLE_F" +
+      "AILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDI" +
+      "NG\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;gith" +
+      "ub.com/flyteorg/flyte/flyteidl/gen/pb-go" +
+      "/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11565,7 +11482,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_Agent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Agent_descriptor,
-        new java.lang.String[] { "Name", "SupportedTaskTypes", "IsSync", });
+        new java.lang.String[] { "Name", "SupportedTaskTypes", });
     internal_static_flyteidl_admin_GetAgentRequest_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_admin_GetAgentRequest_fieldAccessorTable = new

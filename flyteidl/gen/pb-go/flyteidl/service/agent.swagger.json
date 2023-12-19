@@ -229,11 +229,6 @@
             "type": "string"
           },
           "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
-        },
-        "is_sync": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their results synchronously when called by propeller. Given that sync agents can affect the performance of the system, it's important to enforce strict timeout policies. An Async agent, on the other hand, is required to be able to identify jobs by an identifier and query for job statuses as jobs progress."
         }
       },
       "description": "A message containing the agent metadata."
