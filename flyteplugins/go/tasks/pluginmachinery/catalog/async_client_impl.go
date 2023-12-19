@@ -48,7 +48,7 @@ func hashInputs(ctx context.Context, key Key) (string, error) {
 		}
 		inputs = retInputs
 	}
-	return HashLiteralMap(ctx, inputs)
+	return HashLiteralMap(ctx, inputs, key.CacheIgnoreInputVars)
 }
 
 func (c AsyncClientImpl) Download(ctx context.Context, requests ...DownloadRequest) (outputFuture DownloadFuture, err error) {
