@@ -4,13 +4,13 @@ helmCharts:
 - name: flyte-sandbox
   releaseName: flyte-sandbox
   namespace: flyte
-- name: flyteagent
-  releaseName: flyteagent
-  namespace: flyte
+  valuesInline:
+    flyte-binary:
+      flyteagent:
+        enabled: True
 namespace: flyte
 resources:
 - ../namespace.yaml
 
 patchesStrategicMerge:
   - add-agent-secret-patch.yaml
-  - enable-agent-service-patch.yaml
