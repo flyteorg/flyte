@@ -46,7 +46,11 @@ func (n *Nanny) WaitToExit(ctx context.Context) error {
 	return cmd.Run()
 }
 
-func (n *NannyOptions) Exec(ctx context.Context) error {
+func (n *NannyOptions) Exec(ctx context.Context, args []string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("no command provided")
+	}
+
 	// Download inputs
 	downloadOpts := &DownloadOptions{
 		RootOptions:         n.RootOptions,
@@ -64,8 +68,8 @@ func (n *NannyOptions) Exec(ctx context.Context) error {
 
 	// Initialize nanny
 	nanny := &Nanny{
-		command: "/bin/sh",
-		args:    []string{"-c", "sleep 30 && echo 'hello world'"},
+		command: args[0],
+		args:    args[1:],
 	}
 
 	// Upload outputs
@@ -100,7 +104,7 @@ func NewNannyCommand(opts *RootOptions) *cobra.Command {
 		Short: "Run a shell command",
 		Long:  `Run a shell command with handling for downloading inputs and uploading outputs`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return nannyOpts.Exec(context.Background())
+			return nannyOpts.Exec(context.Background(), args)
 		},
 	}
 
