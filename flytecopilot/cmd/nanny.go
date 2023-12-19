@@ -65,7 +65,7 @@ func (n *NannyOptions) Exec(ctx context.Context) error {
 	// Initialize nanny
 	nanny := &Nanny{
 		command: "/bin/sh",
-		args:    []string{"-c", "echo 'hello world'"},
+		args:    []string{"-c", "sleep 30 && echo 'hello world'"},
 	}
 
 	// Upload outputs
