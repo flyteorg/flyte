@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
@@ -30,13 +28,6 @@ func TestDo(t *testing.T) {
 
 	template := flyteIdlCore.TaskTemplate{
 		Type: "api_task",
-		Metadata: &flyteIdlCore.TaskMetadata{
-			Runtime: &flyteIdlCore.RuntimeMetadata{
-				PluginMetadata: &flyteIdlCore.PluginMetadata{
-					IsSyncPlugin: true,
-				},
-			},
-		},
 	}
 
 	taskReader.On("Read", mock.Anything).Return(&template, nil)
@@ -155,7 +146,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_PENDING,
 			Outputs:  nil,
 			Message:  "Waiting for cluster",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -170,7 +161,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_RUNNING,
 			Outputs:  nil,
 			Message:  "Job is running",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -184,7 +175,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_PERMANENT_FAILURE,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -198,7 +189,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_RETRYABLE_FAILURE,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -212,7 +203,7 @@ func TestPlugin(t *testing.T) {
 			State:    5,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
