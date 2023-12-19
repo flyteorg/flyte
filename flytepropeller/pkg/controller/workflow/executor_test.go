@@ -522,24 +522,25 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 			roundsToFail := 8
 			for i := 0; i < roundsToFail; i++ {
-				err := executor.HandleFlyteWorkflow(ctx, w)
-				assert.Nil(t, err, "Round [%v]", i)
-				fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
-				walkAndPrint(w.Connections, w.Status.NodeStatus)
-				for _, v := range w.Status.NodeStatus {
-					// Reset dirty manually for tests.
-					v.ResetDirty()
-				}
-				fmt.Printf("\n")
+				t.Run(fmt.Sprintf("Round[%d]", i), func(t *testing.T) {
+					err := executor.HandleFlyteWorkflow(ctx, w)
+					assert.Nil(t, err, "Round [%v]", i)
+					fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
+					walkAndPrint(w.Connections, w.Status.NodeStatus)
+					for _, v := range w.Status.NodeStatus {
+						// Reset dirty manually for tests.
+						v.ResetDirty()
+					}
+					fmt.Printf("\n")
 
-				if i == roundsToFail-1 {
-					assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
-				} else if i == roundsToFail-2 {
-					assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
-				} else {
-					assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
-				}
-
+					if i == roundsToFail-1 {
+						assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
+					} else if i == roundsToFail-2 {
+						assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
+					} else {
+						assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
+					}
+				})
 			}
 
 			assert.Equal(t, v1alpha1.WorkflowPhaseFailed.String(), w.Status.Phase.String(), "Message: [%v]", w.Status.Message)
