@@ -583,7 +583,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "vscode://flyin:8081/my-pod-name",
+						Uri:           "vscode://flyin:8080/my-pod-name",
 						MessageFormat: core.TaskLog_JSON,
 					},
 				},

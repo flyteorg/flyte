@@ -88,14 +88,12 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 
 	switch scheme {
 	case TemplateSchemeFlyin:
-		// TODO: Confirm that having a default port is okay.
 		port := input.TaskTemplate.GetConfig()["port"]
 		if port == "" {
-			port = "8081"
+			port = "8080"
 		}
 		vars = append(
 			vars,
-			// Replace the port with the port from the task template.
 			TemplateVar{defaultRegexes.Port, port},
 		)
 		fallthrough
