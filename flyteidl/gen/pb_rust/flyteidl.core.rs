@@ -1134,6 +1134,9 @@ pub struct TaskMetadata {
     /// identically as, the default PodTemplate configured in FlytePropeller.
     #[prost(string, tag="12")]
     pub pod_template_name: ::prost::alloc::string::String,
+    /// cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+    #[prost(string, repeated, tag="13")]
+    pub cache_ignore_input_vars: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
