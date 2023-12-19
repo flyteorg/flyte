@@ -17,12 +17,13 @@ import (
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/tests"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func TestDo(t *testing.T) {
+func TestSyncTask(t *testing.T) {
 	tCtx := getTaskContext(t)
 	taskReader := new(pluginCoreMocks.TaskReader)
 
@@ -39,7 +40,6 @@ func TestDo(t *testing.T) {
 	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("create_task_sync_test"))
 	assert.NoError(t, err)
 
-	// Call the Do function by Flavor
 	inputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 	assert.NoError(t, err)
 	basePrefix := storage.DataReference("fake://bucket/prefix/")
@@ -49,10 +49,8 @@ func TestDo(t *testing.T) {
 	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
 	tCtx.OnInputReader().Return(inputReader)
 
-	phase, err := plugin.Handle(context.TODO(), tCtx)
-
-	assert.Nil(t, err)
-	assert.Equal(t, pluginsCore.PhaseSuccess, phase.Info().Phase())
+	phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, nil)
+	assert.Equal(t, true, phase.Phase().IsSuccess())
 }
 
 func TestPlugin(t *testing.T) {
