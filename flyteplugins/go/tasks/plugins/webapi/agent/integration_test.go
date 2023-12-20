@@ -77,6 +77,8 @@ func (m *MockSyncTask) CreateTask(_ context.Context, createTaskRequest *admin.Cr
 				Outputs: &flyteIdlCore.LiteralMap{
 					Literals: map[string]*flyteIdlCore.Literal{},
 				},
+				Message:  "Sync task finished",
+				LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 			},
 		},
 	}, nil
