@@ -224,8 +224,6 @@ replace (
 	github.com/flyteorg/flyte/flytepropeller => ../flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ../flytestdlib
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
-	gorm.io/driver/sqlite => gorm.io/driver/sqlite v1.1.1
-	gorm.io/gorm => gorm.io/gorm v1.24.1-0.20221019064659-5dd2bb482755
 	k8s.io/api => k8s.io/api v0.28.2
 	k8s.io/apimachinery => k8s.io/apimachinery v0.28.2
 	k8s.io/client-go => k8s.io/client-go v0.28.2
