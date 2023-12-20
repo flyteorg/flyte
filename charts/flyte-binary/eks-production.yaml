@@ -2,7 +2,8 @@ configuration:
   database:
     password: <DB_PASSWORD>
     host: <RDS_HOST_DNS>
-    dbname: app
+    username: <DB_USERNAME>
+    dbname: flyteadmin
   storage:
     metadataContainer: <BUCKET_NAME>
     userDataContainer: <USER_DATA_BUCKET_NAME>
@@ -126,8 +127,7 @@ clusterResourceTemplates:
         namespace: '{{ namespace }}'
 ingress:
   create: true
-  commonAnnotations:
-    kubernetes.io/ingress.class: nginx
+  ingressClassName: nginx
   httpAnnotations:
     nginx.ingress.kubernetes.io/app-root: /console
   grpcAnnotations:

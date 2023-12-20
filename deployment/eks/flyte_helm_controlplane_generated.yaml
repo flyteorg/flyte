@@ -1015,7 +1015,6 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     alb.ingress.kubernetes.io/target-type: ip
-    kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
 spec:
   rules:
@@ -1182,11 +1181,11 @@ metadata:
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/tags: service_instance=production
     alb.ingress.kubernetes.io/target-type: ip
-    kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
     alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
+  ingressClassName: "alb"
   rules:
     - host: null
       http:

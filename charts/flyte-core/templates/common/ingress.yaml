@@ -463,7 +463,6 @@ spec:
         - {{ tpl (toYaml .Values.common.ingress.host) $ }}
   {{ end }}
 
-
   {{- if .Values.common.ingress.separateGrpcIngress }}
 # Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only
 # enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services).
@@ -485,6 +484,9 @@ metadata:
   {{- toYaml . | nindent 4}}
   {{- end }}
 spec:
+    {{- if .Values.common.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.common.ingress.ingressClassName | quote }}
+  {{- end }}
   rules:
     - host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
       http:

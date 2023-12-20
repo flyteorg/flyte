@@ -156,11 +156,11 @@ workflow_notifications:
 
 common:
   ingress:
+    ingressClassName: nginx
     host: "{{ .Values.userSettings.hostName }}"
     tls:
       enabled: true
     annotations:
-      kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/ssl-redirect: "true"
       cert-manager.io/issuer: "letsencrypt-production"
     # --- separateGrpcIngress puts GRPC routes into a separate ingress if true. Required for certain ingress controllers like nginx.

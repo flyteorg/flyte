@@ -409,6 +409,9 @@ common:
   ingress:
     # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
+    # --- Specify the IngressClass corresponding to your Ingress controller. This is useful for automated certificate generation, among other use cases. 
+    # --- https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/#using-multiple-ingress-controllers
+    ingressClassName: ""
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
     webpackHMR: false
     # --- separateGrpcIngress puts GRPC routes into a separate ingress if true. Required for certain ingress controllers like nginx.
