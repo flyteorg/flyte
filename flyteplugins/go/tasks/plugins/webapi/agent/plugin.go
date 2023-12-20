@@ -122,7 +122,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		resource.Message = res.GetResource().Message
 		resource.LogLinks = res.GetResource().LogLinks
 	} else {
-		logger.Infof(ctx, "Agent returned no resource, assuming this is an asynchronous task.")
+		logger.Infof(ctx, "If this is a synchronous task, the agent should return a resource.")
 	}
 
 	return ResourceMetaWrapper{
