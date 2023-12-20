@@ -663,7 +663,6 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 	}
 	literalMap := convertMapToArrayLiterals(inputValues)
 
-	// HAMERSAW
 	tests := []struct {
 		name               string
 		defaultMaxAttempts int32
