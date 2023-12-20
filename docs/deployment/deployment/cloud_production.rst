@@ -27,15 +27,15 @@ To turn on ingress, update your ``values.yaml`` file to include the following bl
    
    .. group-tab:: ``flyte-binary`` on EKS using NGINX
 
-      .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
-         :caption: charts/flyte-binary/eks-production.yaml
+      .. literalinclude:: ../../../charts/flyte-binary/eks-starter.yaml
+         :caption: charts/flyte-binary/eks-starter.yaml
          :language: yaml
-         :lines: 93-102 
+         :lines: 94-102 
 
    .. group-tab:: ``flyte-binary``/ on EKS using ALB 
 
-      .. literalinclude:: ../../../charts/flyte-binary/eks-production.yaml
-         :caption: charts/flyte-binary/eks-production.yaml
+      .. literalinclude:: ../../../charts/flyte-binary/eks-starter.yaml
+         :caption: charts/flyte-binary/eks-starter.yaml
          :language: yaml
          :lines: 106-118 
      
