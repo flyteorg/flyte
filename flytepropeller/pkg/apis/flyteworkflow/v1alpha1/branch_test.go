@@ -1,12 +1,10 @@
 package v1alpha1
 
 import (
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"testing"
 
-	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -25,25 +23,6 @@ func TestMarshalUnMarshal_BranchTask(t *testing.T) {
 	if assert.NoError(t, err) {
 		assert.NotEmpty(t, raw)
 	}
-}
-
-// TestBranchNodeSpecMethods tests the methods of the BranchNodeSpec struct.
-func TestErrorMarshalAndUnmarshalJSON(t *testing.T) {
-	coreError := &core.Error{
-		FailedNodeId: "TestNode",
-		Message:      "Test error message",
-	}
-
-	err := Error{Error: coreError}
-	data, jErr := err.MarshalJSON()
-	assert.Nil(t, jErr)
-
-	// Unmarshalling the JSON back to a new core.Error struct
-	var newCoreError core.Error
-	uErr := jsonpb.Unmarshal(bytes.NewReader(data), &newCoreError)
-	assert.Nil(t, uErr)
-	assert.Equal(t, coreError.Message, newCoreError.Message)
-	assert.Equal(t, coreError.FailedNodeId, newCoreError.FailedNodeId)
 }
 
 func TestBranchNodeSpecMethods(t *testing.T) {
@@ -76,7 +55,7 @@ func TestBranchNodeSpecMethods(t *testing.T) {
 			},
 		},
 		Else:     &elseNode,
-		ElseFail: &Error{Error: errorMessage},
+		ElseFail: errorMessage,
 	}
 
 	assert.Equal(t, boolExpr, branchNodeSpec.If.GetCondition())

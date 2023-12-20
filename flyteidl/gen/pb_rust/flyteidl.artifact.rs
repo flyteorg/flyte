@@ -129,9 +129,6 @@ pub struct FindByWorkflowExecRequest {
     pub exec_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
     #[prost(enumeration="find_by_workflow_exec_request::Direction", tag="2")]
     pub direction: i32,
-    /// If set to true, actually fetch the artifact body. By default only the IDs are returned.
-    #[prost(bool, tag="3")]
-    pub fetch_specs: bool,
 }
 /// Nested message and enum types in `FindByWorkflowExecRequest`.
 pub mod find_by_workflow_exec_request {

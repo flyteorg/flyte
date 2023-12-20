@@ -37,9 +37,10 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	State   admin.State
-	Outputs *flyteIdl.LiteralMap
-	Message string
+	State    admin.State
+	Outputs  *flyteIdl.LiteralMap
+	Message  string
+	LogLinks []*flyteIdl.TaskLog
 }
 
 type ResourceMetaWrapper struct {
@@ -140,9 +141,10 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	}
 
 	return ResourceWrapper{
-		State:   res.Resource.State,
-		Outputs: res.Resource.Outputs,
-		Message: res.Resource.Message,
+		State:    res.Resource.State,
+		Outputs:  res.Resource.Outputs,
+		Message:  res.Resource.Message,
+		LogLinks: res.LogLinks,
 	}, nil
 }
 
@@ -170,7 +172,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
-	taskInfo := &core.TaskInfo{}
+	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
 	switch resource.State {
 	case admin.State_PENDING:

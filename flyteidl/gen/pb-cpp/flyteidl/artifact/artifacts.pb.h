@@ -1812,12 +1812,6 @@ class FindByWorkflowExecRequest final :
   ::flyteidl::artifact::FindByWorkflowExecRequest_Direction direction() const;
   void set_direction(::flyteidl::artifact::FindByWorkflowExecRequest_Direction value);
 
-  // bool fetch_specs = 3;
-  void clear_fetch_specs();
-  static const int kFetchSpecsFieldNumber = 3;
-  bool fetch_specs() const;
-  void set_fetch_specs(bool value);
-
   // @@protoc_insertion_point(class_scope:flyteidl.artifact.FindByWorkflowExecRequest)
  private:
   class HasBitSetters;
@@ -1825,7 +1819,6 @@ class FindByWorkflowExecRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::core::WorkflowExecutionIdentifier* exec_id_;
   int direction_;
-  bool fetch_specs_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifact_2fartifacts_2eproto;
 };
@@ -4969,20 +4962,6 @@ inline void FindByWorkflowExecRequest::set_direction(::flyteidl::artifact::FindB
   
   direction_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.artifact.FindByWorkflowExecRequest.direction)
-}
-
-// bool fetch_specs = 3;
-inline void FindByWorkflowExecRequest::clear_fetch_specs() {
-  fetch_specs_ = false;
-}
-inline bool FindByWorkflowExecRequest::fetch_specs() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.FindByWorkflowExecRequest.fetch_specs)
-  return fetch_specs_;
-}
-inline void FindByWorkflowExecRequest::set_fetch_specs(bool value) {
-  
-  fetch_specs_ = value;
-  // @@protoc_insertion_point(field_set:flyteidl.artifact.FindByWorkflowExecRequest.fetch_specs)
 }
 
 // -------------------------------------------------------------------

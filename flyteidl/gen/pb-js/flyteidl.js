@@ -14234,6 +14234,7 @@
                  * @property {boolean|null} [generatesDeck] TaskMetadata generatesDeck
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
+                 * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
                  */
     
                 /**
@@ -14246,6 +14247,7 @@
                  */
                 function TaskMetadata(properties) {
                     this.tags = {};
+                    this.cacheIgnoreInputVars = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -14340,6 +14342,14 @@
                  */
                 TaskMetadata.prototype.podTemplateName = "";
     
+                /**
+                 * TaskMetadata cacheIgnoreInputVars.
+                 * @member {Array.<string>} cacheIgnoreInputVars
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.cacheIgnoreInputVars = $util.emptyArray;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -14401,6 +14411,9 @@
                             writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
                     if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
                         writer.uint32(/* id 12, wireType 2 =*/98).string(message.podTemplateName);
+                    if (message.cacheIgnoreInputVars != null && message.cacheIgnoreInputVars.length)
+                        for (var i = 0; i < message.cacheIgnoreInputVars.length; ++i)
+                            writer.uint32(/* id 13, wireType 2 =*/106).string(message.cacheIgnoreInputVars[i]);
                     return writer;
                 };
     
@@ -14459,6 +14472,11 @@
                             break;
                         case 12:
                             message.podTemplateName = reader.string();
+                            break;
+                        case 13:
+                            if (!(message.cacheIgnoreInputVars && message.cacheIgnoreInputVars.length))
+                                message.cacheIgnoreInputVars = [];
+                            message.cacheIgnoreInputVars.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -14526,6 +14544,13 @@
                     if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
                         if (!$util.isString(message.podTemplateName))
                             return "podTemplateName: string expected";
+                    if (message.cacheIgnoreInputVars != null && message.hasOwnProperty("cacheIgnoreInputVars")) {
+                        if (!Array.isArray(message.cacheIgnoreInputVars))
+                            return "cacheIgnoreInputVars: array expected";
+                        for (var i = 0; i < message.cacheIgnoreInputVars.length; ++i)
+                            if (!$util.isString(message.cacheIgnoreInputVars[i]))
+                                return "cacheIgnoreInputVars: string[] expected";
+                    }
                     return null;
                 };
     
@@ -22157,6 +22182,7 @@
                  * @memberof flyteidl.admin
                  * @interface IGetTaskResponse
                  * @property {flyteidl.admin.IResource|null} [resource] GetTaskResponse resource
+                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] GetTaskResponse logLinks
                  */
     
                 /**
@@ -22168,6 +22194,7 @@
                  * @param {flyteidl.admin.IGetTaskResponse=} [properties] Properties to set
                  */
                 function GetTaskResponse(properties) {
+                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -22181,6 +22208,14 @@
                  * @instance
                  */
                 GetTaskResponse.prototype.resource = null;
+    
+                /**
+                 * GetTaskResponse logLinks.
+                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
+                 * @memberof flyteidl.admin.GetTaskResponse
+                 * @instance
+                 */
+                GetTaskResponse.prototype.logLinks = $util.emptyArray;
     
                 /**
                  * Creates a new GetTaskResponse instance using the specified properties.
@@ -22208,6 +22243,9 @@
                         writer = $Writer.create();
                     if (message.resource != null && message.hasOwnProperty("resource"))
                         $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.logLinks != null && message.logLinks.length)
+                        for (var i = 0; i < message.logLinks.length; ++i)
+                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -22232,6 +22270,11 @@
                         case 1:
                             message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
                             break;
+                        case 2:
+                            if (!(message.logLinks && message.logLinks.length))
+                                message.logLinks = [];
+                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -22255,6 +22298,15 @@
                         var error = $root.flyteidl.admin.Resource.verify(message.resource);
                         if (error)
                             return "resource." + error;
+                    }
+                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
+                        if (!Array.isArray(message.logLinks))
+                            return "logLinks: array expected";
+                        for (var i = 0; i < message.logLinks.length; ++i) {
+                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
+                            if (error)
+                                return "logLinks." + error;
+                        }
                     }
                     return null;
                 };

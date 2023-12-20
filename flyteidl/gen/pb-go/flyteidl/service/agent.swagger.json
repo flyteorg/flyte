@@ -163,6 +163,15 @@
         }
       }
     },
+    "TaskLogMessageFormat": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CSV",
+        "JSON"
+      ],
+      "default": "UNKNOWN"
+    },
     "adminCreateTaskResponse": {
       "type": "object",
       "properties": {
@@ -183,6 +192,13 @@
       "properties": {
         "resource": {
           "$ref": "#/definitions/adminResource"
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
         }
       },
       "description": "Response to get an individual task resource."
@@ -1048,6 +1064,24 @@
       },
       "description": "Encapsulation of fields that identify a Flyte task execution entity."
     },
+    "coreTaskLog": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "message_format": {
+          "$ref": "#/definitions/TaskLogMessageFormat"
+        },
+        "ttl": {
+          "type": "string"
+        }
+      },
+      "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
+    },
     "coreTaskMetadata": {
       "type": "object",
       "properties": {
@@ -1100,6 +1134,13 @@
         "pod_template_name": {
           "type": "string",
           "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
+        },
+        "cache_ignore_input_vars": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
         }
       },
       "title": "Task Metadata"

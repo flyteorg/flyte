@@ -145,3 +145,5 @@ You can check the status of the deployment pods by running the following command
 .. code-block::
 
   kubectl get pods -n flyte
+
+For sensor plugin on the Flyte cluster, please refer to `Sensor Plugin Example <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/sensor_plugin/index.html>`_

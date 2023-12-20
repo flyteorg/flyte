@@ -1175,8 +1175,14 @@ func TestDemystifyPending(t *testing.T) {
 		CreateContainerErrorGracePeriod: config1.Duration{
 			Duration: time.Minute * 3,
 		},
+		CreateContainerConfigErrorGracePeriod: config1.Duration{
+			Duration: time.Minute * 4,
+		},
 		ImagePullBackoffGracePeriod: config1.Duration{
 			Duration: time.Minute * 3,
+		},
+		PodPendingTimeout: config1.Duration{
+			Duration: 0,
 		},
 	}))
 
@@ -1345,6 +1351,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("InvalidImageName", func(t *testing.T) {
@@ -1362,6 +1369,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("RegistryUnavailable", func(t *testing.T) {
@@ -1379,6 +1387,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("RandomError", func(t *testing.T) {
@@ -1396,23 +1405,46 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
-	t.Run("CreateContainerConfigError", func(t *testing.T) {
-		s.ContainerStatuses = []v1.ContainerStatus{
+	t.Run("CreateContainerConfigErrorWithinGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime = metav1.Now()
+		s2.ContainerStatuses = []v1.ContainerStatus{
 			{
 				Ready: false,
 				State: v1.ContainerState{
 					Waiting: &v1.ContainerStateWaiting{
 						Reason:  "CreateContainerConfigError",
-						Message: "this an error",
+						Message: "this is a transient error",
 					},
 				},
 			},
 		}
-		taskStatus, err := DemystifyPending(s)
+		taskStatus, err := DemystifyPending(s2)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, taskStatus.Phase())
+	})
+
+	t.Run("CreateContainerConfigErrorOutsideGracePeriod", func(t *testing.T) {
+		s2 := *s.DeepCopy()
+		s2.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration)
+		s2.ContainerStatuses = []v1.ContainerStatus{
+			{
+				Ready: false,
+				State: v1.ContainerState{
+					Waiting: &v1.ContainerStateWaiting{
+						Reason:  "CreateContainerConfigError",
+						Message: "this a permanent error",
+					},
+				},
+			},
+		}
+		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("CreateContainerErrorWithinGracePeriod", func(t *testing.T) {
@@ -1451,6 +1483,40 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
+	})
+}
+
+func TestDemystifyPendingTimeout(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		CreateContainerErrorGracePeriod: config1.Duration{
+			Duration: time.Minute * 3,
+		},
+		ImagePullBackoffGracePeriod: config1.Duration{
+			Duration: time.Minute * 3,
+		},
+		PodPendingTimeout: config1.Duration{
+			Duration: 10,
+		},
+	}))
+
+	s := v1.PodStatus{
+		Phase: v1.PodPending,
+		Conditions: []v1.PodCondition{
+			{
+				Type:   v1.PodScheduled,
+				Status: v1.ConditionFalse,
+			},
+		},
+	}
+	s.Conditions[0].LastTransitionTime.Time = metav1.Now().Add(-config.GetK8sPluginConfig().PodPendingTimeout.Duration)
+
+	t.Run("PodPendingExceedsTimeout", func(t *testing.T) {
+		taskStatus, err := DemystifyPending(s)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().Code)
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 }
 
@@ -1583,7 +1649,7 @@ func TestDemystifyPending_testcases(t *testing.T) {
 		errCode  string
 		message  string
 	}{
-		{"ImagePullBackOff", "imagepull-failurepod.json", false, "ContainersNotReady|ImagePullBackOff", "containers with unready status: [fdf98e4ed2b524dc3bf7-get-flyte-id-task-0]|Back-off pulling image \"image\""},
+		{"ImagePullBackOff", "imagepull-failurepod.json", false, "ContainersNotReady|ImagePullBackOff", "Grace period [3m0s] exceeded|containers with unready status: [fdf98e4ed2b524dc3bf7-get-flyte-id-task-0]|Back-off pulling image \"image\""},
 	}
 
 	for _, tt := range tests {

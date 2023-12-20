@@ -10545,15 +10545,6 @@ public final class Artifacts {
      * <code>.flyteidl.artifact.FindByWorkflowExecRequest.Direction direction = 2;</code>
      */
     flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction getDirection();
-
-    /**
-     * <pre>
-     * If set to true, actually fetch the artifact body. By default only the IDs are returned.
-     * </pre>
-     *
-     * <code>bool fetch_specs = 3;</code>
-     */
-    boolean getFetchSpecs();
   }
   /**
    * Protobuf type {@code flyteidl.artifact.FindByWorkflowExecRequest}
@@ -10612,11 +10603,6 @@ public final class Artifacts {
               int rawValue = input.readEnum();
 
               direction_ = rawValue;
-              break;
-            }
-            case 24: {
-
-              fetchSpecs_ = input.readBool();
               break;
             }
             default: {
@@ -10787,19 +10773,6 @@ public final class Artifacts {
       return result == null ? flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction.UNRECOGNIZED : result;
     }
 
-    public static final int FETCH_SPECS_FIELD_NUMBER = 3;
-    private boolean fetchSpecs_;
-    /**
-     * <pre>
-     * If set to true, actually fetch the artifact body. By default only the IDs are returned.
-     * </pre>
-     *
-     * <code>bool fetch_specs = 3;</code>
-     */
-    public boolean getFetchSpecs() {
-      return fetchSpecs_;
-    }
-
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10820,9 +10793,6 @@ public final class Artifacts {
       if (direction_ != flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction.INPUTS.getNumber()) {
         output.writeEnum(2, direction_);
       }
-      if (fetchSpecs_ != false) {
-        output.writeBool(3, fetchSpecs_);
-      }
       unknownFields.writeTo(output);
     }
 
@@ -10839,10 +10809,6 @@ public final class Artifacts {
       if (direction_ != flyteidl.artifact.Artifacts.FindByWorkflowExecRequest.Direction.INPUTS.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, direction_);
-      }
-      if (fetchSpecs_ != false) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, fetchSpecs_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -10865,8 +10831,6 @@ public final class Artifacts {
             .equals(other.getExecId())) return false;
       }
       if (direction_ != other.direction_) return false;
-      if (getFetchSpecs()
-          != other.getFetchSpecs()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -10884,9 +10848,6 @@ public final class Artifacts {
       }
       hash = (37 * hash) + DIRECTION_FIELD_NUMBER;
       hash = (53 * hash) + direction_;
-      hash = (37 * hash) + FETCH_SPECS_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getFetchSpecs());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -11028,8 +10989,6 @@ public final class Artifacts {
         }
         direction_ = 0;
 
-        fetchSpecs_ = false;
-
         return this;
       }
 
@@ -11062,7 +11021,6 @@ public final class Artifacts {
           result.execId_ = execIdBuilder_.build();
         }
         result.direction_ = direction_;
-        result.fetchSpecs_ = fetchSpecs_;
         onBuilt();
         return result;
       }
@@ -11116,9 +11074,6 @@ public final class Artifacts {
         }
         if (other.direction_ != 0) {
           setDirectionValue(other.getDirectionValue());
-        }
-        if (other.getFetchSpecs() != false) {
-          setFetchSpecs(other.getFetchSpecs());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -11307,44 +11262,6 @@ public final class Artifacts {
       public Builder clearDirection() {
         
         direction_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private boolean fetchSpecs_ ;
-      /**
-       * <pre>
-       * If set to true, actually fetch the artifact body. By default only the IDs are returned.
-       * </pre>
-       *
-       * <code>bool fetch_specs = 3;</code>
-       */
-      public boolean getFetchSpecs() {
-        return fetchSpecs_;
-      }
-      /**
-       * <pre>
-       * If set to true, actually fetch the artifact body. By default only the IDs are returned.
-       * </pre>
-       *
-       * <code>bool fetch_specs = 3;</code>
-       */
-      public Builder setFetchSpecs(boolean value) {
-        
-        fetchSpecs_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * If set to true, actually fetch the artifact body. By default only the IDs are returned.
-       * </pre>
-       *
-       * <code>bool fetch_specs = 3;</code>
-       */
-      public Builder clearFetchSpecs() {
-        
-        fetchSpecs_ = false;
         onChanged();
         return this;
       }
@@ -20073,81 +19990,81 @@ public final class Artifacts {
       "rchOptions\022\r\n\005token\030\006 \001(\t\022\r\n\005limit\030\007 \001(\005" +
       "\"X\n\027SearchArtifactsResponse\022.\n\tartifacts" +
       "\030\001 \003(\0132\033.flyteidl.artifact.Artifact\022\r\n\005t" +
-      "oken\030\002 \001(\t\"\336\001\n\031FindByWorkflowExecRequest" +
+      "oken\030\002 \001(\t\"\311\001\n\031FindByWorkflowExecRequest" +
       "\022;\n\007exec_id\030\001 \001(\0132*.flyteidl.core.Workfl" +
       "owExecutionIdentifier\022I\n\tdirection\030\002 \001(\016" +
       "26.flyteidl.artifact.FindByWorkflowExecR" +
-      "equest.Direction\022\023\n\013fetch_specs\030\003 \001(\010\"$\n" +
-      "\tDirection\022\n\n\006INPUTS\020\000\022\013\n\007OUTPUTS\020\001\"a\n\rA" +
-      "ddTagRequest\022.\n\013artifact_id\030\001 \001(\0132\031.flyt" +
-      "eidl.core.ArtifactID\022\r\n\005value\030\002 \001(\t\022\021\n\to" +
-      "verwrite\030\003 \001(\010\"\020\n\016AddTagResponse\"O\n\024Crea" +
-      "teTriggerRequest\0227\n\023trigger_launch_plan\030" +
-      "\001 \001(\0132\032.flyteidl.admin.LaunchPlan\"\027\n\025Cre" +
-      "ateTriggerResponse\"E\n\024DeleteTriggerReque" +
-      "st\022-\n\ntrigger_id\030\001 \001(\0132\031.flyteidl.core.I" +
-      "dentifier\"\027\n\025DeleteTriggerResponse\"m\n\020Ar" +
-      "tifactProducer\022,\n\tentity_id\030\001 \001(\0132\031.flyt" +
-      "eidl.core.Identifier\022+\n\007outputs\030\002 \001(\0132\032." +
-      "flyteidl.core.VariableMap\"Q\n\027RegisterPro" +
-      "ducerRequest\0226\n\tproducers\030\001 \003(\0132#.flytei" +
-      "dl.artifact.ArtifactProducer\"m\n\020Artifact" +
-      "Consumer\022,\n\tentity_id\030\001 \001(\0132\031.flyteidl.c" +
-      "ore.Identifier\022+\n\006inputs\030\002 \001(\0132\033.flyteid" +
-      "l.core.ParameterMap\"Q\n\027RegisterConsumerR" +
-      "equest\0226\n\tconsumers\030\001 \003(\0132#.flyteidl.art" +
-      "ifact.ArtifactConsumer\"\022\n\020RegisterRespon" +
-      "se\"\205\001\n\026ExecutionInputsRequest\022@\n\014executi" +
-      "on_id\030\001 \001(\0132*.flyteidl.core.WorkflowExec" +
-      "utionIdentifier\022)\n\006inputs\030\002 \003(\0132\031.flytei" +
-      "dl.core.ArtifactID\"\031\n\027ExecutionInputsRes" +
-      "ponse2\365\r\n\020ArtifactRegistry\022g\n\016CreateArti" +
-      "fact\022(.flyteidl.artifact.CreateArtifactR" +
-      "equest\032).flyteidl.artifact.CreateArtifac" +
-      "tResponse\"\000\022\315\004\n\013GetArtifact\022%.flyteidl.a" +
-      "rtifact.GetArtifactRequest\032&.flyteidl.ar" +
-      "tifact.GetArtifactResponse\"\356\003\202\323\344\223\002\347\003\022\022/d" +
-      "ata/v1/artifactsZ\252\001\022\247\001/data/v1/artifact/" +
-      "id/{query.artifact_id.artifact_key.proje" +
-      "ct}/{query.artifact_id.artifact_key.doma" +
-      "in}/{query.artifact_id.artifact_key.name" +
-      "}/{query.artifact_id.version}Z\216\001\022\213\001/data" +
-      "/v1/artifact/id/{query.artifact_id.artif" +
-      "act_key.project}/{query.artifact_id.arti" +
-      "fact_key.domain}/{query.artifact_id.arti" +
-      "fact_key.name}Z\222\001\022\217\001/data/v1/artifact/ta" +
-      "g/{query.artifact_tag.artifact_key.proje" +
-      "ct}/{query.artifact_tag.artifact_key.dom" +
-      "ain}/{query.artifact_tag.artifact_key.na" +
-      "me}\022\204\002\n\017SearchArtifacts\022).flyteidl.artif" +
-      "act.SearchArtifactsRequest\032*.flyteidl.ar" +
-      "tifact.SearchArtifactsResponse\"\231\001\202\323\344\223\002\222\001" +
-      "\022Q/data/v1/query/s/{artifact_key.project" +
-      "}/{artifact_key.domain}/{artifact_key.na" +
-      "me}Z=\022;/data/v1/query/{artifact_key.proj" +
-      "ect}/{artifact_key.domain}\022d\n\rCreateTrig" +
-      "ger\022\'.flyteidl.artifact.CreateTriggerReq" +
-      "uest\032(.flyteidl.artifact.CreateTriggerRe" +
-      "sponse\"\000\022d\n\rDeleteTrigger\022\'.flyteidl.art" +
-      "ifact.DeleteTriggerRequest\032(.flyteidl.ar" +
-      "tifact.DeleteTriggerResponse\"\000\022O\n\006AddTag" +
-      "\022 .flyteidl.artifact.AddTagRequest\032!.fly" +
-      "teidl.artifact.AddTagResponse\"\000\022e\n\020Regis" +
-      "terProducer\022*.flyteidl.artifact.Register" +
-      "ProducerRequest\032#.flyteidl.artifact.Regi" +
-      "sterResponse\"\000\022e\n\020RegisterConsumer\022*.fly" +
-      "teidl.artifact.RegisterConsumerRequest\032#" +
-      ".flyteidl.artifact.RegisterResponse\"\000\022m\n" +
-      "\022SetExecutionInputs\022).flyteidl.artifact." +
-      "ExecutionInputsRequest\032*.flyteidl.artifa" +
-      "ct.ExecutionInputsResponse\"\000\022\306\001\n\022FindByW" +
-      "orkflowExec\022,.flyteidl.artifact.FindByWo" +
-      "rkflowExecRequest\032*.flyteidl.artifact.Se" +
-      "archArtifactsResponse\"V\202\323\344\223\002P\022N/data/v1/" +
-      "query/e/{exec_id.project}/{exec_id.domai" +
-      "n}/{exec_id.name}/{direction}B@Z>github." +
-      "com/flyteorg/flyte/flyteidl/gen/pb-go/fl" +
-      "yteidl/artifactb\006proto3"
+      "equest.Direction\"$\n\tDirection\022\n\n\006INPUTS\020" +
+      "\000\022\013\n\007OUTPUTS\020\001\"a\n\rAddTagRequest\022.\n\013artif" +
+      "act_id\030\001 \001(\0132\031.flyteidl.core.ArtifactID\022" +
+      "\r\n\005value\030\002 \001(\t\022\021\n\toverwrite\030\003 \001(\010\"\020\n\016Add" +
+      "TagResponse\"O\n\024CreateTriggerRequest\0227\n\023t" +
+      "rigger_launch_plan\030\001 \001(\0132\032.flyteidl.admi" +
+      "n.LaunchPlan\"\027\n\025CreateTriggerResponse\"E\n" +
+      "\024DeleteTriggerRequest\022-\n\ntrigger_id\030\001 \001(" +
+      "\0132\031.flyteidl.core.Identifier\"\027\n\025DeleteTr" +
+      "iggerResponse\"m\n\020ArtifactProducer\022,\n\tent" +
+      "ity_id\030\001 \001(\0132\031.flyteidl.core.Identifier\022" +
+      "+\n\007outputs\030\002 \001(\0132\032.flyteidl.core.Variabl" +
+      "eMap\"Q\n\027RegisterProducerRequest\0226\n\tprodu" +
+      "cers\030\001 \003(\0132#.flyteidl.artifact.ArtifactP" +
+      "roducer\"m\n\020ArtifactConsumer\022,\n\tentity_id" +
+      "\030\001 \001(\0132\031.flyteidl.core.Identifier\022+\n\006inp" +
+      "uts\030\002 \001(\0132\033.flyteidl.core.ParameterMap\"Q" +
+      "\n\027RegisterConsumerRequest\0226\n\tconsumers\030\001" +
+      " \003(\0132#.flyteidl.artifact.ArtifactConsume" +
+      "r\"\022\n\020RegisterResponse\"\205\001\n\026ExecutionInput" +
+      "sRequest\022@\n\014execution_id\030\001 \001(\0132*.flyteid" +
+      "l.core.WorkflowExecutionIdentifier\022)\n\006in" +
+      "puts\030\002 \003(\0132\031.flyteidl.core.ArtifactID\"\031\n" +
+      "\027ExecutionInputsResponse2\365\r\n\020ArtifactReg" +
+      "istry\022g\n\016CreateArtifact\022(.flyteidl.artif" +
+      "act.CreateArtifactRequest\032).flyteidl.art" +
+      "ifact.CreateArtifactResponse\"\000\022\315\004\n\013GetAr" +
+      "tifact\022%.flyteidl.artifact.GetArtifactRe" +
+      "quest\032&.flyteidl.artifact.GetArtifactRes" +
+      "ponse\"\356\003\202\323\344\223\002\347\003\022\022/data/v1/artifactsZ\252\001\022\247" +
+      "\001/data/v1/artifact/id/{query.artifact_id" +
+      ".artifact_key.project}/{query.artifact_i" +
+      "d.artifact_key.domain}/{query.artifact_i" +
+      "d.artifact_key.name}/{query.artifact_id." +
+      "version}Z\216\001\022\213\001/data/v1/artifact/id/{quer" +
+      "y.artifact_id.artifact_key.project}/{que" +
+      "ry.artifact_id.artifact_key.domain}/{que" +
+      "ry.artifact_id.artifact_key.name}Z\222\001\022\217\001/" +
+      "data/v1/artifact/tag/{query.artifact_tag" +
+      ".artifact_key.project}/{query.artifact_t" +
+      "ag.artifact_key.domain}/{query.artifact_" +
+      "tag.artifact_key.name}\022\204\002\n\017SearchArtifac" +
+      "ts\022).flyteidl.artifact.SearchArtifactsRe" +
+      "quest\032*.flyteidl.artifact.SearchArtifact" +
+      "sResponse\"\231\001\202\323\344\223\002\222\001\022Q/data/v1/query/s/{a" +
+      "rtifact_key.project}/{artifact_key.domai" +
+      "n}/{artifact_key.name}Z=\022;/data/v1/query" +
+      "/{artifact_key.project}/{artifact_key.do" +
+      "main}\022d\n\rCreateTrigger\022\'.flyteidl.artifa" +
+      "ct.CreateTriggerRequest\032(.flyteidl.artif" +
+      "act.CreateTriggerResponse\"\000\022d\n\rDeleteTri" +
+      "gger\022\'.flyteidl.artifact.DeleteTriggerRe" +
+      "quest\032(.flyteidl.artifact.DeleteTriggerR" +
+      "esponse\"\000\022O\n\006AddTag\022 .flyteidl.artifact." +
+      "AddTagRequest\032!.flyteidl.artifact.AddTag" +
+      "Response\"\000\022e\n\020RegisterProducer\022*.flyteid" +
+      "l.artifact.RegisterProducerRequest\032#.fly" +
+      "teidl.artifact.RegisterResponse\"\000\022e\n\020Reg" +
+      "isterConsumer\022*.flyteidl.artifact.Regist" +
+      "erConsumerRequest\032#.flyteidl.artifact.Re" +
+      "gisterResponse\"\000\022m\n\022SetExecutionInputs\022)" +
+      ".flyteidl.artifact.ExecutionInputsReques" +
+      "t\032*.flyteidl.artifact.ExecutionInputsRes" +
+      "ponse\"\000\022\306\001\n\022FindByWorkflowExec\022,.flyteid" +
+      "l.artifact.FindByWorkflowExecRequest\032*.f" +
+      "lyteidl.artifact.SearchArtifactsResponse" +
+      "\"V\202\323\344\223\002P\022N/data/v1/query/e/{exec_id.proj" +
+      "ect}/{exec_id.domain}/{exec_id.name}/{di" +
+      "rection}B@Z>github.com/flyteorg/flyte/fl" +
+      "yteidl/gen/pb-go/flyteidl/artifactb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20241,7 +20158,7 @@ public final class Artifacts {
     internal_static_flyteidl_artifact_FindByWorkflowExecRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_artifact_FindByWorkflowExecRequest_descriptor,
-        new java.lang.String[] { "ExecId", "Direction", "FetchSpecs", });
+        new java.lang.String[] { "ExecId", "Direction", });
     internal_static_flyteidl_artifact_AddTagRequest_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_artifact_AddTagRequest_fieldAccessorTable = new

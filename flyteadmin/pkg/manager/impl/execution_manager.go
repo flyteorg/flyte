@@ -1154,26 +1154,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
 	}
 
-	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
-	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
-		Namespace:                namespace,
-		ExecutionID:              &workflowExecutionID,
-		ReferenceWorkflowName:    workflow.Id.Name,
-		ReferenceLaunchPlanName:  launchPlan.Id.Name,
-		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
-		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
-		ExecutionParameters:      executionParameters,
-	})
-
-	if err != nil {
-		m.systemMetrics.PropellerFailures.Inc()
-		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
-			request, workflowExecutionID, executionInputs, err)
-		return nil, nil, err
-	}
 	executionCreatedAt := time.Now()
 	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
-	m.systemMetrics.AcceptanceDelay.Observe(acceptanceDelay.Seconds())
 
 	// Request notification settings takes precedence over the launch plan settings.
 	// If there is no notification in the request and DisableAll is not true, use the settings from the launch plan.
@@ -1194,7 +1176,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		m.publishExecutionStart(ctx, workflowExecutionID, request.Spec.LaunchPlan, workflow.Id, artifactTrackers, usedArtifactIDs)
 	}
 
-	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
+	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
 		LaunchPlanID:        launchPlanModel.ID,
@@ -1206,13 +1188,34 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		WorkflowIdentifier:    workflow.Id,
 		ParentNodeExecutionID: parentNodeExecutionID,
 		SourceExecutionID:     sourceExecutionID,
-		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
 		SecurityContext:       executionConfig.SecurityContext,
 		LaunchEntity:          launchPlan.Id.ResourceType,
 		Namespace:             namespace,
+	}
+
+	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
+	execInfo, execErr := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
+		Namespace:                namespace,
+		ExecutionID:              &workflowExecutionID,
+		ReferenceWorkflowName:    workflow.Id.Name,
+		ReferenceLaunchPlanName:  launchPlan.Id.Name,
+		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
+		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
+		ExecutionParameters:      executionParameters,
 	})
+	if execErr != nil {
+		createExecModelInput.Error = execErr
+		m.systemMetrics.PropellerFailures.Inc()
+		logger.Infof(ctx, "failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
+			request, workflowExecutionID, executionInputs, execErr)
+	} else {
+		m.systemMetrics.AcceptanceDelay.Observe(acceptanceDelay.Seconds())
+		createExecModelInput.Cluster = execInfo.Cluster
+	}
+
+	executionModel, err := transformers.CreateExecutionModel(createExecModelInput)
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
 			workflowExecutionID, err)

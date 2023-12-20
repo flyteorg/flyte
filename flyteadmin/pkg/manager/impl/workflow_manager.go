@@ -149,7 +149,7 @@ func (w *WorkflowManager) CreateWorkflow(
 	workflowClosure, err := w.getCompiledWorkflow(ctx, finalizedRequest)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to compile workflow with err: %v", err)
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to compile workflow for [%+v] with err %v", request.Id, err)
 	}
 	err = validation.ValidateCompiledWorkflow(
