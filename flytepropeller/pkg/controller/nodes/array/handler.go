@@ -208,7 +208,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		maxSystemFailuresValue := int(config.GetConfig().NodeConfig.MaxNodeRetriesOnSystemFailures)
 		maxAttemptsValue := int(config.GetConfig().NodeConfig.DefaultMaxAttempts)
 		if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 1 {
-			maxAttemptsValue = int(*nCtx.Node().GetRetryStrategy().MinAttempts)
+			maxAttemptsValue = *nCtx.Node().GetRetryStrategy().MinAttempts
 		}
 
 		if config.GetConfig().NodeConfig.IgnoreRetryCause {

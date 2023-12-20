@@ -655,7 +655,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 }
 
 func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
-    ctx := context.Background()
+	ctx := context.Background()
 
 	inputValues := map[string][]int64{
 		"foo": []int64{1},
@@ -664,7 +664,7 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 	literalMap := convertMapToArrayLiterals(inputValues)
 
 	// HAMERSAW
-	tests := []struct{
+	tests := []struct {
 		name               string
 		defaultMaxAttempts int32
 		maxSystemFailures  int64
@@ -677,36 +677,36 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 			defaultMaxAttempts: 3,
 			maxSystemFailures:  10,
 			ignoreRetryCause:   false,
-			transition:         handler.DoTransition(handler.TransitionTypeEphemeral,
+			transition: handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoRetryableFailure(idlcore.ExecutionError_USER, "", "", &handler.ExecutionInfo{})),
-			expectedAttempts:   3,
+			expectedAttempts: 3,
 		},
 		{
 			name:               "SystemFailure",
 			defaultMaxAttempts: 3,
 			maxSystemFailures:  10,
 			ignoreRetryCause:   false,
-			transition:         handler.DoTransition(handler.TransitionTypeEphemeral,
+			transition: handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoRetryableFailure(idlcore.ExecutionError_SYSTEM, "", "", &handler.ExecutionInfo{})),
-			expectedAttempts:   11,
+			expectedAttempts: 11,
 		},
 		{
 			name:               "UserFailureIgnoreRetryCause",
 			defaultMaxAttempts: 3,
 			maxSystemFailures:  10,
 			ignoreRetryCause:   true,
-			transition:         handler.DoTransition(handler.TransitionTypeEphemeral,
+			transition: handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoRetryableFailure(idlcore.ExecutionError_USER, "", "", &handler.ExecutionInfo{})),
-			expectedAttempts:   3,
+			expectedAttempts: 3,
 		},
 		{
 			name:               "SystemFailureIgnoreRetryCause",
 			defaultMaxAttempts: 3,
 			maxSystemFailures:  10,
 			ignoreRetryCause:   true,
-			transition:         handler.DoTransition(handler.TransitionTypeEphemeral,
+			transition: handler.DoTransition(handler.TransitionTypeEphemeral,
 				handler.PhaseInfoRetryableFailure(idlcore.ExecutionError_SYSTEM, "", "", &handler.ExecutionInfo{})),
-			expectedAttempts:   3,
+			expectedAttempts: 3,
 		},
 	}
 
@@ -721,6 +721,7 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 			dataStore, err := storage.NewDataStore(&storage.Config{
 				Type: storage.TypeMemory,
 			}, scope)
+			assert.NoError(t, err)
 			eventRecorder := newBufferedEventRecorder()
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseNone,
@@ -758,7 +759,7 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 				assert.NoError(t, err)
 
 				if arrayNodeState.Phase == v1alpha1.ArrayNodePhaseFailing {
-					break;
+					break
 				}
 
 				// failing a task requires two calls to Handle, the first to return a
@@ -773,7 +774,6 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 		})
 	}
 }
-
 
 func TestHandleArrayNodePhaseSucceeding(t *testing.T) {
 	ctx := context.Background()
