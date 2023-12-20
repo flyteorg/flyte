@@ -198,7 +198,7 @@ func TestInitializeAgentRegistry(t *testing.T) {
 		},
 	}
 
-	mockClient.On("ListAgent", mock.Anything, mockRequest).Return(mockResponse, nil)
+	mockClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
 	getAgentMetadataClientFunc := func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
 		return mockClient, nil
 	}

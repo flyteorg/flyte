@@ -56,26 +56,26 @@ func (_m *AgentMetadataServiceServer) GetAgent(_a0 context.Context, _a1 *admin.G
 	return r0, r1
 }
 
-type AgentMetadataServiceServer_ListAgent struct {
+type AgentMetadataServiceServer_ListAgents struct {
 	*mock.Call
 }
 
-func (_m AgentMetadataServiceServer_ListAgent) Return(_a0 *admin.ListAgentsResponse, _a1 error) *AgentMetadataServiceServer_ListAgent {
-	return &AgentMetadataServiceServer_ListAgent{Call: _m.Call.Return(_a0, _a1)}
+func (_m AgentMetadataServiceServer_ListAgents) Return(_a0 *admin.ListAgentsResponse, _a1 error) *AgentMetadataServiceServer_ListAgents {
+	return &AgentMetadataServiceServer_ListAgents{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AgentMetadataServiceServer) OnListAgent(_a0 context.Context, _a1 *admin.ListAgentsRequest) *AgentMetadataServiceServer_ListAgent {
-	c_call := _m.On("ListAgent", _a0, _a1)
-	return &AgentMetadataServiceServer_ListAgent{Call: c_call}
+func (_m *AgentMetadataServiceServer) OnListAgents(_a0 context.Context, _a1 *admin.ListAgentsRequest) *AgentMetadataServiceServer_ListAgents {
+	c_call := _m.On("ListAgents", _a0, _a1)
+	return &AgentMetadataServiceServer_ListAgents{Call: c_call}
 }
 
-func (_m *AgentMetadataServiceServer) OnListAgentMatch(matchers ...interface{}) *AgentMetadataServiceServer_ListAgent {
-	c_call := _m.On("ListAgent", matchers...)
-	return &AgentMetadataServiceServer_ListAgent{Call: c_call}
+func (_m *AgentMetadataServiceServer) OnListAgentsMatch(matchers ...interface{}) *AgentMetadataServiceServer_ListAgents {
+	c_call := _m.On("ListAgents", matchers...)
+	return &AgentMetadataServiceServer_ListAgents{Call: c_call}
 }
 
-// ListAgent provides a mock function with given fields: _a0, _a1
-func (_m *AgentMetadataServiceServer) ListAgent(_a0 context.Context, _a1 *admin.ListAgentsRequest) (*admin.ListAgentsResponse, error) {
+// ListAgents provides a mock function with given fields: _a0, _a1
+func (_m *AgentMetadataServiceServer) ListAgents(_a0 context.Context, _a1 *admin.ListAgentsRequest) (*admin.ListAgentsResponse, error) {
 	ret := _m.Called(_a0, _a1)
 
 	var r0 *admin.ListAgentsResponse

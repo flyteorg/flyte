@@ -56,11 +56,11 @@ func request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runt
 
 }
 
-func request_AgentMetadataService_ListAgent_0(ctx context.Context, marshaler runtime.Marshaler, client AgentMetadataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_AgentMetadataService_ListAgents_0(ctx context.Context, marshaler runtime.Marshaler, client AgentMetadataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq admin.ListAgentsRequest
 	var metadata runtime.ServerMetadata
 
-	msg, err := client.ListAgent(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.ListAgents(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -123,7 +123,7 @@ func RegisterAgentMetadataServiceHandlerClient(ctx context.Context, mux *runtime
 
 	})
 
-	mux.Handle("GET", pattern_AgentMetadataService_ListAgent_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_AgentMetadataService_ListAgents_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -132,14 +132,14 @@ func RegisterAgentMetadataServiceHandlerClient(ctx context.Context, mux *runtime
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_AgentMetadataService_ListAgent_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_AgentMetadataService_ListAgents_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_AgentMetadataService_ListAgent_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_AgentMetadataService_ListAgents_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -147,13 +147,13 @@ func RegisterAgentMetadataServiceHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_AgentMetadataService_GetAgent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "agents", "name"}, ""))
+	pattern_AgentMetadataService_GetAgent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "agent", "name"}, ""))
 
-	pattern_AgentMetadataService_ListAgent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "agents"}, ""))
+	pattern_AgentMetadataService_ListAgents_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "agents"}, ""))
 )
 
 var (
 	forward_AgentMetadataService_GetAgent_0 = runtime.ForwardResponseMessage
 
-	forward_AgentMetadataService_ListAgent_0 = runtime.ForwardResponseMessage
+	forward_AgentMetadataService_ListAgents_0 = runtime.ForwardResponseMessage
 )

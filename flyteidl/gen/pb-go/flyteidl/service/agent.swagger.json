@@ -15,24 +15,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/agents": {
-      "get": {
-        "summary": "Get job status.",
-        "operationId": "ListAgent",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminListAgentsResponse"
-            }
-          }
-        },
-        "tags": [
-          "AgentMetadataService"
-        ]
-      }
-    },
-    "/api/v1/agents/{name}": {
+    "/api/v1/agent/{name}": {
       "get": {
         "summary": "Send a task create request to the agent server.",
         "operationId": "GetAgent",
@@ -53,6 +36,23 @@
             "type": "string"
           }
         ],
+        "tags": [
+          "AgentMetadataService"
+        ]
+      }
+    },
+    "/api/v1/agents": {
+      "get": {
+        "summary": "Get job status.",
+        "operationId": "ListAgents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminListAgentsResponse"
+            }
+          }
+        },
         "tags": [
           "AgentMetadataService"
         ]

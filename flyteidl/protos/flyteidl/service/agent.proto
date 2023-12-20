@@ -22,7 +22,7 @@ service AgentMetadataService {
   // Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
   rpc GetAgent (flyteidl.admin.GetAgentRequest) returns (flyteidl.admin.GetAgentResponse){
     option (google.api.http) = {
-      get: "/api/v1/agents/{name}"
+      get: "/api/v1/agent/{name}" 
     };
   };
 

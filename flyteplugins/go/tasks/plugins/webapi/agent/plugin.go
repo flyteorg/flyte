@@ -339,10 +339,10 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 			return nil, fmt.Errorf("failed to connect to agent [%v] with error: [%v]", agentDeployment, err)
 		}
 
-		finalCtx, cancel := getFinalContext(context.Background(), "ListAgent", agentDeployment)
+		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentDeployment)
 		defer cancel()
 
-		res, err := client.ListAgent(finalCtx, &admin.ListAgentsRequest{})
+		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
 		if err != nil {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {

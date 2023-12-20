@@ -65,26 +65,26 @@ func (_m *AgentMetadataServiceClient) GetAgent(ctx context.Context, in *admin.Ge
 	return r0, r1
 }
 
-type AgentMetadataServiceClient_ListAgent struct {
+type AgentMetadataServiceClient_ListAgents struct {
 	*mock.Call
 }
 
-func (_m AgentMetadataServiceClient_ListAgent) Return(_a0 *admin.ListAgentsResponse, _a1 error) *AgentMetadataServiceClient_ListAgent {
-	return &AgentMetadataServiceClient_ListAgent{Call: _m.Call.Return(_a0, _a1)}
+func (_m AgentMetadataServiceClient_ListAgents) Return(_a0 *admin.ListAgentsResponse, _a1 error) *AgentMetadataServiceClient_ListAgents {
+	return &AgentMetadataServiceClient_ListAgents{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AgentMetadataServiceClient) OnListAgent(ctx context.Context, in *admin.ListAgentsRequest, opts ...grpc.CallOption) *AgentMetadataServiceClient_ListAgent {
-	c_call := _m.On("ListAgent", ctx, in, opts)
-	return &AgentMetadataServiceClient_ListAgent{Call: c_call}
+func (_m *AgentMetadataServiceClient) OnListAgents(ctx context.Context, in *admin.ListAgentsRequest, opts ...grpc.CallOption) *AgentMetadataServiceClient_ListAgents {
+	c_call := _m.On("ListAgents", ctx, in, opts)
+	return &AgentMetadataServiceClient_ListAgents{Call: c_call}
 }
 
-func (_m *AgentMetadataServiceClient) OnListAgentMatch(matchers ...interface{}) *AgentMetadataServiceClient_ListAgent {
-	c_call := _m.On("ListAgent", matchers...)
-	return &AgentMetadataServiceClient_ListAgent{Call: c_call}
+func (_m *AgentMetadataServiceClient) OnListAgentsMatch(matchers ...interface{}) *AgentMetadataServiceClient_ListAgents {
+	c_call := _m.On("ListAgents", matchers...)
+	return &AgentMetadataServiceClient_ListAgents{Call: c_call}
 }
 
-// ListAgent provides a mock function with given fields: ctx, in, opts
-func (_m *AgentMetadataServiceClient) ListAgent(ctx context.Context, in *admin.ListAgentsRequest, opts ...grpc.CallOption) (*admin.ListAgentsResponse, error) {
+// ListAgents provides a mock function with given fields: ctx, in, opts
+func (_m *AgentMetadataServiceClient) ListAgents(ctx context.Context, in *admin.ListAgentsRequest, opts ...grpc.CallOption) (*admin.ListAgentsResponse, error) {
 	_va := make([]interface{}, len(opts))
 	for _i := range opts {
 		_va[_i] = opts[_i]

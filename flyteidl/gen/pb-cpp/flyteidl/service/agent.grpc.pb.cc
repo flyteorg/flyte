@@ -166,7 +166,7 @@ AsyncAgentService::Service::~Service() {
 
 static const char* AgentMetadataService_method_names[] = {
   "/flyteidl.service.AgentMetadataService/GetAgent",
-  "/flyteidl.service.AgentMetadataService/ListAgent",
+  "/flyteidl.service.AgentMetadataService/ListAgents",
 };
 
 std::unique_ptr< AgentMetadataService::Stub> AgentMetadataService::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -177,7 +177,7 @@ std::unique_ptr< AgentMetadataService::Stub> AgentMetadataService::NewStub(const
 
 AgentMetadataService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   : channel_(channel), rpcmethod_GetAgent_(AgentMetadataService_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListAgent_(AgentMetadataService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListAgents_(AgentMetadataService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status AgentMetadataService::Stub::GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::flyteidl::admin::GetAgentResponse* response) {
@@ -208,32 +208,32 @@ void AgentMetadataService::Stub::experimental_async::GetAgent(::grpc::ClientCont
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::GetAgentResponse>::Create(channel_.get(), cq, rpcmethod_GetAgent_, context, request, false);
 }
 
-::grpc::Status AgentMetadataService::Stub::ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_ListAgent_, context, request, response);
+::grpc::Status AgentMetadataService::Stub::ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_ListAgents_, context, request, response);
 }
 
-void AgentMetadataService::Stub::experimental_async::ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListAgent_, context, request, response, std::move(f));
+void AgentMetadataService::Stub::experimental_async::ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListAgents_, context, request, response, std::move(f));
 }
 
-void AgentMetadataService::Stub::experimental_async::ListAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListAgent_, context, request, response, std::move(f));
+void AgentMetadataService::Stub::experimental_async::ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_ListAgents_, context, request, response, std::move(f));
 }
 
-void AgentMetadataService::Stub::experimental_async::ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListAgent_, context, request, response, reactor);
+void AgentMetadataService::Stub::experimental_async::ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListAgents_, context, request, response, reactor);
 }
 
-void AgentMetadataService::Stub::experimental_async::ListAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListAgent_, context, request, response, reactor);
+void AgentMetadataService::Stub::experimental_async::ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_ListAgents_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* AgentMetadataService::Stub::AsyncListAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ListAgentsResponse>::Create(channel_.get(), cq, rpcmethod_ListAgent_, context, request, true);
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* AgentMetadataService::Stub::AsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ListAgentsResponse>::Create(channel_.get(), cq, rpcmethod_ListAgents_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* AgentMetadataService::Stub::PrepareAsyncListAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ListAgentsResponse>::Create(channel_.get(), cq, rpcmethod_ListAgent_, context, request, false);
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* AgentMetadataService::Stub::PrepareAsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ListAgentsResponse>::Create(channel_.get(), cq, rpcmethod_ListAgents_, context, request, false);
 }
 
 AgentMetadataService::Service::Service() {
@@ -246,7 +246,7 @@ AgentMetadataService::Service::Service() {
       AgentMetadataService_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AgentMetadataService::Service, ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>(
-          std::mem_fn(&AgentMetadataService::Service::ListAgent), this)));
+          std::mem_fn(&AgentMetadataService::Service::ListAgents), this)));
 }
 
 AgentMetadataService::Service::~Service() {
@@ -259,7 +259,7 @@ AgentMetadataService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status AgentMetadataService::Service::ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) {
+::grpc::Status AgentMetadataService::Service::ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) {
   (void) context;
   (void) request;
   (void) response;

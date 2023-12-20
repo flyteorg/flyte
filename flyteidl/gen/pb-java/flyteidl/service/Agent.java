@@ -33,10 +33,10 @@ public final class Agent {
       "askResponse\"\000\022U\n\nDeleteTask\022!.flyteidl.a" +
       "dmin.DeleteTaskRequest\032\".flyteidl.admin." +
       "DeleteTaskResponse\"\0002\360\001\n\024AgentMetadataSe" +
-      "rvice\022l\n\010GetAgent\022\037.flyteidl.admin.GetAg" +
+      "rvice\022k\n\010GetAgent\022\037.flyteidl.admin.GetAg" +
       "entRequest\032 .flyteidl.admin.GetAgentResp" +
-      "onse\"\035\202\323\344\223\002\027\022\025/api/v1/agents/{name}\022j\n\tL" +
-      "istAgent\022!.flyteidl.admin.ListAgentsRequ" +
+      "onse\"\034\202\323\344\223\002\026\022\024/api/v1/agent/{name}\022k\n\nLi" +
+      "stAgents\022!.flyteidl.admin.ListAgentsRequ" +
       "est\032\".flyteidl.admin.ListAgentsResponse\"" +
       "\026\202\323\344\223\002\020\022\016/api/v1/agentsB?Z=github.com/fl" +
       "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +

@@ -20031,18 +20031,18 @@ export namespace flyteidl {
             public getAgent(request: flyteidl.admin.IGetAgentRequest): Promise<flyteidl.admin.GetAgentResponse>;
 
             /**
-             * Calls ListAgent.
+             * Calls ListAgents.
              * @param request ListAgentsRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and ListAgentsResponse
              */
-            public listAgent(request: flyteidl.admin.IListAgentsRequest, callback: flyteidl.service.AgentMetadataService.ListAgentCallback): void;
+            public listAgents(request: flyteidl.admin.IListAgentsRequest, callback: flyteidl.service.AgentMetadataService.ListAgentsCallback): void;
 
             /**
-             * Calls ListAgent.
+             * Calls ListAgents.
              * @param request ListAgentsRequest message or plain object
              * @returns Promise
              */
-            public listAgent(request: flyteidl.admin.IListAgentsRequest): Promise<flyteidl.admin.ListAgentsResponse>;
+            public listAgents(request: flyteidl.admin.IListAgentsRequest): Promise<flyteidl.admin.ListAgentsResponse>;
         }
 
         namespace AgentMetadataService {
@@ -20055,11 +20055,11 @@ export namespace flyteidl {
             type GetAgentCallback = (error: (Error|null), response?: flyteidl.admin.GetAgentResponse) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AgentMetadataService#listAgent}.
+             * Callback as used by {@link flyteidl.service.AgentMetadataService#listAgents}.
              * @param error Error, if any
              * @param [response] ListAgentsResponse
              */
-            type ListAgentCallback = (error: (Error|null), response?: flyteidl.admin.ListAgentsResponse) => void;
+            type ListAgentsCallback = (error: (Error|null), response?: flyteidl.admin.ListAgentsResponse) => void;
         }
 
         /** Properties of a OAuth2MetadataRequest. */

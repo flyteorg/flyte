@@ -599,12 +599,12 @@ class AgentMetadataService final {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>>(PrepareAsyncGetAgentRaw(context, request, cq));
     }
     // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
-    virtual ::grpc::Status ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>> AsyncListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>>(AsyncListAgentRaw(context, request, cq));
+    virtual ::grpc::Status ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>> AsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>>(AsyncListAgentsRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>> PrepareAsyncListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>>(PrepareAsyncListAgentRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>> PrepareAsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>>(PrepareAsyncListAgentsRaw(context, request, cq));
     }
     class experimental_async_interface {
      public:
@@ -615,17 +615,17 @@ class AgentMetadataService final {
       virtual void GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
-      virtual void ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ListAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void ListAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>* AsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>* PrepareAsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>* AsyncListAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>* PrepareAsyncListAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>* AsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>* PrepareAsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -637,12 +637,12 @@ class AgentMetadataService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>> PrepareAsyncGetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>>(PrepareAsyncGetAgentRaw(context, request, cq));
     }
-    ::grpc::Status ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>> AsyncListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>>(AsyncListAgentRaw(context, request, cq));
+    ::grpc::Status ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>> AsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>>(AsyncListAgentsRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>> PrepareAsyncListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>>(PrepareAsyncListAgentRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>> PrepareAsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>>(PrepareAsyncListAgentsRaw(context, request, cq));
     }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
@@ -651,10 +651,10 @@ class AgentMetadataService final {
       void GetAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetAgentResponse* response, std::function<void(::grpc::Status)>) override;
       void GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void GetAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) override;
-      void ListAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) override;
-      void ListAgent(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void ListAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) override;
+      void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) override;
+      void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -668,10 +668,10 @@ class AgentMetadataService final {
     class experimental_async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>* AsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>* PrepareAsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* AsyncListAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* PrepareAsyncListAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* AsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* PrepareAsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_GetAgent_;
-    const ::grpc::internal::RpcMethod rpcmethod_ListAgent_;
+    const ::grpc::internal::RpcMethod rpcmethod_ListAgents_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -682,7 +682,7 @@ class AgentMetadataService final {
     // Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
     virtual ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response);
     // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
-    virtual ::grpc::Status ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response);
+    virtual ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_GetAgent : public BaseClass {
@@ -705,26 +705,26 @@ class AgentMetadataService final {
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_ListAgent : public BaseClass {
+  class WithAsyncMethod_ListAgents : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithAsyncMethod_ListAgent() {
+    WithAsyncMethod_ListAgents() {
       ::grpc::Service::MarkMethodAsync(1);
     }
-    ~WithAsyncMethod_ListAgent() override {
+    ~WithAsyncMethod_ListAgents() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestListAgent(::grpc::ServerContext* context, ::flyteidl::admin::ListAgentsRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ListAgentsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestListAgents(::grpc::ServerContext* context, ::flyteidl::admin::ListAgentsRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ListAgentsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_GetAgent<WithAsyncMethod_ListAgent<Service > > AsyncService;
+  typedef WithAsyncMethod_GetAgent<WithAsyncMethod_ListAgents<Service > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_GetAgent : public BaseClass {
    private:
@@ -757,37 +757,37 @@ class AgentMetadataService final {
     virtual void GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_ListAgent : public BaseClass {
+  class ExperimentalWithCallbackMethod_ListAgents : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithCallbackMethod_ListAgent() {
+    ExperimentalWithCallbackMethod_ListAgents() {
       ::grpc::Service::experimental().MarkMethodCallback(1,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ListAgentsRequest* request,
                  ::flyteidl::admin::ListAgentsResponse* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->ListAgent(context, request, response, controller);
+                   return this->ListAgents(context, request, response, controller);
                  }));
     }
-    void SetMessageAllocatorFor_ListAgent(
+    void SetMessageAllocatorFor_ListAgents(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>*>(
           ::grpc::Service::experimental().GetHandler(1))
               ->SetMessageAllocator(allocator);
     }
-    ~ExperimentalWithCallbackMethod_ListAgent() override {
+    ~ExperimentalWithCallbackMethod_ListAgents() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_GetAgent<ExperimentalWithCallbackMethod_ListAgent<Service > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_GetAgent<ExperimentalWithCallbackMethod_ListAgents<Service > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_GetAgent : public BaseClass {
    private:
@@ -806,18 +806,18 @@ class AgentMetadataService final {
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_ListAgent : public BaseClass {
+  class WithGenericMethod_ListAgents : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithGenericMethod_ListAgent() {
+    WithGenericMethod_ListAgents() {
       ::grpc::Service::MarkMethodGeneric(1);
     }
-    ~WithGenericMethod_ListAgent() override {
+    ~WithGenericMethod_ListAgents() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -843,22 +843,22 @@ class AgentMetadataService final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_ListAgent : public BaseClass {
+  class WithRawMethod_ListAgents : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithRawMethod_ListAgent() {
+    WithRawMethod_ListAgents() {
       ::grpc::Service::MarkMethodRaw(1);
     }
-    ~WithRawMethod_ListAgent() override {
+    ~WithRawMethod_ListAgents() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void RequestListAgent(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void RequestListAgents(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -888,29 +888,29 @@ class AgentMetadataService final {
     virtual void GetAgent(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_ListAgent : public BaseClass {
+  class ExperimentalWithRawCallbackMethod_ListAgents : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    ExperimentalWithRawCallbackMethod_ListAgent() {
+    ExperimentalWithRawCallbackMethod_ListAgents() {
       ::grpc::Service::experimental().MarkMethodRawCallback(1,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
                  ::grpc::ByteBuffer* response,
                  ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->ListAgent(context, request, response, controller);
+                   this->ListAgents(context, request, response, controller);
                  }));
     }
-    ~ExperimentalWithRawCallbackMethod_ListAgent() override {
+    ~ExperimentalWithRawCallbackMethod_ListAgents() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual void ListAgent(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+    virtual void ListAgents(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_GetAgent : public BaseClass {
@@ -933,28 +933,28 @@ class AgentMetadataService final {
     virtual ::grpc::Status StreamedGetAgent(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetAgentRequest,::flyteidl::admin::GetAgentResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_ListAgent : public BaseClass {
+  class WithStreamedUnaryMethod_ListAgents : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
-    WithStreamedUnaryMethod_ListAgent() {
+    WithStreamedUnaryMethod_ListAgents() {
       ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>(std::bind(&WithStreamedUnaryMethod_ListAgent<BaseClass>::StreamedListAgent, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>(std::bind(&WithStreamedUnaryMethod_ListAgents<BaseClass>::StreamedListAgents, this, std::placeholders::_1, std::placeholders::_2)));
     }
-    ~WithStreamedUnaryMethod_ListAgent() override {
+    ~WithStreamedUnaryMethod_ListAgents() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status ListAgent(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedListAgent(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::ListAgentsRequest,::flyteidl::admin::ListAgentsResponse>* server_unary_streamer) = 0;
+    virtual ::grpc::Status StreamedListAgents(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::ListAgentsRequest,::flyteidl::admin::ListAgentsResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_GetAgent<WithStreamedUnaryMethod_ListAgent<Service > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_GetAgent<WithStreamedUnaryMethod_ListAgents<Service > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_GetAgent<WithStreamedUnaryMethod_ListAgent<Service > > StreamedService;
+  typedef WithStreamedUnaryMethod_GetAgent<WithStreamedUnaryMethod_ListAgents<Service > > StreamedService;
 };
 
 }  // namespace service

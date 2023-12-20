@@ -154,8 +154,8 @@ class AgentMetadataServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetAgentRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetAgentResponse.FromString,
                 )
-        self.ListAgent = channel.unary_unary(
-                '/flyteidl.service.AgentMetadataService/ListAgent',
+        self.ListAgents = channel.unary_unary(
+                '/flyteidl.service.AgentMetadataService/ListAgents',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.ListAgentsRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.ListAgentsResponse.FromString,
                 )
@@ -173,7 +173,7 @@ class AgentMetadataServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ListAgent(self, request, context):
+    def ListAgents(self, request, context):
         """Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -188,8 +188,8 @@ def add_AgentMetadataServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetAgentRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_agent__pb2.GetAgentResponse.SerializeToString,
             ),
-            'ListAgent': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListAgent,
+            'ListAgents': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListAgents,
                     request_deserializer=flyteidl_dot_admin_dot_agent__pb2.ListAgentsRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_agent__pb2.ListAgentsResponse.SerializeToString,
             ),
@@ -223,7 +223,7 @@ class AgentMetadataService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def ListAgent(request,
+    def ListAgents(request,
             target,
             options=(),
             channel_credentials=None,
@@ -233,7 +233,7 @@ class AgentMetadataService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentMetadataService/ListAgent',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AgentMetadataService/ListAgents',
             flyteidl_dot_admin_dot_agent__pb2.ListAgentsRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.ListAgentsResponse.FromString,
             options, channel_credentials,

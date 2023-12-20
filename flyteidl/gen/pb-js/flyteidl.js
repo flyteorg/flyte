@@ -46810,31 +46810,31 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AgentMetadataService#listAgent}.
+                 * Callback as used by {@link flyteidl.service.AgentMetadataService#listAgents}.
                  * @memberof flyteidl.service.AgentMetadataService
-                 * @typedef ListAgentCallback
+                 * @typedef ListAgentsCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
                  * @param {flyteidl.admin.ListAgentsResponse} [response] ListAgentsResponse
                  */
     
                 /**
-                 * Calls ListAgent.
-                 * @function listAgent
+                 * Calls ListAgents.
+                 * @function listAgents
                  * @memberof flyteidl.service.AgentMetadataService
                  * @instance
                  * @param {flyteidl.admin.IListAgentsRequest} request ListAgentsRequest message or plain object
-                 * @param {flyteidl.service.AgentMetadataService.ListAgentCallback} callback Node-style callback called with the error, if any, and ListAgentsResponse
+                 * @param {flyteidl.service.AgentMetadataService.ListAgentsCallback} callback Node-style callback called with the error, if any, and ListAgentsResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AgentMetadataService.prototype.listAgent = function listAgent(request, callback) {
-                    return this.rpcCall(listAgent, $root.flyteidl.admin.ListAgentsRequest, $root.flyteidl.admin.ListAgentsResponse, request, callback);
-                }, "name", { value: "ListAgent" });
+                Object.defineProperty(AgentMetadataService.prototype.listAgents = function listAgents(request, callback) {
+                    return this.rpcCall(listAgents, $root.flyteidl.admin.ListAgentsRequest, $root.flyteidl.admin.ListAgentsResponse, request, callback);
+                }, "name", { value: "ListAgents" });
     
                 /**
-                 * Calls ListAgent.
-                 * @function listAgent
+                 * Calls ListAgents.
+                 * @function listAgents
                  * @memberof flyteidl.service.AgentMetadataService
                  * @instance
                  * @param {flyteidl.admin.IListAgentsRequest} request ListAgentsRequest message or plain object
