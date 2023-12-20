@@ -61,16 +61,9 @@ data:
       k8s-array:
         logs:
           config: {{- include "flyte-binary.configuration.logging.plugins" . | nindent 12 }}
-      {{- if .Values.configuration.agentService }}
+      {{- if .Values.flyteagent.enabled }}
       agent-service:
       {{- tpl ( .Values.configuration.agentService | toYaml ) . | nindent 8 }}
-      {{- else if .Values.flyteagent.enabled }}
-      agent-service:
-        defaultAgent:
-          endpoint: {{ include "flyteagent.name" . }}:{{ include "flyteagent.servicePort" . }}
-          insecure: true
-        supportedTaskTypes:
-        - bigquery_query_job_task
       {{- end }}
   002-database.yaml: |
     {{- with .Values.configuration.database }}

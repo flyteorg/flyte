@@ -143,6 +143,7 @@ func validateRangeFloat64(fieldName string, min, max, provided float64) error {
 
 	return nil
 }
+
 func validateConfig(cfg webapi.PluginConfig) error {
 	errs := stdErrs.ErrorCollection{}
 	errs.Append(validateRangeInt("cache size", minCacheSize, maxCacheSize, cfg.Caching.Size))
