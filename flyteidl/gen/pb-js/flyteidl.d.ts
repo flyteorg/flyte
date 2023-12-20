@@ -8031,9 +8031,6 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resource */
             resource?: (flyteidl.admin.IResource|null);
-
-            /** CreateTaskResponse logLinks */
-            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a CreateTaskResponse. */
@@ -8050,9 +8047,6 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resource. */
             public resource?: (flyteidl.admin.IResource|null);
-
-            /** CreateTaskResponse logLinks. */
-            public logLinks: flyteidl.core.ITaskLog[];
 
             /** CreateTaskResponse res. */
             public res?: ("resourceMeta"|"resource");

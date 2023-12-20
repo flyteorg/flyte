@@ -115,25 +115,25 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		taskTemplate.GetContainer().Args = argTemplate
 	}
 
-	resource := ResourceWrapper{State: admin.State_RUNNING}
-
 	// If the agent returned a resource, we assume this is a synchronous task.
 	// The state should be a terminal state, for example, SUCCEEDED, PERMANENT_FAILURE, or RETRYABLE_FAILURE.
 	if res.GetResource() != nil {
-		resource.State = res.GetResource().State
-		resource.Outputs = res.GetResource().Outputs
-		resource.Message = res.GetResource().Message
-		resource.LogLinks = res.GetResource().LogLinks
-	} else {
-		logger.Infof(ctx, "If this is a synchronous task, the agent should return a resource.")
+		logger.Infof(ctx, "Agent is executing a synchronous task.")
+		return nil,
+			ResourceWrapper{
+				State:   res.GetResource().State,
+				Outputs: res.GetResource().Outputs,
+				Message: res.GetResource().Message,
+			}, nil
 	}
 
+	logger.Infof(ctx, "Agent is executing an asynchronous task.")
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		Token:             "",
 		TaskType:          taskTemplate.Type,
-	}, resource, nil
+	}, nil, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {

@@ -7,9 +7,6 @@ from flyteidl.admin import agent_pb2 as flyteidl_dot_admin_dot_agent__pb2
 
 class AsyncAgentServiceStub(object):
     """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
-    It can handle asynchronous tasks and synchronous tasks.
-    Asynchronous tasks are for tasks running long, for example running query job.
-    Synchronous tasks are for tasks running quick, for example, you want to execute something really fast, or even retrieving some metadata from a backend service.
     """
 
     def __init__(self, channel):
@@ -36,7 +33,7 @@ class AsyncAgentServiceStub(object):
 
 
 class AsyncAgentServiceServicer(object):
-    """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
     """
 
     def CreateTask(self, request, context):
@@ -86,7 +83,7 @@ def add_AsyncAgentServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class AsyncAgentService(object):
-    """AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+    """AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
     """
 
     @staticmethod

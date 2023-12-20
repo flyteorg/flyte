@@ -672,18 +672,6 @@ class CreateTaskResponse final :
 
   // accessors -------------------------------------------------------
 
-  // repeated .flyteidl.core.TaskLog log_links = 3;
-  int log_links_size() const;
-  void clear_log_links();
-  static const int kLogLinksFieldNumber = 3;
-  ::flyteidl::core::TaskLog* mutable_log_links(int index);
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
-      mutable_log_links();
-  const ::flyteidl::core::TaskLog& log_links(int index) const;
-  ::flyteidl::core::TaskLog* add_log_links();
-  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
-      log_links() const;
-
   // bytes resource_meta = 1;
   private:
   bool has_resource_meta() const;
@@ -722,7 +710,6 @@ class CreateTaskResponse final :
   inline void clear_has_res();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > log_links_;
   union ResUnion {
     ResUnion() {}
     ::google::protobuf::internal::ArenaStringPtr resource_meta_;
@@ -2542,33 +2529,6 @@ inline ::flyteidl::admin::Resource* CreateTaskResponse::mutable_resource() {
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.admin.CreateTaskResponse.resource)
   return res_.resource_;
-}
-
-// repeated .flyteidl.core.TaskLog log_links = 3;
-inline int CreateTaskResponse::log_links_size() const {
-  return log_links_.size();
-}
-inline ::flyteidl::core::TaskLog* CreateTaskResponse::mutable_log_links(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.CreateTaskResponse.log_links)
-  return log_links_.Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >*
-CreateTaskResponse::mutable_log_links() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.CreateTaskResponse.log_links)
-  return &log_links_;
-}
-inline const ::flyteidl::core::TaskLog& CreateTaskResponse::log_links(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.CreateTaskResponse.log_links)
-  return log_links_.Get(index);
-}
-inline ::flyteidl::core::TaskLog* CreateTaskResponse::add_log_links() {
-  // @@protoc_insertion_point(field_add:flyteidl.admin.CreateTaskResponse.log_links)
-  return log_links_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
-CreateTaskResponse::log_links() const {
-  // @@protoc_insertion_point(field_list:flyteidl.admin.CreateTaskResponse.log_links)
-  return log_links_;
 }
 
 inline bool CreateTaskResponse::has_res() const {

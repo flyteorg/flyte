@@ -45,9 +45,6 @@ pub struct CreateTaskRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTaskResponse {
-    /// log information for the task execution.
-    #[prost(message, repeated, tag="3")]
-    pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
     /// Resource is for synchronous task execution.
     #[prost(oneof="create_task_response::Res", tags="1, 2")]

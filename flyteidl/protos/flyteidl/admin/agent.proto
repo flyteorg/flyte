@@ -56,8 +56,6 @@ message CreateTaskResponse {
     bytes resource_meta = 1;
     Resource resource = 2;
   }
-  // log information for the task execution.
-  repeated core.TaskLog log_links = 3;
 }
 
 // A message used to fetch a job resource from flyte agent server.

@@ -19664,7 +19664,6 @@
                  * @interface ICreateTaskResponse
                  * @property {Uint8Array|null} [resourceMeta] CreateTaskResponse resourceMeta
                  * @property {flyteidl.admin.IResource|null} [resource] CreateTaskResponse resource
-                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] CreateTaskResponse logLinks
                  */
     
                 /**
@@ -19676,7 +19675,6 @@
                  * @param {flyteidl.admin.ICreateTaskResponse=} [properties] Properties to set
                  */
                 function CreateTaskResponse(properties) {
-                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19698,14 +19696,6 @@
                  * @instance
                  */
                 CreateTaskResponse.prototype.resource = null;
-    
-                /**
-                 * CreateTaskResponse logLinks.
-                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
-                 * @memberof flyteidl.admin.CreateTaskResponse
-                 * @instance
-                 */
-                CreateTaskResponse.prototype.logLinks = $util.emptyArray;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -19749,9 +19739,6 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.resourceMeta);
                     if (message.resource != null && message.hasOwnProperty("resource"))
                         $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.logLinks != null && message.logLinks.length)
-                        for (var i = 0; i < message.logLinks.length; ++i)
-                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -19778,11 +19765,6 @@
                             break;
                         case 2:
                             message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            if (!(message.logLinks && message.logLinks.length))
-                                message.logLinks = [];
-                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -19817,15 +19799,6 @@
                             var error = $root.flyteidl.admin.Resource.verify(message.resource);
                             if (error)
                                 return "resource." + error;
-                        }
-                    }
-                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
-                        if (!Array.isArray(message.logLinks))
-                            return "logLinks: array expected";
-                        for (var i = 0; i < message.logLinks.length; ++i) {
-                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
-                            if (error)
-                                return "logLinks." + error;
                         }
                     }
                     return null;

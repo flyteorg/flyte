@@ -242,13 +242,6 @@
         },
         "resource": {
           "$ref": "#/definitions/adminResource"
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "description": "log information for the task execution."
         }
       },
       "description": "Represents a create response structure."
