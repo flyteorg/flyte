@@ -79,9 +79,6 @@ pyflyte run hello_world.py hello_world_wf
 ```
 **Ready to try a Flyte cluster?**
 
-<img alt="Getting started with Flyte, showing the welcome screen and Flyte dashboard" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
-
-
 1. Create a new sandbox cluster, running as a Docker container:
 ```bash
 flytectl demo start
@@ -90,6 +87,7 @@ flytectl demo start
 ```bash
 pyflyte run --remote hello_world.py hello_world_wf
 ```
+<img alt="Getting started with Flyte, showing the welcome screen and Flyte dashboard" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/getting_started/getting_started_console.gif" style="width: 100%; height: auto;" />
 
 **Do you want to see more but don't want to install anything?**
 
