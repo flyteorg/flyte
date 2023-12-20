@@ -348,8 +348,6 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			if subNodeStatus.GetPhase() != nodeExecutionRequest.nodePhase || subNodeStatus.GetTaskNodeStatus().GetPhase() != nodeExecutionRequest.taskPhase {
 				incrementTaskPhaseVersion = true
 			}
-
-			fmt.Printf("HAMERSAW - subnode:%d attempts:%d systemFailures:%d\n", index, subNodeStatus.GetAttempts(), subNodeStatus.GetSystemFailures())
 		}
 
 		// if any workers failed then return the error
