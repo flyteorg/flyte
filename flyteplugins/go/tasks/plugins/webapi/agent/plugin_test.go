@@ -2,17 +2,22 @@ package agent
 
 import (
 	"context"
+	"sort"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -45,19 +50,26 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test newAgentPlugin", func(t *testing.T) {
-		p := newAgentPlugin()
+		p := newMockAgentPlugin()
 		assert.NotNil(t, p)
 		assert.Equal(t, "agent-service", p.ID)
 		assert.NotNil(t, p.PluginLoader)
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agent, _ := getFinalAgent("spark", &cfg)
-		assert.Equal(t, cfg.Agents["spark_agent"].Endpoint, agent.Endpoint)
-		agent, _ = getFinalAgent("foo", &cfg)
-		assert.Equal(t, cfg.DefaultAgent.Endpoint, agent.Endpoint)
-		_, err := getFinalAgent("bar", &cfg)
-		assert.NotNil(t, err)
+		agentRegistry := map[string]*Agent{"spark": {Endpoint: "localhost:80"}}
+		agent := getFinalAgent("spark", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, "localhost:80")
+		agent = getFinalAgent("foo", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
+		agent = getFinalAgent("bar", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
+	})
+
+	t.Run("test getAgentMetadataClientFunc", func(t *testing.T) {
+		client, err := getAgentMetadataClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
+		assert.NoError(t, err)
+		assert.NotNil(t, client)
 	})
 
 	t.Run("test getClientFunc", func(t *testing.T) {
@@ -172,4 +184,35 @@ func TestPlugin(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
 	})
+}
+
+func TestInitializeAgentRegistry(t *testing.T) {
+	mockClient := new(agentMocks.AgentMetadataServiceClient)
+	mockRequest := &admin.ListAgentsRequest{}
+	mockResponse := &admin.ListAgentsResponse{
+		Agents: []*admin.Agent{
+			{
+				Name:               "test-agent",
+				SupportedTaskTypes: []string{"task1", "task2", "task3"},
+			},
+		},
+	}
+
+	mockClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
+	getAgentMetadataClientFunc := func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
+		return mockClient, nil
+	}
+
+	cfg := defaultConfig
+	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: "localhost:80"}}
+	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
+	connectionCache := make(map[*Agent]*grpc.ClientConn)
+	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, getAgentMetadataClientFunc)
+	assert.NoError(t, err)
+
+	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
+	agentRegistryKeys := maps.Keys(agentRegistry)
+	sort.Strings(agentRegistryKeys)
+
+	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
 }

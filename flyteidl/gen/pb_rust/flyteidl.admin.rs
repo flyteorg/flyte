@@ -66,7 +66,7 @@ pub struct GetTaskRequest {
 pub struct GetTaskResponse {
     #[prost(message, optional, tag="1")]
     pub resource: ::core::option::Option<Resource>,
-    /// log information for the task execution.
+    /// log information for the task execution
     #[prost(message, repeated, tag="2")]
     pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
@@ -100,6 +100,44 @@ pub struct DeleteTaskRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTaskResponse {
+}
+/// A message containing the agent metadata.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Agent {
+    /// Name is the developer-assigned name of the agent.
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+    /// SupportedTaskTypes are the types of the tasks that the agent can handle.
+    #[prost(string, repeated, tag="2")]
+    pub supported_task_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+/// A request to get an agent.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetAgentRequest {
+    /// The name of the agent.
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+}
+/// A response containing an agent.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetAgentResponse {
+    #[prost(message, optional, tag="1")]
+    pub agent: ::core::option::Option<Agent>,
+}
+/// A request to list all agents.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListAgentsRequest {
+}
+/// A response containing a list of agents.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListAgentsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub agents: ::prost::alloc::vec::Vec<Agent>,
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

@@ -38,29 +38,37 @@ static constexpr ::google::protobuf::Message* const* file_default_instances = nu
 
 const char descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto[] =
   "\n\034flyteidl/service/agent.proto\022\020flyteidl"
-  ".service\032\032flyteidl/admin/agent.proto2\217\002\n"
-  "\021AsyncAgentService\022U\n\nCreateTask\022!.flyte"
-  "idl.admin.CreateTaskRequest\032\".flyteidl.a"
-  "dmin.CreateTaskResponse\"\000\022L\n\007GetTask\022\036.f"
-  "lyteidl.admin.GetTaskRequest\032\037.flyteidl."
-  "admin.GetTaskResponse\"\000\022U\n\nDeleteTask\022!."
-  "flyteidl.admin.DeleteTaskRequest\032\".flyte"
-  "idl.admin.DeleteTaskResponse\"\000B\?Z=github"
-  ".com/flyteorg/flyte/flyteidl/gen/pb-go/f"
-  "lyteidl/serviceb\006proto3"
+  ".service\032\034google/api/annotations.proto\032\032"
+  "flyteidl/admin/agent.proto2\217\002\n\021AsyncAgen"
+  "tService\022U\n\nCreateTask\022!.flyteidl.admin."
+  "CreateTaskRequest\032\".flyteidl.admin.Creat"
+  "eTaskResponse\"\000\022L\n\007GetTask\022\036.flyteidl.ad"
+  "min.GetTaskRequest\032\037.flyteidl.admin.GetT"
+  "askResponse\"\000\022U\n\nDeleteTask\022!.flyteidl.a"
+  "dmin.DeleteTaskRequest\032\".flyteidl.admin."
+  "DeleteTaskResponse\"\0002\360\001\n\024AgentMetadataSe"
+  "rvice\022k\n\010GetAgent\022\037.flyteidl.admin.GetAg"
+  "entRequest\032 .flyteidl.admin.GetAgentResp"
+  "onse\"\034\202\323\344\223\002\026\022\024/api/v1/agent/{name}\022k\n\nLi"
+  "stAgents\022!.flyteidl.admin.ListAgentsRequ"
+  "est\032\".flyteidl.admin.ListAgentsResponse\""
+  "\026\202\323\344\223\002\020\022\016/api/v1/agentsB\?Z=github.com/fl"
+  "yteorg/flyte/flyteidl/gen/pb-go/flyteidl"
+  "/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto,
-  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 423,
+  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 696,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fagent_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[1] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
   {
+    ::AddDescriptors_google_2fapi_2fannotations_2eproto,
     ::AddDescriptors_flyteidl_2fadmin_2fagent_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fservice_2fagent_2eproto, deps, 1);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fservice_2fagent_2eproto, deps, 2);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
