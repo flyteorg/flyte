@@ -42,19 +42,13 @@ Write code in Python or any other language and leverage a robust type engine.
 <img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadmebuildv2.gif" style="width: 60%; height: auto;" />
 
 <h2 align="center">
- Deploy
+ Deploy & Scale
  </h2>
  <p>
 Either locally or on a remote cluster, execute your models with ease.
 </p>
 <img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadme-deploy.gif" style="width: 60%; height: auto;" />
  
-<h2 align="center">
- Scale
- </h2>
- <p>
-TBD
- </p>
 
 <h3 align="center">
   <a href="#quick-start">Get Started</a>
