@@ -27,7 +27,7 @@ service AgentMetadataService {
   };
 
   // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
-  rpc ListAgent (flyteidl.admin.ListAgentsRequest) returns (flyteidl.admin.ListAgentsResponse){
+  rpc ListAgents (flyteidl.admin.ListAgentsRequest) returns (flyteidl.admin.ListAgentsResponse){
     option (google.api.http) = {
       get: "/api/v1/agents"
     };
