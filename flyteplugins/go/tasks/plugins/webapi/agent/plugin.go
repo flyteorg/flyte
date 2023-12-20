@@ -121,9 +121,10 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		logger.Infof(ctx, "Agent is executing a synchronous task.")
 		return nil,
 			ResourceWrapper{
-				State:   res.GetResource().State,
-				Outputs: res.GetResource().Outputs,
-				Message: res.GetResource().Message,
+				State:    res.GetResource().State,
+				Outputs:  res.GetResource().Outputs,
+				Message:  res.GetResource().Message,
+				LogLinks: res.GetResource().LogLinks,
 			}, nil
 	}
 
