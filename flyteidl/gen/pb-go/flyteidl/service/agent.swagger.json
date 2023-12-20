@@ -238,8 +238,10 @@
       "properties": {
         "resource_meta": {
           "type": "string",
-          "format": "byte",
-          "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata)."
+          "format": "byte"
+        },
+        "resource": {
+          "$ref": "#/definitions/adminResource"
         }
       },
       "description": "Represents a create response structure."
@@ -299,6 +301,13 @@
         "message": {
           "type": "string",
           "description": "A descriptive message for the current state. e.g. waiting for cluster."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
         }
       }
     },

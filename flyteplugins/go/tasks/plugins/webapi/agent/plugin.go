@@ -115,12 +115,26 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		taskTemplate.GetContainer().Args = argTemplate
 	}
 
+	// If the agent returned a resource, we assume this is a synchronous task.
+	// The state should be a terminal state, for example, SUCCEEDED, PERMANENT_FAILURE, or RETRYABLE_FAILURE.
+	if res.GetResource() != nil {
+		logger.Infof(ctx, "Agent is executing a synchronous task.")
+		return nil,
+			ResourceWrapper{
+				State:    res.GetResource().State,
+				Outputs:  res.GetResource().Outputs,
+				Message:  res.GetResource().Message,
+				LogLinks: res.GetResource().LogLinks,
+			}, nil
+	}
+
+	logger.Infof(ctx, "Agent is executing an asynchronous task.")
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		Token:             "",
 		TaskType:          taskTemplate.Type,
-	}, ResourceWrapper{State: admin.State_RUNNING}, nil
+	}, nil, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
@@ -209,7 +223,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 
 	var opReader io.OutputReader
 	if resource.Outputs != nil {
-		logger.Debugf(ctx, "Agent returned an output")
+		logger.Debugf(ctx, "Agent returned an output.")
 		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")

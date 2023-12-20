@@ -230,7 +230,24 @@ func (m *CreateTaskResponse) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ResourceMeta
+	switch m.Res.(type) {
+
+	case *CreateTaskResponse_ResourceMeta:
+		// no validation rules for ResourceMeta
+
+	case *CreateTaskResponse_Resource:
+
+		if v, ok := interface{}(m.GetResource()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateTaskResponseValidationError{
+					field:  "Resource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }
@@ -470,6 +487,21 @@ func (m *Resource) Validate() error {
 	}
 
 	// no validation rules for Message
+
+	for idx, item := range m.GetLogLinks() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ResourceValidationError{
+					field:  fmt.Sprintf("LogLinks[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }

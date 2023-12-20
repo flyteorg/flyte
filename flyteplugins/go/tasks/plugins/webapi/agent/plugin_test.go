@@ -11,16 +11,51 @@ import (
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
 	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/tests"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
+
+func TestSyncTask(t *testing.T) {
+	tCtx := getTaskContext(t)
+	taskReader := new(pluginCoreMocks.TaskReader)
+
+	template := flyteIdlCore.TaskTemplate{
+		Type: "api_task",
+	}
+
+	taskReader.On("Read", mock.Anything).Return(&template, nil)
+
+	tCtx.OnTaskReader().Return(taskReader)
+
+	agentPlugin := newMockSyncAgentPlugin()
+	pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
+	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("create_task_sync_test"))
+	assert.NoError(t, err)
+
+	inputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	assert.NoError(t, err)
+	basePrefix := storage.DataReference("fake://bucket/prefix/")
+	inputReader := &ioMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return(basePrefix)
+	inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
+	tCtx.OnInputReader().Return(inputReader)
+
+	phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, nil)
+	assert.Equal(t, true, phase.Phase().IsSuccess())
+}
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
@@ -120,7 +155,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_PENDING,
 			Outputs:  nil,
 			Message:  "Waiting for cluster",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -135,7 +170,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_RUNNING,
 			Outputs:  nil,
 			Message:  "Job is running",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -149,7 +184,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_PERMANENT_FAILURE,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -163,7 +198,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_RETRYABLE_FAILURE,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -177,7 +212,7 @@ func TestPlugin(t *testing.T) {
 			State:    5,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
