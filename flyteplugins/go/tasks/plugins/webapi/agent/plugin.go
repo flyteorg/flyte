@@ -114,11 +114,15 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	resource := ResourceWrapper{State: admin.State_RUNNING}
 
+	// If the agent returned a resource, we assume this is a synchronous task.
+	// The state should be SUCCEEDED, PERMANENT_FAILURE or RETRYABLE_FAILURE.
 	if res.GetResource() != nil {
 		resource.State = res.GetResource().State
 		resource.Outputs = res.GetResource().Outputs
 		resource.Message = res.GetResource().Message
 		resource.LogLinks = res.GetResource().LogLinks
+	} else {
+		logger.Infof(ctx, "Agent returned no resource, assuming this is an asynchronous task.")
 	}
 
 	return ResourceMetaWrapper{
