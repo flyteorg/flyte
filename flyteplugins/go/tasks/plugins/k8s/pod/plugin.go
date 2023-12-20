@@ -153,6 +153,11 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		return pluginsCore.PhaseInfoUndefined, err
 	}
 
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
 	pod := r.(*v1.Pod)
 
 	transitionOccurredAt := flytek8s.GetLastTransitionOccurredAt(pod).Time
@@ -168,7 +173,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
-		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme)
+		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
 		if err != nil {
 			return pluginsCore.PhaseInfoUndefined, err
 		}
