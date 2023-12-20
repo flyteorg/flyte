@@ -205,10 +205,16 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 		}
 
 		// initialize ArrayNode state
-		maxAttempts := int(config.GetConfig().NodeConfig.DefaultMaxAttempts)
-		subNodeSpec := *arrayNode.GetSubNodeSpec()
-		if subNodeSpec.GetRetryStrategy() != nil && subNodeSpec.GetRetryStrategy().MinAttempts != nil {
-			maxAttempts = *subNodeSpec.GetRetryStrategy().MinAttempts
+		maxSystemFailuresValue := int(config.GetConfig().NodeConfig.MaxNodeRetriesOnSystemFailures)
+		maxAttemptsValue := int(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+		if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 1 {
+			maxAttemptsValue = *nCtx.Node().GetRetryStrategy().MinAttempts
+		}
+
+		if config.GetConfig().NodeConfig.IgnoreRetryCause {
+			maxSystemFailuresValue = maxAttemptsValue
+		} else {
+			maxAttemptsValue += maxSystemFailuresValue
 		}
 
 		for _, item := range []struct {
@@ -219,8 +225,8 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			// defined as an `iota` so it is impossible to programmatically get largest value
 			{arrayReference: &arrayNodeState.SubNodePhases, maxValue: int(v1alpha1.NodePhaseRecovered)},
 			{arrayReference: &arrayNodeState.SubNodeTaskPhases, maxValue: len(core.Phases) - 1},
-			{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttempts},
-			{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxAttempts},
+			{arrayReference: &arrayNodeState.SubNodeRetryAttempts, maxValue: maxAttemptsValue},
+			{arrayReference: &arrayNodeState.SubNodeSystemFailures, maxValue: maxSystemFailuresValue},
 		} {
 
 			*item.arrayReference, err = bitarray.NewCompactArray(uint(size), bitarray.Item(item.maxValue))
