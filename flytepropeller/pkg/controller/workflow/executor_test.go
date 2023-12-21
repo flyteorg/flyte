@@ -72,6 +72,10 @@ type fakeRemoteWritePlugin struct {
 	t             assert.TestingT
 }
 
+type fakeNodeExecContext interface {
+	Node()                v1alpha1.ExecutableNode
+}
+
 func (f fakeRemoteWritePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskExecutionContext) (pluginCore.Transition, error) {
 	logger.Infof(ctx, "----------------------------------------------------------------------------------------------")
 	logger.Infof(ctx, "Handle called for %s", tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
@@ -517,7 +521,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	h := &nodemocks.NodeHandler{}
 	h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-	startNodeMatcher := mock.MatchedBy(func(nodeExecContext *nodes.NodeExecContext) bool {
+	startNodeMatcher := mock.MatchedBy(func(nodeExecContext fakeNodeExecContext) bool {
 		return nodeExecContext.Node().IsStartNode()
 	})
 	h.OnHandleMatch(mock.Anything, startNodeMatcher).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil)
