@@ -217,7 +217,12 @@ func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.No
 	}
 
 	// ignores discovery write failures
-	status, err := n.catalog.Put(ctx, catalogKey, outputReader, metadata)
+	var status catalog.Status
+	if nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache {
+		status, err = n.catalog.Update(ctx, catalogKey, outputReader, metadata)
+	} else {
+		status, err = n.catalog.Put(ctx, catalogKey, outputReader, metadata)
+	}
 	if err != nil {
 		n.metrics.catalogPutFailureCount.Inc(ctx)
 		logger.Errorf(ctx, "Failed to write results to catalog for Task [%v]. Error: %v", catalogKey.Identifier, err)
