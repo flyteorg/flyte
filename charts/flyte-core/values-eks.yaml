@@ -258,7 +258,7 @@ configmap:
     propeller:
       resourcemanager:
         type: noop
-        # Note: By default resource manager is disable for propeller, Please use `type: redis` to enaable
+        # Note: By default resource manager is disabled for propeller, Please use `type: redis` to enable
         # type: redis
         # resourceMaxQuota: 10000
         # redis:

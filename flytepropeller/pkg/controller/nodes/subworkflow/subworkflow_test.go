@@ -41,6 +41,36 @@ func TestGetSubWorkflow(t *testing.T) {
 		assert.Equal(t, swf, w)
 	})
 
+	t.Run("subworkflow with failure node", func(t *testing.T) {
+
+		wfNode := &coreMocks.ExecutableWorkflowNode{}
+		x := "x"
+		wfNode.OnGetSubWorkflowRef().Return(&x)
+
+		node := &coreMocks.ExecutableNode{}
+		node.OnGetWorkflowNode().Return(wfNode)
+
+		ectx := &execMocks.ExecutionContext{}
+
+		wfFailureNode := &coreMocks.ExecutableWorkflowNode{}
+		y := "y"
+		wfFailureNode.OnGetSubWorkflowRef().Return(&y)
+		failureNode := &coreMocks.ExecutableNode{}
+		failureNode.OnGetWorkflowNode().Return(wfFailureNode)
+
+		swf := &coreMocks.ExecutableSubWorkflow{}
+		swf.OnGetOnFailureNode().Return(failureNode)
+		ectx.OnFindSubWorkflow("x").Return(swf)
+
+		nCtx := &mocks.NodeExecutionContext{}
+		nCtx.OnNode().Return(node)
+		nCtx.OnExecutionContext().Return(ectx)
+
+		w, err := GetSubWorkflow(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.Equal(t, swf, w)
+	})
+
 	t.Run("missing-subworkflow", func(t *testing.T) {
 
 		wfNode := &coreMocks.ExecutableWorkflowNode{}

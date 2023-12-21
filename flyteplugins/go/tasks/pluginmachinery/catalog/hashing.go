@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 
+	"k8s.io/utils/strings/slices"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 )
@@ -55,7 +57,7 @@ func hashify(literal *core.Literal) *core.Literal {
 	return literal
 }
 
-func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap) (string, error) {
+func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap, cacheIgnoreInputVars []string) (string, error) {
 	if literalMap == nil || len(literalMap.Literals) == 0 {
 		literalMap = &emptyLiteralMap
 	}
@@ -64,7 +66,9 @@ func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap) (string, e
 	// in case the corresponding hash is set.
 	hashifiedLiteralMap := make(map[string]*core.Literal, len(literalMap.Literals))
 	for name, literal := range literalMap.Literals {
-		hashifiedLiteralMap[name] = hashify(literal)
+		if !slices.Contains(cacheIgnoreInputVars, name) {
+			hashifiedLiteralMap[name] = hashify(literal)
+		}
 	}
 	hashifiedInputs := &core.LiteralMap{
 		Literals: hashifiedLiteralMap,

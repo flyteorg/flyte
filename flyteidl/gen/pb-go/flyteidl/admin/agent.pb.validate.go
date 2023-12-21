@@ -230,7 +230,24 @@ func (m *CreateTaskResponse) Validate() error {
 		return nil
 	}
 
-	// no validation rules for ResourceMeta
+	switch m.Res.(type) {
+
+	case *CreateTaskResponse_ResourceMeta:
+		// no validation rules for ResourceMeta
+
+	case *CreateTaskResponse_Resource:
+
+		if v, ok := interface{}(m.GetResource()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return CreateTaskResponseValidationError{
+					field:  "Resource",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	return nil
 }
@@ -471,6 +488,21 @@ func (m *Resource) Validate() error {
 
 	// no validation rules for Message
 
+	for idx, item := range m.GetLogLinks() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ResourceValidationError{
+					field:  fmt.Sprintf("LogLinks[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -665,3 +697,360 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = DeleteTaskResponseValidationError{}
+
+// Validate checks the field values on Agent with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Agent) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Name
+
+	return nil
+}
+
+// AgentValidationError is the validation error returned by Agent.Validate if
+// the designated constraints aren't met.
+type AgentValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e AgentValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e AgentValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e AgentValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e AgentValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e AgentValidationError) ErrorName() string { return "AgentValidationError" }
+
+// Error satisfies the builtin error interface
+func (e AgentValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sAgent.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = AgentValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = AgentValidationError{}
+
+// Validate checks the field values on GetAgentRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *GetAgentRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Name
+
+	return nil
+}
+
+// GetAgentRequestValidationError is the validation error returned by
+// GetAgentRequest.Validate if the designated constraints aren't met.
+type GetAgentRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetAgentRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetAgentRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetAgentRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetAgentRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetAgentRequestValidationError) ErrorName() string { return "GetAgentRequestValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetAgentRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetAgentRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetAgentRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetAgentRequestValidationError{}
+
+// Validate checks the field values on GetAgentResponse with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *GetAgentResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetAgent()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return GetAgentResponseValidationError{
+				field:  "Agent",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// GetAgentResponseValidationError is the validation error returned by
+// GetAgentResponse.Validate if the designated constraints aren't met.
+type GetAgentResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetAgentResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetAgentResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetAgentResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetAgentResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetAgentResponseValidationError) ErrorName() string { return "GetAgentResponseValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetAgentResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetAgentResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetAgentResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetAgentResponseValidationError{}
+
+// Validate checks the field values on ListAgentsRequest with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *ListAgentsRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// ListAgentsRequestValidationError is the validation error returned by
+// ListAgentsRequest.Validate if the designated constraints aren't met.
+type ListAgentsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListAgentsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListAgentsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListAgentsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListAgentsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListAgentsRequestValidationError) ErrorName() string {
+	return "ListAgentsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListAgentsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListAgentsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListAgentsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListAgentsRequestValidationError{}
+
+// Validate checks the field values on ListAgentsResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *ListAgentsResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetAgents() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListAgentsResponseValidationError{
+					field:  fmt.Sprintf("Agents[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ListAgentsResponseValidationError is the validation error returned by
+// ListAgentsResponse.Validate if the designated constraints aren't met.
+type ListAgentsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListAgentsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListAgentsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListAgentsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListAgentsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListAgentsResponseValidationError) ErrorName() string {
+	return "ListAgentsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListAgentsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListAgentsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListAgentsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListAgentsResponseValidationError{}

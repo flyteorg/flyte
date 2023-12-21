@@ -73,6 +73,7 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 
 	var nextState *State
 	var phaseInfo core.PhaseInfo
+
 	switch incomingState.Phase {
 	case PhaseNotStarted:
 		if len(c.p.GetConfig().ResourceQuotas) > 0 {
@@ -123,6 +124,7 @@ func (c CorePlugin) Finalize(ctx context.Context, tCtx core.TaskExecutionContext
 
 	logger.Infof(ctx, "Attempting to finalize resource [%v].",
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName())
+
 	return c.tokenAllocator.releaseToken(ctx, c.p, tCtx, c.metrics)
 }
 
@@ -143,6 +145,7 @@ func validateRangeFloat64(fieldName string, min, max, provided float64) error {
 
 	return nil
 }
+
 func validateConfig(cfg webapi.PluginConfig) error {
 	errs := stdErrs.ErrorCollection{}
 	errs.Append(validateRangeInt("cache size", minCacheSize, maxCacheSize, cfg.Caching.Size))

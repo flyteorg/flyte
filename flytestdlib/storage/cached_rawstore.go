@@ -35,6 +35,9 @@ type cachedRawStore struct {
 
 // Head gets metadata about the reference. This should generally be a lightweight operation.
 func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/Head")
+	defer span.End()
+
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
 		s.metrics.CacheHit.Inc()
