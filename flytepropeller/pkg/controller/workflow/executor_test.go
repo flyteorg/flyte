@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"strconv"
 
-	// "strings"
 	"testing"
 	"time"
 
@@ -520,12 +519,11 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handleMockCall := h.OnHandleMatch(mock.Anything, mock.Anything)
 	handleMockCall.RunFn = func(args mock.Arguments) {
-		nodeId := args[1].(*nodes.NodeExecContext).NodeID()
-		if nodeId != "start-node" {
+		if args[1].(*nodes.NodeExecContext).Node().IsStartNode() {
+			handleMockCall.ReturnArguments = mock.Arguments{handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil}
+		} else {
 			executionError := core.ExecutionError{Code: "code", Message: "message", ErrorUri: "uri"}
 			handleMockCall.ReturnArguments = mock.Arguments{handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(&executionError, nil)), nil}
-		} else {
-			handleMockCall.ReturnArguments = mock.Arguments{handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil}
 		}
 	}
 
