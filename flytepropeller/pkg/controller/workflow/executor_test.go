@@ -534,29 +534,35 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	handlerFactory.OnSetupMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	handlerFactory.OnGetHandlerMatch(mock.Anything).Return(h, nil)
 
-	nodeExec, err := nodes.NewExecutor(ctx, config.GetConfig().NodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
-		maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
-	assert.NoError(t, err)
-	executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
-	assert.NoError(t, err)
-
-	assert.NoError(t, executor.Initialize(ctx))
-
+	
 	tests := []struct {
 		name string
 		onFailurePolicy v1alpha1.WorkflowOnFailurePolicy
+		clearPreviousError bool
 		expectedRoundsToFail int
 		expectedNodesWithErrorsCount int
 		expectedFailedNodesCount int
-	}{
-		{"failImidiately", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY), 6, 1, 1},
-		{"failAfterExecutableNodesComplete", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), 12, 1, 2},
-	}
-
+		}{
+			{"failImidiately", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY), false, 6, 1, 1},
+			{"failImidiately clearPreviousError", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY), true, 6, 1, 1},
+			{"failAfterExecutableNodesComplete", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), false, 12, 2, 2},
+			{"failAfterExecutableNodesComplete clearPreviousError", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), true, 12, 1, 2},
+		}
+		
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
 	assert.NoError(t, err)
 	for _, test := range tests {
+		
 		t.Run(test.name, func(t *testing.T) {
+			nodeConfig := config.GetConfig().NodeConfig
+			nodeConfig.ClearPreviousError = test.clearPreviousError
+			nodeExec, err := nodes.NewExecutor(ctx, nodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
+				maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
+			assert.NoError(t, err)
+			executor, err := NewExecutor(ctx, store, enqueueWorkflow, eventSink, recorder, "", nodeExec, eventConfig, testClusterID, promutils.NewTestScope())
+			assert.NoError(t, err)
+			assert.NoError(t, executor.Initialize(ctx))
+
 			w := &v1alpha1.FlyteWorkflow{
 				RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{}},
 				WorkflowSpec:        &v1alpha1.WorkflowSpec{OnFailurePolicy: test.onFailurePolicy},
