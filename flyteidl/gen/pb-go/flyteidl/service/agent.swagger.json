@@ -14,7 +14,51 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v1/agent/{name}": {
+      "get": {
+        "summary": "Send a task create request to the agent server.",
+        "operationId": "GetAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminGetAgentResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The name of the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AgentMetadataService"
+        ]
+      }
+    },
+    "/api/v1/agents": {
+      "get": {
+        "summary": "Get job status.",
+        "operationId": "ListAgents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminListAgentsResponse"
+            }
+          }
+        },
+        "tags": [
+          "AgentMetadataService"
+        ]
+      }
+    }
+  },
   "definitions": {
     "BlobTypeBlobDimensionality": {
       "type": "string",
@@ -172,13 +216,32 @@
       ],
       "default": "UNKNOWN"
     },
+    "adminAgent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name is the developer-assigned name of the agent."
+        },
+        "supported_task_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
+        }
+      },
+      "description": "A message containing the agent metadata."
+    },
     "adminCreateTaskResponse": {
       "type": "object",
       "properties": {
         "resource_meta": {
           "type": "string",
-          "format": "byte",
-          "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata)."
+          "format": "byte"
+        },
+        "resource": {
+          "$ref": "#/definitions/adminResource"
         }
       },
       "description": "Represents a create response structure."
@@ -186,6 +249,15 @@
     "adminDeleteTaskResponse": {
       "type": "object",
       "description": "Response to delete a task."
+    },
+    "adminGetAgentResponse": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/adminAgent"
+        }
+      },
+      "description": "A response containing an agent."
     },
     "adminGetTaskResponse": {
       "type": "object",
@@ -198,10 +270,22 @@
           "items": {
             "$ref": "#/definitions/coreTaskLog"
           },
-          "description": "log information for the task execution."
+          "title": "log information for the task execution"
         }
       },
       "description": "Response to get an individual task resource."
+    },
+    "adminListAgentsResponse": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminAgent"
+          }
+        }
+      },
+      "description": "A response containing a list of agents."
     },
     "adminResource": {
       "type": "object",
@@ -217,6 +301,13 @@
         "message": {
           "type": "string",
           "description": "A descriptive message for the current state. e.g. waiting for cluster."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
         }
       }
     },
