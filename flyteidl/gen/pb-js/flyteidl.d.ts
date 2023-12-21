@@ -8935,6 +8935,9 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resourceMeta */
             resourceMeta?: (Uint8Array|null);
+
+            /** CreateTaskResponse resource */
+            resource?: (flyteidl.admin.IResource|null);
         }
 
         /** Represents a CreateTaskResponse. */
@@ -8948,6 +8951,12 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resourceMeta. */
             public resourceMeta: Uint8Array;
+
+            /** CreateTaskResponse resource. */
+            public resource?: (flyteidl.admin.IResource|null);
+
+            /** CreateTaskResponse res. */
+            public res?: ("resourceMeta"|"resource");
 
             /**
              * Creates a new CreateTaskResponse instance using the specified properties.
@@ -9109,6 +9118,9 @@ export namespace flyteidl {
 
             /** Resource message */
             message?: (string|null);
+
+            /** Resource logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a Resource. */
@@ -9128,6 +9140,9 @@ export namespace flyteidl {
 
             /** Resource message. */
             public message: string;
+
+            /** Resource logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
 
             /**
              * Creates a new Resource instance using the specified properties.
