@@ -499,10 +499,6 @@ type nodeExecutor struct {
 	taskRecorder                    events.TaskEventRecorder
 }
 
-func (c *nodeExecutor) GetClearPreviousError() bool {
-	return c.clearPreviousError
-}
-
 func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) {
 	if nodeStatus.GetPhase() == v1alpha1.NodePhaseNotYetStarted || nodeStatus.GetPhase() == v1alpha1.NodePhaseQueued {
 		// Log transition latency (The most recently finished parent node endAt time to this node's queuedAt time -now-)

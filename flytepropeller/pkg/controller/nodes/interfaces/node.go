@@ -123,12 +123,6 @@ func (n *NodeStatus) PartiallyComplete() bool {
 	return n.NodePhase == NodePhaseSuccess
 }
 
-func (n *NodeStatus) ResetError() {
-	if n.Err != nil {
-		n.Err.Reset()
-	}
-}
-
 var NodeStatusPending = NodeStatus{NodePhase: NodePhasePending}
 var NodeStatusQueued = NodeStatus{NodePhase: NodePhaseQueued}
 var NodeStatusRunning = NodeStatus{NodePhase: NodePhaseRunning}
