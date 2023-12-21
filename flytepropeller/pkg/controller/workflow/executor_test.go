@@ -471,9 +471,6 @@ func BenchmarkWorkflowExecutor(b *testing.B) {
 }
 
 func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
-	// Need 2 new sub test cases.
-	// 1. With `onFailurePolicy == v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE)`
-	// 2. Additionally with clearing old errors enabled.
 	ctx := context.Background()
 	scope := promutils.NewTestScope()
 	store := createInmemoryDataStore(t, scope)
@@ -481,8 +478,8 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	_, err := events.ConstructEventSink(ctx, &events.Config{Type: events.EventSinkLog}, scope)
 	assert.NoError(t, err)
 
-	// te := createFailingTaskExecutor(t)
-	// pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
+	te := createFailingTaskExecutor(t)
+	pluginmachinery.PluginRegistry().RegisterCorePlugin(te)
 
 	enqueueWorkflow := func(workflowId v1alpha1.WorkflowID) {}
 
@@ -547,46 +544,54 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 	assert.NoError(t, executor.Initialize(ctx))
 
+	tests := []struct {
+		name string
+		onFailurePolicy v1alpha1.WorkflowOnFailurePolicy
+		expectedRoundsToFail int
+		expectedNodesWithErrorsCount int
+		expectedFailedNodesCount int
+	}{
+		{"failImidiately", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY), 6, 1, 1},
+		{"failAfterExecutableNodesComplete", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), 12, 1, 2},
+	}
+
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
-	if assert.NoError(t, err) {
-		w_spec := &v1alpha1.WorkflowSpec{
-			OnFailurePolicy: v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE),
-			// OnFailurePolicy: v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY),
-		}
-		w := &v1alpha1.FlyteWorkflow{
-			RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{}},
-			WorkflowSpec:        w_spec,
-		}
-		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
-			// For benchmark workflow, we will run into the first failure on round 6
-
-			roundsToFail := 12
-			for i := 0; i < roundsToFail; i++ {
-				t.Run(fmt.Sprintf("Round[%d]", i), func(t *testing.T) {
-					err := executor.HandleFlyteWorkflow(ctx, w)
-					assert.Nil(t, err, "Round [%v]", i)
-					fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
-					walkAndPrint(w.Connections, w.Status.NodeStatus)
-					for _, v := range w.Status.NodeStatus {
-						// Reset dirty manually for tests.
-						v.ResetDirty()
-					}
-					fmt.Printf("\n")
-
-					if i == roundsToFail-1 {
-						assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
-					} else if i == roundsToFail-2 {
-						assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
-					} else {
-						assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
-					}
-				})
+	assert.NoError(t, err)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			w := &v1alpha1.FlyteWorkflow{
+				RawOutputDataConfig: v1alpha1.RawOutputDataConfig{RawOutputDataConfig: &admin.RawOutputDataConfig{}},
+				WorkflowSpec:        &v1alpha1.WorkflowSpec{OnFailurePolicy: test.onFailurePolicy},
 			}
-			assert.Equal(t, "message", w.Status.NodeStatus["add-one-and-print-3"].Error.ExecutionError.Message)
-			assert.Greater(t, CountFailedNodes(w.Status.NodeStatus), 1)
-			assert.Equal(t, 1, CountNodesWithErrors(w.Status.NodeStatus))
-			assert.Equal(t, v1alpha1.WorkflowPhaseFailed.String(), w.Status.Phase.String(), "Message: [%v]", w.Status.Message)
-		}
+			if assert.NoError(t, json.Unmarshal(wJSON, w)) {
+				// For benchmark workflow, we will run into the first failure on round 6
+	
+				for i := 0; i < test.expectedRoundsToFail; i++ {
+					t.Run(fmt.Sprintf("Round[%d]", i), func(t *testing.T) {
+						err := executor.HandleFlyteWorkflow(ctx, w)
+						assert.Nil(t, err, "Round [%v]", i)
+						fmt.Printf("Round[%d] Workflow[%v]\n", i, w.Status.Phase.String())
+						walkAndPrint(w.Connections, w.Status.NodeStatus)
+						for _, v := range w.Status.NodeStatus {
+							// Reset dirty manually for tests.
+							v.ResetDirty()
+						}
+						fmt.Printf("\n")
+	
+						if i == test.expectedRoundsToFail-1 {
+							assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
+						} else if i == test.expectedRoundsToFail-2 {
+							assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
+						} else {
+							assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
+						}
+					})
+				}
+				assert.Equal(t, test.expectedFailedNodesCount, CountFailedNodes(w.Status.NodeStatus))
+				assert.Equal(t, test.expectedNodesWithErrorsCount, CountNodesWithErrors(w.Status.NodeStatus))
+				assert.Equal(t, v1alpha1.WorkflowPhaseFailed.String(), w.Status.Phase.String(), "Message: [%v]", w.Status.Message)
+			}
+		})
 	}
 	assert.True(t, recordedRunning)
 	assert.True(t, recordedFailing)
