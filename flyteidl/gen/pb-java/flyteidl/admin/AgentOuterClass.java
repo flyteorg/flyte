@@ -3615,13 +3615,24 @@ public final class AgentOuterClass {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <pre>
-     * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-     * </pre>
-     *
      * <code>bytes resource_meta = 1;</code>
      */
     com.google.protobuf.ByteString getResourceMeta();
+
+    /**
+     * <code>.flyteidl.admin.Resource resource = 2;</code>
+     */
+    boolean hasResource();
+    /**
+     * <code>.flyteidl.admin.Resource resource = 2;</code>
+     */
+    flyteidl.admin.AgentOuterClass.Resource getResource();
+    /**
+     * <code>.flyteidl.admin.Resource resource = 2;</code>
+     */
+    flyteidl.admin.AgentOuterClass.ResourceOrBuilder getResourceOrBuilder();
+
+    public flyteidl.admin.AgentOuterClass.CreateTaskResponse.ResCase getResCase();
   }
   /**
    * <pre>
@@ -3640,7 +3651,6 @@ public final class AgentOuterClass {
       super(builder);
     }
     private CreateTaskResponse() {
-      resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
     }
 
     @java.lang.Override
@@ -3668,8 +3678,22 @@ public final class AgentOuterClass {
               done = true;
               break;
             case 10: {
-
-              resourceMeta_ = input.readBytes();
+              resCase_ = 1;
+              res_ = input.readBytes();
+              break;
+            }
+            case 18: {
+              flyteidl.admin.AgentOuterClass.Resource.Builder subBuilder = null;
+              if (resCase_ == 2) {
+                subBuilder = ((flyteidl.admin.AgentOuterClass.Resource) res_).toBuilder();
+              }
+              res_ =
+                  input.readMessage(flyteidl.admin.AgentOuterClass.Resource.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.admin.AgentOuterClass.Resource) res_);
+                res_ = subBuilder.buildPartial();
+              }
+              resCase_ = 2;
               break;
             }
             default: {
@@ -3704,17 +3728,79 @@ public final class AgentOuterClass {
               flyteidl.admin.AgentOuterClass.CreateTaskResponse.class, flyteidl.admin.AgentOuterClass.CreateTaskResponse.Builder.class);
     }
 
+    private int resCase_ = 0;
+    private java.lang.Object res_;
+    public enum ResCase
+        implements com.google.protobuf.Internal.EnumLite {
+      RESOURCE_META(1),
+      RESOURCE(2),
+      RES_NOT_SET(0);
+      private final int value;
+      private ResCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static ResCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static ResCase forNumber(int value) {
+        switch (value) {
+          case 1: return RESOURCE_META;
+          case 2: return RESOURCE;
+          case 0: return RES_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public ResCase
+    getResCase() {
+      return ResCase.forNumber(
+          resCase_);
+    }
+
     public static final int RESOURCE_META_FIELD_NUMBER = 1;
-    private com.google.protobuf.ByteString resourceMeta_;
     /**
-     * <pre>
-     * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-     * </pre>
-     *
      * <code>bytes resource_meta = 1;</code>
      */
     public com.google.protobuf.ByteString getResourceMeta() {
-      return resourceMeta_;
+      if (resCase_ == 1) {
+        return (com.google.protobuf.ByteString) res_;
+      }
+      return com.google.protobuf.ByteString.EMPTY;
+    }
+
+    public static final int RESOURCE_FIELD_NUMBER = 2;
+    /**
+     * <code>.flyteidl.admin.Resource resource = 2;</code>
+     */
+    public boolean hasResource() {
+      return resCase_ == 2;
+    }
+    /**
+     * <code>.flyteidl.admin.Resource resource = 2;</code>
+     */
+    public flyteidl.admin.AgentOuterClass.Resource getResource() {
+      if (resCase_ == 2) {
+         return (flyteidl.admin.AgentOuterClass.Resource) res_;
+      }
+      return flyteidl.admin.AgentOuterClass.Resource.getDefaultInstance();
+    }
+    /**
+     * <code>.flyteidl.admin.Resource resource = 2;</code>
+     */
+    public flyteidl.admin.AgentOuterClass.ResourceOrBuilder getResourceOrBuilder() {
+      if (resCase_ == 2) {
+         return (flyteidl.admin.AgentOuterClass.Resource) res_;
+      }
+      return flyteidl.admin.AgentOuterClass.Resource.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -3731,8 +3817,12 @@ public final class AgentOuterClass {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (!resourceMeta_.isEmpty()) {
-        output.writeBytes(1, resourceMeta_);
+      if (resCase_ == 1) {
+        output.writeBytes(
+            1, (com.google.protobuf.ByteString) res_);
+      }
+      if (resCase_ == 2) {
+        output.writeMessage(2, (flyteidl.admin.AgentOuterClass.Resource) res_);
       }
       unknownFields.writeTo(output);
     }
@@ -3743,9 +3833,14 @@ public final class AgentOuterClass {
       if (size != -1) return size;
 
       size = 0;
-      if (!resourceMeta_.isEmpty()) {
+      if (resCase_ == 1) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBytesSize(1, resourceMeta_);
+          .computeBytesSize(
+              1, (com.google.protobuf.ByteString) res_);
+      }
+      if (resCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, (flyteidl.admin.AgentOuterClass.Resource) res_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3762,8 +3857,19 @@ public final class AgentOuterClass {
       }
       flyteidl.admin.AgentOuterClass.CreateTaskResponse other = (flyteidl.admin.AgentOuterClass.CreateTaskResponse) obj;
 
-      if (!getResourceMeta()
-          .equals(other.getResourceMeta())) return false;
+      if (!getResCase().equals(other.getResCase())) return false;
+      switch (resCase_) {
+        case 1:
+          if (!getResourceMeta()
+              .equals(other.getResourceMeta())) return false;
+          break;
+        case 2:
+          if (!getResource()
+              .equals(other.getResource())) return false;
+          break;
+        case 0:
+        default:
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3775,8 +3881,18 @@ public final class AgentOuterClass {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + RESOURCE_META_FIELD_NUMBER;
-      hash = (53 * hash) + getResourceMeta().hashCode();
+      switch (resCase_) {
+        case 1:
+          hash = (37 * hash) + RESOURCE_META_FIELD_NUMBER;
+          hash = (53 * hash) + getResourceMeta().hashCode();
+          break;
+        case 2:
+          hash = (37 * hash) + RESOURCE_FIELD_NUMBER;
+          hash = (53 * hash) + getResource().hashCode();
+          break;
+        case 0:
+        default:
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3914,8 +4030,8 @@ public final class AgentOuterClass {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
-
+        resCase_ = 0;
+        res_ = null;
         return this;
       }
 
@@ -3942,7 +4058,17 @@ public final class AgentOuterClass {
       @java.lang.Override
       public flyteidl.admin.AgentOuterClass.CreateTaskResponse buildPartial() {
         flyteidl.admin.AgentOuterClass.CreateTaskResponse result = new flyteidl.admin.AgentOuterClass.CreateTaskResponse(this);
-        result.resourceMeta_ = resourceMeta_;
+        if (resCase_ == 1) {
+          result.res_ = res_;
+        }
+        if (resCase_ == 2) {
+          if (resourceBuilder_ == null) {
+            result.res_ = res_;
+          } else {
+            result.res_ = resourceBuilder_.build();
+          }
+        }
+        result.resCase_ = resCase_;
         onBuilt();
         return result;
       }
@@ -3991,8 +4117,18 @@ public final class AgentOuterClass {
 
       public Builder mergeFrom(flyteidl.admin.AgentOuterClass.CreateTaskResponse other) {
         if (other == flyteidl.admin.AgentOuterClass.CreateTaskResponse.getDefaultInstance()) return this;
-        if (other.getResourceMeta() != com.google.protobuf.ByteString.EMPTY) {
-          setResourceMeta(other.getResourceMeta());
+        switch (other.getResCase()) {
+          case RESOURCE_META: {
+            setResourceMeta(other.getResourceMeta());
+            break;
+          }
+          case RESOURCE: {
+            mergeResource(other.getResource());
+            break;
+          }
+          case RES_NOT_SET: {
+            break;
+          }
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4022,46 +4158,189 @@ public final class AgentOuterClass {
         }
         return this;
       }
+      private int resCase_ = 0;
+      private java.lang.Object res_;
+      public ResCase
+          getResCase() {
+        return ResCase.forNumber(
+            resCase_);
+      }
 
-      private com.google.protobuf.ByteString resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+      public Builder clearRes() {
+        resCase_ = 0;
+        res_ = null;
+        onChanged();
+        return this;
+      }
+
+
       /**
-       * <pre>
-       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-       * </pre>
-       *
        * <code>bytes resource_meta = 1;</code>
        */
       public com.google.protobuf.ByteString getResourceMeta() {
-        return resourceMeta_;
+        if (resCase_ == 1) {
+          return (com.google.protobuf.ByteString) res_;
+        }
+        return com.google.protobuf.ByteString.EMPTY;
       }
       /**
-       * <pre>
-       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-       * </pre>
-       *
        * <code>bytes resource_meta = 1;</code>
        */
       public Builder setResourceMeta(com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  
-        resourceMeta_ = value;
+  resCase_ = 1;
+        res_ = value;
         onChanged();
         return this;
       }
       /**
-       * <pre>
-       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-       * </pre>
-       *
        * <code>bytes resource_meta = 1;</code>
        */
       public Builder clearResourceMeta() {
-        
-        resourceMeta_ = getDefaultInstance().getResourceMeta();
-        onChanged();
+        if (resCase_ == 1) {
+          resCase_ = 0;
+          res_ = null;
+          onChanged();
+        }
         return this;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.AgentOuterClass.Resource, flyteidl.admin.AgentOuterClass.Resource.Builder, flyteidl.admin.AgentOuterClass.ResourceOrBuilder> resourceBuilder_;
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public boolean hasResource() {
+        return resCase_ == 2;
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public flyteidl.admin.AgentOuterClass.Resource getResource() {
+        if (resourceBuilder_ == null) {
+          if (resCase_ == 2) {
+            return (flyteidl.admin.AgentOuterClass.Resource) res_;
+          }
+          return flyteidl.admin.AgentOuterClass.Resource.getDefaultInstance();
+        } else {
+          if (resCase_ == 2) {
+            return resourceBuilder_.getMessage();
+          }
+          return flyteidl.admin.AgentOuterClass.Resource.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public Builder setResource(flyteidl.admin.AgentOuterClass.Resource value) {
+        if (resourceBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          res_ = value;
+          onChanged();
+        } else {
+          resourceBuilder_.setMessage(value);
+        }
+        resCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public Builder setResource(
+          flyteidl.admin.AgentOuterClass.Resource.Builder builderForValue) {
+        if (resourceBuilder_ == null) {
+          res_ = builderForValue.build();
+          onChanged();
+        } else {
+          resourceBuilder_.setMessage(builderForValue.build());
+        }
+        resCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public Builder mergeResource(flyteidl.admin.AgentOuterClass.Resource value) {
+        if (resourceBuilder_ == null) {
+          if (resCase_ == 2 &&
+              res_ != flyteidl.admin.AgentOuterClass.Resource.getDefaultInstance()) {
+            res_ = flyteidl.admin.AgentOuterClass.Resource.newBuilder((flyteidl.admin.AgentOuterClass.Resource) res_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            res_ = value;
+          }
+          onChanged();
+        } else {
+          if (resCase_ == 2) {
+            resourceBuilder_.mergeFrom(value);
+          }
+          resourceBuilder_.setMessage(value);
+        }
+        resCase_ = 2;
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public Builder clearResource() {
+        if (resourceBuilder_ == null) {
+          if (resCase_ == 2) {
+            resCase_ = 0;
+            res_ = null;
+            onChanged();
+          }
+        } else {
+          if (resCase_ == 2) {
+            resCase_ = 0;
+            res_ = null;
+          }
+          resourceBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public flyteidl.admin.AgentOuterClass.Resource.Builder getResourceBuilder() {
+        return getResourceFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      public flyteidl.admin.AgentOuterClass.ResourceOrBuilder getResourceOrBuilder() {
+        if ((resCase_ == 2) && (resourceBuilder_ != null)) {
+          return resourceBuilder_.getMessageOrBuilder();
+        } else {
+          if (resCase_ == 2) {
+            return (flyteidl.admin.AgentOuterClass.Resource) res_;
+          }
+          return flyteidl.admin.AgentOuterClass.Resource.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.flyteidl.admin.Resource resource = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.AgentOuterClass.Resource, flyteidl.admin.AgentOuterClass.Resource.Builder, flyteidl.admin.AgentOuterClass.ResourceOrBuilder> 
+          getResourceFieldBuilder() {
+        if (resourceBuilder_ == null) {
+          if (!(resCase_ == 2)) {
+            res_ = flyteidl.admin.AgentOuterClass.Resource.getDefaultInstance();
+          }
+          resourceBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.AgentOuterClass.Resource, flyteidl.admin.AgentOuterClass.Resource.Builder, flyteidl.admin.AgentOuterClass.ResourceOrBuilder>(
+                  (flyteidl.admin.AgentOuterClass.Resource) res_,
+                  getParentForChildren(),
+                  isClean());
+          res_ = null;
+        }
+        resCase_ = 2;
+        onChanged();;
+        return resourceBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -5962,6 +6241,50 @@ public final class AgentOuterClass {
      */
     com.google.protobuf.ByteString
         getMessageBytes();
+
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    java.util.List<flyteidl.core.Execution.TaskLog> 
+        getLogLinksList();
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    flyteidl.core.Execution.TaskLog getLogLinks(int index);
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    int getLogLinksCount();
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    java.util.List<? extends flyteidl.core.Execution.TaskLogOrBuilder> 
+        getLogLinksOrBuilderList();
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
+        int index);
   }
   /**
    * Protobuf type {@code flyteidl.admin.Resource}
@@ -5978,6 +6301,7 @@ public final class AgentOuterClass {
     private Resource() {
       state_ = 0;
       message_ = "";
+      logLinks_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -6029,6 +6353,15 @@ public final class AgentOuterClass {
               message_ = s;
               break;
             }
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
+                logLinks_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>();
+                mutable_bitField0_ |= 0x00000008;
+              }
+              logLinks_.add(
+                  input.readMessage(flyteidl.core.Execution.TaskLog.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -6044,6 +6377,9 @@ public final class AgentOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000008) != 0)) {
+          logLinks_ = java.util.Collections.unmodifiableList(logLinks_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -6061,6 +6397,7 @@ public final class AgentOuterClass {
               flyteidl.admin.AgentOuterClass.Resource.class, flyteidl.admin.AgentOuterClass.Resource.Builder.class);
     }
 
+    private int bitField0_;
     public static final int STATE_FIELD_NUMBER = 1;
     private int state_;
     /**
@@ -6167,6 +6504,61 @@ public final class AgentOuterClass {
       }
     }
 
+    public static final int LOG_LINKS_FIELD_NUMBER = 4;
+    private java.util.List<flyteidl.core.Execution.TaskLog> logLinks_;
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    public java.util.List<flyteidl.core.Execution.TaskLog> getLogLinksList() {
+      return logLinks_;
+    }
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    public java.util.List<? extends flyteidl.core.Execution.TaskLogOrBuilder> 
+        getLogLinksOrBuilderList() {
+      return logLinks_;
+    }
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    public int getLogLinksCount() {
+      return logLinks_.size();
+    }
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    public flyteidl.core.Execution.TaskLog getLogLinks(int index) {
+      return logLinks_.get(index);
+    }
+    /**
+     * <pre>
+     * log information for the task execution.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+     */
+    public flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
+        int index) {
+      return logLinks_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6190,6 +6582,9 @@ public final class AgentOuterClass {
       if (!getMessageBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, message_);
       }
+      for (int i = 0; i < logLinks_.size(); i++) {
+        output.writeMessage(4, logLinks_.get(i));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -6209,6 +6604,10 @@ public final class AgentOuterClass {
       }
       if (!getMessageBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, message_);
+      }
+      for (int i = 0; i < logLinks_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, logLinks_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6233,6 +6632,8 @@ public final class AgentOuterClass {
       }
       if (!getMessage()
           .equals(other.getMessage())) return false;
+      if (!getLogLinksList()
+          .equals(other.getLogLinksList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6252,6 +6653,10 @@ public final class AgentOuterClass {
       }
       hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
       hash = (53 * hash) + getMessage().hashCode();
+      if (getLogLinksCount() > 0) {
+        hash = (37 * hash) + LOG_LINKS_FIELD_NUMBER;
+        hash = (53 * hash) + getLogLinksList().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6380,6 +6785,7 @@ public final class AgentOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
+          getLogLinksFieldBuilder();
         }
       }
       @java.lang.Override
@@ -6395,6 +6801,12 @@ public final class AgentOuterClass {
         }
         message_ = "";
 
+        if (logLinksBuilder_ == null) {
+          logLinks_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        } else {
+          logLinksBuilder_.clear();
+        }
         return this;
       }
 
@@ -6421,6 +6833,8 @@ public final class AgentOuterClass {
       @java.lang.Override
       public flyteidl.admin.AgentOuterClass.Resource buildPartial() {
         flyteidl.admin.AgentOuterClass.Resource result = new flyteidl.admin.AgentOuterClass.Resource(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.state_ = state_;
         if (outputsBuilder_ == null) {
           result.outputs_ = outputs_;
@@ -6428,6 +6842,16 @@ public final class AgentOuterClass {
           result.outputs_ = outputsBuilder_.build();
         }
         result.message_ = message_;
+        if (logLinksBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) != 0)) {
+            logLinks_ = java.util.Collections.unmodifiableList(logLinks_);
+            bitField0_ = (bitField0_ & ~0x00000008);
+          }
+          result.logLinks_ = logLinks_;
+        } else {
+          result.logLinks_ = logLinksBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -6486,6 +6910,32 @@ public final class AgentOuterClass {
           message_ = other.message_;
           onChanged();
         }
+        if (logLinksBuilder_ == null) {
+          if (!other.logLinks_.isEmpty()) {
+            if (logLinks_.isEmpty()) {
+              logLinks_ = other.logLinks_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+            } else {
+              ensureLogLinksIsMutable();
+              logLinks_.addAll(other.logLinks_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.logLinks_.isEmpty()) {
+            if (logLinksBuilder_.isEmpty()) {
+              logLinksBuilder_.dispose();
+              logLinksBuilder_ = null;
+              logLinks_ = other.logLinks_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+              logLinksBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getLogLinksFieldBuilder() : null;
+            } else {
+              logLinksBuilder_.addAllMessages(other.logLinks_);
+            }
+          }
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -6514,6 +6964,7 @@ public final class AgentOuterClass {
         }
         return this;
       }
+      private int bitField0_;
 
       private int state_ = 0;
       /**
@@ -6838,6 +7289,318 @@ public final class AgentOuterClass {
         message_ = value;
         onChanged();
         return this;
+      }
+
+      private java.util.List<flyteidl.core.Execution.TaskLog> logLinks_ =
+        java.util.Collections.emptyList();
+      private void ensureLogLinksIsMutable() {
+        if (!((bitField0_ & 0x00000008) != 0)) {
+          logLinks_ = new java.util.ArrayList<flyteidl.core.Execution.TaskLog>(logLinks_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder> logLinksBuilder_;
+
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public java.util.List<flyteidl.core.Execution.TaskLog> getLogLinksList() {
+        if (logLinksBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(logLinks_);
+        } else {
+          return logLinksBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public int getLogLinksCount() {
+        if (logLinksBuilder_ == null) {
+          return logLinks_.size();
+        } else {
+          return logLinksBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public flyteidl.core.Execution.TaskLog getLogLinks(int index) {
+        if (logLinksBuilder_ == null) {
+          return logLinks_.get(index);
+        } else {
+          return logLinksBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder setLogLinks(
+          int index, flyteidl.core.Execution.TaskLog value) {
+        if (logLinksBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureLogLinksIsMutable();
+          logLinks_.set(index, value);
+          onChanged();
+        } else {
+          logLinksBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder setLogLinks(
+          int index, flyteidl.core.Execution.TaskLog.Builder builderForValue) {
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          logLinksBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder addLogLinks(flyteidl.core.Execution.TaskLog value) {
+        if (logLinksBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureLogLinksIsMutable();
+          logLinks_.add(value);
+          onChanged();
+        } else {
+          logLinksBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder addLogLinks(
+          int index, flyteidl.core.Execution.TaskLog value) {
+        if (logLinksBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureLogLinksIsMutable();
+          logLinks_.add(index, value);
+          onChanged();
+        } else {
+          logLinksBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder addLogLinks(
+          flyteidl.core.Execution.TaskLog.Builder builderForValue) {
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.add(builderForValue.build());
+          onChanged();
+        } else {
+          logLinksBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder addLogLinks(
+          int index, flyteidl.core.Execution.TaskLog.Builder builderForValue) {
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          logLinksBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder addAllLogLinks(
+          java.lang.Iterable<? extends flyteidl.core.Execution.TaskLog> values) {
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, logLinks_);
+          onChanged();
+        } else {
+          logLinksBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder clearLogLinks() {
+        if (logLinksBuilder_ == null) {
+          logLinks_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+          onChanged();
+        } else {
+          logLinksBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public Builder removeLogLinks(int index) {
+        if (logLinksBuilder_ == null) {
+          ensureLogLinksIsMutable();
+          logLinks_.remove(index);
+          onChanged();
+        } else {
+          logLinksBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public flyteidl.core.Execution.TaskLog.Builder getLogLinksBuilder(
+          int index) {
+        return getLogLinksFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
+          int index) {
+        if (logLinksBuilder_ == null) {
+          return logLinks_.get(index);  } else {
+          return logLinksBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public java.util.List<? extends flyteidl.core.Execution.TaskLogOrBuilder> 
+           getLogLinksOrBuilderList() {
+        if (logLinksBuilder_ != null) {
+          return logLinksBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(logLinks_);
+        }
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public flyteidl.core.Execution.TaskLog.Builder addLogLinksBuilder() {
+        return getLogLinksFieldBuilder().addBuilder(
+            flyteidl.core.Execution.TaskLog.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public flyteidl.core.Execution.TaskLog.Builder addLogLinksBuilder(
+          int index) {
+        return getLogLinksFieldBuilder().addBuilder(
+            index, flyteidl.core.Execution.TaskLog.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * log information for the task execution.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.TaskLog log_links = 4;</code>
+       */
+      public java.util.List<flyteidl.core.Execution.TaskLog.Builder> 
+           getLogLinksBuilderList() {
+        return getLogLinksFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder> 
+          getLogLinksFieldBuilder() {
+        if (logLinksBuilder_ == null) {
+          logLinksBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.Execution.TaskLog, flyteidl.core.Execution.TaskLog.Builder, flyteidl.core.Execution.TaskLogOrBuilder>(
+                  logLinks_,
+                  ((bitField0_ & 0x00000008) != 0),
+                  getParentForChildren(),
+                  isClean());
+          logLinks_ = null;
+        }
+        return logLinksBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -11372,27 +12135,30 @@ public final class AgentOuterClass {
       "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task" +
       "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_" +
       "execution_metadata\030\004 \001(\0132%.flyteidl.admi" +
-      "n.TaskExecutionMetadata\"+\n\022CreateTaskRes" +
-      "ponse\022\025\n\rresource_meta\030\001 \001(\014\":\n\016GetTaskR" +
-      "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me" +
-      "ta\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030" +
-      "\001 \001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_l" +
-      "inks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"m\n\010Re" +
-      "source\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin.S" +
-      "tate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Li" +
-      "teralMap\022\017\n\007message\030\003 \001(\t\"=\n\021DeleteTaskR" +
-      "equest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_me" +
-      "ta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"3\n\005Agent\022" +
-      "\014\n\004name\030\001 \001(\t\022\034\n\024supported_task_types\030\002 " +
-      "\003(\t\"\037\n\017GetAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020" +
-      "GetAgentResponse\022$\n\005agent\030\001 \001(\0132\025.flytei" +
-      "dl.admin.Agent\"\023\n\021ListAgentsRequest\";\n\022L" +
-      "istAgentsResponse\022%\n\006agents\030\001 \003(\0132\025.flyt" +
-      "eidl.admin.Agent*^\n\005State\022\025\n\021RETRYABLE_F" +
-      "AILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDI" +
-      "NG\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;gith" +
-      "ub.com/flyteorg/flyte/flyteidl/gen/pb-go" +
-      "/flyteidl/adminb\006proto3"
+      "n.TaskExecutionMetadata\"b\n\022CreateTaskRes" +
+      "ponse\022\027\n\rresource_meta\030\001 \001(\014H\000\022,\n\010resour" +
+      "ce\030\002 \001(\0132\030.flyteidl.admin.ResourceH\000B\005\n\003" +
+      "res\":\n\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t" +
+      "\022\025\n\rresource_meta\030\002 \001(\014\"h\n\017GetTaskRespon" +
+      "se\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Re" +
+      "source\022)\n\tlog_links\030\002 \003(\0132\026.flyteidl.cor" +
+      "e.TaskLog\"\230\001\n\010Resource\022$\n\005state\030\001 \001(\0162\025." +
+      "flyteidl.admin.State\022*\n\007outputs\030\002 \001(\0132\031." +
+      "flyteidl.core.LiteralMap\022\017\n\007message\030\003 \001(" +
+      "\t\022)\n\tlog_links\030\004 \003(\0132\026.flyteidl.core.Tas" +
+      "kLog\"=\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001" +
+      " \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTas" +
+      "kResponse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024supp" +
+      "orted_task_types\030\002 \003(\t\"\037\n\017GetAgentReques" +
+      "t\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005a" +
+      "gent\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021Lis" +
+      "tAgentsRequest\";\n\022ListAgentsResponse\022%\n\006" +
+      "agents\030\001 \003(\0132\025.flyteidl.admin.Agent*^\n\005S" +
+      "tate\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT" +
+      "_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\t" +
+      "SUCCEEDED\020\004B=Z;github.com/flyteorg/flyte" +
+      "/flyteidl/gen/pb-go/flyteidl/adminb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -11446,7 +12212,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_CreateTaskResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_CreateTaskResponse_descriptor,
-        new java.lang.String[] { "ResourceMeta", });
+        new java.lang.String[] { "ResourceMeta", "Resource", "Res", });
     internal_static_flyteidl_admin_GetTaskRequest_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_admin_GetTaskRequest_fieldAccessorTable = new
@@ -11464,7 +12230,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Resource_descriptor,
-        new java.lang.String[] { "State", "Outputs", "Message", });
+        new java.lang.String[] { "State", "Outputs", "Message", "LogLinks", });
     internal_static_flyteidl_admin_DeleteTaskRequest_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_DeleteTaskRequest_fieldAccessorTable = new

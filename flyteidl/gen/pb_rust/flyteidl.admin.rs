@@ -46,8 +46,22 @@ pub struct CreateTaskRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTaskResponse {
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-    #[prost(bytes="vec", tag="1")]
-    pub resource_meta: ::prost::alloc::vec::Vec<u8>,
+    /// Resource is for synchronous task execution.
+    #[prost(oneof="create_task_response::Res", tags="1, 2")]
+    pub res: ::core::option::Option<create_task_response::Res>,
+}
+/// Nested message and enum types in `CreateTaskResponse`.
+pub mod create_task_response {
+    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// Resource is for synchronous task execution.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Res {
+        #[prost(bytes, tag="1")]
+        ResourceMeta(::prost::alloc::vec::Vec<u8>),
+        #[prost(message, tag="2")]
+        Resource(super::Resource),
+    }
 }
 /// A message used to fetch a job resource from flyte agent server.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -84,6 +98,9 @@ pub struct Resource {
     /// A descriptive message for the current state. e.g. waiting for cluster.
     #[prost(string, tag="3")]
     pub message: ::prost::alloc::string::String,
+    /// log information for the task execution.
+    #[prost(message, repeated, tag="4")]
+    pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
