@@ -251,9 +251,11 @@ func validateParameterMapAllowArtifacts(inputMap *core.ParameterMap, fieldName s
 }
 
 func validateParameterMapDisableArtifacts(inputMap *core.ParameterMap, fieldName string) error {
-	for name, defaultInput := range inputMap.Parameters {
-		if defaultInput.GetArtifactQuery() != nil {
-			return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "artifact mode not enabled but query found %s %s", fieldName, name)
+	if inputMap != nil && len(inputMap.Parameters) > 0 {
+		for name, defaultInput := range inputMap.Parameters {
+			if defaultInput.GetArtifactQuery() != nil {
+				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "artifact mode not enabled but query found %s %s", fieldName, name)
+			}
 		}
 	}
 	return validateParameterMap(inputMap, fieldName)
