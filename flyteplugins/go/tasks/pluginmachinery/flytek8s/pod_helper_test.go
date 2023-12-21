@@ -1351,6 +1351,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("InvalidImageName", func(t *testing.T) {
@@ -1368,6 +1369,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("RegistryUnavailable", func(t *testing.T) {
@@ -1385,6 +1387,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("RandomError", func(t *testing.T) {
@@ -1402,6 +1405,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("CreateContainerConfigErrorWithinGracePeriod", func(t *testing.T) {
@@ -1440,6 +1444,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 
 	t.Run("CreateContainerErrorWithinGracePeriod", func(t *testing.T) {
@@ -1478,6 +1483,7 @@ func TestDemystifyPending(t *testing.T) {
 		taskStatus, err := DemystifyPending(s2)
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, taskStatus.Phase())
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 }
 
@@ -1510,6 +1516,7 @@ func TestDemystifyPendingTimeout(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, taskStatus.Phase())
 		assert.Equal(t, "PodPendingTimeout", taskStatus.Err().Code)
+		assert.True(t, taskStatus.CleanupOnFailure())
 	})
 }
 

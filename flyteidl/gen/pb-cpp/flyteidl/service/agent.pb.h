@@ -29,6 +29,7 @@
 #include <google/protobuf/metadata.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include "google/api/annotations.pb.h"
 #include "flyteidl/admin/agent.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>

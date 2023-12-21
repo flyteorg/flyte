@@ -2,20 +2,60 @@ package agent
 
 import (
 	"context"
-	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"sort"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/tests"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
+
+func TestSyncTask(t *testing.T) {
+	tCtx := getTaskContext(t)
+	taskReader := new(pluginCoreMocks.TaskReader)
+
+	template := flyteIdlCore.TaskTemplate{
+		Type: "api_task",
+	}
+
+	taskReader.On("Read", mock.Anything).Return(&template, nil)
+
+	tCtx.OnTaskReader().Return(taskReader)
+
+	agentPlugin := newMockSyncAgentPlugin()
+	pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
+	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("create_task_sync_test"))
+	assert.NoError(t, err)
+
+	inputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	assert.NoError(t, err)
+	basePrefix := storage.DataReference("fake://bucket/prefix/")
+	inputReader := &ioMocks.InputReader{}
+	inputReader.OnGetInputPrefixPath().Return(basePrefix)
+	inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
+	tCtx.OnInputReader().Return(inputReader)
+
+	phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, nil)
+	assert.Equal(t, true, phase.Phase().IsSuccess())
+}
 
 func TestPlugin(t *testing.T) {
 	fakeSetupContext := pluginCoreMocks.SetupContext{}
@@ -45,19 +85,26 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test newAgentPlugin", func(t *testing.T) {
-		p := newAgentPlugin()
+		p := newMockAgentPlugin()
 		assert.NotNil(t, p)
 		assert.Equal(t, "agent-service", p.ID)
 		assert.NotNil(t, p.PluginLoader)
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agent, _ := getFinalAgent("spark", &cfg)
-		assert.Equal(t, cfg.Agents["spark_agent"].Endpoint, agent.Endpoint)
-		agent, _ = getFinalAgent("foo", &cfg)
-		assert.Equal(t, cfg.DefaultAgent.Endpoint, agent.Endpoint)
-		_, err := getFinalAgent("bar", &cfg)
-		assert.NotNil(t, err)
+		agentRegistry := map[string]*Agent{"spark": {Endpoint: "localhost:80"}}
+		agent := getFinalAgent("spark", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, "localhost:80")
+		agent = getFinalAgent("foo", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
+		agent = getFinalAgent("bar", &cfg, agentRegistry)
+		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
+	})
+
+	t.Run("test getAgentMetadataClientFunc", func(t *testing.T) {
+		client, err := getAgentMetadataClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
+		assert.NoError(t, err)
+		assert.NotNil(t, client)
 	})
 
 	t.Run("test getClientFunc", func(t *testing.T) {
@@ -108,7 +155,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_PENDING,
 			Outputs:  nil,
 			Message:  "Waiting for cluster",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -123,7 +170,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_RUNNING,
 			Outputs:  nil,
 			Message:  "Job is running",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -137,7 +184,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_PERMANENT_FAILURE,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -151,7 +198,7 @@ func TestPlugin(t *testing.T) {
 			State:    admin.State_RETRYABLE_FAILURE,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
@@ -165,11 +212,42 @@ func TestPlugin(t *testing.T) {
 			State:    5,
 			Outputs:  nil,
 			Message:  "",
-			LogLinks: []*flyteidlcore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
 		})
 
 		phase, err := plugin.Status(context.Background(), taskContext)
 		assert.Error(t, err)
 		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
 	})
+}
+
+func TestInitializeAgentRegistry(t *testing.T) {
+	mockClient := new(agentMocks.AgentMetadataServiceClient)
+	mockRequest := &admin.ListAgentsRequest{}
+	mockResponse := &admin.ListAgentsResponse{
+		Agents: []*admin.Agent{
+			{
+				Name:               "test-agent",
+				SupportedTaskTypes: []string{"task1", "task2", "task3"},
+			},
+		},
+	}
+
+	mockClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
+	getAgentMetadataClientFunc := func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
+		return mockClient, nil
+	}
+
+	cfg := defaultConfig
+	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: "localhost:80"}}
+	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
+	connectionCache := make(map[*Agent]*grpc.ClientConn)
+	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, getAgentMetadataClientFunc)
+	assert.NoError(t, err)
+
+	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
+	agentRegistryKeys := maps.Keys(agentRegistry)
+	sort.Strings(agentRegistryKeys)
+
+	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
 }
