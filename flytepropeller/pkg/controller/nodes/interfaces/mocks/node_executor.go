@@ -80,6 +80,38 @@ func (_m *NodeExecutor) Finalize(ctx context.Context, h interfaces.NodeHandler, 
 	return r0
 }
 
+type NodeExecutor_GetClearPreviousError struct {
+	*mock.Call
+}
+
+func (_m NodeExecutor_GetClearPreviousError) Return(_a0 bool) *NodeExecutor_GetClearPreviousError {
+	return &NodeExecutor_GetClearPreviousError{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *NodeExecutor) OnGetClearPreviousError() *NodeExecutor_GetClearPreviousError {
+	c_call := _m.On("GetClearPreviousError")
+	return &NodeExecutor_GetClearPreviousError{Call: c_call}
+}
+
+func (_m *NodeExecutor) OnGetClearPreviousErrorMatch(matchers ...interface{}) *NodeExecutor_GetClearPreviousError {
+	c_call := _m.On("GetClearPreviousError", matchers...)
+	return &NodeExecutor_GetClearPreviousError{Call: c_call}
+}
+
+// GetClearPreviousError provides a mock function with given fields:
+func (_m *NodeExecutor) GetClearPreviousError() bool {
+	ret := _m.Called()
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func() bool); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	return r0
+}
+
 type NodeExecutor_HandleNode struct {
 	*mock.Call
 }
