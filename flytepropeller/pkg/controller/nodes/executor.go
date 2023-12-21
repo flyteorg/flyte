@@ -298,7 +298,9 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 				// If the failure policy allows other nodes to continue running, do not exit the loop,
 				// Keep track of the last failed state in the loop since it'll be the one to return.
 				// TODO: If multiple nodes fail (which this mode allows), consolidate/summarize failure states in one.
-				stateOnComplete.ResetError()
+				if c.nodeExecutor.GetClearPreviousError() {
+					stateOnComplete.ResetError()
+				}
 				stateOnComplete = state
 			} else {
 				return state, nil
@@ -477,6 +479,7 @@ type nodeExecutor struct {
 	catalog                         catalog.Client
 	clusterID                       string
 	enableCRDebugMetadata           bool
+	clearPreviousError              bool
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
 	defaultExecutionDeadline        time.Duration
@@ -492,6 +495,10 @@ type nodeExecutor struct {
 	shardSelector                   ioutils.ShardSelector
 	store                           *storage.DataStore
 	taskRecorder                    events.TaskEventRecorder
+}
+
+func (c *nodeExecutor) GetClearPreviousError() bool {
+	return c.clearPreviousError
 }
 
 func (c *nodeExecutor) RecordTransitionLatency(ctx context.Context, dag executors.DAGStructure, nl executors.NodeLookup, node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus) {
@@ -1438,6 +1445,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		catalog:                         catalogClient,
 		clusterID:                       clusterID,
 		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
+		clearPreviousError:              nodeConfig.ClearPreviousError,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,

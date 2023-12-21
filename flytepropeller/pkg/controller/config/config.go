@@ -99,6 +99,7 @@ var (
 			DefaultMaxAttempts:             1,
 			IgnoreRetryCause:               false,
 			EnableCRDebugMetadata:          false,
+			ClearPreviousError:             false,
 		},
 		MaxStreakLength: 8, // Turbo mode is enabled by default
 		ProfilerPort: config.Port{
@@ -215,6 +216,7 @@ type NodeConfig struct {
 	DefaultMaxAttempts             int32            `json:"default-max-attempts" pflag:"3,Default maximum number of attempts for a node"`
 	IgnoreRetryCause               bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
 	EnableCRDebugMetadata          bool             `json:"enable-cr-debug-metadata" pflag:",Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd."`
+	ClearPreviousError             bool             `json:"clear-previous-error" pflag:",When using the fail after executable nodes complete mode many nodes in the workflow can fail. This option causes the previous error to be cleared every time a new error occurs. This helps reduce the size of workflow state in etcd."`
 }
 
 // DefaultDeadlines contains default values for timeouts

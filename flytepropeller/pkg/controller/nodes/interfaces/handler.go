@@ -16,6 +16,7 @@ type NodeExecutor interface {
 	HandleNode(ctx context.Context, dag executors.DAGStructure, nCtx NodeExecutionContext, h NodeHandler) (NodeStatus, error)
 	Abort(ctx context.Context, h NodeHandler, nCtx NodeExecutionContext, reason string, finalTransition bool) error
 	Finalize(ctx context.Context, h NodeHandler, nCtx NodeExecutionContext) error
+	GetClearPreviousError() bool
 }
 
 // Interface that should be implemented for a node type.
