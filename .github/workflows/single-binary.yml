@@ -126,6 +126,7 @@ jobs:
     timeout-minutes: 60
     needs: [build-and-push-single-binary-image]
     steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
       - name: Set latest Flytesnacks release
         if: ${{ env.FLYTESNACKS_VERSION == '' }}
         run: |
