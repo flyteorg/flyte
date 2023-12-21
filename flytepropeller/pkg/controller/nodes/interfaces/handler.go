@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 //go:generate mockery -all -case=underscore
@@ -16,7 +17,7 @@ type NodeExecutor interface {
 	HandleNode(ctx context.Context, dag executors.DAGStructure, nCtx NodeExecutionContext, h NodeHandler) (NodeStatus, error)
 	Abort(ctx context.Context, h NodeHandler, nCtx NodeExecutionContext, reason string, finalTransition bool) error
 	Finalize(ctx context.Context, h NodeHandler, nCtx NodeExecutionContext) error
-	GetClearPreviousError() bool
+	Clear(executableNodeStatus v1alpha1.ExecutableNodeStatus)
 }
 
 // Interface that should be implemented for a node type.

@@ -346,6 +346,8 @@ type MutableNodeStatus interface {
 	GetArrayNodeStatus() MutableArrayNodeStatus
 	GetOrCreateArrayNodeStatus() MutableArrayNodeStatus
 	ClearArrayNodeStatus()
+
+	ClearExecutionError()
 }
 
 type ExecutionTimeInfo interface {

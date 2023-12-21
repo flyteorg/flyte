@@ -277,6 +277,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 	partialNodeCompletion := false
 	onFailurePolicy := execContext.GetOnFailurePolicy()
 	stateOnComplete := interfaces.NodeStatusComplete
+	var executableNodeStatusOnComplete v1alpha1.ExecutableNodeStatus
 	for _, downstreamNodeName := range downstreamNodes {
 		downstreamNode, ok := nl.GetNode(downstreamNodeName)
 		if !ok {
@@ -298,9 +299,10 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 				// If the failure policy allows other nodes to continue running, do not exit the loop,
 				// Keep track of the last failed state in the loop since it'll be the one to return.
 				// TODO: If multiple nodes fail (which this mode allows), consolidate/summarize failure states in one.
-				if c.nodeExecutor.GetClearPreviousError() {
-					stateOnComplete.ResetError()
+				if executableNodeStatusOnComplete != nil {
+					c.nodeExecutor.Clear(executableNodeStatusOnComplete)
 				}
+				executableNodeStatusOnComplete = nl.GetNodeExecutionStatus(ctx, downstreamNode.GetID())
 				stateOnComplete = state
 			} else {
 				return state, nil
@@ -869,6 +871,12 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 	}
 
 	return phase, nil
+}
+
+func (c *nodeExecutor) Clear(executableNodeStatus v1alpha1.ExecutableNodeStatus) {
+	if c.clearPreviousError {
+		executableNodeStatus.ClearExecutionError()
+	}
 }
 
 func (c *nodeExecutor) Abort(ctx context.Context, h interfaces.NodeHandler, nCtx interfaces.NodeExecutionContext, reason string, finalTransition bool) error {
