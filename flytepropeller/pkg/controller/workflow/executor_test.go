@@ -238,7 +238,7 @@ func CountFailedNodes(nodeStatuses map[v1alpha1.NodeID]*v1alpha1.NodeStatus) int
 func CountNodesWithErrors(nodeStatuses map[v1alpha1.NodeID]*v1alpha1.NodeStatus) int {
 	count := 0
 	for _, v := range nodeStatuses {
-		if v.Error != nil && v.Error.Message != "" {
+		if v.Error != nil {
 			count++
 		}
 	}
