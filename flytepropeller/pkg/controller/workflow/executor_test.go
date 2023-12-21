@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+
 	// "strings"
 	"testing"
 	"time"
@@ -520,12 +521,15 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 	h := &nodemocks.NodeHandler{}
 	h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
-	h.OnHandleMatch(mock.Anything, mock.Anything).Return(handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil).Times(5)
 	handleMockCall := h.OnHandleMatch(mock.Anything, mock.Anything)
 	handleMockCall.RunFn = func(args mock.Arguments) {
-		// code := args[1].(string)
-		executionError := core.ExecutionError{Code: "code", Message: "message", ErrorUri: "uri"}
-		handleMockCall.ReturnArguments = mock.Arguments{handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailingErr(&executionError, nil)), nil}
+		nodeId := args[1].(*nodes.NodeExecContext).NodeID()
+		if nodeId != "start-node" {
+			executionError := core.ExecutionError{Code: "code", Message: "message", ErrorUri: "uri"}
+			handleMockCall.ReturnArguments = mock.Arguments{handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(&executionError, nil)), nil}
+		} else {
+			handleMockCall.ReturnArguments = mock.Arguments{handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoSuccess(nil)), nil}
+		}
 	}
 
 	h.OnFinalizeMatch(mock.Anything, mock.Anything).Return(nil)
@@ -556,7 +560,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 		if assert.NoError(t, json.Unmarshal(wJSON, w)) {
 			// For benchmark workflow, we will run into the first failure on round 6
 
-			roundsToFail := 13
+			roundsToFail := 12
 			for i := 0; i < roundsToFail; i++ {
 				t.Run(fmt.Sprintf("Round[%d]", i), func(t *testing.T) {
 					err := executor.HandleFlyteWorkflow(ctx, w)
@@ -569,16 +573,16 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 					}
 					fmt.Printf("\n")
 
-					// if i == roundsToFail-1 {
-					// 	assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
-					// } else if i == roundsToFail-2 {
-					// 	assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
-					// } else {
-					// 	assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
-					// }
+					if i == roundsToFail-1 {
+						assert.Equal(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase)
+					} else if i == roundsToFail-2 {
+						assert.Equal(t, v1alpha1.WorkflowPhaseHandlingFailureNode, w.Status.Phase)
+					} else {
+						assert.NotEqual(t, v1alpha1.WorkflowPhaseFailed, w.Status.Phase, "For Round [%v] got phase [%v]", i, w.Status.Phase.String())
+					}
 				})
 			}
-			// assert.True(t, strings.Contains(w.Status.NodeStatus[v1alpha1.NodeID("sum-non-none-0")].Error.Message, "caused by"))
+			assert.Equal(t, "message", w.Status.NodeStatus["add-one-and-print-3"].Error.ExecutionError.Message)
 			assert.Greater(t, CountFailedNodes(w.Status.NodeStatus), 1)
 			assert.Equal(t, 1, CountNodesWithErrors(w.Status.NodeStatus))
 			assert.Equal(t, v1alpha1.WorkflowPhaseFailed.String(), w.Status.Phase.String(), "Message: [%v]", w.Status.Message)

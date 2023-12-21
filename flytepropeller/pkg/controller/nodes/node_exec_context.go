@@ -118,7 +118,7 @@ func (e nodeExecMetadata) GetLabels() map[string]string {
 	return e.nodeLabels
 }
 
-type nodeExecContext struct {
+type NodeExecContext struct {
 	store               *storage.DataStore
 	tr                  interfaces.TaskReader
 	md                  interfaces.NodeExecutionMetadata
@@ -135,78 +135,78 @@ type nodeExecContext struct {
 	ic                  executors.ExecutionContext
 }
 
-func (e nodeExecContext) ExecutionContext() executors.ExecutionContext {
+func (e NodeExecContext) ExecutionContext() executors.ExecutionContext {
 	return e.ic
 }
 
-func (e nodeExecContext) ContextualNodeLookup() executors.NodeLookup {
+func (e NodeExecContext) ContextualNodeLookup() executors.NodeLookup {
 	return e.nl
 }
 
-func (e nodeExecContext) OutputShardSelector() ioutils.ShardSelector {
+func (e NodeExecContext) OutputShardSelector() ioutils.ShardSelector {
 	return e.shardSelector
 }
 
-func (e nodeExecContext) RawOutputPrefix() storage.DataReference {
+func (e NodeExecContext) RawOutputPrefix() storage.DataReference {
 	return e.rawOutputPrefix
 }
 
-func (e nodeExecContext) EnqueueOwnerFunc() func() error {
+func (e NodeExecContext) EnqueueOwnerFunc() func() error {
 	return e.enqueueOwner
 }
 
-func (e nodeExecContext) TaskReader() interfaces.TaskReader {
+func (e NodeExecContext) TaskReader() interfaces.TaskReader {
 	return e.tr
 }
 
-func (e nodeExecContext) NodeStateReader() interfaces.NodeStateReader {
+func (e NodeExecContext) NodeStateReader() interfaces.NodeStateReader {
 	return e.nsm
 }
 
-func (e nodeExecContext) NodeStateWriter() interfaces.NodeStateWriter {
+func (e NodeExecContext) NodeStateWriter() interfaces.NodeStateWriter {
 	return e.nsm
 }
 
-func (e nodeExecContext) DataStore() *storage.DataStore {
+func (e NodeExecContext) DataStore() *storage.DataStore {
 	return e.store
 }
 
-func (e nodeExecContext) InputReader() io.InputReader {
+func (e NodeExecContext) InputReader() io.InputReader {
 	return e.inputs
 }
 
-func (e nodeExecContext) EventsRecorder() interfaces.EventRecorder {
+func (e NodeExecContext) EventsRecorder() interfaces.EventRecorder {
 	return e.eventRecorder
 }
 
-func (e nodeExecContext) NodeID() v1alpha1.NodeID {
+func (e NodeExecContext) NodeID() v1alpha1.NodeID {
 	return e.node.GetID()
 }
 
-func (e nodeExecContext) Node() v1alpha1.ExecutableNode {
+func (e NodeExecContext) Node() v1alpha1.ExecutableNode {
 	return e.node
 }
 
-func (e nodeExecContext) CurrentAttempt() uint32 {
+func (e NodeExecContext) CurrentAttempt() uint32 {
 	return e.nodeStatus.GetAttempts()
 }
 
-func (e nodeExecContext) NodeStatus() v1alpha1.ExecutableNodeStatus {
+func (e NodeExecContext) NodeStatus() v1alpha1.ExecutableNodeStatus {
 	return e.nodeStatus
 }
 
-func (e nodeExecContext) NodeExecutionMetadata() interfaces.NodeExecutionMetadata {
+func (e NodeExecContext) NodeExecutionMetadata() interfaces.NodeExecutionMetadata {
 	return e.md
 }
 
-func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
+func (e NodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
 	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
-	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
+	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *NodeExecContext {
 
 	md := nodeExecMetadata{
 		Meta: execContext,
@@ -230,7 +230,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 	nodeLabels[NodeInterruptibleLabel] = strconv.FormatBool(interruptible)
 	md.nodeLabels = nodeLabels
 
-	return &nodeExecContext{
+	return &NodeExecContext{
 		md:         md,
 		store:      store,
 		node:       node,
