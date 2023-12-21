@@ -13,11 +13,7 @@ import (
 
 // ValidateClusterForExecutionID validates that the execution denoted by executionId is recorded as executing on `cluster`.
 func ValidateClusterForExecutionID(ctx context.Context, db repoInterfaces.Repository, executionID *core.WorkflowExecutionIdentifier, clusterInEvent string) error {
-	workflowExecution, err := db.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: executionID.Project,
-		Domain:  executionID.Domain,
-		Name:    executionID.Name,
-	})
+	workflowExecution, err := db.ExecutionRepo().Get(ctx, executionID)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to find existing execution with id [%+v] with err: %v", executionID, err)
 		return err

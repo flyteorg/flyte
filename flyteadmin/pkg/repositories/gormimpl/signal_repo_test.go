@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -36,6 +37,15 @@ var (
 		Value: []byte{3, 4},
 	}
 )
+
+var signalIdentifier = &core.SignalIdentifier{
+	SignalId:            "signal",
+	ExecutionId:          &core.WorkflowExecutionIdentifier{
+		Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+		},
+	}
 
 func toSignalMap(signalModel models.Signal) map[string]interface{} {
 	signal := make(map[string]interface{})
@@ -69,7 +79,7 @@ func TestGetSignal(t *testing.T) {
 		`SELECT * FROM "signals" WHERE "signals"."execution_project" = $1 AND "signals"."execution_domain" = $2 AND "signals"."execution_name" = $3 AND "signals"."signal_id" = $4 LIMIT 1`)
 
 	// retrieve non-existent signalModel
-	lookupSignalModel, err := signalRepo.Get(ctx, signalModel.SignalKey)
+	lookupSignalModel, err := signalRepo.Get(ctx, signalIdentifier)
 	assert.Error(t, err)
 	assert.Empty(t, lookupSignalModel)
 
@@ -80,7 +90,7 @@ func TestGetSignal(t *testing.T) {
 	signalModels := []map[string]interface{}{toSignalMap(*signalModel)}
 	mockSelectQuery.WithReply(signalModels)
 
-	lookupSignalModel, err = signalRepo.Get(ctx, signalModel.SignalKey)
+	lookupSignalModel, err = signalRepo.Get(ctx, signalIdentifier)
 	assert.NoError(t, err)
 	assert.True(t, reflect.DeepEqual(*signalModel, lookupSignalModel))
 
@@ -100,7 +110,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 	mockInsertQuery.WithQuery(
 		`INSERT INTO "signals" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","signal_id","type","value","id") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
 
-	err := signalRepo.GetOrCreate(ctx, signalModel)
+	err := signalRepo.GetOrCreate(ctx, signalIdentifier, signalModel)
 	assert.NoError(t, err)
 
 	assert.True(t, mockInsertQuery.Triggered)
@@ -118,7 +128,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 	lookupSignalModel.Type = nil
 	lookupSignalModel.Value = nil
 
-	err = signalRepo.GetOrCreate(ctx, lookupSignalModel)
+	err = signalRepo.GetOrCreate(ctx, signalIdentifier, lookupSignalModel)
 	assert.NoError(t, err)
 	assert.True(t, reflect.DeepEqual(signalModel, lookupSignalModel))
 
@@ -167,7 +177,7 @@ func TestUpdateSignal(t *testing.T) {
 	mockUpdateQuery.WithQuery(
 		`UPDATE "signals" SET "updated_at"=$1,"value"=$2 WHERE "execution_project" = $3 AND "execution_domain" = $4 AND "execution_name" = $5 AND "signal_id" = $6`).WithRowsNum(0)
 
-	err := signalRepo.Update(ctx, signalModel.SignalKey, signalModel.Value)
+	err := signalRepo.Update(ctx, signalIdentifier, signalModel.Value)
 	assert.Error(t, err)
 
 	assert.True(t, mockUpdateQuery.Triggered)
@@ -176,7 +186,7 @@ func TestUpdateSignal(t *testing.T) {
 	// update signalModel exists
 	mockUpdateQuery.WithRowsNum(1)
 
-	err = signalRepo.Update(ctx, signalModel.SignalKey, signalModel.Value)
+	err = signalRepo.Update(ctx, signalIdentifier, signalModel.Value)
 	assert.NoError(t, err)
 
 	assert.True(t, mockUpdateQuery.Triggered)

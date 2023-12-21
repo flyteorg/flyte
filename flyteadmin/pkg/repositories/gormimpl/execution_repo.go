@@ -22,7 +22,7 @@ type ExecutionRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) error {
+func (r *ExecutionRepo) Create(ctx context.Context, id *core.WorkflowExecutionIdentifier, input models.Execution) error {
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
@@ -32,23 +32,23 @@ func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) erro
 	return nil
 }
 
-func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+func (r *ExecutionRepo) Get(ctx context.Context, id *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 	var execution models.Execution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Execution{
 		ExecutionKey: models.ExecutionKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
 		},
 	}).Take(&execution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Execution{}, adminErrors.GetMissingEntityError("execution", &core.Identifier{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
 		})
 	} else if tx.Error != nil {
 		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -56,7 +56,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 	return execution, nil
 }
 
-func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) error {
+func (r *ExecutionRepo) Update(ctx context.Context, id *core.WorkflowExecutionIdentifier, execution models.Execution) error {
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&execution).Updates(execution)
 	timer.Stop()
@@ -97,7 +97,7 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, common.Execution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.ExecutionCollectionOutput{}, err
 	}
@@ -136,7 +136,7 @@ func (r *ExecutionRepo) Count(ctx context.Context, input interfaces.CountResourc
 	}
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, common.Execution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return 0, err
 	}

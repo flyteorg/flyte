@@ -3,6 +3,8 @@ package rpc
 import (
 	"context"
 	"fmt"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"runtime/debug"
 
 	"github.com/golang/protobuf/proto"
@@ -46,7 +48,8 @@ type SignalService struct {
 	metrics       SignalMetrics
 }
 
-func NewSignalServer(ctx context.Context, configuration runtimeIfaces.Configuration, adminScope promutils.Scope) *SignalService {
+func NewSignalServer(ctx context.Context, configuration runtimeIfaces.Configuration, adminScope promutils.Scope,
+	pluginRegistry *plugins.Registry) *SignalService {
 	panicCounter := adminScope.MustNewCounter("initialization_panic",
 		"panics encountered initializing the signal service")
 
@@ -65,7 +68,11 @@ func NewSignalServer(ctx context.Context, configuration runtimeIfaces.Configurat
 		logger.Fatal(ctx, err)
 	}
 	dbScope := adminScope.NewSubScope("database")
-	repo := repositories.NewGormRepo(
+	pluginRegistry.RegisterDefault(plugins.PluginIDRepositoryImpl, repositories.NewGormRepo)
+	var newRepoImpl repoInterfaces.NewRepo
+	newRepoImpl = plugins.Get[repoInterfaces.NewRepo](pluginRegistry, plugins.PluginIDRepositoryImpl)
+
+	repo := newRepoImpl(
 		db, errors.NewPostgresErrorTransformer(adminScope.NewSubScope("errors")), dbScope)
 
 	signalManager := manager.NewSignalManager(repo, adminScope.NewSubScope("signal_manager"))

@@ -26,7 +26,7 @@ var acceptedReferenceLaunchTypes = map[core.ResourceType]interface{}{
 	core.ResourceType_TASK:        nil,
 }
 
-func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreateRequest,
+func ValidateExecutionRequest(ctx context.Context, request *admin.ExecutionCreateRequest,
 	db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration) error {
 	if err := ValidateEmptyStringField(request.Project, shared.Project); err != nil {
 		return err
@@ -43,7 +43,7 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"name for ExecutionCreateRequest [%+v] exceeded allowed length %d", request, allowedExecutionNameLength)
 	}
-	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, config, request); err != nil {
 		return err
 	}
 

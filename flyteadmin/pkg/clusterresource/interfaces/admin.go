@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
@@ -9,6 +10,6 @@ import (
 //go:generate mockery -name FlyteAdminDataProvider -output=../mocks -case=underscore
 
 type FlyteAdminDataProvider interface {
-	GetClusterResourceAttributes(ctx context.Context, project, domain string) (*admin.ClusterResourceAttributes, error)
+	GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceIdentifier) (*admin.ClusterResourceAttributes, error)
 	GetProjects(ctx context.Context) (*admin.Projects, error)
 }

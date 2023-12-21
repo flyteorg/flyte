@@ -6,10 +6,11 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type CreateTaskFunc func(input models.Task, descriptionEntity *models.DescriptionEntity) error
-type GetTaskFunc func(input interfaces.Identifier) (models.Task, error)
+type GetTaskFunc func(id *core.Identifier) (models.Task, error)
 type ListTaskFunc func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error)
 type ListTaskIdentifiersFunc func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error)
 
@@ -20,7 +21,7 @@ type MockTaskRepo struct {
 	listUniqueTaskIdsFunction ListTaskIdentifiersFunc
 }
 
-func (r *MockTaskRepo) Create(ctx context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error {
+func (r *MockTaskRepo) Create(ctx context.Context, id *core.Identifier, input models.Task, descriptionEntity *models.DescriptionEntity) error {
 	if r.createFunction != nil {
 		return r.createFunction(input, descriptionEntity)
 	}
@@ -31,16 +32,16 @@ func (r *MockTaskRepo) SetCreateCallback(createFunction CreateTaskFunc) {
 	r.createFunction = createFunction
 }
 
-func (r *MockTaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Task, error) {
+func (r *MockTaskRepo) Get(ctx context.Context, id *core.Identifier) (models.Task, error) {
 	if r.getFunction != nil {
-		return r.getFunction(input)
+		return r.getFunction(id)
 	}
 	return models.Task{
 		TaskKey: models.TaskKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}, nil
 }

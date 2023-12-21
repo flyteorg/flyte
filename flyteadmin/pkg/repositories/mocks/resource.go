@@ -20,7 +20,7 @@ type MockResourceRepo struct {
 	ListAllFunction        ListAllResourcesFunction
 }
 
-func (r *MockResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource) error {
+func (r *MockResourceRepo) CreateOrUpdate(ctx context.Context, resourceID interfaces.ResourceID, input models.Resource) error {
 	if r.CreateOrUpdateFunction != nil {
 		return r.CreateOrUpdateFunction(ctx, input)
 	}

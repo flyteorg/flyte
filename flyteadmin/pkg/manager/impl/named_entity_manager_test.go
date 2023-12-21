@@ -43,10 +43,10 @@ func TestNamedEntityManager_Get(t *testing.T) {
 	repository := getMockRepositoryForNETest()
 	manager := NewNamedEntityManager(repository, getMockConfigForNETest(), mockScope.NewTestScope())
 
-	getFunction := func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+	getFunction := func(input *admin.NamedEntityIdentifier, resourceType core.ResourceType) (models.NamedEntity, error) {
 		return models.NamedEntity{
 			NamedEntityKey: models.NamedEntityKey{
-				ResourceType: input.ResourceType,
+				ResourceType: resourceType,
 				Project:      input.Project,
 				Domain:       input.Domain,
 				Name:         input.Name,

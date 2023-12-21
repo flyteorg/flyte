@@ -25,7 +25,7 @@ var executionUpdatedAt = time.Date(2018, time.February, 17, 00, 01, 00, 00, time
 
 func TestCreateExecution(t *testing.T) {
 	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	err := executionRepo.Create(context.Background(), models.Execution{
+	err := executionRepo.Create(context.Background(), &core.WorkflowExecutionIdentifier{}, models.Execution{
 		ExecutionKey: models.ExecutionKey{
 			Project: "project",
 			Domain:  "domain",
@@ -58,7 +58,7 @@ func TestUpdateExecution(t *testing.T) {
 
 	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	//	`WHERE "executions"."deleted_at" IS NULL`)
-	err := executionRepo.Update(context.Background(),
+	err := executionRepo.Update(context.Background(), &core.WorkflowExecutionIdentifier{},
 		models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -131,7 +131,7 @@ func TestGetExecution(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions" WHERE "executions"."execution_project" = $1 AND "executions"."execution_domain" = $2 AND "executions"."execution_name" = $3 LIMIT 1`).WithReply(executions)
 
-	output, err := executionRepo.Get(context.Background(), interfaces.Identifier{
+	output, err := executionRepo.Get(context.Background(), &core.WorkflowExecutionIdentifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "1",
@@ -167,10 +167,10 @@ func TestListExecutions(t *testing.T) {
 	GlobalMock.NewMock().WithReply(executions)
 
 	collection, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.Task, "project", project),
-			getEqualityFilter(common.Task, "domain", domain),
-			getEqualityFilter(common.Task, "name", name),
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
 		},
 		Limit: 20,
 	})
@@ -213,14 +213,17 @@ func TestListExecutions_Filters(t *testing.T) {
 	executions = append(executions, execution)
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	// Only match on queries that append the name filter
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions" WHERE executions.execution_project = $1 AND executions.execution_domain = $2 AND executions.execution_name = $3 AND executions.workflow_id = $4 LIMIT 20`).WithReply(executions[0:1])
 
 	collection, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.Execution, "project", project),
-			getEqualityFilter(common.Execution, "domain", domain),
-			getEqualityFilter(common.Execution, "name", "1"),
 			getEqualityFilter(common.Execution, "workflow_id", workflowID),
 		},
 		Limit: 20,
@@ -260,10 +263,10 @@ func TestListExecutions_Order(t *testing.T) {
 
 	_, err = executionRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.Task, "project", project),
-			getEqualityFilter(common.Task, "domain", domain),
-			getEqualityFilter(common.Task, "name", name),
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
 		},
 		Limit: 20,
 	})
@@ -293,10 +296,12 @@ func TestListExecutions_WithTags(t *testing.T) {
 
 	_, err = executionRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.Task, "project", project),
-			getEqualityFilter(common.Task, "domain", domain),
-			getEqualityFilter(common.Task, "name", name),
 			tagFilter,
 		},
 		Limit: 20,
@@ -308,10 +313,12 @@ func TestListExecutions_WithTags(t *testing.T) {
 func TestListExecutions_MissingParameters(t *testing.T) {
 	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	_, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.Execution, "project", project),
-			getEqualityFilter(common.Execution, "domain", domain),
-			getEqualityFilter(common.Execution, "name", name),
 			getEqualityFilter(common.Execution, "workflow_id", workflowID),
 		},
 	})
@@ -353,10 +360,12 @@ func TestListExecutionsForWorkflow(t *testing.T) {
 	tagFilter, err := common.NewRepeatedValueFilter(common.ExecutionAdminTag, common.ValueIn, "execution_tag_name", vals)
 	assert.NoError(t, err)
 	collection, err := executionRepo.List(context.Background(), interfaces.ListResourceInput{
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    "1",
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.Execution, "project", project),
-			getEqualityFilter(common.Execution, "domain", domain),
-			getEqualityFilter(common.Execution, "name", "1"),
 			getEqualityFilter(common.Workflow, "name", "workflow_name"),
 			getEqualityFilter(common.Task, "name", "task_name"),
 			tagFilter,

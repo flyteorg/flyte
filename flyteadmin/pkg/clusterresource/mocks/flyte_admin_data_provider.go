@@ -3,9 +3,10 @@
 package mocks
 
 import (
-	context "context"
-
+	common "github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	admin "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+
+	context "context"
 
 	mock "github.com/stretchr/testify/mock"
 )
@@ -23,8 +24,8 @@ func (_m FlyteAdminDataProvider_GetClusterResourceAttributes) Return(_a0 *admin.
 	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributes(ctx context.Context, project string, domain string) *FlyteAdminDataProvider_GetClusterResourceAttributes {
-	c_call := _m.On("GetClusterResourceAttributes", ctx, project, domain)
+func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributes(ctx context.Context, identifier common.ResourceIdentifier) *FlyteAdminDataProvider_GetClusterResourceAttributes {
+	c_call := _m.On("GetClusterResourceAttributes", ctx, identifier)
 	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: c_call}
 }
 
@@ -33,13 +34,13 @@ func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributesMatch(matchers .
 	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: c_call}
 }
 
-// GetClusterResourceAttributes provides a mock function with given fields: ctx, project, domain
-func (_m *FlyteAdminDataProvider) GetClusterResourceAttributes(ctx context.Context, project string, domain string) (*admin.ClusterResourceAttributes, error) {
-	ret := _m.Called(ctx, project, domain)
+// GetClusterResourceAttributes provides a mock function with given fields: ctx, identifier
+func (_m *FlyteAdminDataProvider) GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceIdentifier) (*admin.ClusterResourceAttributes, error) {
+	ret := _m.Called(ctx, identifier)
 
 	var r0 *admin.ClusterResourceAttributes
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) *admin.ClusterResourceAttributes); ok {
-		r0 = rf(ctx, project, domain)
+	if rf, ok := ret.Get(0).(func(context.Context, common.ResourceIdentifier) *admin.ClusterResourceAttributes); ok {
+		r0 = rf(ctx, identifier)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*admin.ClusterResourceAttributes)
@@ -47,8 +48,8 @@ func (_m *FlyteAdminDataProvider) GetClusterResourceAttributes(ctx context.Conte
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, project, domain)
+	if rf, ok := ret.Get(1).(func(context.Context, common.ResourceIdentifier) error); ok {
+		r1 = rf(ctx, identifier)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,8 +33,8 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 	t.Run("happy case", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 			return &interfaces.ResourceResponse{
-				Project:      request.Project,
-				Domain:       request.Domain,
+				Project:      request.IdentifierScope.GetProject(),
+				Domain:       request.IdentifierScope.GetDomain(),
 				ResourceType: admin.MatchableResource_CLUSTER_RESOURCE.String(),
 				Attributes: &admin.MatchingAttributes{
 					Target: &admin.MatchingAttributes_ClusterResourceAttributes{
@@ -47,7 +48,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
-		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), common.NewResourceIdentifier("", project, domain))
 		assert.NoError(t, err)
 		assert.EqualValues(t, attrs.Attributes, attributes)
 	})
@@ -58,14 +59,14 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
-		_, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		_, err := provider.GetClusterResourceAttributes(context.TODO(), common.NewResourceIdentifier("", project, domain))
 		assert.EqualError(t, err, errFoo.Error())
 	})
 	t.Run("weird db response", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 			return &interfaces.ResourceResponse{
-				Project:      request.Project,
-				Domain:       request.Domain,
+				Project:      request.IdentifierScope.GetProject(),
+				Domain:       request.IdentifierScope.GetDomain(),
 				ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
 				Attributes: &admin.MatchingAttributes{
 					Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
@@ -79,7 +80,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
-		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), common.NewResourceIdentifier("", project, domain))
 		assert.Nil(t, attrs)
 		s, ok := status.FromError(err)
 		assert.True(t, ok)

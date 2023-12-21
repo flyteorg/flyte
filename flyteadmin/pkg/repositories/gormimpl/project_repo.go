@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
@@ -21,7 +22,7 @@ type ProjectRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *ProjectRepo) Create(ctx context.Context, project models.Project) error {
+func (r *ProjectRepo) Create(ctx context.Context, id *admin.ProjectIdentifier, project models.Project) error {
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&project)
 	timer.Stop()
@@ -31,15 +32,15 @@ func (r *ProjectRepo) Create(ctx context.Context, project models.Project) error 
 	return nil
 }
 
-func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project, error) {
+func (r *ProjectRepo) Get(ctx context.Context, id *admin.ProjectIdentifier) (models.Project, error) {
 	var project models.Project
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Project{
-		Identifier: projectID,
+		Identifier: id.Id,
 	}).Take(&project)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", projectID)
+		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", id.Id)
 	}
 
 	if tx.Error != nil {
@@ -63,7 +64,7 @@ func (r *ProjectRepo) List(ctx context.Context, input interfaces.ListResourceInp
 		tx = tx.Where("state != ?", int32(admin.Project_ARCHIVED))
 	} else {
 		var err error
-		tx, err = applyFilters(tx, input.InlineFilters, input.MapFilters)
+		tx, err = applyFilters(tx, common.Project, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 		if err != nil {
 			return nil, err
 		}
@@ -94,7 +95,7 @@ func NewProjectRepo(db *gorm.DB, errorTransformer flyteAdminDbErrors.ErrorTransf
 	}
 }
 
-func (r *ProjectRepo) UpdateProject(ctx context.Context, projectUpdate models.Project) error {
+func (r *ProjectRepo) UpdateProject(ctx context.Context, id *admin.ProjectIdentifier, projectUpdate models.Project) error {
 	// Use gorm client to update the two fields that are changed.
 	writeTx := r.db.WithContext(ctx).Model(&projectUpdate).Updates(projectUpdate)
 

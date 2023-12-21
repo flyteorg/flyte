@@ -3,16 +3,11 @@ package interfaces
 import (
 	"context"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
-
-type GetNamedEntityInput struct {
-	ResourceType core.ResourceType
-	Project      string
-	Domain       string
-	Name         string
-}
 
 // Parameters for querying multiple resources.
 type ListNamedEntityInput struct {
@@ -32,7 +27,7 @@ type NamedEntityRepoInterface interface {
 	// required
 	List(ctx context.Context, input ListNamedEntityInput) (NamedEntityCollectionOutput, error)
 	// Updates NamedEntity record, will create metadata if it does not exist
-	Update(ctx context.Context, input models.NamedEntity) error
+	Update(ctx context.Context, id *admin.NamedEntityIdentifier, input models.NamedEntity) error
 	// Gets metadata (if available) associated with a NamedEntity
-	Get(ctx context.Context, input GetNamedEntityInput) (models.NamedEntity, error)
+	Get(ctx context.Context, id *admin.NamedEntityIdentifier, resourceType core.ResourceType) (models.NamedEntity, error)
 }

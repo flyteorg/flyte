@@ -112,7 +112,7 @@ func (m *NodeExecutionManager) createNodeExecutionWithEvent(
 			request.RequestId, err)
 		return err
 	}
-	if err := m.db.NodeExecutionRepo().Create(ctx, nodeExecutionModel); err != nil {
+	if err := m.db.NodeExecutionRepo().Create(ctx, request.GetEvent().GetId(), nodeExecutionModel); err != nil {
 		logger.Debugf(ctx, "Failed to create node execution with id [%+v] and model [%+v] "+
 			"with err %v", request.Event.Id, nodeExecutionModel, err)
 		return err
@@ -146,7 +146,7 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 			logger.Errorf(ctx, "Invalid execution ID: %s with err: %v",
 				childExecutionID, err)
 		}
-		_, err = util.GetExecutionModel(ctx, m.db, *childExecutionID)
+		_, err = util.GetExecutionModel(ctx, m.db, childExecutionID)
 		if err != nil {
 			logger.Errorf(ctx, "The node execution launched an execution but it does not exist: %s with err: %v",
 				childExecutionID, err)
@@ -160,7 +160,7 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 		logger.Debugf(ctx, "failed to update node execution model: %+v with err: %v", request.Event.Id, err)
 		return updateFailed, err
 	}
-	err = m.db.NodeExecutionRepo().Update(ctx, nodeExecutionModel)
+	err = m.db.NodeExecutionRepo().Update(ctx, request.GetEvent().GetId(), nodeExecutionModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update node execution with id [%+v] with err %v",
 			request.Event.Id, err)
@@ -210,11 +210,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 		request.Event.Id, request.Event.Phase, request.Event.ParentTaskMetadata)
 
 	executionID := request.Event.Id.ExecutionId
-	workflowExecution, err := m.db.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: executionID.Project,
-		Domain:  executionID.Domain,
-		Name:    executionID.Name,
-	})
+	workflowExecution, err := m.db.ExecutionRepo().Get(ctx, request.GetEvent().GetId().GetExecutionId())
 	if err != nil {
 		m.metrics.MissingWorkflowExecution.Inc()
 		logger.Debugf(ctx, "Failed to find existing execution with id [%+v] with err: %v", executionID, err)
@@ -242,9 +238,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 		dynamicWorkflowRemoteClosureReference = dynamicWorkflowRemoteClosureDataReference.String()
 	}
 
-	nodeExecutionModel, err := m.db.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *request.Event.Id,
-	})
+	nodeExecutionModel, err := m.db.NodeExecutionRepo().Get(ctx, request.GetEvent().GetId())
 	if err != nil {
 		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
 			logger.Debugf(ctx, "Failed to retrieve existing node execution with id [%+v] with err: %v",
@@ -306,9 +300,7 @@ func (m *NodeExecutionManager) transformNodeExecutionModel(ctx context.Context, 
 	}
 	if internalData.EventVersion == 0 {
 		// Issue more expensive query to determine whether this node is a parent and/or dynamic node.
-		nodeExecutionModel, err = m.db.NodeExecutionRepo().GetWithChildren(ctx, repoInterfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: *nodeExecutionID,
-		})
+		nodeExecutionModel, err = m.db.NodeExecutionRepo().GetWithChildren(ctx, nodeExecutionID)
 		if err != nil {
 			return nil, err
 		}
@@ -361,14 +353,15 @@ func (m *NodeExecutionManager) GetNodeExecution(
 }
 
 func (m *NodeExecutionManager) listNodeExecutions(
-	ctx context.Context, identifierFilters []common.InlineFilter,
-	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort, mapFilters []common.MapFilter) (
+	ctx context.Context, workflowExecutionID *core.WorkflowExecutionIdentifier,
+	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort, baseInlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (
 	*admin.NodeExecutionList, error) {
 
-	filters, err := util.AddRequestFilters(requestFilters, common.NodeExecution, identifierFilters)
+	inlineFilters, err := util.GetRequestFilters(requestFilters, common.NodeExecution)
 	if err != nil {
 		return nil, err
 	}
+	inlineFilters = append(baseInlineFilters, inlineFilters...)
 
 	sortParameter, err := common.NewSortParameter(sortBy, models.NodeExecutionColumns)
 	if err != nil {
@@ -381,13 +374,14 @@ func (m *NodeExecutionManager) listNodeExecutions(
 			"invalid pagination token %s for ListNodeExecutions", requestToken)
 	}
 	listInput := repoInterfaces.ListResourceInput{
-		Limit:         int(limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:           int(limit),
+		Offset:          offset,
+		IdentifierScope: util.GetIdentifierScope(workflowExecutionID),
+		InlineFilters:   inlineFilters,
+		SortParameter:   sortParameter,
+		MapFilters:      mapFilters,
 	}
 
-	listInput.MapFilters = mapFilters
 	output, err := m.db.NodeExecutionRepo().List(ctx, listInput)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list node executions for request with err %v", err)
@@ -417,11 +411,7 @@ func (m *NodeExecutionManager) ListNodeExecutions(
 		return nil, err
 	}
 	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
-
-	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.WorkflowExecutionId)
-	if err != nil {
-		return nil, err
-	}
+	var inlineFilters []common.InlineFilter
 	var mapFilters []common.MapFilter
 	if request.UniqueParentId != "" {
 		parentNodeExecution, err := util.GetNodeExecutionModel(ctx, m.db, &core.NodeExecutionIdentifier{
@@ -436,14 +426,14 @@ func (m *NodeExecutionManager) ListNodeExecutions(
 		if err != nil {
 			return nil, err
 		}
-		identifierFilters = append(identifierFilters, parentIDFilter)
+		inlineFilters = []common.InlineFilter{parentIDFilter}
 	} else {
 		mapFilters = []common.MapFilter{
 			isParent,
 		}
 	}
 	return m.listNodeExecutions(
-		ctx, identifierFilters, request.Filters, request.Limit, request.Token, request.SortBy, mapFilters)
+		ctx, request.GetWorkflowExecutionId(), request.Filters, request.Limit, request.Token, request.SortBy, inlineFilters, mapFilters)
 }
 
 // Filters on node executions matching the execution parameters (execution project, domain, and name) as well as the
@@ -455,11 +445,6 @@ func (m *NodeExecutionManager) ListNodeExecutionsForTask(
 		return nil, err
 	}
 	ctx = getTaskExecutionContext(ctx, request.TaskExecutionId)
-	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(
-		ctx, *request.TaskExecutionId.NodeExecutionId.ExecutionId)
-	if err != nil {
-		return nil, err
-	}
 	parentTaskExecutionModel, err := util.GetTaskExecutionModel(ctx, m.db, request.TaskExecutionId)
 	if err != nil {
 		return nil, err
@@ -469,9 +454,8 @@ func (m *NodeExecutionManager) ListNodeExecutionsForTask(
 	if err != nil {
 		return nil, err
 	}
-	identifierFilters = append(identifierFilters, nodeIDFilter)
 	return m.listNodeExecutions(
-		ctx, identifierFilters, request.Filters, request.Limit, request.Token, request.SortBy, nil)
+		ctx, request.GetTaskExecutionId().GetNodeExecutionId().GetExecutionId(), request.Filters, request.Limit, request.Token, request.SortBy, []common.InlineFilter{nodeIDFilter}, nil /* mapFilters */)
 }
 
 func (m *NodeExecutionManager) GetNodeExecutionData(

@@ -9,7 +9,7 @@ import (
 )
 
 type CreateProjectFunction func(ctx context.Context, project models.Project) error
-type GetProjectFunction func(ctx context.Context, projectID string) (models.Project, error)
+type GetProjectFunction func(ctx context.Context, id *admin.ProjectIdentifier) (models.Project, error)
 type ListProjectsFunction func(ctx context.Context, input interfaces.ListResourceInput) ([]models.Project, error)
 type UpdateProjectFunction func(ctx context.Context, projectUpdate models.Project) error
 
@@ -20,20 +20,20 @@ type MockProjectRepo struct {
 	UpdateProjectFunction UpdateProjectFunction
 }
 
-func (r *MockProjectRepo) Create(ctx context.Context, project models.Project) error {
+func (r *MockProjectRepo) Create(ctx context.Context, id *admin.ProjectIdentifier, project models.Project) error {
 	if r.CreateFunction != nil {
 		return r.CreateFunction(ctx, project)
 	}
 	return nil
 }
 
-func (r *MockProjectRepo) Get(ctx context.Context, projectID string) (models.Project, error) {
+func (r *MockProjectRepo) Get(ctx context.Context, id *admin.ProjectIdentifier) (models.Project, error) {
 	if r.GetFunction != nil {
-		return r.GetFunction(ctx, projectID)
+		return r.GetFunction(ctx, id)
 	}
 	activeState := int32(admin.Project_ACTIVE)
 	return models.Project{
-		Identifier: projectID,
+		Identifier: id.Id,
 		State:      &activeState,
 	}, nil
 }
@@ -45,7 +45,7 @@ func (r *MockProjectRepo) List(ctx context.Context, input interfaces.ListResourc
 	return make([]models.Project, 0), nil
 }
 
-func (r *MockProjectRepo) UpdateProject(ctx context.Context, projectUpdate models.Project) error {
+func (r *MockProjectRepo) UpdateProject(ctx context.Context, id *admin.ProjectIdentifier, projectUpdate models.Project) error {
 	if r.UpdateProjectFunction != nil {
 		return r.UpdateProjectFunction(ctx, projectUpdate)
 	}

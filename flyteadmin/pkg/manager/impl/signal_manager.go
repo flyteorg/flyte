@@ -51,7 +51,7 @@ func (s *SignalManager) GetOrCreateSignal(ctx context.Context, request admin.Sig
 		return nil, err
 	}
 
-	err = s.db.SignalRepo().GetOrCreate(ctx, &signalModel)
+	err = s.db.SignalRepo().GetOrCreate(ctx, request.GetId(), &signalModel)
 	if err != nil {
 		return nil, err
 	}
@@ -72,12 +72,7 @@ func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalLis
 	}
 	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
 
-	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.WorkflowExecutionId)
-	if err != nil {
-		return nil, err
-	}
-
-	filters, err := util.AddRequestFilters(request.Filters, common.Signal, identifierFilters)
+	filters, err := util.GetRequestFilters(request.Filters, common.Signal)
 	if err != nil {
 		return nil, err
 	}
@@ -94,10 +89,11 @@ func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalLis
 	}
 
 	signalModelList, err := s.db.SignalRepo().List(ctx, repoInterfaces.ListResourceInput{
-		InlineFilters: filters,
-		Offset:        offset,
-		Limit:         int(request.Limit),
-		SortParameter: sortParameter,
+		InlineFilters:   filters,
+		Offset:          offset,
+		IdentifierScope: util.GetIdentifierScope(request.GetWorkflowExecutionId()),
+		Limit:           int(request.Limit),
+		SortParameter:   sortParameter,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list signals with request [%+v] with err %v",
@@ -132,7 +128,7 @@ func (s *SignalManager) SetSignal(ctx context.Context, request admin.SignalSetRe
 		return nil, err
 	}
 
-	err = s.db.SignalRepo().Update(ctx, signalModel.SignalKey, signalModel.Value)
+	err = s.db.SignalRepo().Update(ctx, request.GetId(), signalModel.Value)
 	if err != nil {
 		return nil, err
 	}

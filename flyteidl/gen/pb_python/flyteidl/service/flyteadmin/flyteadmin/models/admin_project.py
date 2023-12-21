@@ -18,6 +18,7 @@ import six
 
 from flyteadmin.models.admin_domain import AdminDomain  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
+from flyteadmin.models.admin_project_identifier import AdminProjectIdentifier  # noqa: F401,E501
 from flyteadmin.models.project_project_state import ProjectProjectState  # noqa: F401,E501
 
 
@@ -40,7 +41,8 @@ class AdminProject(object):
         'domains': 'list[AdminDomain]',
         'description': 'str',
         'labels': 'AdminLabels',
-        'state': 'ProjectProjectState'
+        'state': 'ProjectProjectState',
+        'identifier': 'AdminProjectIdentifier'
     }
 
     attribute_map = {
@@ -49,10 +51,11 @@ class AdminProject(object):
         'domains': 'domains',
         'description': 'description',
         'labels': 'labels',
-        'state': 'state'
+        'state': 'state',
+        'identifier': 'identifier'
     }
 
-    def __init__(self, id=None, name=None, domains=None, description=None, labels=None, state=None):  # noqa: E501
+    def __init__(self, id=None, name=None, domains=None, description=None, labels=None, state=None, identifier=None):  # noqa: E501
         """AdminProject - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -61,6 +64,7 @@ class AdminProject(object):
         self._description = None
         self._labels = None
         self._state = None
+        self._identifier = None
         self.discriminator = None
 
         if id is not None:
@@ -75,12 +79,14 @@ class AdminProject(object):
             self.labels = labels
         if state is not None:
             self.state = state
+        if identifier is not None:
+            self.identifier = identifier
 
     @property
     def id(self):
         """Gets the id of this AdminProject.  # noqa: E501
 
-        Globally unique project name.  # noqa: E501
+        Deprecated, use identifier instead. Globally unique project name.  # noqa: E501
 
         :return: The id of this AdminProject.  # noqa: E501
         :rtype: str
@@ -91,7 +97,7 @@ class AdminProject(object):
     def id(self, id):
         """Sets the id of this AdminProject.
 
-        Globally unique project name.  # noqa: E501
+        Deprecated, use identifier instead. Globally unique project name.  # noqa: E501
 
         :param id: The id of this AdminProject.  # noqa: E501
         :type: str
@@ -207,6 +213,29 @@ class AdminProject(object):
         """
 
         self._state = state
+
+    @property
+    def identifier(self):
+        """Gets the identifier of this AdminProject.  # noqa: E501
+
+        Optional, org key applied to the project.  # noqa: E501
+
+        :return: The identifier of this AdminProject.  # noqa: E501
+        :rtype: AdminProjectIdentifier
+        """
+        return self._identifier
+
+    @identifier.setter
+    def identifier(self, identifier):
+        """Sets the identifier of this AdminProject.
+
+        Optional, org key applied to the project.  # noqa: E501
+
+        :param identifier: The identifier of this AdminProject.  # noqa: E501
+        :type: AdminProjectIdentifier
+        """
+
+        self._identifier = identifier
 
     def to_dict(self):
         """Returns the model properties as a dict"""

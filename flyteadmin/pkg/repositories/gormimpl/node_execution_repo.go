@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"gorm.io/gorm"
 
@@ -21,7 +22,7 @@ type NodeExecutionRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeExecution) error {
+func (r *NodeExecutionRepo) Create(ctx context.Context, id *core.NodeExecutionIdentifier, execution *models.NodeExecution) error {
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&execution)
 	timer.Stop()
@@ -31,16 +32,16 @@ func (r *NodeExecutionRepo) Create(ctx context.Context, execution *models.NodeEx
 	return nil
 }
 
-func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+func (r *NodeExecutionRepo) Get(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: id.NodeId,
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: id.ExecutionId.Project,
+				Domain:  id.ExecutionId.Domain,
+				Name:    id.ExecutionId.Name,
 			},
 		},
 	}).Take(&nodeExecution)
@@ -49,11 +50,11 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
 			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
+				NodeId: id.NodeId,
 				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Project: id.ExecutionId.Project,
+					Domain:  id.ExecutionId.Domain,
+					Name:    id.ExecutionId.Name,
 				},
 			})
 	} else if tx.Error != nil {
@@ -63,16 +64,16 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	return nodeExecution, nil
 }
 
-func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: id.NodeId,
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: id.ExecutionId.Project,
+				Domain:  id.ExecutionId.Domain,
+				Name:    id.ExecutionId.Name,
 			},
 		},
 	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
@@ -81,11 +82,11 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
 			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
+				NodeId: id.NodeId,
 				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Project: id.ExecutionId.Project,
+					Domain:  id.ExecutionId.Domain,
+					Name:    id.ExecutionId.Name,
 				},
 			})
 	} else if tx.Error != nil {
@@ -95,7 +96,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 	return nodeExecution, nil
 }
 
-func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
+func (r *NodeExecutionRepo) Update(ctx context.Context, id *core.NodeExecutionIdentifier, nodeExecution *models.NodeExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&nodeExecution).Updates(nodeExecution)
 	timer.Stop()
@@ -121,7 +122,7 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyScopedFilters(tx, common.NodeExecution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.NodeExecutionCollectionOutput{}, err
 	}
@@ -141,16 +142,16 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}, nil
 }
 
-func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+func (r *NodeExecutionRepo) Exists(ctx context.Context, id *core.NodeExecutionIdentifier) (bool, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.ExistsDuration.Start()
 	tx := r.db.WithContext(ctx).Select(ID).Where(&models.NodeExecution{
 		NodeExecutionKey: models.NodeExecutionKey{
-			NodeID: input.NodeExecutionIdentifier.NodeId,
+			NodeID: id.NodeId,
 			ExecutionKey: models.ExecutionKey{
-				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Project: id.ExecutionId.Project,
+				Domain:  id.ExecutionId.Domain,
+				Name:    id.ExecutionId.Name,
 			},
 		},
 	}).Take(&nodeExecution)
@@ -173,7 +174,7 @@ func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, common.NodeExecution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return 0, err
 	}

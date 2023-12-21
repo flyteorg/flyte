@@ -60,7 +60,7 @@ func getMockConfigForLpTest() runtimeInterfaces.Configuration {
 func setDefaultWorkflowCallbackForLpTest(repository interfaces.Repository) {
 	workflowSpec := testutils.GetSampleWorkflowSpecForTest()
 	typedInterface, _ := proto.Marshal(workflowSpec.Template.Interface)
-	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+	workflowGetFunc := func(input *core.Identifier) (models.Workflow, error) {
 		return models.Workflow{
 			WorkflowKey: models.WorkflowKey{
 				Project: input.Project,
@@ -77,7 +77,7 @@ func setDefaultWorkflowCallbackForLpTest(repository interfaces.Repository) {
 func TestCreateLaunchPlan(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		func(input *core.Identifier) (models.LaunchPlan, error) {
 			return models.LaunchPlan{}, errors.New("foo")
 		})
 	var createCalled bool
@@ -113,7 +113,7 @@ func TestLaunchPlanManager_GetLaunchPlan(t *testing.T) {
 	specBytes, _ := proto.Marshal(lpRequest.Spec)
 	closureBytes, _ := proto.Marshal(&closure)
 
-	launchPlanGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	launchPlanGetFunc := func(input *core.Identifier) (models.LaunchPlan, error) {
 		return models.LaunchPlan{
 			LaunchPlanKey: models.LaunchPlanKey{
 				Project: input.Project,
@@ -150,21 +150,14 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	closureBytes, _ := proto.Marshal(&closure)
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
-		assert.Len(t, input.InlineFilters, 4)
+		assert.Len(t, input.InlineFilters, 1)
 
-		projectExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-		domainExpr, _ := input.InlineFilters[1].GetGormQueryExpr()
-		nameExpr, _ := input.InlineFilters[2].GetGormQueryExpr()
-		activeExpr, _ := input.InlineFilters[3].GetGormQueryExpr()
-
-		assert.Equal(t, projectExpr.Args, project)
-		assert.Equal(t, projectExpr.Query, testutils.ProjectQueryPattern)
-		assert.Equal(t, domainExpr.Args, domain)
-		assert.Equal(t, domainExpr.Query, testutils.DomainQueryPattern)
-		assert.Equal(t, nameExpr.Args, name)
-		assert.Equal(t, nameExpr.Query, testutils.NameQueryPattern)
+		activeExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
 		assert.Equal(t, activeExpr.Args, state)
 		assert.Equal(t, activeExpr.Query, testutils.StateQueryPattern)
+		assert.Equal(t, input.IdentifierScope.Project, project)
+		assert.Equal(t, input.IdentifierScope.Domain, domain)
+		assert.Equal(t, input.IdentifierScope.Name, name)
 		return interfaces.LaunchPlanCollectionOutput{
 			LaunchPlans: []models.LaunchPlan{
 				{
@@ -253,7 +246,7 @@ func TestLaunchPlanManager_CreateLaunchPlanErrorDueToBadLabels(t *testing.T) {
 func TestLaunchPlan_DatabaseError(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		func(input *core.Identifier) (models.LaunchPlan, error) {
 			return models.LaunchPlan{}, errors.New("foo")
 		})
 	setDefaultWorkflowCallbackForLpTest(repository)
@@ -292,7 +285,7 @@ func TestCreateLaunchPlanInCompatibleInputs(t *testing.T) {
 func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		func(input *core.Identifier) (models.LaunchPlan, error) {
 			return models.LaunchPlan{}, errors.New("foo")
 		})
 	setDefaultWorkflowCallbackForLpTest(repository)
@@ -335,10 +328,10 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 func TestCreateLaunchPlanNoWorkflowInterface(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		func(input *core.Identifier) (models.LaunchPlan, error) {
 			return models.LaunchPlan{}, errors.New("foo")
 		})
-	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+	workflowGetFunc := func(input *core.Identifier) (models.Workflow, error) {
 		return models.Workflow{
 			WorkflowKey: models.WorkflowKey{
 				Project: input.Project,
@@ -376,7 +369,7 @@ func TestCreateLaunchPlanNoWorkflowInterface(t *testing.T) {
 }
 
 func makeLaunchPlanRepoGetCallback(t *testing.T) repositoryMocks.GetLaunchPlanFunc {
-	return func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	return func(input *core.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -780,7 +773,7 @@ func TestUpdateSchedules_EnableNoSchedule(t *testing.T) {
 func TestDisableLaunchPlan(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 
-	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	lpGetFunc := func(input *core.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -840,7 +833,7 @@ func TestDisableLaunchPlan_DatabaseError(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	expectedError := errors.New("expected error")
 
-	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	lpGetFunc := func(input *core.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -856,7 +849,7 @@ func TestDisableLaunchPlan_DatabaseError(t *testing.T) {
 	assert.EqualError(t, err, expectedError.Error(),
 		"Failures on getting the existing launch plan should propagate")
 
-	lpGetFunc = func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	lpGetFunc = func(input *core.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -979,7 +972,7 @@ func TestEnableLaunchPlan_DatabaseError(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	expectedError := errors.New("expected error")
 
-	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	lpGetFunc := func(input *core.Identifier) (models.LaunchPlan, error) {
 		assert.Equal(t, project, input.Project)
 		assert.Equal(t, domain, input.Domain)
 		assert.Equal(t, name, input.Name)
@@ -1072,24 +1065,9 @@ func TestLaunchPlanManager_ListLaunchPlans(t *testing.T) {
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (
 		interfaces.LaunchPlanCollectionOutput, error) {
-		var projectFilter, domainFilter, nameFilter bool
-
-		for _, filter := range input.InlineFilters {
-			assert.Equal(t, common.LaunchPlan, filter.GetEntity())
-			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == project && queryExpr.Query == testutils.ProjectQueryPattern {
-				projectFilter = true
-			}
-			if queryExpr.Args == domain && queryExpr.Query == testutils.DomainQueryPattern {
-				domainFilter = true
-			}
-			if queryExpr.Args == name && queryExpr.Query == testutils.NameQueryPattern {
-				nameFilter = true
-			}
-		}
-		assert.True(t, projectFilter, "Missing project equality filter")
-		assert.True(t, domainFilter, "Missing domain equality filter")
-		assert.True(t, nameFilter, "Missing name equality filter")
+		assert.Equal(t, input.IdentifierScope.GetProject(), project)
+		assert.Equal(t, input.IdentifierScope.GetDomain(), domain)
+		assert.Equal(t, input.IdentifierScope.GetName(), name)
 		assert.Equal(t, 10, input.Limit)
 		assert.Equal(t, 2, input.Offset)
 		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
@@ -1174,20 +1152,8 @@ func TestLaunchPlanManager_ListLaunchPlanIds(t *testing.T) {
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (
 		interfaces.LaunchPlanCollectionOutput, error) {
-		var projectFilter, domainFilter bool
-
-		for _, filter := range input.InlineFilters {
-			assert.Equal(t, common.LaunchPlan, filter.GetEntity())
-			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == project && queryExpr.Query == testutils.ProjectQueryPattern {
-				projectFilter = true
-			}
-			if queryExpr.Args == domain && queryExpr.Query == testutils.DomainQueryPattern {
-				domainFilter = true
-			}
-		}
-		assert.True(t, projectFilter, "Missing project equality filter")
-		assert.True(t, domainFilter, "Missing domain equality filter")
+		assert.Equal(t, input.IdentifierScope.GetProject(), project)
+		assert.Equal(t, input.IdentifierScope.GetDomain(), domain)
 		assert.Equal(t, 10, input.Limit)
 		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
 

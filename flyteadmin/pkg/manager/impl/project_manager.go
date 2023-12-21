@@ -28,13 +28,25 @@ var alphabeticalSortParam, _ = common.NewSortParameter(&admin.Sort{
 	Key:       "identifier",
 }, models.ProjectColumns)
 
+func resolveProjectIdentifier(project *admin.Project) *admin.ProjectIdentifier {
+	id := project.Identifier
+	if id == nil {
+		id = &admin.ProjectIdentifier{}
+	}
+	if len(id.GetId()) == 0 {
+		// fall back to using deprecated top level project id
+		id.Id = project.Id
+	}
+	return id
+}
+
 func (m *ProjectManager) CreateProject(ctx context.Context, request admin.ProjectRegisterRequest) (
 	*admin.ProjectRegisterResponse, error) {
 	if err := validation.ValidateProjectRegisterRequest(request); err != nil {
 		return nil, err
 	}
 	projectModel := transformers.CreateProjectModel(request.Project)
-	err := m.db.ProjectRepo().Create(ctx, projectModel)
+	err := m.db.ProjectRepo().Create(ctx, resolveProjectIdentifier(request.GetProject()), projectModel)
 	if err != nil {
 		return nil, err
 	}
@@ -55,10 +67,7 @@ func (m *ProjectManager) getDomains() []*admin.Domain {
 }
 
 func (m *ProjectManager) ListProjects(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
-	spec := util.FilterSpec{
-		RequestFilters: request.Filters,
-	}
-	filters, err := util.GetDbFilters(spec, common.Project)
+	filters, err := util.GetRequestFilters(request.Filters, common.Project)
 	if err != nil {
 		return nil, err
 	}
@@ -106,7 +115,8 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 	projectRepo := m.db.ProjectRepo()
 
 	// Fetch the existing project if exists. If not, return err and do not update.
-	_, err := projectRepo.Get(ctx, projectUpdate.Id)
+	projectIdentifier := resolveProjectIdentifier(&projectUpdate)
+	_, err := projectRepo.Get(ctx, projectIdentifier)
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +128,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 
 	// Transform the provided project into a model and apply to the DB.
 	projectUpdateModel := transformers.CreateProjectModel(&projectUpdate)
-	err = projectRepo.UpdateProject(ctx, projectUpdateModel)
+	err = projectRepo.UpdateProject(ctx, projectIdentifier, projectUpdateModel)
 
 	if err != nil {
 		return nil, err

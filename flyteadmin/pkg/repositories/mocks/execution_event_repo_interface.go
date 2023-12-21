@@ -5,6 +5,8 @@ package mocks
 import (
 	context "context"
 
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+
 	mock "github.com/stretchr/testify/mock"
 
 	models "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -23,8 +25,8 @@ func (_m ExecutionEventRepoInterface_Create) Return(_a0 error) *ExecutionEventRe
 	return &ExecutionEventRepoInterface_Create{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ExecutionEventRepoInterface) OnCreate(ctx context.Context, input models.ExecutionEvent) *ExecutionEventRepoInterface_Create {
-	c_call := _m.On("Create", ctx, input)
+func (_m *ExecutionEventRepoInterface) OnCreate(ctx context.Context, id *core.WorkflowExecutionIdentifier, input models.ExecutionEvent) *ExecutionEventRepoInterface_Create {
+	c_call := _m.On("Create", ctx, id, input)
 	return &ExecutionEventRepoInterface_Create{Call: c_call}
 }
 
@@ -33,13 +35,13 @@ func (_m *ExecutionEventRepoInterface) OnCreateMatch(matchers ...interface{}) *E
 	return &ExecutionEventRepoInterface_Create{Call: c_call}
 }
 
-// Create provides a mock function with given fields: ctx, input
-func (_m *ExecutionEventRepoInterface) Create(ctx context.Context, input models.ExecutionEvent) error {
-	ret := _m.Called(ctx, input)
+// Create provides a mock function with given fields: ctx, id, input
+func (_m *ExecutionEventRepoInterface) Create(ctx context.Context, id *core.WorkflowExecutionIdentifier, input models.ExecutionEvent) error {
+	ret := _m.Called(ctx, id, input)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.ExecutionEvent) error); ok {
-		r0 = rf(ctx, input)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.WorkflowExecutionIdentifier, models.ExecutionEvent) error); ok {
+		r0 = rf(ctx, id, input)
 	} else {
 		r0 = ret.Error(0)
 	}

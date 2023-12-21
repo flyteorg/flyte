@@ -3,6 +3,7 @@ package validation
 import (
 	"context"
 	"errors"
+	"github.com/golang/protobuf/proto"
 	"strconv"
 	"testing"
 
@@ -254,29 +255,46 @@ func createLabelsMap(size int) map[string]string {
 	return result
 }
 
+type withProjectAndDomain struct {
+	project string
+	domain  string
+}
+
+func (w withProjectAndDomain) GetOrg() string {
+	return ""
+}
+
+func (w withProjectAndDomain) GetProject() string {
+	return w.project
+}
+
+func (w withProjectAndDomain) GetDomain() string {
+	return w.domain
+}
+
 func TestValidateProjectAndDomain(t *testing.T) {
 	mockRepo := repositoryMocks.NewMockRepository()
 	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
-		assert.Equal(t, projectID, "flyte-project-id")
+		ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
+		assert.True(t, proto.Equal(projectID, &admin.ProjectIdentifier{Id: "flyte-project-id"}))
 		activeState := int32(admin.Project_ACTIVE)
 		return models.Project{State: &activeState}, nil
 	}
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project-id", "domain")
+		&withProjectAndDomain{"flyte-project-id", "domain"})
 	assert.Nil(t, err)
 }
 
 func TestValidateProjectAndDomainArchivedProject(t *testing.T) {
 	mockRepo := repositoryMocks.NewMockRepository()
 	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
 		archivedState := int32(admin.Project_ARCHIVED)
 		return models.Project{State: &archivedState}, nil
 	}
 
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project-id", "domain")
+		&withProjectAndDomain{"flyte-project-id", "domain"})
 	assert.EqualError(t, err,
 		"project [flyte-project-id] is not active")
 }
@@ -284,12 +302,12 @@ func TestValidateProjectAndDomainArchivedProject(t *testing.T) {
 func TestValidateProjectAndDomainError(t *testing.T) {
 	mockRepo := repositoryMocks.NewMockRepository()
 	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
 		return models.Project{}, errors.New("foo")
 	}
 
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project-id", "domain")
+		&withProjectAndDomain{"flyte-project-id", "domain"})
 	assert.EqualError(t, err,
 		"failed to validate that project [flyte-project-id] and domain [domain] are registered, err: [foo]")
 }
@@ -297,45 +315,45 @@ func TestValidateProjectAndDomainError(t *testing.T) {
 func TestValidateProjectAndDomainNotFound(t *testing.T) {
 	mockRepo := repositoryMocks.NewMockRepository()
 	mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
 		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", projectID)
 	}
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project", "domain")
-	assert.EqualError(t, err, "failed to validate that project [flyte-project] and domain [domain] are registered, err: [project [flyte-project] not found]")
+		&withProjectAndDomain{"flyte-project-id", "domain"})
+	assert.EqualError(t, err, "failed to validate that project [flyte-project-id] and domain [domain] are registered, err: [project [id:\"flyte-project-id\" ] not found]")
 }
 
 func TestValidateProjectDb(t *testing.T) {
 	mockRepo := repositoryMocks.NewMockRepository()
 	t.Run("base case", func(t *testing.T) {
 		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-			ctx context.Context, projectID string) (models.Project, error) {
-			assert.Equal(t, projectID, "flyte-project-id")
+			ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
+			assert.Equal(t, projectID.GetId(), "flyte-project-id")
 			activeState := int32(admin.Project_ACTIVE)
 			return models.Project{State: &activeState}, nil
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectForUpdate(context.Background(), mockRepo, &admin.ProjectIdentifier{Id: "flyte-project-id"})
 
 		assert.Nil(t, err)
 	})
 
 	t.Run("error getting", func(t *testing.T) {
 		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-			ctx context.Context, projectID string) (models.Project, error) {
+			ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
 
 			return models.Project{}, errors.New("missing")
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectForUpdate(context.Background(), mockRepo, &admin.ProjectIdentifier{Id: "flyte-project-id"})
 		assert.Error(t, err)
 	})
 
 	t.Run("error archived", func(t *testing.T) {
 		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-			ctx context.Context, projectID string) (models.Project, error) {
+			ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
 			state := int32(admin.Project_ARCHIVED)
 			return models.Project{State: &state}, nil
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectForUpdate(context.Background(), mockRepo, &admin.ProjectIdentifier{Id: "flyte-project-id"})
 		assert.Error(t, err)
 	})
 }
@@ -344,23 +362,23 @@ func TestValidateProjectExistsDb(t *testing.T) {
 	mockRepo := repositoryMocks.NewMockRepository()
 	t.Run("base case", func(t *testing.T) {
 		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-			ctx context.Context, projectID string) (models.Project, error) {
-			assert.Equal(t, projectID, "flyte-project-id")
+			ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
+			assert.True(t, proto.Equal(projectID, &admin.ProjectIdentifier{Id: "flyte-project-id"}))
 			activeState := int32(admin.Project_ACTIVE)
 			return models.Project{State: &activeState}, nil
 		}
-		err := ValidateProjectExists(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectExists(context.Background(), mockRepo, &admin.ProjectIdentifier{Id: "flyte-project-id"})
 
 		assert.Nil(t, err)
 	})
 
 	t.Run("error getting", func(t *testing.T) {
 		mockRepo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-			ctx context.Context, projectID string) (models.Project, error) {
+			ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
 
 			return models.Project{}, errors.New("missing")
 		}
-		err := ValidateProjectExists(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectExists(context.Background(), mockRepo, &admin.ProjectIdentifier{Id: "flyte-project-id"})
 		assert.Error(t, err)
 	})
 }

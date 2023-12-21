@@ -5,14 +5,15 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type CreateNodeExecutionFunc func(ctx context.Context, input *models.NodeExecution) error
 type UpdateNodeExecutionFunc func(ctx context.Context, nodeExecution *models.NodeExecution) error
-type GetNodeExecutionFunc func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error)
+type GetNodeExecutionFunc func(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error)
 type ListNodeExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.NodeExecutionCollectionOutput, error)
-type ExistsNodeExecutionFunc func(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error)
+type ExistsNodeExecutionFunc func(ctx context.Context, id *core.NodeExecutionIdentifier) (bool, error)
 type CountNodeExecutionFunc func(ctx context.Context, input interfaces.CountResourceInput) (int64, error)
 
 type MockNodeExecutionRepo struct {
@@ -25,7 +26,7 @@ type MockNodeExecutionRepo struct {
 	countFunction           CountNodeExecutionFunc
 }
 
-func (r *MockNodeExecutionRepo) Create(ctx context.Context, input *models.NodeExecution) error {
+func (r *MockNodeExecutionRepo) Create(ctx context.Context, id *core.NodeExecutionIdentifier, input *models.NodeExecution) error {
 	if r.createFunction != nil {
 		return r.createFunction(ctx, input)
 	}
@@ -36,7 +37,7 @@ func (r *MockNodeExecutionRepo) SetCreateCallback(createFunction CreateNodeExecu
 	r.createFunction = createFunction
 }
 
-func (r *MockNodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
+func (r *MockNodeExecutionRepo) Update(ctx context.Context, id *core.NodeExecutionIdentifier, nodeExecution *models.NodeExecution) error {
 	if r.updateFunction != nil {
 		return r.updateFunction(ctx, nodeExecution)
 	}
@@ -47,9 +48,9 @@ func (r *MockNodeExecutionRepo) SetUpdateCallback(updateFunction UpdateNodeExecu
 	r.updateFunction = updateFunction
 }
 
-func (r *MockNodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+func (r *MockNodeExecutionRepo) Get(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
 	if r.getFunction != nil {
-		return r.getFunction(ctx, input)
+		return r.getFunction(ctx, id)
 	}
 	return models.NodeExecution{}, nil
 }
@@ -58,9 +59,9 @@ func (r *MockNodeExecutionRepo) SetGetCallback(getFunction GetNodeExecutionFunc)
 	r.getFunction = getFunction
 }
 
-func (r *MockNodeExecutionRepo) GetWithChildren(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+func (r *MockNodeExecutionRepo) GetWithChildren(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
 	if r.getWithChildrenFunction != nil {
-		return r.getWithChildrenFunction(ctx, input)
+		return r.getWithChildrenFunction(ctx, id)
 	}
 	return models.NodeExecution{}, nil
 }
@@ -81,9 +82,9 @@ func (r *MockNodeExecutionRepo) SetListCallback(listFunction ListNodeExecutionFu
 	r.listFunction = listFunction
 }
 
-func (r *MockNodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+func (r *MockNodeExecutionRepo) Exists(ctx context.Context, id *core.NodeExecutionIdentifier) (bool, error) {
 	if r.existsFunction != nil {
-		return r.existsFunction(ctx, input)
+		return r.existsFunction(ctx, id)
 	}
 	return true, nil
 }

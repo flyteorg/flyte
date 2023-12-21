@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
@@ -10,6 +11,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -22,7 +24,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 	descriptionEntity := getMockDescriptionEntityResponseFromDb(version, []byte{1, 2})
 	descriptionEntities = append(descriptionEntities, descriptionEntity)
 
-	output, err := descriptionEntityRepo.Get(context.Background(), interfaces.GetDescriptionEntityInput{
+	output, err := descriptionEntityRepo.Get(context.Background(), &core.Identifier{
 		ResourceType: resourceType,
 		Project:      project,
 		Domain:       domain,
@@ -37,7 +39,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "description_entities" WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4 LIMIT 1`).
 		WithReply(descriptionEntities)
-	output, err = descriptionEntityRepo.Get(context.Background(), interfaces.GetDescriptionEntityInput{
+	output, err = descriptionEntityRepo.Get(context.Background(), &core.Identifier{
 		ResourceType: resourceType,
 		Project:      project,
 		Domain:       domain,
@@ -65,17 +67,20 @@ func TestListDescriptionEntities(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithReply(descriptionEntities)
 
-	collection, err := descriptionEntityRepo.List(context.Background(), interfaces.ListResourceInput{})
+	identifierScope := &admin.NamedEntityIdentifier{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "name",
+	}
+	collection, err := descriptionEntityRepo.List(context.Background(), common.Workflow, interfaces.ListResourceInput{
+		IdentifierScope: identifierScope,
+	})
 	assert.Equal(t, 0, len(collection.Entities))
 	assert.Error(t, err)
 
-	collection, err = descriptionEntityRepo.List(context.Background(), interfaces.ListResourceInput{
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.Workflow, "project", project),
-			getEqualityFilter(common.Workflow, "domain", domain),
-			getEqualityFilter(common.Workflow, "name", name),
-		},
-		Limit: 20,
+	collection, err = descriptionEntityRepo.List(context.Background(), common.Workflow, interfaces.ListResourceInput{
+		IdentifierScope: identifierScope,
+		Limit:           20,
 	})
 	assert.Empty(t, err)
 	assert.NotEmpty(t, collection)
@@ -100,26 +105,4 @@ func getMockDescriptionEntityResponseFromDb(version string, digest []byte) map[s
 	descriptionEntity["Digest"] = digest
 	descriptionEntity["ShortDescription"] = shortDescription
 	return descriptionEntity
-}
-
-func TestGetDescriptionEntityFilters(t *testing.T) {
-	filters, err := getDescriptionEntityFilters(resourceType, project, domain, name, version)
-	entity := common.ResourceTypeToEntity[resourceType]
-	assert.NoError(t, err)
-
-	projectFilter, err := common.NewSingleValueFilter(entity, common.Equal, Project, project)
-	assert.NoError(t, err)
-	assert.Equal(t, filters[0], projectFilter)
-
-	domainFilter, err := common.NewSingleValueFilter(entity, common.Equal, Domain, domain)
-	assert.NoError(t, err)
-	assert.Equal(t, filters[1], domainFilter)
-
-	nameFilter, err := common.NewSingleValueFilter(entity, common.Equal, Name, name)
-	assert.NoError(t, err)
-	assert.Equal(t, filters[2], nameFilter)
-
-	versionFilter, err := common.NewSingleValueFilter(entity, common.Equal, Version, version)
-	assert.NoError(t, err)
-	assert.Equal(t, filters[3], versionFilter)
 }

@@ -21,7 +21,7 @@ func ValidateLaunchPlan(ctx context.Context,
 	if err := ValidateIdentifier(request.Id, common.LaunchPlan); err != nil {
 		return err
 	}
-	if err := ValidateProjectAndDomain(ctx, db, config, request.Id.Project, request.Id.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, config, request.GetId()); err != nil {
 		return err
 	}
 	if request.Spec == nil {

@@ -28,7 +28,7 @@ func (w *nodeExecutionEventWriter) Run() {
 			logger.Warnf(context.TODO(), "Failed to transform event [%+v] to database model with err [%+v]", event, err)
 			continue
 		}
-		err = w.db.NodeExecutionEventRepo().Create(context.TODO(), *eventModel)
+		err = w.db.NodeExecutionEventRepo().Create(context.TODO(), event.GetEvent().GetId(), *eventModel)
 		if err != nil {
 			// It's okay to be lossy here. These events aren't used to fetch execution state but rather as a convenience
 			// to replay and understand the event execution timeline.

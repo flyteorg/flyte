@@ -10,14 +10,14 @@ import (
 // Defines the interface for interacting with launch plan models.
 type LaunchPlanRepoInterface interface {
 	// Inserts a launch plan model into the database store.
-	Create(ctx context.Context, input models.LaunchPlan) error
+	Create(ctx context.Context, id *core.Identifier, input models.LaunchPlan) error
 	// Updates an existing launch plan in the database store.
-	Update(ctx context.Context, input models.LaunchPlan) error
+	Update(ctx context.Context, id *core.Identifier, input models.LaunchPlan) error
 	// Sets the state to active for an existing launch plan in the database store
 	// (and deactivates the formerly active version if the toDisable model exists).
-	SetActive(ctx context.Context, toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error
+	SetActive(ctx context.Context, toEnableID *core.Identifier, toEnable models.LaunchPlan, toDisableID *core.Identifier, toDisable *models.LaunchPlan) error
 	// Returns a matching launch plan if it exists.
-	Get(ctx context.Context, input Identifier) (models.LaunchPlan, error)
+	Get(ctx context.Context, id *core.Identifier) (models.LaunchPlan, error)
 	// Returns launch plan revisions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (LaunchPlanCollectionOutput, error)
 	// Returns a list of identifiers for launch plans.  A limit must be provided for the results page size.

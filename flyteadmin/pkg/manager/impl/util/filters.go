@@ -2,8 +2,8 @@
 package util
 
 import (
-	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"regexp"
 	"strconv"
 	"strings"
@@ -16,8 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
@@ -120,19 +118,19 @@ func prepareValues(field string, values []string) (interface{}, error) {
 	return preparedValues, nil
 }
 
-var allowedJoinEntities = map[common.Entity]sets.String{
-	common.Execution:           sets.NewString(common.Execution, common.LaunchPlan, common.Workflow, common.Task, common.AdminTag),
-	common.LaunchPlan:          sets.NewString(common.LaunchPlan, common.Workflow),
-	common.NodeExecution:       sets.NewString(common.NodeExecution, common.Execution),
-	common.NodeExecutionEvent:  sets.NewString(common.NodeExecutionEvent),
-	common.Task:                sets.NewString(common.Task),
-	common.TaskExecution:       sets.NewString(common.TaskExecution, common.Task, common.Execution, common.NodeExecution),
-	common.Workflow:            sets.NewString(common.Workflow),
-	common.NamedEntity:         sets.NewString(common.NamedEntity, common.NamedEntityMetadata),
-	common.NamedEntityMetadata: sets.NewString(common.NamedEntityMetadata),
-	common.Project:             sets.NewString(common.Project),
-	common.Signal:              sets.NewString(common.Signal),
-	common.AdminTag:            sets.NewString(common.AdminTag),
+var allowedJoinEntities = map[common.Entity]sets.Set[common.Entity]{
+	common.Execution:           sets.New[common.Entity](common.Execution, common.LaunchPlan, common.Workflow, common.Task, common.AdminTag),
+	common.LaunchPlan:          sets.New[common.Entity](common.LaunchPlan, common.Workflow),
+	common.NodeExecution:       sets.New[common.Entity](common.NodeExecution, common.Execution),
+	common.NodeExecutionEvent:  sets.New[common.Entity](common.NodeExecutionEvent),
+	common.Task:                sets.New[common.Entity](common.Task),
+	common.TaskExecution:       sets.New[common.Entity](common.TaskExecution, common.Task, common.Execution, common.NodeExecution),
+	common.Workflow:            sets.New[common.Entity](common.Workflow),
+	common.NamedEntity:         sets.New[common.Entity](common.NamedEntity, common.NamedEntityMetadata),
+	common.NamedEntityMetadata: sets.New[common.Entity](common.NamedEntityMetadata),
+	common.Project:             sets.New[common.Entity](common.Project),
+	common.Signal:              sets.New[common.Entity](common.Signal),
+	common.AdminTag:            sets.New[common.Entity](common.AdminTag),
 }
 
 var entityColumns = map[common.Entity]sets.String{
@@ -167,7 +165,6 @@ func ParseFilters(filterParams string, primaryEntity common.Entity) ([]common.In
 		if !ok {
 			return nil, fmt.Errorf("unsupported entity '%s'", primaryEntity)
 		}
-
 		if !joinEntities.Has(referencedEntity) {
 			return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "'%s' entity is not allowed in filters", referencedEntity)
 		}
@@ -196,122 +193,30 @@ func GetSingleValueEqualityFilter(entity common.Entity, field, value string) (co
 	return common.NewSingleValueFilter(entity, common.Equal, field, value)
 }
 
-type FilterSpec struct {
-	// All of these fields are optional (although they should not *all* be empty).
-	Project        string
-	Domain         string
-	Name           string
-	RequestFilters string
-}
-
-// Returns equality filters initialized for identifier attributes (project, domain & name)
-// which can be optionally specified in requests.
-func getIdentifierFilters(entity common.Entity, spec FilterSpec) ([]common.InlineFilter, error) {
-	filters := make([]common.InlineFilter, 0)
-	if spec.Project != "" {
-		projectFilter, err := GetSingleValueEqualityFilter(entity, shared.Project, spec.Project)
-		if err != nil {
-			return nil, err
-		}
-		filters = append(filters, projectFilter)
-	}
-	if spec.Domain != "" {
-		domainFilter, err := GetSingleValueEqualityFilter(entity, shared.Domain, spec.Domain)
-		if err != nil {
-			return nil, err
-		}
-		filters = append(filters, domainFilter)
-	}
-
-	if spec.Name != "" {
-		nameFilter, err := GetSingleValueEqualityFilter(entity, shared.Name, spec.Name)
-		if err != nil {
-			return nil, err
-		}
-		filters = append(filters, nameFilter)
-	}
-	return filters, nil
-}
-
-func AddRequestFilters(requestFilters string, primaryEntity common.Entity, existingFilters []common.InlineFilter) (
-	[]common.InlineFilter, error) {
-
+func GetRequestFilters(requestFilters string, primaryEntity common.Entity) (
+	filters []common.InlineFilter, err error) {
 	if requestFilters == "" {
-		return existingFilters, nil
+		return filters, nil
 	}
-	var additionalFilters []common.InlineFilter
-	additionalFilters, err := ParseFilters(requestFilters, primaryEntity)
+	filters, err = ParseFilters(requestFilters, primaryEntity)
 	if err != nil {
 		return nil, err
 	}
-	updatedFilters := append(existingFilters, additionalFilters...)
-	return updatedFilters, nil
-}
-
-// Consolidates request params and filters to a single list of filters. This consolidation is necessary since the db is
-// agnostic to required request parameters and additional filter arguments.
-func GetDbFilters(spec FilterSpec, primaryEntity common.Entity) ([]common.InlineFilter, error) {
-	filters, err := getIdentifierFilters(primaryEntity, spec)
-	if err != nil {
-		return nil, err
-	}
-
-	// Append any request filters.
-	if spec.RequestFilters != "" {
-		filters, err = AddRequestFilters(spec.RequestFilters, primaryEntity, filters)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return filters, nil
 }
 
-func GetWorkflowExecutionIdentifierFilters(
-	ctx context.Context, workflowExecutionIdentifier core.WorkflowExecutionIdentifier) ([]common.InlineFilter, error) {
-	identifierFilters := make([]common.InlineFilter, 3)
-	identifierProjectFilter, err := GetSingleValueEqualityFilter(
-		common.Execution, shared.Project, workflowExecutionIdentifier.Project)
-	if err != nil {
-		logger.Warningf(ctx, "Failed to create execution identifier filter for project: %s with identifier [%+v]",
-			workflowExecutionIdentifier.Project, workflowExecutionIdentifier)
-		return nil, err
-	}
-	identifierFilters[0] = identifierProjectFilter
-
-	identifierDomainFilter, err := GetSingleValueEqualityFilter(
-		common.Execution, shared.Domain, workflowExecutionIdentifier.Domain)
-	if err != nil {
-		logger.Warningf(ctx, "Failed to create execution identifier filter for domain: %s with identifier [%+v]",
-			workflowExecutionIdentifier.Domain, workflowExecutionIdentifier)
-		return nil, err
-	}
-	identifierFilters[1] = identifierDomainFilter
-
-	identifierNameFilter, err := GetSingleValueEqualityFilter(
-		common.Execution, shared.Name, workflowExecutionIdentifier.Name)
-	if err != nil {
-		logger.Warningf(ctx, "Failed to create execution identifier filter for domain: %s with identifier [%+v]",
-			workflowExecutionIdentifier.Name, workflowExecutionIdentifier)
-		return nil, err
-	}
-	identifierFilters[2] = identifierNameFilter
-	return identifierFilters, nil
+type NamedEntityLike interface {
+	GetProject() string
+	GetDomain() string
+	GetName() string
+	GetOrg() string
 }
 
-// All inputs to this function must be validated.
-func GetNodeExecutionIdentifierFilters(
-	ctx context.Context, nodeExecutionIdentifier core.NodeExecutionIdentifier) ([]common.InlineFilter, error) {
-	workflowExecutionIdentifierFilters, err :=
-		GetWorkflowExecutionIdentifierFilters(ctx, *nodeExecutionIdentifier.ExecutionId)
-	if err != nil {
-		return nil, err
+func GetIdentifierScope(id NamedEntityLike) *admin.NamedEntityIdentifier {
+	return &admin.NamedEntityIdentifier{
+		Project: id.GetProject(),
+		Domain:  id.GetDomain(),
+		Name:    id.GetName(),
+		Org:     id.GetOrg(),
 	}
-	nodeIDFilter, err := GetSingleValueEqualityFilter(
-		common.NodeExecution, shared.NodeID, nodeExecutionIdentifier.NodeId)
-	if err != nil {
-		logger.Warningf(ctx, "Failed to create node execution identifier filter for node id: %s with identifier [%+v]",
-			nodeExecutionIdentifier.NodeId, nodeExecutionIdentifier)
-	}
-	return append(workflowExecutionIdentifierFilters, nodeIDFilter), nil
 }

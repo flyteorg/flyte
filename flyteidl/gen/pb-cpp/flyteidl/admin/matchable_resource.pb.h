@@ -1707,6 +1707,20 @@ class MatchableAttributesConfiguration final :
   ::std::string* release_launch_plan();
   void set_allocated_launch_plan(::std::string* launch_plan);
 
+  // string org = 6;
+  void clear_org();
+  static const int kOrgFieldNumber = 6;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.MatchingAttributes attributes = 1;
   bool has_attributes() const;
   void clear_attributes();
@@ -1725,6 +1739,7 @@ class MatchableAttributesConfiguration final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr workflow_;
   ::google::protobuf::internal::ArenaStringPtr launch_plan_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   ::flyteidl::admin::MatchingAttributes* attributes_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fmatchable_5fresource_2eproto;
@@ -3566,6 +3581,59 @@ inline void MatchableAttributesConfiguration::set_allocated_launch_plan(::std::s
   }
   launch_plan_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), launch_plan);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchableAttributesConfiguration.launch_plan)
+}
+
+// string org = 6;
+inline void MatchableAttributesConfiguration::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& MatchableAttributesConfiguration::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.MatchableAttributesConfiguration.org)
+  return org_.GetNoArena();
+}
+inline void MatchableAttributesConfiguration::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.MatchableAttributesConfiguration.org)
+}
+#if LANG_CXX11
+inline void MatchableAttributesConfiguration::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.MatchableAttributesConfiguration.org)
+}
+#endif
+inline void MatchableAttributesConfiguration::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.MatchableAttributesConfiguration.org)
+}
+inline void MatchableAttributesConfiguration::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.MatchableAttributesConfiguration.org)
+}
+inline ::std::string* MatchableAttributesConfiguration::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.MatchableAttributesConfiguration.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* MatchableAttributesConfiguration::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.MatchableAttributesConfiguration.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void MatchableAttributesConfiguration::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.MatchableAttributesConfiguration.org)
 }
 
 // -------------------------------------------------------------------

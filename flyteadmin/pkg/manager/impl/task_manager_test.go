@@ -69,7 +69,7 @@ func getMockTaskRepository() interfaces.Repository {
 func TestCreateTask(t *testing.T) {
 	mockRepository := getMockTaskRepository()
 	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.Task, error) {
+		func(input *core.Identifier) (models.Task, error) {
 			return models.Task{}, errors.New("foo")
 		})
 	var createCalled bool
@@ -81,7 +81,7 @@ func TestCreateTask(t *testing.T) {
 		return nil
 	})
 	mockRepository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(
-		func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
+		func(id *core.Identifier) (models.DescriptionEntity, error) {
 			return models.DescriptionEntity{}, adminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound")
 		})
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
@@ -129,7 +129,7 @@ func TestCreateTask_CompilerError(t *testing.T) {
 func TestCreateTask_DatabaseError(t *testing.T) {
 	repository := getMockTaskRepository()
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.Task, error) {
+		func(input *core.Identifier) (models.Task, error) {
 			return models.Task{}, errors.New("foo")
 		})
 	expectedErr := errors.New("expected error")
@@ -147,7 +147,7 @@ func TestCreateTask_DatabaseError(t *testing.T) {
 
 func TestGetTask(t *testing.T) {
 	repository := getMockTaskRepository()
-	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
+	taskGetFunc := func(input *core.Identifier) (models.Task, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -182,7 +182,7 @@ func TestGetTask(t *testing.T) {
 func TestGetTask_DatabaseError(t *testing.T) {
 	repository := getMockTaskRepository()
 	expectedErr := errors.New("expected error")
-	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
+	taskGetFunc := func(input *core.Identifier) (models.Task, error) {
 		return models.Task{}, expectedErr
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
@@ -196,7 +196,7 @@ func TestGetTask_DatabaseError(t *testing.T) {
 
 func TestGetTask_TransformerError(t *testing.T) {
 	repository := getMockTaskRepository()
-	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
+	taskGetFunc := func(input *core.Identifier) (models.Task, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -223,24 +223,13 @@ func TestGetTask_TransformerError(t *testing.T) {
 
 func TestListTasks(t *testing.T) {
 	repository := getMockTaskRepository()
+	namedEntityIdentifier := &admin.NamedEntityIdentifier{
+		Project: projectValue,
+		Domain:  domainValue,
+		Name:    nameValue,
+	}
 	taskListFunc := func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error) {
-		var projectFilter, domainFilter, nameFilter bool
-		for _, filter := range input.InlineFilters {
-			assert.Equal(t, common.Task, filter.GetEntity())
-			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == projectValue && queryExpr.Query == testutils.ProjectQueryPattern {
-				projectFilter = true
-			}
-			if queryExpr.Args == domainValue && queryExpr.Query == testutils.DomainQueryPattern {
-				domainFilter = true
-			}
-			if queryExpr.Args == nameValue && queryExpr.Query == testutils.NameQueryPattern {
-				nameFilter = true
-			}
-		}
-		assert.True(t, projectFilter, "Missing project equality filter")
-		assert.True(t, domainFilter, "Missing domain equality filter")
-		assert.True(t, nameFilter, "Missing name equality filter")
+		assert.True(t, proto.Equal(namedEntityIdentifier, input.IdentifierScope))
 		assert.Equal(t, 2, input.Limit)
 		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
 		return interfaces.TaskCollectionOutput{
@@ -274,11 +263,7 @@ func TestListTasks(t *testing.T) {
 	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
 
 	taskList, err := taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
-		Id: &admin.NamedEntityIdentifier{
-			Project: projectValue,
-			Domain:  domainValue,
-			Name:    nameValue,
-		},
+		Id:    namedEntityIdentifier,
 		Limit: 2,
 		SortBy: &admin.Sort{
 			Direction: admin.Sort_ASCENDING,
@@ -352,18 +337,10 @@ func TestListUniqueTaskIdentifiers(t *testing.T) {
 	listFunc := func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error) {
 		// Test that parameters are being passed in
 		assert.Equal(t, 100, input.Limit)
-		assert.Len(t, input.InlineFilters, 2)
-		for idx, filter := range input.InlineFilters {
-			assert.Equal(t, common.Task, filter.GetEntity())
-			query, _ := filter.GetGormQueryExpr()
-			if idx == 0 {
-				assert.Equal(t, testutils.ProjectQueryPattern, query.Query)
-				assert.Equal(t, "foo", query.Args)
-			} else {
-				assert.Equal(t, testutils.DomainQueryPattern, query.Query)
-				assert.Equal(t, "bar", query.Args)
-			}
-		}
+		assert.True(t, proto.Equal(&admin.NamedEntityIdentifier{
+			Project: projectValue,
+			Domain:  domainValue,
+		}, input.IdentifierScope))
 		assert.Equal(t, 10, input.Offset)
 		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
 

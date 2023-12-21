@@ -5,6 +5,8 @@ import (
 	"crypto/md5" // #nosec
 	"encoding/json"
 	"fmt"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"io/ioutil"
 	"os"
 	"path"
@@ -191,7 +193,7 @@ func populateDefaultTemplateValues(defaultData map[runtimeInterfaces.DomainName]
 // substitutions based on the input project and domain. These database values are overlaid on top of the configured
 // variable defaults for the specific domain as defined in the admin application config file.
 func (c *controller) getCustomTemplateValues(
-	ctx context.Context, project, domain string, domainTemplateValues templateValuesType) (templateValuesType, error) {
+	ctx context.Context, identifier common.ResourceIdentifier, domainTemplateValues templateValuesType) (templateValuesType, error) {
 	if len(domainTemplateValues) == 0 {
 		domainTemplateValues = make(templateValuesType)
 	}
@@ -201,7 +203,7 @@ func (c *controller) getCustomTemplateValues(
 	}
 	collectedErrs := make([]error, 0)
 	// All override values saved in the database take precedence over the domain-specific defaults.
-	attributes, err := c.adminDataProvider.GetClusterResourceAttributes(ctx, project, domain)
+	attributes, err := c.adminDataProvider.GetClusterResourceAttributes(ctx, identifier)
 	if err != nil {
 		s, ok := status.FromError(err)
 		if !ok || s.Code() != codes.NotFound {
@@ -559,6 +561,14 @@ func (c *controller) createPatch(gvk schema.GroupVersionKind, currentObj *unstru
 	return patch, patchType, nil
 }
 
+func getProjectResourceIdentifier(project *admin.Project, domain string) common.ResourceIdentifier {
+	projectID := project.GetIdentifier().GetId()
+	if len(projectID) == 0 {
+		projectID = project.GetId()
+	}
+	return common.NewResourceIdentifier(project.GetIdentifier().GetOrg(), projectID, domain)
+}
+
 func (c *controller) Sync(ctx context.Context) error {
 	defer func() {
 		if err := recover(); err != nil {
@@ -591,7 +601,7 @@ func (c *controller) Sync(ctx context.Context) error {
 		for _, domain := range project.Domains {
 			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Id, domain.Name)
 			customTemplateValues, err := c.getCustomTemplateValues(
-				ctx, project.Id, domain.Id, domainTemplateValues[domain.Id])
+				ctx, getProjectResourceIdentifier(project, domain.Id), domainTemplateValues[domain.Id])
 			if err != nil {
 				logger.Errorf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
 				errs = append(errs, err)
@@ -675,7 +685,7 @@ func NewClusterResourceController(adminDataProvider interfaces.FlyteAdminDataPro
 	}
 }
 
-func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils.Scope, configuration runtimeInterfaces.Configuration) (Controller, error) {
+func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils.Scope, configuration runtimeInterfaces.Configuration, pluginRegistry *plugins.Registry) (Controller, error) {
 	initializationErrorCounter := scope.MustNewCounter(
 		"flyteclient_initialization_error",
 		"count of errors encountered initializing a flyte client from kube config")
@@ -707,8 +717,10 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 			return nil, err
 		}
 		dbScope := scope.NewSubScope("db")
-
-		repo := repositories.NewGormRepo(
+		pluginRegistry.RegisterDefault(plugins.PluginIDRepositoryImpl, repositories.NewGormRepo)
+		var newRepoImpl repoInterfaces.NewRepo
+		newRepoImpl = plugins.Get[repoInterfaces.NewRepo](pluginRegistry, plugins.PluginIDRepositoryImpl)
+		repo := newRepoImpl(
 			db, errors2.NewPostgresErrorTransformer(dbScope.NewSubScope("errors")), dbScope)
 
 		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resources.NewResourceManager(repo, configuration.ApplicationConfiguration()))

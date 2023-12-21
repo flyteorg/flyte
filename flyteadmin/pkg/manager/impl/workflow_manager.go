@@ -73,7 +73,7 @@ func (w *WorkflowManager) getCompiledWorkflow(
 
 	var tasks = make([]*core.CompiledTask, len(reqs.GetRequiredTaskIds()))
 	for idx, taskID := range reqs.GetRequiredTaskIds() {
-		task, err := util.GetTask(ctx, w.db, taskID)
+		task, err := util.GetTask(ctx, w.db, &taskID)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get task with id [%+v] when compiling workflow with id [%+v] with err %v",
 				taskID, request.Id, err)
@@ -85,7 +85,7 @@ func (w *WorkflowManager) getCompiledWorkflow(
 	var launchPlans = make([]compiler.InterfaceProvider, len(reqs.GetRequiredLaunchPlanIds()))
 	for idx, launchPlanID := range reqs.GetRequiredLaunchPlanIds() {
 		var launchPlanModel models.LaunchPlan
-		launchPlanModel, err = util.GetLaunchPlanModel(ctx, w.db, launchPlanID)
+		launchPlanModel, err = util.GetLaunchPlanModel(ctx, w.db, &launchPlanID)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get launch plan with id [%+v] when compiling workflow with id [%+v] with err %v",
 				launchPlanID, request.Id, err)
@@ -161,7 +161,7 @@ func (w *WorkflowManager) CreateWorkflow(
 	}
 
 	// Assert that a matching workflow doesn't already exist before uploading the workflow closure.
-	existingWorkflowModel, err := util.GetWorkflowModel(ctx, w.db, *request.Id)
+	existingWorkflowModel, err := util.GetWorkflowModel(ctx, w.db, request.Id)
 	// Check that no identical or conflicting workflows exist.
 	if err == nil {
 		// A workflow's structure is uniquely defined by its collection of nodes.
@@ -211,7 +211,7 @@ func (w *WorkflowManager) CreateWorkflow(
 	if descriptionModel != nil {
 		workflowModel.ShortDescription = descriptionModel.ShortDescription
 	}
-	if err = w.db.WorkflowRepo().Create(ctx, workflowModel, descriptionModel); err != nil {
+	if err = w.db.WorkflowRepo().Create(ctx, request.GetId(), workflowModel, descriptionModel); err != nil {
 		logger.Infof(ctx, "Failed to create workflow model [%+v] with err %v", request.Id, err)
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (w *WorkflowManager) GetWorkflow(ctx context.Context, request admin.ObjectG
 		return nil, err
 	}
 	ctx = getWorkflowContext(ctx, request.Id)
-	workflow, err := util.GetWorkflow(ctx, w.db, w.storageClient, *request.Id)
+	workflow, err := util.GetWorkflow(ctx, w.db, w.storageClient, request.Id)
 	if err != nil {
 		logger.Infof(ctx, "Failed to get workflow with id [%+v] with err %v", request.Id, err)
 		return nil, err
@@ -243,12 +243,7 @@ func (w *WorkflowManager) ListWorkflows(
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	ctx = contextutils.WithWorkflowID(ctx, request.Id.Name)
-	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name,
-		RequestFilters: request.Filters,
-	}, common.Workflow)
+	filters, err := util.GetRequestFilters(request.Filters, common.Workflow)
 	if err != nil {
 		return nil, err
 	}
@@ -264,10 +259,11 @@ func (w *WorkflowManager) ListWorkflows(
 			"invalid pagination token %s for ListWorkflows", request.Token)
 	}
 	listWorkflowsInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:           int(request.Limit),
+		Offset:          offset,
+		IdentifierScope: request.GetId(),
+		InlineFilters:   filters,
+		SortParameter:   sortParameter,
 	}
 	output, err := w.db.WorkflowRepo().List(ctx, listWorkflowsInput)
 	if err != nil {
@@ -298,14 +294,6 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
-	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project: request.Project,
-		Domain:  request.Domain,
-	}, common.Workflow)
-	if err != nil {
-		return nil, err
-	}
-
 	sortParameter, err := common.NewSortParameter(request.SortBy, models.WorkflowColumns)
 	if err != nil {
 		return nil, err
@@ -317,10 +305,10 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 			"invalid pagination token %s for ListWorkflowIdentifiers", request.Token)
 	}
 	listWorkflowsInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:           int(request.Limit),
+		Offset:          offset,
+		IdentifierScope: util.FromNamedEntityIdentifierListRequest(request),
+		SortParameter:   sortParameter,
 	}
 
 	output, err := w.db.WorkflowRepo().ListIdentifiers(ctx, listWorkflowsInput)

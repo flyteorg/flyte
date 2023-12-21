@@ -65,7 +65,7 @@ func ValidateSignalSetRequest(ctx context.Context, db repositoryInterfaces.Repos
 	if err != nil {
 		return nil
 	}
-	lookupSignalModel, err := db.SignalRepo().Get(ctx, signalModel.SignalKey)
+	lookupSignalModel, err := db.SignalRepo().Get(ctx, request.GetId())
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that signal [%v] exists, err: [%+v]",

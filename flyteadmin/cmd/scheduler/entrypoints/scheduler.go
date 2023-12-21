@@ -2,6 +2,7 @@ package entrypoints
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
@@ -12,6 +13,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 )
+
+var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
 
 var schedulerRunCmd = &cobra.Command{
 	Use:   "run",
@@ -32,7 +35,7 @@ var schedulerRunCmd = &cobra.Command{
 		applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 		server.SetMetricKeys(applicationConfiguration)
 
-		return scheduler.StartScheduler(ctx)
+		return scheduler.StartScheduler(ctx, pluginRegistryStore.Load())
 	},
 }
 

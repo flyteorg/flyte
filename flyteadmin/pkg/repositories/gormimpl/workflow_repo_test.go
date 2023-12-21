@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -21,7 +22,7 @@ const remoteSpecIdentifier = "remote spec id"
 
 func TestCreateWorkflow(t *testing.T) {
 	workflowRepo := NewWorkflowRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	err := workflowRepo.Create(context.Background(), models.Workflow{
+	err := workflowRepo.Create(context.Background(), &core.Identifier{}, models.Workflow{
 		WorkflowKey: models.WorkflowKey{
 			Project: project,
 			Domain:  domain,
@@ -56,7 +57,7 @@ func TestGetWorkflow(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "workflows" WHERE "workflows"."project" = $1 AND "workflows"."domain" = $2 AND "workflows"."name" = $3 AND "workflows"."version" = $4 LIMIT 1`).WithReply(workflows)
-	output, err := workflowRepo.Get(context.Background(), interfaces.Identifier{
+	output, err := workflowRepo.Get(context.Background(), &core.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,

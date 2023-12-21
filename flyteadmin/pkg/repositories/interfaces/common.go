@@ -2,21 +2,15 @@ package interfaces
 
 import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
-
-// Parameters for getting an individual resource.
-type Identifier struct {
-	Project string
-	Domain  string
-	Name    string
-	Version string
-}
 
 // Parameters for querying multiple resources.
 type ListResourceInput struct {
-	Limit         int
-	Offset        int
-	InlineFilters []common.InlineFilter
+	Limit           int
+	Offset          int
+	IdentifierScope *admin.NamedEntityIdentifier
+	InlineFilters   []common.InlineFilter
 	// MapFilters refers to primary entity filters defined as map values rather than inline sql queries.
 	// These exist to permit filtering on "IS NULL" which isn't permitted with inline filter queries and
 	// pq driver value substitution.
@@ -35,7 +29,8 @@ type UpdateResourceInput struct {
 
 // Parameters for counting multiple resources.
 type CountResourceInput struct {
-	InlineFilters []common.InlineFilter
+	IdentifierScope *admin.NamedEntityIdentifier
+	InlineFilters   []common.InlineFilter
 	// MapFilters refers to primary entity filters defined as map values rather than inline sql queries.
 	// These exist to permit filtering on "IS NULL" which isn't permitted with inline filter queries and
 	// pq driver value substitution.

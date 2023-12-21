@@ -86,21 +86,15 @@ func fromAdminProtoTaskResourceSpec(ctx context.Context, spec *admin.TaskResourc
 // flyteadmin default configured values.
 func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager interfaces.ResourceInterface,
 	taskResourceConfig runtimeInterfaces.TaskResourceConfiguration) workflowengineInterfaces.TaskResources {
-
 	request := interfaces.ResourceRequest{
-		ResourceType: admin.MatchableResource_TASK_RESOURCE,
-	}
-	if id != nil && len(id.Project) > 0 {
-		request.Project = id.Project
-	}
-	if id != nil && len(id.Domain) > 0 {
-		request.Domain = id.Domain
+		IdentifierScope: id,
+		ResourceType:    admin.MatchableResource_TASK_RESOURCE,
 	}
 	if id != nil && id.ResourceType == core.ResourceType_WORKFLOW && len(id.Name) > 0 {
 		request.Workflow = id.Name
 	}
 
-	resource, err := resourceManager.GetResource(ctx, request)
+	res, err := resourceManager.GetResource(ctx, request)
 	if err != nil && !errors.IsDoesNotExistError(err) {
 		logger.Infof(ctx, "Failed to fetch override values when assigning task resource default values for [%+v]: %v",
 			id, err)
@@ -108,9 +102,9 @@ func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager 
 
 	logger.Debugf(ctx, "Assigning task requested resources for [%+v]", id)
 	var taskResourceAttributes = workflowengineInterfaces.TaskResources{}
-	if resource != nil && resource.Attributes != nil && resource.Attributes.GetTaskResourceAttributes() != nil {
-		taskResourceAttributes.Defaults = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Defaults)
-		taskResourceAttributes.Limits = fromAdminProtoTaskResourceSpec(ctx, resource.Attributes.GetTaskResourceAttributes().Limits)
+	if res != nil && res.Attributes != nil && res.Attributes.GetTaskResourceAttributes() != nil {
+		taskResourceAttributes.Defaults = fromAdminProtoTaskResourceSpec(ctx, res.Attributes.GetTaskResourceAttributes().Defaults)
+		taskResourceAttributes.Limits = fromAdminProtoTaskResourceSpec(ctx, res.Attributes.GetTaskResourceAttributes().Limits)
 	} else {
 		taskResourceAttributes = workflowengineInterfaces.TaskResources{
 			Defaults: taskResourceConfig.GetDefaults(),

@@ -54,7 +54,7 @@ func TestCreateNodeExecution(t *testing.T) {
 		NodeExecutionUpdatedAt: &nodeCreatedAt,
 		ParentID:               &parentID,
 	}
-	err := nodeExecutionRepo.Create(context.Background(), &nodeExecution)
+	err := nodeExecutionRepo.Create(context.Background(), &core.NodeExecutionIdentifier{}, &nodeExecution)
 	assert.NoError(t, err)
 	assert.True(t, nodeExecutionQuery.Triggered)
 }
@@ -65,7 +65,7 @@ func TestUpdateNodeExecution(t *testing.T) {
 	// Only match on queries that append the name filter
 	nodeExecutionQuery := GlobalMock.NewMock()
 	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "id"=$1,"updated_at"=$2,"execution_project"=$3,"execution_domain"=$4,"execution_name"=$5,"node_id"=$6,"phase"=$7,"input_uri"=$8,"closure"=$9,"started_at"=$10,"node_execution_created_at"=$11,"node_execution_updated_at"=$12,"duration"=$13 WHERE "execution_project" = $14 AND "execution_domain" = $15 AND "execution_name" = $16 AND "node_id" = $17`)
-	err := nodeExecutionRepo.Update(context.Background(),
+	err := nodeExecutionRepo.Update(context.Background(), &core.NodeExecutionIdentifier{},
 		&models.NodeExecution{
 			BaseModel: models.BaseModel{ID: 1},
 			NodeExecutionKey: models.NodeExecutionKey{
@@ -138,15 +138,13 @@ func TestGetNodeExecution(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
-	output, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+	output, err := nodeExecutionRepo.Get(context.Background(), &core.NodeExecutionIdentifier{
 			NodeId: "1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "execution_project",
 				Domain:  "execution_domain",
 				Name:    "execution_name",
 			},
-		},
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, expectedNodeExecution, output)
@@ -159,15 +157,13 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock := mocket.Catcher.Reset()
 		GlobalMock.NewMock().WithError(gorm.ErrRecordNotFound)
 
-		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+		_, err := nodeExecutionRepo.Get(context.Background(), &core.NodeExecutionIdentifier{
 				NodeId: "1",
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "execution_project",
 					Domain:  "execution_domain",
 					Name:    "execution_name",
 				},
-			},
 		})
 		assert.Equal(t, err.(flyteAdminErrors.FlyteAdminError).Code(), codes.NotFound)
 	})
@@ -175,15 +171,13 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock := mocket.Catcher.Reset()
 		GlobalMock.NewMock().WithError(gorm.ErrInvalidData)
 
-		_, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
-			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+		_, err := nodeExecutionRepo.Get(context.Background(), &core.NodeExecutionIdentifier{
 				NodeId: "1",
 				ExecutionId: &core.WorkflowExecutionIdentifier{
 					Project: "execution_project",
 					Domain:  "execution_domain",
 					Name:    "execution_name",
 				},
-			},
 		})
 		assert.Equal(t, err.(flyteAdminErrors.FlyteAdminError).Code(), codes.Unknown)
 	})
@@ -361,15 +355,13 @@ func TestNodeExecutionExists(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(
 		`SELECT "id" FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
-	exists, err := nodeExecutionRepo.Exists(context.Background(), interfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+	exists, err := nodeExecutionRepo.Exists(context.Background(), &core.NodeExecutionIdentifier{
 			NodeId: "1",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
 				Project: "execution_project",
 				Domain:  "execution_domain",
 				Name:    "execution_name",
 			},
-		},
 	})
 	assert.NoError(t, err)
 	assert.True(t, exists)

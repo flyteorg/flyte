@@ -9,7 +9,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -25,7 +24,7 @@ var testExecID = &core.WorkflowExecutionIdentifier{
 
 func TestValidateClusterForExecutionID(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{
 			Cluster: testCluster,
 		}, nil
@@ -36,7 +35,7 @@ func TestValidateClusterForExecutionID(t *testing.T) {
 
 func TestValidateCluster_Nonmatching(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{
 			Cluster: "C2",
 		}, nil
@@ -48,7 +47,7 @@ func TestValidateCluster_Nonmatching(t *testing.T) {
 func TestValidateCluster_NoExecution(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.NewFlyteAdminError(codes.Internal, "foo")
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{}, expectedErr
 	})
 	err := ValidateClusterForExecutionID(context.TODO(), repository, testExecID, testCluster)

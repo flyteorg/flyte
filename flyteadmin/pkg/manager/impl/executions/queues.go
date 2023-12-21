@@ -59,8 +59,10 @@ func (q *queueAllocatorImpl) GetQueue(ctx context.Context, identifier core.Ident
 	q.refreshExecutionQueues(executionQueues)
 
 	resource, err := q.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: identifier.Project,
+			Domain:  identifier.Domain,
+		},
 		Workflow:     identifier.Name,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
 	})

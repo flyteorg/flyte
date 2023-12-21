@@ -1085,6 +1085,8 @@ func (m *ActiveLaunchPlanListRequest) Validate() error {
 		}
 	}
 
+	// no validation rules for Org
+
 	return nil
 }
 

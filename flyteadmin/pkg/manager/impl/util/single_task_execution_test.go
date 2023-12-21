@@ -12,7 +12,6 @@ import (
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
@@ -76,7 +75,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowcreateFunc)
 
-	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+	workflowGetFunc := func(input *core.Identifier) (models.Workflow, error) {
 		if getCalledCount == 0 {
 			getCalledCount++
 			return models.Workflow{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "not found")
@@ -152,14 +151,7 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 			},
 		},
 	}
-	workflowModel, err := CreateOrGetWorkflowModel(context.Background(), admin.ExecutionCreateRequest{
-		Project: "flytekit",
-		Domain:  "production",
-		Name:    "SingleTaskExecution",
-		Spec: &admin.ExecutionSpec{
-			LaunchPlan: taskIdentifier,
-		},
-	}, repository, &mockWorkflowManager, &mockNamedEntityManager, taskIdentifier, task)
+	workflowModel, err := CreateOrGetWorkflowModel(context.Background(), repository, &mockWorkflowManager, &mockNamedEntityManager, taskIdentifier, task)
 	assert.NoError(t, err)
 	assert.EqualValues(t, workflowModel, &newlyCreatedWorkflow)
 }
@@ -174,7 +166,7 @@ func TestCreateOrGetLaunchPlan(t *testing.T) {
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(launchPlanCreateFunc)
 
-	launchPlanGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	launchPlanGetFunc := func(input *core.Identifier) (models.LaunchPlan, error) {
 		if getCalledCount == 0 {
 			getCalledCount++
 			return models.LaunchPlan{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "not found")

@@ -207,7 +207,7 @@ func TestProjectManager_UpdateProject(t *testing.T) {
 	}
 	labelsBytes, _ := proto.Marshal(&labels)
 	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, id *admin.ProjectIdentifier) (models.Project, error) {
 
 		return models.Project{Identifier: "project-id",
 			Name:        "old-project-name",
@@ -239,8 +239,8 @@ func TestProjectManager_UpdateProject(t *testing.T) {
 func TestProjectManager_UpdateProject_ErrorDueToProjectNotFound(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
 	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
-		return models.Project{}, errors.New(projectID + " not found")
+		ctx context.Context, id *admin.ProjectIdentifier) (models.Project, error) {
+		return models.Project{}, errors.New(id.Id + " not found")
 	}
 	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).UpdateProjectFunction = func(
 		ctx context.Context, projectUpdate models.Project) error {
@@ -261,7 +261,7 @@ func TestProjectManager_UpdateProject_ErrorDueToProjectNotFound(t *testing.T) {
 func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
 	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, id *admin.ProjectIdentifier) (models.Project, error) {
 		return models.Project{Identifier: "project-id", Name: "old-project-name", Description: "old-project-description"}, nil
 	}
 	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).UpdateProjectFunction = func(

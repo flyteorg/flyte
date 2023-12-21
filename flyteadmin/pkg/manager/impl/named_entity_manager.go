@@ -57,7 +57,7 @@ func (m *NamedEntityManager) UpdateNamedEntity(ctx context.Context, request admi
 	}
 
 	metadataModel := transformers.CreateNamedEntityModel(&request)
-	err = m.db.NamedEntityRepo().Update(ctx, metadataModel)
+	err = m.db.NamedEntityRepo().Update(ctx, request.GetId(), metadataModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update named_entity for [%+v] with err %v", request.Id, err)
 		return nil, err

@@ -6,12 +6,13 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type CreateLaunchPlanFunc func(input models.LaunchPlan) error
 type UpdateLaunchPlanFunc func(input models.LaunchPlan) error
 type SetActiveLaunchPlanFunc func(toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error
-type GetLaunchPlanFunc func(input interfaces.Identifier) (models.LaunchPlan, error)
+type GetLaunchPlanFunc func(id *core.Identifier) (models.LaunchPlan, error)
 type ListLaunchPlanFunc func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error)
 type ListLaunchPlanIdentifiersFunc func(input interfaces.ListResourceInput) (
 	interfaces.LaunchPlanCollectionOutput, error)
@@ -25,7 +26,7 @@ type MockLaunchPlanRepo struct {
 	listIdsFunction   ListLaunchPlanIdentifiersFunc
 }
 
-func (r *MockLaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) error {
+func (r *MockLaunchPlanRepo) Create(ctx context.Context, id *core.Identifier, input models.LaunchPlan) error {
 	if r.createFunction != nil {
 		return r.createFunction(input)
 	}
@@ -36,7 +37,7 @@ func (r *MockLaunchPlanRepo) SetCreateCallback(createFunction CreateLaunchPlanFu
 	r.createFunction = createFunction
 }
 
-func (r *MockLaunchPlanRepo) Update(ctx context.Context, launchPlan models.LaunchPlan) error {
+func (r *MockLaunchPlanRepo) Update(ctx context.Context, id *core.Identifier, launchPlan models.LaunchPlan) error {
 	if r.updateFunction != nil {
 		return r.updateFunction(launchPlan)
 	}
@@ -48,7 +49,7 @@ func (r *MockLaunchPlanRepo) SetUpdateCallback(updateFunction UpdateLaunchPlanFu
 }
 
 func (r *MockLaunchPlanRepo) SetActive(
-	ctx context.Context, toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error {
+	ctx context.Context, toEnableID *core.Identifier, toEnable models.LaunchPlan, toDisableID *core.Identifier, toDisable *models.LaunchPlan) error {
 	if r.setActiveFunction != nil {
 		return r.setActiveFunction(toEnable, toDisable)
 	}
@@ -60,16 +61,16 @@ func (r *MockLaunchPlanRepo) SetSetActiveCallback(setActiveFunction SetActiveLau
 }
 
 func (r *MockLaunchPlanRepo) Get(
-	ctx context.Context, input interfaces.Identifier) (models.LaunchPlan, error) {
+	ctx context.Context, id *core.Identifier) (models.LaunchPlan, error) {
 	if r.getFunction != nil {
-		return r.getFunction(input)
+		return r.getFunction(id)
 	}
 	return models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}, nil
 }

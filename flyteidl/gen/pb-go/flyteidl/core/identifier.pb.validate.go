@@ -53,6 +53,8 @@ func (m *Identifier) Validate() error {
 
 	// no validation rules for Version
 
+	// no validation rules for Org
+
 	return nil
 }
 
@@ -123,6 +125,8 @@ func (m *WorkflowExecutionIdentifier) Validate() error {
 	// no validation rules for Domain
 
 	// no validation rules for Name
+
+	// no validation rules for Org
 
 	return nil
 }

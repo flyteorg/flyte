@@ -1,7 +1,6 @@
 package util
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -11,7 +10,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestParseRepeatedValues(t *testing.T) {
@@ -128,8 +126,8 @@ func TestGetEqualityFilter(t *testing.T) {
 }
 
 func Test_AddRequestFilters(t *testing.T) {
-	filters, err := AddRequestFilters(
-		"ne(cluster, TheWorst)+eq(workflow.name, workflow)", common.Execution, make([]common.InlineFilter, 0))
+	filters, err := GetRequestFilters(
+		"ne(cluster, TheWorst)+eq(workflow.name, workflow)", common.Execution)
 
 	assert.NoError(t, err)
 	require.Len(t, filters, 2)
@@ -146,86 +144,15 @@ func Test_AddRequestFilters(t *testing.T) {
 }
 
 func TestGetDbFilters(t *testing.T) {
-	actualFilters, err := GetDbFilters(FilterSpec{
-		Project:        "project",
-		Domain:         "domain",
-		Name:           "name",
-		RequestFilters: "ne(version, TheWorst)+eq(workflow.name, workflow)",
-	}, common.LaunchPlan)
+	actualFilters, err := GetRequestFilters("ne(version, TheWorst)+eq(workflow.name, workflow)", common.LaunchPlan)
 	assert.NoError(t, err)
 
 	// Init expected values for filters.
-	projectFilter, _ := GetSingleValueEqualityFilter(common.LaunchPlan, shared.Project, "project")
-	domainFilter, _ := GetSingleValueEqualityFilter(common.LaunchPlan, shared.Domain, "domain")
-	nameFilter, _ := GetSingleValueEqualityFilter(common.LaunchPlan, shared.Name, "name")
 	versionFilter, _ := common.NewSingleValueFilter(common.LaunchPlan, common.NotEqual, shared.Version, "TheWorst")
 	workflowNameFilter, _ := common.NewSingleValueFilter(common.Workflow, common.Equal, shared.Name, "workflow")
 	expectedFilters := []common.InlineFilter{
-		projectFilter,
-		domainFilter,
-		nameFilter,
 		versionFilter,
 		workflowNameFilter,
 	}
 	assert.EqualValues(t, expectedFilters, actualFilters)
-}
-
-func TestGetWorkflowExecutionIdentifierFilters(t *testing.T) {
-	identifierFilters, err := GetWorkflowExecutionIdentifierFilters(
-		context.Background(), core.WorkflowExecutionIdentifier{
-			Project: "ex project",
-			Domain:  "ex domain",
-			Name:    "ex name",
-		})
-	assert.Nil(t, err)
-
-	assert.Len(t, identifierFilters, 3)
-	assert.Equal(t, common.Execution, identifierFilters[0].GetEntity())
-	queryExpr, _ := identifierFilters[0].GetGormQueryExpr()
-	assert.Equal(t, "ex project", queryExpr.Args)
-	assert.Equal(t, "execution_project = ?", queryExpr.Query)
-
-	assert.Equal(t, common.Execution, identifierFilters[1].GetEntity())
-	queryExpr, _ = identifierFilters[1].GetGormQueryExpr()
-	assert.Equal(t, "ex domain", queryExpr.Args)
-	assert.Equal(t, "execution_domain = ?", queryExpr.Query)
-
-	assert.Equal(t, common.Execution, identifierFilters[2].GetEntity())
-	queryExpr, _ = identifierFilters[2].GetGormQueryExpr()
-	assert.Equal(t, "ex name", queryExpr.Args)
-	assert.Equal(t, "execution_name = ?", queryExpr.Query)
-}
-
-func TestGetNodeExecutionIdentifierFilters(t *testing.T) {
-	identifierFilters, err := GetNodeExecutionIdentifierFilters(
-		context.Background(), core.NodeExecutionIdentifier{
-			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Project: "ex project",
-				Domain:  "ex domain",
-				Name:    "ex name",
-			},
-			NodeId: "nodey",
-		})
-	assert.Nil(t, err)
-
-	assert.Len(t, identifierFilters, 4)
-	assert.Equal(t, common.Execution, identifierFilters[0].GetEntity())
-	queryExpr, _ := identifierFilters[0].GetGormQueryExpr()
-	assert.Equal(t, "ex project", queryExpr.Args)
-	assert.Equal(t, "execution_project = ?", queryExpr.Query)
-
-	assert.Equal(t, common.Execution, identifierFilters[1].GetEntity())
-	queryExpr, _ = identifierFilters[1].GetGormQueryExpr()
-	assert.Equal(t, "ex domain", queryExpr.Args)
-	assert.Equal(t, "execution_domain = ?", queryExpr.Query)
-
-	assert.Equal(t, common.Execution, identifierFilters[2].GetEntity())
-	queryExpr, _ = identifierFilters[2].GetGormQueryExpr()
-	assert.Equal(t, "ex name", queryExpr.Args)
-	assert.Equal(t, "execution_name = ?", queryExpr.Query)
-
-	assert.Equal(t, common.NodeExecution, identifierFilters[3].GetEntity())
-	queryExpr, _ = identifierFilters[3].GetGormQueryExpr()
-	assert.Equal(t, "nodey", queryExpr.Args)
-	assert.Equal(t, "node_id = ?", queryExpr.Query)
 }

@@ -58,6 +58,8 @@ func (m *ProjectDomainAttributes) Validate() error {
 		}
 	}
 
+	// no validation rules for Org
+
 	return nil
 }
 
@@ -277,6 +279,8 @@ func (m *ProjectDomainAttributesGetRequest) Validate() error {
 
 	// no validation rules for ResourceType
 
+	// no validation rules for Org
+
 	return nil
 }
 
@@ -428,6 +432,8 @@ func (m *ProjectDomainAttributesDeleteRequest) Validate() error {
 	// no validation rules for Domain
 
 	// no validation rules for ResourceType
+
+	// no validation rules for Org
 
 	return nil
 }

@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 
 	"gorm.io/gorm"
 
@@ -20,17 +21,23 @@ type DescriptionEntityRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *DescriptionEntityRepo) Get(ctx context.Context, input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
+func (r *DescriptionEntityRepo) Get(ctx context.Context, id *core.Identifier) (models.DescriptionEntity, error) {
 	var descriptionEntity models.DescriptionEntity
 
-	filters, err := getDescriptionEntityFilters(input.ResourceType, input.Project, input.Domain, input.Name, input.Version)
+	entity := common.ResourceTypeToEntity[id.GetResourceType()]
+	versionFilter, err := common.NewSingleValueFilter(entity, common.Equal, Version, id.GetVersion())
 	if err != nil {
 		return models.DescriptionEntity{}, err
 	}
 
 	tx := r.db.WithContext(ctx).Table(descriptionEntityTableName)
 	// Apply filters
-	tx, err = applyFilters(tx, filters, nil)
+	tx, err = applyFilters(tx, entity, &admin.NamedEntityIdentifier{
+		Project: id.GetProject(),
+		Domain:  id.GetDomain(),
+		Org:     id.GetOrg(),
+		Name:    id.GetName(),
+	}, []common.InlineFilter{versionFilter}, nil)
 	if err != nil {
 		return models.DescriptionEntity{}, err
 	}
@@ -47,7 +54,7 @@ func (r *DescriptionEntityRepo) Get(ctx context.Context, input interfaces.GetDes
 }
 
 func (r *DescriptionEntityRepo) List(
-	ctx context.Context, input interfaces.ListResourceInput) (interfaces.DescriptionEntityCollectionOutput, error) {
+	ctx context.Context, entity common.Entity, input interfaces.ListResourceInput) (interfaces.DescriptionEntityCollectionOutput, error) {
 	// First validate input.
 	if err := ValidateListInput(input); err != nil {
 		return interfaces.DescriptionEntityCollectionOutput{}, err
@@ -56,7 +63,7 @@ func (r *DescriptionEntityRepo) List(
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, entity, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.DescriptionEntityCollectionOutput{}, err
 	}
@@ -73,34 +80,6 @@ func (r *DescriptionEntityRepo) List(
 	return interfaces.DescriptionEntityCollectionOutput{
 		Entities: descriptionEntities,
 	}, nil
-}
-
-func getDescriptionEntityFilters(resourceType core.ResourceType, project string, domain string, name string, version string) ([]common.InlineFilter, error) {
-	entity := common.ResourceTypeToEntity[resourceType]
-
-	filters := make([]common.InlineFilter, 0)
-	projectFilter, err := common.NewSingleValueFilter(entity, common.Equal, Project, project)
-	if err != nil {
-		return nil, err
-	}
-	filters = append(filters, projectFilter)
-	domainFilter, err := common.NewSingleValueFilter(entity, common.Equal, Domain, domain)
-	if err != nil {
-		return nil, err
-	}
-	filters = append(filters, domainFilter)
-	nameFilter, err := common.NewSingleValueFilter(entity, common.Equal, Name, name)
-	if err != nil {
-		return nil, err
-	}
-	filters = append(filters, nameFilter)
-	versionFilter, err := common.NewSingleValueFilter(entity, common.Equal, Version, version)
-	if err != nil {
-		return nil, err
-	}
-	filters = append(filters, versionFilter)
-
-	return filters, nil
 }
 
 // NewDescriptionEntityRepo Returns an instance of DescriptionRepoInterface

@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineImpl "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/impl"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
@@ -79,7 +80,12 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		logger.Fatal(ctx, err)
 	}
 	dbScope := adminScope.NewSubScope("database")
-	repo := repositories.NewGormRepo(
+
+	pluginRegistry.RegisterDefault(plugins.PluginIDRepositoryImpl, repositories.NewGormRepo)
+	var newRepoImpl repoInterfaces.NewRepo
+	newRepoImpl = plugins.Get[repoInterfaces.NewRepo](pluginRegistry, plugins.PluginIDRepositoryImpl)
+
+	repo := newRepoImpl(
 		db, errors.NewPostgresErrorTransformer(adminScope.NewSubScope("errors")), dbScope)
 	execCluster := executionCluster.GetExecutionCluster(
 		adminScope.NewSubScope("executor").NewSubScope("cluster"),

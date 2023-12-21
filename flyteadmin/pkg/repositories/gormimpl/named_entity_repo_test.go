@@ -47,12 +47,11 @@ func TestGetNamedEntity(t *testing.T) {
 	GlobalMock.Logging = true
 	GlobalMock.NewMock().WithQuery(
 		`SELECT workflows.project,workflows.domain,workflows.name,'2' AS resource_type,named_entity_metadata.description,named_entity_metadata.state FROM "workflows" LEFT JOIN named_entity_metadata ON named_entity_metadata.resource_type = 2 AND named_entity_metadata.project = workflows.project AND named_entity_metadata.domain = workflows.domain AND named_entity_metadata.name = workflows.name WHERE workflows.project = $1 AND workflows.domain = $2 AND workflows.name = $3 LIMIT 1`).WithReply(results)
-	output, err := metadataRepo.Get(context.Background(), interfaces.GetNamedEntityInput{
-		ResourceType: resourceType,
+	output, err := metadataRepo.Get(context.Background(), &admin.NamedEntityIdentifier{
 		Project:      project,
 		Domain:       domain,
 		Name:         name,
-	})
+	}, resourceType)
 	assert.NoError(t, err)
 	assert.Equal(t, project, output.Project)
 	assert.Equal(t, domain, output.Domain)
@@ -90,7 +89,7 @@ func TestUpdateNamedEntity_WithExisting(t *testing.T) {
 	mockQuery.WithQuery(
 		`UPDATE "named_entity_metadata" SET "description"=$1,"state"=$2,"updated_at"=$3 WHERE "named_entity_metadata"."resource_type" = $4 AND "named_entity_metadata"."project" = $5 AND "named_entity_metadata"."domain" = $6 AND "named_entity_metadata"."name" = $7 AND "resource_type" = $8 AND "project" = $9 AND "domain" = $10 AND "name" = $11`)
 
-	err := metadataRepo.Update(context.Background(), models.NamedEntity{
+	err := metadataRepo.Update(context.Background(), &admin.NamedEntityIdentifier{}, models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
 			ResourceType: resourceType,
 			Project:      project,
@@ -117,7 +116,7 @@ func TestUpdateNamedEntity_CreateNew(t *testing.T) {
 	mockQuery.WithQuery(
 		`INSERT INTO "named_entity_metadata" ("created_at","updated_at","deleted_at","resource_type","project","domain","name","description","state") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`)
 
-	err := metadataRepo.Update(context.Background(), models.NamedEntity{
+	err := metadataRepo.Update(context.Background(), &admin.NamedEntityIdentifier{}, models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
 			ResourceType: resourceType,
 			Project:      project,

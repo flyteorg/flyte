@@ -22,6 +22,9 @@ message NamedEntityIdentifier {
     // The combination of project + domain + name uniquely identifies the resource.
     // +optional - in certain contexts - like 'List API', 'Launch plans'
     string name = 3;
+
+    // Optional, org key applied to the resource.
+    string org = 4;
 }
 
 // The status of the named entity is used to control its visibility in the UI.
@@ -102,6 +105,9 @@ message NamedEntityIdentifierListRequest {
     // Indicates a list of filters passed as string.
     // +optional
     string filters = 6;
+
+    // Optional, org key applied to the resource.
+    string org = 7;
 }
 
 // Represents a request structure to list NamedEntity objects
@@ -128,6 +134,9 @@ message NamedEntityListRequest {
     // Indicates a list of filters passed as string.
     // +optional
     string filters = 7;
+
+    // Optional, org key applied to the resource.
+    string org = 8;
 
 }
 

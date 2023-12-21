@@ -1972,6 +1972,8 @@ func (m *DatasetID) Validate() error {
 
 	// no validation rules for UUID
 
+	// no validation rules for Partition
+
 	return nil
 }
 
@@ -2913,6 +2915,9 @@ func (m *DatasetPropertyFilter) Validate() error {
 
 	case *DatasetPropertyFilter_Version:
 		// no validation rules for Version
+
+	case *DatasetPropertyFilter_Partition:
+		// no validation rules for Partition
 
 	}
 

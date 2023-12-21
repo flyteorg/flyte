@@ -5,11 +5,12 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type CreateExecutionFunc func(ctx context.Context, input models.Execution) error
 type UpdateExecutionFunc func(ctx context.Context, execution models.Execution) error
-type GetExecutionFunc func(ctx context.Context, input interfaces.Identifier) (models.Execution, error)
+type GetExecutionFunc func(ctx context.Context, id *core.WorkflowExecutionIdentifier) (models.Execution, error)
 type ListExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.ExecutionCollectionOutput, error)
 type CountExecutionFunc func(ctx context.Context, input interfaces.CountResourceInput) (int64, error)
@@ -22,7 +23,7 @@ type MockExecutionRepo struct {
 	countFunction  CountExecutionFunc
 }
 
-func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution) error {
+func (r *MockExecutionRepo) Create(ctx context.Context, id *core.WorkflowExecutionIdentifier, input models.Execution) error {
 	if r.createFunction != nil {
 		return r.createFunction(ctx, input)
 	}
@@ -33,7 +34,7 @@ func (r *MockExecutionRepo) SetCreateCallback(createFunction CreateExecutionFunc
 	r.createFunction = createFunction
 }
 
-func (r *MockExecutionRepo) Update(ctx context.Context, execution models.Execution) error {
+func (r *MockExecutionRepo) Update(ctx context.Context, id *core.WorkflowExecutionIdentifier, execution models.Execution) error {
 	if r.updateFunction != nil {
 		return r.updateFunction(ctx, execution)
 	}
@@ -44,9 +45,9 @@ func (r *MockExecutionRepo) SetUpdateCallback(updateFunction UpdateExecutionFunc
 	r.updateFunction = updateFunction
 }
 
-func (r *MockExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+func (r *MockExecutionRepo) Get(ctx context.Context, id *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 	if r.getFunction != nil {
-		return r.getFunction(ctx, input)
+		return r.getFunction(ctx, id)
 	}
 	return models.Execution{}, nil
 }

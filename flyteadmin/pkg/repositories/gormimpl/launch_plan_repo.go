@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"time"
 
 	"gorm.io/gorm"
@@ -29,7 +30,7 @@ type LaunchPlanRepo struct {
 	launchPlanMetrics launchPlanMetrics
 }
 
-func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) error {
+func (r *LaunchPlanRepo) Create(ctx context.Context, id *core.Identifier, input models.LaunchPlan) error {
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
@@ -39,7 +40,7 @@ func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) er
 	return nil
 }
 
-func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) error {
+func (r *LaunchPlanRepo) Update(ctx context.Context, id *core.Identifier, input models.LaunchPlan) error {
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).Model(&input).Updates(input)
 	timer.Stop()
@@ -49,15 +50,15 @@ func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) er
 	return nil
 }
 
-func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (models.LaunchPlan, error) {
+func (r *LaunchPlanRepo) Get(ctx context.Context, id *core.Identifier) (models.LaunchPlan, error) {
 	var launchPlan models.LaunchPlan
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}).Take(&launchPlan)
 	timer.Stop()
@@ -65,10 +66,10 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.LaunchPlan{},
 			adminErrors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), &core.Identifier{
-				Project: input.Project,
-				Domain:  input.Domain,
-				Name:    input.Name,
-				Version: input.Version,
+				Project: id.Project,
+				Domain:  id.Domain,
+				Name:    id.Name,
+				Version: id.Version,
 			})
 	} else if tx.Error != nil {
 		return models.LaunchPlan{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -80,7 +81,7 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 // Transactional semantics are used to guarantee that setting the desired launch plan to active also disables
 // the existing launch plan version (if any).
 func (r *LaunchPlanRepo) SetActive(
-	ctx context.Context, toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error {
+	ctx context.Context, toEnableID *core.Identifier, toEnable models.LaunchPlan, toDisableID *core.Identifier, toDisable *models.LaunchPlan) error {
 	timer := r.launchPlanMetrics.SetActiveDuration.Start()
 	defer timer.Stop()
 	// Use a transaction to guarantee no partial updates.
@@ -120,7 +121,7 @@ func (r *LaunchPlanRepo) List(ctx context.Context, input interfaces.ListResource
 	tx = tx.Joins("inner join workflows on launch_plans.workflow_id = workflows.id")
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyScopedFilters(tx, common.LaunchPlan, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}
@@ -154,7 +155,7 @@ func (r *LaunchPlanRepo) ListLaunchPlanIdentifiers(ctx context.Context, input in
 	tx := r.db.WithContext(ctx).Model(models.LaunchPlan{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, common.LaunchPlan, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}

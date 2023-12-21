@@ -153,7 +153,7 @@ func getLegacyExecutionRequest() *admin.ExecutionCreateRequest {
 	r := testutils.GetExecutionRequest()
 	r.Spec.Inputs = r.Inputs
 	r.Inputs = nil
-	return &r
+	return r
 }
 
 func getMockNamespaceMappingConfig() runtimeInterfaces.NamespaceMappingConfiguration {
@@ -195,7 +195,7 @@ func setDefaultLpCallbackForExecTest(repository interfaces.Repository) {
 	}
 	lpClosureBytes, _ := proto.Marshal(&lpClosure)
 
-	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	lpGetFunc := func(input *core.Identifier) (models.LaunchPlan, error) {
 		lpModel := models.LaunchPlan{
 			LaunchPlanKey: models.LaunchPlanKey{
 				Project: input.Project,
@@ -215,7 +215,7 @@ func setDefaultLpCallbackForExecTest(repository interfaces.Repository) {
 }
 
 func setDefaultTaskCallbackForExecTest(repository interfaces.Repository) {
-	taskGetFunc := func(input interfaces.Identifier) (models.Task, error) {
+	taskGetFunc := func(input *core.Identifier) (models.Task, error) {
 		return models.Task{
 			TaskKey: models.TaskKey{
 				Project: input.Project,
@@ -264,7 +264,7 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 func getMockRepositoryForExecTest() interfaces.Repository {
 	repository := repositoryMocks.NewMockRepository()
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.Workflow, error) {
+		func(input *core.Identifier) (models.Workflow, error) {
 			return models.Workflow{
 				BaseModel: models.BaseModel{
 					CreatedAt: testutils.MockCreatedAtValue,
@@ -296,7 +296,7 @@ func TestCreateExecution(t *testing.T) {
 			"label2": "1", // common label, will be dropped
 		}}
 	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, projectID *admin.ProjectIdentifier) (models.Project, error) {
 		return transformers.CreateProjectModel(&admin.Project{
 			Labels: &labels}), nil
 	}
@@ -386,7 +386,7 @@ func TestCreateExecution(t *testing.T) {
 	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
 	assert.NoError(t, err)
 	ctx := identity.WithContext(context.Background())
-	response, err := execManager.CreateExecution(ctx, request, requestedAt)
+	response, err := execManager.CreateExecution(ctx, *request, requestedAt)
 	assert.Nil(t, err)
 
 	expectedResponse := &admin.ExecutionCreateResponse{
@@ -413,8 +413,8 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 
 	getNodeExecutionCalled := false
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-			assert.EqualValues(t, input.NodeExecutionIdentifier, parentNodeExecutionID)
+		func(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
+			assert.True(t, proto.Equal(id, &parentNodeExecutionID))
 			getNodeExecutionCalled = true
 			return models.NodeExecution{
 				BaseModel: models.BaseModel{
@@ -426,7 +426,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 
 	getExecutionCalled := false
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			assert.EqualValues(t, input.Project, parentNodeExecutionID.ExecutionId.Project)
 			assert.EqualValues(t, input.Domain, parentNodeExecutionID.ExecutionId.Domain)
 			assert.EqualValues(t, input.Name, parentNodeExecutionID.ExecutionId.Name)
@@ -478,7 +478,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		Mode:                admin.ExecutionMetadata_CHILD_WORKFLOW,
 		ParentNodeExecution: &parentNodeExecutionID,
 	}
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, getNodeExecutionCalled)
 	assert.True(t, getExecutionCalled)
@@ -512,7 +512,7 @@ func TestCreateExecution_NoAssignedName(t *testing.T) {
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	request := testutils.GetExecutionRequest()
 	request.Name = ""
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 
 	expectedResponse := &admin.ExecutionCreateResponse{
@@ -563,7 +563,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 	execManager := NewExecutionManager(repository, r, configProvider, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
 	request := testutils.GetExecutionRequest()
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 
 	expectedResponse := &admin.ExecutionCreateResponse{
@@ -582,7 +582,7 @@ func TestCreateExecutionValidationError(t *testing.T) {
 
 	request := testutils.GetExecutionRequest()
 	request.Domain = ""
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.EqualError(t, err, "missing domain")
 	assert.Nil(t, response)
 }
@@ -596,7 +596,7 @@ func TestCreateExecution_InvalidLpIdentifier(t *testing.T) {
 
 	request := testutils.GetExecutionRequest()
 	request.Spec.LaunchPlan = nil
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.EqualError(t, err, "missing id")
 	assert.Nil(t, response)
 }
@@ -614,7 +614,7 @@ func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 			"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
 		},
 	}
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.EqualError(t, err, "invalid input foo-1")
 	assert.Nil(t, response)
 }
@@ -664,7 +664,7 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 
 	expectedResponse := &admin.ExecutionCreateResponse{Id: &executionIdentifier}
 
-	response, err := execManager.CreateExecution(ctx, request, requestedAt)
+	response, err := execManager.CreateExecution(ctx, *request, requestedAt)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedResponse, response)
@@ -687,7 +687,7 @@ func TestCreateExecutionDatabaseFailure(t *testing.T) {
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 	request := testutils.GetExecutionRequest()
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.EqualError(t, err, expectedErr.Error())
 	assert.Nil(t, response)
 }
@@ -756,7 +756,7 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 
 	execManager.(*ExecutionManager)._clock = mockClock
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&executionIdentifier, response.Id))
 }
@@ -797,7 +797,7 @@ func TestCreateExecutionDefaultNotifications(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
 		Project: "project",
@@ -836,7 +836,7 @@ func TestCreateExecutionDisableNotifications(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
 		Project: "project",
@@ -866,7 +866,7 @@ func TestCreateExecutionNoNotifications(t *testing.T) {
 
 	// The LaunchPlan is retrieved within the CreateExecution call to ExecutionManager.
 	// Create a callback method used by the mock to retrieve a LaunchPlan.
-	lpGetFunc := func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	lpGetFunc := func(input *core.Identifier) (models.LaunchPlan, error) {
 		lpModel := models.LaunchPlan{
 			LaunchPlanKey: models.LaunchPlanKey{
 				Project: input.Project,
@@ -906,7 +906,7 @@ func TestCreateExecutionNoNotifications(t *testing.T) {
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
 		Project: "project",
@@ -947,7 +947,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 			"dynamicannotation4": "dynamic4",
 		},
 	}
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 
 	expectedResponse := &admin.ExecutionCreateResponse{
@@ -1054,7 +1054,7 @@ func TestCreateExecutionInterruptible(t *testing.T) {
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
-			_, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+			_, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 			assert.Nil(t, err)
 		})
 	}
@@ -1134,7 +1134,7 @@ func TestCreateExecutionOverwriteCache(t *testing.T) {
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
-			_, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+			_, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 			assert.Nil(t, err)
 		})
 	}
@@ -1218,7 +1218,7 @@ func TestCreateExecutionWithEnvs(t *testing.T) {
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
-			_, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+			_, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 			assert.Nil(t, err)
 		})
 	}
@@ -1262,14 +1262,14 @@ func TestCreateExecution_CustomNamespaceMappingConfig(t *testing.T) {
 
 	execManager.(*ExecutionManager)._clock = mockClock
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
+	response, err := execManager.CreateExecution(context.Background(), *request, requestedAt)
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&executionIdentifier, response.Id))
 }
 
 func makeExecutionGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
-	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	return func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1295,7 +1295,7 @@ func makeExecutionGetFunc(
 
 func makeLegacyExecutionGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
-	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	return func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1321,7 +1321,7 @@ func makeLegacyExecutionGetFunc(
 
 func makeExecutionInterruptibleGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time, interruptible *bool) repositoryMocks.GetExecutionFunc {
-	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	return func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1358,7 +1358,7 @@ func makeExecutionInterruptibleGetFunc(
 
 func makeExecutionOverwriteCacheGetFunc(
 	t *testing.T, closureBytes []byte, startTime *time.Time, overwriteCache bool) repositoryMocks.GetExecutionFunc {
-	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	return func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1391,7 +1391,7 @@ func makeExecutionOverwriteCacheGetFunc(
 
 func makeExecutionWithEnvs(
 	t *testing.T, closureBytes []byte, startTime *time.Time, envs []*core.KeyValuePair) repositoryMocks.GetExecutionFunc {
-	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	return func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -1495,7 +1495,7 @@ func TestRelaunchExecution_GetExistingFailure(t *testing.T) {
 
 	expectedErr := errors.New("expected error")
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{}, expectedErr
 		})
 
@@ -1865,7 +1865,7 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 	existingClosureBytes, _ := proto.Marshal(&existingClosure)
 	referencedExecutionID := uint(123)
 	ignoredExecutionID := uint(456)
-	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		switch input.Name {
 		case "name":
 			return models.Execution{
@@ -1913,9 +1913,8 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 		},
 		NodeId: "parent",
 	}
-	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-		assert.True(t, proto.Equal(&parentNodeExecution, &input.NodeExecutionIdentifier))
-
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(func(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
+		assert.True(t, proto.Equal(&parentNodeExecution, id))
 		return models.NodeExecution{
 			BaseModel: models.BaseModel{
 				ID: parentNodeDatabaseID,
@@ -1960,7 +1959,7 @@ func TestRecoverExecution_GetExistingFailure(t *testing.T) {
 
 	expectedErr := errors.New("expected error")
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{}, expectedErr
 		})
 
@@ -2278,7 +2277,7 @@ func TestCreateWorkflowEvent(t *testing.T) {
 
 func TestCreateWorkflowEvent_TerminalState(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -2321,7 +2320,7 @@ func TestCreateWorkflowEvent_TerminalState(t *testing.T) {
 
 func TestCreateWorkflowEvent_NoRunningToQueued(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -2357,7 +2356,7 @@ func TestCreateWorkflowEvent_NoRunningToQueued(t *testing.T) {
 
 func TestCreateWorkflowEvent_CurrentlyAborting(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -2467,7 +2466,7 @@ func TestCreateWorkflowEvent_DuplicateRunning(t *testing.T) {
 	occurredAt := time.Now().UTC()
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
 					Project: "project",
@@ -2510,7 +2509,7 @@ func TestCreateWorkflowEvent_InvalidPhaseChange(t *testing.T) {
 	occurredAt := time.Now().UTC()
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
 					Project: "project",
@@ -2557,7 +2556,7 @@ func TestCreateWorkflowEvent_ClusterReassignmentOnQueued(t *testing.T) {
 	occurredAt := time.Now().UTC()
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
 					Project: "project",
@@ -2674,7 +2673,7 @@ func TestCreateWorkflowEvent_DatabaseGetError(t *testing.T) {
 	startTime := time.Now()
 
 	expectedErr := errors.New("expected error")
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{}, expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
@@ -2745,7 +2744,7 @@ func TestCreateWorkflowEvent_IncompatibleCluster(t *testing.T) {
 	occurredAt := time.Now().UTC()
 
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
 					Project: "project",
@@ -2801,7 +2800,7 @@ func TestCreateWorkflowEvent_IncompatibleCluster(t *testing.T) {
 func TestGetExecution(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -2840,7 +2839,7 @@ func TestGetExecution_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.New("expected error")
 
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -2860,7 +2859,7 @@ func TestGetExecution_DatabaseError(t *testing.T) {
 func TestGetExecution_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -2966,7 +2965,7 @@ func TestUpdateExecution(t *testing.T) {
 
 	t.Run("get execution error", func(t *testing.T) {
 		repository := repositoryMocks.NewMockRepository()
-		getExecFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		getExecFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{}, fmt.Errorf("some db error")
 		}
 		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(getExecFunc)
@@ -2986,29 +2985,13 @@ func TestListExecutions(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	executionListFunc := func(
 		ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
-		var projectFilter, domainFilter, nameFilter bool
-		for _, filter := range input.InlineFilters {
-			assert.Equal(t, common.Execution, filter.GetEntity())
-			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == projectValue && queryExpr.Query == "execution_project = ?" {
-				projectFilter = true
-			}
-			if queryExpr.Args == domainValue && queryExpr.Query == "execution_domain = ?" {
-				domainFilter = true
-			}
-			if queryExpr.Args == nameValue && queryExpr.Query == "execution_name = ?" {
-				nameFilter = true
-			}
-		}
-		assert.True(t, projectFilter, "Missing project equality filter")
-		assert.True(t, domainFilter, "Missing domain equality filter")
-		assert.False(t, nameFilter, "Included name equality filter")
+		assert.Equal(t, projectValue, input.IdentifierScope.Project)
+		assert.Equal(t, domainValue, input.IdentifierScope.Domain)
+		assert.Empty(t, input.IdentifierScope.Name)
 		assert.Equal(t, limit, input.Limit)
 		assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 		assert.Equal(t, 2, input.Offset)
-		assert.EqualValues(t, map[common.Entity]bool{
-			common.Execution: true,
-		}, input.JoinTableEntities)
+		assert.Empty(t, input.JoinTableEntities)
 		return interfaces.ExecutionCollectionOutput{
 			Executions: []models.Execution{
 				{
@@ -3542,7 +3525,7 @@ func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
 
 	repository := repositoryMocks.NewMockRepository()
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{
 				Phase: core.WorkflowExecution_SUCCEEDED.String(),
 			}, nil
@@ -3578,7 +3561,7 @@ func TestGetExecutionData(t *testing.T) {
 	}
 	var closureBytes, _ = proto.Marshal(&closure)
 
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{
 			ExecutionKey: models.ExecutionKey{
 				Project: "project",
@@ -3684,8 +3667,8 @@ func TestAddPluginOverrides(t *testing.T) {
 	db := repositoryMocks.NewMockRepository()
 	db.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (
 		models.Resource, error) {
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, domain, ID.IdentifierScope.GetDomain())
 		assert.Equal(t, workflowName, ID.Workflow)
 		assert.Equal(t, launchPlanName, ID.LaunchPlan)
 		existingAttributes := commonTestUtils.GetPluginOverridesAttributes(map[string][]string{
@@ -3747,7 +3730,7 @@ func TestPluginOverrides_ResourceGetFailure(t *testing.T) {
 func TestGetExecution_Legacy(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -3794,7 +3777,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	}
 	var closureBytes, _ = proto.Marshal(closure)
 
-	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+	executionGetFunc := func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{
 			BaseModel: models.BaseModel{
 				CreatedAt: testutils.MockCreatedAtValue,
@@ -3971,23 +3954,9 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	executionListFunc := func(
 		ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
-		var projectFilter, domainFilter, nameFilter bool
-		for _, filter := range input.InlineFilters {
-			assert.Equal(t, common.Execution, filter.GetEntity())
-			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == projectValue && queryExpr.Query == "execution_project = ?" {
-				projectFilter = true
-			}
-			if queryExpr.Args == domainValue && queryExpr.Query == "execution_domain = ?" {
-				domainFilter = true
-			}
-			if queryExpr.Args == nameValue && queryExpr.Query == "execution_name = ?" {
-				nameFilter = true
-			}
-		}
-		assert.True(t, projectFilter, "Missing project equality filter")
-		assert.True(t, domainFilter, "Missing domain equality filter")
-		assert.False(t, nameFilter, "Included name equality filter")
+		assert.Equal(t, input.IdentifierScope.Project, projectValue)
+		assert.Equal(t, input.IdentifierScope.Domain, domainValue)
+		assert.Empty(t, input.IdentifierScope.Name)
 		assert.Equal(t, limit, input.Limit)
 		assert.Equal(t, "execution_domain asc", input.SortParameter.GetGormOrderExpr())
 		assert.Equal(t, 2, input.Offset)
@@ -4338,7 +4307,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowCreateFunc)
 
-	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+	workflowGetFunc := func(input *core.Identifier) (models.Workflow, error) {
 		if getCalledCount <= 1 {
 			getCalledCount++
 			return models.Workflow{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "not found")
@@ -4355,7 +4324,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 		Version:      "12345",
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.Task, error) {
+		func(input *core.Identifier) (models.Task, error) {
 			createdAt := time.Now()
 			createdAtProto, _ := ptypes.TimestampProto(createdAt)
 			taskClosure := &admin.TaskClosure{
@@ -4469,7 +4438,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 		launchplan = &input
 		return nil
 	})
-	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(func(input interfaces.Identifier) (models.LaunchPlan, error) {
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(func(input *core.Identifier) (models.LaunchPlan, error) {
 		if launchplan == nil {
 			return models.LaunchPlan{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "launchplan not found")
 		}
@@ -4570,14 +4539,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	resourceManager.GetResourceFunc = func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 		// two requests will be made, one with empty domain and one with filled in domain
-		assert.Contains(t, []managerInterfaces.ResourceRequest{{
-			Project:      workflowIdentifier.Project,
-			Domain:       workflowIdentifier.Domain,
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-		}, {Project: workflowIdentifier.Project,
-			Domain:       "",
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-		}, request)
+		assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+		assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+		assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 		projectDomainResponse := &managerInterfaces.ResourceResponse{
 			Attributes: &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
@@ -4611,7 +4575,7 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 				},
 			},
 		}
-		if request.Domain == "" {
+		if request.IdentifierScope.GetDomain() == "" {
 			return projectResponse, nil
 		}
 		return projectDomainResponse, nil
@@ -4822,14 +4786,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	t.Run("matchable resource partial config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-			}, request)
+			assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+			assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+			assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 
 			return &managerInterfaces.ResourceResponse{
 				Attributes: &admin.MatchingAttributes{
@@ -4869,14 +4828,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	t.Run("matchable resource with no config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-			}, request)
+			assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+			assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+			assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 			return &managerInterfaces.ResourceResponse{
 				Attributes: &admin.MatchingAttributes{
 					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
@@ -4907,14 +4861,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	t.Run("fetch security context from deprecated config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-			}, request)
+			assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+			assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+			assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 
 			return &managerInterfaces.ResourceResponse{
 				Attributes: &admin.MatchingAttributes{
@@ -4950,16 +4899,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	t.Run("matchable resource workflow resource", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-				Workflow:     workflowIdentifier.Name,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				Workflow:     "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-			}, request)
+			assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+			assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+			assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 
 			return &managerInterfaces.ResourceResponse{
 				Attributes: &admin.MatchingAttributes{
@@ -5004,14 +4946,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	t.Run("matchable resource failure", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-			}, request)
+			assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+			assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+			assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 			return nil, fmt.Errorf("failed to fetch the resources")
 		}
 		request := &admin.ExecutionCreateRequest{
@@ -5036,14 +4973,9 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	t.Run("application configuration", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-			}, request)
+			assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+			assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+			assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 			return &managerInterfaces.ResourceResponse{
 				Attributes: &admin.MatchingAttributes{
 					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
@@ -5320,14 +5252,9 @@ func TestGetExecutionConfig(t *testing.T) {
 	resourceManager := managerMocks.MockResourceManager{}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-		assert.Contains(t, []managerInterfaces.ResourceRequest{{
-			Project:      workflowIdentifier.Project,
-			Domain:       workflowIdentifier.Domain,
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-		}, {Project: workflowIdentifier.Project,
-			Domain:       "",
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
-		}, request)
+		assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+		assert.Contains(t, sets.New[string]("", workflowIdentifier.Domain), request.IdentifierScope.GetDomain())
+		assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.ResourceType)
 		return &managerInterfaces.ResourceResponse{
 			Attributes: &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
@@ -5426,11 +5353,9 @@ func TestGetClusterAssignment(t *testing.T) {
 	resourceManager := managerMocks.MockResourceManager{}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
 		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-		assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
-			Project:      workflowIdentifier.Project,
-			Domain:       workflowIdentifier.Domain,
-			ResourceType: admin.MatchableResource_CLUSTER_ASSIGNMENT,
-		})
+		assert.Equal(t, workflowIdentifier.Project, request.IdentifierScope.GetProject())
+		assert.Equal(t, workflowIdentifier.Domain, request.IdentifierScope.GetDomain())
+		assert.Equal(t, request.ResourceType, admin.MatchableResource_CLUSTER_ASSIGNMENT)
 		return &managerInterfaces.ResourceResponse{
 			Attributes: &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ClusterAssignment{

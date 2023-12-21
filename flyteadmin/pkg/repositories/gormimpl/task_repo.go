@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"gorm.io/gorm"
 
@@ -20,7 +21,7 @@ type TaskRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *TaskRepo) Create(ctx context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error {
+func (r *TaskRepo) Create(ctx context.Context, id *core.Identifier, input models.Task, descriptionEntity *models.DescriptionEntity) error {
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if descriptionEntity == nil {
@@ -46,24 +47,24 @@ func (r *TaskRepo) Create(ctx context.Context, input models.Task, descriptionEnt
 	return err
 }
 
-func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Task, error) {
+func (r *TaskRepo) Get(ctx context.Context, id *core.Identifier) (models.Task, error) {
 	var task models.Task
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Task{
 		TaskKey: models.TaskKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}).Take(&task)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Task{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		})
 	}
 
@@ -82,7 +83,7 @@ func (r *TaskRepo) List(
 	var tasks []models.Task
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, common.Task, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.TaskCollectionOutput{}, err
 	}
@@ -113,7 +114,7 @@ func (r *TaskRepo) ListTaskIdentifiers(ctx context.Context, input interfaces.Lis
 	tx := r.db.WithContext(ctx).Model(models.Task{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, common.Task, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.TaskCollectionOutput{}, err
 	}

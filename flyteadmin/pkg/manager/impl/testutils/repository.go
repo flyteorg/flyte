@@ -12,7 +12,7 @@ import (
 func GetRepoWithDefaultProjectAndErr(err error) repositoryInterfaces.Repository {
 	repo := repositoryMocks.NewMockRepository()
 	repo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, identifier *admin.ProjectIdentifier) (models.Project, error) {
 		activeState := int32(admin.Project_ACTIVE)
 		return models.Project{State: &activeState}, err
 	}
@@ -22,7 +22,7 @@ func GetRepoWithDefaultProjectAndErr(err error) repositoryInterfaces.Repository 
 func GetRepoWithDefaultProject() repositoryInterfaces.Repository {
 	repo := repositoryMocks.NewMockRepository()
 	repo.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, identifier *admin.ProjectIdentifier) (models.Project, error) {
 		activeState := int32(admin.Project_ACTIVE)
 		return models.Project{State: &activeState}, nil
 	}

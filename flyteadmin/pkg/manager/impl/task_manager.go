@@ -117,7 +117,7 @@ func (t *TaskManager) CreateTask(
 	if descriptionModel != nil {
 		taskModel.ShortDescription = descriptionModel.ShortDescription
 	}
-	err = t.db.TaskRepo().Create(ctx, taskModel, descriptionModel)
+	err = t.db.TaskRepo().Create(ctx, request.GetId(), taskModel, descriptionModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to create task model with id [%+v] with err %v", request.Id, err)
 		return nil, err
@@ -139,7 +139,7 @@ func (t *TaskManager) GetTask(ctx context.Context, request admin.ObjectGetReques
 		logger.Debugf(ctx, "invalid identifier [%+v]: %v", request.Id, err)
 	}
 	ctx = getTaskContext(ctx, request.Id)
-	task, err := util.GetTask(ctx, t.db, *request.Id)
+	task, err := util.GetTask(ctx, t.db, request.Id)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get task with id [%+v] with err %v", err, request.Id)
 		return nil, err
@@ -155,14 +155,8 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	ctx = contextutils.WithTaskID(ctx, request.Id.Name)
-	spec := util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name,
-		RequestFilters: request.Filters,
-	}
 
-	filters, err := util.GetDbFilters(spec, common.Task)
+	filters, err := util.GetRequestFilters(request.Filters, common.Task)
 	if err != nil {
 		return nil, err
 	}
@@ -179,10 +173,11 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 	}
 	// And finally, query the database
 	listTasksInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:           int(request.Limit),
+		Offset:          offset,
+		IdentifierScope: request.GetId(),
+		InlineFilters:   filters,
+		SortParameter:   sortParameter,
 	}
 	output, err := t.db.TaskRepo().List(ctx, listTasksInput)
 	if err != nil {
@@ -215,13 +210,6 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 		return nil, err
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
-	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project: request.Project,
-		Domain:  request.Domain,
-	}, common.Task)
-	if err != nil {
-		return nil, err
-	}
 
 	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskColumns)
 	if err != nil {
@@ -234,10 +222,10 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 			"invalid pagination token %s for ListUniqueTaskIdentifiers", request.Token)
 	}
 	listTasksInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:           int(request.Limit),
+		Offset:          offset,
+		IdentifierScope: util.FromNamedEntityIdentifierListRequest(request),
+		SortParameter:   sortParameter,
 	}
 
 	output, err := t.db.TaskRepo().ListTaskIdentifiers(ctx, listTasksInput)

@@ -3,6 +3,8 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	repoInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"runtime/debug"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
@@ -14,7 +16,7 @@ import (
 )
 
 // StartScheduler creates and starts a new scheduler instance. This is a blocking call and will block the calling go-routine
-func StartScheduler(ctx context.Context) error {
+func StartScheduler(ctx context.Context, pluginRegistry *plugins.Registry) error {
 	configuration := runtime.NewConfigurationProvider()
 	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 
@@ -38,7 +40,11 @@ func StartScheduler(ctx context.Context) error {
 		logger.Fatal(ctx, err)
 	}
 	dbScope := schedulerScope.NewSubScope("database")
-	repo := repositories.NewGormRepo(
+	pluginRegistry.RegisterDefault(plugins.PluginIDRepositoryImpl, repositories.NewGormRepo)
+	var newRepoImpl repoInterfaces.NewRepo
+	newRepoImpl = plugins.Get[repoInterfaces.NewRepo](pluginRegistry, plugins.PluginIDRepositoryImpl)
+
+	repo := newRepoImpl(
 		db, errors.NewPostgresErrorTransformer(schedulerScope.NewSubScope("errors")), dbScope)
 
 	clientSet, err := admin.ClientSetBuilder().WithConfig(admin.GetConfig(ctx)).Build(ctx)

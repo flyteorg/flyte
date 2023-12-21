@@ -2,13 +2,14 @@ package interfaces
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
 type ResourceRepoInterface interface {
 	// Inserts or updates an existing Type model into the database store.
-	CreateOrUpdate(ctx context.Context, input models.Resource) error
+	CreateOrUpdate(ctx context.Context, resourceID ResourceID, input models.Resource) error
 	// Returns a matching Type model based on hierarchical resolution.
 	Get(ctx context.Context, ID ResourceID) (models.Resource, error)
 	// Returns a matching Type model.
@@ -23,9 +24,8 @@ type ResourceRepoInterface interface {
 }
 
 type ResourceID struct {
-	Project      string
-	Domain       string
-	Workflow     string
-	LaunchPlan   string
-	ResourceType string
+	IdentifierScope common.ResourceIdentifier
+	Workflow        string
+	LaunchPlan      string
+	ResourceType    string
 }

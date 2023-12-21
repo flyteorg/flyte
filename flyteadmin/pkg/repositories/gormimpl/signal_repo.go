@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
@@ -11,6 +12,7 @@ import (
 	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -22,11 +24,18 @@ type SignalRepo struct {
 }
 
 // Get retrieves a signal model from the database store.
-func (s *SignalRepo) Get(ctx context.Context, input models.SignalKey) (models.Signal, error) {
+func (s *SignalRepo) Get(ctx context.Context, id *core.SignalIdentifier) (models.Signal, error) {
 	var signal models.Signal
 	timer := s.metrics.GetDuration.Start()
 	tx := s.db.Where(&models.Signal{
-		SignalKey: input,
+		SignalKey: models.SignalKey{
+			ExecutionKey: models.ExecutionKey{
+				Project: id.GetExecutionId().Project,
+				Domain:  id.GetExecutionId().Domain,
+				Name:    id.GetExecutionId().Name,
+			},
+			SignalID: id.GetSignalId(),
+		},
 	}).Take(&signal)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -39,7 +48,7 @@ func (s *SignalRepo) Get(ctx context.Context, input models.SignalKey) (models.Si
 }
 
 // GetOrCreate returns a signal if it already exists, if not it creates a new one given the input
-func (s *SignalRepo) GetOrCreate(ctx context.Context, input *models.Signal) error {
+func (s *SignalRepo) GetOrCreate(ctx context.Context, id *core.SignalIdentifier, input *models.Signal) error {
 	timer := s.metrics.CreateDuration.Start()
 	tx := s.db.FirstOrCreate(&input, input)
 	timer.Stop()
@@ -59,7 +68,7 @@ func (s *SignalRepo) List(ctx context.Context, input interfaces.ListResourceInpu
 	tx := s.db.Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, common.Signal, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return nil, err
 	}
@@ -78,10 +87,17 @@ func (s *SignalRepo) List(ctx context.Context, input interfaces.ListResourceInpu
 }
 
 // Update sets the value field on the specified signal model
-func (s *SignalRepo) Update(ctx context.Context, input models.SignalKey, value []byte) error {
+func (s *SignalRepo) Update(ctx context.Context, id *core.SignalIdentifier, value []byte) error {
 	signal := models.Signal{
-		SignalKey: input,
-		Value:     value,
+		SignalKey: models.SignalKey{
+			ExecutionKey: models.ExecutionKey{
+				Project: id.GetExecutionId().Project,
+				Domain:  id.GetExecutionId().Domain,
+				Name:    id.GetExecutionId().Name,
+			},
+			SignalID: id.GetSignalId(),
+		},
+		Value: value,
 	}
 
 	timer := s.metrics.GetDuration.Start()

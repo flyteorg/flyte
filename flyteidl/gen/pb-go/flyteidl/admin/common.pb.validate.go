@@ -60,6 +60,8 @@ func (m *NamedEntityIdentifier) Validate() error {
 
 	// no validation rules for Name
 
+	// no validation rules for Org
+
 	return nil
 }
 
@@ -373,6 +375,8 @@ func (m *NamedEntityIdentifierListRequest) Validate() error {
 
 	// no validation rules for Filters
 
+	// no validation rules for Org
+
 	return nil
 }
 
@@ -462,6 +466,8 @@ func (m *NamedEntityListRequest) Validate() error {
 	}
 
 	// no validation rules for Filters
+
+	// no validation rules for Org
 
 	return nil
 }

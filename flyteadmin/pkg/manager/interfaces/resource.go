@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
@@ -36,11 +37,10 @@ type ResourceInterface interface {
 
 // TODO we can move this to flyteidl, once we are exposing an endpoint
 type ResourceRequest struct {
-	Project      string
-	Domain       string
-	Workflow     string
-	LaunchPlan   string
-	ResourceType admin.MatchableResource
+	IdentifierScope common.ResourceIdentifier
+	Workflow        string
+	LaunchPlan      string
+	ResourceType    admin.MatchableResource
 }
 
 type ResourceResponse struct {

@@ -4,22 +4,22 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-type Entity = string
+type Entity string
 
 const (
-	Execution           = "e"
-	LaunchPlan          = "l"
-	NodeExecution       = "ne"
-	NodeExecutionEvent  = "nee"
-	Task                = "t"
-	TaskExecution       = "te"
-	Workflow            = "w"
-	NamedEntity         = "nen"
-	NamedEntityMetadata = "nem"
-	Project             = "p"
-	Signal              = "s"
-	AdminTag            = "at"
-	ExecutionAdminTag   = "eat"
+	Execution           Entity = "e"
+	LaunchPlan          Entity = "l"
+	NodeExecution       Entity = "ne"
+	NodeExecutionEvent  Entity = "nee"
+	Task                Entity = "t"
+	TaskExecution       Entity = "te"
+	Workflow            Entity = "w"
+	NamedEntity         Entity = "nen"
+	NamedEntityMetadata Entity = "nem"
+	Project             Entity = "p"
+	Signal              Entity = "s"
+	AdminTag            Entity = "at"
+	ExecutionAdminTag   Entity = "eat"
 )
 
 // ResourceTypeToEntity maps a resource type to an entity suitable for use with Database filters

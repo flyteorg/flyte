@@ -2,6 +2,8 @@ package resources
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+
 	// pkg/runtime/interfaces/application_configuration.go
 	"testing"
 
@@ -22,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+const org = "org"
 const project = "project"
 const domain = "domain"
 const workflow = "workflow"
@@ -157,8 +160,8 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, domain, ID.IdentifierScope.GetDomain())
 		assert.Equal(t, workflow, ID.Workflow)
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
@@ -193,8 +196,8 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) error {
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, domain, ID.IdentifierScope.GetDomain())
 		assert.Equal(t, workflow, ID.Workflow)
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		return nil
@@ -327,8 +330,8 @@ func TestGetProjectDomainAttributes(t *testing.T) {
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, domain, ID.IdentifierScope.GetDomain())
 		assert.Equal(t, "", ID.Workflow)
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
@@ -360,8 +363,8 @@ func TestDeleteProjectDomainAttributes(t *testing.T) {
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) error {
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, domain, ID.IdentifierScope.GetDomain())
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		return nil
 	}
@@ -511,8 +514,8 @@ func TestGetProjectAttributes(t *testing.T) {
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
 
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, "", ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, "", ID.IdentifierScope.GetDomain())
 		assert.Equal(t, "", ID.Workflow)
 		assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG.String(), ID.ResourceType)
 		expectedSerializedAttrs, _ := proto.Marshal(testutils.WorkflowExecutionConfigSample)
@@ -671,8 +674,8 @@ func TestDeleteProjectAttributes(t *testing.T) {
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).DeleteFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) error {
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, "", ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, "", ID.IdentifierScope.GetDomain())
 		assert.Equal(t, admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG.String(), ID.ResourceType)
 		return nil
 	}
@@ -683,24 +686,23 @@ func TestDeleteProjectAttributes(t *testing.T) {
 
 func TestGetResource(t *testing.T) {
 	request := interfaces.ResourceRequest{
-		Project:      project,
-		Domain:       domain,
-		Workflow:     workflow,
-		LaunchPlan:   "launch_plan",
-		ResourceType: admin.MatchableResource_EXECUTION_QUEUE,
+		IdentifierScope: common.NewResourceIdentifier(org, project, domain),
+		Workflow:        workflow,
+		LaunchPlan:      "launch_plan",
+		ResourceType:    admin.MatchableResource_EXECUTION_QUEUE,
 	}
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(
 		ctx context.Context, ID repoInterfaces.ResourceID) (models.Resource, error) {
-		assert.Equal(t, project, ID.Project)
-		assert.Equal(t, domain, ID.Domain)
+		assert.Equal(t, project, ID.IdentifierScope.GetProject())
+		assert.Equal(t, domain, ID.IdentifierScope.GetDomain())
 		assert.Equal(t, workflow, ID.Workflow)
 		assert.Equal(t, "launch_plan", ID.LaunchPlan)
 		assert.Equal(t, admin.MatchableResource_EXECUTION_QUEUE.String(), ID.ResourceType)
 		expectedSerializedAttrs, _ := proto.Marshal(testutils.ExecutionQueueAttributes)
 		return models.Resource{
-			Project:      ID.Project,
-			Domain:       ID.Domain,
+			Project:      ID.IdentifierScope.GetProject(),
+			Domain:       ID.IdentifierScope.GetDomain(),
 			Workflow:     ID.Workflow,
 			LaunchPlan:   ID.LaunchPlan,
 			ResourceType: ID.ResourceType,
@@ -710,8 +712,8 @@ func TestGetResource(t *testing.T) {
 	manager := NewResourceManager(db, testutils.GetApplicationConfigWithDefaultDomains())
 	response, err := manager.GetResource(context.Background(), request)
 	assert.Nil(t, err)
-	assert.Equal(t, request.Project, response.Project)
-	assert.Equal(t, request.Domain, response.Domain)
+	assert.Equal(t, request.IdentifierScope.GetProject(), response.Project)
+	assert.Equal(t, request.IdentifierScope.GetDomain(), response.Domain)
 	assert.Equal(t, request.Workflow, response.Workflow)
 	assert.Equal(t, request.LaunchPlan, response.LaunchPlan)
 	assert.Equal(t, request.ResourceType.String(), response.ResourceType)

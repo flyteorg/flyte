@@ -54,7 +54,8 @@ func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 func startClusterResourceController(ctx context.Context) error {
 	configuration := runtime.NewConfigurationProvider()
 	scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
-	clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration)
+	registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
+	clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, registry.Load())
 	if err != nil {
 		return err
 	}
@@ -81,10 +82,11 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 
 	g, childCtx := errgroup.WithContext(ctx)
 
+	registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
 	if !cfg.DisableScheduler {
 		logger.Infof(ctx, "Starting Scheduler...")
 		g.Go(func() error {
-			return adminScheduler.StartScheduler(childCtx)
+			return adminScheduler.StartScheduler(childCtx, registry.Load())
 		})
 	}
 
@@ -98,7 +100,6 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 	if !cfg.Disabled {
 		g.Go(func() error {
 			logger.Infof(ctx, "Starting Admin server...")
-			registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
 			return adminServer.Serve(childCtx, registry.Load(), GetConsoleHandlers())
 		})
 	}

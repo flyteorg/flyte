@@ -21,16 +21,16 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func GetExecutionName(request admin.ExecutionCreateRequest) string {
+func GetExecutionName(request *admin.ExecutionCreateRequest) string {
 	if request.Name != "" {
 		return request.Name
 	}
 	return common.GetExecutionName(time.Now().UnixNano())
 }
 
-func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (
+func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (
 	*admin.Task, error) {
-	taskModel, err := GetTaskModel(ctx, repo, &identifier)
+	taskModel, err := GetTaskModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
 	}
@@ -44,13 +44,8 @@ func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier cor
 }
 
 func GetWorkflowModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.Workflow, error) {
-	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
-		Version: identifier.Version,
-	})
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.Workflow, error) {
+	workflowModel, err := (repo).WorkflowRepo().Get(ctx, identifier)
 	if err != nil {
 		return models.Workflow{}, err
 	}
@@ -74,7 +69,7 @@ func GetWorkflow(
 	ctx context.Context,
 	repo repoInterfaces.Repository,
 	store *storage.DataStore,
-	identifier core.Identifier) (*admin.Workflow, error) {
+	identifier *core.Identifier) (*admin.Workflow, error) {
 	workflowModel, err := GetWorkflowModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
@@ -93,13 +88,8 @@ func GetWorkflow(
 }
 
 func GetLaunchPlanModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.LaunchPlan, error) {
-	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
-		Version: identifier.Version,
-	})
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.LaunchPlan, error) {
+	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, identifier)
 	if err != nil {
 		return models.LaunchPlan{}, err
 	}
@@ -107,7 +97,7 @@ func GetLaunchPlanModel(
 }
 
 func GetLaunchPlan(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (*admin.LaunchPlan, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (*admin.LaunchPlan, error) {
 	launchPlanModel, err := GetLaunchPlanModel(ctx, repo, identifier)
 	if err != nil {
 		return nil, err
@@ -117,12 +107,7 @@ func GetLaunchPlan(
 
 func GetNamedEntityModel(
 	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntity, error) {
-	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, repoInterfaces.GetNamedEntityInput{
-		ResourceType: resourceType,
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
-		Name:         identifier.Name,
-	})
+	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, &identifier, resourceType)
 	if err != nil {
 		return models.NamedEntity{}, err
 	}
@@ -140,14 +125,8 @@ func GetNamedEntity(
 }
 
 func GetDescriptionEntityModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.DescriptionEntity, error) {
-	descriptionEntityModel, err := (repo).DescriptionEntityRepo().Get(ctx, repoInterfaces.GetDescriptionEntityInput{
-		ResourceType: identifier.ResourceType,
-		Project:      identifier.Project,
-		Domain:       identifier.Domain,
-		Name:         identifier.Name,
-		Version:      identifier.Version,
-	})
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (models.DescriptionEntity, error) {
+	descriptionEntityModel, err := (repo).DescriptionEntityRepo().Get(ctx, identifier)
 	if err != nil {
 		return models.DescriptionEntity{}, err
 	}
@@ -155,7 +134,7 @@ func GetDescriptionEntityModel(
 }
 
 func GetDescriptionEntity(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (*admin.DescriptionEntity, error) {
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.Identifier) (*admin.DescriptionEntity, error) {
 	descriptionEntityModel, err := GetDescriptionEntityModel(ctx, repo, identifier)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get description entity [%+v]: %v", identifier, err)
@@ -170,24 +149,12 @@ func GetDescriptionEntity(
 }
 
 // Returns the set of filters necessary to query launch plan models to find the active version of a launch plan
-func GetActiveLaunchPlanVersionFilters(project, domain, name string) ([]common.InlineFilter, error) {
-	projectFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Project, project)
-	if err != nil {
-		return nil, err
-	}
-	domainFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Domain, domain)
-	if err != nil {
-		return nil, err
-	}
-	nameFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Name, name)
-	if err != nil {
-		return nil, err
-	}
+func GetActiveLaunchPlanVersionFilter() (common.InlineFilter, error) {
 	activeFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.State, int32(admin.LaunchPlanState_ACTIVE))
 	if err != nil {
 		return nil, err
 	}
-	return []common.InlineFilter{projectFilter, domainFilter, nameFilter, activeFilter}, nil
+	return activeFilter, nil
 }
 
 // Returns the set of filters necessary to query launch plan models to find the active version of a launch plan
@@ -208,13 +175,9 @@ func ListActiveLaunchPlanVersionsFilters(project, domain string) ([]common.Inlin
 }
 
 func GetExecutionModel(
-	ctx context.Context, repo repoInterfaces.Repository, identifier core.WorkflowExecutionIdentifier) (
+	ctx context.Context, repo repoInterfaces.Repository, identifier *core.WorkflowExecutionIdentifier) (
 	*models.Execution, error) {
-	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: identifier.Project,
-		Domain:  identifier.Domain,
-		Name:    identifier.Name,
-	})
+	executionModel, err := repo.ExecutionRepo().Get(ctx, identifier)
 	if err != nil {
 		return nil, err
 	}
@@ -223,9 +186,7 @@ func GetExecutionModel(
 
 func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, nodeExecutionIdentifier *core.NodeExecutionIdentifier) (
 	*models.NodeExecution, error) {
-	nodeExecutionModel, err := repo.NodeExecutionRepo().Get(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *nodeExecutionIdentifier,
-	})
+	nodeExecutionModel, err := repo.NodeExecutionRepo().Get(ctx, nodeExecutionIdentifier)
 
 	if err != nil {
 		return nil, err
@@ -235,12 +196,7 @@ func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, 
 
 func GetTaskModel(ctx context.Context, repo repoInterfaces.Repository, taskIdentifier *core.Identifier) (
 	*models.Task, error) {
-	taskModel, err := repo.TaskRepo().Get(ctx, repoInterfaces.Identifier{
-		Project: taskIdentifier.Project,
-		Domain:  taskIdentifier.Domain,
-		Name:    taskIdentifier.Name,
-		Version: taskIdentifier.Version,
-	})
+	taskModel, err := repo.TaskRepo().Get(ctx, taskIdentifier)
 
 	if err != nil {
 		return nil, err
@@ -255,9 +211,7 @@ func GetTaskExecutionModel(
 		return nil, err
 	}
 
-	taskExecutionModel, err := repo.TaskExecutionRepo().Get(ctx, repoInterfaces.GetTaskExecutionInput{
-		TaskExecutionID: *taskExecutionID,
-	})
+	taskExecutionModel, err := repo.TaskExecutionRepo().Get(ctx, taskExecutionID)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get task execution with id [%+v] with err %v", taskExecutionID, err)
 		return nil, err
@@ -268,16 +222,15 @@ func GetTaskExecutionModel(
 // GetMatchableResource gets matchable resource for resourceType and project - domain - workflow combination.
 // Returns nil with nothing is found or return an error
 func GetMatchableResource(ctx context.Context, resourceManager interfaces.ResourceInterface, resourceType admin.MatchableResource,
-	project, domain, workflowName string) (*interfaces.ResourceResponse, error) {
+	identifierScope common.ResourceIdentifier, workflowName string) (*interfaces.ResourceResponse, error) {
 	matchableResource, err := resourceManager.GetResource(ctx, interfaces.ResourceRequest{
-		Project:      project,
-		Domain:       domain,
-		Workflow:     workflowName,
-		ResourceType: resourceType,
+		IdentifierScope: identifierScope,
+		Workflow:        workflowName,
+		ResourceType:    resourceType,
 	})
 	if err != nil && !errors.IsDoesNotExistError(err) {
 		logger.Errorf(ctx, "Failed to get %v overrides in %s project %s domain %s workflow with error: %v", resourceType,
-			project, domain, workflowName, err)
+			identifierScope.GetProject(), identifierScope.GetDomain(), workflowName, err)
 		return nil, err
 	}
 	return matchableResource, nil
@@ -331,4 +284,12 @@ func MergeIntoExecConfig(workflowExecConfig admin.WorkflowExecutionConfig, spec 
 	}
 
 	return workflowExecConfig
+}
+
+func FromNamedEntityIdentifierListRequest(request admin.NamedEntityIdentifierListRequest) *admin.NamedEntityIdentifier {
+	return &admin.NamedEntityIdentifier{
+		Project: request.GetProject(),
+		Domain:  request.GetDomain(),
+		Org:     request.GetOrg(),
+	}
 }

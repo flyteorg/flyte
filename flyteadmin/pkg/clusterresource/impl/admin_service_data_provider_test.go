@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,7 +41,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,
 		}
-		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), common.NewResourceIdentifier("", project, domain))
 		assert.NoError(t, err)
 		assert.EqualValues(t, attrs.Attributes, attributes)
 	})
@@ -53,7 +54,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,
 		}
-		_, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		_, err := provider.GetClusterResourceAttributes(context.TODO(), common.NewResourceIdentifier("", project, domain))
 		assert.EqualError(t, err, errFoo.Error())
 	})
 	t.Run("wonky admin service response", func(t *testing.T) {
@@ -75,7 +76,7 @@ func TestServiceGetClusterResourceAttributes(t *testing.T) {
 		provider := serviceAdminProvider{
 			adminClient: &mockAdmin,
 		}
-		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), common.NewResourceIdentifier("", project, domain))
 		assert.Nil(t, attrs)
 		s, ok := status.FromError(err)
 		assert.True(t, ok)

@@ -8,6 +8,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -17,7 +18,7 @@ type NodeExecutionEventRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *NodeExecutionEventRepo) Create(ctx context.Context, input models.NodeExecutionEvent) error {
+func (r *NodeExecutionEventRepo) Create(ctx context.Context, id *core.NodeExecutionIdentifier, input models.NodeExecutionEvent) error {
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()

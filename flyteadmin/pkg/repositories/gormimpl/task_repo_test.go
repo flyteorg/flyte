@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -19,7 +20,7 @@ const pythonTestTaskType = "python-task"
 
 func TestCreateTask(t *testing.T) {
 	taskRepo := NewTaskRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	err := taskRepo.Create(context.Background(), models.Task{
+	err := taskRepo.Create(context.Background(), &core.Identifier{}, models.Task{
 		TaskKey: models.TaskKey{
 			Project: project,
 			Domain:  domain,
@@ -50,7 +51,7 @@ func TestGetTask(t *testing.T) {
 	task := getMockTaskResponseFromDb(version, []byte{1, 2})
 	tasks = append(tasks, task)
 
-	output, err := taskRepo.Get(context.Background(), interfaces.Identifier{
+	output, err := taskRepo.Get(context.Background(), &core.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,
@@ -65,7 +66,7 @@ func TestGetTask(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 AND "tasks"."version" = $4 LIMIT 1`).
 		WithReply(tasks)
-	output, err = taskRepo.Get(context.Background(), interfaces.Identifier{
+	output, err = taskRepo.Get(context.Background(), &core.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,

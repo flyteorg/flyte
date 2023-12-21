@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -25,7 +26,7 @@ var active = int32(admin.LaunchPlanState_ACTIVE)
 
 func TestCreateLaunchPlan(t *testing.T) {
 	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	err := launchPlanRepo.Create(context.Background(), models.LaunchPlan{
+	err := launchPlanRepo.Create(context.Background(), &core.Identifier{}, models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: project,
 			Domain:  domain,
@@ -76,7 +77,7 @@ func TestGetLaunchPlan(t *testing.T) {
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "launch_plans" WHERE "launch_plans"."project" = $1 AND "launch_plans"."domain" = $2 AND "launch_plans"."name" = $3 AND "launch_plans"."version" = $4 LIMIT 1`).WithReply(launchPlans)
-	output, err := launchPlanRepo.Get(context.Background(), interfaces.Identifier{
+	output, err := launchPlanRepo.Get(context.Background(), &core.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,
@@ -104,7 +105,7 @@ func TestSetInactiveLaunchPlan(t *testing.T) {
 		},
 	)
 
-	err := launchPlanRepo.Update(context.Background(), models.LaunchPlan{
+	err := launchPlanRepo.Update(context.Background(), &core.Identifier{}, models.LaunchPlan{
 		BaseModel: models.BaseModel{
 			ID: 1,
 		},
@@ -135,7 +136,7 @@ func TestSetActiveLaunchPlan(t *testing.T) {
 		},
 	)
 
-	err := launchPlanRepo.SetActive(context.Background(), models.LaunchPlan{
+	err := launchPlanRepo.SetActive(context.Background(), &core.Identifier{}, models.LaunchPlan{
 		BaseModel: models.BaseModel{
 			ID: 1,
 		},
@@ -147,7 +148,7 @@ func TestSetActiveLaunchPlan(t *testing.T) {
 		},
 		Closure: []byte{5, 6},
 		State:   &active,
-	}, &models.LaunchPlan{
+	}, &core.Identifier{}, &models.LaunchPlan{
 		BaseModel: models.BaseModel{
 			ID: 2,
 		},
@@ -177,7 +178,7 @@ func TestSetActiveLaunchPlan_NoCurrentlyActiveLaunchPlan(t *testing.T) {
 			updated = true
 		},
 	)
-	err := launchPlanRepo.SetActive(context.Background(), models.LaunchPlan{
+	err := launchPlanRepo.SetActive(context.Background(), &core.Identifier{}, models.LaunchPlan{
 		BaseModel: models.BaseModel{
 			ID: 1,
 		},
@@ -189,7 +190,7 @@ func TestSetActiveLaunchPlan_NoCurrentlyActiveLaunchPlan(t *testing.T) {
 		},
 		Closure: []byte{5, 6},
 		State:   &active,
-	}, nil)
+	}, &core.Identifier{}, nil)
 	assert.NoError(t, err)
 	assert.True(t, updated)
 }
@@ -219,10 +220,10 @@ func TestListLaunchPlans(t *testing.T) {
 	GlobalMock.NewMock().WithReply(launchPlans)
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.LaunchPlan, "project", project),
-			getEqualityFilter(common.LaunchPlan, "domain", domain),
-			getEqualityFilter(common.LaunchPlan, "name", name),
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
 		},
 		Limit: 20,
 	})
@@ -267,10 +268,10 @@ func TestListLaunchPlans_Pagination(t *testing.T) {
 		`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 LIMIT 2 OFFSET 1`).WithReply(launchPlans)
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.LaunchPlan, "project", project),
-			getEqualityFilter(common.LaunchPlan, "domain", domain),
-			getEqualityFilter(common.LaunchPlan, "name", name),
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
 		},
 		Limit:  2,
 		Offset: 1,
@@ -314,10 +315,12 @@ func TestListLaunchPlans_Filters(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND launch_plans.version = $4 LIMIT 20`).WithReply(launchPlans[0:1])
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.LaunchPlan, "project", project),
-			getEqualityFilter(common.LaunchPlan, "domain", domain),
-			getEqualityFilter(common.LaunchPlan, "name", name),
 			getEqualityFilter(common.LaunchPlan, "version", "ABC"),
 		},
 		Limit: 20,
@@ -351,10 +354,12 @@ func TestListLaunchPlans_Order(t *testing.T) {
 	}, models.LaunchPlanColumns)
 	_, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
 		SortParameter: sortParameter,
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.LaunchPlan, "project", project),
-			getEqualityFilter(common.LaunchPlan, "domain", domain),
-			getEqualityFilter(common.LaunchPlan, "name", name),
 			getEqualityFilter(common.LaunchPlan, "version", version),
 		},
 		Limit: 20,
@@ -366,10 +371,12 @@ func TestListLaunchPlans_Order(t *testing.T) {
 func TestListLaunchPlans_MissingParameters(t *testing.T) {
 	launchPlanRepo := NewLaunchPlanRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	_, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.LaunchPlan, "project", project),
-			getEqualityFilter(common.LaunchPlan, "domain", domain),
-			getEqualityFilter(common.LaunchPlan, "name", name),
 			getEqualityFilter(common.LaunchPlan, "version", version),
 		},
 	})
@@ -409,10 +416,12 @@ func TestListLaunchPlansForWorkflow(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(alternateQuery).WithReply(launchPlans)
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
 		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.LaunchPlan, "project", project),
-			getEqualityFilter(common.LaunchPlan, "domain", domain),
-			getEqualityFilter(common.LaunchPlan, "name", name),
 			getEqualityFilter(common.Workflow, "deleted_at", "foo"),
 		},
 		Limit: 20,
@@ -470,10 +479,10 @@ func TestListLaunchPlanIds(t *testing.T) {
 	GlobalMock.NewMock().WithReply(launchPlans)
 
 	collection, err := launchPlanRepo.ListLaunchPlanIdentifiers(context.Background(), interfaces.ListResourceInput{
-		InlineFilters: []common.InlineFilter{
-			getEqualityFilter(common.LaunchPlan, "project", project),
-			getEqualityFilter(common.LaunchPlan, "domain", domain),
-			getEqualityFilter(common.LaunchPlan, "name", name),
+		IdentifierScope: &admin.NamedEntityIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
 		},
 		Limit: 20,
 	})

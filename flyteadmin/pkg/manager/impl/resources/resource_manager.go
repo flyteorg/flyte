@@ -2,7 +2,7 @@ package resources
 
 import (
 	"context"
-
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/gogo/protobuf/proto"
 	"google.golang.org/grpc/codes"
 
@@ -26,11 +26,10 @@ type ResourceManager struct {
 
 func (m *ResourceManager) GetResource(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 	resource, err := m.db.ResourceRepo().Get(ctx, repo_interface.ResourceID{
-		ResourceType: request.ResourceType.String(),
-		Project:      request.Project,
-		Domain:       request.Domain,
-		Workflow:     request.Workflow,
-		LaunchPlan:   request.LaunchPlan,
+		ResourceType:    request.ResourceType.String(),
+		IdentifierScope: request.IdentifierScope,
+		Workflow:        request.Workflow,
+		LaunchPlan:      request.LaunchPlan,
 	})
 	if err != nil {
 		return nil, err
@@ -56,18 +55,17 @@ func (m *ResourceManager) createOrMergeUpdateWorkflowAttributes(
 	ctx context.Context, request admin.WorkflowAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.WorkflowAttributesUpdateResponse, error) {
 	resourceID := repo_interface.ResourceID{
-		Project:      model.Project,
-		Domain:       model.Domain,
-		Workflow:     model.Workflow,
-		LaunchPlan:   model.LaunchPlan,
-		ResourceType: model.ResourceType,
+		IdentifierScope: request.GetAttributes(),
+		Workflow:        model.Workflow,
+		LaunchPlan:      model.LaunchPlan,
+		ResourceType:    model.ResourceType,
 	}
 	existing, err := m.db.ResourceRepo().GetRaw(ctx, resourceID)
 	if err != nil {
 		ec, ok := err.(errors.FlyteAdminError)
 		if ok && ec.Code() == codes.NotFound {
 			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
-			err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+			err = m.db.ResourceRepo().CreateOrUpdate(ctx, resourceID, model)
 			if err != nil {
 				return nil, err
 			}
@@ -80,7 +78,7 @@ func (m *ResourceManager) createOrMergeUpdateWorkflowAttributes(
 	if err != nil {
 		return nil, err
 	}
-	err = m.db.ResourceRepo().CreateOrUpdate(ctx, updatedModel)
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, resourceID, updatedModel)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +101,11 @@ func (m *ResourceManager) UpdateWorkflowAttributes(
 	if request.Attributes.GetMatchingAttributes().GetPluginOverrides() != nil {
 		return m.createOrMergeUpdateWorkflowAttributes(ctx, request, model, admin.MatchableResource_PLUGIN_OVERRIDE)
 	}
-	err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, repo_interface.ResourceID{
+		IdentifierScope: request.GetAttributes(),
+		Workflow:        request.Attributes.Workflow,
+		ResourceType:    model.ResourceType,
+	}, model)
 	if err != nil {
 		return nil, err
 	}
@@ -114,11 +116,13 @@ func (m *ResourceManager) UpdateWorkflowAttributes(
 func (m *ResourceManager) GetWorkflowAttributes(
 	ctx context.Context, request admin.WorkflowAttributesGetRequest) (
 	*admin.WorkflowAttributesGetResponse, error) {
-	if err := validation.ValidateWorkflowAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
+	if err := validation.ValidateWorkflowAttributesGetRequest(ctx, m.db, m.config, &request); err != nil {
 		return nil, err
 	}
 	workflowAttributesModel, err := m.db.ResourceRepo().Get(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, Workflow: request.Workflow, ResourceType: request.ResourceType.String()})
+		ctx, repo_interface.ResourceID{
+			IdentifierScope: &request,
+			Workflow:        request.Workflow, ResourceType: request.ResourceType.String()})
 	if err != nil {
 		return nil, err
 	}
@@ -133,11 +137,12 @@ func (m *ResourceManager) GetWorkflowAttributes(
 
 func (m *ResourceManager) DeleteWorkflowAttributes(ctx context.Context,
 	request admin.WorkflowAttributesDeleteRequest) (*admin.WorkflowAttributesDeleteResponse, error) {
-	if err := validation.ValidateWorkflowAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
+	if err := validation.ValidateWorkflowAttributesDeleteRequest(ctx, m.db, m.config, &request); err != nil {
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, Workflow: request.Workflow, ResourceType: request.ResourceType.String()}); err != nil {
+		ctx, repo_interface.ResourceID{
+			IdentifierScope: &request, Workflow: request.Workflow, ResourceType: request.ResourceType.String()}); err != nil {
 		return nil, err
 	}
 	logger.Infof(ctx, "Deleted workflow attributes for: %s-%s-%s (%s)", request.Project,
@@ -163,7 +168,10 @@ func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request a
 		return m.createOrMergeUpdateProjectAttributes(ctx, request, model, admin.MatchableResource_PLUGIN_OVERRIDE)
 	}
 
-	err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, repo_interface.ResourceID{
+		IdentifierScope: common.NewProjectResourceIdentifier(request.Attributes.GetOrg(), request.Attributes.GetProject()),
+		ResourceType:    model.ResourceType,
+	}, model)
 	if err != nil {
 		return nil, err
 	}
@@ -174,12 +182,18 @@ func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request a
 func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error) {
 
-	if err := validation.ValidateProjectExists(ctx, m.db, request.Project); err != nil {
+	if err := validation.ValidateProjectExists(ctx, m.db, &admin.ProjectIdentifier{
+		Id:  request.Project,
+		Org: request.Org,
+	}); err != nil {
 		return nil, err
 	}
 
 	projectAttributesModel, err := m.db.ResourceRepo().GetProjectLevel(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: "", ResourceType: request.ResourceType.String()})
+		ctx, repo_interface.ResourceID{
+			IdentifierScope: common.NewProjectResourceIdentifier(request.GetOrg(), request.GetProject()),
+			ResourceType:    request.ResourceType.String(),
+		})
 	if err != nil {
 		return nil, err
 	}
@@ -250,11 +264,16 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 func (m *ResourceManager) DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
 	*admin.ProjectAttributesDeleteResponse, error) {
 
-	if err := validation.ValidateProjectForUpdate(ctx, m.db, request.Project); err != nil {
+	if err := validation.ValidateProjectForUpdate(ctx, m.db, &admin.ProjectIdentifier{
+		Id:  request.GetProject(),
+		Org: request.GetOrg(),
+	}); err != nil {
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(
-		ctx, repo_interface.ResourceID{Project: request.Project, ResourceType: request.ResourceType.String()}); err != nil {
+		ctx, repo_interface.ResourceID{
+			IdentifierScope: common.NewProjectResourceIdentifier(request.GetOrg(), request.GetProject()),
+			ResourceType:    request.ResourceType.String()}); err != nil {
 		return nil, err
 	}
 	logger.Infof(ctx, "Deleted project attributes for: %s-%s (%s)", request.Project, request.ResourceType.String())
@@ -265,18 +284,17 @@ func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.ProjectDomainAttributesUpdateResponse, error) {
 	resourceID := repo_interface.ResourceID{
-		Project:      model.Project,
-		Domain:       model.Domain,
-		Workflow:     model.Workflow,
-		LaunchPlan:   model.LaunchPlan,
-		ResourceType: model.ResourceType,
+		IdentifierScope: request.Attributes,
+		Workflow:        model.Workflow,
+		LaunchPlan:      model.LaunchPlan,
+		ResourceType:    model.ResourceType,
 	}
 	existing, err := m.db.ResourceRepo().GetRaw(ctx, resourceID)
 	if err != nil {
 		ec, ok := err.(errors.FlyteAdminError)
 		if ok && ec.Code() == codes.NotFound {
 			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
-			err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+			err = m.db.ResourceRepo().CreateOrUpdate(ctx, resourceID, model)
 			if err != nil {
 				return nil, err
 			}
@@ -289,7 +307,7 @@ func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
 	if err != nil {
 		return nil, err
 	}
-	err = m.db.ResourceRepo().CreateOrUpdate(ctx, updatedModel)
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, resourceID, updatedModel)
 	if err != nil {
 		return nil, err
 	}
@@ -301,18 +319,17 @@ func (m *ResourceManager) createOrMergeUpdateProjectAttributes(
 	resourceType admin.MatchableResource) (*admin.ProjectAttributesUpdateResponse, error) {
 
 	resourceID := repo_interface.ResourceID{
-		Project:      model.Project,
-		Domain:       model.Domain,
-		Workflow:     model.Workflow,
-		LaunchPlan:   model.LaunchPlan,
-		ResourceType: model.ResourceType,
+		IdentifierScope: common.NewProjectResourceIdentifier(request.Attributes.GetOrg(), request.Attributes.GetProject()),
+		Workflow:        model.Workflow,
+		LaunchPlan:      model.LaunchPlan,
+		ResourceType:    model.ResourceType,
 	}
 	existing, err := m.db.ResourceRepo().GetRaw(ctx, resourceID)
 	if err != nil {
 		ec, ok := err.(errors.FlyteAdminError)
 		if ok && ec.Code() == codes.NotFound {
 			// Proceed with the default CreateOrUpdate call since there's no existing model to update.
-			err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+			err = m.db.ResourceRepo().CreateOrUpdate(ctx, resourceID, model)
 			if err != nil {
 				return nil, err
 			}
@@ -325,7 +342,7 @@ func (m *ResourceManager) createOrMergeUpdateProjectAttributes(
 	if err != nil {
 		return nil, err
 	}
-	err = m.db.ResourceRepo().CreateOrUpdate(ctx, updatedModel)
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, resourceID, updatedModel)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +366,13 @@ func (m *ResourceManager) UpdateProjectDomainAttributes(
 	if request.Attributes.GetMatchingAttributes().GetPluginOverrides() != nil {
 		return m.createOrMergeUpdateProjectDomainAttributes(ctx, request, model, admin.MatchableResource_PLUGIN_OVERRIDE)
 	}
-	err = m.db.ResourceRepo().CreateOrUpdate(ctx, model)
+	resourceID := repo_interface.ResourceID{
+		IdentifierScope: request.GetAttributes(),
+		Workflow:        model.Workflow,
+		LaunchPlan:      model.LaunchPlan,
+		ResourceType:    model.ResourceType,
+	}
+	err = m.db.ResourceRepo().CreateOrUpdate(ctx, resourceID, model)
 	if err != nil {
 		return nil, err
 	}
@@ -359,11 +382,12 @@ func (m *ResourceManager) UpdateProjectDomainAttributes(
 func (m *ResourceManager) GetProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesGetRequest) (
 	*admin.ProjectDomainAttributesGetResponse, error) {
-	if err := validation.ValidateProjectDomainAttributesGetRequest(ctx, m.db, m.config, request); err != nil {
+	if err := validation.ValidateProjectDomainAttributesGetRequest(ctx, m.db, m.config, &request); err != nil {
 		return nil, err
 	}
 	projectAttributesModel, err := m.db.ResourceRepo().Get(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, ResourceType: request.ResourceType.String()})
+		ctx, repo_interface.ResourceID{
+			IdentifierScope: &request, ResourceType: request.ResourceType.String()})
 	if err != nil {
 		return nil, err
 	}
@@ -378,11 +402,12 @@ func (m *ResourceManager) GetProjectDomainAttributes(
 
 func (m *ResourceManager) DeleteProjectDomainAttributes(ctx context.Context,
 	request admin.ProjectDomainAttributesDeleteRequest) (*admin.ProjectDomainAttributesDeleteResponse, error) {
-	if err := validation.ValidateProjectDomainAttributesDeleteRequest(ctx, m.db, m.config, request); err != nil {
+	if err := validation.ValidateProjectDomainAttributesDeleteRequest(ctx, m.db, m.config, &request); err != nil {
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, ResourceType: request.ResourceType.String()}); err != nil {
+		ctx, repo_interface.ResourceID{
+			IdentifierScope: &request, ResourceType: request.ResourceType.String()}); err != nil {
 		return nil, err
 	}
 	logger.Infof(ctx, "Deleted project-domain attributes for: %s-%s (%s)", request.Project,

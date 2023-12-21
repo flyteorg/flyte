@@ -27,7 +27,7 @@ func TestCreateExecutionEvent(t *testing.T) {
 		},
 	)
 	execEventRepo := NewExecutionEventRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
-	err := execEventRepo.Create(context.Background(), models.ExecutionEvent{
+	err := execEventRepo.Create(context.Background(), &core.WorkflowExecutionIdentifier{}, models.ExecutionEvent{
 		RequestID: "request id 1",
 		ExecutionKey: models.ExecutionKey{
 			Project: "project",

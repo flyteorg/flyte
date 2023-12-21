@@ -3,6 +3,7 @@ package util
 import (
 	"context"
 	"fmt"
+	"github.com/golang/protobuf/proto"
 	"strings"
 	"unicode"
 
@@ -68,22 +69,14 @@ func generateBindings(outputs core.VariableMap, nodeID string) []*core.Binding {
 }
 
 func CreateOrGetWorkflowModel(
-	ctx context.Context, request admin.ExecutionCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, taskIdentifier *core.Identifier,
 	task *admin.Task) (*models.Workflow, error) {
-	workflowIdentifier := core.Identifier{
-		ResourceType: core.ResourceType_WORKFLOW,
-		Project:      taskIdentifier.Project,
-		Domain:       taskIdentifier.Domain,
-		Name:         generateWorkflowNameFromTask(taskIdentifier.Name),
-		Version:      taskIdentifier.Version,
-	}
-	workflowModel, err := db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
-		Project: workflowIdentifier.Project,
-		Domain:  workflowIdentifier.Domain,
-		Name:    workflowIdentifier.Name,
-		Version: workflowIdentifier.Version,
-	})
+	var workflowIdentifier *core.Identifier
+	workflowIdentifier = proto.Clone(taskIdentifier).(*core.Identifier)
+	workflowIdentifier.Name = generateWorkflowNameFromTask(taskIdentifier.Name)
+	workflowIdentifier.ResourceType = core.ResourceType_WORKFLOW
+	workflowModel, err := db.WorkflowRepo().Get(ctx, workflowIdentifier)
 
 	if err != nil {
 		if ferr, ok := err.(errors.FlyteAdminError); !ok || ferr.Code() != codes.NotFound {
@@ -92,7 +85,7 @@ func CreateOrGetWorkflowModel(
 		// If we got this far, there is no existing workflow. Create a skeleton one now.
 		workflowSpec := admin.WorkflowSpec{
 			Template: &core.WorkflowTemplate{
-				Id:        &workflowIdentifier,
+				Id:        workflowIdentifier,
 				Interface: task.Closure.CompiledTask.Template.Interface,
 				Nodes: []*core.Node{
 					{
@@ -117,7 +110,7 @@ func CreateOrGetWorkflowModel(
 		}
 
 		_, err = workflowManager.CreateWorkflow(ctx, admin.WorkflowCreateRequest{
-			Id:   &workflowIdentifier,
+			Id:   workflowIdentifier,
 			Spec: &workflowSpec,
 		})
 		if err != nil {
@@ -141,12 +134,7 @@ func CreateOrGetWorkflowModel(
 			logger.Warningf(ctx, "Failed to set skeleton workflow state to system-generated: %v", err)
 			return nil, err
 		}
-		workflowModel, err = db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
-			Project: workflowIdentifier.Project,
-			Domain:  workflowIdentifier.Domain,
-			Name:    workflowIdentifier.Name,
-			Version: workflowIdentifier.Version,
-		})
+		workflowModel, err = db.WorkflowRepo().Get(ctx, workflowIdentifier)
 		if err != nil {
 			// This is unexpected - at this point we've successfully just created the skeleton workflow.
 			logger.Warningf(ctx, "Failed to fetch newly created workflow model from db store: %v", err)
@@ -162,13 +150,11 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 	workflowInterface *core.TypedInterface, workflowID uint, spec *admin.ExecutionSpec) (*admin.LaunchPlan, error) {
 	var launchPlan *admin.LaunchPlan
 	var err error
-	launchPlanIdentifier := core.Identifier{
-		ResourceType: core.ResourceType_LAUNCH_PLAN,
-		Project:      taskIdentifier.Project,
-		Domain:       taskIdentifier.Domain,
-		Name:         generateWorkflowNameFromTask(taskIdentifier.Name),
-		Version:      taskIdentifier.Version,
-	}
+
+	var launchPlanIdentifier *core.Identifier
+	launchPlanIdentifier = proto.Clone(taskIdentifier).(*core.Identifier)
+	launchPlanIdentifier.Name = generateWorkflowNameFromTask(taskIdentifier.Name)
+	launchPlanIdentifier.ResourceType = core.ResourceType_LAUNCH_PLAN
 	launchPlan, err = GetLaunchPlan(ctx, db, launchPlanIdentifier)
 	if err != nil {
 		if ferr, ok := err.(errors.FlyteAdminError); !ok || ferr.Code() != codes.NotFound {
@@ -177,7 +163,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 
 		// Create launch plan.
 		generatedCreateLaunchPlanReq := admin.LaunchPlanCreateRequest{
-			Id: &launchPlanIdentifier,
+			Id: launchPlanIdentifier,
 			Spec: &admin.LaunchPlanSpec{
 				WorkflowId: &core.Identifier{
 					ResourceType: core.ResourceType_WORKFLOW,
@@ -214,7 +200,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 				taskIdentifier, workflowInterface.Outputs, err)
 			return nil, err
 		}
-		err = db.LaunchPlanRepo().Create(ctx, launchPlanModel)
+		err = db.LaunchPlanRepo().Create(ctx, launchPlanIdentifier, launchPlanModel)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to save launch plan model [%+v] with err: %v", launchPlanIdentifier, err)
 			return nil, err

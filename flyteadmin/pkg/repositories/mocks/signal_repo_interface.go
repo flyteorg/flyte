@@ -6,6 +6,8 @@ import (
 	context "context"
 
 	interfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+
 	mock "github.com/stretchr/testify/mock"
 
 	models "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -24,8 +26,8 @@ func (_m SignalRepoInterface_Get) Return(_a0 models.Signal, _a1 error) *SignalRe
 	return &SignalRepoInterface_Get{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *SignalRepoInterface) OnGet(ctx context.Context, input models.SignalKey) *SignalRepoInterface_Get {
-	c_call := _m.On("Get", ctx, input)
+func (_m *SignalRepoInterface) OnGet(ctx context.Context, id *core.SignalIdentifier) *SignalRepoInterface_Get {
+	c_call := _m.On("Get", ctx, id)
 	return &SignalRepoInterface_Get{Call: c_call}
 }
 
@@ -34,20 +36,20 @@ func (_m *SignalRepoInterface) OnGetMatch(matchers ...interface{}) *SignalRepoIn
 	return &SignalRepoInterface_Get{Call: c_call}
 }
 
-// Get provides a mock function with given fields: ctx, input
-func (_m *SignalRepoInterface) Get(ctx context.Context, input models.SignalKey) (models.Signal, error) {
-	ret := _m.Called(ctx, input)
+// Get provides a mock function with given fields: ctx, id
+func (_m *SignalRepoInterface) Get(ctx context.Context, id *core.SignalIdentifier) (models.Signal, error) {
+	ret := _m.Called(ctx, id)
 
 	var r0 models.Signal
-	if rf, ok := ret.Get(0).(func(context.Context, models.SignalKey) models.Signal); ok {
-		r0 = rf(ctx, input)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.SignalIdentifier) models.Signal); ok {
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Get(0).(models.Signal)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.SignalKey) error); ok {
-		r1 = rf(ctx, input)
+	if rf, ok := ret.Get(1).(func(context.Context, *core.SignalIdentifier) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -63,8 +65,8 @@ func (_m SignalRepoInterface_GetOrCreate) Return(_a0 error) *SignalRepoInterface
 	return &SignalRepoInterface_GetOrCreate{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *SignalRepoInterface) OnGetOrCreate(ctx context.Context, input *models.Signal) *SignalRepoInterface_GetOrCreate {
-	c_call := _m.On("GetOrCreate", ctx, input)
+func (_m *SignalRepoInterface) OnGetOrCreate(ctx context.Context, id *core.SignalIdentifier, input *models.Signal) *SignalRepoInterface_GetOrCreate {
+	c_call := _m.On("GetOrCreate", ctx, id, input)
 	return &SignalRepoInterface_GetOrCreate{Call: c_call}
 }
 
@@ -73,13 +75,13 @@ func (_m *SignalRepoInterface) OnGetOrCreateMatch(matchers ...interface{}) *Sign
 	return &SignalRepoInterface_GetOrCreate{Call: c_call}
 }
 
-// GetOrCreate provides a mock function with given fields: ctx, input
-func (_m *SignalRepoInterface) GetOrCreate(ctx context.Context, input *models.Signal) error {
-	ret := _m.Called(ctx, input)
+// GetOrCreate provides a mock function with given fields: ctx, id, input
+func (_m *SignalRepoInterface) GetOrCreate(ctx context.Context, id *core.SignalIdentifier, input *models.Signal) error {
+	ret := _m.Called(ctx, id, input)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *models.Signal) error); ok {
-		r0 = rf(ctx, input)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.SignalIdentifier, *models.Signal) error); ok {
+		r0 = rf(ctx, id, input)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -136,8 +138,8 @@ func (_m SignalRepoInterface_Update) Return(_a0 error) *SignalRepoInterface_Upda
 	return &SignalRepoInterface_Update{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *SignalRepoInterface) OnUpdate(ctx context.Context, input models.SignalKey, value []byte) *SignalRepoInterface_Update {
-	c_call := _m.On("Update", ctx, input, value)
+func (_m *SignalRepoInterface) OnUpdate(ctx context.Context, id *core.SignalIdentifier, value []byte) *SignalRepoInterface_Update {
+	c_call := _m.On("Update", ctx, id, value)
 	return &SignalRepoInterface_Update{Call: c_call}
 }
 
@@ -146,13 +148,13 @@ func (_m *SignalRepoInterface) OnUpdateMatch(matchers ...interface{}) *SignalRep
 	return &SignalRepoInterface_Update{Call: c_call}
 }
 
-// Update provides a mock function with given fields: ctx, input, value
-func (_m *SignalRepoInterface) Update(ctx context.Context, input models.SignalKey, value []byte) error {
-	ret := _m.Called(ctx, input, value)
+// Update provides a mock function with given fields: ctx, id, value
+func (_m *SignalRepoInterface) Update(ctx context.Context, id *core.SignalIdentifier, value []byte) error {
+	ret := _m.Called(ctx, id, value)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.SignalKey, []byte) error); ok {
-		r0 = rf(ctx, input, value)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.SignalIdentifier, []byte) error); ok {
+		r0 = rf(ctx, id, value)
 	} else {
 		r0 = ret.Error(0)
 	}

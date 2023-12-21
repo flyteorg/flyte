@@ -203,8 +203,8 @@ func GetLaunchPlanRequestWithFixedRateSchedule(testRateValue uint32, testRateUni
 	return lpRequest
 }
 
-func GetExecutionRequest() admin.ExecutionCreateRequest {
-	return admin.ExecutionCreateRequest{
+func GetExecutionRequest() *admin.ExecutionCreateRequest {
+	return &admin.ExecutionCreateRequest{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",

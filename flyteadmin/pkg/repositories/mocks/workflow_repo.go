@@ -6,10 +6,11 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type CreateWorkflowFunc func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error
-type GetWorkflowFunc func(input interfaces.Identifier) (models.Workflow, error)
+type GetWorkflowFunc func(id *core.Identifier) (models.Workflow, error)
 type ListWorkflowFunc func(input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error)
 type ListIdentifiersFunc func(input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error)
 
@@ -20,7 +21,7 @@ type MockWorkflowRepo struct {
 	listIdentifiersFunc ListIdentifiersFunc
 }
 
-func (r *MockWorkflowRepo) Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
+func (r *MockWorkflowRepo) Create(ctx context.Context, id *core.Identifier, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 	if r.createFunction != nil {
 		return r.createFunction(input, descriptionEntity)
 	}
@@ -31,16 +32,16 @@ func (r *MockWorkflowRepo) SetCreateCallback(createFunction CreateWorkflowFunc) 
 	r.createFunction = createFunction
 }
 
-func (r *MockWorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Workflow, error) {
+func (r *MockWorkflowRepo) Get(ctx context.Context, id *core.Identifier) (models.Workflow, error) {
 	if r.getFunction != nil {
-		return r.getFunction(input)
+		return r.getFunction(id)
 	}
 	return models.Workflow{
 		WorkflowKey: models.WorkflowKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}, nil
 }

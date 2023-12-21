@@ -6,9 +6,11 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
-type GetNamedEntityFunc func(input interfaces.GetNamedEntityInput) (models.NamedEntity, error)
+type GetNamedEntityFunc func(id *admin.NamedEntityIdentifier, resourceType core.ResourceType) (models.NamedEntity, error)
 type ListNamedEntityFunc func(input interfaces.ListNamedEntityInput) (interfaces.NamedEntityCollectionOutput, error)
 type UpdateNamedEntityFunc func(input models.NamedEntity) error
 
@@ -18,7 +20,7 @@ type MockNamedEntityRepo struct {
 	updateFunction UpdateNamedEntityFunc
 }
 
-func (r *MockNamedEntityRepo) Update(ctx context.Context, NamedEntity models.NamedEntity) error {
+func (r *MockNamedEntityRepo) Update(ctx context.Context, id *admin.NamedEntityIdentifier, NamedEntity models.NamedEntity) error {
 	if r.updateFunction != nil {
 		return r.updateFunction(NamedEntity)
 	}
@@ -26,16 +28,16 @@ func (r *MockNamedEntityRepo) Update(ctx context.Context, NamedEntity models.Nam
 }
 
 func (r *MockNamedEntityRepo) Get(
-	ctx context.Context, input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+	ctx context.Context, id *admin.NamedEntityIdentifier, resourceType core.ResourceType) (models.NamedEntity, error) {
 	if r.getFunction != nil {
-		return r.getFunction(input)
+		return r.getFunction(id, resourceType)
 	}
 	return models.NamedEntity{
 		NamedEntityKey: models.NamedEntityKey{
-			ResourceType: input.ResourceType,
-			Project:      input.Project,
-			Domain:       input.Domain,
-			Name:         input.Name,
+			ResourceType: resourceType,
+			Project:      id.Project,
+			Domain:       id.Domain,
+			Name:         id.Name,
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: "",

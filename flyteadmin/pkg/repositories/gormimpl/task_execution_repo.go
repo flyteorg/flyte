@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"gorm.io/gorm"
 
@@ -20,7 +21,7 @@ type TaskExecutionRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *TaskExecutionRepo) Create(ctx context.Context, input models.TaskExecution) error {
+func (r *TaskExecutionRepo) Create(ctx context.Context, id *core.TaskExecutionIdentifier, input models.TaskExecution) error {
 	timer := r.metrics.CreateDuration.Start()
 	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
@@ -30,55 +31,40 @@ func (r *TaskExecutionRepo) Create(ctx context.Context, input models.TaskExecuti
 	return nil
 }
 
-func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+func (r *TaskExecutionRepo) Get(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 	var taskExecution models.TaskExecution
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.TaskExecution{
 		TaskExecutionKey: models.TaskExecutionKey{
 			TaskKey: models.TaskKey{
-				Project: input.TaskExecutionID.TaskId.Project,
-				Domain:  input.TaskExecutionID.TaskId.Domain,
-				Name:    input.TaskExecutionID.TaskId.Name,
-				Version: input.TaskExecutionID.TaskId.Version,
+				Project: id.TaskId.Project,
+				Domain:  id.TaskId.Domain,
+				Name:    id.TaskId.Name,
+				Version: id.TaskId.Version,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
-				NodeID: input.TaskExecutionID.NodeExecutionId.NodeId,
+				NodeID: id.NodeExecutionId.NodeId,
 				ExecutionKey: models.ExecutionKey{
-					Project: input.TaskExecutionID.NodeExecutionId.ExecutionId.Project,
-					Domain:  input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain,
-					Name:    input.TaskExecutionID.NodeExecutionId.ExecutionId.Name,
+					Project: id.NodeExecutionId.ExecutionId.Project,
+					Domain:  id.NodeExecutionId.ExecutionId.Domain,
+					Name:    id.NodeExecutionId.ExecutionId.Name,
 				},
 			},
-			RetryAttempt: &input.TaskExecutionID.RetryAttempt,
+			RetryAttempt: &id.RetryAttempt,
 		},
 	}).Preload("ChildNodeExecution").Take(&taskExecution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.TaskExecution{},
-			flyteAdminDbErrors.GetMissingEntityError("task execution", &core.TaskExecutionIdentifier{
-				TaskId: &core.Identifier{
-					Project: input.TaskExecutionID.TaskId.Project,
-					Domain:  input.TaskExecutionID.TaskId.Domain,
-					Name:    input.TaskExecutionID.TaskId.Name,
-					Version: input.TaskExecutionID.TaskId.Version,
-				},
-				NodeExecutionId: &core.NodeExecutionIdentifier{
-					NodeId: input.TaskExecutionID.NodeExecutionId.NodeId,
-					ExecutionId: &core.WorkflowExecutionIdentifier{
-						Project: input.TaskExecutionID.NodeExecutionId.ExecutionId.Project,
-						Domain:  input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain,
-						Name:    input.TaskExecutionID.NodeExecutionId.ExecutionId.Name,
-					},
-				},
-			})
+			flyteAdminDbErrors.GetMissingEntityError("task execution", id)
 	} else if tx.Error != nil {
 		return models.TaskExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return taskExecution, nil
 }
 
-func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
+func (r *TaskExecutionRepo) Update(ctx context.Context, id *core.TaskExecutionIdentifier, execution models.TaskExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
 	tx := r.db.WithContext(ctx).WithContext(ctx).Save(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
 	timer.Stop()
@@ -106,7 +92,7 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	tx = tx.Joins(innerJoinExecToNodeExec)
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyScopedFilters(tx, common.TaskExecution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.TaskExecutionCollectionOutput{}, err
 	}
@@ -141,7 +127,7 @@ func (r *TaskExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 	tx = tx.Joins(innerJoinExecToNodeExec)
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, common.TaskExecution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return 0, err
 	}

@@ -54,37 +54,46 @@ func ValidateProject(project admin.Project) error {
 	return nil
 }
 
+type WithProjectAndDomain interface {
+	GetProject() string
+	GetDomain() string
+	GetOrg() string
+}
+
 // Validates that a specified project and domain combination has been registered and exists in the db.
 func ValidateProjectAndDomain(
-	ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID string) error {
-	project, err := db.ProjectRepo().Get(ctx, projectID)
+	ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, message WithProjectAndDomain) error {
+	project, err := db.ProjectRepo().Get(ctx, &admin.ProjectIdentifier{
+		Id:  message.GetProject(),
+		Org: message.GetOrg(),
+	})
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s] and domain [%s] are registered, err: [%+v]",
-			projectID, domainID, err)
+			message.GetProject(), message.GetDomain(), err)
 	}
 	if *project.State != int32(admin.Project_ACTIVE) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"project [%s] is not active", projectID)
+			"project [%s] is not active", message.GetProject())
 	}
 	var validDomain bool
 	domains := config.GetDomainsConfig()
 	for _, domain := range *domains {
-		if domain.ID == domainID {
+		if domain.ID == message.GetDomain() {
 			validDomain = true
 			break
 		}
 	}
 	if !validDomain {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "domain [%s] is unrecognized by system", domainID)
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "domain [%s] is unrecognized by system", message.GetDomain())
 	}
 	return nil
 }
 
 func ValidateProjectForUpdate(
-	ctx context.Context, db repositoryInterfaces.Repository, projectID string) error {
+	ctx context.Context, db repositoryInterfaces.Repository, id *admin.ProjectIdentifier) error {
 
-	project, err := db.ProjectRepo().Get(ctx, projectID)
+	project, err := db.ProjectRepo().Get(ctx, id)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s] is registered, err: [%+v]",
@@ -100,9 +109,9 @@ func ValidateProjectForUpdate(
 // ValidateProjectExists doesn't check that the project is active. This is used to get Project level attributes, which you should
 // be able to do even for inactive projects.
 func ValidateProjectExists(
-	ctx context.Context, db repositoryInterfaces.Repository, projectID string) error {
+	ctx context.Context, db repositoryInterfaces.Repository, id *admin.ProjectIdentifier) error {
 
-	_, err := db.ProjectRepo().Get(ctx, projectID)
+	_, err := db.ProjectRepo().Get(ctx, id)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s] exists, err: [%+v]",

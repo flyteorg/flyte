@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -80,7 +79,7 @@ func getMockRepository(workflowOnGet bool) interfaces.Repository {
 	mockRepo := repositoryMocks.NewMockRepository()
 	if !workflowOnGet {
 		mockRepo.(*repositoryMocks.MockRepository).WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(
-			func(input interfaces.Identifier) (models.Workflow, error) {
+			func(input *core.Identifier) (models.Workflow, error) {
 				return models.Workflow{}, adminErrors.NewFlyteAdminError(codes.NotFound, "not found")
 			})
 	}
@@ -272,7 +271,7 @@ func TestCreateWorkflow_DatabaseError(t *testing.T) {
 
 func TestGetWorkflow(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+	workflowGetFunc := func(input *core.Identifier) (models.Workflow, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -319,7 +318,7 @@ func TestGetWorkflow(t *testing.T) {
 func TestGetWorkflow_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.New("expected error")
-	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+	workflowGetFunc := func(input *core.Identifier) (models.Workflow, error) {
 		return models.Workflow{}, expectedErr
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
@@ -335,7 +334,7 @@ func TestGetWorkflow_DatabaseError(t *testing.T) {
 
 func TestGetWorkflow_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
-	workflowGetFunc := func(input interfaces.Identifier) (models.Workflow, error) {
+	workflowGetFunc := func(input *core.Identifier) (models.Workflow, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
 		assert.Equal(t, "name", input.Name)
@@ -372,24 +371,11 @@ func TestGetWorkflow_TransformerError(t *testing.T) {
 func TestListWorkflows(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	workflowListFunc := func(input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error) {
-		var projectFilter, domainFilter, nameFilter bool
-		assert.Len(t, input.InlineFilters, 3)
-		for _, filter := range input.InlineFilters {
-			assert.Equal(t, common.Workflow, filter.GetEntity())
-			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == projectValue && queryExpr.Query == testutils.ProjectQueryPattern {
-				projectFilter = true
-			}
-			if queryExpr.Args == domainValue && queryExpr.Query == testutils.DomainQueryPattern {
-				domainFilter = true
-			}
-			if queryExpr.Args == nameValue && queryExpr.Query == testutils.NameQueryPattern {
-				nameFilter = true
-			}
-		}
-		assert.True(t, projectFilter, "Missing project equality filter")
-		assert.True(t, domainFilter, "Missing domain equality filter")
-		assert.True(t, nameFilter, "Missing name equality filter")
+		assert.True(t, proto.Equal(&admin.NamedEntityIdentifier{
+			Project: projectValue,
+			Domain:  domainValue,
+			Name:    nameValue,
+		}, input.IdentifierScope))
 		assert.Equal(t, limit, input.Limit)
 		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
 		assert.Equal(t, 10, input.Offset)
@@ -521,19 +507,10 @@ func TestListWorkflows_DatabaseError(t *testing.T) {
 func TestWorkflowManager_ListWorkflowIdentifiers(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	workflowListIdsFunc := func(input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error) {
-		var projectFilter, domainFilter bool
-		for _, filter := range input.InlineFilters {
-			assert.Equal(t, common.Workflow, filter.GetEntity())
-			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == projectValue && queryExpr.Query == testutils.ProjectQueryPattern {
-				projectFilter = true
-			}
-			if queryExpr.Args == domainValue && queryExpr.Query == testutils.DomainQueryPattern {
-				domainFilter = true
-			}
-		}
-		assert.True(t, projectFilter, "Missing project equality filter")
-		assert.True(t, domainFilter, "Missing domain equality filter")
+		assert.True(t, proto.Equal(&admin.NamedEntityIdentifier{
+			Project: projectValue,
+			Domain:  domainValue,
+		}, input.IdentifierScope))
 		assert.Equal(t, limit, input.Limit)
 		assert.Equal(t, "domain asc", input.SortParameter.GetGormOrderExpr())
 		return interfaces.WorkflowCollectionOutput{

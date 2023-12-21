@@ -876,6 +876,8 @@ func (m *MatchableAttributesConfiguration) Validate() error {
 
 	// no validation rules for LaunchPlan
 
+	// no validation rules for Org
+
 	return nil
 }
 

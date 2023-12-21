@@ -2,6 +2,7 @@ package gormimpl
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
@@ -26,7 +27,7 @@ func TestCreateWorkflowAttributes(t *testing.T) {
 	query.WithQuery(
 		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "id"`)
 
-	err := resourceRepo.CreateOrUpdate(context.Background(), models.Resource{
+	err := resourceRepo.CreateOrUpdate(context.Background(), interfaces.ResourceID{}, models.Resource{
 		Project:      "project",
 		Domain:       "domain",
 		Workflow:     resourceTestWorkflowName,
@@ -69,7 +70,7 @@ func TestUpdateWorkflowAttributes_WithExisting(t *testing.T) {
 	mockSaveQuery.WithQuery(
 		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
 
-	err := resourceRepo.CreateOrUpdate(context.Background(), models.Resource{
+	err := resourceRepo.CreateOrUpdate(context.Background(), interfaces.ResourceID{}, models.Resource{
 		ResourceType: resourceType.String(),
 		Project:      project,
 		Domain:       domain,
@@ -97,7 +98,10 @@ func TestGetWorkflowAttributes(t *testing.T) {
 			response,
 		})
 
-	output, err := resourceRepo.Get(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", Workflow: "workflow", ResourceType: "resource"})
+	output, err := resourceRepo.Get(context.Background(), interfaces.ResourceID{
+		IdentifierScope: common.NewResourceIdentifier("", "project", "domain"),
+		Workflow:        "workflow", ResourceType: "resource",
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, "project", output.Project)
 	assert.Equal(t, "domain", output.Domain)
@@ -122,7 +126,10 @@ func TestProjectDomainAttributes(t *testing.T) {
 			response,
 		})
 
-	output, err := resourceRepo.Get(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", ResourceType: "resource"})
+	output, err := resourceRepo.Get(context.Background(), interfaces.ResourceID{
+		IdentifierScope: common.NewResourceIdentifier("", "project", "domain"),
+		ResourceType:    "resource",
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, project, output.Project)
 	assert.Equal(t, domain, output.Domain)
@@ -147,7 +154,11 @@ func TestProjectLevelAttributes(t *testing.T) {
 			response,
 		})
 
-	output, err := resourceRepo.GetProjectLevel(context.Background(), interfaces.ResourceID{Project: "project", Domain: "", ResourceType: "resource"})
+	output, err := resourceRepo.GetProjectLevel(context.Background(), interfaces.ResourceID{
+
+		IdentifierScope: common.NewResourceIdentifier("", "project", ""),
+		ResourceType:    "resource",
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, project, output.Project)
 	assert.Equal(t, "", output.Domain)
@@ -156,7 +167,10 @@ func TestProjectLevelAttributes(t *testing.T) {
 	assert.Equal(t, []byte("attrs"), output.Attributes)
 
 	// Must have a project defined
-	_, err = resourceRepo.GetProjectLevel(context.Background(), interfaces.ResourceID{Project: "", Domain: "", ResourceType: "resource"})
+	_, err = resourceRepo.GetProjectLevel(context.Background(), interfaces.ResourceID{
+		IdentifierScope: common.NewResourceIdentifier("", "", ""),
+		ResourceType:    "resource",
+	})
 	assert.Error(t, err)
 }
 
@@ -178,7 +192,10 @@ func TestGetRawWorkflowAttributes(t *testing.T) {
 			response,
 		})
 
-	output, err := resourceRepo.GetRaw(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", Workflow: "workflow", LaunchPlan: "launch_plan", ResourceType: "resource"})
+	output, err := resourceRepo.GetRaw(context.Background(), interfaces.ResourceID{
+		IdentifierScope: common.NewResourceIdentifier("", "project", "domain"),
+		Workflow:        "workflow", LaunchPlan: "launch_plan", ResourceType: "resource",
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, project, output.Project)
 	assert.Equal(t, domain, output.Domain)
@@ -196,7 +213,10 @@ func TestDeleteWorkflowAttributes(t *testing.T) {
 	fakeResponse := query.WithQuery(
 		`DELETE FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."workflow" = $3 AND "resources"."launch_plan" = $4 AND "resources"."resource_type" = $5`)
 
-	err := resourceRepo.Delete(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", Workflow: "workflow", LaunchPlan: "launch_plan", ResourceType: "resource"})
+	err := resourceRepo.Delete(context.Background(), interfaces.ResourceID{
+		IdentifierScope: common.NewResourceIdentifier("", "project", "domain"),
+		Workflow:        "workflow", LaunchPlan: "launch_plan", ResourceType: "resource",
+	})
 	assert.Nil(t, err)
 	assert.True(t, fakeResponse.Triggered)
 }
@@ -238,7 +258,10 @@ func TestGetError(t *testing.T) {
 	query := GlobalMock.NewMock()
 	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6,$7) AND launch_plan IN ($8) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithError(gorm.ErrRecordNotFound)
 
-	output, err := resourceRepo.Get(context.Background(), interfaces.ResourceID{Project: "project", Domain: "domain", Workflow: "workflow", ResourceType: "resource"})
+	output, err := resourceRepo.Get(context.Background(), interfaces.ResourceID{
+		IdentifierScope: common.NewResourceIdentifier("", "project", "domain"),
+		Workflow:        "workflow", ResourceType: "resource",
+	})
 	assert.Error(t, err)
 	assert.Equal(t, "", output.Project)
 	assert.Equal(t, "", output.Domain)

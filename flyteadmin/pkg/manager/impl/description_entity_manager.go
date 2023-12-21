@@ -39,7 +39,7 @@ func (d *DescriptionEntityManager) GetDescriptionEntity(ctx context.Context, req
 		return nil, err
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
-	return util.GetDescriptionEntity(ctx, d.db, *request.Id)
+	return util.GetDescriptionEntity(ctx, d.db, request.Id)
 }
 
 func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, request admin.DescriptionEntityListRequest) (*admin.DescriptionEntityList, error) {
@@ -55,17 +55,7 @@ func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, re
 		ctx = contextutils.WithTaskID(ctx, request.Id.Name)
 	}
 
-	filters, err := util.GetDbFilters(util.FilterSpec{
-		Project:        request.Id.Project,
-		Domain:         request.Id.Domain,
-		Name:           request.Id.Name,
-		RequestFilters: request.Filters,
-	}, common.ResourceTypeToEntity[request.ResourceType])
-	if err != nil {
-		logger.Error(ctx, "failed to get database filter")
-		return nil, err
-	}
-
+	entity := common.ResourceTypeToEntity[request.ResourceType]
 	sortParameter, err := common.NewSortParameter(request.SortBy, models.DescriptionEntityColumns)
 	if err != nil {
 		return nil, err
@@ -77,12 +67,12 @@ func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, re
 			"invalid pagination token %s for ListWorkflows", request.Token)
 	}
 	listDescriptionEntitiesInput := repoInterfaces.ListResourceInput{
-		Limit:         int(request.Limit),
-		Offset:        offset,
-		InlineFilters: filters,
-		SortParameter: sortParameter,
+		Limit:           int(request.Limit),
+		Offset:          offset,
+		IdentifierScope: request.GetId(),
+		SortParameter:   sortParameter,
 	}
-	output, err := d.db.DescriptionEntityRepo().List(ctx, listDescriptionEntitiesInput)
+	output, err := d.db.DescriptionEntityRepo().List(ctx, entity, listDescriptionEntitiesInput)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list workflows with [%+v] with err %v", request.Id, err)
 		return nil, err

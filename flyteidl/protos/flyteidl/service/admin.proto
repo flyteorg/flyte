@@ -51,6 +51,9 @@ service AdminService {
   rpc GetTask (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Task) {
     option (google.api.http) = {
       get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}"
+      additional_bindings {
+        get: "/api/v1/tasks/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve an existing task definition."
@@ -61,6 +64,9 @@ service AdminService {
   rpc ListTaskIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
     option (google.api.http) = {
       get: "/api/v1/task_ids/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/tasks/{org}/{project}/{domain}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch existing task definition identifiers matching input filters."
@@ -72,7 +78,13 @@ service AdminService {
     option (google.api.http) = {
       get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}"
       additional_bindings {
-        get: "/api/v1/tasks/{id.project}/{id.domain}"
+        get: "/api/v1/tasks/{id.org}/{id.project}/{id.domain}/{id.name}",
+      }
+      additional_bindings {
+        get: "/api/v1/tasks/{id.project}/{id.domain}",
+      }
+      additional_bindings {
+        get: "/api/v1/tasks/{id.org}/{id.project}/{id.domain}",
       }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -107,6 +119,9 @@ service AdminService {
   rpc GetWorkflow (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Workflow) {
     option (google.api.http) = {
       get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}"
+      additional_bindings {
+        get: "/api/v1/workflows/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve an existing workflow definition."
@@ -117,6 +132,9 @@ service AdminService {
   rpc ListWorkflowIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
     option (google.api.http) = {
       get: "/api/v1/workflow_ids/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/workflows/{org}/{project}/{domain}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch an existing workflow definition identifiers matching input filters."
@@ -128,7 +146,13 @@ service AdminService {
     option (google.api.http) = {
       get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}"
       additional_bindings {
-        get: "/api/v1/workflows/{id.project}/{id.domain}"
+        get: "/api/v1/workflows/{id.org}/{id.project}/{id.domain}/{id.name}",
+      }
+      additional_bindings {
+        get: "/api/v1/workflows/{id.project}/{id.domain}",
+      }
+      additional_bindings {
+        get: "/api/v1/workflows/{id.org}/{id.project}/{id.domain}",
       }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -163,6 +187,9 @@ service AdminService {
   rpc GetLaunchPlan (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.LaunchPlan) {
     option (google.api.http) = {
       get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
+      additional_bindings {
+        get: "/api/v1/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve an existing launch plan definition."
@@ -173,6 +200,9 @@ service AdminService {
   rpc GetActiveLaunchPlan (flyteidl.admin.ActiveLaunchPlanRequest) returns (flyteidl.admin.LaunchPlan) {
     option (google.api.http) = {
       get: "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/active_launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve the active launch plan version specified by input request filters."
@@ -193,6 +223,9 @@ service AdminService {
   rpc ListLaunchPlanIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
     option (google.api.http) = {
       get: "/api/v1/launch_plan_ids/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/launch_plan_ids/{org}/{project}/{domain}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch existing launch plan definition identifiers matching input filters."
@@ -204,7 +237,13 @@ service AdminService {
     option (google.api.http) = {
       get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}"
       additional_bindings {
+        get: "/api/v1/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
+      additional_bindings {
         get: "/api/v1/launch_plans/{id.project}/{id.domain}"
+      }
+      additional_bindings {
+        get: "/api/v1/launch_plans/{id.org}/{id.project}/{id.domain}"
       }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -216,6 +255,9 @@ service AdminService {
   rpc UpdateLaunchPlan (flyteidl.admin.LaunchPlanUpdateRequest) returns (flyteidl.admin.LaunchPlanUpdateResponse) {
     option (google.api.http) = {
       put: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
+      additional_bindings {
+        put: "/api/v1/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+      }
       body: "*"
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -273,6 +315,9 @@ service AdminService {
   rpc GetExecution (flyteidl.admin.WorkflowExecutionGetRequest) returns (flyteidl.admin.Execution) {
     option (google.api.http) = {
       get: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve an existing workflow execution."
@@ -284,6 +329,10 @@ service AdminService {
     option (google.api.http) = {
       put: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
       body: "*"
+      additional_bindings {
+        put: "/api/v1/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Update execution belonging to project domain."
@@ -294,6 +343,9 @@ service AdminService {
   rpc GetExecutionData (flyteidl.admin.WorkflowExecutionGetDataRequest) returns (flyteidl.admin.WorkflowExecutionGetDataResponse) {
     option (google.api.http) = {
       get: "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/data/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve input and output data from an existing workflow execution."
@@ -304,6 +356,9 @@ service AdminService {
   rpc ListExecutions (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.ExecutionList) {
     option (google.api.http) = {
       get: "/api/v1/executions/{id.project}/{id.domain}"
+      additional_bindings {
+        get: "/api/v1/executions/{id.org}/{id.project}/{id.domain}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch existing workflow executions matching input filters."
@@ -315,6 +370,10 @@ service AdminService {
     option (google.api.http) = {
       delete: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
       body: "*"
+      additional_bindings {
+        delete: "/api/v1/data/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Terminate the active workflow execution specified in the request."
@@ -325,6 +384,9 @@ service AdminService {
   rpc GetNodeExecution (flyteidl.admin.NodeExecutionGetRequest) returns (flyteidl.admin.NodeExecution) {
     option (google.api.http) = {
       get: "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+      additional_bindings {
+        get: "/api/v1/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve an existing node execution."
@@ -335,6 +397,9 @@ service AdminService {
   rpc ListNodeExecutions (flyteidl.admin.NodeExecutionListRequest) returns (flyteidl.admin.NodeExecutionList) {
     option (google.api.http) = {
       get: "/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+      additional_bindings {
+        get: "/api/v1/node_executions/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch existing node executions matching input filters."
@@ -345,6 +410,9 @@ service AdminService {
   rpc ListNodeExecutionsForTask (flyteidl.admin.NodeExecutionForTaskListRequest) returns (flyteidl.admin.NodeExecutionList) {
     option (google.api.http) = {
       get: "/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+      additional_bindings {
+        get: "/api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch child node executions launched by the specified task execution."
@@ -355,6 +423,9 @@ service AdminService {
   rpc GetNodeExecutionData (flyteidl.admin.NodeExecutionGetDataRequest) returns (flyteidl.admin.NodeExecutionGetDataResponse) {
     option (google.api.http) = {
       get: "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+      additional_bindings {
+        get: "/api/v1/data/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve input and output data from an existing node execution."
@@ -379,6 +450,18 @@ service AdminService {
     option (google.api.http) = {
       put: "/api/v1/projects/{id}"
       body: "*"
+      additional_bindings {
+        put: "/api/v1/projects/{identifier.id}"
+        body: "*"
+      }
+      additional_bindings {
+        put: "/api/v1/projects/{identifier.org}/{id}"
+        body: "*"
+      }
+      additional_bindings {
+        put: "/api/v1/projects/{identifier.org}/{identifier.id}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Update a project."
@@ -432,6 +515,9 @@ service AdminService {
   rpc GetTaskExecution (flyteidl.admin.TaskExecutionGetRequest) returns (flyteidl.admin.TaskExecution) {
     option (google.api.http) = {
         get: "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+        additional_bindings {
+          get: "/api/v1/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+        }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve an existing task execution."
@@ -442,6 +528,9 @@ service AdminService {
   rpc ListTaskExecutions (flyteidl.admin.TaskExecutionListRequest) returns (flyteidl.admin.TaskExecutionList) {
     option (google.api.http) = {
         get: "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
+        additional_bindings {
+          get: "/api/v1/task_executions/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
+        }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch existing task executions matching input filters."
@@ -453,6 +542,9 @@ service AdminService {
   rpc GetTaskExecutionData (flyteidl.admin.TaskExecutionGetDataRequest) returns (flyteidl.admin.TaskExecutionGetDataResponse) {
     option (google.api.http) = {
         get: "/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+        additional_bindings {
+          get: "/api/v1/data/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+        }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve input and output data from an existing task execution."
@@ -464,6 +556,10 @@ service AdminService {
     option (google.api.http) = {
       put: "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}"
       body: "*"
+      additional_bindings {
+        put: "/api/v1/project_domain_attributes/{attributes.org}/{attributes.project}/{attributes.domain}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Update the customized resource attributes associated with a project-domain combination"
@@ -474,6 +570,9 @@ service AdminService {
   rpc GetProjectDomainAttributes (flyteidl.admin.ProjectDomainAttributesGetRequest) returns (flyteidl.admin.ProjectDomainAttributesGetResponse) {
     option (google.api.http) = {
       get: "/api/v1/project_domain_attributes/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/project_domain_attributes/{org}/{project}/{domain}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve the customized resource attributes associated with a project-domain combination"
@@ -485,6 +584,10 @@ service AdminService {
     option (google.api.http) = {
       delete: "/api/v1/project_domain_attributes/{project}/{domain}"
       body: "*"
+      additional_bindings {
+        delete: "/api/v1/project_domain_attributes/{org}/{project}/{domain}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Delete the customized resource attributes associated with a project-domain combination"
@@ -496,6 +599,10 @@ service AdminService {
     option (google.api.http) = {
       put: "/api/v1/project_attributes/{attributes.project}"
       body: "*"
+      additional_bindings {
+        put: "/api/v1/project_domain_attributes/{attributes.org}/{attributes.project}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Update the customized resource attributes associated with a project"
@@ -506,6 +613,9 @@ service AdminService {
   rpc GetProjectAttributes (flyteidl.admin.ProjectAttributesGetRequest) returns (flyteidl.admin.ProjectAttributesGetResponse) {
     option (google.api.http) = {
       get: "/api/v1/project_attributes/{project}"
+      additional_bindings {
+        get: "/api/v1/project_domain_attributes/{org}/{project}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve the customized resource attributes associated with a project"
@@ -517,6 +627,10 @@ service AdminService {
     option (google.api.http) = {
       delete: "/api/v1/project_attributes/{project}"
       body: "*"
+      additional_bindings {
+        delete: "/api/v1/project_domain_attributes/{org}/{project}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Delete the customized resource attributes associated with a project"
@@ -527,6 +641,10 @@ service AdminService {
     option (google.api.http) = {
       put: "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}"
       body: "*"
+      additional_bindings {
+        put: "/api/v1/workflow_attributes/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Update the customized resource attributes associated with a project, domain and workflow combination"
@@ -537,6 +655,9 @@ service AdminService {
   rpc GetWorkflowAttributes (flyteidl.admin.WorkflowAttributesGetRequest) returns (flyteidl.admin.WorkflowAttributesGetResponse) {
     option (google.api.http) = {
       get: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
+      additional_bindings {
+        get: "/api/v1/workflow_attributes/{org}/{project}/{domain}/{workflow}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve the customized resource attributes associated with a project, domain and workflow combination"
@@ -548,6 +669,10 @@ service AdminService {
     option (google.api.http) = {
       delete: "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
       body: "*"
+      additional_bindings {
+        delete: "/api/v1/workflow_attributes/{org}/{project}/{domain}/{workflow}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Delete the customized resource attributes associated with a project, domain and workflow combination"
@@ -568,6 +693,9 @@ service AdminService {
   rpc ListNamedEntities (flyteidl.admin.NamedEntityListRequest) returns (flyteidl.admin.NamedEntityList) {
     option (google.api.http) = {
       get: "/api/v1/named_entities/{resource_type}/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/named_entities/{resource_type}/{org}/{project}/{domain}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain."
@@ -578,6 +706,9 @@ service AdminService {
   rpc GetNamedEntity (flyteidl.admin.NamedEntityGetRequest) returns (flyteidl.admin.NamedEntity) {
     option (google.api.http) = {
       get: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/named_entities/{resource_type}/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve a NamedEntity object."
@@ -589,6 +720,10 @@ service AdminService {
     option (google.api.http) = {
       put: "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
       body: "*"
+      additional_bindings {
+        put: "/api/v1/named_entities/{resource_type}/{id.org}/{id.project}/{id.domain}/{id.name}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Update the fields associated with a NamedEntity"
@@ -608,6 +743,9 @@ service AdminService {
   rpc GetDescriptionEntity (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.DescriptionEntity) {
     option (google.api.http) = {
       get: "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
+      additional_bindings {
+        get: "/api/v1/description_entities/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve an existing description entity description."
@@ -619,7 +757,13 @@ service AdminService {
     option (google.api.http) = {
       get: "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
       additional_bindings {
+        get: "/api/v1/description_entities/{resource_type}/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
+      additional_bindings {
         get: "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}"
+      }
+      additional_bindings {
+        get: "/api/v1/description_entities/{resource_type}/{id.org}/{id.project}/{id.domain}"
       }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -631,6 +775,9 @@ service AdminService {
   rpc GetExecutionMetrics (flyteidl.admin.WorkflowExecutionGetMetricsRequest) returns (flyteidl.admin.WorkflowExecutionGetMetricsResponse) {
     option (google.api.http) = {
       get: "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/metrics/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve metrics from an existing workflow execution."

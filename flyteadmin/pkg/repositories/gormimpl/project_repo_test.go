@@ -30,7 +30,7 @@ func TestCreateProject(t *testing.T) {
 		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","name","description","labels","state","identifier") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`)
 
 	activeState := int32(admin.Project_ACTIVE)
-	err := projectRepo.Create(context.Background(), models.Project{
+	err := projectRepo.Create(context.Background(), &admin.ProjectIdentifier{}, models.Project{
 		Identifier:  "proj",
 		Name:        "proj",
 		Description: "projDescription",
@@ -50,7 +50,9 @@ func TestGetProject(t *testing.T) {
 	response["description"] = "project_description"
 	response["state"] = admin.Project_ACTIVE
 
-	output, err := projectRepo.Get(context.Background(), "project_id")
+	output, err := projectRepo.Get(context.Background(), &admin.ProjectIdentifier{
+		Id: "project_id",
+	})
 	assert.Empty(t, output)
 	assert.EqualError(t, err, "project [project_id] not found")
 
@@ -61,7 +63,9 @@ func TestGetProject(t *testing.T) {
 			response,
 		})
 
-	output, err = projectRepo.Get(context.Background(), "project_id")
+	output, err = projectRepo.Get(context.Background(), &admin.ProjectIdentifier{
+		Id: "project_id",
+	})
 	assert.Nil(t, err)
 	assert.Equal(t, "project_id", output.Identifier)
 	assert.Equal(t, "project_name", output.Name)
@@ -129,7 +133,7 @@ func TestUpdateProject(t *testing.T) {
 	query.WithQuery(`UPDATE "projects" SET "updated_at"=$1,"identifier"=$2,"name"=$3,"description"=$4,"state"=$5 WHERE "identifier" = $6`)
 
 	activeState := int32(admin.Project_ACTIVE)
-	err := projectRepo.UpdateProject(context.Background(), models.Project{
+	err := projectRepo.UpdateProject(context.Background(), &admin.ProjectIdentifier{}, models.Project{
 		Identifier:  "project_id",
 		Name:        "project_name",
 		Description: "project_description",

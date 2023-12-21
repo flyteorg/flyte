@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"hash/fnv"
 	"math/rand"
 
@@ -94,11 +95,10 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 		return nil, fmt.Errorf("invalid cluster target %s", spec.TargetID)
 	}
 	resource, err := s.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
-		Project:      spec.Project,
-		Domain:       spec.Domain,
-		Workflow:     spec.Workflow,
-		LaunchPlan:   spec.LaunchPlan,
-		ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
+		IdentifierScope: common.NewResourceIdentifier("", spec.Project, spec.Domain),
+		Workflow:        spec.Workflow,
+		LaunchPlan:      spec.LaunchPlan,
+		ResourceType:    admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
 	})
 	if err != nil && !errors.IsDoesNotExistError(err) {
 		return nil, err

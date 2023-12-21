@@ -188,7 +188,7 @@ message ActiveLaunchPlanRequest {
     NamedEntityIdentifier id = 1;
 }
 
-// Represents a request structure to list active launch plans within a project/domain.
+// Represents a request structure to list active launch plans within a project/domain and optional org.
 // See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 message ActiveLaunchPlanListRequest {
     // Name of the project that contains the identifiers.
@@ -211,4 +211,7 @@ message ActiveLaunchPlanListRequest {
     // Sort ordering.
     // +optional
     Sort sort_by = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }

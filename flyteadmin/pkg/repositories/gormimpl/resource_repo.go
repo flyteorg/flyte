@@ -53,7 +53,7 @@ func validateCreateOrUpdateResourceInput(project, domain, workflow, launchPlan, 
 	return true
 }
 
-func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource) error {
+func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, resourceID interfaces.ResourceID, input models.Resource) error {
 	if !validateCreateOrUpdateResourceInput(input.Project, input.Domain, input.Workflow, input.LaunchPlan, input.ResourceType) {
 		return flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", input))
 	}
@@ -86,8 +86,8 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 }
 
 // Get returns the most-specific attribute setting for the given ResourceType.
-func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
-	if !validateCreateOrUpdateResourceInput(ID.Project, ID.Domain, ID.Workflow, ID.LaunchPlan, ID.ResourceType) {
+func (r *ResourceRepo) Get(ctx context.Context, resourceID interfaces.ResourceID) (models.Resource, error) {
+	if !validateCreateOrUpdateResourceInput(resourceID.IdentifierScope.GetProject(), resourceID.IdentifierScope.GetDomain(), resourceID.Workflow, resourceID.LaunchPlan, resourceID.ResourceType) {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 	var resources []models.Resource
@@ -95,26 +95,26 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 
 	txWhereClause := "resource_type = ? AND domain IN (?) AND project IN (?) AND workflow IN (?) AND launch_plan IN (?)"
 	project := []string{""}
-	if ID.Project != "" {
-		project = append(project, ID.Project)
+	if resourceID.IdentifierScope.GetProject() != "" {
+		project = append(project, resourceID.IdentifierScope.GetProject())
 	}
 
 	domain := []string{""}
-	if ID.Domain != "" {
-		domain = append(domain, ID.Domain)
+	if resourceID.IdentifierScope.GetDomain() != "" {
+		domain = append(domain, resourceID.IdentifierScope.GetDomain())
 	}
 
 	workflow := []string{""}
-	if ID.Workflow != "" {
-		workflow = append(workflow, ID.Workflow)
+	if resourceID.Workflow != "" {
+		workflow = append(workflow, resourceID.Workflow)
 	}
 
 	launchPlan := []string{""}
-	if ID.LaunchPlan != "" {
-		launchPlan = append(launchPlan, ID.LaunchPlan)
+	if resourceID.LaunchPlan != "" {
+		launchPlan = append(launchPlan, resourceID.LaunchPlan)
 	}
 
-	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, domain, project, workflow, launchPlan)
+	tx := r.db.WithContext(ctx).Where(txWhereClause, resourceID.ResourceType, domain, project, workflow, launchPlan)
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
@@ -130,8 +130,8 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 // GetProjectLevel differs from Get in that it returns only the project-level attribute setting for the
 // given ResourceType if it exists. The reason this exists is because we want to return project level
 // attributes to Flyte Console, regardless of whether a more specific setting exists.
-func (r *ResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
-	if ID.Project == "" {
+func (r *ResourceRepo) GetProjectLevel(ctx context.Context, resourceID interfaces.ResourceID) (models.Resource, error) {
+	if resourceID.IdentifierScope.GetProject() == "" {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 
@@ -140,7 +140,7 @@ func (r *ResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.Resour
 
 	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = ''"
 
-	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, ID.Project)
+	tx := r.db.WithContext(ctx).Where(txWhereClause, resourceID.ResourceType, resourceID.IdentifierScope.GetProject())
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
@@ -153,18 +153,18 @@ func (r *ResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.Resour
 	return resources[0], nil
 }
 
-func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (models.Resource, error) {
-	if ID.Domain == "" || ID.ResourceType == "" {
+func (r *ResourceRepo) GetRaw(ctx context.Context, resourceID interfaces.ResourceID) (models.Resource, error) {
+	if resourceID.IdentifierScope.GetDomain() == "" || resourceID.ResourceType == "" {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 	var model models.Resource
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Resource{
-		Project:      ID.Project,
-		Domain:       ID.Domain,
-		Workflow:     ID.Workflow,
-		LaunchPlan:   ID.LaunchPlan,
-		ResourceType: ID.ResourceType,
+		Project:      resourceID.IdentifierScope.GetProject(),
+		Domain:       resourceID.IdentifierScope.GetDomain(),
+		Workflow:     resourceID.Workflow,
+		LaunchPlan:   resourceID.LaunchPlan,
+		ResourceType: resourceID.ResourceType,
 	}).First(&model)
 	timer.Stop()
 
@@ -190,15 +190,15 @@ func (r *ResourceRepo) ListAll(ctx context.Context, resourceType string) ([]mode
 	return resources, nil
 }
 
-func (r *ResourceRepo) Delete(ctx context.Context, ID interfaces.ResourceID) error {
+func (r *ResourceRepo) Delete(ctx context.Context, resourceID interfaces.ResourceID) error {
 	var tx *gorm.DB
 	r.metrics.DeleteDuration.Time(func() {
 		tx = r.db.WithContext(ctx).Where(&models.Resource{
-			Project:      ID.Project,
-			Domain:       ID.Domain,
-			Workflow:     ID.Workflow,
-			LaunchPlan:   ID.LaunchPlan,
-			ResourceType: ID.ResourceType,
+			Project:      resourceID.IdentifierScope.GetProject(),
+			Domain:       resourceID.IdentifierScope.GetDomain(),
+			Workflow:     resourceID.Workflow,
+			LaunchPlan:   resourceID.LaunchPlan,
+			ResourceType: resourceID.ResourceType,
 		}).Unscoped().Delete(models.Resource{})
 	})
 

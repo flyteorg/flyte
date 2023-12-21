@@ -16,4 +16,6 @@ type AdminExecutionCreateRequest struct {
 	Name string `json:"name,omitempty"`
 	Spec *AdminExecutionSpec `json:"spec,omitempty"`
 	Inputs *CoreLiteralMap `json:"inputs,omitempty"`
+	// Optional, org key applied to the resource.
+	Org string `json:"org,omitempty"`
 }

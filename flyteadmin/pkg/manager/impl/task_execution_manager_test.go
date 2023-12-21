@@ -68,7 +68,7 @@ var retryAttemptValue = uint32(1)
 
 func addGetWorkflowExecutionCallback(repository interfaces.Repository) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		func(ctx context.Context, input *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 			return models.Execution{
 				ExecutionKey: models.ExecutionKey{
 					Project: sampleNodeExecID.ExecutionId.Project,
@@ -84,7 +84,7 @@ func addGetWorkflowExecutionCallback(repository interfaces.Repository) {
 
 func addGetNodeExecutionCallback(repository interfaces.Repository) {
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+		func(ctx context.Context, input *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
 			return models.NodeExecution{
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: sampleNodeExecID.NodeId,
@@ -101,7 +101,7 @@ func addGetNodeExecutionCallback(repository interfaces.Repository) {
 
 func addGetTaskCallback(repository interfaces.Repository) {
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
-		func(input interfaces.Identifier) (models.Task, error) {
+		func(input *core.Identifier) (models.Task, error) {
 			return models.Task{
 				TaskKey: models.TaskKey{
 					Project: sampleTaskID.Project,
@@ -123,17 +123,17 @@ func TestCreateTaskEvent(t *testing.T) {
 	getTaskCalled := false
 	// See if we check for existing task executions, and return none found
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			getTaskCalled = true
-			assert.Equal(t, core.ResourceType_TASK, input.TaskExecutionID.TaskId.ResourceType)
-			assert.Equal(t, "task-id", input.TaskExecutionID.TaskId.Name)
-			assert.Equal(t, "project", input.TaskExecutionID.TaskId.Project)
-			assert.Equal(t, "domain", input.TaskExecutionID.TaskId.Domain)
-			assert.Equal(t, "task-v", input.TaskExecutionID.TaskId.Version)
-			assert.Equal(t, "node-id", input.TaskExecutionID.NodeExecutionId.NodeId)
-			assert.Equal(t, "project", input.TaskExecutionID.NodeExecutionId.ExecutionId.Project)
-			assert.Equal(t, "domain", input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain)
-			assert.Equal(t, "name", input.TaskExecutionID.NodeExecutionId.ExecutionId.Name)
+			assert.Equal(t, core.ResourceType_TASK, id.TaskId.ResourceType)
+			assert.Equal(t, "task-id", id.TaskId.Name)
+			assert.Equal(t, "project", id.TaskId.Project)
+			assert.Equal(t, "domain", id.TaskId.Domain)
+			assert.Equal(t, "task-v", id.TaskId.Version)
+			assert.Equal(t, "node-id", id.NodeExecutionId.NodeId)
+			assert.Equal(t, "project", id.NodeExecutionId.ExecutionId.Project)
+			assert.Equal(t, "domain", id.NodeExecutionId.ExecutionId.Domain)
+			assert.Equal(t, "name", id.NodeExecutionId.ExecutionId.Name)
 			return models.TaskExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 
@@ -205,7 +205,7 @@ func TestCreateTaskEvent_Update(t *testing.T) {
 	getTaskCalled := false
 	// See if we check for existing task executions, and return one
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			getTaskCalled = true
 			runningTaskClosure := &admin.TaskExecutionClosure{
 				StartedAt: sampleTaskEventOccurredAt,
@@ -311,12 +311,12 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "expected error")
 	addGetWorkflowExecutionCallback(repository)
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			return models.TaskExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetExistsCallback(
 		func(
-			ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+			ctx context.Context, identifier *core.NodeExecutionIdentifier) (bool, error) {
 			return false, expectedErr
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
@@ -328,7 +328,7 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetExistsCallback(
 		func(
-			ctx context.Context, input interfaces.NodeExecutionResource) (bool, error) {
+			ctx context.Context, identifier *core.NodeExecutionIdentifier) (bool, error) {
 			return false, nil
 		})
 	taskExecManager = NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
@@ -342,7 +342,7 @@ func TestCreateTaskEvent_CreateDatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetWorkflowExecutionCallback(repository)
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			return models.TaskExecution{}, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "foo")
 		})
 
@@ -363,7 +363,7 @@ func TestCreateTaskEvent_UpdateDatabaseError(t *testing.T) {
 	addGetNodeExecutionCallback(repository)
 
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
@@ -402,7 +402,7 @@ func TestCreateTaskEvent_UpdateTerminalEventError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	addGetWorkflowExecutionCallback(repository)
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
@@ -451,7 +451,7 @@ func TestCreateTaskEvent_PhaseVersionChange(t *testing.T) {
 	getTaskCalled := false
 	// See if we check for existing task executions, and return one
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			getTaskCalled = true
 
 			return models.TaskExecution{
@@ -523,11 +523,11 @@ func TestGetTaskExecution(t *testing.T) {
 
 	getTaskCalled := false
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			getTaskCalled = true
-			assert.Equal(t, sampleTaskID, input.TaskExecutionID.TaskId)
-			assert.Equal(t, sampleNodeExecID, input.TaskExecutionID.NodeExecutionId)
-			assert.Equal(t, uint32(1), input.TaskExecutionID.RetryAttempt)
+			assert.Equal(t, sampleTaskID, id.TaskId)
+			assert.Equal(t, sampleNodeExecID, id.NodeExecutionId)
+			assert.Equal(t, uint32(1), id.RetryAttempt)
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
@@ -576,7 +576,7 @@ func TestGetTaskExecution(t *testing.T) {
 func TestGetTaskExecution_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{
 					TaskKey: models.TaskKey{
@@ -641,25 +641,13 @@ func TestListTaskExecutions(t *testing.T) {
 			listTaskExecutionsCalled = true
 			assert.Equal(t, 99, input.Limit)
 			assert.Equal(t, 1, input.Offset)
-
-			assert.Len(t, input.InlineFilters, 4)
-			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
+			assert.True(t, proto.Equal(&admin.NamedEntityIdentifier{
+				Project: "exec project b",
+				Domain:  "exec domain b",
+				Name:    "exec name b",
+			}, input.IdentifierScope))
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-			assert.Equal(t, "exec project b", queryExpr.Args)
-			assert.Equal(t, "execution_project = ?", queryExpr.Query)
-
-			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
-			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
-			assert.Equal(t, "exec domain b", queryExpr.Args)
-			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
-
-			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
-			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
-			assert.Equal(t, "exec name b", queryExpr.Args)
-			assert.Equal(t, "execution_name = ?", queryExpr.Query)
-
-			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
-			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "nodey b", queryExpr.Args)
 			assert.Equal(t, "node_id = ?", queryExpr.Query)
 
@@ -870,7 +858,7 @@ func TestGetTaskExecutionData(t *testing.T) {
 
 	getTaskCalled := false
 	repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
-		func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
+		func(ctx context.Context, id *core.TaskExecutionIdentifier) (models.TaskExecution, error) {
 			getTaskCalled = true
 			return models.TaskExecution{
 				TaskExecutionKey: models.TaskExecutionKey{

@@ -37,10 +37,9 @@ type qualityOfServiceAllocator struct {
 func (q qualityOfServiceAllocator) getQualityOfServiceFromDb(ctx context.Context, workflowIdentifier *core.Identifier) (
 	*core.QualityOfService, error) {
 	resource, err := q.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
-		Project:      workflowIdentifier.Project,
-		Domain:       workflowIdentifier.Domain,
-		Workflow:     workflowIdentifier.Name,
-		ResourceType: admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION,
+		IdentifierScope: workflowIdentifier,
+		Workflow:        workflowIdentifier.Name,
+		ResourceType:    admin.MatchableResource_QUALITY_OF_SERVICE_SPECIFICATION,
 	})
 	if err != nil {
 		if !errors.IsDoesNotExistError(err) {

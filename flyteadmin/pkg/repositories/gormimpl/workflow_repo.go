@@ -3,6 +3,7 @@ package gormimpl
 import (
 	"context"
 	"errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"gorm.io/gorm"
 
@@ -20,7 +21,7 @@ type WorkflowRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
+func (r *WorkflowRepo) Create(ctx context.Context, id *core.Identifier, input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 	timer := r.metrics.CreateDuration.Start()
 	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if descriptionEntity != nil {
@@ -40,25 +41,25 @@ func (r *WorkflowRepo) Create(ctx context.Context, input models.Workflow, descri
 	return err
 }
 
-func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Workflow, error) {
+func (r *WorkflowRepo) Get(ctx context.Context, id *core.Identifier) (models.Workflow, error) {
 	var workflow models.Workflow
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Workflow{
 		WorkflowKey: models.WorkflowKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}).Take(&workflow)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Workflow{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), &core.Identifier{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		})
 	} else if tx.Error != nil {
 		return models.Workflow{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -76,7 +77,7 @@ func (r *WorkflowRepo) List(
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, common.Workflow, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.WorkflowCollectionOutput{}, err
 	}
@@ -106,7 +107,7 @@ func (r *WorkflowRepo) ListIdentifiers(ctx context.Context, input interfaces.Lis
 	tx := r.db.WithContext(ctx).Model(models.Workflow{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
-	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyFilters(tx, common.Workflow, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.WorkflowCollectionOutput{}, err
 	}

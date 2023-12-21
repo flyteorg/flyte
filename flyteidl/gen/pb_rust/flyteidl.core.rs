@@ -618,6 +618,9 @@ pub struct Identifier {
     /// Specific version of the resource.
     #[prost(string, tag="5")]
     pub version: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that uniquely identifies a Flyte workflow execution
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -633,6 +636,9 @@ pub struct WorkflowExecutionIdentifier {
     /// User or system provided value for the resource.
     #[prost(string, tag="4")]
     pub name: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that identify a Flyte node execution entity.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2170,7 +2176,7 @@ pub struct ArrayNode {
     #[prost(message, optional, boxed, tag="1")]
     pub node: ::core::option::Option<::prost::alloc::boxed::Box<Node>>,
     /// parallelism defines the minimum number of instances to bring up concurrently at any given
-    /// point. Note that this is an optimistic restriction and that, due to network partitioning or
+    /// point. Note that this is an optimistic restriction and that, due to network orging or
     /// other failures, the actual number of currently running instances might be more. This has to
     /// be a positive number if assigned. Default value is size.
     #[prost(uint32, tag="2")]

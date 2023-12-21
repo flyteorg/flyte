@@ -3,14 +3,16 @@ package mocks
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type CreateDescriptionEntityFunc func(input models.DescriptionEntity) error
-type GetDescriptionEntityFunc func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error)
-type ListDescriptionEntityFunc func(input interfaces.ListResourceInput) (interfaces.DescriptionEntityCollectionOutput, error)
+type GetDescriptionEntityFunc func(id *core.Identifier) (models.DescriptionEntity, error)
+type ListDescriptionEntityFunc func(entity common.Entity, input interfaces.ListResourceInput) (interfaces.DescriptionEntityCollectionOutput, error)
 
 type MockDescriptionEntityRepo struct {
 	createFunction CreateDescriptionEntityFunc
@@ -18,33 +20,26 @@ type MockDescriptionEntityRepo struct {
 	listFunction   ListDescriptionEntityFunc
 }
 
-func (r *MockDescriptionEntityRepo) Create(ctx context.Context, DescriptionEntity models.DescriptionEntity) (uint, error) {
-	if r.createFunction != nil {
-		return 1, r.createFunction(DescriptionEntity)
-	}
-	return 1, nil
-}
-
 func (r *MockDescriptionEntityRepo) Get(
-	ctx context.Context, input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
+	ctx context.Context, id *core.Identifier) (models.DescriptionEntity, error) {
 	if r.getFunction != nil {
-		return r.getFunction(input)
+		return r.getFunction(id)
 	}
 	return models.DescriptionEntity{
 		DescriptionEntityKey: models.DescriptionEntityKey{
-			ResourceType: input.ResourceType,
-			Project:      input.Project,
-			Domain:       input.Domain,
-			Name:         input.Name,
-			Version:      input.Version,
+			ResourceType: id.ResourceType,
+			Project:      id.Project,
+			Domain:       id.Domain,
+			Name:         id.Name,
+			Version:      id.Version,
 		},
 		ShortDescription: "hello world",
 	}, nil
 }
 
-func (r *MockDescriptionEntityRepo) List(ctx context.Context, input interfaces.ListResourceInput) (interfaces.DescriptionEntityCollectionOutput, error) {
+func (r *MockDescriptionEntityRepo) List(ctx context.Context, entity common.Entity, input interfaces.ListResourceInput) (interfaces.DescriptionEntityCollectionOutput, error) {
 	if r.listFunction != nil {
-		return r.listFunction(input)
+		return r.listFunction(entity, input)
 	}
 	return interfaces.DescriptionEntityCollectionOutput{}, nil
 }

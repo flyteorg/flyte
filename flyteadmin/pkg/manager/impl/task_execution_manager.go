@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"strconv"
 
 	"github.com/golang/protobuf/proto"
@@ -64,9 +65,7 @@ func (m *TaskExecutionManager) createTaskExecution(
 	models.TaskExecution, error) {
 
 	nodeExecutionID := request.Event.ParentNodeExecutionId
-	nodeExecutionExists, err := m.db.NodeExecutionRepo().Exists(ctx, repoInterfaces.NodeExecutionResource{
-		NodeExecutionIdentifier: *nodeExecutionID,
-	})
+	nodeExecutionExists, err := m.db.NodeExecutionRepo().Exists(ctx, nodeExecutionID)
 	if err != nil || !nodeExecutionExists {
 		m.metrics.MissingTaskExecution.Inc()
 		logger.Debugf(ctx, "Failed to get existing node execution [%+v] with err %v", nodeExecutionID, err)
@@ -91,7 +90,10 @@ func (m *TaskExecutionManager) createTaskExecution(
 		return models.TaskExecution{}, err
 	}
 
-	if err := m.db.TaskExecutionRepo().Create(ctx, *taskExecutionModel); err != nil {
+	if err := m.db.TaskExecutionRepo().Create(ctx, &core.TaskExecutionIdentifier{
+		TaskId:          request.GetEvent().GetTaskId(),
+		NodeExecutionId: request.GetEvent().GetParentNodeExecutionId(),
+	}, *taskExecutionModel); err != nil {
 		logger.Debugf(ctx, "Failed to create task execution with task id [%+v] with err %v",
 			request.Event.TaskId, err)
 		return models.TaskExecution{}, err
@@ -114,7 +116,10 @@ func (m *TaskExecutionManager) updateTaskExecutionModelState(
 		return models.TaskExecution{}, err
 	}
 
-	err = m.db.TaskExecutionRepo().Update(ctx, *existingTaskExecution)
+	err = m.db.TaskExecutionRepo().Update(ctx, &core.TaskExecutionIdentifier{
+		TaskId:          request.GetEvent().GetTaskId(),
+		NodeExecutionId: request.GetEvent().GetParentNodeExecutionId(),
+	}, *existingTaskExecution)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update task execution with task id [%+v] and task execution model [%+v] with err %v",
 			request.Event.TaskId, existingTaskExecution, err)
@@ -148,9 +153,7 @@ func (m *TaskExecutionManager) CreateTaskExecutionEvent(ctx context.Context, req
 	// See if the task execution exists
 	// - if it does check if the new phase is applicable and then update
 	// - if it doesn't, create a task execution
-	taskExecutionModel, err := m.db.TaskExecutionRepo().Get(ctx, repoInterfaces.GetTaskExecutionInput{
-		TaskExecutionID: taskExecutionID,
-	})
+	taskExecutionModel, err := m.db.TaskExecutionRepo().Get(ctx, &taskExecutionID)
 
 	if err != nil {
 		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
@@ -244,15 +247,14 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 	}
 	ctx = getNodeExecutionContext(ctx, request.NodeExecutionId)
 
-	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *request.NodeExecutionId)
-	if err != nil {
-		return nil, err
-	}
+	nodeIDFilter, err := util.GetSingleValueEqualityFilter(
+		common.NodeExecution, shared.NodeID, request.GetNodeExecutionId().NodeId)
 
-	filters, err := util.AddRequestFilters(request.Filters, common.TaskExecution, identifierFilters)
+	filters, err := util.GetRequestFilters(request.Filters, common.TaskExecution)
 	if err != nil {
 		return nil, err
 	}
+	filters = append(filters, nodeIDFilter)
 
 	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskExecutionColumns)
 	if err != nil {
@@ -266,10 +268,11 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 	}
 
 	output, err := m.db.TaskExecutionRepo().List(ctx, repoInterfaces.ListResourceInput{
-		InlineFilters: filters,
-		Offset:        offset,
-		Limit:         int(request.Limit),
-		SortParameter: sortParameter,
+		InlineFilters:   filters,
+		Offset:          offset,
+		IdentifierScope: util.GetIdentifierScope(request.GetNodeExecutionId().ExecutionId),
+		Limit:           int(request.Limit),
+		SortParameter:   sortParameter,
 	})
 	if err != nil {
 		logger.Debugf(ctx, "Failed to list task executions with request [%+v] with err %v",

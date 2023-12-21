@@ -4,14 +4,15 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // Defines the interface for interacting with Workflow models.
 type WorkflowRepoInterface interface {
 	// Inserts a workflow model into the database store.
-	Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error
+	Create(ctx context.Context, id *core.Identifier, input models.Workflow, descriptionEntity *models.DescriptionEntity) error
 	// Returns a matching workflow if it exists.
-	Get(ctx context.Context, input Identifier) (models.Workflow, error)
+	Get(ctx context.Context, id *core.Identifier) (models.Workflow, error)
 	// Returns workflow revisions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (WorkflowCollectionOutput, error)
 	ListIdentifiers(ctx context.Context, input ListResourceInput) (WorkflowCollectionOutput, error)

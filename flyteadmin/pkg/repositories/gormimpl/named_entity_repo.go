@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -111,7 +112,7 @@ type NamedEntityRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) error {
+func (r *NamedEntityRepo) Update(ctx context.Context, id *admin.NamedEntityIdentifier, input models.NamedEntity) error {
 	timer := r.metrics.UpdateDuration.Start()
 	var metadata models.NamedEntityMetadata
 	tx := r.db.WithContext(ctx).Where(&models.NamedEntityMetadata{
@@ -129,30 +130,30 @@ func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) 
 	return nil
 }
 
-func (r *NamedEntityRepo) Get(ctx context.Context, input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
+func (r *NamedEntityRepo) Get(ctx context.Context, id *admin.NamedEntityIdentifier, resourceType core.ResourceType) (models.NamedEntity, error) {
 	var namedEntity models.NamedEntity
 
-	filters, err := getNamedEntityFilters(input.ResourceType, input.Project, input.Domain, input.Name)
-	if err != nil {
-		return models.NamedEntity{}, err
-	}
-
-	tableName, tableFound := resourceTypeToTableName[input.ResourceType]
-	joinString, joinFound := resourceTypeToMetadataJoin[input.ResourceType]
+	//filters, err := getNamedEntityFilters(resourceType, id.Project, id.Domain, id.Name)
+	//if err != nil {
+	//	return models.NamedEntity{}, err
+	//}
+	entity := common.ResourceTypeToEntity[resourceType]
+	tableName, tableFound := resourceTypeToTableName[resourceType]
+	joinString, joinFound := resourceTypeToMetadataJoin[resourceType]
 	if !tableFound || !joinFound {
-		return models.NamedEntity{}, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, "Cannot get NamedEntityMetadata for resource type: %v", input.ResourceType)
+		return models.NamedEntity{}, adminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, "Cannot get NamedEntityMetadata for resource type: %v", resourceType)
 	}
 
 	tx := r.db.WithContext(ctx).Table(tableName).Joins(joinString)
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, filters, nil)
+	tx, err := applyScopedFilters(tx, entity, id, nil, nil)
 	if err != nil {
 		return models.NamedEntity{}, err
 	}
 
 	timer := r.metrics.GetDuration.Start()
-	tx = tx.Select(getSelectForNamedEntity(tableName, input.ResourceType)).Take(&namedEntity)
+	tx = tx.Select(getSelectForNamedEntity(tableName, resourceType)).Take(&namedEntity)
 	timer.Stop()
 
 	if tx.Error != nil {
@@ -185,7 +186,7 @@ func (r *NamedEntityRepo) List(ctx context.Context, input interfaces.ListNamedEn
 	tx := getSubQueryJoin(r.db, tableName, input)
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	tx, err := applyScopedFilters(tx, common.NamedEntity, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.NamedEntityCollectionOutput{}, err
 	}

@@ -1,6 +1,8 @@
 package interfaces
 
 import (
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 
 	schedulerInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
@@ -28,3 +30,5 @@ type Repository interface {
 
 	GetGormDB() *gorm.DB
 }
+
+type NewRepo = func(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) Repository
