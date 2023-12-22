@@ -18,9 +18,7 @@ var defaultConfig = &DbConfig{
 	MaxOpenConnections: 100,
 	ConnMaxLifeTime:    config.Duration{Duration: time.Hour},
 	Postgres: PostgresConfig{
-		// These values are suitable for local sandbox development
-		Host:         "localhost",
-		Port:         30001,
+		Port:         5432,
 		DbName:       postgresStr,
 		User:         postgresStr,
 		Password:     postgresStr,
