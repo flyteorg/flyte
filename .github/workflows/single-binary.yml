@@ -172,13 +172,13 @@ jobs:
               memory: "0"
           EOF
           flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never >/dev/null &
-          sleep 30
+          sleep 90
           kubectl config use-context flyte-sandbox
           while :
           do
             kubectl -n flyte get pods
             echo "logs: "
-            kubectl -n flyte logs $(kubectl -n flyte get pods | tail -n1 | cut -d' ' -f1)
+            kubectl -n flyte logs $(kubectl -n flyte get pods | grep flyte-sandbox | grep -v -E "docker|buildkit|postgres|proxy|minio|kube" | cut -d' ' -f1) || true
             sleep 5
           done
       - name: Install Python dependencies
