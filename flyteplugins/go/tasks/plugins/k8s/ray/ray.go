@@ -36,8 +36,7 @@ const (
 	DisableUsageStatsStartParameter = "disable-usage-stats"
 )
 
-type rayJobResourceHandler struct {
-}
+type rayJobResourceHandler struct{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
@@ -171,7 +170,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		shutdownAfterJobFinishes = true
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
-	
+
 	jobSpec := rayv1alpha1.RayJobSpec{
 		RayClusterSpec:           rayClusterSpec,
 		Entrypoint:               strings.Join(primaryContainer.Args, " "),
@@ -447,7 +446,6 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		Namespace:               rayJob.Namespace,
 		TaskExecutionIdentifier: &taskID,
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate task logs. Error: %w", err)
 	}

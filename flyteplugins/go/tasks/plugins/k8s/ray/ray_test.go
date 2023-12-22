@@ -27,8 +27,10 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
-const testImage = "image://"
-const serviceAccount = "ray_sa"
+const (
+	testImage      = "image://"
+	serviceAccount = "ray_sa"
+)
 
 var (
 	dummyEnvVars = []*core.KeyValuePair{
@@ -78,9 +80,9 @@ func transformPodSpecToTaskTemplateTarget(podSpec *corev1.PodSpec) *core.TaskTem
 func dummyRayCustomObj() *plugins.RayJob {
 	return &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:           &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
-			WorkerGroupSpec:         []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
-			EnableInTreeAutoscaling: false,
+			HeadGroupSpec:     &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: false,
 		},
 	}
 }
@@ -184,7 +186,8 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
-			"node-ip-address": "$MY_POD_IP", "num-cpus": "1"})
+			"node-ip-address": "$MY_POD_IP", "num-cpus": "1",
+		})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
@@ -232,7 +235,7 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			[]corev1.NodeSelectorTerm{
 				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-t4"},
@@ -272,12 +275,12 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			[]corev1.NodeSelectorTerm{
 				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
@@ -347,9 +350,9 @@ func TestDefaultStartParameters(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	rayJob := &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:           &plugins.HeadGroupSpec{},
-			WorkerGroupSpec:         []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
-			EnableInTreeAutoscaling: false,
+			HeadGroupSpec:     &plugins.HeadGroupSpec{},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: false,
 		},
 	}
 
@@ -378,7 +381,8 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
-			"node-ip-address": "$MY_POD_IP"})
+			"node-ip-address": "$MY_POD_IP",
+		})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
