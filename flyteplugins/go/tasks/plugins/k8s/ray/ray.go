@@ -46,8 +46,7 @@ var logTemplateRegexes = struct {
 	tasklog.MustCreateRegex("rayJobID"),
 }
 
-type rayJobResourceHandler struct {
-}
+type rayJobResourceHandler struct{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
@@ -156,10 +155,19 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 			workerNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
 		}
 
+		minReplicas := spec.MinReplicas
+		if minReplicas > spec.Replicas {
+			minReplicas = spec.Replicas
+		}
+		maxReplicas := spec.MaxReplicas
+		if maxReplicas < spec.Replicas {
+			maxReplicas = spec.Replicas
+		}
+
 		workerNodeSpec := rayv1alpha1.WorkerGroupSpec{
 			GroupName:      spec.GroupName,
-			MinReplicas:    &spec.MinReplicas,
-			MaxReplicas:    &spec.MaxReplicas,
+			MinReplicas:    &minReplicas,
+			MaxReplicas:    &maxReplicas,
 			Replicas:       &spec.Replicas,
 			RayStartParams: workerNodeRayStartParams,
 			Template:       workerPodTemplate,
