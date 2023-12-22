@@ -67,7 +67,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 	})
 
 	t.Run("Inject exec identity", func(t *testing.T) {
-		config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: true})
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: true}))
 
 		existingMetadata := &mocks.TaskExecutionMetadata{}
 		existingAnnotations := map[string]string{}
@@ -88,7 +88,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 	})
 
 	t.Run("No inject exec identity", func(t *testing.T) {
-		config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: false})
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: false}))
 
 		existingMetadata := &mocks.TaskExecutionMetadata{}
 		existingAnnotations := map[string]string{}
@@ -109,7 +109,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 	})
 
 	t.Run("Inject non-existing exec identity", func(t *testing.T) {
-		config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: true}) // configure to inject exec identity
+		assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: true})) // configure to inject exec identity
 
 		existingMetadata := &mocks.TaskExecutionMetadata{}
 		existingAnnotations := map[string]string{}
