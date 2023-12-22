@@ -265,8 +265,8 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 	}
 
 	if GetConfig().Limits.GetLimitMegabytes != 0 {
-		if sizeMbs := sizeBytes / MiB; sizeMbs > GetConfig().Limits.GetLimitMegabytes {
-			return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %vmb > %vmb.", sizeMbs, GetConfig().Limits.GetLimitMegabytes)
+		if sizeBytes > GetConfig().Limits.GetLimitMegabytes*MiB {
+			return nil, errors.Errorf(ErrExceedsLimit, "limit exceeded. %.6fmb > %vmb.", float64(sizeBytes)/float64(MiB), GetConfig().Limits.GetLimitMegabytes)
 		}
 	}
 

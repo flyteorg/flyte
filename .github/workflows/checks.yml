@@ -6,26 +6,11 @@ concurrency:
 
 on:
   pull_request:
-    paths:
-      - 'datacatalog/**'
-      - 'flyteadmin/**'
-      - 'flytecopilot/**'
-      - 'flyteplugins/**'
-      - 'flytepropeller/**'
-      - 'flytestdlib/**'
   push:
     branches:
       - master
-    paths:
-      - 'datacatalog/**'
-      - 'flyteadmin/**'
-      - 'flytecopilot/**'
-      - 'flyteidl/**'
-      - 'flyteplugins/**'
-      - 'flytepropeller/**'
-      - 'flytestdlib/**'
 env:
-  GO_VERSION: "1.19"
+  GO_VERSION: "1.21"
   PRIORITIES: "P0"
 jobs:
   unpack-envvars:
@@ -133,6 +118,8 @@ jobs:
     with:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
   build_docker_images:
     name: Build Images

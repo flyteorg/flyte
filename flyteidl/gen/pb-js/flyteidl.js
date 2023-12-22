@@ -12785,6 +12785,7 @@
                  * @property {boolean|null} [generatesDeck] TaskMetadata generatesDeck
                  * @property {Object.<string,string>|null} [tags] TaskMetadata tags
                  * @property {string|null} [podTemplateName] TaskMetadata podTemplateName
+                 * @property {Array.<string>|null} [cacheIgnoreInputVars] TaskMetadata cacheIgnoreInputVars
                  */
     
                 /**
@@ -12797,6 +12798,7 @@
                  */
                 function TaskMetadata(properties) {
                     this.tags = {};
+                    this.cacheIgnoreInputVars = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -12891,6 +12893,14 @@
                  */
                 TaskMetadata.prototype.podTemplateName = "";
     
+                /**
+                 * TaskMetadata cacheIgnoreInputVars.
+                 * @member {Array.<string>} cacheIgnoreInputVars
+                 * @memberof flyteidl.core.TaskMetadata
+                 * @instance
+                 */
+                TaskMetadata.prototype.cacheIgnoreInputVars = $util.emptyArray;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -12952,6 +12962,9 @@
                             writer.uint32(/* id 11, wireType 2 =*/90).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.tags[keys[i]]).ldelim();
                     if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
                         writer.uint32(/* id 12, wireType 2 =*/98).string(message.podTemplateName);
+                    if (message.cacheIgnoreInputVars != null && message.cacheIgnoreInputVars.length)
+                        for (var i = 0; i < message.cacheIgnoreInputVars.length; ++i)
+                            writer.uint32(/* id 13, wireType 2 =*/106).string(message.cacheIgnoreInputVars[i]);
                     return writer;
                 };
     
@@ -13010,6 +13023,11 @@
                             break;
                         case 12:
                             message.podTemplateName = reader.string();
+                            break;
+                        case 13:
+                            if (!(message.cacheIgnoreInputVars && message.cacheIgnoreInputVars.length))
+                                message.cacheIgnoreInputVars = [];
+                            message.cacheIgnoreInputVars.push(reader.string());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13077,6 +13095,13 @@
                     if (message.podTemplateName != null && message.hasOwnProperty("podTemplateName"))
                         if (!$util.isString(message.podTemplateName))
                             return "podTemplateName: string expected";
+                    if (message.cacheIgnoreInputVars != null && message.hasOwnProperty("cacheIgnoreInputVars")) {
+                        if (!Array.isArray(message.cacheIgnoreInputVars))
+                            return "cacheIgnoreInputVars: array expected";
+                        for (var i = 0; i < message.cacheIgnoreInputVars.length; ++i)
+                            if (!$util.isString(message.cacheIgnoreInputVars[i]))
+                                return "cacheIgnoreInputVars: string[] expected";
+                    }
                     return null;
                 };
     
@@ -19638,6 +19663,7 @@
                  * @memberof flyteidl.admin
                  * @interface ICreateTaskResponse
                  * @property {Uint8Array|null} [resourceMeta] CreateTaskResponse resourceMeta
+                 * @property {flyteidl.admin.IResource|null} [resource] CreateTaskResponse resource
                  */
     
                 /**
@@ -19662,6 +19688,28 @@
                  * @instance
                  */
                 CreateTaskResponse.prototype.resourceMeta = $util.newBuffer([]);
+    
+                /**
+                 * CreateTaskResponse resource.
+                 * @member {flyteidl.admin.IResource|null|undefined} resource
+                 * @memberof flyteidl.admin.CreateTaskResponse
+                 * @instance
+                 */
+                CreateTaskResponse.prototype.resource = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * CreateTaskResponse res.
+                 * @member {"resourceMeta"|"resource"|undefined} res
+                 * @memberof flyteidl.admin.CreateTaskResponse
+                 * @instance
+                 */
+                Object.defineProperty(CreateTaskResponse.prototype, "res", {
+                    get: $util.oneOfGetter($oneOfFields = ["resourceMeta", "resource"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
     
                 /**
                  * Creates a new CreateTaskResponse instance using the specified properties.
@@ -19689,6 +19737,8 @@
                         writer = $Writer.create();
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.resourceMeta);
+                    if (message.resource != null && message.hasOwnProperty("resource"))
+                        $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -19713,6 +19763,9 @@
                         case 1:
                             message.resourceMeta = reader.bytes();
                             break;
+                        case 2:
+                            message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -19732,9 +19785,22 @@
                 CreateTaskResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
+                    var properties = {};
+                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta")) {
+                        properties.res = 1;
                         if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
                             return "resourceMeta: buffer expected";
+                    }
+                    if (message.resource != null && message.hasOwnProperty("resource")) {
+                        if (properties.res === 1)
+                            return "res: multiple values";
+                        properties.res = 1;
+                        {
+                            var error = $root.flyteidl.admin.Resource.verify(message.resource);
+                            if (error)
+                                return "resource." + error;
+                        }
+                    }
                     return null;
                 };
     
@@ -19875,6 +19941,7 @@
                  * @memberof flyteidl.admin
                  * @interface IGetTaskResponse
                  * @property {flyteidl.admin.IResource|null} [resource] GetTaskResponse resource
+                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] GetTaskResponse logLinks
                  */
     
                 /**
@@ -19886,6 +19953,7 @@
                  * @param {flyteidl.admin.IGetTaskResponse=} [properties] Properties to set
                  */
                 function GetTaskResponse(properties) {
+                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -19899,6 +19967,14 @@
                  * @instance
                  */
                 GetTaskResponse.prototype.resource = null;
+    
+                /**
+                 * GetTaskResponse logLinks.
+                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
+                 * @memberof flyteidl.admin.GetTaskResponse
+                 * @instance
+                 */
+                GetTaskResponse.prototype.logLinks = $util.emptyArray;
     
                 /**
                  * Creates a new GetTaskResponse instance using the specified properties.
@@ -19926,6 +20002,9 @@
                         writer = $Writer.create();
                     if (message.resource != null && message.hasOwnProperty("resource"))
                         $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.logLinks != null && message.logLinks.length)
+                        for (var i = 0; i < message.logLinks.length; ++i)
+                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -19949,6 +20028,11 @@
                         switch (tag >>> 3) {
                         case 1:
                             message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            if (!(message.logLinks && message.logLinks.length))
+                                message.logLinks = [];
+                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -19974,6 +20058,15 @@
                         if (error)
                             return "resource." + error;
                     }
+                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
+                        if (!Array.isArray(message.logLinks))
+                            return "logLinks: array expected";
+                        for (var i = 0; i < message.logLinks.length; ++i) {
+                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
+                            if (error)
+                                return "logLinks." + error;
+                        }
+                    }
                     return null;
                 };
     
@@ -19989,6 +20082,7 @@
                  * @property {flyteidl.admin.State|null} [state] Resource state
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
                  * @property {string|null} [message] Resource message
+                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
                  */
     
                 /**
@@ -20000,6 +20094,7 @@
                  * @param {flyteidl.admin.IResource=} [properties] Properties to set
                  */
                 function Resource(properties) {
+                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -20031,6 +20126,14 @@
                 Resource.prototype.message = "";
     
                 /**
+                 * Resource logLinks.
+                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.logLinks = $util.emptyArray;
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -20060,6 +20163,9 @@
                         $root.flyteidl.core.LiteralMap.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.message != null && message.hasOwnProperty("message"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.message);
+                    if (message.logLinks != null && message.logLinks.length)
+                        for (var i = 0; i < message.logLinks.length; ++i)
+                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -20089,6 +20195,11 @@
                             break;
                         case 3:
                             message.message = reader.string();
+                            break;
+                        case 4:
+                            if (!(message.logLinks && message.logLinks.length))
+                                message.logLinks = [];
+                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -20128,6 +20239,15 @@
                     if (message.message != null && message.hasOwnProperty("message"))
                         if (!$util.isString(message.message))
                             return "message: string expected";
+                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
+                        if (!Array.isArray(message.logLinks))
+                            return "logLinks: array expected";
+                        for (var i = 0; i < message.logLinks.length; ++i) {
+                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
+                            if (error)
+                                return "logLinks." + error;
+                        }
+                    }
                     return null;
                 };
     
@@ -20352,6 +20472,576 @@
                 };
     
                 return DeleteTaskResponse;
+            })();
+    
+            admin.Agent = (function() {
+    
+                /**
+                 * Properties of an Agent.
+                 * @memberof flyteidl.admin
+                 * @interface IAgent
+                 * @property {string|null} [name] Agent name
+                 * @property {Array.<string>|null} [supportedTaskTypes] Agent supportedTaskTypes
+                 */
+    
+                /**
+                 * Constructs a new Agent.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an Agent.
+                 * @implements IAgent
+                 * @constructor
+                 * @param {flyteidl.admin.IAgent=} [properties] Properties to set
+                 */
+                function Agent(properties) {
+                    this.supportedTaskTypes = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Agent name.
+                 * @member {string} name
+                 * @memberof flyteidl.admin.Agent
+                 * @instance
+                 */
+                Agent.prototype.name = "";
+    
+                /**
+                 * Agent supportedTaskTypes.
+                 * @member {Array.<string>} supportedTaskTypes
+                 * @memberof flyteidl.admin.Agent
+                 * @instance
+                 */
+                Agent.prototype.supportedTaskTypes = $util.emptyArray;
+    
+                /**
+                 * Creates a new Agent instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.Agent
+                 * @static
+                 * @param {flyteidl.admin.IAgent=} [properties] Properties to set
+                 * @returns {flyteidl.admin.Agent} Agent instance
+                 */
+                Agent.create = function create(properties) {
+                    return new Agent(properties);
+                };
+    
+                /**
+                 * Encodes the specified Agent message. Does not implicitly {@link flyteidl.admin.Agent.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.Agent
+                 * @static
+                 * @param {flyteidl.admin.IAgent} message Agent message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Agent.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+                    if (message.supportedTaskTypes != null && message.supportedTaskTypes.length)
+                        for (var i = 0; i < message.supportedTaskTypes.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.supportedTaskTypes[i]);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an Agent message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.Agent
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.Agent} Agent
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Agent.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Agent();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.name = reader.string();
+                            break;
+                        case 2:
+                            if (!(message.supportedTaskTypes && message.supportedTaskTypes.length))
+                                message.supportedTaskTypes = [];
+                            message.supportedTaskTypes.push(reader.string());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an Agent message.
+                 * @function verify
+                 * @memberof flyteidl.admin.Agent
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Agent.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        if (!$util.isString(message.name))
+                            return "name: string expected";
+                    if (message.supportedTaskTypes != null && message.hasOwnProperty("supportedTaskTypes")) {
+                        if (!Array.isArray(message.supportedTaskTypes))
+                            return "supportedTaskTypes: array expected";
+                        for (var i = 0; i < message.supportedTaskTypes.length; ++i)
+                            if (!$util.isString(message.supportedTaskTypes[i]))
+                                return "supportedTaskTypes: string[] expected";
+                    }
+                    return null;
+                };
+    
+                return Agent;
+            })();
+    
+            admin.GetAgentRequest = (function() {
+    
+                /**
+                 * Properties of a GetAgentRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IGetAgentRequest
+                 * @property {string|null} [name] GetAgentRequest name
+                 */
+    
+                /**
+                 * Constructs a new GetAgentRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a GetAgentRequest.
+                 * @implements IGetAgentRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IGetAgentRequest=} [properties] Properties to set
+                 */
+                function GetAgentRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * GetAgentRequest name.
+                 * @member {string} name
+                 * @memberof flyteidl.admin.GetAgentRequest
+                 * @instance
+                 */
+                GetAgentRequest.prototype.name = "";
+    
+                /**
+                 * Creates a new GetAgentRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.GetAgentRequest
+                 * @static
+                 * @param {flyteidl.admin.IGetAgentRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.GetAgentRequest} GetAgentRequest instance
+                 */
+                GetAgentRequest.create = function create(properties) {
+                    return new GetAgentRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified GetAgentRequest message. Does not implicitly {@link flyteidl.admin.GetAgentRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.GetAgentRequest
+                 * @static
+                 * @param {flyteidl.admin.IGetAgentRequest} message GetAgentRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                GetAgentRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a GetAgentRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.GetAgentRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.GetAgentRequest} GetAgentRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                GetAgentRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.GetAgentRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.name = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a GetAgentRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.GetAgentRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                GetAgentRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.name != null && message.hasOwnProperty("name"))
+                        if (!$util.isString(message.name))
+                            return "name: string expected";
+                    return null;
+                };
+    
+                return GetAgentRequest;
+            })();
+    
+            admin.GetAgentResponse = (function() {
+    
+                /**
+                 * Properties of a GetAgentResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IGetAgentResponse
+                 * @property {flyteidl.admin.IAgent|null} [agent] GetAgentResponse agent
+                 */
+    
+                /**
+                 * Constructs a new GetAgentResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a GetAgentResponse.
+                 * @implements IGetAgentResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IGetAgentResponse=} [properties] Properties to set
+                 */
+                function GetAgentResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * GetAgentResponse agent.
+                 * @member {flyteidl.admin.IAgent|null|undefined} agent
+                 * @memberof flyteidl.admin.GetAgentResponse
+                 * @instance
+                 */
+                GetAgentResponse.prototype.agent = null;
+    
+                /**
+                 * Creates a new GetAgentResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.GetAgentResponse
+                 * @static
+                 * @param {flyteidl.admin.IGetAgentResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.GetAgentResponse} GetAgentResponse instance
+                 */
+                GetAgentResponse.create = function create(properties) {
+                    return new GetAgentResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified GetAgentResponse message. Does not implicitly {@link flyteidl.admin.GetAgentResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.GetAgentResponse
+                 * @static
+                 * @param {flyteidl.admin.IGetAgentResponse} message GetAgentResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                GetAgentResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.agent != null && message.hasOwnProperty("agent"))
+                        $root.flyteidl.admin.Agent.encode(message.agent, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a GetAgentResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.GetAgentResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.GetAgentResponse} GetAgentResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                GetAgentResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.GetAgentResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.agent = $root.flyteidl.admin.Agent.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a GetAgentResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.GetAgentResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                GetAgentResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.agent != null && message.hasOwnProperty("agent")) {
+                        var error = $root.flyteidl.admin.Agent.verify(message.agent);
+                        if (error)
+                            return "agent." + error;
+                    }
+                    return null;
+                };
+    
+                return GetAgentResponse;
+            })();
+    
+            admin.ListAgentsRequest = (function() {
+    
+                /**
+                 * Properties of a ListAgentsRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IListAgentsRequest
+                 */
+    
+                /**
+                 * Constructs a new ListAgentsRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ListAgentsRequest.
+                 * @implements IListAgentsRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IListAgentsRequest=} [properties] Properties to set
+                 */
+                function ListAgentsRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Creates a new ListAgentsRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ListAgentsRequest
+                 * @static
+                 * @param {flyteidl.admin.IListAgentsRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ListAgentsRequest} ListAgentsRequest instance
+                 */
+                ListAgentsRequest.create = function create(properties) {
+                    return new ListAgentsRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ListAgentsRequest message. Does not implicitly {@link flyteidl.admin.ListAgentsRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ListAgentsRequest
+                 * @static
+                 * @param {flyteidl.admin.IListAgentsRequest} message ListAgentsRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ListAgentsRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ListAgentsRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ListAgentsRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ListAgentsRequest} ListAgentsRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ListAgentsRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ListAgentsRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ListAgentsRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ListAgentsRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ListAgentsRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    return null;
+                };
+    
+                return ListAgentsRequest;
+            })();
+    
+            admin.ListAgentsResponse = (function() {
+    
+                /**
+                 * Properties of a ListAgentsResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IListAgentsResponse
+                 * @property {Array.<flyteidl.admin.IAgent>|null} [agents] ListAgentsResponse agents
+                 */
+    
+                /**
+                 * Constructs a new ListAgentsResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ListAgentsResponse.
+                 * @implements IListAgentsResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IListAgentsResponse=} [properties] Properties to set
+                 */
+                function ListAgentsResponse(properties) {
+                    this.agents = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ListAgentsResponse agents.
+                 * @member {Array.<flyteidl.admin.IAgent>} agents
+                 * @memberof flyteidl.admin.ListAgentsResponse
+                 * @instance
+                 */
+                ListAgentsResponse.prototype.agents = $util.emptyArray;
+    
+                /**
+                 * Creates a new ListAgentsResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ListAgentsResponse
+                 * @static
+                 * @param {flyteidl.admin.IListAgentsResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ListAgentsResponse} ListAgentsResponse instance
+                 */
+                ListAgentsResponse.create = function create(properties) {
+                    return new ListAgentsResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified ListAgentsResponse message. Does not implicitly {@link flyteidl.admin.ListAgentsResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ListAgentsResponse
+                 * @static
+                 * @param {flyteidl.admin.IListAgentsResponse} message ListAgentsResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ListAgentsResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.agents != null && message.agents.length)
+                        for (var i = 0; i < message.agents.length; ++i)
+                            $root.flyteidl.admin.Agent.encode(message.agents[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ListAgentsResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ListAgentsResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ListAgentsResponse} ListAgentsResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ListAgentsResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ListAgentsResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.agents && message.agents.length))
+                                message.agents = [];
+                            message.agents.push($root.flyteidl.admin.Agent.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ListAgentsResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ListAgentsResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ListAgentsResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.agents != null && message.hasOwnProperty("agents")) {
+                        if (!Array.isArray(message.agents))
+                            return "agents: array expected";
+                        for (var i = 0; i < message.agents.length; ++i) {
+                            var error = $root.flyteidl.admin.Agent.verify(message.agents[i]);
+                            if (error)
+                                return "agents." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return ListAgentsResponse;
             })();
     
             admin.ClusterAssignment = (function() {
@@ -46120,6 +46810,107 @@
                  */
     
                 return AsyncAgentService;
+            })();
+    
+            service.AgentMetadataService = (function() {
+    
+                /**
+                 * Constructs a new AgentMetadataService service.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents an AgentMetadataService
+                 * @extends $protobuf.rpc.Service
+                 * @constructor
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 */
+                function AgentMetadataService(rpcImpl, requestDelimited, responseDelimited) {
+                    $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+                }
+    
+                (AgentMetadataService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = AgentMetadataService;
+    
+                /**
+                 * Creates new AgentMetadataService service using the specified rpc implementation.
+                 * @function create
+                 * @memberof flyteidl.service.AgentMetadataService
+                 * @static
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 * @returns {AgentMetadataService} RPC service. Useful where requests and/or responses are streamed.
+                 */
+                AgentMetadataService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                    return new this(rpcImpl, requestDelimited, responseDelimited);
+                };
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AgentMetadataService#getAgent}.
+                 * @memberof flyteidl.service.AgentMetadataService
+                 * @typedef GetAgentCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.GetAgentResponse} [response] GetAgentResponse
+                 */
+    
+                /**
+                 * Calls GetAgent.
+                 * @function getAgent
+                 * @memberof flyteidl.service.AgentMetadataService
+                 * @instance
+                 * @param {flyteidl.admin.IGetAgentRequest} request GetAgentRequest message or plain object
+                 * @param {flyteidl.service.AgentMetadataService.GetAgentCallback} callback Node-style callback called with the error, if any, and GetAgentResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AgentMetadataService.prototype.getAgent = function getAgent(request, callback) {
+                    return this.rpcCall(getAgent, $root.flyteidl.admin.GetAgentRequest, $root.flyteidl.admin.GetAgentResponse, request, callback);
+                }, "name", { value: "GetAgent" });
+    
+                /**
+                 * Calls GetAgent.
+                 * @function getAgent
+                 * @memberof flyteidl.service.AgentMetadataService
+                 * @instance
+                 * @param {flyteidl.admin.IGetAgentRequest} request GetAgentRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.GetAgentResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AgentMetadataService#listAgents}.
+                 * @memberof flyteidl.service.AgentMetadataService
+                 * @typedef ListAgentsCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.ListAgentsResponse} [response] ListAgentsResponse
+                 */
+    
+                /**
+                 * Calls ListAgents.
+                 * @function listAgents
+                 * @memberof flyteidl.service.AgentMetadataService
+                 * @instance
+                 * @param {flyteidl.admin.IListAgentsRequest} request ListAgentsRequest message or plain object
+                 * @param {flyteidl.service.AgentMetadataService.ListAgentsCallback} callback Node-style callback called with the error, if any, and ListAgentsResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AgentMetadataService.prototype.listAgents = function listAgents(request, callback) {
+                    return this.rpcCall(listAgents, $root.flyteidl.admin.ListAgentsRequest, $root.flyteidl.admin.ListAgentsResponse, request, callback);
+                }, "name", { value: "ListAgents" });
+    
+                /**
+                 * Calls ListAgents.
+                 * @function listAgents
+                 * @memberof flyteidl.service.AgentMetadataService
+                 * @instance
+                 * @param {flyteidl.admin.IListAgentsRequest} request ListAgentsRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.ListAgentsResponse>} Promise
+                 * @variation 2
+                 */
+    
+                return AgentMetadataService;
             })();
     
             service.OAuth2MetadataRequest = (function() {

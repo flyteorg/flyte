@@ -11,6 +11,8 @@
 
 flyteadmin:
   enabled: true
+  serviceMonitor:
+    enabled: false
   # -- Replicas count for Flyteadmin deployment
   replicaCount: 1
   image:

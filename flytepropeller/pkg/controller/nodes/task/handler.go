@@ -33,6 +33,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -516,6 +517,9 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 }
 
 func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.task.Handler/HandleTask")
+	defer span.End()
+
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
@@ -749,6 +753,7 @@ func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i 
 func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	taskNodeState := nCtx.NodeStateReader().GetTaskNodeState()
 	currentPhase := taskNodeState.PluginPhase
+	currentPhaseVersion := taskNodeState.PluginPhaseVersion
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
 
 	if currentPhase.IsTerminal() && !(currentPhase.IsFailure() && taskNodeState.CleanupOnFailure) {
@@ -786,8 +791,40 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 		logger.Errorf(ctx, "Abort failed when calling plugin abort.")
 		return err
 	}
-	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+
 	evRecorder := nCtx.EventsRecorder()
+	logger.Debugf(ctx, "Sending buffered Task events.")
+	for _, ev := range tCtx.ber.GetAll(ctx) {
+		evInfo, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
+			TaskExecContext:       tCtx,
+			InputReader:           nCtx.InputReader(),
+			EventConfig:           t.eventConfig,
+			OutputWriter:          tCtx.ow,
+			Info:                  ev.WithVersion(currentPhaseVersion + 1),
+			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
+			ExecContext:           nCtx.ExecutionContext(),
+			TaskType:              ttype,
+			PluginID:              p.GetID(),
+			ResourcePoolInfo:      tCtx.rm.GetResourcePoolInfo(),
+			ClusterID:             t.clusterID,
+		})
+		if err != nil {
+			return err
+		}
+		if currentPhase.IsFailure() {
+			evInfo.Phase = core.TaskExecution_FAILED
+		} else {
+			evInfo.Phase = core.TaskExecution_ABORTED
+		}
+		if err := evRecorder.RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
+			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.Phase.String(), err.Error())
+			// Check for idempotency
+			// Check for terminate state error
+			return err
+		}
+	}
+
+	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	nodeExecutionID, err := getParentNodeExecIDForTask(&taskExecID, nCtx.ExecutionContext())
 	if err != nil {
 		return err

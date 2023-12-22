@@ -2,11 +2,12 @@ from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import tasks_pb2 as _tasks_pb2
 from flyteidl.core import interface_pb2 as _interface_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
+from flyteidl.core import execution_pb2 as _execution_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -73,10 +74,12 @@ class CreateTaskRequest(_message.Message):
     def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
-    __slots__ = ["resource_meta"]
+    __slots__ = ["resource_meta", "resource"]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    RESOURCE_FIELD_NUMBER: _ClassVar[int]
     resource_meta: bytes
-    def __init__(self, resource_meta: _Optional[bytes] = ...) -> None: ...
+    resource: Resource
+    def __init__(self, resource_meta: _Optional[bytes] = ..., resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
 
 class GetTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]
@@ -87,20 +90,24 @@ class GetTaskRequest(_message.Message):
     def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ...) -> None: ...
 
 class GetTaskResponse(_message.Message):
-    __slots__ = ["resource"]
+    __slots__ = ["resource", "log_links"]
     RESOURCE_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     resource: Resource
-    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
+    log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
+    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class Resource(_message.Message):
-    __slots__ = ["state", "outputs", "message"]
+    __slots__ = ["state", "outputs", "message", "log_links"]
     STATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     state: State
     outputs: _literals_pb2.LiteralMap
     message: str
-    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ...) -> None: ...
+    log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]
@@ -113,3 +120,33 @@ class DeleteTaskRequest(_message.Message):
 class DeleteTaskResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class Agent(_message.Message):
+    __slots__ = ["name", "supported_task_types"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    supported_task_types: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class GetAgentRequest(_message.Message):
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    def __init__(self, name: _Optional[str] = ...) -> None: ...
+
+class GetAgentResponse(_message.Message):
+    __slots__ = ["agent"]
+    AGENT_FIELD_NUMBER: _ClassVar[int]
+    agent: Agent
+    def __init__(self, agent: _Optional[_Union[Agent, _Mapping]] = ...) -> None: ...
+
+class ListAgentsRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ListAgentsResponse(_message.Message):
+    __slots__ = ["agents"]
+    AGENTS_FIELD_NUMBER: _ClassVar[int]
+    agents: _containers.RepeatedCompositeFieldContainer[Agent]
+    def __init__(self, agents: _Optional[_Iterable[_Union[Agent, _Mapping]]] = ...) -> None: ...

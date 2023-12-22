@@ -5390,6 +5390,9 @@ export namespace flyteidl {
 
             /** TaskMetadata podTemplateName */
             podTemplateName?: (string|null);
+
+            /** TaskMetadata cacheIgnoreInputVars */
+            cacheIgnoreInputVars?: (string[]|null);
         }
 
         /** Represents a TaskMetadata. */
@@ -5433,6 +5436,9 @@ export namespace flyteidl {
 
             /** TaskMetadata podTemplateName. */
             public podTemplateName: string;
+
+            /** TaskMetadata cacheIgnoreInputVars. */
+            public cacheIgnoreInputVars: string[];
 
             /** TaskMetadata interruptibleValue. */
             public interruptibleValue?: "interruptible";
@@ -8022,6 +8028,9 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resourceMeta */
             resourceMeta?: (Uint8Array|null);
+
+            /** CreateTaskResponse resource */
+            resource?: (flyteidl.admin.IResource|null);
         }
 
         /** Represents a CreateTaskResponse. */
@@ -8035,6 +8044,12 @@ export namespace flyteidl {
 
             /** CreateTaskResponse resourceMeta. */
             public resourceMeta: Uint8Array;
+
+            /** CreateTaskResponse resource. */
+            public resource?: (flyteidl.admin.IResource|null);
+
+            /** CreateTaskResponse res. */
+            public res?: ("resourceMeta"|"resource");
 
             /**
              * Creates a new CreateTaskResponse instance using the specified properties.
@@ -8132,6 +8147,9 @@ export namespace flyteidl {
 
             /** GetTaskResponse resource */
             resource?: (flyteidl.admin.IResource|null);
+
+            /** GetTaskResponse logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a GetTaskResponse. */
@@ -8145,6 +8163,9 @@ export namespace flyteidl {
 
             /** GetTaskResponse resource. */
             public resource?: (flyteidl.admin.IResource|null);
+
+            /** GetTaskResponse logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
 
             /**
              * Creates a new GetTaskResponse instance using the specified properties.
@@ -8190,6 +8211,9 @@ export namespace flyteidl {
 
             /** Resource message */
             message?: (string|null);
+
+            /** Resource logLinks */
+            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a Resource. */
@@ -8209,6 +8233,9 @@ export namespace flyteidl {
 
             /** Resource message. */
             public message: string;
+
+            /** Resource logLinks. */
+            public logLinks: flyteidl.core.ITaskLog[];
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -8341,6 +8368,266 @@ export namespace flyteidl {
 
             /**
              * Verifies a DeleteTaskResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Agent. */
+        interface IAgent {
+
+            /** Agent name */
+            name?: (string|null);
+
+            /** Agent supportedTaskTypes */
+            supportedTaskTypes?: (string[]|null);
+        }
+
+        /** Represents an Agent. */
+        class Agent implements IAgent {
+
+            /**
+             * Constructs a new Agent.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IAgent);
+
+            /** Agent name. */
+            public name: string;
+
+            /** Agent supportedTaskTypes. */
+            public supportedTaskTypes: string[];
+
+            /**
+             * Creates a new Agent instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Agent instance
+             */
+            public static create(properties?: flyteidl.admin.IAgent): flyteidl.admin.Agent;
+
+            /**
+             * Encodes the specified Agent message. Does not implicitly {@link flyteidl.admin.Agent.verify|verify} messages.
+             * @param message Agent message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IAgent, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Agent message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Agent
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Agent;
+
+            /**
+             * Verifies an Agent message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetAgentRequest. */
+        interface IGetAgentRequest {
+
+            /** GetAgentRequest name */
+            name?: (string|null);
+        }
+
+        /** Represents a GetAgentRequest. */
+        class GetAgentRequest implements IGetAgentRequest {
+
+            /**
+             * Constructs a new GetAgentRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IGetAgentRequest);
+
+            /** GetAgentRequest name. */
+            public name: string;
+
+            /**
+             * Creates a new GetAgentRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetAgentRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IGetAgentRequest): flyteidl.admin.GetAgentRequest;
+
+            /**
+             * Encodes the specified GetAgentRequest message. Does not implicitly {@link flyteidl.admin.GetAgentRequest.verify|verify} messages.
+             * @param message GetAgentRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IGetAgentRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetAgentRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetAgentRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.GetAgentRequest;
+
+            /**
+             * Verifies a GetAgentRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a GetAgentResponse. */
+        interface IGetAgentResponse {
+
+            /** GetAgentResponse agent */
+            agent?: (flyteidl.admin.IAgent|null);
+        }
+
+        /** Represents a GetAgentResponse. */
+        class GetAgentResponse implements IGetAgentResponse {
+
+            /**
+             * Constructs a new GetAgentResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IGetAgentResponse);
+
+            /** GetAgentResponse agent. */
+            public agent?: (flyteidl.admin.IAgent|null);
+
+            /**
+             * Creates a new GetAgentResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetAgentResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IGetAgentResponse): flyteidl.admin.GetAgentResponse;
+
+            /**
+             * Encodes the specified GetAgentResponse message. Does not implicitly {@link flyteidl.admin.GetAgentResponse.verify|verify} messages.
+             * @param message GetAgentResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IGetAgentResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetAgentResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetAgentResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.GetAgentResponse;
+
+            /**
+             * Verifies a GetAgentResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ListAgentsRequest. */
+        interface IListAgentsRequest {
+        }
+
+        /** Represents a ListAgentsRequest. */
+        class ListAgentsRequest implements IListAgentsRequest {
+
+            /**
+             * Constructs a new ListAgentsRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IListAgentsRequest);
+
+            /**
+             * Creates a new ListAgentsRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ListAgentsRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IListAgentsRequest): flyteidl.admin.ListAgentsRequest;
+
+            /**
+             * Encodes the specified ListAgentsRequest message. Does not implicitly {@link flyteidl.admin.ListAgentsRequest.verify|verify} messages.
+             * @param message ListAgentsRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IListAgentsRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ListAgentsRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ListAgentsRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ListAgentsRequest;
+
+            /**
+             * Verifies a ListAgentsRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a ListAgentsResponse. */
+        interface IListAgentsResponse {
+
+            /** ListAgentsResponse agents */
+            agents?: (flyteidl.admin.IAgent[]|null);
+        }
+
+        /** Represents a ListAgentsResponse. */
+        class ListAgentsResponse implements IListAgentsResponse {
+
+            /**
+             * Constructs a new ListAgentsResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IListAgentsResponse);
+
+            /** ListAgentsResponse agents. */
+            public agents: flyteidl.admin.IAgent[];
+
+            /**
+             * Creates a new ListAgentsResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ListAgentsResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IListAgentsResponse): flyteidl.admin.ListAgentsResponse;
+
+            /**
+             * Encodes the specified ListAgentsResponse message. Does not implicitly {@link flyteidl.admin.ListAgentsResponse.verify|verify} messages.
+             * @param message ListAgentsResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IListAgentsResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ListAgentsResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ListAgentsResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ListAgentsResponse;
+
+            /**
+             * Verifies a ListAgentsResponse message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -19722,6 +20009,72 @@ export namespace flyteidl {
              * @param [response] DeleteTaskResponse
              */
             type DeleteTaskCallback = (error: (Error|null), response?: flyteidl.admin.DeleteTaskResponse) => void;
+        }
+
+        /** Represents an AgentMetadataService */
+        class AgentMetadataService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new AgentMetadataService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new AgentMetadataService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AgentMetadataService;
+
+            /**
+             * Calls GetAgent.
+             * @param request GetAgentRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and GetAgentResponse
+             */
+            public getAgent(request: flyteidl.admin.IGetAgentRequest, callback: flyteidl.service.AgentMetadataService.GetAgentCallback): void;
+
+            /**
+             * Calls GetAgent.
+             * @param request GetAgentRequest message or plain object
+             * @returns Promise
+             */
+            public getAgent(request: flyteidl.admin.IGetAgentRequest): Promise<flyteidl.admin.GetAgentResponse>;
+
+            /**
+             * Calls ListAgents.
+             * @param request ListAgentsRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ListAgentsResponse
+             */
+            public listAgents(request: flyteidl.admin.IListAgentsRequest, callback: flyteidl.service.AgentMetadataService.ListAgentsCallback): void;
+
+            /**
+             * Calls ListAgents.
+             * @param request ListAgentsRequest message or plain object
+             * @returns Promise
+             */
+            public listAgents(request: flyteidl.admin.IListAgentsRequest): Promise<flyteidl.admin.ListAgentsResponse>;
+        }
+
+        namespace AgentMetadataService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.AgentMetadataService#getAgent}.
+             * @param error Error, if any
+             * @param [response] GetAgentResponse
+             */
+            type GetAgentCallback = (error: (Error|null), response?: flyteidl.admin.GetAgentResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AgentMetadataService#listAgents}.
+             * @param error Error, if any
+             * @param [response] ListAgentsResponse
+             */
+            type ListAgentsCallback = (error: (Error|null), response?: flyteidl.admin.ListAgentsResponse) => void;
         }
 
         /** Properties of a OAuth2MetadataRequest. */

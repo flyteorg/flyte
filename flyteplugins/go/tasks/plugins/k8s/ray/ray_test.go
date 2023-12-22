@@ -24,6 +24,7 @@ import (
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
@@ -617,14 +618,24 @@ func newPluginContext() k8s.PluginContext {
 
 	taskExecID := &mocks.TaskExecutionID{}
 	taskExecID.OnGetID().Return(core.TaskExecutionIdentifier{
+		TaskId: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Name:         "my-task-name",
+			Project:      "my-task-project",
+			Domain:       "my-task-domain",
+			Version:      "1",
+		},
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Name:    "my_name",
-				Project: "my_project",
-				Domain:  "my_domain",
+				Name:    "my-execution-name",
+				Project: "my-execution-project",
+				Domain:  "my-execution-domain",
 			},
 		},
+		RetryAttempt: 1,
 	})
+	taskExecID.OnGetUniqueNodeID().Return("unique-node")
+	taskExecID.OnGetGeneratedName().Return("generated-name")
 
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
@@ -652,6 +663,7 @@ func TestGetTaskPhase(t *testing.T) {
 		rayJobPhase       rayv1alpha1.JobStatus
 		rayClusterPhase   rayv1alpha1.JobDeploymentStatus
 		expectedCorePhase pluginsCore.Phase
+		expectedError     bool
 	}{
 		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing, false},
 		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure, false},
@@ -674,8 +686,165 @@ func TestGetTaskPhase(t *testing.T) {
 			startTime := metav1.NewTime(time.Now())
 			rayObject.Status.StartTime = &startTime
 			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
-			assert.Nil(t, err)
+			if tc.expectedError {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
 			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
+		})
+	}
+}
+
+func TestGetEventInfo_LogTemplates(t *testing.T) {
+	pluginCtx := newPluginContext()
+	testCases := []struct {
+		name             string
+		rayJob           rayv1alpha1.RayJob
+		logPlugin        tasklog.TemplateLogPlugin
+		expectedTaskLogs []*core.TaskLog
+	}{
+		{
+			name: "namespace",
+			rayJob: rayv1alpha1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "namespace",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .namespace }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "namespace",
+					Uri:  "http://test/test-namespace",
+				},
+			},
+		},
+		{
+			name:   "task execution ID",
+			rayJob: rayv1alpha1.RayJob{},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName: "taskExecID",
+				TemplateURIs: []tasklog.TemplateURI{
+					"http://test/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}",
+				},
+				Scheme: tasklog.TemplateSchemeTaskExecution,
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "taskExecID",
+					Uri:  "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+				},
+			},
+		},
+		{
+			name: "ray cluster name",
+			rayJob: rayv1alpha1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+				},
+				Status: rayv1alpha1.RayJobStatus{
+					RayClusterName: "ray-cluster",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "ray cluster name",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .namespace }}/{{ .rayClusterName }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "ray cluster name",
+					Uri:  "http://test/test-namespace/ray-cluster",
+				},
+			},
+		},
+		{
+			name: "ray job ID",
+			rayJob: rayv1alpha1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+				},
+				Status: rayv1alpha1.RayJobStatus{
+					JobId: "ray-job-1",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "ray job ID",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .namespace }}/{{ .rayJobID }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "ray job ID",
+					Uri:  "http://test/test-namespace/ray-job-1",
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ti, err := getEventInfoForRayJob(
+				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
+				pluginCtx,
+				&tc.rayJob,
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
+		})
+	}
+}
+
+func TestGetEventInfo_DashboardURL(t *testing.T) {
+	pluginCtx := newPluginContext()
+	testCases := []struct {
+		name                 string
+		rayJob               rayv1alpha1.RayJob
+		dashboardURLTemplate tasklog.TemplateLogPlugin
+		expectedTaskLogs     []*core.TaskLog
+	}{
+		{
+			name: "dashboard URL displayed",
+			rayJob: rayv1alpha1.RayJob{
+				Status: rayv1alpha1.RayJobStatus{
+					DashboardURL: "exists",
+					JobStatus:    rayv1alpha1.JobStatusRunning,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "Ray Dashboard",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{.generatedName}}"},
+				Scheme:       tasklog.TemplateSchemeTaskExecution,
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "Ray Dashboard",
+					Uri:  "http://test/generated-name",
+				},
+			},
+		},
+		{
+			name: "dashboard URL is not displayed",
+			rayJob: rayv1alpha1.RayJob{
+				Status: rayv1alpha1.RayJobStatus{
+					JobStatus: rayv1alpha1.JobStatusPending,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "dummy",
+				TemplateURIs: []tasklog.TemplateURI{"http://dummy"},
+			},
+			expectedTaskLogs: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
+			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
 	}
 }
