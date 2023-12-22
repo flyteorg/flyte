@@ -36,7 +36,16 @@ const (
 	DisableUsageStatsStartParameter = "disable-usage-stats"
 )
 
-type rayJobResourceHandler struct{}
+var logTemplateRegexes = struct {
+	RayClusterName *regexp.Regexp
+	RayJobID       *regexp.Regexp
+}{
+	tasklog.MustCreateRegex("rayClusterName"),
+	tasklog.MustCreateRegex("rayJobID"),
+}
+
+type rayJobResourceHandler struct {
+}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
@@ -441,11 +450,7 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 	// TODO: Retrieve the name of head pod from rayJob.status, and add it to task logs
 	// RayJob CRD does not include the name of the worker or head pod for now
 
-	taskID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
-	logOutput, err := logPlugin.GetTaskLogs(tasklog.Input{
-		Namespace:               rayJob.Namespace,
-		TaskExecutionIdentifier: &taskID,
-	})
+	logOutput, err := logPlugin.GetTaskLogs(input)
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate task logs. Error: %w", err)
 	}
