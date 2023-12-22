@@ -258,6 +258,33 @@ func TestGetOutputs(t *testing.T) {
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 		assert.Empty(t, outputURLBlob)
 	})
+	t.Run("inline outputs over limit", func(t *testing.T) {
+		mockRemoteURL := urlMocks.NewMockRemoteURL()
+		mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+			t.Fatal("Should not fetch a remote URL for outputs stored inline for an execution model")
+			return admin.UrlBlob{}, nil
+		}
+		remoteDataConfig := interfaces.RemoteDataConfig{}
+		remoteDataConfig.MaxSizeInBytes = 0
+
+		mockStorage := commonMocks.GetMockStorageClient()
+		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
+			ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+			t.Fatal("Should not fetch when outputs stored inline for an execution model")
+			return nil
+		}
+		closure := &admin.NodeExecutionClosure{
+			OutputResult: &admin.NodeExecutionClosure_OutputData{
+				OutputData: testLiteralMap,
+			},
+		}
+
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		assert.Nil(t, fullOutputs)
+		assert.Nil(t, outputURLBlob)
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "LIMIT_EXCEEDED")
+	})
 	t.Run("storage read fails with signed URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
 			Enabled: true,

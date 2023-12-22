@@ -10,6 +10,7 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -121,7 +122,8 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		if int64(proto.Size(closure.GetOutputData())) < remoteDataConfig.MaxSizeInBytes {
 			fullOutputs = closure.GetOutputData()
 		} else {
-			logger.Debugf(ctx, "execution closure contains output data that exceeds max data size for responses")
+			logger.Errorf(ctx, "execution closure contains output data that exceeds max data size for responses")
+			return nil, nil, errors.Errorf(storage.ErrExceedsLimit, "limit exceeded. %.6vb > %vb.", int64(proto.Size(closure.GetOutputData())), remoteDataConfig.MaxSizeInBytes)
 		}
 	} else if shouldFetchOutputData(remoteDataConfig, outputsURLBlob, closure.GetOutputUri()) {
 		err := storageClient.ReadProtobuf(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs)
