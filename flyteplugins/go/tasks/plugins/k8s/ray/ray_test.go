@@ -81,12 +81,12 @@ func transformPodSpecToTaskTemplateTarget(podSpec *corev1.PodSpec) *core.TaskTem
 func dummyRayCustomObj() *plugins.RayJob {
 	return &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:            &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
-			WorkerGroupSpec:          []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
-			EnableAutoscaling:        true,
-			ShutdownAfterJobFinishes: true,
-			TtlSecondsAfterFinished:  120,
+			HeadGroupSpec:     &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: true,
 		},
+		ShutdownAfterJobFinishes: true,
+		TtlSecondsAfterFinished:  120,
 	}
 }
 
@@ -182,8 +182,8 @@ func TestBuildResourceRay(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.ShutdownAfterJobFinishes, true)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.TTLSecondsAfterFinished, int32(120))
+	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
+	assert.Equal(t, *ray.Spec.TTLSecondsAfterFinished, int32(120))
 
 	headReplica := int32(1)
 	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
@@ -355,12 +355,12 @@ func TestDefaultStartParameters(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	rayJob := &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:            &plugins.HeadGroupSpec{},
-			WorkerGroupSpec:          []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
-			EnableAutoscaling:        true,
-			ShutdownAfterJobFinishes: true,
-			TtlSecondsAfterFinished:  120,
+			HeadGroupSpec:     &plugins.HeadGroupSpec{},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: true,
 		},
+		ShutdownAfterJobFinishes: true,
+		TtlSecondsAfterFinished:  120,
 	}
 
 	taskTemplate := dummyRayTaskTemplate("ray-id", rayJob)
@@ -381,8 +381,8 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.ShutdownAfterJobFinishes, true)
-	assert.Equal(t, *ray.Spec.RayClusterSpec.TTLSecondsAfterFinished, int32(120))
+	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
+	assert.Equal(t, *ray.Spec.TTLSecondsAfterFinished, int32(120))
 
 	headReplica := int32(1)
 	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
