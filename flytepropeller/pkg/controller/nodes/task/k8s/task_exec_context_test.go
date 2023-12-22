@@ -7,6 +7,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 )
 
 func Test_newTaskExecutionMetadata(t *testing.T) {
@@ -63,6 +64,69 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 			"existingLabel":        "existingLabelValue",
 			"inject-flyte-secrets": "true",
 		}, actual.GetLabels())
+	})
+
+	t.Run("Inject exec identity", func(t *testing.T) {
+		config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: true})
+
+		existingMetadata := &mocks.TaskExecutionMetadata{}
+		existingAnnotations := map[string]string{}
+		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "test-exec-identity"}})
+
+		existingLabels := map[string]string{
+			"existingLabel": "existingLabelValue",
+		}
+		existingMetadata.OnGetLabels().Return(existingLabels)
+
+		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
+		assert.NoError(t, err)
+
+		assert.Equal(t, 2, len(actual.GetLabels()))
+		assert.Equal(t, "test-exec-identity", actual.GetLabels()[executionIdentityVariable])
+	})
+
+	t.Run("No inject exec identity", func(t *testing.T) {
+		config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: false})
+
+		existingMetadata := &mocks.TaskExecutionMetadata{}
+		existingAnnotations := map[string]string{}
+		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "test-exec-identity"}})
+
+		existingLabels := map[string]string{
+			"existingLabel": "existingLabelValue",
+		}
+		existingMetadata.OnGetLabels().Return(existingLabels)
+
+		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
+		assert.NoError(t, err)
+
+		assert.Equal(t, 1, len(actual.GetLabels()))
+		assert.Equal(t, "existingLabelValue", actual.GetLabels()["existingLabel"])
+	})
+
+	t.Run("Inject non-existing exec identity", func(t *testing.T) {
+		config.SetK8sPluginConfig(&config.K8sPluginConfig{InjectExecutionIdentity: true}) // configure to inject exec identity
+
+		existingMetadata := &mocks.TaskExecutionMetadata{}
+		existingAnnotations := map[string]string{}
+		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}}) // no exec identity
+
+		existingLabels := map[string]string{
+			"existingLabel": "existingLabelValue",
+		}
+		existingMetadata.OnGetLabels().Return(existingLabels)
+
+		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
+		assert.NoError(t, err)
+
+		assert.Equal(t, 1, len(actual.GetLabels()))
+		assert.Equal(t, "existingLabelValue", actual.GetLabels()["existingLabel"])
 	})
 }
 
