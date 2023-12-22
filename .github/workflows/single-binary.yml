@@ -159,8 +159,6 @@ jobs:
         with:
           python-version: "3.11"
       - uses: unionai/flytectl-setup-action@v0.0.1
-        with:
-          version: '0.8.4'
       - name: Setup sandbox
         run: |
           mkdir -p ~/.flyte/sandbox
