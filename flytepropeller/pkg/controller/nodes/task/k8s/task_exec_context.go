@@ -69,6 +69,6 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 	return TaskExecutionMetadata{
 		TaskExecutionMetadata: tCtx,
 		annotations:           utils.UnionMaps(tCtx.GetAnnotations(), secretsMap),
-		labels:                utils.UnionMaps(tCtx.GetLabels(), injectLabels, injectLabels),
+		labels:                utils.UnionMaps(tCtx.GetLabels(), injectLabels),
 	}, nil
 }
