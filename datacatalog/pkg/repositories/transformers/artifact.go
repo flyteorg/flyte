@@ -9,6 +9,14 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
+func SerializedMetadata(metadata *datacatalog.Metadata) ([]byte, error) {
+	serializedMetadata, err := marshalMetadata(metadata)
+	if err != nil {
+		return []byte{}, err
+	}
+	return serializedMetadata, nil
+}
+
 func CreateArtifactModel(request *datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData, dataset models.Dataset) (models.Artifact, error) {
 	datasetID := request.Artifact.Dataset
 
