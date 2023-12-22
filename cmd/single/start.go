@@ -2,6 +2,7 @@ package single
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"net/http"
 	"os"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
@@ -43,6 +44,8 @@ import (
 const defaultNamespace = "all"
 const propellerDefaultNamespace = "flyte"
 
+var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
+
 func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 	if err := datacatalogRepo.Migrate(ctx); err != nil {
 		return err
@@ -51,11 +54,10 @@ func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 	return datacatalog.ServeInsecure(ctx, catalogCfg)
 }
 
-func startClusterResourceController(ctx context.Context) error {
+func startClusterResourceController(ctx context.Context, pluginRegistry *plugins.Registry) error {
 	configuration := runtime.NewConfigurationProvider()
 	scope := promutils.NewScope(configuration.ApplicationConfiguration().GetTopLevelConfig().MetricsScope).NewSubScope("clusterresource")
-	registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
-	clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, registry.Load())
+	clusterResourceController, err := clusterresource.NewClusterResourceControllerFromConfig(ctx, scope, configuration, pluginRegistry)
 	if err != nil {
 		return err
 	}
@@ -82,25 +84,26 @@ func startAdmin(ctx context.Context, cfg Admin) error {
 
 	g, childCtx := errgroup.WithContext(ctx)
 
-	registry := plugins.NewAtomicRegistry(plugins.NewRegistry())
+	registry := pluginRegistryStore.Load()
+	registry.RegisterDefault(plugins.PluginIDNewRepositoryFunction, repositories.NewGormRepo)
 	if !cfg.DisableScheduler {
 		logger.Infof(ctx, "Starting Scheduler...")
 		g.Go(func() error {
-			return adminScheduler.StartScheduler(childCtx, registry.Load())
+			return adminScheduler.StartScheduler(childCtx, registry)
 		})
 	}
 
 	if !cfg.DisableClusterResourceManager {
 		logger.Infof(ctx, "Starting cluster resource controller...")
 		g.Go(func() error {
-			return startClusterResourceController(childCtx)
+			return startClusterResourceController(childCtx, registry)
 		})
 	}
 
 	if !cfg.Disabled {
 		g.Go(func() error {
 			logger.Infof(ctx, "Starting Admin server...")
-			return adminServer.Serve(childCtx, registry.Load(), GetConsoleHandlers())
+			return adminServer.Serve(childCtx, registry, GetConsoleHandlers())
 		})
 	}
 	return g.Wait()

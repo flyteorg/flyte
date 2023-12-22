@@ -60,12 +60,7 @@ func (r *TaskRepo) Get(ctx context.Context, id *core.Identifier) (models.Task, e
 	}).Take(&task)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		return models.Task{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{
-			Project: id.Project,
-			Domain:  id.Domain,
-			Name:    id.Name,
-			Version: id.Version,
-		})
+		return models.Task{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_TASK.String(), id)
 	}
 
 	if tx.Error != nil {

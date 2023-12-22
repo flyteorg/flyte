@@ -1179,6 +1179,28 @@ class TaskMetadata final :
   ::google::protobuf::Map< ::std::string, ::std::string >*
       mutable_tags();
 
+  // repeated string cache_ignore_input_vars = 13;
+  int cache_ignore_input_vars_size() const;
+  void clear_cache_ignore_input_vars();
+  static const int kCacheIgnoreInputVarsFieldNumber = 13;
+  const ::std::string& cache_ignore_input_vars(int index) const;
+  ::std::string* mutable_cache_ignore_input_vars(int index);
+  void set_cache_ignore_input_vars(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_cache_ignore_input_vars(int index, ::std::string&& value);
+  #endif
+  void set_cache_ignore_input_vars(int index, const char* value);
+  void set_cache_ignore_input_vars(int index, const char* value, size_t size);
+  ::std::string* add_cache_ignore_input_vars();
+  void add_cache_ignore_input_vars(const ::std::string& value);
+  #if LANG_CXX11
+  void add_cache_ignore_input_vars(::std::string&& value);
+  #endif
+  void add_cache_ignore_input_vars(const char* value);
+  void add_cache_ignore_input_vars(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& cache_ignore_input_vars() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_cache_ignore_input_vars();
+
   // string discovery_version = 6;
   void clear_discovery_version();
   static const int kDiscoveryVersionFieldNumber = 6;
@@ -1292,6 +1314,7 @@ class TaskMetadata final :
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       0 > tags_;
+  ::google::protobuf::RepeatedPtrField<::std::string> cache_ignore_input_vars_;
   ::google::protobuf::internal::ArenaStringPtr discovery_version_;
   ::google::protobuf::internal::ArenaStringPtr deprecated_error_message_;
   ::google::protobuf::internal::ArenaStringPtr pod_template_name_;
@@ -3703,6 +3726,75 @@ inline void TaskMetadata::set_allocated_pod_template_name(::std::string* pod_tem
   }
   pod_template_name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), pod_template_name);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskMetadata.pod_template_name)
+}
+
+// repeated string cache_ignore_input_vars = 13;
+inline int TaskMetadata::cache_ignore_input_vars_size() const {
+  return cache_ignore_input_vars_.size();
+}
+inline void TaskMetadata::clear_cache_ignore_input_vars() {
+  cache_ignore_input_vars_.Clear();
+}
+inline const ::std::string& TaskMetadata::cache_ignore_input_vars(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+  return cache_ignore_input_vars_.Get(index);
+}
+inline ::std::string* TaskMetadata::mutable_cache_ignore_input_vars(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+  return cache_ignore_input_vars_.Mutable(index);
+}
+inline void TaskMetadata::set_cache_ignore_input_vars(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+  cache_ignore_input_vars_.Mutable(index)->assign(value);
+}
+#if LANG_CXX11
+inline void TaskMetadata::set_cache_ignore_input_vars(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+  cache_ignore_input_vars_.Mutable(index)->assign(std::move(value));
+}
+#endif
+inline void TaskMetadata::set_cache_ignore_input_vars(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  cache_ignore_input_vars_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+}
+inline void TaskMetadata::set_cache_ignore_input_vars(int index, const char* value, size_t size) {
+  cache_ignore_input_vars_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+}
+inline ::std::string* TaskMetadata::add_cache_ignore_input_vars() {
+  // @@protoc_insertion_point(field_add_mutable:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+  return cache_ignore_input_vars_.Add();
+}
+inline void TaskMetadata::add_cache_ignore_input_vars(const ::std::string& value) {
+  cache_ignore_input_vars_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+}
+#if LANG_CXX11
+inline void TaskMetadata::add_cache_ignore_input_vars(::std::string&& value) {
+  cache_ignore_input_vars_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+}
+#endif
+inline void TaskMetadata::add_cache_ignore_input_vars(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  cache_ignore_input_vars_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+}
+inline void TaskMetadata::add_cache_ignore_input_vars(const char* value, size_t size) {
+  cache_ignore_input_vars_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+TaskMetadata::cache_ignore_input_vars() const {
+  // @@protoc_insertion_point(field_list:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+  return cache_ignore_input_vars_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+TaskMetadata::mutable_cache_ignore_input_vars() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.core.TaskMetadata.cache_ignore_input_vars)
+  return &cache_ignore_input_vars_;
 }
 
 inline bool TaskMetadata::has_interruptible_value() const {

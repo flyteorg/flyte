@@ -32,12 +32,12 @@ func TestGetQueue(t *testing.T) {
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
 		response := models.Resource{
-			Project:      ID.IdentifierScope.GetProject(),
-			Domain:       ID.IdentifierScope.GetDomain(),
+			Project:      ID.Scope.GetProject(),
+			Domain:       ID.Scope.GetDomain(),
 			Workflow:     ID.Workflow,
 			ResourceType: ID.ResourceType,
 		}
-		if ID.IdentifierScope.GetProject() == testProject && ID.IdentifierScope.GetDomain() == testDomain && ID.Workflow == testWorkflow {
+		if ID.Scope.GetProject() == testProject && ID.Scope.GetDomain() == testDomain && ID.Workflow == testWorkflow {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -115,7 +115,7 @@ func TestGetQueueDefaults(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	db.ResourceRepo().(*mocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (resource models.Resource, e error) {
-		if ID.IdentifierScope.GetProject() == testProject && ID.IdentifierScope.GetDomain() == testDomain && ID.Workflow == "workflow" &&
+		if ID.Scope.GetProject() == testProject && ID.Scope.GetDomain() == testDomain && ID.Workflow == "workflow" &&
 			ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
@@ -126,14 +126,14 @@ func TestGetQueueDefaults(t *testing.T) {
 			}
 			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
 			return models.Resource{
-				Project:      ID.IdentifierScope.GetProject(),
-				Domain:       ID.IdentifierScope.GetDomain(),
+				Project:      ID.Scope.GetProject(),
+				Domain:       ID.Scope.GetDomain(),
 				Workflow:     ID.Workflow,
 				ResourceType: ID.ResourceType,
 				Attributes:   marshalledMatchingAttributes,
 			}, nil
 		}
-		if ID.IdentifierScope.GetProject() == testProject && ID.IdentifierScope.GetDomain() == testDomain && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
+		if ID.Scope.GetProject() == testProject && ID.Scope.GetDomain() == testDomain && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -143,14 +143,14 @@ func TestGetQueueDefaults(t *testing.T) {
 			}
 			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
 			return models.Resource{
-				Project:      ID.IdentifierScope.GetProject(),
-				Domain:       ID.IdentifierScope.GetDomain(),
+				Project:      ID.Scope.GetProject(),
+				Domain:       ID.Scope.GetDomain(),
 				ResourceType: ID.ResourceType,
 				Attributes:   marshalledMatchingAttributes,
 			}, nil
 		}
 
-		if ID.IdentifierScope.GetProject() == testProject && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
+		if ID.Scope.GetProject() == testProject && ID.ResourceType == admin.MatchableResource_EXECUTION_QUEUE.String() {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionQueueAttributes{
 					ExecutionQueueAttributes: &admin.ExecutionQueueAttributes{
@@ -160,7 +160,7 @@ func TestGetQueueDefaults(t *testing.T) {
 			}
 			marshalledMatchingAttributes, _ := proto.Marshal(matchingAttributes)
 			return models.Resource{
-				Project:      ID.IdentifierScope.GetProject(),
+				Project:      ID.Scope.GetProject(),
 				ResourceType: ID.ResourceType,
 				Attributes:   marshalledMatchingAttributes,
 			}, nil

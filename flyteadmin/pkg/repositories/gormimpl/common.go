@@ -5,6 +5,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
@@ -89,37 +90,37 @@ func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdmi
 // Returns equality filters initialized for identifier attributes (project, domain & name)
 // which can be optionally specified in requests.
 func getIdentifierFilters(entity common.Entity, identifier *admin.NamedEntityIdentifier) ([]common.InlineFilter, error) {
-	filters := make([]common.InlineFilter, 0)
+	inlineFilters := make([]common.InlineFilter, 0)
 	if identifier == nil {
-		return filters, nil
+		return inlineFilters, nil
 	}
-	if identifier.Project != "" {
+	if len(identifier.Project) > 0 {
 		projectFilter, err := util.GetSingleValueEqualityFilter(entity, shared.Project, identifier.Project)
 		if err != nil {
 			return nil, err
 		}
-		filters = append(filters, projectFilter)
+		inlineFilters = append(inlineFilters, projectFilter)
 	}
-	if identifier.Domain != "" {
+	if len(identifier.Domain) > 0 {
 		domainFilter, err := util.GetSingleValueEqualityFilter(entity, shared.Domain, identifier.Domain)
 		if err != nil {
 			return nil, err
 		}
-		filters = append(filters, domainFilter)
+		inlineFilters = append(inlineFilters, domainFilter)
 	}
 
-	if identifier.Name != "" {
+	if len(identifier.Name) > 0 {
 		nameFilter, err := util.GetSingleValueEqualityFilter(entity, shared.Name, identifier.Name)
 		if err != nil {
 			return nil, err
 		}
-		filters = append(filters, nameFilter)
+		inlineFilters = append(inlineFilters, nameFilter)
 	}
-	return filters, nil
+	return inlineFilters, nil
 }
 
-func applyFilters(tx *gorm.DB, entity common.Entity, identifierScope *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
-	identifierFilters, err := getIdentifierFilters(entity, identifierScope)
+func applyFilters(tx *gorm.DB, entity common.Entity, id *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
+	identifierFilters, err := getIdentifierFilters(entity, id)
 	if err != nil {
 		return nil, errors.GetInvalidInputError(err.Error())
 	}
@@ -137,8 +138,8 @@ func applyFilters(tx *gorm.DB, entity common.Entity, identifierScope *admin.Name
 	return tx, nil
 }
 
-func applyScopedFilters(tx *gorm.DB, entity common.Entity, identifierScope *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
-	identifierFilters, err := getIdentifierFilters(entity, identifierScope)
+func applyScopedFilters(tx *gorm.DB, entity common.Entity, identifier *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
+	identifierFilters, err := getIdentifierFilters(entity, identifier)
 	if err != nil {
 		return nil, errors.GetInvalidInputError(err.Error())
 	}
@@ -159,4 +160,13 @@ func applyScopedFilters(tx *gorm.DB, entity common.Entity, identifierScope *admi
 		tx = tx.Where(mapFilter.GetFilter())
 	}
 	return tx, nil
+}
+
+func toNamedEntityIdentifier(id *core.Identifier) *admin.NamedEntityIdentifier {
+	return &admin.NamedEntityIdentifier{
+		Project: id.GetProject(),
+		Domain:  id.GetDomain(),
+		Org:     id.GetOrg(),
+		Name:    id.GetName(),
+	}
 }

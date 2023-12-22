@@ -10,6 +10,6 @@ import (
 //go:generate mockery -name FlyteAdminDataProvider -output=../mocks -case=underscore
 
 type FlyteAdminDataProvider interface {
-	GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceIdentifier) (*admin.ClusterResourceAttributes, error)
+	GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceScope) (*admin.ClusterResourceAttributes, error)
 	GetProjects(ctx context.Context) (*admin.Projects, error)
 }

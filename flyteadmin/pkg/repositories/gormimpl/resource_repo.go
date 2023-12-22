@@ -87,7 +87,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, resourceID interfaces
 
 // Get returns the most-specific attribute setting for the given ResourceType.
 func (r *ResourceRepo) Get(ctx context.Context, resourceID interfaces.ResourceID) (models.Resource, error) {
-	if !validateCreateOrUpdateResourceInput(resourceID.IdentifierScope.GetProject(), resourceID.IdentifierScope.GetDomain(), resourceID.Workflow, resourceID.LaunchPlan, resourceID.ResourceType) {
+	if !validateCreateOrUpdateResourceInput(resourceID.Scope.GetProject(), resourceID.Scope.GetDomain(), resourceID.Workflow, resourceID.LaunchPlan, resourceID.ResourceType) {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 	var resources []models.Resource
@@ -95,13 +95,13 @@ func (r *ResourceRepo) Get(ctx context.Context, resourceID interfaces.ResourceID
 
 	txWhereClause := "resource_type = ? AND domain IN (?) AND project IN (?) AND workflow IN (?) AND launch_plan IN (?)"
 	project := []string{""}
-	if resourceID.IdentifierScope.GetProject() != "" {
-		project = append(project, resourceID.IdentifierScope.GetProject())
+	if resourceID.Scope.GetProject() != "" {
+		project = append(project, resourceID.Scope.GetProject())
 	}
 
 	domain := []string{""}
-	if resourceID.IdentifierScope.GetDomain() != "" {
-		domain = append(domain, resourceID.IdentifierScope.GetDomain())
+	if resourceID.Scope.GetDomain() != "" {
+		domain = append(domain, resourceID.Scope.GetDomain())
 	}
 
 	workflow := []string{""}
@@ -131,7 +131,7 @@ func (r *ResourceRepo) Get(ctx context.Context, resourceID interfaces.ResourceID
 // given ResourceType if it exists. The reason this exists is because we want to return project level
 // attributes to Flyte Console, regardless of whether a more specific setting exists.
 func (r *ResourceRepo) GetProjectLevel(ctx context.Context, resourceID interfaces.ResourceID) (models.Resource, error) {
-	if resourceID.IdentifierScope.GetProject() == "" {
+	if resourceID.Scope.GetProject() == "" {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 
@@ -140,7 +140,7 @@ func (r *ResourceRepo) GetProjectLevel(ctx context.Context, resourceID interface
 
 	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = ''"
 
-	tx := r.db.WithContext(ctx).Where(txWhereClause, resourceID.ResourceType, resourceID.IdentifierScope.GetProject())
+	tx := r.db.WithContext(ctx).Where(txWhereClause, resourceID.ResourceType, resourceID.Scope.GetProject())
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
@@ -154,14 +154,14 @@ func (r *ResourceRepo) GetProjectLevel(ctx context.Context, resourceID interface
 }
 
 func (r *ResourceRepo) GetRaw(ctx context.Context, resourceID interfaces.ResourceID) (models.Resource, error) {
-	if resourceID.IdentifierScope.GetDomain() == "" || resourceID.ResourceType == "" {
+	if resourceID.Scope.GetDomain() == "" || resourceID.ResourceType == "" {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(flyteAdminDbErrors.GetInvalidInputError(fmt.Sprintf("%v", ID)))
 	}
 	var model models.Resource
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Resource{
-		Project:      resourceID.IdentifierScope.GetProject(),
-		Domain:       resourceID.IdentifierScope.GetDomain(),
+		Project:      resourceID.Scope.GetProject(),
+		Domain:       resourceID.Scope.GetDomain(),
 		Workflow:     resourceID.Workflow,
 		LaunchPlan:   resourceID.LaunchPlan,
 		ResourceType: resourceID.ResourceType,
@@ -194,8 +194,8 @@ func (r *ResourceRepo) Delete(ctx context.Context, resourceID interfaces.Resourc
 	var tx *gorm.DB
 	r.metrics.DeleteDuration.Time(func() {
 		tx = r.db.WithContext(ctx).Where(&models.Resource{
-			Project:      resourceID.IdentifierScope.GetProject(),
-			Domain:       resourceID.IdentifierScope.GetDomain(),
+			Project:      resourceID.Scope.GetProject(),
+			Domain:       resourceID.Scope.GetDomain(),
 			Workflow:     resourceID.Workflow,
 			LaunchPlan:   resourceID.LaunchPlan,
 			ResourceType: resourceID.ResourceType,

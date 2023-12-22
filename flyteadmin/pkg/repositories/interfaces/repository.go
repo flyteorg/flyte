@@ -31,4 +31,4 @@ type Repository interface {
 	GetGormDB() *gorm.DB
 }
 
-type NewRepo = func(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) Repository
+type NewRepositoryFunc = func(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope promutils.Scope) Repository

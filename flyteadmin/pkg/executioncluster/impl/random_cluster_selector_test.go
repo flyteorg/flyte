@@ -55,18 +55,18 @@ func getRandomClusterSelectorForTest(t *testing.T) interfaces2.ClusterInterface 
 	db := repo_mock.NewMockRepository()
 	db.ResourceRepo().(*repo_mock.MockResourceRepo).GetFunction = func(ctx context.Context, ID repo_interface.ResourceID) (resource models.Resource, e error) {
 		assert.Equal(t, "EXECUTION_CLUSTER_LABEL", ID.ResourceType)
-		if ID.IdentifierScope.GetProject() == "" {
+		if ID.Scope.GetProject() == "" {
 			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.NotFound,
 				"Resource [%+v] not found", ID)
 		}
 		response := models.Resource{
-			Project:      ID.IdentifierScope.GetProject(),
-			Domain:       ID.IdentifierScope.GetDomain(),
+			Project:      ID.Scope.GetProject(),
+			Domain:       ID.Scope.GetDomain(),
 			Workflow:     ID.Workflow,
 			ResourceType: ID.ResourceType,
 			LaunchPlan:   ID.LaunchPlan,
 		}
-		if ID.IdentifierScope.GetProject() == testProject && ID.IdentifierScope.GetDomain() == testDomain {
+		if ID.Scope.GetProject() == testProject && ID.Scope.GetDomain() == testDomain {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionClusterLabel{
 					ExecutionClusterLabel: &admin.ExecutionClusterLabel{
@@ -128,18 +128,18 @@ func getRandomClusterSelectorWithDefaultLabelForTest(t *testing.T, configFile st
 	db := repo_mock.NewMockRepository()
 	db.ResourceRepo().(*repo_mock.MockResourceRepo).GetFunction = func(ctx context.Context, ID repo_interface.ResourceID) (resource models.Resource, e error) {
 		assert.Equal(t, "EXECUTION_CLUSTER_LABEL", ID.ResourceType)
-		if ID.IdentifierScope.GetProject() == "" {
+		if ID.Scope.GetProject() == "" {
 			return models.Resource{}, errors.NewFlyteAdminErrorf(codes.NotFound,
 				"Resource [%+v] not found", ID)
 		}
 		response := models.Resource{
-			Project:      ID.IdentifierScope.GetProject(),
-			Domain:       ID.IdentifierScope.GetDomain(),
+			Project:      ID.Scope.GetProject(),
+			Domain:       ID.Scope.GetDomain(),
 			Workflow:     ID.Workflow,
 			ResourceType: ID.ResourceType,
 			LaunchPlan:   ID.LaunchPlan,
 		}
-		if ID.IdentifierScope.GetProject() == testProject && ID.IdentifierScope.GetDomain() == testDomain {
+		if ID.Scope.GetProject() == testProject && ID.Scope.GetDomain() == testDomain {
 			matchingAttributes := &admin.MatchingAttributes{
 				Target: &admin.MatchingAttributes_ExecutionClusterLabel{
 					ExecutionClusterLabel: &admin.ExecutionClusterLabel{

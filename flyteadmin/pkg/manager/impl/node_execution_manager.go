@@ -357,7 +357,7 @@ func (m *NodeExecutionManager) listNodeExecutions(
 	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort, baseInlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (
 	*admin.NodeExecutionList, error) {
 
-	inlineFilters, err := util.GetRequestFilters(requestFilters, common.NodeExecution)
+	inlineFilters, err := util.ParseFilters(requestFilters, common.NodeExecution)
 	if err != nil {
 		return nil, err
 	}

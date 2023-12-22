@@ -1,33 +1,38 @@
 package common
 
-type ResourceIdentifier interface {
-	GetProject() string
+type ResourceScope interface {
 	GetOrg() string
+	GetProject() string
 	GetDomain() string
 }
 
-func (i resourceIdentifier) GetProject() string {
+func (i resourceScope) GetProject() string {
 	return i.project
 }
 
-func (i resourceIdentifier) GetOrg() string {
+func (i resourceScope) GetOrg() string {
 	return i.org
 }
 
-func (i resourceIdentifier) GetDomain() string {
+func (i resourceScope) GetDomain() string {
 	return i.domain
 }
 
-type resourceIdentifier struct {
-	project string
+type resourceScope struct {
 	org     string
+	project string
 	domain  string
 }
 
-func NewResourceIdentifier(org, project, domain string) ResourceIdentifier {
-	return &resourceIdentifier{project: project, org: org, domain: domain}
+func NewResourceScope(org, project, domain string) ResourceScope {
+	return &resourceScope{project: project, org: org, domain: domain}
 }
 
-func NewProjectResourceIdentifier(org, project string) ResourceIdentifier {
-	return &resourceIdentifier{project: project, org: org}
+type ProjectScope interface {
+	GetProject() string
+	GetOrg() string
+}
+
+func NewProjectResourceScope(id ProjectScope) ResourceScope {
+	return &resourceScope{project: id.GetProject(), org: id.GetOrg()}
 }

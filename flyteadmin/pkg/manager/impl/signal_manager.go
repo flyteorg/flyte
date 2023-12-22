@@ -72,7 +72,7 @@ func (s *SignalManager) ListSignals(ctx context.Context, request admin.SignalLis
 	}
 	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
 
-	filters, err := util.GetRequestFilters(request.Filters, common.Signal)
+	filters, err := util.ParseFilters(request.Filters, common.Signal)
 	if err != nil {
 		return nil, err
 	}

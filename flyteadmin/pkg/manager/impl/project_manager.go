@@ -67,7 +67,7 @@ func (m *ProjectManager) getDomains() []*admin.Domain {
 }
 
 func (m *ProjectManager) ListProjects(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
-	filters, err := util.GetRequestFilters(request.Filters, common.Project)
+	filters, err := util.ParseFilters(request.Filters, common.Project)
 	if err != nil {
 		return nil, err
 	}

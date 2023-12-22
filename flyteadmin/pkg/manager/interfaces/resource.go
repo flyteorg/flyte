@@ -37,7 +37,7 @@ type ResourceInterface interface {
 
 // TODO we can move this to flyteidl, once we are exposing an endpoint
 type ResourceRequest struct {
-	IdentifierScope common.ResourceIdentifier
+	IdentifierScope common.ResourceScope
 	Workflow        string
 	LaunchPlan      string
 	ResourceType    admin.MatchableResource

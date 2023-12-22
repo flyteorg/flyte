@@ -8,8 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 )
 
 func TestParseRepeatedValues(t *testing.T) {
@@ -123,36 +121,4 @@ func TestGetEqualityFilter(t *testing.T) {
 	actualFilterExpression, _ := filter.GetGormQueryExpr()
 	assert.Equal(t, "field = ?", actualFilterExpression.Query)
 	assert.Equal(t, "value", actualFilterExpression.Args)
-}
-
-func Test_AddRequestFilters(t *testing.T) {
-	filters, err := GetRequestFilters(
-		"ne(cluster, TheWorst)+eq(workflow.name, workflow)", common.Execution)
-
-	assert.NoError(t, err)
-	require.Len(t, filters, 2)
-
-	expression, err := filters[0].GetGormQueryExpr()
-	assert.NoError(t, err)
-	assert.Equal(t, "cluster <> ?", expression.Query)
-	assert.Equal(t, "TheWorst", expression.Args)
-
-	expression, err = filters[1].GetGormQueryExpr()
-	assert.NoError(t, err)
-	assert.Equal(t, testutils.NameQueryPattern, expression.Query)
-	assert.Equal(t, "workflow", expression.Args)
-}
-
-func TestGetDbFilters(t *testing.T) {
-	actualFilters, err := GetRequestFilters("ne(version, TheWorst)+eq(workflow.name, workflow)", common.LaunchPlan)
-	assert.NoError(t, err)
-
-	// Init expected values for filters.
-	versionFilter, _ := common.NewSingleValueFilter(common.LaunchPlan, common.NotEqual, shared.Version, "TheWorst")
-	workflowNameFilter, _ := common.NewSingleValueFilter(common.Workflow, common.Equal, shared.Name, "workflow")
-	expectedFilters := []common.InlineFilter{
-		versionFilter,
-		workflowNameFilter,
-	}
-	assert.EqualValues(t, expectedFilters, actualFilters)
 }

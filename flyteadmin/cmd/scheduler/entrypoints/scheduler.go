@@ -2,6 +2,7 @@ package entrypoints
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 
 	"github.com/spf13/cobra"
@@ -35,7 +36,9 @@ var schedulerRunCmd = &cobra.Command{
 		applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 		server.SetMetricKeys(applicationConfiguration)
 
-		return scheduler.StartScheduler(ctx, pluginRegistryStore.Load())
+		registry := pluginRegistryStore.Load()
+		registry.RegisterDefault(plugins.PluginIDNewRepositoryFunction, repositories.NewGormRepo)
+		return scheduler.StartScheduler(ctx, registry)
 	},
 }
 

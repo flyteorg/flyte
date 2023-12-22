@@ -365,7 +365,7 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	// system level defaults for the rest.
 	// See FLYTE-2322 for more background information.
 	projectMatchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, common.NewProjectResourceIdentifier(request.GetOrg(), request.GetProject()), "")
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, common.NewProjectResourceScope(request), "")
 	if err != nil {
 		return nil, err
 	}
@@ -486,14 +486,9 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, nil, err
 	}
 
-	name := util.GetExecutionName(request)
-	workflowExecutionID := core.WorkflowExecutionIdentifier{
-		Project: request.Project,
-		Domain:  request.Domain,
-		Name:    name,
-		Org:     request.Org,
-	}
-	ctx = getExecutionContext(ctx, &workflowExecutionID)
+	workflowExecutionID := GetWorkflowExecutionIdentifierFromRequest(request)
+	workflowExecutionID.Name = util.GetExecutionName(request)
+	ctx = getExecutionContext(ctx, workflowExecutionID)
 	namespace := common.GetNamespaceName(
 		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Project, workflowExecutionID.Domain)
 
@@ -506,7 +501,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Get the node execution (if any) that launched this execution
 	var parentNodeExecutionID uint
 	var sourceExecutionID uint
-	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, &workflowExecutionID)
+	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, workflowExecutionID)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -538,7 +533,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		labels = executionConfig.Labels.Values
 	}
 
-	labels, err = m.addProjectLabels(ctx, request.GetOrg(), request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, util.ToProjectIdentifier(request), labels)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -571,7 +566,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		ClusterAssignment:   clusterAssignment,
 	}
 
-	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, workflowExecutionID.Name, "")
+	overrides, err := m.addPluginOverrides(ctx, workflowExecutionID, workflowExecutionID.Name, "")
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -586,7 +581,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
 	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:                namespace,
-		ExecutionID:              &workflowExecutionID,
+		ExecutionID:              workflowExecutionID,
 		ReferenceWorkflowName:    workflow.Id.Name,
 		ReferenceLaunchPlanName:  launchPlan.Id.Name,
 		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
@@ -618,7 +613,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
-		WorkflowExecutionID: workflowExecutionID,
+		WorkflowExecutionID: *workflowExecutionID,
 		RequestSpec:         requestSpec,
 		TaskID:              taskModel.ID,
 		WorkflowID:          workflowModel.ID,
@@ -642,7 +637,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, nil, err
 	}
 	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(proto.Size(request.Inputs)))
-	return ctx, &workflowExecutionID, executionModel, nil
+	return ctx, workflowExecutionID, executionModel, nil
 }
 
 func resolveAuthRole(request *admin.ExecutionCreateRequest, launchPlan *admin.LaunchPlan) *admin.AuthRole {
@@ -744,14 +739,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	closure.CreatedAt = workflow.Closure.CreatedAt
 	workflow.Closure = closure
 
-	name := util.GetExecutionName(request)
-	workflowExecutionID := core.WorkflowExecutionIdentifier{
-		Project: request.Project,
-		Domain:  request.Domain,
-		Name:    name,
-		Org:     request.Org,
-	}
-	ctx = getExecutionContext(ctx, &workflowExecutionID)
+	workflowExecutionID := GetWorkflowExecutionIdentifierFromRequest(request)
+	workflowExecutionID.Name = util.GetExecutionName(request)
+	ctx = getExecutionContext(ctx, workflowExecutionID)
 	var requestSpec = request.Spec
 	if requestSpec.Metadata == nil {
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
@@ -761,7 +751,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Get the node and parent execution (if any) that launched this execution
 	var parentNodeExecutionID uint
 	var sourceExecutionID uint
-	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, &workflowExecutionID)
+	parentNodeExecutionID, sourceExecutionID, err = m.getInheritedExecMetadata(ctx, requestSpec, workflowExecutionID)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -796,7 +786,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	labels, err = m.addProjectLabels(ctx, request.GetOrg(), request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, util.ToProjectIdentifier(request), labels)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -827,7 +817,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		ClusterAssignment:   clusterAssignment,
 	}
 
-	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name)
+	overrides, err := m.addPluginOverrides(ctx, workflowExecutionID, launchPlan.GetSpec().WorkflowId.Name, launchPlan.Id.Name)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -857,7 +847,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	createExecModelInput := transformers.CreateExecutionModelInput{
-		WorkflowExecutionID: workflowExecutionID,
+		WorkflowExecutionID: *workflowExecutionID,
 		RequestSpec:         requestSpec,
 		LaunchPlanID:        launchPlanModel.ID,
 		WorkflowID:          launchPlanModel.WorkflowID,
@@ -878,7 +868,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
 	execInfo, execErr := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
 		Namespace:                namespace,
-		ExecutionID:              &workflowExecutionID,
+		ExecutionID:              workflowExecutionID,
 		ReferenceWorkflowName:    workflow.Id.Name,
 		ReferenceLaunchPlanName:  launchPlan.Id.Name,
 		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
@@ -902,28 +892,23 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, nil, err
 	}
 
-	return ctx, &workflowExecutionID, executionModel, nil
+	return ctx, workflowExecutionID, executionModel, nil
 }
 
 // Inserts an execution model into the database store and emits platform metrics.
 func (m *ExecutionManager) createExecutionModel(
-	ctx context.Context, id *core.WorkflowExecutionIdentifier, executionModel *models.Execution) (*core.WorkflowExecutionIdentifier, error) {
-	workflowExecutionIdentifier := core.WorkflowExecutionIdentifier{
-		Project: executionModel.ExecutionKey.Project,
-		Domain:  executionModel.ExecutionKey.Domain,
-		Name:    executionModel.ExecutionKey.Name,
-	}
-	err := m.db.ExecutionRepo().Create(ctx, id, *executionModel)
+	ctx context.Context, workflowExecutionIdentifier *core.WorkflowExecutionIdentifier, executionModel *models.Execution) error {
+	err := m.db.ExecutionRepo().Create(ctx, workflowExecutionIdentifier, *executionModel)
 	if err != nil {
 		logger.Debugf(ctx, "failed to save newly created execution [%+v] with id %+v to db with err %v",
 			workflowExecutionIdentifier, workflowExecutionIdentifier, err)
-		return nil, err
+		return err
 	}
 	m.systemMetrics.ActiveExecutions.Inc()
 	m.systemMetrics.ExecutionsCreated.Inc()
 	m.systemMetrics.SpecSizeBytes.Observe(float64(len(executionModel.Spec)))
 	m.systemMetrics.ClosureSizeBytes.Observe(float64(len(executionModel.Closure)))
-	return &workflowExecutionIdentifier, nil
+	return nil
 }
 
 func (m *ExecutionManager) CreateExecution(
@@ -933,14 +918,14 @@ func (m *ExecutionManager) CreateExecution(
 	if request.Inputs == nil || len(request.Inputs.Literals) == 0 {
 		request.Inputs = request.GetSpec().GetInputs()
 	}
-	var id *core.WorkflowExecutionIdentifier
+	var workflowExecutionIdentifier *core.WorkflowExecutionIdentifier
 	var executionModel *models.Execution
 	var err error
-	ctx, id, executionModel, err = m.launchExecutionAndPrepareModel(ctx, &request, requestedAt)
+	ctx, workflowExecutionIdentifier, executionModel, err = m.launchExecutionAndPrepareModel(ctx, &request, requestedAt)
 	if err != nil {
 		return nil, err
 	}
-	workflowExecutionIdentifier, err := m.createExecutionModel(ctx, id, executionModel)
+	err = m.createExecutionModel(ctx, workflowExecutionIdentifier, executionModel)
 	if err != nil {
 		return nil, err
 	}
@@ -984,9 +969,9 @@ func (m *ExecutionManager) RelaunchExecution(
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RELAUNCH
 	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
 	executionSpec.OverwriteCache = request.GetOverwriteCache()
-	var id *core.WorkflowExecutionIdentifier
+	var workflowExecutionIdentifier *core.WorkflowExecutionIdentifier
 	var executionModel *models.Execution
-	ctx, id, executionModel, err = m.launchExecutionAndPrepareModel(ctx, &admin.ExecutionCreateRequest{
+	ctx, workflowExecutionIdentifier, executionModel, err = m.launchExecutionAndPrepareModel(ctx, &admin.ExecutionCreateRequest{
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Name,
@@ -997,7 +982,7 @@ func (m *ExecutionManager) RelaunchExecution(
 		return nil, err
 	}
 	executionModel.SourceExecutionID = existingExecutionModel.ID
-	workflowExecutionIdentifier, err := m.createExecutionModel(ctx, id, executionModel)
+	err = m.createExecutionModel(ctx, workflowExecutionIdentifier, executionModel)
 	if err != nil {
 		return nil, err
 	}
@@ -1036,9 +1021,9 @@ func (m *ExecutionManager) RecoverExecution(
 	}
 	executionSpec.Metadata.Mode = admin.ExecutionMetadata_RECOVERED
 	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
-	var id *core.WorkflowExecutionIdentifier
+	var workflowExecutionIdentifier *core.WorkflowExecutionIdentifier
 	var executionModel *models.Execution
-	ctx, id, executionModel, err = m.launchExecutionAndPrepareModel(ctx, &admin.ExecutionCreateRequest{
+	ctx, workflowExecutionIdentifier, executionModel, err = m.launchExecutionAndPrepareModel(ctx, &admin.ExecutionCreateRequest{
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Name,
@@ -1049,7 +1034,7 @@ func (m *ExecutionManager) RecoverExecution(
 		return nil, err
 	}
 	executionModel.SourceExecutionID = existingExecutionModel.ID
-	workflowExecutionIdentifier, err := m.createExecutionModel(ctx, id, executionModel)
+	err = m.createExecutionModel(ctx, workflowExecutionIdentifier, executionModel)
 	if err != nil {
 		return nil, err
 	}
@@ -1413,7 +1398,7 @@ func (m *ExecutionManager) ListExecutions(
 		return nil, err
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
-	filters, err := util.GetRequestFilters(request.Filters, common.Execution)
+	filters, err := util.ParseFilters(request.Filters, common.Execution)
 	if err != nil {
 		return nil, err
 	}
@@ -1654,11 +1639,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 }
 
 // Adds project labels with higher precedence to workflow labels. Project labels are ignored if a corresponding label is set on the workflow.
-func (m *ExecutionManager) addProjectLabels(ctx context.Context, org, projectName string, initialLabels map[string]string) (map[string]string, error) {
-	project, err := m.db.ProjectRepo().Get(ctx, &admin.ProjectIdentifier{
-		Id:  projectName,
-		Org: org,
-	})
+func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectID *admin.ProjectIdentifier, initialLabels map[string]string) (map[string]string, error) {
+	project, err := m.db.ProjectRepo().Get(ctx, projectID)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get project for [%+v] with error: %v", project, err)
 		return nil, err
@@ -1695,4 +1677,12 @@ func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error
 		filters = append(filters, stateFilter)
 	}
 	return filters, nil
+}
+
+func GetWorkflowExecutionIdentifierFromRequest(request *admin.ExecutionCreateRequest) *core.WorkflowExecutionIdentifier {
+	return &core.WorkflowExecutionIdentifier{
+		Project: request.GetProject(),
+		Domain:  request.GetDomain(),
+		Org:     request.GetOrg(),
+	}
 }

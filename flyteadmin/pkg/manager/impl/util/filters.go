@@ -3,7 +3,6 @@ package util
 
 import (
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"regexp"
 	"strconv"
 	"strings"
@@ -148,10 +147,12 @@ var entityColumns = map[common.Entity]sets.String{
 	common.AdminTag:            models.AdminTagColumns,
 }
 
-func ParseFilters(filterParams string, primaryEntity common.Entity) ([]common.InlineFilter, error) {
+func ParseFilters(filterParams string, primaryEntity common.Entity) (parsedFilters []common.InlineFilter, err error) {
+	if len(filterParams) == 0 {
+		return parsedFilters, nil
+	}
 	// Multiple filters can be appended as URI-escaped strings joined by filterExpressionSeperator
 	filterExpressions := strings.Split(filterParams, filterExpressionSeperator)
-	parsedFilters := make([]common.InlineFilter, 0)
 	for _, filterExpression := range filterExpressions {
 		// Parse string expression
 		matches := filterRegex.FindStringSubmatch(filterExpression)
@@ -191,32 +192,4 @@ func ParseFilters(filterParams string, primaryEntity common.Entity) ([]common.In
 
 func GetSingleValueEqualityFilter(entity common.Entity, field, value string) (common.InlineFilter, error) {
 	return common.NewSingleValueFilter(entity, common.Equal, field, value)
-}
-
-func GetRequestFilters(requestFilters string, primaryEntity common.Entity) (
-	filters []common.InlineFilter, err error) {
-	if requestFilters == "" {
-		return filters, nil
-	}
-	filters, err = ParseFilters(requestFilters, primaryEntity)
-	if err != nil {
-		return nil, err
-	}
-	return filters, nil
-}
-
-type NamedEntityLike interface {
-	GetProject() string
-	GetDomain() string
-	GetName() string
-	GetOrg() string
-}
-
-func GetIdentifierScope(id NamedEntityLike) *admin.NamedEntityIdentifier {
-	return &admin.NamedEntityIdentifier{
-		Project: id.GetProject(),
-		Domain:  id.GetDomain(),
-		Name:    id.GetName(),
-		Org:     id.GetOrg(),
-	}
 }

@@ -7,8 +7,9 @@ import (
 
 // Parameters for querying multiple resources.
 type ListResourceInput struct {
-	Limit           int
-	Offset          int
+	Limit  int
+	Offset int
+	// IdentifierScope encapsulates identifier fields used for scoping the query to filter response entities.
 	IdentifierScope *admin.NamedEntityIdentifier
 	InlineFilters   []common.InlineFilter
 	// MapFilters refers to primary entity filters defined as map values rather than inline sql queries.
@@ -29,6 +30,7 @@ type UpdateResourceInput struct {
 
 // Parameters for counting multiple resources.
 type CountResourceInput struct {
+	// IdentifierScope encapsulates identifier fields used for scoping the query to filter response entities.
 	IdentifierScope *admin.NamedEntityIdentifier
 	InlineFilters   []common.InlineFilter
 	// MapFilters refers to primary entity filters defined as map values rather than inline sql queries.

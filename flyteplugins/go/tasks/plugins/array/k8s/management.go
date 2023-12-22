@@ -382,10 +382,10 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 			messageCollector.Collect(childIdx, err.Error())
 		} else {
 			externalResources = append(externalResources, &core.ExternalResource{
-				ExternalID:       stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
-				Index:            uint32(originalIdx),
-				RetryAttempt:     uint32(retryAttempt),
-				Phase:            core.PhaseAborted,
+				ExternalID:   stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Index:        uint32(originalIdx),
+				RetryAttempt: uint32(retryAttempt),
+				Phase:        core.PhaseAborted,
 			})
 		}
 	}

@@ -250,7 +250,7 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 	nodeIDFilter, err := util.GetSingleValueEqualityFilter(
 		common.NodeExecution, shared.NodeID, request.GetNodeExecutionId().NodeId)
 
-	filters, err := util.GetRequestFilters(request.Filters, common.TaskExecution)
+	filters, err := util.ParseFilters(request.Filters, common.TaskExecution)
 	if err != nil {
 		return nil, err
 	}

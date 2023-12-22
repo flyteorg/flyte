@@ -55,12 +55,7 @@ func (r *WorkflowRepo) Get(ctx context.Context, id *core.Identifier) (models.Wor
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		return models.Workflow{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), &core.Identifier{
-			Project: id.Project,
-			Domain:  id.Domain,
-			Name:    id.Name,
-			Version: id.Version,
-		})
+		return models.Workflow{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_WORKFLOW.String(), id)
 	} else if tx.Error != nil {
 		return models.Workflow{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

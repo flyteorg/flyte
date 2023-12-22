@@ -428,10 +428,11 @@ static void InitDefaultsUpdateArtifactRequest_flyteidl_2fdatacatalog_2fdatacatal
   ::datacatalog::UpdateArtifactRequest::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<2> scc_info_UpdateArtifactRequest_flyteidl_2fdatacatalog_2fdatacatalog_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsUpdateArtifactRequest_flyteidl_2fdatacatalog_2fdatacatalog_2eproto}, {
+::google::protobuf::internal::SCCInfo<3> scc_info_UpdateArtifactRequest_flyteidl_2fdatacatalog_2fdatacatalog_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsUpdateArtifactRequest_flyteidl_2fdatacatalog_2fdatacatalog_2eproto}, {
       &scc_info_DatasetID_flyteidl_2fdatacatalog_2fdatacatalog_2eproto.base,
-      &scc_info_ArtifactData_flyteidl_2fdatacatalog_2fdatacatalog_2eproto.base,}};
+      &scc_info_ArtifactData_flyteidl_2fdatacatalog_2fdatacatalog_2eproto.base,
+      &scc_info_Metadata_flyteidl_2fdatacatalog_2fdatacatalog_2eproto.base,}};
 
 static void InitDefaultsUpdateArtifactResponse_flyteidl_2fdatacatalog_2fdatacatalog_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -924,6 +925,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fdatacatalog_2fdatacatalo
   offsetof(::datacatalog::UpdateArtifactRequestDefaultTypeInternal, artifact_id_),
   offsetof(::datacatalog::UpdateArtifactRequestDefaultTypeInternal, tag_name_),
   PROTOBUF_FIELD_OFFSET(::datacatalog::UpdateArtifactRequest, data_),
+  PROTOBUF_FIELD_OFFSET(::datacatalog::UpdateArtifactRequest, metadata_),
   PROTOBUF_FIELD_OFFSET(::datacatalog::UpdateArtifactRequest, query_handle_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::datacatalog::UpdateArtifactResponse, _internal_metadata_),
@@ -1124,29 +1126,29 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 75, -1, sizeof(::datacatalog::ListDatasetsRequest)},
   { 82, -1, sizeof(::datacatalog::ListDatasetsResponse)},
   { 89, -1, sizeof(::datacatalog::UpdateArtifactRequest)},
-  { 99, -1, sizeof(::datacatalog::UpdateArtifactResponse)},
-  { 105, -1, sizeof(::datacatalog::ReservationID)},
-  { 112, -1, sizeof(::datacatalog::GetOrExtendReservationRequest)},
-  { 120, -1, sizeof(::datacatalog::Reservation)},
-  { 130, -1, sizeof(::datacatalog::GetOrExtendReservationResponse)},
-  { 136, -1, sizeof(::datacatalog::ReleaseReservationRequest)},
-  { 143, -1, sizeof(::datacatalog::ReleaseReservationResponse)},
-  { 148, -1, sizeof(::datacatalog::Dataset)},
-  { 156, -1, sizeof(::datacatalog::Partition)},
-  { 163, -1, sizeof(::datacatalog::DatasetID)},
-  { 174, -1, sizeof(::datacatalog::Artifact)},
-  { 186, -1, sizeof(::datacatalog::ArtifactData)},
-  { 193, -1, sizeof(::datacatalog::Tag)},
-  { 201, 208, sizeof(::datacatalog::Metadata_KeyMapEntry_DoNotUse)},
-  { 210, -1, sizeof(::datacatalog::Metadata)},
-  { 216, -1, sizeof(::datacatalog::FilterExpression)},
-  { 222, -1, sizeof(::datacatalog::SinglePropertyFilter)},
-  { 233, -1, sizeof(::datacatalog::ArtifactPropertyFilter)},
-  { 240, -1, sizeof(::datacatalog::TagPropertyFilter)},
-  { 247, -1, sizeof(::datacatalog::PartitionPropertyFilter)},
-  { 254, -1, sizeof(::datacatalog::KeyValuePair)},
-  { 261, -1, sizeof(::datacatalog::DatasetPropertyFilter)},
-  { 272, -1, sizeof(::datacatalog::PaginationOptions)},
+  { 100, -1, sizeof(::datacatalog::UpdateArtifactResponse)},
+  { 106, -1, sizeof(::datacatalog::ReservationID)},
+  { 113, -1, sizeof(::datacatalog::GetOrExtendReservationRequest)},
+  { 121, -1, sizeof(::datacatalog::Reservation)},
+  { 131, -1, sizeof(::datacatalog::GetOrExtendReservationResponse)},
+  { 137, -1, sizeof(::datacatalog::ReleaseReservationRequest)},
+  { 144, -1, sizeof(::datacatalog::ReleaseReservationResponse)},
+  { 149, -1, sizeof(::datacatalog::Dataset)},
+  { 157, -1, sizeof(::datacatalog::Partition)},
+  { 164, -1, sizeof(::datacatalog::DatasetID)},
+  { 175, -1, sizeof(::datacatalog::Artifact)},
+  { 187, -1, sizeof(::datacatalog::ArtifactData)},
+  { 194, -1, sizeof(::datacatalog::Tag)},
+  { 202, 209, sizeof(::datacatalog::Metadata_KeyMapEntry_DoNotUse)},
+  { 211, -1, sizeof(::datacatalog::Metadata)},
+  { 217, -1, sizeof(::datacatalog::FilterExpression)},
+  { 223, -1, sizeof(::datacatalog::SinglePropertyFilter)},
+  { 234, -1, sizeof(::datacatalog::ArtifactPropertyFilter)},
+  { 241, -1, sizeof(::datacatalog::TagPropertyFilter)},
+  { 248, -1, sizeof(::datacatalog::PartitionPropertyFilter)},
+  { 255, -1, sizeof(::datacatalog::KeyValuePair)},
+  { 262, -1, sizeof(::datacatalog::DatasetPropertyFilter)},
+  { 273, -1, sizeof(::datacatalog::PaginationOptions)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -1226,105 +1228,106 @@ const char descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eprot
   "\002 \001(\0132\036.datacatalog.PaginationOptions\"R\n"
   "\024ListDatasetsResponse\022&\n\010datasets\030\001 \003(\0132"
   "\024.datacatalog.Dataset\022\022\n\nnext_token\030\002 \001("
-  "\t\"\244\001\n\025UpdateArtifactRequest\022\'\n\007dataset\030\001"
+  "\t\"\315\001\n\025UpdateArtifactRequest\022\'\n\007dataset\030\001"
   " \001(\0132\026.datacatalog.DatasetID\022\025\n\013artifact"
   "_id\030\002 \001(\tH\000\022\022\n\010tag_name\030\003 \001(\tH\000\022\'\n\004data\030"
-  "\004 \003(\0132\031.datacatalog.ArtifactDataB\016\n\014quer"
-  "y_handle\"-\n\026UpdateArtifactResponse\022\023\n\013ar"
-  "tifact_id\030\001 \001(\t\"M\n\rReservationID\022*\n\ndata"
-  "set_id\030\001 \001(\0132\026.datacatalog.DatasetID\022\020\n\010"
-  "tag_name\030\002 \001(\t\"\234\001\n\035GetOrExtendReservatio"
-  "nRequest\0222\n\016reservation_id\030\001 \001(\0132\032.datac"
-  "atalog.ReservationID\022\020\n\010owner_id\030\002 \001(\t\0225"
-  "\n\022heartbeat_interval\030\003 \001(\0132\031.google.prot"
-  "obuf.Duration\"\343\001\n\013Reservation\0222\n\016reserva"
-  "tion_id\030\001 \001(\0132\032.datacatalog.ReservationI"
-  "D\022\020\n\010owner_id\030\002 \001(\t\0225\n\022heartbeat_interva"
-  "l\030\003 \001(\0132\031.google.protobuf.Duration\022.\n\nex"
-  "pires_at\030\004 \001(\0132\032.google.protobuf.Timesta"
-  "mp\022\'\n\010metadata\030\006 \001(\0132\025.datacatalog.Metad"
-  "ata\"O\n\036GetOrExtendReservationResponse\022-\n"
-  "\013reservation\030\001 \001(\0132\030.datacatalog.Reserva"
-  "tion\"a\n\031ReleaseReservationRequest\0222\n\016res"
-  "ervation_id\030\001 \001(\0132\032.datacatalog.Reservat"
-  "ionID\022\020\n\010owner_id\030\002 \001(\t\"\034\n\032ReleaseReserv"
-  "ationResponse\"m\n\007Dataset\022\"\n\002id\030\001 \001(\0132\026.d"
-  "atacatalog.DatasetID\022\'\n\010metadata\030\002 \001(\0132\025"
-  ".datacatalog.Metadata\022\025\n\rpartitionKeys\030\003"
-  " \003(\t\"\'\n\tPartition\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030"
-  "\002 \001(\t\"l\n\tDatasetID\022\017\n\007project\030\001 \001(\t\022\014\n\004n"
-  "ame\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\017\n\007version\030\004 \001"
-  "(\t\022\014\n\004UUID\030\005 \001(\t\022\021\n\tpartition\030\006 \001(\t\"\215\002\n\010"
-  "Artifact\022\n\n\002id\030\001 \001(\t\022\'\n\007dataset\030\002 \001(\0132\026."
-  "datacatalog.DatasetID\022\'\n\004data\030\003 \003(\0132\031.da"
-  "tacatalog.ArtifactData\022\'\n\010metadata\030\004 \001(\013"
-  "2\025.datacatalog.Metadata\022*\n\npartitions\030\005 "
-  "\003(\0132\026.datacatalog.Partition\022\036\n\004tags\030\006 \003("
-  "\0132\020.datacatalog.Tag\022.\n\ncreated_at\030\007 \001(\0132"
-  "\032.google.protobuf.Timestamp\"C\n\014ArtifactD"
-  "ata\022\014\n\004name\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.flyte"
-  "idl.core.Literal\"Q\n\003Tag\022\014\n\004name\030\001 \001(\t\022\023\n"
-  "\013artifact_id\030\002 \001(\t\022\'\n\007dataset\030\003 \001(\0132\026.da"
-  "tacatalog.DatasetID\"m\n\010Metadata\0222\n\007key_m"
-  "ap\030\001 \003(\0132!.datacatalog.Metadata.KeyMapEn"
-  "try\032-\n\013KeyMapEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value"
-  "\030\002 \001(\t:\0028\001\"F\n\020FilterExpression\0222\n\007filter"
-  "s\030\001 \003(\0132!.datacatalog.SinglePropertyFilt"
-  "er\"\211\003\n\024SinglePropertyFilter\0224\n\ntag_filte"
-  "r\030\001 \001(\0132\036.datacatalog.TagPropertyFilterH"
-  "\000\022@\n\020partition_filter\030\002 \001(\0132$.datacatalo"
-  "g.PartitionPropertyFilterH\000\022>\n\017artifact_"
-  "filter\030\003 \001(\0132#.datacatalog.ArtifactPrope"
-  "rtyFilterH\000\022<\n\016dataset_filter\030\004 \001(\0132\".da"
-  "tacatalog.DatasetPropertyFilterH\000\022F\n\010ope"
-  "rator\030\n \001(\01624.datacatalog.SingleProperty"
-  "Filter.ComparisonOperator\" \n\022ComparisonO"
-  "perator\022\n\n\006EQUALS\020\000B\021\n\017property_filter\";"
-  "\n\026ArtifactPropertyFilter\022\025\n\013artifact_id\030"
-  "\001 \001(\tH\000B\n\n\010property\"3\n\021TagPropertyFilter"
-  "\022\022\n\010tag_name\030\001 \001(\tH\000B\n\n\010property\"S\n\027Part"
-  "itionPropertyFilter\022,\n\007key_val\030\001 \001(\0132\031.d"
-  "atacatalog.KeyValuePairH\000B\n\n\010property\"*\n"
-  "\014KeyValuePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001("
-  "\t\"\200\001\n\025DatasetPropertyFilter\022\021\n\007project\030\001"
-  " \001(\tH\000\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain\030\003 \001(\tH\000"
-  "\022\021\n\007version\030\004 \001(\tH\000\022\023\n\tpartition\030\005 \001(\tH\000"
-  "B\n\n\010property\"\361\001\n\021PaginationOptions\022\r\n\005li"
-  "mit\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001("
-  "\0162&.datacatalog.PaginationOptions.SortKe"
-  "y\022;\n\tsortOrder\030\004 \001(\0162(.datacatalog.Pagin"
-  "ationOptions.SortOrder\"*\n\tSortOrder\022\016\n\nD"
-  "ESCENDING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n"
-  "\rCREATION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCrea"
-  "teDataset\022!.datacatalog.CreateDatasetReq"
-  "uest\032\".datacatalog.CreateDatasetResponse"
-  "\022M\n\nGetDataset\022\036.datacatalog.GetDatasetR"
-  "equest\032\037.datacatalog.GetDatasetResponse\022"
-  "Y\n\016CreateArtifact\022\".datacatalog.CreateAr"
-  "tifactRequest\032#.datacatalog.CreateArtifa"
-  "ctResponse\022P\n\013GetArtifact\022\037.datacatalog."
-  "GetArtifactRequest\032 .datacatalog.GetArti"
-  "factResponse\022A\n\006AddTag\022\032.datacatalog.Add"
-  "TagRequest\032\033.datacatalog.AddTagResponse\022"
-  "V\n\rListArtifacts\022!.datacatalog.ListArtif"
-  "actsRequest\032\".datacatalog.ListArtifactsR"
-  "esponse\022S\n\014ListDatasets\022 .datacatalog.Li"
-  "stDatasetsRequest\032!.datacatalog.ListData"
-  "setsResponse\022Y\n\016UpdateArtifact\022\".datacat"
-  "alog.UpdateArtifactRequest\032#.datacatalog"
-  ".UpdateArtifactResponse\022q\n\026GetOrExtendRe"
-  "servation\022*.datacatalog.GetOrExtendReser"
-  "vationRequest\032+.datacatalog.GetOrExtendR"
-  "eservationResponse\022e\n\022ReleaseReservation"
-  "\022&.datacatalog.ReleaseReservationRequest"
-  "\032\'.datacatalog.ReleaseReservationRespons"
-  "eBCZAgithub.com/flyteorg/flyte/flyteidl/"
-  "gen/pb-go/flyteidl/datacatalogb\006proto3"
+  "\004 \003(\0132\031.datacatalog.ArtifactData\022\'\n\010meta"
+  "data\030\005 \001(\0132\025.datacatalog.MetadataB\016\n\014que"
+  "ry_handle\"-\n\026UpdateArtifactResponse\022\023\n\013a"
+  "rtifact_id\030\001 \001(\t\"M\n\rReservationID\022*\n\ndat"
+  "aset_id\030\001 \001(\0132\026.datacatalog.DatasetID\022\020\n"
+  "\010tag_name\030\002 \001(\t\"\234\001\n\035GetOrExtendReservati"
+  "onRequest\0222\n\016reservation_id\030\001 \001(\0132\032.data"
+  "catalog.ReservationID\022\020\n\010owner_id\030\002 \001(\t\022"
+  "5\n\022heartbeat_interval\030\003 \001(\0132\031.google.pro"
+  "tobuf.Duration\"\343\001\n\013Reservation\0222\n\016reserv"
+  "ation_id\030\001 \001(\0132\032.datacatalog.Reservation"
+  "ID\022\020\n\010owner_id\030\002 \001(\t\0225\n\022heartbeat_interv"
+  "al\030\003 \001(\0132\031.google.protobuf.Duration\022.\n\ne"
+  "xpires_at\030\004 \001(\0132\032.google.protobuf.Timest"
+  "amp\022\'\n\010metadata\030\006 \001(\0132\025.datacatalog.Meta"
+  "data\"O\n\036GetOrExtendReservationResponse\022-"
+  "\n\013reservation\030\001 \001(\0132\030.datacatalog.Reserv"
+  "ation\"a\n\031ReleaseReservationRequest\0222\n\016re"
+  "servation_id\030\001 \001(\0132\032.datacatalog.Reserva"
+  "tionID\022\020\n\010owner_id\030\002 \001(\t\"\034\n\032ReleaseReser"
+  "vationResponse\"m\n\007Dataset\022\"\n\002id\030\001 \001(\0132\026."
+  "datacatalog.DatasetID\022\'\n\010metadata\030\002 \001(\0132"
+  "\025.datacatalog.Metadata\022\025\n\rpartitionKeys\030"
+  "\003 \003(\t\"\'\n\tPartition\022\013\n\003key\030\001 \001(\t\022\r\n\005value"
+  "\030\002 \001(\t\"l\n\tDatasetID\022\017\n\007project\030\001 \001(\t\022\014\n\004"
+  "name\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\017\n\007version\030\004 "
+  "\001(\t\022\014\n\004UUID\030\005 \001(\t\022\021\n\tpartition\030\006 \001(\t\"\215\002\n"
+  "\010Artifact\022\n\n\002id\030\001 \001(\t\022\'\n\007dataset\030\002 \001(\0132\026"
+  ".datacatalog.DatasetID\022\'\n\004data\030\003 \003(\0132\031.d"
+  "atacatalog.ArtifactData\022\'\n\010metadata\030\004 \001("
+  "\0132\025.datacatalog.Metadata\022*\n\npartitions\030\005"
+  " \003(\0132\026.datacatalog.Partition\022\036\n\004tags\030\006 \003"
+  "(\0132\020.datacatalog.Tag\022.\n\ncreated_at\030\007 \001(\013"
+  "2\032.google.protobuf.Timestamp\"C\n\014Artifact"
+  "Data\022\014\n\004name\030\001 \001(\t\022%\n\005value\030\002 \001(\0132\026.flyt"
+  "eidl.core.Literal\"Q\n\003Tag\022\014\n\004name\030\001 \001(\t\022\023"
+  "\n\013artifact_id\030\002 \001(\t\022\'\n\007dataset\030\003 \001(\0132\026.d"
+  "atacatalog.DatasetID\"m\n\010Metadata\0222\n\007key_"
+  "map\030\001 \003(\0132!.datacatalog.Metadata.KeyMapE"
+  "ntry\032-\n\013KeyMapEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005valu"
+  "e\030\002 \001(\t:\0028\001\"F\n\020FilterExpression\0222\n\007filte"
+  "rs\030\001 \003(\0132!.datacatalog.SinglePropertyFil"
+  "ter\"\211\003\n\024SinglePropertyFilter\0224\n\ntag_filt"
+  "er\030\001 \001(\0132\036.datacatalog.TagPropertyFilter"
+  "H\000\022@\n\020partition_filter\030\002 \001(\0132$.datacatal"
+  "og.PartitionPropertyFilterH\000\022>\n\017artifact"
+  "_filter\030\003 \001(\0132#.datacatalog.ArtifactProp"
+  "ertyFilterH\000\022<\n\016dataset_filter\030\004 \001(\0132\".d"
+  "atacatalog.DatasetPropertyFilterH\000\022F\n\010op"
+  "erator\030\n \001(\01624.datacatalog.SinglePropert"
+  "yFilter.ComparisonOperator\" \n\022Comparison"
+  "Operator\022\n\n\006EQUALS\020\000B\021\n\017property_filter\""
+  ";\n\026ArtifactPropertyFilter\022\025\n\013artifact_id"
+  "\030\001 \001(\tH\000B\n\n\010property\"3\n\021TagPropertyFilte"
+  "r\022\022\n\010tag_name\030\001 \001(\tH\000B\n\n\010property\"S\n\027Par"
+  "titionPropertyFilter\022,\n\007key_val\030\001 \001(\0132\031."
+  "datacatalog.KeyValuePairH\000B\n\n\010property\"*"
+  "\n\014KeyValuePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001"
+  "(\t\"\200\001\n\025DatasetPropertyFilter\022\021\n\007project\030"
+  "\001 \001(\tH\000\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain\030\003 \001(\tH"
+  "\000\022\021\n\007version\030\004 \001(\tH\000\022\023\n\tpartition\030\005 \001(\tH"
+  "\000B\n\n\010property\"\361\001\n\021PaginationOptions\022\r\n\005l"
+  "imit\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001"
+  "(\0162&.datacatalog.PaginationOptions.SortK"
+  "ey\022;\n\tsortOrder\030\004 \001(\0162(.datacatalog.Pagi"
+  "nationOptions.SortOrder\"*\n\tSortOrder\022\016\n\n"
+  "DESCENDING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021"
+  "\n\rCREATION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCre"
+  "ateDataset\022!.datacatalog.CreateDatasetRe"
+  "quest\032\".datacatalog.CreateDatasetRespons"
+  "e\022M\n\nGetDataset\022\036.datacatalog.GetDataset"
+  "Request\032\037.datacatalog.GetDatasetResponse"
+  "\022Y\n\016CreateArtifact\022\".datacatalog.CreateA"
+  "rtifactRequest\032#.datacatalog.CreateArtif"
+  "actResponse\022P\n\013GetArtifact\022\037.datacatalog"
+  ".GetArtifactRequest\032 .datacatalog.GetArt"
+  "ifactResponse\022A\n\006AddTag\022\032.datacatalog.Ad"
+  "dTagRequest\032\033.datacatalog.AddTagResponse"
+  "\022V\n\rListArtifacts\022!.datacatalog.ListArti"
+  "factsRequest\032\".datacatalog.ListArtifacts"
+  "Response\022S\n\014ListDatasets\022 .datacatalog.L"
+  "istDatasetsRequest\032!.datacatalog.ListDat"
+  "asetsResponse\022Y\n\016UpdateArtifact\022\".dataca"
+  "talog.UpdateArtifactRequest\032#.datacatalo"
+  "g.UpdateArtifactResponse\022q\n\026GetOrExtendR"
+  "eservation\022*.datacatalog.GetOrExtendRese"
+  "rvationRequest\032+.datacatalog.GetOrExtend"
+  "ReservationResponse\022e\n\022ReleaseReservatio"
+  "n\022&.datacatalog.ReleaseReservationReques"
+  "t\032\'.datacatalog.ReleaseReservationRespon"
+  "seBCZAgithub.com/flyteorg/flyte/flyteidl"
+  "/gen/pb-go/flyteidl/datacatalogb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto = {
   false, InitDefaults_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 
   descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eproto,
-  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 4918,
+  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 4959,
 };
 
 void AddDescriptors_flyteidl_2fdatacatalog_2fdatacatalog_2eproto() {
@@ -5721,21 +5724,29 @@ void UpdateArtifactRequest::InitAsDefaultInstance() {
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::datacatalog::_UpdateArtifactRequest_default_instance_.tag_name_.UnsafeSetDefault(
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::datacatalog::_UpdateArtifactRequest_default_instance_._instance.get_mutable()->metadata_ = const_cast< ::datacatalog::Metadata*>(
+      ::datacatalog::Metadata::internal_default_instance());
 }
 class UpdateArtifactRequest::HasBitSetters {
  public:
   static const ::datacatalog::DatasetID& dataset(const UpdateArtifactRequest* msg);
+  static const ::datacatalog::Metadata& metadata(const UpdateArtifactRequest* msg);
 };
 
 const ::datacatalog::DatasetID&
 UpdateArtifactRequest::HasBitSetters::dataset(const UpdateArtifactRequest* msg) {
   return *msg->dataset_;
 }
+const ::datacatalog::Metadata&
+UpdateArtifactRequest::HasBitSetters::metadata(const UpdateArtifactRequest* msg) {
+  return *msg->metadata_;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int UpdateArtifactRequest::kDatasetFieldNumber;
 const int UpdateArtifactRequest::kArtifactIdFieldNumber;
 const int UpdateArtifactRequest::kTagNameFieldNumber;
 const int UpdateArtifactRequest::kDataFieldNumber;
+const int UpdateArtifactRequest::kMetadataFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 UpdateArtifactRequest::UpdateArtifactRequest()
@@ -5752,6 +5763,11 @@ UpdateArtifactRequest::UpdateArtifactRequest(const UpdateArtifactRequest& from)
     dataset_ = new ::datacatalog::DatasetID(*from.dataset_);
   } else {
     dataset_ = nullptr;
+  }
+  if (from.has_metadata()) {
+    metadata_ = new ::datacatalog::Metadata(*from.metadata_);
+  } else {
+    metadata_ = nullptr;
   }
   clear_has_query_handle();
   switch (from.query_handle_case()) {
@@ -5773,7 +5789,9 @@ UpdateArtifactRequest::UpdateArtifactRequest(const UpdateArtifactRequest& from)
 void UpdateArtifactRequest::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_UpdateArtifactRequest_flyteidl_2fdatacatalog_2fdatacatalog_2eproto.base);
-  dataset_ = nullptr;
+  ::memset(&dataset_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&metadata_) -
+      reinterpret_cast<char*>(&dataset_)) + sizeof(metadata_));
   clear_has_query_handle();
 }
 
@@ -5784,6 +5802,7 @@ UpdateArtifactRequest::~UpdateArtifactRequest() {
 
 void UpdateArtifactRequest::SharedDtor() {
   if (this != internal_default_instance()) delete dataset_;
+  if (this != internal_default_instance()) delete metadata_;
   if (has_query_handle()) {
     clear_query_handle();
   }
@@ -5828,6 +5847,10 @@ void UpdateArtifactRequest::Clear() {
     delete dataset_;
   }
   dataset_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
   clear_query_handle();
   _internal_metadata_.Clear();
 }
@@ -5904,6 +5927,19 @@ const char* UpdateArtifactRequest::_InternalParse(const char* begin, const char*
               {parser_till_end, object}, ptr - size, ptr));
           if (ptr >= end) break;
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
+        break;
+      }
+      // .datacatalog.Metadata metadata = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::datacatalog::Metadata::_InternalParse;
+        object = msg->mutable_metadata();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
         break;
       }
       default: {
@@ -5992,6 +6028,17 @@ bool UpdateArtifactRequest::MergePartialFromCodedStream(
         break;
       }
 
+      // .datacatalog.Metadata metadata = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_metadata()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -6054,6 +6101,12 @@ void UpdateArtifactRequest::SerializeWithCachedSizes(
       output);
   }
 
+  // .datacatalog.Metadata metadata = 5;
+  if (this->has_metadata()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      5, HasBitSetters::metadata(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -6104,6 +6157,13 @@ void UpdateArtifactRequest::SerializeWithCachedSizes(
         4, this->data(static_cast<int>(i)), target);
   }
 
+  // .datacatalog.Metadata metadata = 5;
+  if (this->has_metadata()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        5, HasBitSetters::metadata(this), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -6141,6 +6201,13 @@ size_t UpdateArtifactRequest::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *dataset_);
+  }
+
+  // .datacatalog.Metadata metadata = 5;
+  if (this->has_metadata()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *metadata_);
   }
 
   switch (query_handle_case()) {
@@ -6193,6 +6260,9 @@ void UpdateArtifactRequest::MergeFrom(const UpdateArtifactRequest& from) {
   if (from.has_dataset()) {
     mutable_dataset()->::datacatalog::DatasetID::MergeFrom(from.dataset());
   }
+  if (from.has_metadata()) {
+    mutable_metadata()->::datacatalog::Metadata::MergeFrom(from.metadata());
+  }
   switch (from.query_handle_case()) {
     case kArtifactId: {
       set_artifact_id(from.artifact_id());
@@ -6235,6 +6305,7 @@ void UpdateArtifactRequest::InternalSwap(UpdateArtifactRequest* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   CastToBase(&data_)->InternalSwap(CastToBase(&other->data_));
   swap(dataset_, other->dataset_);
+  swap(metadata_, other->metadata_);
   swap(query_handle_, other->query_handle_);
   swap(_oneof_case_[0], other->_oneof_case_[0]);
 }

@@ -479,7 +479,7 @@ func TestGetMatchableResource(t *testing.T) {
 	project := "dummyProject"
 	domain := "dummyDomain"
 	workflow := "dummyWorkflow"
-	resourceIdentifier := common.NewResourceIdentifier("", project, domain)
+	resourceIdentifier := common.NewResourceScope("", project, domain)
 	t.Run("successful fetch", func(t *testing.T) {
 		resourceManager := &managerMocks.MockResourceManager{}
 		resourceManager.GetResourceFunc = func(ctx context.Context,
@@ -553,7 +553,7 @@ func TestGetMatchableResource(t *testing.T) {
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.Internal, "internal error")
 		}
 
-		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, common.NewResourceIdentifier(
+		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, common.NewResourceScope(
 			"", project, domain), "")
 		assert.NotNil(t, err)
 	})

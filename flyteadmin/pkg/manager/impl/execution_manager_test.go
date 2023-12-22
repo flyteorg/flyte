@@ -3667,8 +3667,8 @@ func TestAddPluginOverrides(t *testing.T) {
 	db := repositoryMocks.NewMockRepository()
 	db.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (
 		models.Resource, error) {
-		assert.Equal(t, project, ID.IdentifierScope.GetProject())
-		assert.Equal(t, domain, ID.IdentifierScope.GetDomain())
+		assert.Equal(t, project, ID.Scope.GetProject())
+		assert.Equal(t, domain, ID.Scope.GetDomain())
 		assert.Equal(t, workflowName, ID.Workflow)
 		assert.Equal(t, launchPlanName, ID.LaunchPlan)
 		existingAttributes := commonTestUtils.GetPluginOverridesAttributes(map[string][]string{

@@ -45,11 +45,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, id *core.WorkflowExecutionIdent
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-		return models.Execution{}, adminErrors.GetMissingEntityError("execution", &core.Identifier{
-			Project: id.Project,
-			Domain:  id.Domain,
-			Name:    id.Name,
-		})
+		return models.Execution{}, adminErrors.GetMissingEntityError("execution", id)
 	} else if tx.Error != nil {
 		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

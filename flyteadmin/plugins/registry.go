@@ -15,7 +15,7 @@ const (
 	PluginIDPreRedirectHook        PluginID = "PreRedirectHook"
 	PluginIDLogoutHook             PluginID = "LogoutHook"
 	PluginIDAdditionalGRPCService  PluginID = "AdditionalGRPCService"
-	PluginIDRepositoryImpl         PluginID = "RepositoryImplementation"
+	PluginIDNewRepositoryFunction  PluginID = "NewRepositoryFunction"
 )
 
 type AtomicRegistry struct {

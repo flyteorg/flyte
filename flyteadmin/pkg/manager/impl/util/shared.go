@@ -222,7 +222,7 @@ func GetTaskExecutionModel(
 // GetMatchableResource gets matchable resource for resourceType and project - domain - workflow combination.
 // Returns nil with nothing is found or return an error
 func GetMatchableResource(ctx context.Context, resourceManager interfaces.ResourceInterface, resourceType admin.MatchableResource,
-	identifierScope common.ResourceIdentifier, workflowName string) (*interfaces.ResourceResponse, error) {
+	identifierScope common.ResourceScope, workflowName string) (*interfaces.ResourceResponse, error) {
 	matchableResource, err := resourceManager.GetResource(ctx, interfaces.ResourceRequest{
 		IdentifierScope: identifierScope,
 		Workflow:        workflowName,
@@ -291,5 +291,17 @@ func FromNamedEntityIdentifierListRequest(request admin.NamedEntityIdentifierLis
 		Project: request.GetProject(),
 		Domain:  request.GetDomain(),
 		Org:     request.GetOrg(),
+	}
+}
+
+type ProjectIdentifierLike interface {
+	GetProject() string
+	GetOrg() string
+}
+
+func ToProjectIdentifier(id ProjectIdentifierLike) *admin.ProjectIdentifier {
+	return &admin.ProjectIdentifier{
+		Id:  id.GetProject(),
+		Org: id.GetOrg(),
 	}
 }

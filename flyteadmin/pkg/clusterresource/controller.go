@@ -193,7 +193,7 @@ func populateDefaultTemplateValues(defaultData map[runtimeInterfaces.DomainName]
 // substitutions based on the input project and domain. These database values are overlaid on top of the configured
 // variable defaults for the specific domain as defined in the admin application config file.
 func (c *controller) getCustomTemplateValues(
-	ctx context.Context, identifier common.ResourceIdentifier, domainTemplateValues templateValuesType) (templateValuesType, error) {
+	ctx context.Context, identifier common.ResourceScope, domainTemplateValues templateValuesType) (templateValuesType, error) {
 	if len(domainTemplateValues) == 0 {
 		domainTemplateValues = make(templateValuesType)
 	}
@@ -561,12 +561,12 @@ func (c *controller) createPatch(gvk schema.GroupVersionKind, currentObj *unstru
 	return patch, patchType, nil
 }
 
-func getProjectResourceIdentifier(project *admin.Project, domain string) common.ResourceIdentifier {
+func getProjectResourceIdentifier(project *admin.Project, domain string) common.ResourceScope {
 	projectID := project.GetIdentifier().GetId()
 	if len(projectID) == 0 {
 		projectID = project.GetId()
 	}
-	return common.NewResourceIdentifier(project.GetIdentifier().GetOrg(), projectID, domain)
+	return common.NewResourceScope(project.GetIdentifier().GetOrg(), projectID, domain)
 }
 
 func (c *controller) Sync(ctx context.Context) error {
@@ -717,10 +717,10 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 			return nil, err
 		}
 		dbScope := scope.NewSubScope("db")
-		pluginRegistry.RegisterDefault(plugins.PluginIDRepositoryImpl, repositories.NewGormRepo)
-		var newRepoImpl repoInterfaces.NewRepo
-		newRepoImpl = plugins.Get[repoInterfaces.NewRepo](pluginRegistry, plugins.PluginIDRepositoryImpl)
-		repo := newRepoImpl(
+		pluginRegistry.RegisterDefault(plugins.PluginIDNewRepositoryFunction, repositories.NewGormRepo)
+		var newRepoFunc repoInterfaces.NewRepositoryFunc
+		newRepoFunc = plugins.Get[repoInterfaces.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
+		repo := newRepoFunc(
 			db, errors2.NewPostgresErrorTransformer(dbScope.NewSubScope("errors")), dbScope)
 
 		adminDataProvider = impl2.NewDatabaseAdminDataProvider(repo, configuration, resources.NewResourceManager(repo, configuration.ApplicationConfiguration()))

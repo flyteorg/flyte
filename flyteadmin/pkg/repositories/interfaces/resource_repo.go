@@ -24,8 +24,9 @@ type ResourceRepoInterface interface {
 }
 
 type ResourceID struct {
-	IdentifierScope common.ResourceIdentifier
-	Workflow        string
-	LaunchPlan      string
-	ResourceType    string
+	// Scope encapsulates identifier fields used for scoping the query to filter response entities.
+	Scope        common.ResourceScope
+	Workflow     string
+	LaunchPlan   string
+	ResourceType string
 }

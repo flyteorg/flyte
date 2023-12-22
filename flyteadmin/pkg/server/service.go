@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"net"
 	"net/http"
 	"strings"
@@ -82,6 +83,10 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	logger.Infof(ctx, "Registering default middleware with blanket auth validation")
 	pluginRegistry.RegisterDefault(plugins.PluginIDUnaryServiceMiddleware, grpcmiddleware.ChainUnaryServer(
 		RequestIDInterceptor, auth.BlanketAuthorization, auth.ExecutionUserIdentifierInterceptor))
+
+	logger.Infof(ctx, "registering default gormimpl")
+
+	pluginRegistry.RegisterDefault(plugins.PluginIDNewRepositoryFunction, repositories.NewGormRepo)
 
 	if cfg.GrpcConfig.EnableGrpcLatencyMetrics {
 		logger.Debugf(ctx, "enabling grpc histogram metrics")

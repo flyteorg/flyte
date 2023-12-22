@@ -122,7 +122,7 @@ func TestPopulateDefaultTemplateValues(t *testing.T) {
 
 func TestGetCustomTemplateValues(t *testing.T) {
 	adminDataProvider := mocks.FlyteAdminDataProvider{}
-	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, common.NewResourceIdentifier("", proj, domain)).Return(&admin.ClusterResourceAttributes{
+	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, common.NewResourceScope("", proj, domain)).Return(&admin.ClusterResourceAttributes{
 		Attributes: map[string]string{
 			"var1": "val1",
 			"var2": "val2",
@@ -136,7 +136,7 @@ func TestGetCustomTemplateValues(t *testing.T) {
 		"{{ var1 }}": "i'm getting overwritten",
 		"{{ var3 }}": "persist",
 	}
-	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), common.NewResourceIdentifier("", proj, domain), domainTemplateValues)
+	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), common.NewResourceScope("", proj, domain), domainTemplateValues)
 	assert.Nil(t, err)
 	assert.EqualValues(t, templateValuesType{
 		"{{ var1 }}": "val1",
@@ -149,12 +149,12 @@ func TestGetCustomTemplateValues(t *testing.T) {
 
 func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 	adminDataProvider := mocks.FlyteAdminDataProvider{}
-	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, common.NewResourceIdentifier("", proj, domain)).Return(
+	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, common.NewResourceScope("", proj, domain)).Return(
 		nil, errors.NewFlyteAdminError(codes.NotFound, "foo"))
 	testController := controller{
 		adminDataProvider: &adminDataProvider,
 	}
-	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), common.NewResourceIdentifier("", proj, domain), templateValuesType{
+	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), common.NewResourceScope("", proj, domain), templateValuesType{
 		"{{ var1 }}": "val1",
 		"{{ var2 }}": "val2",
 	})

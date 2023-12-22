@@ -39,9 +39,9 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, id *core.NodeExecutionIdent
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: id.NodeId,
 			ExecutionKey: models.ExecutionKey{
-				Project: id.ExecutionId.Project,
-				Domain:  id.ExecutionId.Domain,
-				Name:    id.ExecutionId.Name,
+				Project: id.GetExecutionId().Project,
+				Domain:  id.GetExecutionId().Domain,
+				Name:    id.GetExecutionId().Name,
 			},
 		},
 	}).Take(&nodeExecution)
@@ -49,14 +49,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, id *core.NodeExecutionIdent
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
-			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: id.NodeId,
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: id.ExecutionId.Project,
-					Domain:  id.ExecutionId.Domain,
-					Name:    id.ExecutionId.Name,
-				},
-			})
+			adminErrors.GetMissingEntityError("node execution", id)
 	} else if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
@@ -71,9 +64,9 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, id *core.NodeEx
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: id.NodeId,
 			ExecutionKey: models.ExecutionKey{
-				Project: id.ExecutionId.Project,
-				Domain:  id.ExecutionId.Domain,
-				Name:    id.ExecutionId.Name,
+				Project: id.GetExecutionId().Project,
+				Domain:  id.GetExecutionId().Domain,
+				Name:    id.GetExecutionId().Name,
 			},
 		},
 	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
@@ -81,14 +74,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, id *core.NodeEx
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
-			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: id.NodeId,
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: id.ExecutionId.Project,
-					Domain:  id.ExecutionId.Domain,
-					Name:    id.ExecutionId.Name,
-				},
-			})
+			adminErrors.GetMissingEntityError("node execution", id)
 	} else if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
@@ -149,9 +135,9 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, id *core.NodeExecutionId
 		NodeExecutionKey: models.NodeExecutionKey{
 			NodeID: id.NodeId,
 			ExecutionKey: models.ExecutionKey{
-				Project: id.ExecutionId.Project,
-				Domain:  id.ExecutionId.Domain,
-				Name:    id.ExecutionId.Name,
+				Project: id.GetExecutionId().Project,
+				Domain:  id.GetExecutionId().Domain,
+				Name:    id.GetExecutionId().Name,
 			},
 		},
 	}).Take(&nodeExecution)

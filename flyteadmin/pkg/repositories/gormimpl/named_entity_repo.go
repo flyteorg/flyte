@@ -131,12 +131,6 @@ func (r *NamedEntityRepo) Update(ctx context.Context, id *admin.NamedEntityIdent
 }
 
 func (r *NamedEntityRepo) Get(ctx context.Context, id *admin.NamedEntityIdentifier, resourceType core.ResourceType) (models.NamedEntity, error) {
-	var namedEntity models.NamedEntity
-
-	//filters, err := getNamedEntityFilters(resourceType, id.Project, id.Domain, id.Name)
-	//if err != nil {
-	//	return models.NamedEntity{}, err
-	//}
 	entity := common.ResourceTypeToEntity[resourceType]
 	tableName, tableFound := resourceTypeToTableName[resourceType]
 	joinString, joinFound := resourceTypeToMetadataJoin[resourceType]
@@ -152,6 +146,7 @@ func (r *NamedEntityRepo) Get(ctx context.Context, id *admin.NamedEntityIdentifi
 		return models.NamedEntity{}, err
 	}
 
+	var namedEntity models.NamedEntity
 	timer := r.metrics.GetDuration.Start()
 	tx = tx.Select(getSelectForNamedEntity(tableName, resourceType)).Take(&namedEntity)
 	timer.Stop()

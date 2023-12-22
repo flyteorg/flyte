@@ -156,7 +156,7 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	ctx = contextutils.WithTaskID(ctx, request.Id.Name)
 
-	filters, err := util.GetRequestFilters(request.Filters, common.Task)
+	filters, err := util.ParseFilters(request.Filters, common.Task)
 	if err != nil {
 		return nil, err
 	}

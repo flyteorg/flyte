@@ -243,7 +243,7 @@ func (w *WorkflowManager) ListWorkflows(
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	ctx = contextutils.WithWorkflowID(ctx, request.Id.Name)
-	filters, err := util.GetRequestFilters(request.Filters, common.Workflow)
+	filters, err := util.ParseFilters(request.Filters, common.Workflow)
 	if err != nil {
 		return nil, err
 	}

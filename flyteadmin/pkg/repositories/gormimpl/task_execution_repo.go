@@ -37,17 +37,17 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, id *core.TaskExecutionIdent
 	tx := r.db.WithContext(ctx).Where(&models.TaskExecution{
 		TaskExecutionKey: models.TaskExecutionKey{
 			TaskKey: models.TaskKey{
-				Project: id.TaskId.Project,
-				Domain:  id.TaskId.Domain,
-				Name:    id.TaskId.Name,
-				Version: id.TaskId.Version,
+				Project: id.GetTaskId().Project,
+				Domain:  id.GetTaskId().Domain,
+				Name:    id.GetTaskId().Name,
+				Version: id.GetTaskId().Version,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
-				NodeID: id.NodeExecutionId.NodeId,
+				NodeID: id.GetNodeExecutionId().NodeId,
 				ExecutionKey: models.ExecutionKey{
-					Project: id.NodeExecutionId.ExecutionId.Project,
-					Domain:  id.NodeExecutionId.ExecutionId.Domain,
-					Name:    id.NodeExecutionId.ExecutionId.Name,
+					Project: id.GetNodeExecutionId().GetExecutionId().Project,
+					Domain:  id.GetNodeExecutionId().GetExecutionId().Domain,
+					Name:    id.GetNodeExecutionId().GetExecutionId().Name,
 				},
 			},
 			RetryAttempt: &id.RetryAttempt,

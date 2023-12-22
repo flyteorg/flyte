@@ -397,7 +397,7 @@ func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request admin.R
 	}
 	ctx = m.getNamedEntityContext(ctx, request.Id)
 
-	filters, err := util.GetRequestFilters(request.Filters, common.LaunchPlan)
+	filters, err := util.ParseFilters(request.Filters, common.LaunchPlan)
 	if err != nil {
 		return nil, err
 	}

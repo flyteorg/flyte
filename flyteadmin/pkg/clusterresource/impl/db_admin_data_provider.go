@@ -19,7 +19,7 @@ type dbAdminProvider struct {
 	resourceManager managerInterfaces.ResourceInterface
 }
 
-func (p dbAdminProvider) GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceIdentifier) (*admin.ClusterResourceAttributes, error) {
+func (p dbAdminProvider) GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceScope) (*admin.ClusterResourceAttributes, error) {
 	resource, err := p.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
 		IdentifierScope: identifier,
 		ResourceType:    admin.MatchableResource_CLUSTER_RESOURCE,

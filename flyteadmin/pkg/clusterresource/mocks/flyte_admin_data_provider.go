@@ -24,7 +24,7 @@ func (_m FlyteAdminDataProvider_GetClusterResourceAttributes) Return(_a0 *admin.
 	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributes(ctx context.Context, identifier common.ResourceIdentifier) *FlyteAdminDataProvider_GetClusterResourceAttributes {
+func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributes(ctx context.Context, identifier common.ResourceScope) *FlyteAdminDataProvider_GetClusterResourceAttributes {
 	c_call := _m.On("GetClusterResourceAttributes", ctx, identifier)
 	return &FlyteAdminDataProvider_GetClusterResourceAttributes{Call: c_call}
 }
@@ -35,11 +35,11 @@ func (_m *FlyteAdminDataProvider) OnGetClusterResourceAttributesMatch(matchers .
 }
 
 // GetClusterResourceAttributes provides a mock function with given fields: ctx, identifier
-func (_m *FlyteAdminDataProvider) GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceIdentifier) (*admin.ClusterResourceAttributes, error) {
+func (_m *FlyteAdminDataProvider) GetClusterResourceAttributes(ctx context.Context, identifier common.ResourceScope) (*admin.ClusterResourceAttributes, error) {
 	ret := _m.Called(ctx, identifier)
 
 	var r0 *admin.ClusterResourceAttributes
-	if rf, ok := ret.Get(0).(func(context.Context, common.ResourceIdentifier) *admin.ClusterResourceAttributes); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, common.ResourceScope) *admin.ClusterResourceAttributes); ok {
 		r0 = rf(ctx, identifier)
 	} else {
 		if ret.Get(0) != nil {
@@ -48,7 +48,7 @@ func (_m *FlyteAdminDataProvider) GetClusterResourceAttributes(ctx context.Conte
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, common.ResourceIdentifier) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, common.ResourceScope) error); ok {
 		r1 = rf(ctx, identifier)
 	} else {
 		r1 = ret.Error(1)

@@ -65,12 +65,7 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, id *core.Identifier) (models.L
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.LaunchPlan{},
-			adminErrors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), &core.Identifier{
-				Project: id.Project,
-				Domain:  id.Domain,
-				Name:    id.Name,
-				Version: id.Version,
-			})
+			adminErrors.GetMissingEntityError(core.ResourceType_LAUNCH_PLAN.String(), id)
 	} else if tx.Error != nil {
 		return models.LaunchPlan{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

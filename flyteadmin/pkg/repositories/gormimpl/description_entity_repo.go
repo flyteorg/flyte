@@ -2,8 +2,6 @@ package gormimpl
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -32,12 +30,7 @@ func (r *DescriptionEntityRepo) Get(ctx context.Context, id *core.Identifier) (m
 
 	tx := r.db.WithContext(ctx).Table(descriptionEntityTableName)
 	// Apply filters
-	tx, err = applyFilters(tx, entity, &admin.NamedEntityIdentifier{
-		Project: id.GetProject(),
-		Domain:  id.GetDomain(),
-		Org:     id.GetOrg(),
-		Name:    id.GetName(),
-	}, []common.InlineFilter{versionFilter}, nil)
+	tx, err = applyFilters(tx, entity, toNamedEntityIdentifier(id), []common.InlineFilter{versionFilter}, nil)
 	if err != nil {
 		return models.DescriptionEntity{}, err
 	}
