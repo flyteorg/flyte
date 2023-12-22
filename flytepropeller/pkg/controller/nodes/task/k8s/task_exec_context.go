@@ -3,9 +3,12 @@ package k8s
 import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 )
+
+const executionIdentityVariable = "execution_identity"
 
 // TaskExecutionContext provides a layer on top of core TaskExecutionContext with a custom TaskExecutionMetadata.
 type TaskExecutionContext struct {
@@ -42,25 +45,30 @@ func (t TaskExecutionMetadata) GetAnnotations() map[string]string {
 }
 
 // newTaskExecutionMetadata creates a TaskExecutionMetadata with secrets serialized as annotations and a label added
-// to trigger the flyte pod webhook
+// to trigger the flyte pod webhook. Optionally, the execution identity is injected as a label.
 func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *core.TaskTemplate) (TaskExecutionMetadata, error) {
 	var err error
 	secretsMap := make(map[string]string)
-	injectSecretsLabel := make(map[string]string)
+	injectLabels := make(map[string]string)
 	if taskTmpl.SecurityContext != nil && len(taskTmpl.SecurityContext.Secrets) > 0 {
 		secretsMap, err = secrets.MarshalSecretsToMapStrings(taskTmpl.SecurityContext.Secrets)
 		if err != nil {
 			return TaskExecutionMetadata{}, err
 		}
 
-		injectSecretsLabel = map[string]string{
-			secrets.PodLabel: secrets.PodLabelValue,
+		injectLabels[secrets.PodLabel] = secrets.PodLabelValue
+	}
+
+	if config.GetK8sPluginConfig().InjectExecutionIdentity {
+		id := tCtx.GetSecurityContext().RunAs.ExecutionIdentity
+		if id != "" {
+			injectLabels[executionIdentityVariable] = id
 		}
 	}
 
 	return TaskExecutionMetadata{
 		TaskExecutionMetadata: tCtx,
 		annotations:           utils.UnionMaps(tCtx.GetAnnotations(), secretsMap),
-		labels:                utils.UnionMaps(tCtx.GetLabels(), injectSecretsLabel),
+		labels:                utils.UnionMaps(tCtx.GetLabels(), injectLabels, injectLabels),
 	}, nil
 }
