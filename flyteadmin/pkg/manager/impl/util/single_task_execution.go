@@ -3,10 +3,10 @@ package util
 import (
 	"context"
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"strings"
 	"unicode"
 
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"

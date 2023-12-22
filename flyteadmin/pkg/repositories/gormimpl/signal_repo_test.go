@@ -39,13 +39,13 @@ var (
 )
 
 var signalIdentifier = &core.SignalIdentifier{
-	SignalId:            "signal",
-	ExecutionId:          &core.WorkflowExecutionIdentifier{
+	SignalId: "signal",
+	ExecutionId: &core.WorkflowExecutionIdentifier{
 		Project: "project",
-			Domain:  "domain",
-			Name:    "name",
-		},
-	}
+		Domain:  "domain",
+		Name:    "name",
+	},
+}
 
 func toSignalMap(signalModel models.Signal) map[string]interface{} {
 	signal := make(map[string]interface{})

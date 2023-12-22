@@ -1,11 +1,11 @@
 package interfaces
 
 import (
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	schedulerInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // The Repository indicates the methods that each Repository must support.

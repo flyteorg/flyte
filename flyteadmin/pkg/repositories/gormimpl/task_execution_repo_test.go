@@ -104,21 +104,21 @@ func TestGetTaskExecution(t *testing.T) {
 		WithReply(taskExecutions)
 
 	output, err := taskExecutionRepo.Get(context.Background(), &core.TaskExecutionIdentifier{
-			TaskId: &core.Identifier{
-				ResourceType: core.ResourceType_TASK,
-				Project:      "project",
-				Domain:       "domain",
-				Name:         "task-id",
-				Version:      "task-version",
+		TaskId: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "task-id",
+			Version:      "task-version",
+		},
+		NodeExecutionId: &core.NodeExecutionIdentifier{
+			NodeId: "node-id",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
 			},
-			NodeExecutionId: &core.NodeExecutionIdentifier{
-				NodeId: "node-id",
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: "project",
-					Domain:  "domain",
-					Name:    "name",
-				},
-			},
+		},
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, testTaskExecution, output)

@@ -2,8 +2,6 @@ package resources
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-
 	// pkg/runtime/interfaces/application_configuration.go
 	"testing"
 
@@ -11,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"

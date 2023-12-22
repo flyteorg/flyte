@@ -2,14 +2,14 @@ package entrypoints
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
-	"github.com/flyteorg/flyte/flyteadmin/plugins"
 
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"

@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -108,7 +108,7 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
 
 	// Apply filters
-	tx, err := applyScopedFilters(tx, common.NodeExecution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
+	tx, err := applyScopedFilters(tx, common.Execution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return interfaces.NodeExecutionCollectionOutput{}, err
 	}
@@ -160,7 +160,7 @@ func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
 
 	// Apply filters
-	tx, err = applyScopedFilters(tx, common.NodeExecution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
+	tx, err = applyScopedFilters(tx, common.Execution, input.IdentifierScope, input.InlineFilters, input.MapFilters)
 	if err != nil {
 		return 0, err
 	}

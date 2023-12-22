@@ -2,18 +2,19 @@ package gormimpl
 
 import (
 	"fmt"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const Project = "project"
@@ -87,6 +88,8 @@ func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdmi
 	return nil
 }
 
+var executionEntities = sets.New[common.Entity](common.NodeExecution, common.TaskExecution)
+
 // Returns equality filters initialized for identifier attributes (project, domain & name)
 // which can be optionally specified in requests.
 func getIdentifierFilters(entity common.Entity, identifier *admin.NamedEntityIdentifier) ([]common.InlineFilter, error) {
@@ -119,8 +122,8 @@ func getIdentifierFilters(entity common.Entity, identifier *admin.NamedEntityIde
 	return inlineFilters, nil
 }
 
-func applyFilters(tx *gorm.DB, entity common.Entity, id *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
-	identifierFilters, err := getIdentifierFilters(entity, id)
+func applyFilters(tx *gorm.DB, identifierEntity common.Entity, id *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
+	identifierFilters, err := getIdentifierFilters(identifierEntity, id)
 	if err != nil {
 		return nil, errors.GetInvalidInputError(err.Error())
 	}
@@ -138,8 +141,8 @@ func applyFilters(tx *gorm.DB, entity common.Entity, id *admin.NamedEntityIdenti
 	return tx, nil
 }
 
-func applyScopedFilters(tx *gorm.DB, entity common.Entity, identifier *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
-	identifierFilters, err := getIdentifierFilters(entity, identifier)
+func applyScopedFilters(tx *gorm.DB, identifierEntity common.Entity, identifier *admin.NamedEntityIdentifier, inlineFilters []common.InlineFilter, mapFilters []common.MapFilter) (*gorm.DB, error) {
+	identifierFilters, err := getIdentifierFilters(identifierEntity, identifier)
 	if err != nil {
 		return nil, errors.GetInvalidInputError(err.Error())
 	}

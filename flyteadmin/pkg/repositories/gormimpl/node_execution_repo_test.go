@@ -139,12 +139,12 @@ func TestGetNodeExecution(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
 	output, err := nodeExecutionRepo.Get(context.Background(), &core.NodeExecutionIdentifier{
-			NodeId: "1",
-			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Project: "execution_project",
-				Domain:  "execution_domain",
-				Name:    "execution_name",
-			},
+		NodeId: "1",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: "execution_project",
+			Domain:  "execution_domain",
+			Name:    "execution_name",
+		},
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, expectedNodeExecution, output)
@@ -158,12 +158,12 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock.NewMock().WithError(gorm.ErrRecordNotFound)
 
 		_, err := nodeExecutionRepo.Get(context.Background(), &core.NodeExecutionIdentifier{
-				NodeId: "1",
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: "execution_project",
-					Domain:  "execution_domain",
-					Name:    "execution_name",
-				},
+			NodeId: "1",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "execution_project",
+				Domain:  "execution_domain",
+				Name:    "execution_name",
+			},
 		})
 		assert.Equal(t, err.(flyteAdminErrors.FlyteAdminError).Code(), codes.NotFound)
 	})
@@ -172,12 +172,12 @@ func TestGetNodeExecutionErr(t *testing.T) {
 		GlobalMock.NewMock().WithError(gorm.ErrInvalidData)
 
 		_, err := nodeExecutionRepo.Get(context.Background(), &core.NodeExecutionIdentifier{
-				NodeId: "1",
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: "execution_project",
-					Domain:  "execution_domain",
-					Name:    "execution_name",
-				},
+			NodeId: "1",
+			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Project: "execution_project",
+				Domain:  "execution_domain",
+				Name:    "execution_name",
+			},
 		})
 		assert.Equal(t, err.(flyteAdminErrors.FlyteAdminError).Code(), codes.Unknown)
 	})
@@ -356,12 +356,12 @@ func TestNodeExecutionExists(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT "id" FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
 	exists, err := nodeExecutionRepo.Exists(context.Background(), &core.NodeExecutionIdentifier{
-			NodeId: "1",
-			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Project: "execution_project",
-				Domain:  "execution_domain",
-				Name:    "execution_name",
-			},
+		NodeId: "1",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: "execution_project",
+			Domain:  "execution_domain",
+			Name:    "execution_name",
+		},
 	})
 	assert.NoError(t, err)
 	assert.True(t, exists)

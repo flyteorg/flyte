@@ -3,7 +3,6 @@ package clusterresource
 import (
 	"context"
 	"crypto/md5" // #nosec
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -16,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource/mocks"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	execClusterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
