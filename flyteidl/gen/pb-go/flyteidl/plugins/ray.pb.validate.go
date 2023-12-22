@@ -55,6 +55,10 @@ func (m *RayJob) Validate() error {
 
 	// no validation rules for RuntimeEnv
 
+	// no validation rules for ShutdownAfterJobFinishes
+
+	// no validation rules for TtlSecondsAfterFinished
+
 	return nil
 }
 
@@ -144,7 +148,7 @@ func (m *RayCluster) Validate() error {
 
 	}
 
-	// no validation rules for EnableInTreeAutoscaling
+	// no validation rules for EnableAutoscaling
 
 	return nil
 }

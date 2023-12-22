@@ -119,7 +119,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 			RayStartParams: headNodeRayStartParams,
 		},
 		WorkerGroupSpecs:        []rayv1alpha1.WorkerGroupSpec{},
-		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableInTreeAutoscaling,
+		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
 	}
 
 	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
@@ -165,11 +165,18 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		rayClusterSpec.WorkerGroupSpecs[index].Template.Spec.ServiceAccountName = serviceAccountName
 	}
 
+	shutdownAfterJobFinishes := cfg.ShutdownAfterJobFinishes
+	ttlSecondsAfterFinished := &cfg.TTLSecondsAfterFinished
+	if rayJob.ShutdownAfterJobFinishes {
+		shutdownAfterJobFinishes = true
+		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
+	}
+	
 	jobSpec := rayv1alpha1.RayJobSpec{
 		RayClusterSpec:           rayClusterSpec,
 		Entrypoint:               strings.Join(primaryContainer.Args, " "),
-		ShutdownAfterJobFinishes: cfg.ShutdownAfterJobFinishes,
-		TTLSecondsAfterFinished:  &cfg.TTLSecondsAfterFinished,
+		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
+		TTLSecondsAfterFinished:  ttlSecondsAfterFinished,
 		RuntimeEnv:               rayJob.RuntimeEnv,
 	}
 

@@ -62,6 +62,24 @@ public final class Ray {
      */
     com.google.protobuf.ByteString
         getRuntimeEnvBytes();
+
+    /**
+     * <pre>
+     * shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+     * </pre>
+     *
+     * <code>bool shutdown_after_job_finishes = 3;</code>
+     */
+    boolean getShutdownAfterJobFinishes();
+
+    /**
+     * <pre>
+     * ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+     * </pre>
+     *
+     * <code>int32 ttl_seconds_after_finished = 4;</code>
+     */
+    int getTtlSecondsAfterFinished();
   }
   /**
    * <pre>
@@ -124,6 +142,16 @@ public final class Ray {
               java.lang.String s = input.readStringRequireUtf8();
 
               runtimeEnv_ = s;
+              break;
+            }
+            case 24: {
+
+              shutdownAfterJobFinishes_ = input.readBool();
+              break;
+            }
+            case 32: {
+
+              ttlSecondsAfterFinished_ = input.readInt32();
               break;
             }
             default: {
@@ -235,6 +263,32 @@ public final class Ray {
       }
     }
 
+    public static final int SHUTDOWN_AFTER_JOB_FINISHES_FIELD_NUMBER = 3;
+    private boolean shutdownAfterJobFinishes_;
+    /**
+     * <pre>
+     * shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+     * </pre>
+     *
+     * <code>bool shutdown_after_job_finishes = 3;</code>
+     */
+    public boolean getShutdownAfterJobFinishes() {
+      return shutdownAfterJobFinishes_;
+    }
+
+    public static final int TTL_SECONDS_AFTER_FINISHED_FIELD_NUMBER = 4;
+    private int ttlSecondsAfterFinished_;
+    /**
+     * <pre>
+     * ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+     * </pre>
+     *
+     * <code>int32 ttl_seconds_after_finished = 4;</code>
+     */
+    public int getTtlSecondsAfterFinished() {
+      return ttlSecondsAfterFinished_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -255,6 +309,12 @@ public final class Ray {
       if (!getRuntimeEnvBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, runtimeEnv_);
       }
+      if (shutdownAfterJobFinishes_ != false) {
+        output.writeBool(3, shutdownAfterJobFinishes_);
+      }
+      if (ttlSecondsAfterFinished_ != 0) {
+        output.writeInt32(4, ttlSecondsAfterFinished_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -270,6 +330,14 @@ public final class Ray {
       }
       if (!getRuntimeEnvBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, runtimeEnv_);
+      }
+      if (shutdownAfterJobFinishes_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, shutdownAfterJobFinishes_);
+      }
+      if (ttlSecondsAfterFinished_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, ttlSecondsAfterFinished_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -293,6 +361,10 @@ public final class Ray {
       }
       if (!getRuntimeEnv()
           .equals(other.getRuntimeEnv())) return false;
+      if (getShutdownAfterJobFinishes()
+          != other.getShutdownAfterJobFinishes()) return false;
+      if (getTtlSecondsAfterFinished()
+          != other.getTtlSecondsAfterFinished()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -310,6 +382,11 @@ public final class Ray {
       }
       hash = (37 * hash) + RUNTIME_ENV_FIELD_NUMBER;
       hash = (53 * hash) + getRuntimeEnv().hashCode();
+      hash = (37 * hash) + SHUTDOWN_AFTER_JOB_FINISHES_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getShutdownAfterJobFinishes());
+      hash = (37 * hash) + TTL_SECONDS_AFTER_FINISHED_FIELD_NUMBER;
+      hash = (53 * hash) + getTtlSecondsAfterFinished();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -455,6 +532,10 @@ public final class Ray {
         }
         runtimeEnv_ = "";
 
+        shutdownAfterJobFinishes_ = false;
+
+        ttlSecondsAfterFinished_ = 0;
+
         return this;
       }
 
@@ -487,6 +568,8 @@ public final class Ray {
           result.rayCluster_ = rayClusterBuilder_.build();
         }
         result.runtimeEnv_ = runtimeEnv_;
+        result.shutdownAfterJobFinishes_ = shutdownAfterJobFinishes_;
+        result.ttlSecondsAfterFinished_ = ttlSecondsAfterFinished_;
         onBuilt();
         return result;
       }
@@ -541,6 +624,12 @@ public final class Ray {
         if (!other.getRuntimeEnv().isEmpty()) {
           runtimeEnv_ = other.runtimeEnv_;
           onChanged();
+        }
+        if (other.getShutdownAfterJobFinishes() != false) {
+          setShutdownAfterJobFinishes(other.getShutdownAfterJobFinishes());
+        }
+        if (other.getTtlSecondsAfterFinished() != 0) {
+          setTtlSecondsAfterFinished(other.getTtlSecondsAfterFinished());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -817,6 +906,82 @@ public final class Ray {
         onChanged();
         return this;
       }
+
+      private boolean shutdownAfterJobFinishes_ ;
+      /**
+       * <pre>
+       * shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+       * </pre>
+       *
+       * <code>bool shutdown_after_job_finishes = 3;</code>
+       */
+      public boolean getShutdownAfterJobFinishes() {
+        return shutdownAfterJobFinishes_;
+      }
+      /**
+       * <pre>
+       * shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+       * </pre>
+       *
+       * <code>bool shutdown_after_job_finishes = 3;</code>
+       */
+      public Builder setShutdownAfterJobFinishes(boolean value) {
+        
+        shutdownAfterJobFinishes_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+       * </pre>
+       *
+       * <code>bool shutdown_after_job_finishes = 3;</code>
+       */
+      public Builder clearShutdownAfterJobFinishes() {
+        
+        shutdownAfterJobFinishes_ = false;
+        onChanged();
+        return this;
+      }
+
+      private int ttlSecondsAfterFinished_ ;
+      /**
+       * <pre>
+       * ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+       * </pre>
+       *
+       * <code>int32 ttl_seconds_after_finished = 4;</code>
+       */
+      public int getTtlSecondsAfterFinished() {
+        return ttlSecondsAfterFinished_;
+      }
+      /**
+       * <pre>
+       * ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+       * </pre>
+       *
+       * <code>int32 ttl_seconds_after_finished = 4;</code>
+       */
+      public Builder setTtlSecondsAfterFinished(int value) {
+        
+        ttlSecondsAfterFinished_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+       * </pre>
+       *
+       * <code>int32 ttl_seconds_after_finished = 4;</code>
+       */
+      public Builder clearTtlSecondsAfterFinished() {
+        
+        ttlSecondsAfterFinished_ = 0;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -945,12 +1110,12 @@ public final class Ray {
 
     /**
      * <pre>
-     * Whether to enable in-tree autoscaling.
+     * Whether to enable autoscaling.
      * </pre>
      *
-     * <code>bool enable_in_tree_autoscaling = 3;</code>
+     * <code>bool enable_autoscaling = 3;</code>
      */
-    boolean getEnableInTreeAutoscaling();
+    boolean getEnableAutoscaling();
   }
   /**
    * <pre>
@@ -1020,7 +1185,7 @@ public final class Ray {
             }
             case 24: {
 
-              enableInTreeAutoscaling_ = input.readBool();
+              enableAutoscaling_ = input.readBool();
               break;
             }
             default: {
@@ -1147,17 +1312,17 @@ public final class Ray {
       return workerGroupSpec_.get(index);
     }
 
-    public static final int ENABLE_IN_TREE_AUTOSCALING_FIELD_NUMBER = 3;
-    private boolean enableInTreeAutoscaling_;
+    public static final int ENABLE_AUTOSCALING_FIELD_NUMBER = 3;
+    private boolean enableAutoscaling_;
     /**
      * <pre>
-     * Whether to enable in-tree autoscaling.
+     * Whether to enable autoscaling.
      * </pre>
      *
-     * <code>bool enable_in_tree_autoscaling = 3;</code>
+     * <code>bool enable_autoscaling = 3;</code>
      */
-    public boolean getEnableInTreeAutoscaling() {
-      return enableInTreeAutoscaling_;
+    public boolean getEnableAutoscaling() {
+      return enableAutoscaling_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -1180,8 +1345,8 @@ public final class Ray {
       for (int i = 0; i < workerGroupSpec_.size(); i++) {
         output.writeMessage(2, workerGroupSpec_.get(i));
       }
-      if (enableInTreeAutoscaling_ != false) {
-        output.writeBool(3, enableInTreeAutoscaling_);
+      if (enableAutoscaling_ != false) {
+        output.writeBool(3, enableAutoscaling_);
       }
       unknownFields.writeTo(output);
     }
@@ -1200,9 +1365,9 @@ public final class Ray {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, workerGroupSpec_.get(i));
       }
-      if (enableInTreeAutoscaling_ != false) {
+      if (enableAutoscaling_ != false) {
         size += com.google.protobuf.CodedOutputStream
-          .computeBoolSize(3, enableInTreeAutoscaling_);
+          .computeBoolSize(3, enableAutoscaling_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1226,8 +1391,8 @@ public final class Ray {
       }
       if (!getWorkerGroupSpecList()
           .equals(other.getWorkerGroupSpecList())) return false;
-      if (getEnableInTreeAutoscaling()
-          != other.getEnableInTreeAutoscaling()) return false;
+      if (getEnableAutoscaling()
+          != other.getEnableAutoscaling()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1247,9 +1412,9 @@ public final class Ray {
         hash = (37 * hash) + WORKER_GROUP_SPEC_FIELD_NUMBER;
         hash = (53 * hash) + getWorkerGroupSpecList().hashCode();
       }
-      hash = (37 * hash) + ENABLE_IN_TREE_AUTOSCALING_FIELD_NUMBER;
+      hash = (37 * hash) + ENABLE_AUTOSCALING_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
-          getEnableInTreeAutoscaling());
+          getEnableAutoscaling());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1400,7 +1565,7 @@ public final class Ray {
         } else {
           workerGroupSpecBuilder_.clear();
         }
-        enableInTreeAutoscaling_ = false;
+        enableAutoscaling_ = false;
 
         return this;
       }
@@ -1444,7 +1609,7 @@ public final class Ray {
         } else {
           result.workerGroupSpec_ = workerGroupSpecBuilder_.build();
         }
-        result.enableInTreeAutoscaling_ = enableInTreeAutoscaling_;
+        result.enableAutoscaling_ = enableAutoscaling_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1523,8 +1688,8 @@ public final class Ray {
             }
           }
         }
-        if (other.getEnableInTreeAutoscaling() != false) {
-          setEnableInTreeAutoscaling(other.getEnableInTreeAutoscaling());
+        if (other.getEnableAutoscaling() != false) {
+          setEnableAutoscaling(other.getEnableAutoscaling());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2021,40 +2186,40 @@ public final class Ray {
         return workerGroupSpecBuilder_;
       }
 
-      private boolean enableInTreeAutoscaling_ ;
+      private boolean enableAutoscaling_ ;
       /**
        * <pre>
-       * Whether to enable in-tree autoscaling.
+       * Whether to enable autoscaling.
        * </pre>
        *
-       * <code>bool enable_in_tree_autoscaling = 3;</code>
+       * <code>bool enable_autoscaling = 3;</code>
        */
-      public boolean getEnableInTreeAutoscaling() {
-        return enableInTreeAutoscaling_;
+      public boolean getEnableAutoscaling() {
+        return enableAutoscaling_;
       }
       /**
        * <pre>
-       * Whether to enable in-tree autoscaling.
+       * Whether to enable autoscaling.
        * </pre>
        *
-       * <code>bool enable_in_tree_autoscaling = 3;</code>
+       * <code>bool enable_autoscaling = 3;</code>
        */
-      public Builder setEnableInTreeAutoscaling(boolean value) {
+      public Builder setEnableAutoscaling(boolean value) {
         
-        enableInTreeAutoscaling_ = value;
+        enableAutoscaling_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Whether to enable in-tree autoscaling.
+       * Whether to enable autoscaling.
        * </pre>
        *
-       * <code>bool enable_in_tree_autoscaling = 3;</code>
+       * <code>bool enable_autoscaling = 3;</code>
        */
-      public Builder clearEnableInTreeAutoscaling() {
+      public Builder clearEnableAutoscaling() {
         
-        enableInTreeAutoscaling_ = false;
+        enableAutoscaling_ = false;
         onChanged();
         return this;
       }
@@ -4191,25 +4356,26 @@ public final class Ray {
   static {
     java.lang.String[] descriptorData = {
       "\n\032flyteidl/plugins/ray.proto\022\020flyteidl.p" +
-      "lugins\"P\n\006RayJob\0221\n\013ray_cluster\030\001 \001(\0132\034." +
-      "flyteidl.plugins.RayCluster\022\023\n\013runtime_e" +
-      "nv\030\002 \001(\t\"\250\001\n\nRayCluster\0228\n\017head_group_sp" +
-      "ec\030\001 \001(\0132\037.flyteidl.plugins.HeadGroupSpe" +
-      "c\022<\n\021worker_group_spec\030\002 \003(\0132!.flyteidl." +
-      "plugins.WorkerGroupSpec\022\"\n\032enable_in_tre" +
-      "e_autoscaling\030\003 \001(\010\"\225\001\n\rHeadGroupSpec\022M\n" +
-      "\020ray_start_params\030\001 \003(\01323.flyteidl.plugi" +
-      "ns.HeadGroupSpec.RayStartParamsEntry\0325\n\023" +
-      "RayStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005valu" +
-      "e\030\002 \001(\t:\0028\001\"\353\001\n\017WorkerGroupSpec\022\022\n\ngroup" +
-      "_name\030\001 \001(\t\022\020\n\010replicas\030\002 \001(\005\022\024\n\014min_rep" +
-      "licas\030\003 \001(\005\022\024\n\014max_replicas\030\004 \001(\005\022O\n\020ray" +
-      "_start_params\030\005 \003(\01325.flyteidl.plugins.W" +
-      "orkerGroupSpec.RayStartParamsEntry\0325\n\023Ra" +
-      "yStartParamsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
-      "\002 \001(\t:\0028\001B?Z=github.com/flyteorg/flyte/f" +
-      "lyteidl/gen/pb-go/flyteidl/pluginsb\006prot" +
-      "o3"
+      "lugins\"\231\001\n\006RayJob\0221\n\013ray_cluster\030\001 \001(\0132\034" +
+      ".flyteidl.plugins.RayCluster\022\023\n\013runtime_" +
+      "env\030\002 \001(\t\022#\n\033shutdown_after_job_finishes" +
+      "\030\003 \001(\010\022\"\n\032ttl_seconds_after_finished\030\004 \001" +
+      "(\005\"\240\001\n\nRayCluster\0228\n\017head_group_spec\030\001 \001" +
+      "(\0132\037.flyteidl.plugins.HeadGroupSpec\022<\n\021w" +
+      "orker_group_spec\030\002 \003(\0132!.flyteidl.plugin" +
+      "s.WorkerGroupSpec\022\032\n\022enable_autoscaling\030" +
+      "\003 \001(\010\"\225\001\n\rHeadGroupSpec\022M\n\020ray_start_par" +
+      "ams\030\001 \003(\01323.flyteidl.plugins.HeadGroupSp" +
+      "ec.RayStartParamsEntry\0325\n\023RayStartParams" +
+      "Entry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"\353\001" +
+      "\n\017WorkerGroupSpec\022\022\n\ngroup_name\030\001 \001(\t\022\020\n" +
+      "\010replicas\030\002 \001(\005\022\024\n\014min_replicas\030\003 \001(\005\022\024\n" +
+      "\014max_replicas\030\004 \001(\005\022O\n\020ray_start_params\030" +
+      "\005 \003(\01325.flyteidl.plugins.WorkerGroupSpec" +
+      ".RayStartParamsEntry\0325\n\023RayStartParamsEn" +
+      "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B?Z=g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4228,13 +4394,13 @@ public final class Ray {
     internal_static_flyteidl_plugins_RayJob_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_RayJob_descriptor,
-        new java.lang.String[] { "RayCluster", "RuntimeEnv", });
+        new java.lang.String[] { "RayCluster", "RuntimeEnv", "ShutdownAfterJobFinishes", "TtlSecondsAfterFinished", });
     internal_static_flyteidl_plugins_RayCluster_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_plugins_RayCluster_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_RayCluster_descriptor,
-        new java.lang.String[] { "HeadGroupSpec", "WorkerGroupSpec", "EnableInTreeAutoscaling", });
+        new java.lang.String[] { "HeadGroupSpec", "WorkerGroupSpec", "EnableAutoscaling", });
     internal_static_flyteidl_plugins_HeadGroupSpec_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_plugins_HeadGroupSpec_fieldAccessorTable = new
