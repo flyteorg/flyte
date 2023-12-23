@@ -2,8 +2,9 @@ package artifacts
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegistryNoClient(t *testing.T) {
