@@ -126,7 +126,6 @@ jobs:
     timeout-minutes: 60
     needs: [build-and-push-single-binary-image]
     steps:
-      - uses: insightsengineering/disk-space-reclaimer@v1
       - name: Set latest Flytesnacks release
         if: ${{ env.FLYTESNACKS_VERSION == '' }}
         run: |
@@ -171,16 +170,7 @@ jobs:
               cpu: "0"
               memory: "0"
           EOF
-          flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never >/dev/null &
-          sleep 90
-          kubectl config use-context flyte-sandbox
-          while :
-          do
-            kubectl -n flyte get pods
-            echo "logs: "
-            kubectl -n flyte logs $(kubectl -n flyte get pods | grep flyte-sandbox | grep -v -E "docker|buildkit|postgres|proxy|minio|kube" | cut -d' ' -f1) || true
-            sleep 5
-          done
+          flytectl demo start --image flyte-sandbox-bundled:local --imagePullPolicy Never
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
