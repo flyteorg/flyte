@@ -5,9 +5,9 @@ import (
 	stdErrors "errors"
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -15,12 +15,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	repoErrors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -656,7 +657,6 @@ func TestUpdateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
 					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
-
 
 		request := &datacatalog.UpdateArtifactRequest{
 			Dataset: expectedDataset.Id,
