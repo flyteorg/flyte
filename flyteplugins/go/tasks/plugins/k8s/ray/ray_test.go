@@ -28,8 +28,10 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
-const testImage = "image://"
-const serviceAccount = "ray_sa"
+const (
+	testImage      = "image://"
+	serviceAccount = "ray_sa"
+)
 
 var (
 	dummyEnvVars = []*core.KeyValuePair{
@@ -79,9 +81,12 @@ func transformPodSpecToTaskTemplateTarget(podSpec *corev1.PodSpec) *core.TaskTem
 func dummyRayCustomObj() *plugins.RayJob {
 	return &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:   &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
-			WorkerGroupSpec: []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3}},
+			HeadGroupSpec:     &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: true,
 		},
+		ShutdownAfterJobFinishes: true,
+		TtlSecondsAfterFinished:  120,
 	}
 }
 
@@ -176,21 +181,26 @@ func TestBuildResourceRay(t *testing.T) {
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
 
+	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
+	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
+	assert.Equal(t, *ray.Spec.TTLSecondsAfterFinished, int32(120))
+
 	headReplica := int32(1)
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, &headReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
-			"node-ip-address": "$MY_POD_IP", "num-cpus": "1"})
+			"node-ip-address": "$MY_POD_IP", "num-cpus": "1",
+		})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, &workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
@@ -230,7 +240,7 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			[]corev1.NodeSelectorTerm{
 				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-t4"},
@@ -270,12 +280,12 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			[]corev1.NodeSelectorTerm{
 				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
@@ -345,9 +355,12 @@ func TestDefaultStartParameters(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	rayJob := &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:   &plugins.HeadGroupSpec{},
-			WorkerGroupSpec: []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3}},
+			HeadGroupSpec:     &plugins.HeadGroupSpec{},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: true,
 		},
+		ShutdownAfterJobFinishes: true,
+		TtlSecondsAfterFinished:  120,
 	}
 
 	taskTemplate := dummyRayTaskTemplate("ray-id", rayJob)
@@ -367,21 +380,26 @@ func TestDefaultStartParameters(t *testing.T) {
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
 
+	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
+	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
+	assert.Equal(t, *ray.Spec.TTLSecondsAfterFinished, int32(120))
+
 	headReplica := int32(1)
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, &headReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
-			"node-ip-address": "$MY_POD_IP"})
+			"node-ip-address": "$MY_POD_IP",
+		})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, &workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
