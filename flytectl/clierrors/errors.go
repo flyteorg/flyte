@@ -1,7 +1,8 @@
 package clierrors
 
 var (
-	ErrInvalidStateUpdate = "invalid state passed. Specify either activate or archive\n"
+	ErrInvalidStateUpdate     = "invalid state passed. Specify either activate or archive\n"
+	ErrInvalidBothStateUpdate = "invalid state passed. Specify either activate or deactivate\n"
 
 	ErrProjectNotPassed     = "project id wasn't passed\n" // #nosec
 	ErrProjectIDBothPassed  = "both project and id are passed\n"

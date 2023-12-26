@@ -15,10 +15,10 @@ Activates a `launch plan <https://docs.flyte.org/projects/cookbook/en/latest/aut
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --activate
 
-Archives `(deactivates) <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#deactivating-a-schedule>`__ a launch plan which deschedules any scheduled job associated with it:
+Deactivates a `launch plan <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#deactivating-a-schedule>`__ which deschedules any scheduled job associated with it:
 ::
 
- flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --archive
+ flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --deactivate
 
 Usage
 
@@ -33,7 +33,7 @@ Options
 ::
 
       --activate         activate launchplan.
-      --archive          disable the launch plan schedule (if it has an active schedule associated with it).
+      --deactivate       disable the launch plan schedule (if it has an active schedule associated with it).
       --dryRun           execute command without making any modifications.
       --force            do not ask for an acknowledgement during updates.
   -h, --help             help for launchplan
@@ -53,11 +53,12 @@ Options inherited from parent commands
       --admin.clientSecretEnvVar string              Environment variable containing the client secret
       --admin.clientSecretLocation string            File containing the client secret (default "/etc/secrets/client_secret")
       --admin.command strings                        Command for external authentication token generation
-      --admin.defaultServiceConfig string
+      --admin.defaultServiceConfig string            
       --admin.deviceFlowConfig.pollInterval string   amount of time the device flow would poll the token endpoint if auth server doesn't return a polling interval. Okta and google IDP do return an interval' (default "5s")
       --admin.deviceFlowConfig.refreshTime string    grace period from the token expiry after which it would refresh the token. (default "5m0s")
       --admin.deviceFlowConfig.timeout string        amount of time the device flow should complete or else it will be cancelled. (default "10m0s")
       --admin.endpoint string                        For admin types,  specify where the uri of the service is located.
+      --admin.httpProxyURL string                    OPTIONAL: HTTP Proxy to be used for OAuth requests.
       --admin.insecure                               Use insecure connection.
       --admin.insecureSkipVerify                     InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
       --admin.maxBackoffDelay string                 Max delay for grpc backoff (default "8s")
