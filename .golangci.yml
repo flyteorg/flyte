@@ -8,7 +8,6 @@ run:
 linters:
   disable-all: true
   enable:
-    - deadcode
     - errcheck
     - gas
     - gci
@@ -21,12 +20,11 @@ linters:
     - misspell
     - nakedret
     - staticcheck
-    - structcheck
+    - unused
     - typecheck
     - unconvert
     - unparam
     - unused
-    - varcheck
 
 linters-settings:
   gci:
@@ -36,4 +34,3 @@ linters-settings:
       - default
       - prefix(github.com/flyteorg)
     skip-generated: true
-
