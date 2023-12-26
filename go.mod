@@ -6,7 +6,7 @@ require (
 	github.com/flyteorg/flyte/datacatalog v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flyteadmin v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flytepropeller v0.0.0-00010101000000-000000000000
-	github.com/flyteorg/flyte/flytestdlib v1.9.5
+	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/golang/glog v1.1.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/spf13/cobra v1.7.0

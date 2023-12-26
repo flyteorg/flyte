@@ -82,13 +82,12 @@ func (a *ArtifactRegistry) GetClient() artifact.ArtifactRegistryClient {
 // if nil, should either call the default config or return an error
 func NewArtifactRegistry(ctx context.Context, connCfg *admin2.Config, _ ...grpc.DialOption) *ArtifactRegistry {
 
-	var cfg = connCfg
 	if connCfg == nil {
-		//cfg = admin2.GetConfig(ctx)
 		return &ArtifactRegistry{
 			client: nil,
 		}
 	}
+	var cfg = connCfg
 	clients, err := admin2.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create Artifact client")
