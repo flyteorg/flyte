@@ -112,10 +112,20 @@ build_native_flyte:
 .PHONY: go-tidy
 go-tidy:
 	go mod tidy
-	make -C datacatalog go-tidy
-	make -C flyteadmin go-tidy
-	make -C flyteidl go-tidy
-	make -C flytepropeller go-tidy
-	make -C flyteplugins go-tidy
-	make -C flytestdlib go-tidy
-	make -C flytecopilot go-tidy
+	$(MAKE) -C datacatalog go-tidy
+	$(MAKE) -C flyteadmin go-tidy
+	$(MAKE) -C flyteidl go-tidy
+	$(MAKE) -C flytepropeller go-tidy
+	$(MAKE) -C flyteplugins go-tidy
+	$(MAKE) -C flytestdlib go-tidy
+	$(MAKE) -C flytecopilot go-tidy
+
+.PHONY: lint
+lint-all:
+	$(MAKE) -C datacatalog lint
+	$(MAKE) -C flyteadmin lint
+	$(MAKE) -C flyteidl lint
+	$(MAKE) -C flytepropeller lint
+	$(MAKE) -C flyteplugins lint
+	$(MAKE) -C flytestdlib lint
+	$(MAKE) -C flytecopilot lint
