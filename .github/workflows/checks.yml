@@ -26,22 +26,10 @@ jobs:
     name: Lint
     needs:
       - unpack-envvars
-    strategy:
-      fail-fast: false
-      matrix:
-        component:
-          - datacatalog
-          - flyteadmin
-          # TODO(monorepo): Enable lint flytecopilot
-          # - flytecopilot
-          - flyteidl
-          - flyteplugins
-          - flytepropeller
-          - flytestdlib
-    uses: ./.github/workflows/lint.yml
-    with:
-      component: ${{ matrix.component }}
-      go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+    steps:
+      - run: |
+          make lint
+
   unit-tests:
     name: Unit Tests
     needs:

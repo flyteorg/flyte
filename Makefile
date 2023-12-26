@@ -129,3 +129,12 @@ lint-all:
 	$(MAKE) -C flyteplugins lint
 	$(MAKE) -C flytestdlib lint
 	$(MAKE) -C flytecopilot lint
+
+
+.PHONY: download_tooling
+download_tooling: #download dependencies (including test deps) for the package
+	@boilerplate/flyte/golang_test_targets/download_tooling.sh
+
+.PHONY: lint
+lint: download_tooling #lints the package for common code smells
+	GL_DEBUG=linters_output,env find . -type f -name go.mod -maxdepth 3 -execdir golangci-lint run --deadline=5m --exclude deprecated -v \;

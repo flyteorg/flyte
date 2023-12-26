@@ -5,6 +5,9 @@ run:
     - gen
     - mocks
     - _test.go$
+    # Single-binary has a few exceptions
+    - cmd/single
+    - cmd/main.go
 
 linters:
   disable-all: true
@@ -14,14 +17,13 @@ linters:
     - gci
     - goconst
     - goimports
-    - revive
     - gosimple
     - govet
     - ineffassign
     - misspell
     - nakedret
+    - revive
     - staticcheck
-    - unused
     - typecheck
     - unconvert
     - unparam
