@@ -4,6 +4,8 @@ run:
     - cmd/entrypoints/serve.go
     - pkg/async/messages/sqs.go
     - gen
+    - mocks
+    - _test.go$
 
 linters:
   disable-all: true
@@ -13,7 +15,7 @@ linters:
     - gci
     - goconst
     - goimports
-    - golint
+    - revive
     - gosimple
     - govet
     - ineffassign
@@ -34,3 +36,7 @@ linters-settings:
       - default
       - prefix(github.com/flyteorg)
     skip-generated: true
+  revive:
+    rules:
+      - name: unused-parameter
+        disabled: true
