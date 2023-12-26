@@ -26,6 +26,7 @@ jobs:
     name: Lint
     needs:
       - unpack-envvars
+    runs-on: ubuntu-latest
     steps:
       - run: |
           make lint
