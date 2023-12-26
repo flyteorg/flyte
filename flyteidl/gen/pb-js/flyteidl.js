@@ -36951,6 +36951,325 @@
                 return NodeExecutionGetRequest;
             })();
     
+            admin.WorkflowNodeExecutionsGetRequest = (function() {
+    
+                /**
+                 * Properties of a WorkflowNodeExecutionsGetRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowNodeExecutionsGetRequest
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [executionId] WorkflowNodeExecutionsGetRequest executionId
+                 * @property {string|null} [workflowName] WorkflowNodeExecutionsGetRequest workflowName
+                 * @property {string|null} [workflowVersion] WorkflowNodeExecutionsGetRequest workflowVersion
+                 * @property {string|null} [dynamicNodeId] WorkflowNodeExecutionsGetRequest dynamicNodeId
+                 * @property {string|null} [parentNodeId] WorkflowNodeExecutionsGetRequest parentNodeId
+                 */
+    
+                /**
+                 * Constructs a new WorkflowNodeExecutionsGetRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowNodeExecutionsGetRequest.
+                 * @implements IWorkflowNodeExecutionsGetRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetRequest=} [properties] Properties to set
+                 */
+                function WorkflowNodeExecutionsGetRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowNodeExecutionsGetRequest executionId.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} executionId
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @instance
+                 */
+                WorkflowNodeExecutionsGetRequest.prototype.executionId = null;
+    
+                /**
+                 * WorkflowNodeExecutionsGetRequest workflowName.
+                 * @member {string} workflowName
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @instance
+                 */
+                WorkflowNodeExecutionsGetRequest.prototype.workflowName = "";
+    
+                /**
+                 * WorkflowNodeExecutionsGetRequest workflowVersion.
+                 * @member {string} workflowVersion
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @instance
+                 */
+                WorkflowNodeExecutionsGetRequest.prototype.workflowVersion = "";
+    
+                /**
+                 * WorkflowNodeExecutionsGetRequest dynamicNodeId.
+                 * @member {string} dynamicNodeId
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @instance
+                 */
+                WorkflowNodeExecutionsGetRequest.prototype.dynamicNodeId = "";
+    
+                /**
+                 * WorkflowNodeExecutionsGetRequest parentNodeId.
+                 * @member {string} parentNodeId
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @instance
+                 */
+                WorkflowNodeExecutionsGetRequest.prototype.parentNodeId = "";
+    
+                /**
+                 * Creates a new WorkflowNodeExecutionsGetRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowNodeExecutionsGetRequest} WorkflowNodeExecutionsGetRequest instance
+                 */
+                WorkflowNodeExecutionsGetRequest.create = function create(properties) {
+                    return new WorkflowNodeExecutionsGetRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowNodeExecutionsGetRequest message. Does not implicitly {@link flyteidl.admin.WorkflowNodeExecutionsGetRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetRequest} message WorkflowNodeExecutionsGetRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowNodeExecutionsGetRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.executionId != null && message.hasOwnProperty("executionId"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.executionId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.workflowName != null && message.hasOwnProperty("workflowName"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.workflowName);
+                    if (message.workflowVersion != null && message.hasOwnProperty("workflowVersion"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.workflowVersion);
+                    if (message.dynamicNodeId != null && message.hasOwnProperty("dynamicNodeId"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.dynamicNodeId);
+                    if (message.parentNodeId != null && message.hasOwnProperty("parentNodeId"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.parentNodeId);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowNodeExecutionsGetRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowNodeExecutionsGetRequest} WorkflowNodeExecutionsGetRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowNodeExecutionsGetRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowNodeExecutionsGetRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.executionId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.workflowName = reader.string();
+                            break;
+                        case 3:
+                            message.workflowVersion = reader.string();
+                            break;
+                        case 4:
+                            message.dynamicNodeId = reader.string();
+                            break;
+                        case 5:
+                            message.parentNodeId = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowNodeExecutionsGetRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowNodeExecutionsGetRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.executionId != null && message.hasOwnProperty("executionId")) {
+                        var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.executionId);
+                        if (error)
+                            return "executionId." + error;
+                    }
+                    if (message.workflowName != null && message.hasOwnProperty("workflowName"))
+                        if (!$util.isString(message.workflowName))
+                            return "workflowName: string expected";
+                    if (message.workflowVersion != null && message.hasOwnProperty("workflowVersion"))
+                        if (!$util.isString(message.workflowVersion))
+                            return "workflowVersion: string expected";
+                    if (message.dynamicNodeId != null && message.hasOwnProperty("dynamicNodeId"))
+                        if (!$util.isString(message.dynamicNodeId))
+                            return "dynamicNodeId: string expected";
+                    if (message.parentNodeId != null && message.hasOwnProperty("parentNodeId"))
+                        if (!$util.isString(message.parentNodeId))
+                            return "parentNodeId: string expected";
+                    return null;
+                };
+    
+                return WorkflowNodeExecutionsGetRequest;
+            })();
+    
+            admin.WorkflowNodeExecutionsGetResponse = (function() {
+    
+                /**
+                 * Properties of a WorkflowNodeExecutionsGetResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowNodeExecutionsGetResponse
+                 * @property {flyteidl.core.ICompiledWorkflowClosure|null} [closure] WorkflowNodeExecutionsGetResponse closure
+                 * @property {Array.<flyteidl.admin.INodeExecution>|null} [nodeExecutions] WorkflowNodeExecutionsGetResponse nodeExecutions
+                 */
+    
+                /**
+                 * Constructs a new WorkflowNodeExecutionsGetResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowNodeExecutionsGetResponse.
+                 * @implements IWorkflowNodeExecutionsGetResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetResponse=} [properties] Properties to set
+                 */
+                function WorkflowNodeExecutionsGetResponse(properties) {
+                    this.nodeExecutions = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowNodeExecutionsGetResponse closure.
+                 * @member {flyteidl.core.ICompiledWorkflowClosure|null|undefined} closure
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetResponse
+                 * @instance
+                 */
+                WorkflowNodeExecutionsGetResponse.prototype.closure = null;
+    
+                /**
+                 * WorkflowNodeExecutionsGetResponse nodeExecutions.
+                 * @member {Array.<flyteidl.admin.INodeExecution>} nodeExecutions
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetResponse
+                 * @instance
+                 */
+                WorkflowNodeExecutionsGetResponse.prototype.nodeExecutions = $util.emptyArray;
+    
+                /**
+                 * Creates a new WorkflowNodeExecutionsGetResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetResponse
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowNodeExecutionsGetResponse} WorkflowNodeExecutionsGetResponse instance
+                 */
+                WorkflowNodeExecutionsGetResponse.create = function create(properties) {
+                    return new WorkflowNodeExecutionsGetResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowNodeExecutionsGetResponse message. Does not implicitly {@link flyteidl.admin.WorkflowNodeExecutionsGetResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetResponse
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetResponse} message WorkflowNodeExecutionsGetResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowNodeExecutionsGetResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.closure != null && message.hasOwnProperty("closure"))
+                        $root.flyteidl.core.CompiledWorkflowClosure.encode(message.closure, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.nodeExecutions != null && message.nodeExecutions.length)
+                        for (var i = 0; i < message.nodeExecutions.length; ++i)
+                            $root.flyteidl.admin.NodeExecution.encode(message.nodeExecutions[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowNodeExecutionsGetResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowNodeExecutionsGetResponse} WorkflowNodeExecutionsGetResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowNodeExecutionsGetResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowNodeExecutionsGetResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.closure = $root.flyteidl.core.CompiledWorkflowClosure.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            if (!(message.nodeExecutions && message.nodeExecutions.length))
+                                message.nodeExecutions = [];
+                            message.nodeExecutions.push($root.flyteidl.admin.NodeExecution.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowNodeExecutionsGetResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowNodeExecutionsGetResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowNodeExecutionsGetResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.closure != null && message.hasOwnProperty("closure")) {
+                        var error = $root.flyteidl.core.CompiledWorkflowClosure.verify(message.closure);
+                        if (error)
+                            return "closure." + error;
+                    }
+                    if (message.nodeExecutions != null && message.hasOwnProperty("nodeExecutions")) {
+                        if (!Array.isArray(message.nodeExecutions))
+                            return "nodeExecutions: array expected";
+                        for (var i = 0; i < message.nodeExecutions.length; ++i) {
+                            var error = $root.flyteidl.admin.NodeExecution.verify(message.nodeExecutions[i]);
+                            if (error)
+                                return "nodeExecutions." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return WorkflowNodeExecutionsGetResponse;
+            })();
+    
             admin.NodeExecutionListRequest = (function() {
     
                 /**
@@ -38920,6 +39239,1182 @@
                 };
     
                 return NodeExecutionGetDataResponse;
+            })();
+    
+            admin.WorkflowCreateRequest = (function() {
+    
+                /**
+                 * Properties of a WorkflowCreateRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowCreateRequest
+                 * @property {flyteidl.core.IIdentifier|null} [id] WorkflowCreateRequest id
+                 * @property {flyteidl.admin.IWorkflowSpec|null} [spec] WorkflowCreateRequest spec
+                 */
+    
+                /**
+                 * Constructs a new WorkflowCreateRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowCreateRequest.
+                 * @implements IWorkflowCreateRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowCreateRequest=} [properties] Properties to set
+                 */
+                function WorkflowCreateRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowCreateRequest id.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} id
+                 * @memberof flyteidl.admin.WorkflowCreateRequest
+                 * @instance
+                 */
+                WorkflowCreateRequest.prototype.id = null;
+    
+                /**
+                 * WorkflowCreateRequest spec.
+                 * @member {flyteidl.admin.IWorkflowSpec|null|undefined} spec
+                 * @memberof flyteidl.admin.WorkflowCreateRequest
+                 * @instance
+                 */
+                WorkflowCreateRequest.prototype.spec = null;
+    
+                /**
+                 * Creates a new WorkflowCreateRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowCreateRequest
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowCreateRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowCreateRequest} WorkflowCreateRequest instance
+                 */
+                WorkflowCreateRequest.create = function create(properties) {
+                    return new WorkflowCreateRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowCreateRequest message. Does not implicitly {@link flyteidl.admin.WorkflowCreateRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowCreateRequest
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowCreateRequest} message WorkflowCreateRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowCreateRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.spec != null && message.hasOwnProperty("spec"))
+                        $root.flyteidl.admin.WorkflowSpec.encode(message.spec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowCreateRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowCreateRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowCreateRequest} WorkflowCreateRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowCreateRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowCreateRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.spec = $root.flyteidl.admin.WorkflowSpec.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowCreateRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowCreateRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowCreateRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.spec != null && message.hasOwnProperty("spec")) {
+                        var error = $root.flyteidl.admin.WorkflowSpec.verify(message.spec);
+                        if (error)
+                            return "spec." + error;
+                    }
+                    return null;
+                };
+    
+                return WorkflowCreateRequest;
+            })();
+    
+            admin.WorkflowCreateResponse = (function() {
+    
+                /**
+                 * Properties of a WorkflowCreateResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowCreateResponse
+                 */
+    
+                /**
+                 * Constructs a new WorkflowCreateResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowCreateResponse.
+                 * @implements IWorkflowCreateResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowCreateResponse=} [properties] Properties to set
+                 */
+                function WorkflowCreateResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Creates a new WorkflowCreateResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowCreateResponse
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowCreateResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowCreateResponse} WorkflowCreateResponse instance
+                 */
+                WorkflowCreateResponse.create = function create(properties) {
+                    return new WorkflowCreateResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowCreateResponse message. Does not implicitly {@link flyteidl.admin.WorkflowCreateResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowCreateResponse
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowCreateResponse} message WorkflowCreateResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowCreateResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowCreateResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowCreateResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowCreateResponse} WorkflowCreateResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowCreateResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowCreateResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowCreateResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowCreateResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowCreateResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    return null;
+                };
+    
+                return WorkflowCreateResponse;
+            })();
+    
+            admin.Workflow = (function() {
+    
+                /**
+                 * Properties of a Workflow.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflow
+                 * @property {flyteidl.core.IIdentifier|null} [id] Workflow id
+                 * @property {flyteidl.admin.IWorkflowClosure|null} [closure] Workflow closure
+                 * @property {string|null} [shortDescription] Workflow shortDescription
+                 */
+    
+                /**
+                 * Constructs a new Workflow.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a Workflow.
+                 * @implements IWorkflow
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflow=} [properties] Properties to set
+                 */
+                function Workflow(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Workflow id.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} id
+                 * @memberof flyteidl.admin.Workflow
+                 * @instance
+                 */
+                Workflow.prototype.id = null;
+    
+                /**
+                 * Workflow closure.
+                 * @member {flyteidl.admin.IWorkflowClosure|null|undefined} closure
+                 * @memberof flyteidl.admin.Workflow
+                 * @instance
+                 */
+                Workflow.prototype.closure = null;
+    
+                /**
+                 * Workflow shortDescription.
+                 * @member {string} shortDescription
+                 * @memberof flyteidl.admin.Workflow
+                 * @instance
+                 */
+                Workflow.prototype.shortDescription = "";
+    
+                /**
+                 * Creates a new Workflow instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.Workflow
+                 * @static
+                 * @param {flyteidl.admin.IWorkflow=} [properties] Properties to set
+                 * @returns {flyteidl.admin.Workflow} Workflow instance
+                 */
+                Workflow.create = function create(properties) {
+                    return new Workflow(properties);
+                };
+    
+                /**
+                 * Encodes the specified Workflow message. Does not implicitly {@link flyteidl.admin.Workflow.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.Workflow
+                 * @static
+                 * @param {flyteidl.admin.IWorkflow} message Workflow message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Workflow.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.closure != null && message.hasOwnProperty("closure"))
+                        $root.flyteidl.admin.WorkflowClosure.encode(message.closure, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.shortDescription != null && message.hasOwnProperty("shortDescription"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.shortDescription);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Workflow message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.Workflow
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.Workflow} Workflow
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Workflow.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Workflow();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.closure = $root.flyteidl.admin.WorkflowClosure.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.shortDescription = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Workflow message.
+                 * @function verify
+                 * @memberof flyteidl.admin.Workflow
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Workflow.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    if (message.closure != null && message.hasOwnProperty("closure")) {
+                        var error = $root.flyteidl.admin.WorkflowClosure.verify(message.closure);
+                        if (error)
+                            return "closure." + error;
+                    }
+                    if (message.shortDescription != null && message.hasOwnProperty("shortDescription"))
+                        if (!$util.isString(message.shortDescription))
+                            return "shortDescription: string expected";
+                    return null;
+                };
+    
+                return Workflow;
+            })();
+    
+            admin.WorkflowList = (function() {
+    
+                /**
+                 * Properties of a WorkflowList.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowList
+                 * @property {Array.<flyteidl.admin.IWorkflow>|null} [workflows] WorkflowList workflows
+                 * @property {string|null} [token] WorkflowList token
+                 */
+    
+                /**
+                 * Constructs a new WorkflowList.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowList.
+                 * @implements IWorkflowList
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowList=} [properties] Properties to set
+                 */
+                function WorkflowList(properties) {
+                    this.workflows = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowList workflows.
+                 * @member {Array.<flyteidl.admin.IWorkflow>} workflows
+                 * @memberof flyteidl.admin.WorkflowList
+                 * @instance
+                 */
+                WorkflowList.prototype.workflows = $util.emptyArray;
+    
+                /**
+                 * WorkflowList token.
+                 * @member {string} token
+                 * @memberof flyteidl.admin.WorkflowList
+                 * @instance
+                 */
+                WorkflowList.prototype.token = "";
+    
+                /**
+                 * Creates a new WorkflowList instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowList
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowList=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowList} WorkflowList instance
+                 */
+                WorkflowList.create = function create(properties) {
+                    return new WorkflowList(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowList message. Does not implicitly {@link flyteidl.admin.WorkflowList.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowList
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowList} message WorkflowList message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowList.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.workflows != null && message.workflows.length)
+                        for (var i = 0; i < message.workflows.length; ++i)
+                            $root.flyteidl.admin.Workflow.encode(message.workflows[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.token != null && message.hasOwnProperty("token"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.token);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowList message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowList
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowList} WorkflowList
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowList.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowList();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.workflows && message.workflows.length))
+                                message.workflows = [];
+                            message.workflows.push($root.flyteidl.admin.Workflow.decode(reader, reader.uint32()));
+                            break;
+                        case 2:
+                            message.token = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowList message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowList
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowList.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.workflows != null && message.hasOwnProperty("workflows")) {
+                        if (!Array.isArray(message.workflows))
+                            return "workflows: array expected";
+                        for (var i = 0; i < message.workflows.length; ++i) {
+                            var error = $root.flyteidl.admin.Workflow.verify(message.workflows[i]);
+                            if (error)
+                                return "workflows." + error;
+                        }
+                    }
+                    if (message.token != null && message.hasOwnProperty("token"))
+                        if (!$util.isString(message.token))
+                            return "token: string expected";
+                    return null;
+                };
+    
+                return WorkflowList;
+            })();
+    
+            admin.WorkflowSpec = (function() {
+    
+                /**
+                 * Properties of a WorkflowSpec.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowSpec
+                 * @property {flyteidl.core.IWorkflowTemplate|null} [template] WorkflowSpec template
+                 * @property {Array.<flyteidl.core.IWorkflowTemplate>|null} [subWorkflows] WorkflowSpec subWorkflows
+                 * @property {flyteidl.admin.IDescriptionEntity|null} [description] WorkflowSpec description
+                 */
+    
+                /**
+                 * Constructs a new WorkflowSpec.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowSpec.
+                 * @implements IWorkflowSpec
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowSpec=} [properties] Properties to set
+                 */
+                function WorkflowSpec(properties) {
+                    this.subWorkflows = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowSpec template.
+                 * @member {flyteidl.core.IWorkflowTemplate|null|undefined} template
+                 * @memberof flyteidl.admin.WorkflowSpec
+                 * @instance
+                 */
+                WorkflowSpec.prototype.template = null;
+    
+                /**
+                 * WorkflowSpec subWorkflows.
+                 * @member {Array.<flyteidl.core.IWorkflowTemplate>} subWorkflows
+                 * @memberof flyteidl.admin.WorkflowSpec
+                 * @instance
+                 */
+                WorkflowSpec.prototype.subWorkflows = $util.emptyArray;
+    
+                /**
+                 * WorkflowSpec description.
+                 * @member {flyteidl.admin.IDescriptionEntity|null|undefined} description
+                 * @memberof flyteidl.admin.WorkflowSpec
+                 * @instance
+                 */
+                WorkflowSpec.prototype.description = null;
+    
+                /**
+                 * Creates a new WorkflowSpec instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowSpec
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowSpec=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowSpec} WorkflowSpec instance
+                 */
+                WorkflowSpec.create = function create(properties) {
+                    return new WorkflowSpec(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowSpec message. Does not implicitly {@link flyteidl.admin.WorkflowSpec.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowSpec
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowSpec} message WorkflowSpec message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowSpec.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.template != null && message.hasOwnProperty("template"))
+                        $root.flyteidl.core.WorkflowTemplate.encode(message.template, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.subWorkflows != null && message.subWorkflows.length)
+                        for (var i = 0; i < message.subWorkflows.length; ++i)
+                            $root.flyteidl.core.WorkflowTemplate.encode(message.subWorkflows[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.description != null && message.hasOwnProperty("description"))
+                        $root.flyteidl.admin.DescriptionEntity.encode(message.description, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowSpec message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowSpec
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowSpec} WorkflowSpec
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowSpec.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowSpec();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.template = $root.flyteidl.core.WorkflowTemplate.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            if (!(message.subWorkflows && message.subWorkflows.length))
+                                message.subWorkflows = [];
+                            message.subWorkflows.push($root.flyteidl.core.WorkflowTemplate.decode(reader, reader.uint32()));
+                            break;
+                        case 3:
+                            message.description = $root.flyteidl.admin.DescriptionEntity.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowSpec message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowSpec
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowSpec.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.template != null && message.hasOwnProperty("template")) {
+                        var error = $root.flyteidl.core.WorkflowTemplate.verify(message.template);
+                        if (error)
+                            return "template." + error;
+                    }
+                    if (message.subWorkflows != null && message.hasOwnProperty("subWorkflows")) {
+                        if (!Array.isArray(message.subWorkflows))
+                            return "subWorkflows: array expected";
+                        for (var i = 0; i < message.subWorkflows.length; ++i) {
+                            var error = $root.flyteidl.core.WorkflowTemplate.verify(message.subWorkflows[i]);
+                            if (error)
+                                return "subWorkflows." + error;
+                        }
+                    }
+                    if (message.description != null && message.hasOwnProperty("description")) {
+                        var error = $root.flyteidl.admin.DescriptionEntity.verify(message.description);
+                        if (error)
+                            return "description." + error;
+                    }
+                    return null;
+                };
+    
+                return WorkflowSpec;
+            })();
+    
+            admin.WorkflowClosure = (function() {
+    
+                /**
+                 * Properties of a WorkflowClosure.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowClosure
+                 * @property {flyteidl.core.ICompiledWorkflowClosure|null} [compiledWorkflow] WorkflowClosure compiledWorkflow
+                 * @property {google.protobuf.ITimestamp|null} [createdAt] WorkflowClosure createdAt
+                 */
+    
+                /**
+                 * Constructs a new WorkflowClosure.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowClosure.
+                 * @implements IWorkflowClosure
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowClosure=} [properties] Properties to set
+                 */
+                function WorkflowClosure(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowClosure compiledWorkflow.
+                 * @member {flyteidl.core.ICompiledWorkflowClosure|null|undefined} compiledWorkflow
+                 * @memberof flyteidl.admin.WorkflowClosure
+                 * @instance
+                 */
+                WorkflowClosure.prototype.compiledWorkflow = null;
+    
+                /**
+                 * WorkflowClosure createdAt.
+                 * @member {google.protobuf.ITimestamp|null|undefined} createdAt
+                 * @memberof flyteidl.admin.WorkflowClosure
+                 * @instance
+                 */
+                WorkflowClosure.prototype.createdAt = null;
+    
+                /**
+                 * Creates a new WorkflowClosure instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowClosure
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowClosure=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowClosure} WorkflowClosure instance
+                 */
+                WorkflowClosure.create = function create(properties) {
+                    return new WorkflowClosure(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowClosure message. Does not implicitly {@link flyteidl.admin.WorkflowClosure.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowClosure
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowClosure} message WorkflowClosure message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowClosure.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow"))
+                        $root.flyteidl.core.CompiledWorkflowClosure.encode(message.compiledWorkflow, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.createdAt != null && message.hasOwnProperty("createdAt"))
+                        $root.google.protobuf.Timestamp.encode(message.createdAt, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowClosure message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowClosure
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowClosure} WorkflowClosure
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowClosure.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowClosure();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.compiledWorkflow = $root.flyteidl.core.CompiledWorkflowClosure.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.createdAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowClosure message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowClosure
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowClosure.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow")) {
+                        var error = $root.flyteidl.core.CompiledWorkflowClosure.verify(message.compiledWorkflow);
+                        if (error)
+                            return "compiledWorkflow." + error;
+                    }
+                    if (message.createdAt != null && message.hasOwnProperty("createdAt")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.createdAt);
+                        if (error)
+                            return "createdAt." + error;
+                    }
+                    return null;
+                };
+    
+                return WorkflowClosure;
+            })();
+    
+            admin.WorkflowErrorExistsDifferentStructure = (function() {
+    
+                /**
+                 * Properties of a WorkflowErrorExistsDifferentStructure.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowErrorExistsDifferentStructure
+                 * @property {flyteidl.core.IIdentifier|null} [id] WorkflowErrorExistsDifferentStructure id
+                 */
+    
+                /**
+                 * Constructs a new WorkflowErrorExistsDifferentStructure.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowErrorExistsDifferentStructure.
+                 * @implements IWorkflowErrorExistsDifferentStructure
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure=} [properties] Properties to set
+                 */
+                function WorkflowErrorExistsDifferentStructure(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowErrorExistsDifferentStructure id.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} id
+                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+                 * @instance
+                 */
+                WorkflowErrorExistsDifferentStructure.prototype.id = null;
+    
+                /**
+                 * Creates a new WorkflowErrorExistsDifferentStructure instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowErrorExistsDifferentStructure} WorkflowErrorExistsDifferentStructure instance
+                 */
+                WorkflowErrorExistsDifferentStructure.create = function create(properties) {
+                    return new WorkflowErrorExistsDifferentStructure(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowErrorExistsDifferentStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure} message WorkflowErrorExistsDifferentStructure message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowErrorExistsDifferentStructure.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowErrorExistsDifferentStructure message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowErrorExistsDifferentStructure} WorkflowErrorExistsDifferentStructure
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowErrorExistsDifferentStructure.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowErrorExistsDifferentStructure message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowErrorExistsDifferentStructure.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    return null;
+                };
+    
+                return WorkflowErrorExistsDifferentStructure;
+            })();
+    
+            admin.WorkflowErrorExistsIdenticalStructure = (function() {
+    
+                /**
+                 * Properties of a WorkflowErrorExistsIdenticalStructure.
+                 * @memberof flyteidl.admin
+                 * @interface IWorkflowErrorExistsIdenticalStructure
+                 * @property {flyteidl.core.IIdentifier|null} [id] WorkflowErrorExistsIdenticalStructure id
+                 */
+    
+                /**
+                 * Constructs a new WorkflowErrorExistsIdenticalStructure.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a WorkflowErrorExistsIdenticalStructure.
+                 * @implements IWorkflowErrorExistsIdenticalStructure
+                 * @constructor
+                 * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure=} [properties] Properties to set
+                 */
+                function WorkflowErrorExistsIdenticalStructure(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * WorkflowErrorExistsIdenticalStructure id.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} id
+                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+                 * @instance
+                 */
+                WorkflowErrorExistsIdenticalStructure.prototype.id = null;
+    
+                /**
+                 * Creates a new WorkflowErrorExistsIdenticalStructure instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure=} [properties] Properties to set
+                 * @returns {flyteidl.admin.WorkflowErrorExistsIdenticalStructure} WorkflowErrorExistsIdenticalStructure instance
+                 */
+                WorkflowErrorExistsIdenticalStructure.create = function create(properties) {
+                    return new WorkflowErrorExistsIdenticalStructure(properties);
+                };
+    
+                /**
+                 * Encodes the specified WorkflowErrorExistsIdenticalStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+                 * @static
+                 * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure} message WorkflowErrorExistsIdenticalStructure message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                WorkflowErrorExistsIdenticalStructure.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a WorkflowErrorExistsIdenticalStructure message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.WorkflowErrorExistsIdenticalStructure} WorkflowErrorExistsIdenticalStructure
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                WorkflowErrorExistsIdenticalStructure.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a WorkflowErrorExistsIdenticalStructure message.
+                 * @function verify
+                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                WorkflowErrorExistsIdenticalStructure.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    return null;
+                };
+    
+                return WorkflowErrorExistsIdenticalStructure;
+            })();
+    
+            admin.CreateWorkflowFailureReason = (function() {
+    
+                /**
+                 * Properties of a CreateWorkflowFailureReason.
+                 * @memberof flyteidl.admin
+                 * @interface ICreateWorkflowFailureReason
+                 * @property {flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null} [existsDifferentStructure] CreateWorkflowFailureReason existsDifferentStructure
+                 * @property {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null} [existsIdenticalStructure] CreateWorkflowFailureReason existsIdenticalStructure
+                 */
+    
+                /**
+                 * Constructs a new CreateWorkflowFailureReason.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a CreateWorkflowFailureReason.
+                 * @implements ICreateWorkflowFailureReason
+                 * @constructor
+                 * @param {flyteidl.admin.ICreateWorkflowFailureReason=} [properties] Properties to set
+                 */
+                function CreateWorkflowFailureReason(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * CreateWorkflowFailureReason existsDifferentStructure.
+                 * @member {flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null|undefined} existsDifferentStructure
+                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
+                 * @instance
+                 */
+                CreateWorkflowFailureReason.prototype.existsDifferentStructure = null;
+    
+                /**
+                 * CreateWorkflowFailureReason existsIdenticalStructure.
+                 * @member {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null|undefined} existsIdenticalStructure
+                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
+                 * @instance
+                 */
+                CreateWorkflowFailureReason.prototype.existsIdenticalStructure = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * CreateWorkflowFailureReason reason.
+                 * @member {"existsDifferentStructure"|"existsIdenticalStructure"|undefined} reason
+                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
+                 * @instance
+                 */
+                Object.defineProperty(CreateWorkflowFailureReason.prototype, "reason", {
+                    get: $util.oneOfGetter($oneOfFields = ["existsDifferentStructure", "existsIdenticalStructure"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new CreateWorkflowFailureReason instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
+                 * @static
+                 * @param {flyteidl.admin.ICreateWorkflowFailureReason=} [properties] Properties to set
+                 * @returns {flyteidl.admin.CreateWorkflowFailureReason} CreateWorkflowFailureReason instance
+                 */
+                CreateWorkflowFailureReason.create = function create(properties) {
+                    return new CreateWorkflowFailureReason(properties);
+                };
+    
+                /**
+                 * Encodes the specified CreateWorkflowFailureReason message. Does not implicitly {@link flyteidl.admin.CreateWorkflowFailureReason.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
+                 * @static
+                 * @param {flyteidl.admin.ICreateWorkflowFailureReason} message CreateWorkflowFailureReason message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                CreateWorkflowFailureReason.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.existsDifferentStructure != null && message.hasOwnProperty("existsDifferentStructure"))
+                        $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.encode(message.existsDifferentStructure, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.existsIdenticalStructure != null && message.hasOwnProperty("existsIdenticalStructure"))
+                        $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.encode(message.existsIdenticalStructure, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a CreateWorkflowFailureReason message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.CreateWorkflowFailureReason} CreateWorkflowFailureReason
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                CreateWorkflowFailureReason.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.CreateWorkflowFailureReason();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.existsDifferentStructure = $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.existsIdenticalStructure = $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a CreateWorkflowFailureReason message.
+                 * @function verify
+                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                CreateWorkflowFailureReason.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.existsDifferentStructure != null && message.hasOwnProperty("existsDifferentStructure")) {
+                        properties.reason = 1;
+                        {
+                            var error = $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify(message.existsDifferentStructure);
+                            if (error)
+                                return "existsDifferentStructure." + error;
+                        }
+                    }
+                    if (message.existsIdenticalStructure != null && message.hasOwnProperty("existsIdenticalStructure")) {
+                        if (properties.reason === 1)
+                            return "reason: multiple values";
+                        properties.reason = 1;
+                        {
+                            var error = $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify(message.existsIdenticalStructure);
+                            if (error)
+                                return "existsIdenticalStructure." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return CreateWorkflowFailureReason;
             })();
     
             admin.EmailMessage = (function() {
@@ -45117,1182 +46612,6 @@
                 return GetVersionRequest;
             })();
     
-            admin.WorkflowCreateRequest = (function() {
-    
-                /**
-                 * Properties of a WorkflowCreateRequest.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowCreateRequest
-                 * @property {flyteidl.core.IIdentifier|null} [id] WorkflowCreateRequest id
-                 * @property {flyteidl.admin.IWorkflowSpec|null} [spec] WorkflowCreateRequest spec
-                 */
-    
-                /**
-                 * Constructs a new WorkflowCreateRequest.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowCreateRequest.
-                 * @implements IWorkflowCreateRequest
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowCreateRequest=} [properties] Properties to set
-                 */
-                function WorkflowCreateRequest(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowCreateRequest id.
-                 * @member {flyteidl.core.IIdentifier|null|undefined} id
-                 * @memberof flyteidl.admin.WorkflowCreateRequest
-                 * @instance
-                 */
-                WorkflowCreateRequest.prototype.id = null;
-    
-                /**
-                 * WorkflowCreateRequest spec.
-                 * @member {flyteidl.admin.IWorkflowSpec|null|undefined} spec
-                 * @memberof flyteidl.admin.WorkflowCreateRequest
-                 * @instance
-                 */
-                WorkflowCreateRequest.prototype.spec = null;
-    
-                /**
-                 * Creates a new WorkflowCreateRequest instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowCreateRequest
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowCreateRequest=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowCreateRequest} WorkflowCreateRequest instance
-                 */
-                WorkflowCreateRequest.create = function create(properties) {
-                    return new WorkflowCreateRequest(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowCreateRequest message. Does not implicitly {@link flyteidl.admin.WorkflowCreateRequest.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowCreateRequest
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowCreateRequest} message WorkflowCreateRequest message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowCreateRequest.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.spec != null && message.hasOwnProperty("spec"))
-                        $root.flyteidl.admin.WorkflowSpec.encode(message.spec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowCreateRequest message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowCreateRequest
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowCreateRequest} WorkflowCreateRequest
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowCreateRequest.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowCreateRequest();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.spec = $root.flyteidl.admin.WorkflowSpec.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowCreateRequest message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowCreateRequest
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowCreateRequest.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.id != null && message.hasOwnProperty("id")) {
-                        var error = $root.flyteidl.core.Identifier.verify(message.id);
-                        if (error)
-                            return "id." + error;
-                    }
-                    if (message.spec != null && message.hasOwnProperty("spec")) {
-                        var error = $root.flyteidl.admin.WorkflowSpec.verify(message.spec);
-                        if (error)
-                            return "spec." + error;
-                    }
-                    return null;
-                };
-    
-                return WorkflowCreateRequest;
-            })();
-    
-            admin.WorkflowCreateResponse = (function() {
-    
-                /**
-                 * Properties of a WorkflowCreateResponse.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowCreateResponse
-                 */
-    
-                /**
-                 * Constructs a new WorkflowCreateResponse.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowCreateResponse.
-                 * @implements IWorkflowCreateResponse
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowCreateResponse=} [properties] Properties to set
-                 */
-                function WorkflowCreateResponse(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * Creates a new WorkflowCreateResponse instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowCreateResponse
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowCreateResponse=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowCreateResponse} WorkflowCreateResponse instance
-                 */
-                WorkflowCreateResponse.create = function create(properties) {
-                    return new WorkflowCreateResponse(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowCreateResponse message. Does not implicitly {@link flyteidl.admin.WorkflowCreateResponse.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowCreateResponse
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowCreateResponse} message WorkflowCreateResponse message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowCreateResponse.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowCreateResponse message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowCreateResponse
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowCreateResponse} WorkflowCreateResponse
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowCreateResponse.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowCreateResponse();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowCreateResponse message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowCreateResponse
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowCreateResponse.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    return null;
-                };
-    
-                return WorkflowCreateResponse;
-            })();
-    
-            admin.Workflow = (function() {
-    
-                /**
-                 * Properties of a Workflow.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflow
-                 * @property {flyteidl.core.IIdentifier|null} [id] Workflow id
-                 * @property {flyteidl.admin.IWorkflowClosure|null} [closure] Workflow closure
-                 * @property {string|null} [shortDescription] Workflow shortDescription
-                 */
-    
-                /**
-                 * Constructs a new Workflow.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a Workflow.
-                 * @implements IWorkflow
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflow=} [properties] Properties to set
-                 */
-                function Workflow(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * Workflow id.
-                 * @member {flyteidl.core.IIdentifier|null|undefined} id
-                 * @memberof flyteidl.admin.Workflow
-                 * @instance
-                 */
-                Workflow.prototype.id = null;
-    
-                /**
-                 * Workflow closure.
-                 * @member {flyteidl.admin.IWorkflowClosure|null|undefined} closure
-                 * @memberof flyteidl.admin.Workflow
-                 * @instance
-                 */
-                Workflow.prototype.closure = null;
-    
-                /**
-                 * Workflow shortDescription.
-                 * @member {string} shortDescription
-                 * @memberof flyteidl.admin.Workflow
-                 * @instance
-                 */
-                Workflow.prototype.shortDescription = "";
-    
-                /**
-                 * Creates a new Workflow instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.Workflow
-                 * @static
-                 * @param {flyteidl.admin.IWorkflow=} [properties] Properties to set
-                 * @returns {flyteidl.admin.Workflow} Workflow instance
-                 */
-                Workflow.create = function create(properties) {
-                    return new Workflow(properties);
-                };
-    
-                /**
-                 * Encodes the specified Workflow message. Does not implicitly {@link flyteidl.admin.Workflow.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.Workflow
-                 * @static
-                 * @param {flyteidl.admin.IWorkflow} message Workflow message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                Workflow.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.closure != null && message.hasOwnProperty("closure"))
-                        $root.flyteidl.admin.WorkflowClosure.encode(message.closure, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.shortDescription != null && message.hasOwnProperty("shortDescription"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.shortDescription);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a Workflow message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.Workflow
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.Workflow} Workflow
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                Workflow.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.Workflow();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.closure = $root.flyteidl.admin.WorkflowClosure.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            message.shortDescription = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a Workflow message.
-                 * @function verify
-                 * @memberof flyteidl.admin.Workflow
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                Workflow.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.id != null && message.hasOwnProperty("id")) {
-                        var error = $root.flyteidl.core.Identifier.verify(message.id);
-                        if (error)
-                            return "id." + error;
-                    }
-                    if (message.closure != null && message.hasOwnProperty("closure")) {
-                        var error = $root.flyteidl.admin.WorkflowClosure.verify(message.closure);
-                        if (error)
-                            return "closure." + error;
-                    }
-                    if (message.shortDescription != null && message.hasOwnProperty("shortDescription"))
-                        if (!$util.isString(message.shortDescription))
-                            return "shortDescription: string expected";
-                    return null;
-                };
-    
-                return Workflow;
-            })();
-    
-            admin.WorkflowList = (function() {
-    
-                /**
-                 * Properties of a WorkflowList.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowList
-                 * @property {Array.<flyteidl.admin.IWorkflow>|null} [workflows] WorkflowList workflows
-                 * @property {string|null} [token] WorkflowList token
-                 */
-    
-                /**
-                 * Constructs a new WorkflowList.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowList.
-                 * @implements IWorkflowList
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowList=} [properties] Properties to set
-                 */
-                function WorkflowList(properties) {
-                    this.workflows = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowList workflows.
-                 * @member {Array.<flyteidl.admin.IWorkflow>} workflows
-                 * @memberof flyteidl.admin.WorkflowList
-                 * @instance
-                 */
-                WorkflowList.prototype.workflows = $util.emptyArray;
-    
-                /**
-                 * WorkflowList token.
-                 * @member {string} token
-                 * @memberof flyteidl.admin.WorkflowList
-                 * @instance
-                 */
-                WorkflowList.prototype.token = "";
-    
-                /**
-                 * Creates a new WorkflowList instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowList
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowList=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowList} WorkflowList instance
-                 */
-                WorkflowList.create = function create(properties) {
-                    return new WorkflowList(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowList message. Does not implicitly {@link flyteidl.admin.WorkflowList.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowList
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowList} message WorkflowList message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowList.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.workflows != null && message.workflows.length)
-                        for (var i = 0; i < message.workflows.length; ++i)
-                            $root.flyteidl.admin.Workflow.encode(message.workflows[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.token != null && message.hasOwnProperty("token"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.token);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowList message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowList
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowList} WorkflowList
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowList.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowList();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            if (!(message.workflows && message.workflows.length))
-                                message.workflows = [];
-                            message.workflows.push($root.flyteidl.admin.Workflow.decode(reader, reader.uint32()));
-                            break;
-                        case 2:
-                            message.token = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowList message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowList
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowList.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.workflows != null && message.hasOwnProperty("workflows")) {
-                        if (!Array.isArray(message.workflows))
-                            return "workflows: array expected";
-                        for (var i = 0; i < message.workflows.length; ++i) {
-                            var error = $root.flyteidl.admin.Workflow.verify(message.workflows[i]);
-                            if (error)
-                                return "workflows." + error;
-                        }
-                    }
-                    if (message.token != null && message.hasOwnProperty("token"))
-                        if (!$util.isString(message.token))
-                            return "token: string expected";
-                    return null;
-                };
-    
-                return WorkflowList;
-            })();
-    
-            admin.WorkflowSpec = (function() {
-    
-                /**
-                 * Properties of a WorkflowSpec.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowSpec
-                 * @property {flyteidl.core.IWorkflowTemplate|null} [template] WorkflowSpec template
-                 * @property {Array.<flyteidl.core.IWorkflowTemplate>|null} [subWorkflows] WorkflowSpec subWorkflows
-                 * @property {flyteidl.admin.IDescriptionEntity|null} [description] WorkflowSpec description
-                 */
-    
-                /**
-                 * Constructs a new WorkflowSpec.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowSpec.
-                 * @implements IWorkflowSpec
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowSpec=} [properties] Properties to set
-                 */
-                function WorkflowSpec(properties) {
-                    this.subWorkflows = [];
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowSpec template.
-                 * @member {flyteidl.core.IWorkflowTemplate|null|undefined} template
-                 * @memberof flyteidl.admin.WorkflowSpec
-                 * @instance
-                 */
-                WorkflowSpec.prototype.template = null;
-    
-                /**
-                 * WorkflowSpec subWorkflows.
-                 * @member {Array.<flyteidl.core.IWorkflowTemplate>} subWorkflows
-                 * @memberof flyteidl.admin.WorkflowSpec
-                 * @instance
-                 */
-                WorkflowSpec.prototype.subWorkflows = $util.emptyArray;
-    
-                /**
-                 * WorkflowSpec description.
-                 * @member {flyteidl.admin.IDescriptionEntity|null|undefined} description
-                 * @memberof flyteidl.admin.WorkflowSpec
-                 * @instance
-                 */
-                WorkflowSpec.prototype.description = null;
-    
-                /**
-                 * Creates a new WorkflowSpec instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowSpec
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowSpec=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowSpec} WorkflowSpec instance
-                 */
-                WorkflowSpec.create = function create(properties) {
-                    return new WorkflowSpec(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowSpec message. Does not implicitly {@link flyteidl.admin.WorkflowSpec.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowSpec
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowSpec} message WorkflowSpec message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowSpec.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.template != null && message.hasOwnProperty("template"))
-                        $root.flyteidl.core.WorkflowTemplate.encode(message.template, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.subWorkflows != null && message.subWorkflows.length)
-                        for (var i = 0; i < message.subWorkflows.length; ++i)
-                            $root.flyteidl.core.WorkflowTemplate.encode(message.subWorkflows[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.description != null && message.hasOwnProperty("description"))
-                        $root.flyteidl.admin.DescriptionEntity.encode(message.description, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowSpec message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowSpec
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowSpec} WorkflowSpec
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowSpec.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowSpec();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.template = $root.flyteidl.core.WorkflowTemplate.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            if (!(message.subWorkflows && message.subWorkflows.length))
-                                message.subWorkflows = [];
-                            message.subWorkflows.push($root.flyteidl.core.WorkflowTemplate.decode(reader, reader.uint32()));
-                            break;
-                        case 3:
-                            message.description = $root.flyteidl.admin.DescriptionEntity.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowSpec message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowSpec
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowSpec.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.template != null && message.hasOwnProperty("template")) {
-                        var error = $root.flyteidl.core.WorkflowTemplate.verify(message.template);
-                        if (error)
-                            return "template." + error;
-                    }
-                    if (message.subWorkflows != null && message.hasOwnProperty("subWorkflows")) {
-                        if (!Array.isArray(message.subWorkflows))
-                            return "subWorkflows: array expected";
-                        for (var i = 0; i < message.subWorkflows.length; ++i) {
-                            var error = $root.flyteidl.core.WorkflowTemplate.verify(message.subWorkflows[i]);
-                            if (error)
-                                return "subWorkflows." + error;
-                        }
-                    }
-                    if (message.description != null && message.hasOwnProperty("description")) {
-                        var error = $root.flyteidl.admin.DescriptionEntity.verify(message.description);
-                        if (error)
-                            return "description." + error;
-                    }
-                    return null;
-                };
-    
-                return WorkflowSpec;
-            })();
-    
-            admin.WorkflowClosure = (function() {
-    
-                /**
-                 * Properties of a WorkflowClosure.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowClosure
-                 * @property {flyteidl.core.ICompiledWorkflowClosure|null} [compiledWorkflow] WorkflowClosure compiledWorkflow
-                 * @property {google.protobuf.ITimestamp|null} [createdAt] WorkflowClosure createdAt
-                 */
-    
-                /**
-                 * Constructs a new WorkflowClosure.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowClosure.
-                 * @implements IWorkflowClosure
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowClosure=} [properties] Properties to set
-                 */
-                function WorkflowClosure(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowClosure compiledWorkflow.
-                 * @member {flyteidl.core.ICompiledWorkflowClosure|null|undefined} compiledWorkflow
-                 * @memberof flyteidl.admin.WorkflowClosure
-                 * @instance
-                 */
-                WorkflowClosure.prototype.compiledWorkflow = null;
-    
-                /**
-                 * WorkflowClosure createdAt.
-                 * @member {google.protobuf.ITimestamp|null|undefined} createdAt
-                 * @memberof flyteidl.admin.WorkflowClosure
-                 * @instance
-                 */
-                WorkflowClosure.prototype.createdAt = null;
-    
-                /**
-                 * Creates a new WorkflowClosure instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowClosure
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowClosure=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowClosure} WorkflowClosure instance
-                 */
-                WorkflowClosure.create = function create(properties) {
-                    return new WorkflowClosure(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowClosure message. Does not implicitly {@link flyteidl.admin.WorkflowClosure.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowClosure
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowClosure} message WorkflowClosure message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowClosure.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow"))
-                        $root.flyteidl.core.CompiledWorkflowClosure.encode(message.compiledWorkflow, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.createdAt != null && message.hasOwnProperty("createdAt"))
-                        $root.google.protobuf.Timestamp.encode(message.createdAt, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowClosure message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowClosure
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowClosure} WorkflowClosure
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowClosure.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowClosure();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.compiledWorkflow = $root.flyteidl.core.CompiledWorkflowClosure.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.createdAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowClosure message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowClosure
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowClosure.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow")) {
-                        var error = $root.flyteidl.core.CompiledWorkflowClosure.verify(message.compiledWorkflow);
-                        if (error)
-                            return "compiledWorkflow." + error;
-                    }
-                    if (message.createdAt != null && message.hasOwnProperty("createdAt")) {
-                        var error = $root.google.protobuf.Timestamp.verify(message.createdAt);
-                        if (error)
-                            return "createdAt." + error;
-                    }
-                    return null;
-                };
-    
-                return WorkflowClosure;
-            })();
-    
-            admin.WorkflowErrorExistsDifferentStructure = (function() {
-    
-                /**
-                 * Properties of a WorkflowErrorExistsDifferentStructure.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowErrorExistsDifferentStructure
-                 * @property {flyteidl.core.IIdentifier|null} [id] WorkflowErrorExistsDifferentStructure id
-                 */
-    
-                /**
-                 * Constructs a new WorkflowErrorExistsDifferentStructure.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowErrorExistsDifferentStructure.
-                 * @implements IWorkflowErrorExistsDifferentStructure
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure=} [properties] Properties to set
-                 */
-                function WorkflowErrorExistsDifferentStructure(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowErrorExistsDifferentStructure id.
-                 * @member {flyteidl.core.IIdentifier|null|undefined} id
-                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
-                 * @instance
-                 */
-                WorkflowErrorExistsDifferentStructure.prototype.id = null;
-    
-                /**
-                 * Creates a new WorkflowErrorExistsDifferentStructure instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowErrorExistsDifferentStructure} WorkflowErrorExistsDifferentStructure instance
-                 */
-                WorkflowErrorExistsDifferentStructure.create = function create(properties) {
-                    return new WorkflowErrorExistsDifferentStructure(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowErrorExistsDifferentStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowErrorExistsDifferentStructure} message WorkflowErrorExistsDifferentStructure message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowErrorExistsDifferentStructure.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowErrorExistsDifferentStructure message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowErrorExistsDifferentStructure} WorkflowErrorExistsDifferentStructure
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowErrorExistsDifferentStructure.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowErrorExistsDifferentStructure message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowErrorExistsDifferentStructure
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowErrorExistsDifferentStructure.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.id != null && message.hasOwnProperty("id")) {
-                        var error = $root.flyteidl.core.Identifier.verify(message.id);
-                        if (error)
-                            return "id." + error;
-                    }
-                    return null;
-                };
-    
-                return WorkflowErrorExistsDifferentStructure;
-            })();
-    
-            admin.WorkflowErrorExistsIdenticalStructure = (function() {
-    
-                /**
-                 * Properties of a WorkflowErrorExistsIdenticalStructure.
-                 * @memberof flyteidl.admin
-                 * @interface IWorkflowErrorExistsIdenticalStructure
-                 * @property {flyteidl.core.IIdentifier|null} [id] WorkflowErrorExistsIdenticalStructure id
-                 */
-    
-                /**
-                 * Constructs a new WorkflowErrorExistsIdenticalStructure.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a WorkflowErrorExistsIdenticalStructure.
-                 * @implements IWorkflowErrorExistsIdenticalStructure
-                 * @constructor
-                 * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure=} [properties] Properties to set
-                 */
-                function WorkflowErrorExistsIdenticalStructure(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * WorkflowErrorExistsIdenticalStructure id.
-                 * @member {flyteidl.core.IIdentifier|null|undefined} id
-                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
-                 * @instance
-                 */
-                WorkflowErrorExistsIdenticalStructure.prototype.id = null;
-    
-                /**
-                 * Creates a new WorkflowErrorExistsIdenticalStructure instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure=} [properties] Properties to set
-                 * @returns {flyteidl.admin.WorkflowErrorExistsIdenticalStructure} WorkflowErrorExistsIdenticalStructure instance
-                 */
-                WorkflowErrorExistsIdenticalStructure.create = function create(properties) {
-                    return new WorkflowErrorExistsIdenticalStructure(properties);
-                };
-    
-                /**
-                 * Encodes the specified WorkflowErrorExistsIdenticalStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
-                 * @static
-                 * @param {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure} message WorkflowErrorExistsIdenticalStructure message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                WorkflowErrorExistsIdenticalStructure.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a WorkflowErrorExistsIdenticalStructure message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.WorkflowErrorExistsIdenticalStructure} WorkflowErrorExistsIdenticalStructure
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                WorkflowErrorExistsIdenticalStructure.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a WorkflowErrorExistsIdenticalStructure message.
-                 * @function verify
-                 * @memberof flyteidl.admin.WorkflowErrorExistsIdenticalStructure
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                WorkflowErrorExistsIdenticalStructure.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.id != null && message.hasOwnProperty("id")) {
-                        var error = $root.flyteidl.core.Identifier.verify(message.id);
-                        if (error)
-                            return "id." + error;
-                    }
-                    return null;
-                };
-    
-                return WorkflowErrorExistsIdenticalStructure;
-            })();
-    
-            admin.CreateWorkflowFailureReason = (function() {
-    
-                /**
-                 * Properties of a CreateWorkflowFailureReason.
-                 * @memberof flyteidl.admin
-                 * @interface ICreateWorkflowFailureReason
-                 * @property {flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null} [existsDifferentStructure] CreateWorkflowFailureReason existsDifferentStructure
-                 * @property {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null} [existsIdenticalStructure] CreateWorkflowFailureReason existsIdenticalStructure
-                 */
-    
-                /**
-                 * Constructs a new CreateWorkflowFailureReason.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a CreateWorkflowFailureReason.
-                 * @implements ICreateWorkflowFailureReason
-                 * @constructor
-                 * @param {flyteidl.admin.ICreateWorkflowFailureReason=} [properties] Properties to set
-                 */
-                function CreateWorkflowFailureReason(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * CreateWorkflowFailureReason existsDifferentStructure.
-                 * @member {flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null|undefined} existsDifferentStructure
-                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
-                 * @instance
-                 */
-                CreateWorkflowFailureReason.prototype.existsDifferentStructure = null;
-    
-                /**
-                 * CreateWorkflowFailureReason existsIdenticalStructure.
-                 * @member {flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null|undefined} existsIdenticalStructure
-                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
-                 * @instance
-                 */
-                CreateWorkflowFailureReason.prototype.existsIdenticalStructure = null;
-    
-                // OneOf field names bound to virtual getters and setters
-                var $oneOfFields;
-    
-                /**
-                 * CreateWorkflowFailureReason reason.
-                 * @member {"existsDifferentStructure"|"existsIdenticalStructure"|undefined} reason
-                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
-                 * @instance
-                 */
-                Object.defineProperty(CreateWorkflowFailureReason.prototype, "reason", {
-                    get: $util.oneOfGetter($oneOfFields = ["existsDifferentStructure", "existsIdenticalStructure"]),
-                    set: $util.oneOfSetter($oneOfFields)
-                });
-    
-                /**
-                 * Creates a new CreateWorkflowFailureReason instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
-                 * @static
-                 * @param {flyteidl.admin.ICreateWorkflowFailureReason=} [properties] Properties to set
-                 * @returns {flyteidl.admin.CreateWorkflowFailureReason} CreateWorkflowFailureReason instance
-                 */
-                CreateWorkflowFailureReason.create = function create(properties) {
-                    return new CreateWorkflowFailureReason(properties);
-                };
-    
-                /**
-                 * Encodes the specified CreateWorkflowFailureReason message. Does not implicitly {@link flyteidl.admin.CreateWorkflowFailureReason.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
-                 * @static
-                 * @param {flyteidl.admin.ICreateWorkflowFailureReason} message CreateWorkflowFailureReason message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                CreateWorkflowFailureReason.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.existsDifferentStructure != null && message.hasOwnProperty("existsDifferentStructure"))
-                        $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.encode(message.existsDifferentStructure, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.existsIdenticalStructure != null && message.hasOwnProperty("existsIdenticalStructure"))
-                        $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.encode(message.existsIdenticalStructure, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a CreateWorkflowFailureReason message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.CreateWorkflowFailureReason} CreateWorkflowFailureReason
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                CreateWorkflowFailureReason.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.CreateWorkflowFailureReason();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.existsDifferentStructure = $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.existsIdenticalStructure = $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a CreateWorkflowFailureReason message.
-                 * @function verify
-                 * @memberof flyteidl.admin.CreateWorkflowFailureReason
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                CreateWorkflowFailureReason.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    var properties = {};
-                    if (message.existsDifferentStructure != null && message.hasOwnProperty("existsDifferentStructure")) {
-                        properties.reason = 1;
-                        {
-                            var error = $root.flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify(message.existsDifferentStructure);
-                            if (error)
-                                return "existsDifferentStructure." + error;
-                        }
-                    }
-                    if (message.existsIdenticalStructure != null && message.hasOwnProperty("existsIdenticalStructure")) {
-                        if (properties.reason === 1)
-                            return "reason: multiple values";
-                        properties.reason = 1;
-                        {
-                            var error = $root.flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify(message.existsIdenticalStructure);
-                            if (error)
-                                return "existsIdenticalStructure." + error;
-                        }
-                    }
-                    return null;
-                };
-    
-                return CreateWorkflowFailureReason;
-            })();
-    
             admin.WorkflowAttributes = (function() {
     
                 /**
@@ -48043,6 +48362,39 @@
                  * @instance
                  * @param {flyteidl.admin.INodeExecutionGetRequest} request NodeExecutionGetRequest message or plain object
                  * @returns {Promise<flyteidl.admin.NodeExecution>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getWorkflowNodeExecutions}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetWorkflowNodeExecutionsCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.WorkflowNodeExecutionsGetResponse} [response] WorkflowNodeExecutionsGetResponse
+                 */
+    
+                /**
+                 * Calls GetWorkflowNodeExecutions.
+                 * @function getWorkflowNodeExecutions
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetRequest} request WorkflowNodeExecutionsGetRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetWorkflowNodeExecutionsCallback} callback Node-style callback called with the error, if any, and WorkflowNodeExecutionsGetResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getWorkflowNodeExecutions = function getWorkflowNodeExecutions(request, callback) {
+                    return this.rpcCall(getWorkflowNodeExecutions, $root.flyteidl.admin.WorkflowNodeExecutionsGetRequest, $root.flyteidl.admin.WorkflowNodeExecutionsGetResponse, request, callback);
+                }, "name", { value: "GetWorkflowNodeExecutions" });
+    
+                /**
+                 * Calls GetWorkflowNodeExecutions.
+                 * @function getWorkflowNodeExecutions
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IWorkflowNodeExecutionsGetRequest} request WorkflowNodeExecutionsGetRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.WorkflowNodeExecutionsGetResponse>} Promise
                  * @variation 2
                  */
     

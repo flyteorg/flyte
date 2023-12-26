@@ -66,6 +66,24 @@ func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (mo
 	return workflow, nil
 }
 
+func (r *WorkflowRepo) GetByID(ctx context.Context, id uint) (models.Workflow, error) {
+	// TODO remove
+	var workflow models.Workflow
+	err := r.db.WithContext(ctx).
+		Where(&models.Workflow{
+			BaseModel: models.BaseModel{ID: id},
+		}).
+		Take(&workflow).
+		Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.Workflow{}, flyteAdminDbErrors.GetMissingEntityByIDError(core.ResourceType_WORKFLOW.String())
+		}
+		return models.Workflow{}, r.errorTransformer.ToFlyteAdminError(err)
+	}
+	return workflow, nil
+}
+
 func (r *WorkflowRepo) List(
 	ctx context.Context, input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error) {
 	// First validate input.

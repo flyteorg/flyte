@@ -24,9 +24,9 @@ var adminScope = promutils.NewScope("flyteadmin")
 func getDbConfig() *database.DbConfig {
 	return &database.DbConfig{
 		Postgres: database.PostgresConfig{
-			Host:   "postgres",
+			Host:   "localhost",
 			Port:   5432,
-			DbName: "postgres",
+			DbName: "flyteadmin",
 			User:   "postgres",
 		},
 	}
@@ -74,7 +74,7 @@ func truncateAllTablesForTestingOnly() {
 	TruncateAdminTags := fmt.Sprintf("TRUNCATE TABLE admin_tags;")
 	TruncateExecutionAdminTags := fmt.Sprintf("TRUNCATE TABLE execution_admin_tags;")
 	ctx := context.Background()
-	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
+	db, err := repositories.GetDB(ctx, getLocalDbConfig(), getLoggerConfig())
 	if err != nil {
 		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)
 	}

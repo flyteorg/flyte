@@ -48,6 +48,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**GetVersion**](docs/AdminServiceApi.md#getversion) | **Get** /api/v1/version | 
 *AdminServiceApi* | [**GetWorkflow**](docs/AdminServiceApi.md#getworkflow) | **Get** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
 *AdminServiceApi* | [**GetWorkflowAttributes**](docs/AdminServiceApi.md#getworkflowattributes) | **Get** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**GetWorkflowNodeExecutions**](docs/AdminServiceApi.md#getworkflownodeexecutions) | **Get** /api/v1/workflow_node_executions/{execution_id.project}/{execution_id.domain}/{execution_id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.WorkflowNodeExecutionsGetResponse&#x60;.
 *AdminServiceApi* | [**ListActiveLaunchPlans**](docs/AdminServiceApi.md#listactivelaunchplans) | **Get** /api/v1/active_launch_plans/{project}/{domain} | List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
 *AdminServiceApi* | [**ListDescriptionEntities**](docs/AdminServiceApi.md#listdescriptionentities) | **Get** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
 *AdminServiceApi* | [**ListDescriptionEntities2**](docs/AdminServiceApi.md#listdescriptionentities2) | **Get** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
@@ -205,6 +206,7 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowExecutionGetDataResponse](docs/AdminWorkflowExecutionGetDataResponse.md)
  - [AdminWorkflowExecutionGetMetricsResponse](docs/AdminWorkflowExecutionGetMetricsResponse.md)
  - [AdminWorkflowList](docs/AdminWorkflowList.md)
+ - [AdminWorkflowNodeExecutionsGetResponse](docs/AdminWorkflowNodeExecutionsGetResponse.md)
  - [AdminWorkflowSpec](docs/AdminWorkflowSpec.md)
  - [BlobTypeBlobDimensionality](docs/BlobTypeBlobDimensionality.md)
  - [CatalogReservationStatus](docs/CatalogReservationStatus.md)

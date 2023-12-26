@@ -15,4 +15,5 @@ type NodeExecutionInterface interface {
 	ListNodeExecutionsForTask(ctx context.Context, request admin.NodeExecutionForTaskListRequest) (*admin.NodeExecutionList, error)
 	GetNodeExecutionData(
 		ctx context.Context, request admin.NodeExecutionGetDataRequest) (*admin.NodeExecutionGetDataResponse, error)
+	GetWorkflowNodeExecutions(ctx context.Context, request admin.WorkflowNodeExecutionsGetRequest) (*admin.WorkflowNodeExecutionsGetResponse, error)
 }

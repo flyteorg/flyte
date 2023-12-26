@@ -361,24 +361,21 @@ func (m *NodeExecutionManager) GetNodeExecution(
 	return nodeExecution, nil
 }
 
-func (m *NodeExecutionManager) listNodeExecutions(
-	ctx context.Context, identifierFilters []common.InlineFilter,
-	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort, mapFilters []common.MapFilter) (
-	*admin.NodeExecutionList, error) {
-
+func (m *NodeExecutionManager) listNodeExecutionsModels(ctx context.Context, identifierFilters []common.InlineFilter,
+	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort, mapFilters []common.MapFilter) (repoInterfaces.NodeExecutionCollectionOutput, error) {
 	filters, err := util.AddRequestFilters(requestFilters, common.NodeExecution, identifierFilters)
 	if err != nil {
-		return nil, err
+		return repoInterfaces.NodeExecutionCollectionOutput{}, err
 	}
 
 	sortParameter, err := common.NewSortParameter(sortBy, models.NodeExecutionColumns)
 	if err != nil {
-		return nil, err
+		return repoInterfaces.NodeExecutionCollectionOutput{}, err
 	}
 
 	offset, err := validation.ValidateToken(requestToken)
 	if err != nil {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+		return repoInterfaces.NodeExecutionCollectionOutput{}, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"invalid pagination token %s for ListNodeExecutions", requestToken)
 	}
 	listInput := repoInterfaces.ListResourceInput{
@@ -391,14 +388,30 @@ func (m *NodeExecutionManager) listNodeExecutions(
 	listInput.MapFilters = mapFilters
 	output, err := m.db.NodeExecutionRepo().List(ctx, listInput)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to list node executions for request with err %v", err)
+		logger.Errorf(ctx, "failed to list node executions for request with err %v", err)
+		return repoInterfaces.NodeExecutionCollectionOutput{}, err
+	}
+
+	if len(output.NodeExecutions) == int(limit) {
+		output.Token = strconv.Itoa(offset + len(output.NodeExecutions))
+	}
+	return output, nil
+}
+
+func (m *NodeExecutionManager) listNodeExecutions(
+	ctx context.Context,
+	identifierFilters []common.InlineFilter,
+	requestFilters string,
+	limit uint32,
+	requestToken string,
+	sortBy *admin.Sort,
+	mapFilters []common.MapFilter,
+) (*admin.NodeExecutionList, error) {
+	output, err := m.listNodeExecutionsModels(ctx, identifierFilters, requestFilters, limit, requestToken, sortBy, mapFilters)
+	if err != nil {
 		return nil, err
 	}
 
-	var token string
-	if len(output.NodeExecutions) == int(limit) {
-		token = strconv.Itoa(offset + len(output.NodeExecutions))
-	}
 	nodeExecutionList, err := m.transformNodeExecutionModelList(ctx, output.NodeExecutions)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform node execution models for request with err: %v", err)
@@ -407,7 +420,7 @@ func (m *NodeExecutionManager) listNodeExecutions(
 
 	return &admin.NodeExecutionList{
 		NodeExecutions: nodeExecutionList,
-		Token:          token,
+		Token:          output.Token,
 	}, nil
 }
 
@@ -544,6 +557,137 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	}
 
 	return response, nil
+}
+
+func (m *NodeExecutionManager) GetWorkflowNodeExecutions(ctx context.Context, request admin.WorkflowNodeExecutionsGetRequest) (*admin.WorkflowNodeExecutionsGetResponse, error) {
+	err := validation.ValidateWorkflowExecutionIdentifier(request.GetExecutionId())
+	if err != nil {
+		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.GetExecutionId(), err)
+	}
+
+	ctx = getExecutionContext(ctx, request.ExecutionId)
+
+	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.ExecutionId)
+	if err != nil {
+		return nil, err
+	}
+	var mapFilters []common.MapFilter
+	var parentNodeExecution *models.NodeExecution
+	parentNodeID := request.ParentNodeId
+	if parentNodeID == "" {
+		parentNodeID = request.DynamicNodeId
+	}
+	if parentNodeID != "" {
+		logger.Debugf(ctx, "fetching node execution for requested parent node id '%s'", parentNodeID)
+		parentNodeExecution, err = util.GetNodeExecutionModel(ctx, m.db, &core.NodeExecutionIdentifier{
+			ExecutionId: request.ExecutionId,
+			NodeId:      parentNodeID,
+		})
+		if err != nil {
+			logger.Errorf(ctx, "failed to fetch node execution for requested parent node id '%s': %v", parentNodeID, err)
+			return nil, err
+		}
+		parentIDFilter, err := common.NewSingleValueFilter(
+			common.NodeExecution, common.Equal, shared.ParentID, parentNodeExecution.ID)
+		if err != nil {
+			return nil, err
+		}
+		identifierFilters = append(identifierFilters, parentIDFilter)
+	} else {
+		mapFilters = []common.MapFilter{isParent}
+	}
+
+	logger.Debugf(ctx, "fetching node executions")
+	output, err := m.listNodeExecutionsModels(ctx,
+		identifierFilters,
+		"",
+		10000,
+		"",
+		nil,
+		mapFilters)
+	if err != nil {
+		logger.Errorf(ctx, "failed to fetch node executions: %v", err)
+		return &admin.WorkflowNodeExecutionsGetResponse{}, err
+	}
+	if len(output.NodeExecutions) == 0 {
+		logger.Debugf(ctx, "fetch empty node executions")
+		return &admin.WorkflowNodeExecutionsGetResponse{}, nil
+	}
+
+	var workflowClosure *core.CompiledWorkflowClosure
+
+	if request.DynamicNodeId != "" {
+		// client should not send both dynamic_node_id and workflow_name+version pair
+		if request.WorkflowName != "" {
+			return nil, shared.GetInvalidArgumentError("workflow_name")
+		}
+		if request.WorkflowVersion != "" {
+			return nil, shared.GetMissingArgumentError("workflow_version")
+		}
+
+		nodeExecResource := repoInterfaces.NodeExecutionResource{
+			NodeExecutionIdentifier: core.NodeExecutionIdentifier{
+				NodeId:      request.DynamicNodeId,
+				ExecutionId: request.ExecutionId,
+			},
+		}
+		nodeExecModel, err := m.db.NodeExecutionRepo().Get(ctx, nodeExecResource)
+		if err != nil {
+			logger.Errorf(ctx, "failed to fetch dynamic node execution: %v", err)
+			return nil, err
+		}
+		remoteReference := nodeExecModel.DynamicWorkflowRemoteClosureReference
+		if remoteReference != "" {
+			logger.Debugf(ctx, "fetching dynamic workflow closure from node")
+
+			closure := &core.CompiledWorkflowClosure{}
+			err = m.storageClient.ReadProtobuf(ctx, storage.DataReference(remoteReference), closure)
+			if err != nil {
+				logger.Errorf(ctx, "failed to fetch dynamic workflow closure from node: %v", err)
+				return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+					"unable to read WorkflowClosure from location %s : %v", remoteReference, err)
+			}
+			workflowClosure = closure
+		} else {
+			logger.Warnf(ctx, "empty dynamic workflow reference in dynamic node")
+		}
+	} else {
+		if request.WorkflowName == "" {
+			return nil, shared.GetMissingArgumentError("workflow_name")
+		}
+		if request.WorkflowVersion == "" {
+			return nil, shared.GetMissingArgumentError("workflow_version")
+		}
+
+		workflowID := core.Identifier{
+			ResourceType: core.ResourceType_WORKFLOW,
+			Project:      request.ExecutionId.Project,
+			Domain:       request.ExecutionId.Domain,
+			Name:         request.WorkflowName,
+			Version:      request.WorkflowVersion,
+		}
+		workflow, err := util.GetWorkflow(ctx, m.db, m.storageClient, workflowID)
+		if err != nil {
+			logger.Errorf(ctx, "failed to fetch workflow: %v", err)
+			return nil, err
+		}
+
+		workflowClosure = workflow.GetClosure().GetCompiledWorkflow()
+	}
+
+	// TODO return workflow closure sub-tree only for request.ParentNodeId.
+	// If its not provided, return 1st level nodes only
+
+	nodeExecutionList, err := m.transformNodeExecutionModelList(ctx, output.NodeExecutions)
+	if err != nil {
+		logger.Debugf(ctx, "failed to transform node execution models for request with err: %v", err)
+		return nil, err
+	}
+
+	return &admin.WorkflowNodeExecutionsGetResponse{
+		Closure:        workflowClosure,
+		NodeExecutions: nodeExecutionList,
+	}, nil
 }
 
 func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,

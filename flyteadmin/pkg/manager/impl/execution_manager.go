@@ -463,21 +463,17 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Prepare a skeleton workflow
 	taskIdentifier := request.Spec.LaunchPlan
 	workflowModel, err :=
-		util.CreateOrGetWorkflowModel(ctx, request, m.db, m.workflowManager, m.namedEntityManager, taskIdentifier, &task)
+		util.CreateOrGetWorkflowModel(ctx, m.db, m.workflowManager, m.namedEntityManager, taskIdentifier, &task)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to created skeleton workflow for [%+v] with err: %v", taskIdentifier, err)
 		return nil, nil, err
 	}
-	workflow, err := transformers.FromWorkflowModel(*workflowModel)
+
+	workflow, err := util.TransformWorkflowWithClosure(ctx, m.storageClient, workflowModel)
 	if err != nil {
 		return nil, nil, err
 	}
-	closure, err := util.FetchAndGetWorkflowClosure(ctx, m.storageClient, workflowModel.RemoteClosureIdentifier)
-	if err != nil {
-		return nil, nil, err
-	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
-	workflow.Closure = closure
+
 	// Also prepare a skeleton launch plan.
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, taskIdentifier,
 		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID, request.Spec)
@@ -1042,21 +1038,13 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	workflowModel, err := util.GetWorkflowModel(ctx, m.db, *launchPlan.Spec.WorkflowId)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
 		return nil, nil, err
 	}
-	workflow, err := transformers.FromWorkflowModel(workflowModel)
+
+	workflow, err := util.TransformWorkflowWithClosure(ctx, m.storageClient, workflowModel)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
 		return nil, nil, err
 	}
-	closure, err := util.FetchAndGetWorkflowClosure(ctx, m.storageClient, workflowModel.RemoteClosureIdentifier)
-	if err != nil {
-		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
-		return nil, nil, err
-	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
-	workflow.Closure = closure
 
 	name := util.GetExecutionName(request)
 	workflowExecutionID := core.WorkflowExecutionIdentifier{

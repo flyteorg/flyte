@@ -5,8 +5,16 @@ package tests
 
 import (
 	"context"
+	"os"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/encoding/protojson"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -367,10 +375,11 @@ func TestListNodeExecutionWithParent(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Len(t, response.NodeExecutions, 2)
 	nodeExecutionResponse = response.NodeExecutions[0]
-	assert.True(t, proto.Equal(&core.NodeExecutionIdentifier{
+	expectedID2 := &core.NodeExecutionIdentifier{
 		NodeId:      "child2",
 		ExecutionId: nodeExecutionId.ExecutionId,
-	}, nodeExecutionResponse.Id))
+	}
+	assert.True(t, proto.Equal(expectedID2, nodeExecutionResponse.Id), "expected %v, got %v", expectedID2, nodeExecutionResponse.Id)
 	assert.Equal(t, core.NodeExecution_RUNNING, nodeExecutionResponse.Closure.Phase)
 	assert.Equal(t, inputURI, nodeExecutionResponse.InputUri)
 	assert.True(t, proto.Equal(occurredAtProto, nodeExecutionResponse.Closure.StartedAt))
@@ -477,4 +486,172 @@ func TestCreateChildNodeExecutionForTaskExecution(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(taskExecutionIdentifier, taskExecutionResp.Id))
 	assert.True(t, taskExecutionResp.IsParent)
+}
+
+func Test_GetWorkflowNodeExecutions(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionForTestingOnly(project, domain, name)
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	taskCreateReq := testutils.GetValidTaskRequest()
+	taskCreateReq.Id.Project = project
+	taskCreateReq.Id.Domain = domain
+	taskCreateReq.Id.Name = "simple task"
+
+	_, err := client.CreateTask(ctx, &taskCreateReq)
+	assert.NoError(t, err)
+
+	identifier := core.Identifier{
+		ResourceType: core.ResourceType_WORKFLOW,
+		Project:      project,
+		Domain:       domain,
+		Name:         "name",
+		Version:      "version",
+	}
+	workflowReq := &admin.WorkflowCreateRequest{
+		Id: &identifier,
+		Spec: &admin.WorkflowSpec{
+			Template: &core.WorkflowTemplate{
+				Id:        &identifier,
+				Interface: &core.TypedInterface{},
+				Nodes: []*core.Node{
+					{
+						Id: "I'm a node",
+						Target: &core.Node_TaskNode{
+							TaskNode: &core.TaskNode{
+								Reference: &core.TaskNode_ReferenceId{
+									ReferenceId: taskCreateReq.Id,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	_, err = client.CreateWorkflow(ctx, workflowReq)
+	assert.NoError(t, err)
+
+	occurredAt := time.Now()
+	occurredAtProto := timestamppb.New(occurredAt)
+	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
+		RequestId: "request id",
+		Event: &event.NodeExecutionEvent{
+			Id:    nodeExecutionId,
+			Phase: core.NodeExecution_SUCCEEDED,
+			InputValue: &event.NodeExecutionEvent_InputUri{
+				InputUri: inputURI,
+			},
+			OccurredAt: occurredAtProto,
+		},
+	})
+	assert.NoError(t, err)
+	expected := &admin.WorkflowNodeExecutionsGetResponse{
+		Closure: &admin.WorkflowClosure{
+			CompiledWorkflow: &core.CompiledWorkflowClosure{
+				Primary: &core.CompiledWorkflow{
+					Template: &core.WorkflowTemplate{
+						Id: &identifier,
+						Interface: &core.TypedInterface{
+							Inputs:  &core.VariableMap{},
+							Outputs: &core.VariableMap{},
+						},
+						Nodes: []*core.Node{
+							{
+								Id: "start-node",
+							},
+							{
+								Id: "end-node",
+							},
+							{
+								Id: "I'm a node",
+								Target: &core.Node_TaskNode{
+									TaskNode: &core.TaskNode{
+										Reference: &core.TaskNode_ReferenceId{
+											ReferenceId: taskCreateReq.Id,
+										},
+									},
+								},
+							},
+						},
+					},
+					Connections: &core.ConnectionSet{
+						Downstream: map[string]*core.ConnectionSet_IdList{
+							"I'm a node": {
+								Ids: []string{"end-node"},
+							},
+							"start-node": {
+								Ids: []string{"I'm a node"},
+							},
+						},
+						Upstream: map[string]*core.ConnectionSet_IdList{
+							"I'm a node": {
+								Ids: []string{"start-node"},
+							},
+							"end-node": {
+								Ids: []string{"I'm a node"},
+							},
+						},
+					},
+				},
+				Tasks: []*core.CompiledTask{
+					{
+						Template: &core.TaskTemplate{
+							Id:   taskCreateReq.Id,
+							Type: "type",
+							Metadata: &core.TaskMetadata{
+								Runtime: &core.RuntimeMetadata{Version: "runtime version"},
+							},
+							Interface: &core.TypedInterface{
+								Inputs:  &core.VariableMap{},
+								Outputs: &core.VariableMap{},
+							},
+							Target: &core.TaskTemplate_Container{
+								Container: &core.Container{
+									Image:   "image",
+									Command: []string{"command"},
+								},
+							},
+						},
+					},
+				},
+			},
+			CreatedAt: occurredAtProto,
+		},
+		NodeExecutions: []*admin.NodeExecution{
+			{
+				Id:       nodeExecutionId,
+				InputUri: inputURI,
+				Metadata: &admin.NodeExecutionMetaData{},
+				Closure: &admin.NodeExecutionClosure{
+					Phase:     core.NodeExecution_SUCCEEDED,
+					CreatedAt: occurredAtProto,
+					UpdatedAt: occurredAtProto,
+				},
+			},
+		},
+	}
+
+	resp, err := client.GetWorkflowNodeExecutions(ctx, &admin.WorkflowNodeExecutionsGetRequest{
+		ExecutionId: nodeExecutionId.ExecutionId,
+	})
+
+	assert.NoError(t, err)
+	resp.Closure.CreatedAt = occurredAtProto
+	assert.True(t, proto.Equal(expected, resp), "got %v", resp)
+
+	dump(t, resp, "got.json")
+	dump(t, expected, "expected.json")
+}
+
+func dump(t *testing.T, msg any, path string) {
+	opts := protojson.MarshalOptions{Multiline: true, Indent: "  "}
+	respBts, err := opts.Marshal(proto.MessageV2(msg))
+	require.NoError(t, err)
+	err = os.WriteFile(path, respBts, 0644)
+	require.NoError(t, err)
 }

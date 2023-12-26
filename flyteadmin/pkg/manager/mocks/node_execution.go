@@ -84,3 +84,7 @@ func (m *MockNodeExecutionManager) GetNodeExecutionData(
 	}
 	return nil, nil
 }
+
+func (m *MockNodeExecutionManager) GetWorkflowNodeExecutions(_ context.Context, _ admin.WorkflowNodeExecutionsGetRequest) (*admin.WorkflowNodeExecutionsGetResponse, error) {
+	return nil, nil
+}

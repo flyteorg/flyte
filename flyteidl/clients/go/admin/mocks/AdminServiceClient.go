@@ -1313,6 +1313,54 @@ func (_m *AdminServiceClient) GetWorkflowAttributes(ctx context.Context, in *adm
 	return r0, r1
 }
 
+type AdminServiceClient_GetWorkflowNodeExecutions struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetWorkflowNodeExecutions) Return(_a0 *admin.WorkflowNodeExecutionsGetResponse, _a1 error) *AdminServiceClient_GetWorkflowNodeExecutions {
+	return &AdminServiceClient_GetWorkflowNodeExecutions{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetWorkflowNodeExecutions(ctx context.Context, in *admin.WorkflowNodeExecutionsGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetWorkflowNodeExecutions {
+	c_call := _m.On("GetWorkflowNodeExecutions", ctx, in, opts)
+	return &AdminServiceClient_GetWorkflowNodeExecutions{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetWorkflowNodeExecutionsMatch(matchers ...interface{}) *AdminServiceClient_GetWorkflowNodeExecutions {
+	c_call := _m.On("GetWorkflowNodeExecutions", matchers...)
+	return &AdminServiceClient_GetWorkflowNodeExecutions{Call: c_call}
+}
+
+// GetWorkflowNodeExecutions provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetWorkflowNodeExecutions(ctx context.Context, in *admin.WorkflowNodeExecutionsGetRequest, opts ...grpc.CallOption) (*admin.WorkflowNodeExecutionsGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.WorkflowNodeExecutionsGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowNodeExecutionsGetRequest, ...grpc.CallOption) *admin.WorkflowNodeExecutionsGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowNodeExecutionsGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowNodeExecutionsGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_ListActiveLaunchPlans struct {
 	*mock.Call
 }

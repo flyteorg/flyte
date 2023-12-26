@@ -63,6 +63,24 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 	return nodeExecution, nil
 }
 
+func (r *NodeExecutionRepo) GetByID(ctx context.Context, id uint) (models.NodeExecution, error) {
+	// TODO remove
+	var nodeExecution models.NodeExecution
+	err := r.db.WithContext(ctx).
+		Where(&models.NodeExecution{
+			BaseModel: models.BaseModel{ID: id},
+		}).
+		Take(&nodeExecution).
+		Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return models.NodeExecution{}, adminErrors.GetMissingEntityByIDError("node_execution")
+		}
+		return models.NodeExecution{}, err
+	}
+	return nodeExecution, nil
+}
+
 func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
 	var nodeExecution models.NodeExecution
 	timer := r.metrics.GetDuration.Start()

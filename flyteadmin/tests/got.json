@@ -1,0 +1,116 @@
+{
+  "closure": {
+    "compiledWorkflow": {
+      "primary": {
+        "template": {
+          "id": {
+            "resourceType": "WORKFLOW",
+            "project": "project",
+            "domain": "domain",
+            "name": "name",
+            "version": "version"
+          },
+          "interface": {
+            "inputs": {},
+            "outputs": {}
+          },
+          "nodes": [
+            {
+              "id": "start-node"
+            },
+            {
+              "id": "end-node"
+            },
+            {
+              "id": "I'm a node",
+              "taskNode": {
+                "referenceId": {
+                  "resourceType": "TASK",
+                  "project": "project",
+                  "domain": "domain",
+                  "name": "simple task",
+                  "version": "version"
+                }
+              }
+            }
+          ]
+        },
+        "connections": {
+          "downstream": {
+            "I'm a node": {
+              "ids": [
+                "end-node"
+              ]
+            },
+            "start-node": {
+              "ids": [
+                "I'm a node"
+              ]
+            }
+          },
+          "upstream": {
+            "I'm a node": {
+              "ids": [
+                "start-node"
+              ]
+            },
+            "end-node": {
+              "ids": [
+                "I'm a node"
+              ]
+            }
+          }
+        }
+      },
+      "tasks": [
+        {
+          "template": {
+            "id": {
+              "resourceType": "TASK",
+              "project": "project",
+              "domain": "domain",
+              "name": "simple task",
+              "version": "version"
+            },
+            "type": "type",
+            "metadata": {
+              "runtime": {
+                "version": "runtime version"
+              }
+            },
+            "interface": {
+              "inputs": {},
+              "outputs": {}
+            },
+            "container": {
+              "image": "image",
+              "command": [
+                "command"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "createdAt": "2023-12-26T19:03:46.793386Z"
+  },
+  "nodeExecutions": [
+    {
+      "id": {
+        "nodeId": "nodey",
+        "executionId": {
+          "project": "project",
+          "domain": "domain",
+          "name": "execution name"
+        }
+      },
+      "inputUri": "input uri",
+      "closure": {
+        "phase": "SUCCEEDED",
+        "createdAt": "2023-12-26T19:03:46.793386Z",
+        "updatedAt": "2023-12-26T19:03:46.793386Z"
+      },
+      "metadata": {}
+    }
+  ]
+}

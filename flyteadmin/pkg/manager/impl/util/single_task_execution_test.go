@@ -152,16 +152,10 @@ func TestCreateOrGetWorkflowModel(t *testing.T) {
 			},
 		},
 	}
-	workflowModel, err := CreateOrGetWorkflowModel(context.Background(), admin.ExecutionCreateRequest{
-		Project: "flytekit",
-		Domain:  "production",
-		Name:    "SingleTaskExecution",
-		Spec: &admin.ExecutionSpec{
-			LaunchPlan: taskIdentifier,
-		},
-	}, repository, &mockWorkflowManager, &mockNamedEntityManager, taskIdentifier, task)
+	workflowModel, err := CreateOrGetWorkflowModel(context.Background(),
+		repository, &mockWorkflowManager, &mockNamedEntityManager, taskIdentifier, task)
 	assert.NoError(t, err)
-	assert.EqualValues(t, workflowModel, &newlyCreatedWorkflow)
+	assert.EqualValues(t, workflowModel, newlyCreatedWorkflow)
 }
 
 func TestCreateOrGetLaunchPlan(t *testing.T) {

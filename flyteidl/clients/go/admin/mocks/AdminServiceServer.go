@@ -1122,6 +1122,47 @@ func (_m *AdminServiceServer) GetWorkflowAttributes(_a0 context.Context, _a1 *ad
 	return r0, r1
 }
 
+type AdminServiceServer_GetWorkflowNodeExecutions struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetWorkflowNodeExecutions) Return(_a0 *admin.WorkflowNodeExecutionsGetResponse, _a1 error) *AdminServiceServer_GetWorkflowNodeExecutions {
+	return &AdminServiceServer_GetWorkflowNodeExecutions{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetWorkflowNodeExecutions(_a0 context.Context, _a1 *admin.WorkflowNodeExecutionsGetRequest) *AdminServiceServer_GetWorkflowNodeExecutions {
+	c_call := _m.On("GetWorkflowNodeExecutions", _a0, _a1)
+	return &AdminServiceServer_GetWorkflowNodeExecutions{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetWorkflowNodeExecutionsMatch(matchers ...interface{}) *AdminServiceServer_GetWorkflowNodeExecutions {
+	c_call := _m.On("GetWorkflowNodeExecutions", matchers...)
+	return &AdminServiceServer_GetWorkflowNodeExecutions{Call: c_call}
+}
+
+// GetWorkflowNodeExecutions provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetWorkflowNodeExecutions(_a0 context.Context, _a1 *admin.WorkflowNodeExecutionsGetRequest) (*admin.WorkflowNodeExecutionsGetResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.WorkflowNodeExecutionsGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowNodeExecutionsGetRequest) *admin.WorkflowNodeExecutionsGetResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowNodeExecutionsGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowNodeExecutionsGetRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_ListActiveLaunchPlans struct {
 	*mock.Call
 }

@@ -6,12 +6,16 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 )
 
+//go:generate mockery -name=WorkflowRepoInterface -output=../mocks -case=underscore
+
 // Defines the interface for interacting with Workflow models.
 type WorkflowRepoInterface interface {
 	// Inserts a workflow model into the database store.
 	Create(ctx context.Context, input models.Workflow, descriptionEntity *models.DescriptionEntity) error
 	// Returns a matching workflow if it exists.
 	Get(ctx context.Context, input Identifier) (models.Workflow, error)
+	// Returns workflow by numeric id
+	GetByID(ctx context.Context, id uint) (models.Workflow, error)
 	// Returns workflow revisions matching query parameters. A limit must be provided for the results page size.
 	List(ctx context.Context, input ListResourceInput) (WorkflowCollectionOutput, error)
 	ListIdentifiers(ctx context.Context, input ListResourceInput) (WorkflowCollectionOutput, error)

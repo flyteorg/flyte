@@ -54,6 +54,11 @@ func (r *MockNodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeEx
 	return models.NodeExecution{}, nil
 }
 
+func (r *MockNodeExecutionRepo) GetByID(ctx context.Context, id uint) (models.NodeExecution, error) {
+	// TODO
+	return models.NodeExecution{}, nil
+}
+
 func (r *MockNodeExecutionRepo) SetGetCallback(getFunction GetNodeExecutionFunc) {
 	r.getFunction = getFunction
 }

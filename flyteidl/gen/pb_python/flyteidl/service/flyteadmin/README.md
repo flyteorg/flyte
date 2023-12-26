@@ -97,6 +97,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**get_version**](docs/AdminServiceApi.md#get_version) | **GET** /api/v1/version | 
 *AdminServiceApi* | [**get_workflow**](docs/AdminServiceApi.md#get_workflow) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
 *AdminServiceApi* | [**get_workflow_attributes**](docs/AdminServiceApi.md#get_workflow_attributes) | **GET** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**get_workflow_node_executions**](docs/AdminServiceApi.md#get_workflow_node_executions) | **GET** /api/v1/workflow_node_executions/{execution_id.project}/{execution_id.domain}/{execution_id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.WorkflowNodeExecutionsGetResponse&#x60;.
 *AdminServiceApi* | [**list_active_launch_plans**](docs/AdminServiceApi.md#list_active_launch_plans) | **GET** /api/v1/active_launch_plans/{project}/{domain} | List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
 *AdminServiceApi* | [**list_description_entities**](docs/AdminServiceApi.md#list_description_entities) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
 *AdminServiceApi* | [**list_description_entities2**](docs/AdminServiceApi.md#list_description_entities2) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
@@ -254,6 +255,7 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowExecutionGetDataResponse](docs/AdminWorkflowExecutionGetDataResponse.md)
  - [AdminWorkflowExecutionGetMetricsResponse](docs/AdminWorkflowExecutionGetMetricsResponse.md)
  - [AdminWorkflowList](docs/AdminWorkflowList.md)
+ - [AdminWorkflowNodeExecutionsGetResponse](docs/AdminWorkflowNodeExecutionsGetResponse.md)
  - [AdminWorkflowSpec](docs/AdminWorkflowSpec.md)
  - [BlobTypeBlobDimensionality](docs/BlobTypeBlobDimensionality.md)
  - [CatalogReservationStatus](docs/CatalogReservationStatus.md)

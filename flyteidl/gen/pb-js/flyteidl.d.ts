@@ -15288,6 +15288,140 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a WorkflowNodeExecutionsGetRequest. */
+        interface IWorkflowNodeExecutionsGetRequest {
+
+            /** WorkflowNodeExecutionsGetRequest executionId */
+            executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WorkflowNodeExecutionsGetRequest workflowName */
+            workflowName?: (string|null);
+
+            /** WorkflowNodeExecutionsGetRequest workflowVersion */
+            workflowVersion?: (string|null);
+
+            /** WorkflowNodeExecutionsGetRequest dynamicNodeId */
+            dynamicNodeId?: (string|null);
+
+            /** WorkflowNodeExecutionsGetRequest parentNodeId */
+            parentNodeId?: (string|null);
+        }
+
+        /** Represents a WorkflowNodeExecutionsGetRequest. */
+        class WorkflowNodeExecutionsGetRequest implements IWorkflowNodeExecutionsGetRequest {
+
+            /**
+             * Constructs a new WorkflowNodeExecutionsGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowNodeExecutionsGetRequest);
+
+            /** WorkflowNodeExecutionsGetRequest executionId. */
+            public executionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** WorkflowNodeExecutionsGetRequest workflowName. */
+            public workflowName: string;
+
+            /** WorkflowNodeExecutionsGetRequest workflowVersion. */
+            public workflowVersion: string;
+
+            /** WorkflowNodeExecutionsGetRequest dynamicNodeId. */
+            public dynamicNodeId: string;
+
+            /** WorkflowNodeExecutionsGetRequest parentNodeId. */
+            public parentNodeId: string;
+
+            /**
+             * Creates a new WorkflowNodeExecutionsGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowNodeExecutionsGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowNodeExecutionsGetRequest): flyteidl.admin.WorkflowNodeExecutionsGetRequest;
+
+            /**
+             * Encodes the specified WorkflowNodeExecutionsGetRequest message. Does not implicitly {@link flyteidl.admin.WorkflowNodeExecutionsGetRequest.verify|verify} messages.
+             * @param message WorkflowNodeExecutionsGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowNodeExecutionsGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowNodeExecutionsGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowNodeExecutionsGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowNodeExecutionsGetRequest;
+
+            /**
+             * Verifies a WorkflowNodeExecutionsGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowNodeExecutionsGetResponse. */
+        interface IWorkflowNodeExecutionsGetResponse {
+
+            /** WorkflowNodeExecutionsGetResponse closure */
+            closure?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** WorkflowNodeExecutionsGetResponse nodeExecutions */
+            nodeExecutions?: (flyteidl.admin.INodeExecution[]|null);
+        }
+
+        /** Represents a WorkflowNodeExecutionsGetResponse. */
+        class WorkflowNodeExecutionsGetResponse implements IWorkflowNodeExecutionsGetResponse {
+
+            /**
+             * Constructs a new WorkflowNodeExecutionsGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowNodeExecutionsGetResponse);
+
+            /** WorkflowNodeExecutionsGetResponse closure. */
+            public closure?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** WorkflowNodeExecutionsGetResponse nodeExecutions. */
+            public nodeExecutions: flyteidl.admin.INodeExecution[];
+
+            /**
+             * Creates a new WorkflowNodeExecutionsGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowNodeExecutionsGetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowNodeExecutionsGetResponse): flyteidl.admin.WorkflowNodeExecutionsGetResponse;
+
+            /**
+             * Encodes the specified WorkflowNodeExecutionsGetResponse message. Does not implicitly {@link flyteidl.admin.WorkflowNodeExecutionsGetResponse.verify|verify} messages.
+             * @param message WorkflowNodeExecutionsGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowNodeExecutionsGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowNodeExecutionsGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowNodeExecutionsGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowNodeExecutionsGetResponse;
+
+            /**
+             * Verifies a WorkflowNodeExecutionsGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a NodeExecutionListRequest. */
         interface INodeExecutionListRequest {
 
@@ -16082,6 +16216,519 @@ export namespace flyteidl {
 
             /**
              * Verifies a NodeExecutionGetDataResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowCreateRequest. */
+        interface IWorkflowCreateRequest {
+
+            /** WorkflowCreateRequest id */
+            id?: (flyteidl.core.IIdentifier|null);
+
+            /** WorkflowCreateRequest spec */
+            spec?: (flyteidl.admin.IWorkflowSpec|null);
+        }
+
+        /** Represents a WorkflowCreateRequest. */
+        class WorkflowCreateRequest implements IWorkflowCreateRequest {
+
+            /**
+             * Constructs a new WorkflowCreateRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowCreateRequest);
+
+            /** WorkflowCreateRequest id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /** WorkflowCreateRequest spec. */
+            public spec?: (flyteidl.admin.IWorkflowSpec|null);
+
+            /**
+             * Creates a new WorkflowCreateRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowCreateRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowCreateRequest): flyteidl.admin.WorkflowCreateRequest;
+
+            /**
+             * Encodes the specified WorkflowCreateRequest message. Does not implicitly {@link flyteidl.admin.WorkflowCreateRequest.verify|verify} messages.
+             * @param message WorkflowCreateRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowCreateRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowCreateRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowCreateRequest;
+
+            /**
+             * Verifies a WorkflowCreateRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowCreateResponse. */
+        interface IWorkflowCreateResponse {
+        }
+
+        /** Represents a WorkflowCreateResponse. */
+        class WorkflowCreateResponse implements IWorkflowCreateResponse {
+
+            /**
+             * Constructs a new WorkflowCreateResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowCreateResponse);
+
+            /**
+             * Creates a new WorkflowCreateResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowCreateResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowCreateResponse): flyteidl.admin.WorkflowCreateResponse;
+
+            /**
+             * Encodes the specified WorkflowCreateResponse message. Does not implicitly {@link flyteidl.admin.WorkflowCreateResponse.verify|verify} messages.
+             * @param message WorkflowCreateResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowCreateResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowCreateResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowCreateResponse;
+
+            /**
+             * Verifies a WorkflowCreateResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a Workflow. */
+        interface IWorkflow {
+
+            /** Workflow id */
+            id?: (flyteidl.core.IIdentifier|null);
+
+            /** Workflow closure */
+            closure?: (flyteidl.admin.IWorkflowClosure|null);
+
+            /** Workflow shortDescription */
+            shortDescription?: (string|null);
+        }
+
+        /** Represents a Workflow. */
+        class Workflow implements IWorkflow {
+
+            /**
+             * Constructs a new Workflow.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflow);
+
+            /** Workflow id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /** Workflow closure. */
+            public closure?: (flyteidl.admin.IWorkflowClosure|null);
+
+            /** Workflow shortDescription. */
+            public shortDescription: string;
+
+            /**
+             * Creates a new Workflow instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Workflow instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflow): flyteidl.admin.Workflow;
+
+            /**
+             * Encodes the specified Workflow message. Does not implicitly {@link flyteidl.admin.Workflow.verify|verify} messages.
+             * @param message Workflow message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflow, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Workflow message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Workflow
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Workflow;
+
+            /**
+             * Verifies a Workflow message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowList. */
+        interface IWorkflowList {
+
+            /** WorkflowList workflows */
+            workflows?: (flyteidl.admin.IWorkflow[]|null);
+
+            /** WorkflowList token */
+            token?: (string|null);
+        }
+
+        /** Represents a WorkflowList. */
+        class WorkflowList implements IWorkflowList {
+
+            /**
+             * Constructs a new WorkflowList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowList);
+
+            /** WorkflowList workflows. */
+            public workflows: flyteidl.admin.IWorkflow[];
+
+            /** WorkflowList token. */
+            public token: string;
+
+            /**
+             * Creates a new WorkflowList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowList instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowList): flyteidl.admin.WorkflowList;
+
+            /**
+             * Encodes the specified WorkflowList message. Does not implicitly {@link flyteidl.admin.WorkflowList.verify|verify} messages.
+             * @param message WorkflowList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowList;
+
+            /**
+             * Verifies a WorkflowList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowSpec. */
+        interface IWorkflowSpec {
+
+            /** WorkflowSpec template */
+            template?: (flyteidl.core.IWorkflowTemplate|null);
+
+            /** WorkflowSpec subWorkflows */
+            subWorkflows?: (flyteidl.core.IWorkflowTemplate[]|null);
+
+            /** WorkflowSpec description */
+            description?: (flyteidl.admin.IDescriptionEntity|null);
+        }
+
+        /** Represents a WorkflowSpec. */
+        class WorkflowSpec implements IWorkflowSpec {
+
+            /**
+             * Constructs a new WorkflowSpec.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowSpec);
+
+            /** WorkflowSpec template. */
+            public template?: (flyteidl.core.IWorkflowTemplate|null);
+
+            /** WorkflowSpec subWorkflows. */
+            public subWorkflows: flyteidl.core.IWorkflowTemplate[];
+
+            /** WorkflowSpec description. */
+            public description?: (flyteidl.admin.IDescriptionEntity|null);
+
+            /**
+             * Creates a new WorkflowSpec instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowSpec instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowSpec): flyteidl.admin.WorkflowSpec;
+
+            /**
+             * Encodes the specified WorkflowSpec message. Does not implicitly {@link flyteidl.admin.WorkflowSpec.verify|verify} messages.
+             * @param message WorkflowSpec message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowSpec, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowSpec message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowSpec
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowSpec;
+
+            /**
+             * Verifies a WorkflowSpec message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowClosure. */
+        interface IWorkflowClosure {
+
+            /** WorkflowClosure compiledWorkflow */
+            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** WorkflowClosure createdAt */
+            createdAt?: (google.protobuf.ITimestamp|null);
+        }
+
+        /** Represents a WorkflowClosure. */
+        class WorkflowClosure implements IWorkflowClosure {
+
+            /**
+             * Constructs a new WorkflowClosure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowClosure);
+
+            /** WorkflowClosure compiledWorkflow. */
+            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /** WorkflowClosure createdAt. */
+            public createdAt?: (google.protobuf.ITimestamp|null);
+
+            /**
+             * Creates a new WorkflowClosure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowClosure instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowClosure): flyteidl.admin.WorkflowClosure;
+
+            /**
+             * Encodes the specified WorkflowClosure message. Does not implicitly {@link flyteidl.admin.WorkflowClosure.verify|verify} messages.
+             * @param message WorkflowClosure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowClosure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowClosure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowClosure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowClosure;
+
+            /**
+             * Verifies a WorkflowClosure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowErrorExistsDifferentStructure. */
+        interface IWorkflowErrorExistsDifferentStructure {
+
+            /** WorkflowErrorExistsDifferentStructure id */
+            id?: (flyteidl.core.IIdentifier|null);
+        }
+
+        /** Represents a WorkflowErrorExistsDifferentStructure. */
+        class WorkflowErrorExistsDifferentStructure implements IWorkflowErrorExistsDifferentStructure {
+
+            /**
+             * Constructs a new WorkflowErrorExistsDifferentStructure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowErrorExistsDifferentStructure);
+
+            /** WorkflowErrorExistsDifferentStructure id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /**
+             * Creates a new WorkflowErrorExistsDifferentStructure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowErrorExistsDifferentStructure instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowErrorExistsDifferentStructure): flyteidl.admin.WorkflowErrorExistsDifferentStructure;
+
+            /**
+             * Encodes the specified WorkflowErrorExistsDifferentStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify|verify} messages.
+             * @param message WorkflowErrorExistsDifferentStructure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowErrorExistsDifferentStructure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowErrorExistsDifferentStructure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowErrorExistsDifferentStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowErrorExistsDifferentStructure;
+
+            /**
+             * Verifies a WorkflowErrorExistsDifferentStructure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a WorkflowErrorExistsIdenticalStructure. */
+        interface IWorkflowErrorExistsIdenticalStructure {
+
+            /** WorkflowErrorExistsIdenticalStructure id */
+            id?: (flyteidl.core.IIdentifier|null);
+        }
+
+        /** Represents a WorkflowErrorExistsIdenticalStructure. */
+        class WorkflowErrorExistsIdenticalStructure implements IWorkflowErrorExistsIdenticalStructure {
+
+            /**
+             * Constructs a new WorkflowErrorExistsIdenticalStructure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure);
+
+            /** WorkflowErrorExistsIdenticalStructure id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /**
+             * Creates a new WorkflowErrorExistsIdenticalStructure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns WorkflowErrorExistsIdenticalStructure instance
+             */
+            public static create(properties?: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure): flyteidl.admin.WorkflowErrorExistsIdenticalStructure;
+
+            /**
+             * Encodes the specified WorkflowErrorExistsIdenticalStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify|verify} messages.
+             * @param message WorkflowErrorExistsIdenticalStructure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a WorkflowErrorExistsIdenticalStructure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns WorkflowErrorExistsIdenticalStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowErrorExistsIdenticalStructure;
+
+            /**
+             * Verifies a WorkflowErrorExistsIdenticalStructure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CreateWorkflowFailureReason. */
+        interface ICreateWorkflowFailureReason {
+
+            /** CreateWorkflowFailureReason existsDifferentStructure */
+            existsDifferentStructure?: (flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null);
+
+            /** CreateWorkflowFailureReason existsIdenticalStructure */
+            existsIdenticalStructure?: (flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null);
+        }
+
+        /** Represents a CreateWorkflowFailureReason. */
+        class CreateWorkflowFailureReason implements ICreateWorkflowFailureReason {
+
+            /**
+             * Constructs a new CreateWorkflowFailureReason.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ICreateWorkflowFailureReason);
+
+            /** CreateWorkflowFailureReason existsDifferentStructure. */
+            public existsDifferentStructure?: (flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null);
+
+            /** CreateWorkflowFailureReason existsIdenticalStructure. */
+            public existsIdenticalStructure?: (flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null);
+
+            /** CreateWorkflowFailureReason reason. */
+            public reason?: ("existsDifferentStructure"|"existsIdenticalStructure");
+
+            /**
+             * Creates a new CreateWorkflowFailureReason instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateWorkflowFailureReason instance
+             */
+            public static create(properties?: flyteidl.admin.ICreateWorkflowFailureReason): flyteidl.admin.CreateWorkflowFailureReason;
+
+            /**
+             * Encodes the specified CreateWorkflowFailureReason message. Does not implicitly {@link flyteidl.admin.CreateWorkflowFailureReason.verify|verify} messages.
+             * @param message CreateWorkflowFailureReason message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ICreateWorkflowFailureReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateWorkflowFailureReason message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateWorkflowFailureReason
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.CreateWorkflowFailureReason;
+
+            /**
+             * Verifies a CreateWorkflowFailureReason message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -18783,519 +19430,6 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a WorkflowCreateRequest. */
-        interface IWorkflowCreateRequest {
-
-            /** WorkflowCreateRequest id */
-            id?: (flyteidl.core.IIdentifier|null);
-
-            /** WorkflowCreateRequest spec */
-            spec?: (flyteidl.admin.IWorkflowSpec|null);
-        }
-
-        /** Represents a WorkflowCreateRequest. */
-        class WorkflowCreateRequest implements IWorkflowCreateRequest {
-
-            /**
-             * Constructs a new WorkflowCreateRequest.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowCreateRequest);
-
-            /** WorkflowCreateRequest id. */
-            public id?: (flyteidl.core.IIdentifier|null);
-
-            /** WorkflowCreateRequest spec. */
-            public spec?: (flyteidl.admin.IWorkflowSpec|null);
-
-            /**
-             * Creates a new WorkflowCreateRequest instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowCreateRequest instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowCreateRequest): flyteidl.admin.WorkflowCreateRequest;
-
-            /**
-             * Encodes the specified WorkflowCreateRequest message. Does not implicitly {@link flyteidl.admin.WorkflowCreateRequest.verify|verify} messages.
-             * @param message WorkflowCreateRequest message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowCreateRequest, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowCreateRequest message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowCreateRequest
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowCreateRequest;
-
-            /**
-             * Verifies a WorkflowCreateRequest message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowCreateResponse. */
-        interface IWorkflowCreateResponse {
-        }
-
-        /** Represents a WorkflowCreateResponse. */
-        class WorkflowCreateResponse implements IWorkflowCreateResponse {
-
-            /**
-             * Constructs a new WorkflowCreateResponse.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowCreateResponse);
-
-            /**
-             * Creates a new WorkflowCreateResponse instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowCreateResponse instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowCreateResponse): flyteidl.admin.WorkflowCreateResponse;
-
-            /**
-             * Encodes the specified WorkflowCreateResponse message. Does not implicitly {@link flyteidl.admin.WorkflowCreateResponse.verify|verify} messages.
-             * @param message WorkflowCreateResponse message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowCreateResponse, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowCreateResponse message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowCreateResponse
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowCreateResponse;
-
-            /**
-             * Verifies a WorkflowCreateResponse message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a Workflow. */
-        interface IWorkflow {
-
-            /** Workflow id */
-            id?: (flyteidl.core.IIdentifier|null);
-
-            /** Workflow closure */
-            closure?: (flyteidl.admin.IWorkflowClosure|null);
-
-            /** Workflow shortDescription */
-            shortDescription?: (string|null);
-        }
-
-        /** Represents a Workflow. */
-        class Workflow implements IWorkflow {
-
-            /**
-             * Constructs a new Workflow.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflow);
-
-            /** Workflow id. */
-            public id?: (flyteidl.core.IIdentifier|null);
-
-            /** Workflow closure. */
-            public closure?: (flyteidl.admin.IWorkflowClosure|null);
-
-            /** Workflow shortDescription. */
-            public shortDescription: string;
-
-            /**
-             * Creates a new Workflow instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Workflow instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflow): flyteidl.admin.Workflow;
-
-            /**
-             * Encodes the specified Workflow message. Does not implicitly {@link flyteidl.admin.Workflow.verify|verify} messages.
-             * @param message Workflow message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflow, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Workflow message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Workflow
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Workflow;
-
-            /**
-             * Verifies a Workflow message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowList. */
-        interface IWorkflowList {
-
-            /** WorkflowList workflows */
-            workflows?: (flyteidl.admin.IWorkflow[]|null);
-
-            /** WorkflowList token */
-            token?: (string|null);
-        }
-
-        /** Represents a WorkflowList. */
-        class WorkflowList implements IWorkflowList {
-
-            /**
-             * Constructs a new WorkflowList.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowList);
-
-            /** WorkflowList workflows. */
-            public workflows: flyteidl.admin.IWorkflow[];
-
-            /** WorkflowList token. */
-            public token: string;
-
-            /**
-             * Creates a new WorkflowList instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowList instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowList): flyteidl.admin.WorkflowList;
-
-            /**
-             * Encodes the specified WorkflowList message. Does not implicitly {@link flyteidl.admin.WorkflowList.verify|verify} messages.
-             * @param message WorkflowList message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowList, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowList message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowList
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowList;
-
-            /**
-             * Verifies a WorkflowList message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowSpec. */
-        interface IWorkflowSpec {
-
-            /** WorkflowSpec template */
-            template?: (flyteidl.core.IWorkflowTemplate|null);
-
-            /** WorkflowSpec subWorkflows */
-            subWorkflows?: (flyteidl.core.IWorkflowTemplate[]|null);
-
-            /** WorkflowSpec description */
-            description?: (flyteidl.admin.IDescriptionEntity|null);
-        }
-
-        /** Represents a WorkflowSpec. */
-        class WorkflowSpec implements IWorkflowSpec {
-
-            /**
-             * Constructs a new WorkflowSpec.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowSpec);
-
-            /** WorkflowSpec template. */
-            public template?: (flyteidl.core.IWorkflowTemplate|null);
-
-            /** WorkflowSpec subWorkflows. */
-            public subWorkflows: flyteidl.core.IWorkflowTemplate[];
-
-            /** WorkflowSpec description. */
-            public description?: (flyteidl.admin.IDescriptionEntity|null);
-
-            /**
-             * Creates a new WorkflowSpec instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowSpec instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowSpec): flyteidl.admin.WorkflowSpec;
-
-            /**
-             * Encodes the specified WorkflowSpec message. Does not implicitly {@link flyteidl.admin.WorkflowSpec.verify|verify} messages.
-             * @param message WorkflowSpec message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowSpec, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowSpec message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowSpec
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowSpec;
-
-            /**
-             * Verifies a WorkflowSpec message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowClosure. */
-        interface IWorkflowClosure {
-
-            /** WorkflowClosure compiledWorkflow */
-            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
-
-            /** WorkflowClosure createdAt */
-            createdAt?: (google.protobuf.ITimestamp|null);
-        }
-
-        /** Represents a WorkflowClosure. */
-        class WorkflowClosure implements IWorkflowClosure {
-
-            /**
-             * Constructs a new WorkflowClosure.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowClosure);
-
-            /** WorkflowClosure compiledWorkflow. */
-            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
-
-            /** WorkflowClosure createdAt. */
-            public createdAt?: (google.protobuf.ITimestamp|null);
-
-            /**
-             * Creates a new WorkflowClosure instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowClosure instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowClosure): flyteidl.admin.WorkflowClosure;
-
-            /**
-             * Encodes the specified WorkflowClosure message. Does not implicitly {@link flyteidl.admin.WorkflowClosure.verify|verify} messages.
-             * @param message WorkflowClosure message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowClosure, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowClosure message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowClosure
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowClosure;
-
-            /**
-             * Verifies a WorkflowClosure message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowErrorExistsDifferentStructure. */
-        interface IWorkflowErrorExistsDifferentStructure {
-
-            /** WorkflowErrorExistsDifferentStructure id */
-            id?: (flyteidl.core.IIdentifier|null);
-        }
-
-        /** Represents a WorkflowErrorExistsDifferentStructure. */
-        class WorkflowErrorExistsDifferentStructure implements IWorkflowErrorExistsDifferentStructure {
-
-            /**
-             * Constructs a new WorkflowErrorExistsDifferentStructure.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowErrorExistsDifferentStructure);
-
-            /** WorkflowErrorExistsDifferentStructure id. */
-            public id?: (flyteidl.core.IIdentifier|null);
-
-            /**
-             * Creates a new WorkflowErrorExistsDifferentStructure instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowErrorExistsDifferentStructure instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowErrorExistsDifferentStructure): flyteidl.admin.WorkflowErrorExistsDifferentStructure;
-
-            /**
-             * Encodes the specified WorkflowErrorExistsDifferentStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsDifferentStructure.verify|verify} messages.
-             * @param message WorkflowErrorExistsDifferentStructure message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowErrorExistsDifferentStructure, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowErrorExistsDifferentStructure message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowErrorExistsDifferentStructure
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowErrorExistsDifferentStructure;
-
-            /**
-             * Verifies a WorkflowErrorExistsDifferentStructure message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a WorkflowErrorExistsIdenticalStructure. */
-        interface IWorkflowErrorExistsIdenticalStructure {
-
-            /** WorkflowErrorExistsIdenticalStructure id */
-            id?: (flyteidl.core.IIdentifier|null);
-        }
-
-        /** Represents a WorkflowErrorExistsIdenticalStructure. */
-        class WorkflowErrorExistsIdenticalStructure implements IWorkflowErrorExistsIdenticalStructure {
-
-            /**
-             * Constructs a new WorkflowErrorExistsIdenticalStructure.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure);
-
-            /** WorkflowErrorExistsIdenticalStructure id. */
-            public id?: (flyteidl.core.IIdentifier|null);
-
-            /**
-             * Creates a new WorkflowErrorExistsIdenticalStructure instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns WorkflowErrorExistsIdenticalStructure instance
-             */
-            public static create(properties?: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure): flyteidl.admin.WorkflowErrorExistsIdenticalStructure;
-
-            /**
-             * Encodes the specified WorkflowErrorExistsIdenticalStructure message. Does not implicitly {@link flyteidl.admin.WorkflowErrorExistsIdenticalStructure.verify|verify} messages.
-             * @param message WorkflowErrorExistsIdenticalStructure message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IWorkflowErrorExistsIdenticalStructure, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a WorkflowErrorExistsIdenticalStructure message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns WorkflowErrorExistsIdenticalStructure
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.WorkflowErrorExistsIdenticalStructure;
-
-            /**
-             * Verifies a WorkflowErrorExistsIdenticalStructure message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a CreateWorkflowFailureReason. */
-        interface ICreateWorkflowFailureReason {
-
-            /** CreateWorkflowFailureReason existsDifferentStructure */
-            existsDifferentStructure?: (flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null);
-
-            /** CreateWorkflowFailureReason existsIdenticalStructure */
-            existsIdenticalStructure?: (flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null);
-        }
-
-        /** Represents a CreateWorkflowFailureReason. */
-        class CreateWorkflowFailureReason implements ICreateWorkflowFailureReason {
-
-            /**
-             * Constructs a new CreateWorkflowFailureReason.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.ICreateWorkflowFailureReason);
-
-            /** CreateWorkflowFailureReason existsDifferentStructure. */
-            public existsDifferentStructure?: (flyteidl.admin.IWorkflowErrorExistsDifferentStructure|null);
-
-            /** CreateWorkflowFailureReason existsIdenticalStructure. */
-            public existsIdenticalStructure?: (flyteidl.admin.IWorkflowErrorExistsIdenticalStructure|null);
-
-            /** CreateWorkflowFailureReason reason. */
-            public reason?: ("existsDifferentStructure"|"existsIdenticalStructure");
-
-            /**
-             * Creates a new CreateWorkflowFailureReason instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns CreateWorkflowFailureReason instance
-             */
-            public static create(properties?: flyteidl.admin.ICreateWorkflowFailureReason): flyteidl.admin.CreateWorkflowFailureReason;
-
-            /**
-             * Encodes the specified CreateWorkflowFailureReason message. Does not implicitly {@link flyteidl.admin.CreateWorkflowFailureReason.verify|verify} messages.
-             * @param message CreateWorkflowFailureReason message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.ICreateWorkflowFailureReason, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a CreateWorkflowFailureReason message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns CreateWorkflowFailureReason
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.CreateWorkflowFailureReason;
-
-            /**
-             * Verifies a CreateWorkflowFailureReason message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of a WorkflowAttributes. */
         interface IWorkflowAttributes {
 
@@ -20063,6 +20197,20 @@ export namespace flyteidl {
             public getNodeExecution(request: flyteidl.admin.INodeExecutionGetRequest): Promise<flyteidl.admin.NodeExecution>;
 
             /**
+             * Calls GetWorkflowNodeExecutions.
+             * @param request WorkflowNodeExecutionsGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and WorkflowNodeExecutionsGetResponse
+             */
+            public getWorkflowNodeExecutions(request: flyteidl.admin.IWorkflowNodeExecutionsGetRequest, callback: flyteidl.service.AdminService.GetWorkflowNodeExecutionsCallback): void;
+
+            /**
+             * Calls GetWorkflowNodeExecutions.
+             * @param request WorkflowNodeExecutionsGetRequest message or plain object
+             * @returns Promise
+             */
+            public getWorkflowNodeExecutions(request: flyteidl.admin.IWorkflowNodeExecutionsGetRequest): Promise<flyteidl.admin.WorkflowNodeExecutionsGetResponse>;
+
+            /**
              * Calls ListNodeExecutions.
              * @param request NodeExecutionListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and NodeExecutionList
@@ -20638,6 +20786,13 @@ export namespace flyteidl {
              * @param [response] NodeExecution
              */
             type GetNodeExecutionCallback = (error: (Error|null), response?: flyteidl.admin.NodeExecution) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getWorkflowNodeExecutions}.
+             * @param error Error, if any
+             * @param [response] WorkflowNodeExecutionsGetResponse
+             */
+            type GetWorkflowNodeExecutionsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowNodeExecutionsGetResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNodeExecutions}.

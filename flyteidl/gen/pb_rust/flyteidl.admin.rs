@@ -1928,6 +1928,113 @@ impl MatchableResource {
         }
     }
 }
+/// Represents a request structure to create a revision of a workflow.
+/// See :ref:`ref_flyteidl.admin.Workflow` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowCreateRequest {
+    /// id represents the unique identifier of the workflow.
+    /// +required
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+    /// Represents the specification for workflow.
+    /// +required
+    #[prost(message, optional, tag="2")]
+    pub spec: ::core::option::Option<WorkflowSpec>,
+}
+/// Purposefully empty, may be populated in the future. 
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowCreateResponse {
+}
+/// Represents the workflow structure stored in the Admin
+/// A workflow is created by ordering tasks and associating outputs to inputs
+/// in order to produce a directed-acyclic execution graph.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Workflow {
+    /// id represents the unique identifier of the workflow.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+    /// closure encapsulates all the fields that maps to a compiled version of the workflow.
+    #[prost(message, optional, tag="2")]
+    pub closure: ::core::option::Option<WorkflowClosure>,
+    /// One-liner overview of the entity.
+    #[prost(string, tag="3")]
+    pub short_description: ::prost::alloc::string::String,
+}
+/// Represents a list of workflows returned from the admin.
+/// See :ref:`ref_flyteidl.admin.Workflow` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowList {
+    /// A list of workflows returned based on the request.
+    #[prost(message, repeated, tag="1")]
+    pub workflows: ::prost::alloc::vec::Vec<Workflow>,
+    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    /// in a query. If there are no more results, this value will be empty.
+    #[prost(string, tag="2")]
+    pub token: ::prost::alloc::string::String,
+}
+/// Represents a structure that encapsulates the specification of the workflow.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowSpec {
+    /// Template of the task that encapsulates all the metadata of the workflow.
+    #[prost(message, optional, tag="1")]
+    pub template: ::core::option::Option<super::core::WorkflowTemplate>,
+    /// Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
+    /// propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
+    /// to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
+    #[prost(message, repeated, tag="2")]
+    pub sub_workflows: ::prost::alloc::vec::Vec<super::core::WorkflowTemplate>,
+    /// Represents the specification for description entity.
+    #[prost(message, optional, tag="3")]
+    pub description: ::core::option::Option<DescriptionEntity>,
+}
+/// A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowClosure {
+    /// Represents the compiled representation of the workflow from the specification provided.
+    #[prost(message, optional, tag="1")]
+    pub compiled_workflow: ::core::option::Option<super::core::CompiledWorkflowClosure>,
+    /// Time at which the workflow was created.
+    #[prost(message, optional, tag="2")]
+    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+}
+/// The workflow id is already used and the structure is different
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowErrorExistsDifferentStructure {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+}
+/// The workflow id is already used with an identical sctructure
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowErrorExistsIdenticalStructure {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::Identifier>,
+}
+/// When a CreateWorkflowRequest fails due to matching id
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CreateWorkflowFailureReason {
+    #[prost(oneof="create_workflow_failure_reason::Reason", tags="1, 2")]
+    pub reason: ::core::option::Option<create_workflow_failure_reason::Reason>,
+}
+/// Nested message and enum types in `CreateWorkflowFailureReason`.
+pub mod create_workflow_failure_reason {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Reason {
+        #[prost(message, tag="1")]
+        ExistsDifferentStructure(super::WorkflowErrorExistsDifferentStructure),
+        #[prost(message, tag="2")]
+        ExistsIdenticalStructure(super::WorkflowErrorExistsIdenticalStructure),
+    }
+}
 /// A message used to fetch a single node execution entity.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1937,6 +2044,43 @@ pub struct NodeExecutionGetRequest {
     /// +required
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
+}
+/// A message used to fetch a single node execution entity.
+/// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowNodeExecutionsGetRequest {
+    /// Uniquely identifies an individual workflow execution
+    /// +required
+    #[prost(message, optional, tag="1")]
+    pub execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    /// Name of workflow that was executed. Should be sent together with workflow_version.
+    /// +optional
+    #[prost(string, tag="2")]
+    pub workflow_name: ::prost::alloc::string::String,
+    /// Version of workflow that was executed. Should be sent together with workflow_name.
+    /// +optional
+    #[prost(string, tag="3")]
+    pub workflow_version: ::prost::alloc::string::String,
+    /// Id of dynamic node containing workflow closure containing requested parent node.
+    /// If not sent, top-level workflow closure is fetched.
+    /// +optional
+    #[prost(string, tag="4")]
+    pub dynamic_node_id: ::prost::alloc::string::String,
+    /// Node id of parent node if we want to fetch a subworkflow generated by node.
+    /// +optional
+    #[prost(string, tag="5")]
+    pub parent_node_id: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct WorkflowNodeExecutionsGetResponse {
+    /// Actual requested workflow
+    #[prost(message, optional, tag="1")]
+    pub closure: ::core::option::Option<super::core::CompiledWorkflowClosure>,
+    /// Node executions for each node in closure
+    #[prost(message, repeated, tag="2")]
+    pub node_executions: ::prost::alloc::vec::Vec<NodeExecution>,
 }
 /// Represents a request structure to retrieve a list of node execution entities.
 /// See :ref:`ref_flyteidl.admin.NodeExecution` for more details
@@ -2853,113 +2997,6 @@ pub struct Version {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetVersionRequest {
-}
-/// Represents a request structure to create a revision of a workflow.
-/// See :ref:`ref_flyteidl.admin.Workflow` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowCreateRequest {
-    /// id represents the unique identifier of the workflow.
-    /// +required
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-    /// Represents the specification for workflow.
-    /// +required
-    #[prost(message, optional, tag="2")]
-    pub spec: ::core::option::Option<WorkflowSpec>,
-}
-/// Purposefully empty, may be populated in the future. 
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowCreateResponse {
-}
-/// Represents the workflow structure stored in the Admin
-/// A workflow is created by ordering tasks and associating outputs to inputs
-/// in order to produce a directed-acyclic execution graph.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Workflow {
-    /// id represents the unique identifier of the workflow.
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-    /// closure encapsulates all the fields that maps to a compiled version of the workflow.
-    #[prost(message, optional, tag="2")]
-    pub closure: ::core::option::Option<WorkflowClosure>,
-    /// One-liner overview of the entity.
-    #[prost(string, tag="3")]
-    pub short_description: ::prost::alloc::string::String,
-}
-/// Represents a list of workflows returned from the admin.
-/// See :ref:`ref_flyteidl.admin.Workflow` for more details
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowList {
-    /// A list of workflows returned based on the request.
-    #[prost(message, repeated, tag="1")]
-    pub workflows: ::prost::alloc::vec::Vec<Workflow>,
-    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
-    /// in a query. If there are no more results, this value will be empty.
-    #[prost(string, tag="2")]
-    pub token: ::prost::alloc::string::String,
-}
-/// Represents a structure that encapsulates the specification of the workflow.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowSpec {
-    /// Template of the task that encapsulates all the metadata of the workflow.
-    #[prost(message, optional, tag="1")]
-    pub template: ::core::option::Option<super::core::WorkflowTemplate>,
-    /// Workflows that are embedded into other workflows need to be passed alongside the parent workflow to the
-    /// propeller compiler (since the compiler doesn't have any knowledge of other workflows - ie, it doesn't reach out
-    /// to Admin to see other registered workflows).  In fact, subworkflows do not even need to be registered.
-    #[prost(message, repeated, tag="2")]
-    pub sub_workflows: ::prost::alloc::vec::Vec<super::core::WorkflowTemplate>,
-    /// Represents the specification for description entity.
-    #[prost(message, optional, tag="3")]
-    pub description: ::core::option::Option<DescriptionEntity>,
-}
-/// A container holding the compiled workflow produced from the WorkflowSpec and additional metadata.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowClosure {
-    /// Represents the compiled representation of the workflow from the specification provided.
-    #[prost(message, optional, tag="1")]
-    pub compiled_workflow: ::core::option::Option<super::core::CompiledWorkflowClosure>,
-    /// Time at which the workflow was created.
-    #[prost(message, optional, tag="2")]
-    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
-}
-/// The workflow id is already used and the structure is different
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowErrorExistsDifferentStructure {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-}
-/// The workflow id is already used with an identical sctructure
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct WorkflowErrorExistsIdenticalStructure {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-}
-/// When a CreateWorkflowRequest fails due to matching id
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CreateWorkflowFailureReason {
-    #[prost(oneof="create_workflow_failure_reason::Reason", tags="1, 2")]
-    pub reason: ::core::option::Option<create_workflow_failure_reason::Reason>,
-}
-/// Nested message and enum types in `CreateWorkflowFailureReason`.
-pub mod create_workflow_failure_reason {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Reason {
-        #[prost(message, tag="1")]
-        ExistsDifferentStructure(super::WorkflowErrorExistsDifferentStructure),
-        #[prost(message, tag="2")]
-        ExistsIdenticalStructure(super::WorkflowErrorExistsIdenticalStructure),
-    }
 }
 /// Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`

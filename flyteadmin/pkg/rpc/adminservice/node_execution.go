@@ -108,3 +108,20 @@ func (m *AdminService) GetNodeExecutionData(
 	m.Metrics.nodeExecutionEndpointMetrics.getData.Success()
 	return response, nil
 }
+
+func (m *AdminService) GetWorkflowNodeExecutions(ctx context.Context, request *admin.WorkflowNodeExecutionsGetRequest) (*admin.WorkflowNodeExecutionsGetResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.WorkflowNodeExecutionsGetResponse
+	var err error
+	m.Metrics.nodeExecutionEndpointMetrics.getWorkflowNodeExecutions.Time(func() {
+		response, err = m.NodeExecutionManager.GetWorkflowNodeExecutions(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.getWorkflowNodeExecutions)
+	}
+	m.Metrics.nodeExecutionEndpointMetrics.getWorkflowNodeExecutions.Success()
+	return response, nil
+}

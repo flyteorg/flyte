@@ -45,6 +45,11 @@ func (r *MockWorkflowRepo) Get(ctx context.Context, input interfaces.Identifier)
 	}, nil
 }
 
+func (r *MockWorkflowRepo) GetByID(ctx context.Context, id uint) (models.Workflow, error) {
+	// TODO
+	return models.Workflow{}, nil
+}
+
 func (r *MockWorkflowRepo) SetGetCallback(getFunction GetWorkflowFunc) {
 	r.getFunction = getFunction
 }

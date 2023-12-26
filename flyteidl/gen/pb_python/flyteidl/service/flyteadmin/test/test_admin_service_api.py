@@ -217,6 +217,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_workflow_node_executions(self):
+        """Test case for get_workflow_node_executions
+
+        Fetches a :ref:`ref_flyteidl.admin.WorkflowNodeExecutionsGetResponse`.  # noqa: E501
+        """
+        pass
+
     def test_list_active_launch_plans(self):
         """Test case for list_active_launch_plans
 

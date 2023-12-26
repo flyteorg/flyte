@@ -7,6 +7,8 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+//go:generate mockery -name=NodeExecutionRepoInterface -output=../mocks -case=underscore
+
 // Defines the interface for interacting with node execution models.
 type NodeExecutionRepoInterface interface {
 	// Create a new node execution model and the first event that triggers it into the database store.
@@ -15,6 +17,8 @@ type NodeExecutionRepoInterface interface {
 	Update(ctx context.Context, execution *models.NodeExecution) error
 	// Get returns a matching execution if it exists.
 	Get(ctx context.Context, input NodeExecutionResource) (models.NodeExecution, error)
+	// Get returns a execution by numeric id if it exists.
+	GetByID(ctx context.Context, id uint) (models.NodeExecution, error)
 	// GetWithChildren returns a matching execution with preloaded child node executions. This should only be called for legacy node executions
 	// which were created with eventVersion == 0
 	GetWithChildren(ctx context.Context, input NodeExecutionResource) (models.NodeExecution, error)
@@ -33,6 +37,7 @@ type NodeExecutionResource struct {
 // Response format for a query on node executions.
 type NodeExecutionCollectionOutput struct {
 	NodeExecutions []models.NodeExecution
+	Token          string
 }
 
 // Response format for a query on node execution events.

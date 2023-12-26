@@ -70,26 +70,34 @@ func FetchAndGetWorkflowClosure(ctx context.Context,
 	return closure, nil
 }
 
-func GetWorkflow(
-	ctx context.Context,
-	repo repoInterfaces.Repository,
+func TransformWorkflowWithClosure(ctx context.Context,
 	store *storage.DataStore,
-	identifier core.Identifier) (*admin.Workflow, error) {
-	workflowModel, err := GetWorkflowModel(ctx, repo, identifier)
+	model models.Workflow,
+) (*admin.Workflow, error) {
+	workflow, err := transformers.FromWorkflowModel(model)
 	if err != nil {
 		return nil, err
 	}
-	workflow, err := transformers.FromWorkflowModel(workflowModel)
-	if err != nil {
-		return nil, err
-	}
-	closure, err := FetchAndGetWorkflowClosure(ctx, store, workflowModel.RemoteClosureIdentifier)
+	closure, err := FetchAndGetWorkflowClosure(ctx, store, model.RemoteClosureIdentifier)
 	if err != nil {
 		return nil, err
 	}
 	closure.CreatedAt = workflow.Closure.CreatedAt
 	workflow.Closure = closure
 	return &workflow, nil
+}
+
+func GetWorkflow(
+	ctx context.Context,
+	repo repoInterfaces.Repository,
+	store *storage.DataStore,
+	identifier core.Identifier,
+) (*admin.Workflow, error) {
+	workflowModel, err := GetWorkflowModel(ctx, repo, identifier)
+	if err != nil {
+		return nil, err
+	}
+	return TransformWorkflowWithClosure(ctx, store, workflowModel)
 }
 
 func GetLaunchPlanModel(

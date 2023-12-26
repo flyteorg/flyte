@@ -68,9 +68,9 @@ func generateBindings(outputs core.VariableMap, nodeID string) []*core.Binding {
 }
 
 func CreateOrGetWorkflowModel(
-	ctx context.Context, request admin.ExecutionCreateRequest, db repositoryInterfaces.Repository,
+	ctx context.Context, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, taskIdentifier *core.Identifier,
-	task *admin.Task) (*models.Workflow, error) {
+	task *admin.Task) (models.Workflow, error) {
 	workflowIdentifier := core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
 		Project:      taskIdentifier.Project,
@@ -87,7 +87,7 @@ func CreateOrGetWorkflowModel(
 
 	if err != nil {
 		if ferr, ok := err.(errors.FlyteAdminError); !ok || ferr.Code() != codes.NotFound {
-			return nil, err
+			return models.Workflow{}, err
 		}
 		// If we got this far, there is no existing workflow. Create a skeleton one now.
 		workflowSpec := admin.WorkflowSpec{
@@ -124,7 +124,7 @@ func CreateOrGetWorkflowModel(
 			// In the case of race conditions, if the workflow already exists we can safely ignore the corresponding
 			// error.
 			if ferr, ok := err.(errors.FlyteAdminError); !ok || ferr.Code() != codes.AlreadyExists {
-				return nil, err
+				return models.Workflow{}, err
 			}
 		}
 		// Now, set the newly created skeleton workflow to 'SYSTEM_GENERATED'.
@@ -139,7 +139,7 @@ func CreateOrGetWorkflowModel(
 		})
 		if err != nil {
 			logger.Warningf(ctx, "Failed to set skeleton workflow state to system-generated: %v", err)
-			return nil, err
+			return models.Workflow{}, err
 		}
 		workflowModel, err = db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
 			Project: workflowIdentifier.Project,
@@ -150,11 +150,11 @@ func CreateOrGetWorkflowModel(
 		if err != nil {
 			// This is unexpected - at this point we've successfully just created the skeleton workflow.
 			logger.Warningf(ctx, "Failed to fetch newly created workflow model from db store: %v", err)
-			return nil, err
+			return models.Workflow{}, err
 		}
 	}
 
-	return &workflowModel, nil
+	return workflowModel, nil
 }
 
 func CreateOrGetLaunchPlan(ctx context.Context,

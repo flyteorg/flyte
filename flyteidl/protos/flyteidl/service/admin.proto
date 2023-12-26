@@ -331,6 +331,16 @@ service AdminService {
     // };
   }
 
+  // Fetches a :ref:`ref_flyteidl.admin.WorkflowNodeExecutionsGetResponse`.
+  rpc GetWorkflowNodeExecutions (flyteidl.admin.WorkflowNodeExecutionsGetRequest) returns (flyteidl.admin.WorkflowNodeExecutionsGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/workflow_node_executions/{execution_id.project}/{execution_id.domain}/{execution_id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a workflow closure with node executions for each node."
+    // };
+  }
+
   // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
   rpc ListNodeExecutions (flyteidl.admin.NodeExecutionListRequest) returns (flyteidl.admin.NodeExecutionList) {
     option (google.api.http) = {

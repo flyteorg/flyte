@@ -150,6 +150,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.FromString,
                 )
+        self.GetWorkflowNodeExecutions = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetWorkflowNodeExecutions',
+                request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.WorkflowNodeExecutionsGetRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.WorkflowNodeExecutionsGetResponse.FromString,
+                )
         self.ListNodeExecutions = channel.unary_unary(
                 '/flyteidl.service.AdminService/ListNodeExecutions',
                 request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionListRequest.SerializeToString,
@@ -469,6 +474,13 @@ class AdminServiceServicer(object):
 
     def GetNodeExecution(self, request, context):
         """Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetWorkflowNodeExecutions(self, request, context):
+        """Fetches a :ref:`ref_flyteidl.admin.WorkflowNodeExecutionsGetResponse`.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -800,6 +812,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.GetNodeExecution,
                     request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.SerializeToString,
+            ),
+            'GetWorkflowNodeExecutions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetWorkflowNodeExecutions,
+                    request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.WorkflowNodeExecutionsGetRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_node__execution__pb2.WorkflowNodeExecutionsGetResponse.SerializeToString,
             ),
             'ListNodeExecutions': grpc.unary_unary_rpc_method_handler(
                     servicer.ListNodeExecutions,
@@ -1363,6 +1380,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetNodeExecution',
             flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.SerializeToString,
             flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetWorkflowNodeExecutions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetWorkflowNodeExecutions',
+            flyteidl_dot_admin_dot_node__execution__pb2.WorkflowNodeExecutionsGetRequest.SerializeToString,
+            flyteidl_dot_admin_dot_node__execution__pb2.WorkflowNodeExecutionsGetResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

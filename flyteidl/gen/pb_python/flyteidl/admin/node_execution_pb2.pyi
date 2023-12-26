@@ -4,6 +4,7 @@ from flyteidl.core import catalog_pb2 as _catalog_pb2
 from flyteidl.core import compiler_pb2 as _compiler_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
+from flyteidl.admin import workflow_pb2 as _workflow_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf.internal import containers as _containers
@@ -18,6 +19,28 @@ class NodeExecutionGetRequest(_message.Message):
     ID_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.NodeExecutionIdentifier
     def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ...) -> None: ...
+
+class WorkflowNodeExecutionsGetRequest(_message.Message):
+    __slots__ = ["execution_id", "workflow_name", "workflow_version", "dynamic_node_id", "parent_node_id"]
+    EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_NAME_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_VERSION_FIELD_NUMBER: _ClassVar[int]
+    DYNAMIC_NODE_ID_FIELD_NUMBER: _ClassVar[int]
+    PARENT_NODE_ID_FIELD_NUMBER: _ClassVar[int]
+    execution_id: _identifier_pb2.WorkflowExecutionIdentifier
+    workflow_name: str
+    workflow_version: str
+    dynamic_node_id: str
+    parent_node_id: str
+    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., workflow_name: _Optional[str] = ..., workflow_version: _Optional[str] = ..., dynamic_node_id: _Optional[str] = ..., parent_node_id: _Optional[str] = ...) -> None: ...
+
+class WorkflowNodeExecutionsGetResponse(_message.Message):
+    __slots__ = ["closure", "node_executions"]
+    CLOSURE_FIELD_NUMBER: _ClassVar[int]
+    NODE_EXECUTIONS_FIELD_NUMBER: _ClassVar[int]
+    closure: _compiler_pb2.CompiledWorkflowClosure
+    node_executions: _containers.RepeatedCompositeFieldContainer[NodeExecution]
+    def __init__(self, closure: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ..., node_executions: _Optional[_Iterable[_Union[NodeExecution, _Mapping]]] = ...) -> None: ...
 
 class NodeExecutionListRequest(_message.Message):
     __slots__ = ["workflow_execution_id", "limit", "token", "filters", "sort_by", "unique_parent_id"]
