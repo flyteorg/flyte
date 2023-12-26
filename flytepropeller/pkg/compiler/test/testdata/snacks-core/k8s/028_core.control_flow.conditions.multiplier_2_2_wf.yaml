@@ -76,7 +76,7 @@ spec:
     n0:
       branch:
         elseFail:
-          failedNodeId: fractions
+          failed_node_id: fractions
           message: The input must be between 0 and 10
         elseIf:
         - condition:

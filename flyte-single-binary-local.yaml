@@ -23,7 +23,7 @@ cluster_resources:
 
 logger:
   show-source: true
-  level: 3
+  level: 5
 
 propeller:
   create-flyteworkflow-crd: true

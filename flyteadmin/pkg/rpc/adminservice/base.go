@@ -22,6 +22,7 @@ import (
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineImpl "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/impl"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -115,9 +116,8 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	var artifactRegistry *artifacts.ArtifactRegistry
 	if configuration.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
-		artifactRegistry = artifacts.NewArtifactRegistry(ctx, configuration.ApplicationConfiguration().GetArtifactsConfig())
-	} else {
-		artifactRegistry = nil
+		adminClientCfg := admin2.GetConfig(ctx)
+		artifactRegistry = artifacts.NewArtifactRegistry(ctx, adminClientCfg)
 	}
 
 	launchPlanManager := manager.NewLaunchPlanManager(

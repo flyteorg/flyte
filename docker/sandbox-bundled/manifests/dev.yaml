@@ -398,10 +398,6 @@ data:
                                               route:
                                                   cluster: flyte_grpc
                                             - match:
-                                                  prefix: "/flyteidl.artifact.ArtifactRegistry"
-                                              route:
-                                                  cluster: artifact
-                                            - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
                                                   path_redirect: "/kubernetes-dashboard/"
@@ -477,20 +473,6 @@ data:
                                       socket_address:
                                           address: flyte-sandbox-minio
                                           port_value: 9001
-            - name: artifact
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              http2_protocol_options: {}
-              load_assignment:
-                  cluster_name: artifact
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: artifact-service
-                                          port_value: 50051
 kind: ConfigMap
 metadata:
   labels:
@@ -517,7 +499,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: MUFZMGpjUDBoNlF0TFlpTg==
+  haSharedSecret: MGNlbmFPenJydE1hNlB0Sw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -623,22 +605,6 @@ subsets:
   - name: webhook
     port: 9443
     protocol: TCP
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels:
-    app: artifact-service
-  name: artifact-service
-  namespace: flyte
-spec:
-  ports:
-  - name: grpc
-    port: 50051
-    targetPort: 50051
-  selector:
-    app: artifact-service
-  type: ClusterIP
 ---
 apiVersion: v1
 kind: Service
@@ -892,44 +858,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: artifact-service
-  name: artifact-service
-  namespace: flyte
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: artifact-service
-  template:
-    metadata:
-      labels:
-        app: artifact-service
-    spec:
-      containers:
-      - env:
-        - name: DATABASE_URL
-          value: postgresql://postgres:postgres@flyte-sandbox-postgresql.flyte:5432/postgres
-        - name: REDIS_HOST
-          value: flyte-sandbox-redis-headless.flyte.svc.cluster.local
-        - name: REDIS_PORT
-          value: "6379"
-        image: ghcr.io/unionai/artifacts:sandbox
-        livenessProbe:
-          initialDelaySeconds: 30
-          tcpSocket:
-            port: grpc
-        name: main
-        ports:
-        - containerPort: 50051
-          name: grpc
-        readinessProbe:
-          tcpSocket:
-            port: grpc
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
@@ -1005,7 +933,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: a26795e1e50c34e0c595242afc1467391093fa7a3def3c463679e8ad5a85b554
+        checksum/secret: 05cc4dc3bf13796e3a35e79da36baf286c81f80b207628f1f64197c80a04130c
       labels:
         app: docker-registry
         release: flyte-sandbox

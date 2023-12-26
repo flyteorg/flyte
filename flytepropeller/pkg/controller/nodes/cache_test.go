@@ -62,6 +62,7 @@ func setupCacheableNodeExecutionContext(dataStore *storage.DataStore, taskTempla
 
 	mockExecutionContext := &executorsmocks.ExecutionContext{}
 	mockExecutionContext.OnGetParentInfoMatch(mock.Anything).Return(mockParentInfo)
+	mockExecutionContext.OnGetExecutionConfigMatch().Return(v1alpha1.ExecutionConfig{})
 
 	mockNodeExecutionMetadata := &interfacesmocks.NodeExecutionMetadata{}
 	mockNodeExecutionMetadata.OnGetOwnerID().Return(

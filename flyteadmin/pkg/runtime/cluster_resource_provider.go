@@ -1,6 +1,7 @@
 package runtime
 
 import (
+	"os"
 	"time"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -21,7 +22,7 @@ var clusterResourceConfig = config.MustRegisterSection(clusterResourceKey, &inte
 type ClusterResourceConfigurationProvider struct{}
 
 func (p *ClusterResourceConfigurationProvider) GetTemplatePath() string {
-	return clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).TemplatePath
+	return os.ExpandEnv(clusterResourceConfig.GetConfig().(*interfaces.ClusterResourceConfig).TemplatePath)
 }
 
 func (p *ClusterResourceConfigurationProvider) GetTemplateData() interfaces.TemplateData {
