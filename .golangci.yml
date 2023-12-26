@@ -2,7 +2,6 @@ run:
   skip-files:
     # because we're skipping TLS verification - for now
     - cmd/entrypoints/serve.go
-    - pkg/async/messages/sqs.go
     - gen
     - mocks
     - _test.go$
