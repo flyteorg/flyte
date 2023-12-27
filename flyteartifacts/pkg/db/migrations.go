@@ -8,6 +8,13 @@ import (
 
 var Migrations = []*gormigrate.Migration{
 	{
+		ID: "2023-10-12-hstore",
+		Migrate: func(tx *gorm.DB) error {
+			tx.Exec("CREATE EXTENSION IF NOT EXISTS hstore")
+			return nil
+		},
+	},
+	{
 		ID: "2023-10-12-inits",
 		Migrate: func(tx *gorm.DB) error {
 			type ArtifactKey struct {
