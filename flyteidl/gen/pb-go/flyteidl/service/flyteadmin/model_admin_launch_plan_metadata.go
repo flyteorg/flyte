@@ -13,4 +13,5 @@ package flyteadmin
 type AdminLaunchPlanMetadata struct {
 	Schedule *AdminSchedule `json:"schedule,omitempty"`
 	Notifications []AdminNotification `json:"notifications,omitempty"`
+	LaunchConditions *ProtobufAny `json:"launch_conditions,omitempty"`
 }
