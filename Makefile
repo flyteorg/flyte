@@ -121,20 +121,6 @@ go-tidy:
 	$(MAKE) -C flytecopilot go-tidy
 
 .PHONY: lint
-lint-all:
-	$(MAKE) -C datacatalog lint
-	$(MAKE) -C flyteadmin lint
-	$(MAKE) -C flyteidl lint
-	$(MAKE) -C flytepropeller lint
-	$(MAKE) -C flyteplugins lint
-	$(MAKE) -C flytestdlib lint
-	$(MAKE) -C flytecopilot lint
-
-
-.PHONY: download_tooling
-download_tooling: #download dependencies (including test deps) for the package
-	@boilerplate/flyte/golang_test_targets/download_tooling.sh
-
-.PHONY: lint
-lint: download_tooling #lints the package for common code smells
+lint: #lints the package for common code smells
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3
 	GL_DEBUG=linters_output,env find . -type f -name go.mod -maxdepth 3 -execdir golangci-lint run --deadline=5m --exclude deprecated -v \;
