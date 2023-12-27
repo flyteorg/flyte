@@ -332,6 +332,16 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 		return nil, err
 	}
 
+	// artifactModel needs to be updated with new SerializedMetadata
+	serializedMetadata, err := transformers.SerializedMetadata(request.Metadata)
+	if err != nil {
+		logger.Errorf(ctx, "Error in transforming Metadata from request %+v, err %v", request.Metadata, err)
+		m.systemMetrics.transformerErrorCounter.Inc(ctx)
+		m.systemMetrics.updateFailureCounter.Inc(ctx)
+		return nil, err
+	}
+	artifactModel.SerializedMetadata = serializedMetadata
+
 	artifact, err := transformers.FromArtifactModel(artifactModel)
 	if err != nil {
 		logger.Errorf(ctx, "Error in transforming update artifact request %+v, err %v", artifactModel, err)
@@ -369,6 +379,8 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 
 	// update artifact in DB, also replaces/upserts associated artifact data
 	artifactModel.ArtifactData = artifactDataModels
+	logger.Debugf(ctx, "Updating ArtifactModel with %+v", artifactModel)
+
 	err = m.repo.ArtifactRepo().Update(ctx, artifactModel)
 	if err != nil {
 		if errors.IsDoesNotExistError(err) {
