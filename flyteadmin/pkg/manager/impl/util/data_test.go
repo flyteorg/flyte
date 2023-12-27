@@ -174,23 +174,15 @@ func TestGetOutputs(t *testing.T) {
 			OutputUri: testOutputsURI,
 		},
 	}
-	t.Run("offloaded outputs with signed URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: true,
-		}
-
+	t.Run("offloaded outputs", func(t *testing.T) {
 		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 	})
-	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: false,
-		}
-
-		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
-		assert.NoError(t, err)
-		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
+	t.Run("offloaded outputs storage read fails", func(t *testing.T) {
+		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
+		assert.Error(t, err)
+		assert.Nil(t, fullOutputs)
 	})
 	t.Run("inline outputs", func(t *testing.T) {
 		mockRemoteURL := urlMocks.NewMockRemoteURL()
@@ -234,21 +226,6 @@ func TestGetOutputs(t *testing.T) {
 		assert.Nil(t, fullOutputs)
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "LIMIT_EXCEEDED")
-	})
-	t.Run("storage read fails with signed URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: true,
-		}
-		_, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
-		assert.NoError(t, err)
-	})
-	t.Run("storage read fails without signed URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: false,
-		}
-		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
-		assert.Error(t, err)
-		assert.Nil(t, fullOutputs)
 	})
 }
 

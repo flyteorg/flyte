@@ -96,7 +96,7 @@ func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosu
 	}
 }
 
-// GetOutputs returns an outputs URL blob and if config settings permit, inline outputs data for an execution.
+// GetOutputs returns inline outputs data for an execution
 func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, closure ExecutionClosure) (
 	*core.LiteralMap, error) {
@@ -115,14 +115,8 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	} else if len(closure.GetOutputUri()) > 0 {
 		err := storageClient.ReadProtobuf(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs)
 		if err != nil {
-			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
-			// Instead we return the signed URL blob so that the client can use that to fetch the output data.
-			if remoteDataConfig.SignedURL.Enabled {
-				logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
-			} else {
-				logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
-				return nil, err
-			}
+			logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
+			return nil, err
 		}
 	}
 
