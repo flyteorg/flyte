@@ -49,12 +49,7 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the input data.
-			if remoteDataConfig.SignedURL.Enabled {
-				logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
-			} else {
-				logger.Errorf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
-				return nil, nil, err
-			}
+			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
 		}
 	}
 	return &fullInputs, &inputsURLBlob, nil
