@@ -777,6 +777,16 @@ func (m *LaunchPlanMetadata) Validate() error {
 
 	}
 
+	if v, ok := interface{}(m.GetLaunchConditions()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return LaunchPlanMetadataValidationError{
+				field:  "LaunchConditions",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

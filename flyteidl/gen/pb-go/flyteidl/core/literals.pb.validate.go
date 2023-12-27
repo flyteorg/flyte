@@ -924,6 +924,8 @@ func (m *Literal) Validate() error {
 
 	// no validation rules for Hash
 
+	// no validation rules for Metadata
+
 	switch m.Value.(type) {
 
 	case *Literal_Scalar:

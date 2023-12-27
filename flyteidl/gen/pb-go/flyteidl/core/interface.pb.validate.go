@@ -55,6 +55,26 @@ func (m *Variable) Validate() error {
 
 	// no validation rules for Description
 
+	if v, ok := interface{}(m.GetArtifactPartialId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VariableValidationError{
+				field:  "ArtifactPartialId",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetArtifactTag()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return VariableValidationError{
+				field:  "ArtifactTag",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 
@@ -312,6 +332,30 @@ func (m *Parameter) Validate() error {
 
 	case *Parameter_Required:
 		// no validation rules for Required
+
+	case *Parameter_ArtifactQuery:
+
+		if v, ok := interface{}(m.GetArtifactQuery()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ParameterValidationError{
+					field:  "ArtifactQuery",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	case *Parameter_ArtifactId:
+
+		if v, ok := interface{}(m.GetArtifactId()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ParameterValidationError{
+					field:  "ArtifactId",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
 
 	}
 
