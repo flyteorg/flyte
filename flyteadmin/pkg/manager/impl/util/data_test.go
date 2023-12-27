@@ -151,8 +151,6 @@ func TestGetInputs(t *testing.T) {
 
 func TestGetOutputs(t *testing.T) {
 
-	mockRemoteURL := urlMocks.NewMockRemoteURL()
-
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
 	}
@@ -175,17 +173,16 @@ func TestGetOutputs(t *testing.T) {
 		},
 	}
 	t.Run("offloaded outputs", func(t *testing.T) {
-		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 	})
 	t.Run("offloaded outputs storage read fails", func(t *testing.T) {
-		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), &remoteDataConfig, mockStorageReadFailure, closure)
 		assert.Error(t, err)
 		assert.Nil(t, fullOutputs)
 	})
 	t.Run("inline outputs", func(t *testing.T) {
-		mockRemoteURL := urlMocks.NewMockRemoteURL()
 		remoteDataConfig := interfaces.RemoteDataConfig{}
 		remoteDataConfig.MaxSizeInBytes = 2000
 
@@ -201,12 +198,11 @@ func TestGetOutputs(t *testing.T) {
 			},
 		}
 
-		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 	})
 	t.Run("inline outputs over limit", func(t *testing.T) {
-		mockRemoteURL := urlMocks.NewMockRemoteURL()
 		remoteDataConfig := interfaces.RemoteDataConfig{}
 		remoteDataConfig.MaxSizeInBytes = 0
 
@@ -222,7 +218,7 @@ func TestGetOutputs(t *testing.T) {
 			},
 		}
 
-		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), &remoteDataConfig, mockStorage, closure)
 		assert.Nil(t, fullOutputs)
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "LIMIT_EXCEEDED")

@@ -313,7 +313,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	if err != nil {
 		return nil, err
 	}
-	outputs, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+	outputs, err := util.GetOutputs(ctx, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, taskExecution.Closure)
 	if err != nil {
 		return nil, err

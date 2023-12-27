@@ -96,9 +96,9 @@ func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosu
 	}
 }
 
-// GetOutputs returns inline outputs data for an execution
-func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
-	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, closure ExecutionClosure) (
+// GetOutputs returns outputs data for an execution
+func GetOutputs(ctx context.Context, remoteDataConfig *runtimeInterfaces.RemoteDataConfig,
+	storageClient *storage.DataStore, closure ExecutionClosure) (
 	*core.LiteralMap, error) {
 	var fullOutputs = &core.LiteralMap{}
 	if closure == nil {
