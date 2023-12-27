@@ -5,6 +5,8 @@ package mocks
 import (
 	context "context"
 
+	datacatalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+
 	mock "github.com/stretchr/testify/mock"
 
 	models "github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
@@ -23,8 +25,8 @@ func (_m ArtifactRepo_Create) Return(_a0 error) *ArtifactRepo_Create {
 	return &ArtifactRepo_Create{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ArtifactRepo) OnCreate(ctx context.Context, in models.Artifact) *ArtifactRepo_Create {
-	c_call := _m.On("Create", ctx, in)
+func (_m *ArtifactRepo) OnCreate(ctx context.Context, id *datacatalog.DatasetID, in models.Artifact) *ArtifactRepo_Create {
+	c_call := _m.On("Create", ctx, id, in)
 	return &ArtifactRepo_Create{Call: c_call}
 }
 
@@ -33,13 +35,13 @@ func (_m *ArtifactRepo) OnCreateMatch(matchers ...interface{}) *ArtifactRepo_Cre
 	return &ArtifactRepo_Create{Call: c_call}
 }
 
-// Create provides a mock function with given fields: ctx, in
-func (_m *ArtifactRepo) Create(ctx context.Context, in models.Artifact) error {
-	ret := _m.Called(ctx, in)
+// Create provides a mock function with given fields: ctx, id, in
+func (_m *ArtifactRepo) Create(ctx context.Context, id *datacatalog.DatasetID, in models.Artifact) error {
+	ret := _m.Called(ctx, id, in)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.Artifact) error); ok {
-		r0 = rf(ctx, in)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, models.Artifact) error); ok {
+		r0 = rf(ctx, id, in)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -55,8 +57,8 @@ func (_m ArtifactRepo_Get) Return(_a0 models.Artifact, _a1 error) *ArtifactRepo_
 	return &ArtifactRepo_Get{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ArtifactRepo) OnGet(ctx context.Context, in models.ArtifactKey) *ArtifactRepo_Get {
-	c_call := _m.On("Get", ctx, in)
+func (_m *ArtifactRepo) OnGet(ctx context.Context, id *datacatalog.DatasetID, artifactID string) *ArtifactRepo_Get {
+	c_call := _m.On("Get", ctx, id, artifactID)
 	return &ArtifactRepo_Get{Call: c_call}
 }
 
@@ -65,20 +67,20 @@ func (_m *ArtifactRepo) OnGetMatch(matchers ...interface{}) *ArtifactRepo_Get {
 	return &ArtifactRepo_Get{Call: c_call}
 }
 
-// Get provides a mock function with given fields: ctx, in
-func (_m *ArtifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
-	ret := _m.Called(ctx, in)
+// Get provides a mock function with given fields: ctx, id, artifactID
+func (_m *ArtifactRepo) Get(ctx context.Context, id *datacatalog.DatasetID, artifactID string) (models.Artifact, error) {
+	ret := _m.Called(ctx, id, artifactID)
 
 	var r0 models.Artifact
-	if rf, ok := ret.Get(0).(func(context.Context, models.ArtifactKey) models.Artifact); ok {
-		r0 = rf(ctx, in)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, string) models.Artifact); ok {
+		r0 = rf(ctx, id, artifactID)
 	} else {
 		r0 = ret.Get(0).(models.Artifact)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.ArtifactKey) error); ok {
-		r1 = rf(ctx, in)
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.DatasetID, string) error); ok {
+		r1 = rf(ctx, id, artifactID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -94,8 +96,8 @@ func (_m ArtifactRepo_List) Return(_a0 []models.Artifact, _a1 error) *ArtifactRe
 	return &ArtifactRepo_List{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *ArtifactRepo) OnList(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) *ArtifactRepo_List {
-	c_call := _m.On("List", ctx, datasetKey, in)
+func (_m *ArtifactRepo) OnList(ctx context.Context, id *datacatalog.DatasetID, in models.ListModelsInput) *ArtifactRepo_List {
+	c_call := _m.On("List", ctx, id, in)
 	return &ArtifactRepo_List{Call: c_call}
 }
 
@@ -104,13 +106,13 @@ func (_m *ArtifactRepo) OnListMatch(matchers ...interface{}) *ArtifactRepo_List 
 	return &ArtifactRepo_List{Call: c_call}
 }
 
-// List provides a mock function with given fields: ctx, datasetKey, in
-func (_m *ArtifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
-	ret := _m.Called(ctx, datasetKey, in)
+// List provides a mock function with given fields: ctx, id, in
+func (_m *ArtifactRepo) List(ctx context.Context, id *datacatalog.DatasetID, in models.ListModelsInput) ([]models.Artifact, error) {
+	ret := _m.Called(ctx, id, in)
 
 	var r0 []models.Artifact
-	if rf, ok := ret.Get(0).(func(context.Context, models.DatasetKey, models.ListModelsInput) []models.Artifact); ok {
-		r0 = rf(ctx, datasetKey, in)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, models.ListModelsInput) []models.Artifact); ok {
+		r0 = rf(ctx, id, in)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]models.Artifact)
@@ -118,8 +120,8 @@ func (_m *ArtifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, 
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.DatasetKey, models.ListModelsInput) error); ok {
-		r1 = rf(ctx, datasetKey, in)
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.DatasetID, models.ListModelsInput) error); ok {
+		r1 = rf(ctx, id, in)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -135,8 +137,8 @@ func (_m ArtifactRepo_Update) Return(_a0 error) *ArtifactRepo_Update {
 	return &ArtifactRepo_Update{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *ArtifactRepo) OnUpdate(ctx context.Context, artifact models.Artifact) *ArtifactRepo_Update {
-	c_call := _m.On("Update", ctx, artifact)
+func (_m *ArtifactRepo) OnUpdate(ctx context.Context, id *datacatalog.DatasetID, artifact models.Artifact) *ArtifactRepo_Update {
+	c_call := _m.On("Update", ctx, id, artifact)
 	return &ArtifactRepo_Update{Call: c_call}
 }
 
@@ -145,13 +147,13 @@ func (_m *ArtifactRepo) OnUpdateMatch(matchers ...interface{}) *ArtifactRepo_Upd
 	return &ArtifactRepo_Update{Call: c_call}
 }
 
-// Update provides a mock function with given fields: ctx, artifact
-func (_m *ArtifactRepo) Update(ctx context.Context, artifact models.Artifact) error {
-	ret := _m.Called(ctx, artifact)
+// Update provides a mock function with given fields: ctx, id, artifact
+func (_m *ArtifactRepo) Update(ctx context.Context, id *datacatalog.DatasetID, artifact models.Artifact) error {
+	ret := _m.Called(ctx, id, artifact)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.Artifact) error); ok {
-		r0 = rf(ctx, artifact)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, models.Artifact) error); ok {
+		r0 = rf(ctx, id, artifact)
 	} else {
 		r0 = ret.Error(0)
 	}

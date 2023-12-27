@@ -2,7 +2,6 @@ package gormimpl
 
 import (
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/sets"
 
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
@@ -87,8 +86,6 @@ func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdmi
 	}
 	return nil
 }
-
-var executionEntities = sets.New[common.Entity](common.NodeExecution, common.TaskExecution)
 
 // Returns equality filters initialized for identifier attributes (project, domain & name)
 // which can be optionally specified in requests.

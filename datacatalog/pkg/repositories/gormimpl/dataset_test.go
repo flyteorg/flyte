@@ -101,7 +101,7 @@ func TestCreateDatasetNoPartitions(t *testing.T) {
 	dataset.PartitionKeys = nil
 
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := datasetRepo.Create(context.Background(), dataset)
+	err := datasetRepo.Create(context.Background(), testDatasetID, dataset)
 	assert.NoError(t, err)
 	assert.True(t, datasetCreated)
 }
@@ -137,7 +137,7 @@ func TestCreateDataset(t *testing.T) {
 	)
 
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := datasetRepo.Create(context.Background(), getTestDataset())
+	err := datasetRepo.Create(context.Background(), testDatasetID, getTestDataset())
 	assert.NoError(t, err)
 	assert.True(t, datasetCreated)
 	assert.Equal(t, insertKeyQueryNum, 2)
@@ -170,7 +170,7 @@ func TestGetDataset(t *testing.T) {
 
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "partition_keys" WHERE "partition_keys"."dataset_uuid" = $1 ORDER BY partition_keys.created_at ASC`).WithReply(expectedPartitionKeyResponse)
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
+	actualDataset, err := datasetRepo.Get(context.Background(), testDatasetID)
 	assert.NoError(t, err)
 	assert.Equal(t, dataset.Project, actualDataset.Project)
 	assert.Equal(t, dataset.Domain, actualDataset.Domain)
@@ -202,7 +202,9 @@ func TestGetDatasetWithUUID(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets" WHERE "datasets"."uuid" = $1 ORDER BY "datasets"."created_at" LIMIT 1%!(EXTRA string=test-uuid)`).WithReply(expectedResponse)
 
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
+	actualDataset, err := datasetRepo.Get(context.Background(), &datacatalog.DatasetID{
+		UUID: getDatasetUUID(),
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, dataset.Project, actualDataset.Project)
 	assert.Equal(t, dataset.Domain, actualDataset.Domain)
@@ -225,7 +227,7 @@ func TestGetDatasetNotFound(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(`SELECT * FROM "datasets"  WHERE "datasets"."deleted_at" IS NULL AND (("datasets"."project" = testProject) AND ("datasets"."name" = testName) AND ("datasets"."domain" = testDomain) AND ("datasets"."version" = testVersion)) ORDER BY "datasets"."id" ASC LIMIT 1`).WithReply(nil)
 
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	_, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
+	_, err := datasetRepo.Get(context.Background(), testDatasetID)
 	assert.Error(t, err)
 	notFoundErr, ok := err.(datacatalog_error.DataCatalogError)
 	assert.True(t, ok)
@@ -243,7 +245,7 @@ func TestCreateDatasetAlreadyExists(t *testing.T) {
 	)
 
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := datasetRepo.Create(context.Background(), getTestDataset())
+	err := datasetRepo.Create(context.Background(), testDatasetID, getTestDataset())
 	assert.Error(t, err)
 	dcErr, ok := err.(datacatalog_error.DataCatalogError)
 	assert.True(t, ok)

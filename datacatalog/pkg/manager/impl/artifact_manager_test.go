@@ -5,9 +5,9 @@ import (
 	stdErrors "errors"
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -15,12 +15,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	repoErrors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -31,6 +32,14 @@ import (
 
 func init() {
 	labeled.SetMetricKeys(contextutils.AppNameKey)
+}
+
+var testDatasetID = &datacatalog.DatasetID{
+	Project: "test-project",
+	Domain:  "test-domain",
+	Name:    "test-name",
+	Version: "test-version",
+	UUID:    "test-uuid",
 }
 
 func createInmemoryDataStore(t testing.TB, scope mockScope.Scope) *storage.DataStore {
@@ -64,18 +73,11 @@ func getTestTimestamp() time.Time {
 }
 
 func getTestArtifact() *datacatalog.Artifact {
-	datasetID := &datacatalog.DatasetID{
-		Project: "test-project",
-		Domain:  "test-domain",
-		Name:    "test-name",
-		Version: "test-version",
-		UUID:    "test-uuid",
-	}
 	createdAt, _ := ptypes.TimestampProto(getTestTimestamp())
 
 	return &datacatalog.Artifact{
 		Id:      "test-id",
-		Dataset: datasetID,
+		Dataset: testDatasetID,
 		Metadata: &datacatalog.Metadata{
 			KeyMap: map[string]string{"key1": "value1"},
 		},
@@ -90,7 +92,7 @@ func getTestArtifact() *datacatalog.Artifact {
 			{Key: "key2", Value: "value2"},
 		},
 		Tags: []*datacatalog.Tag{
-			{Name: "test-tag", Dataset: datasetID, ArtifactId: "test-id"},
+			{Name: "test-tag", Dataset: testDatasetID, ArtifactId: "test-id"},
 		},
 		CreatedAt: createdAt,
 	}
@@ -197,18 +199,18 @@ func TestCreateArtifact(t *testing.T) {
 
 		ctx := context.Background()
 		dcRepo := newMockDataCatalogRepo()
+		expectedArtifact := getTestArtifact()
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
-			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Name == expectedDataset.Id.Name &&
-					dataset.Version == expectedDataset.Id.Version
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			})).Return(mockDatasetModel, nil)
 
 		dcRepo.MockArtifactRepo.On("Create",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
-				expectedArtifact := getTestArtifact()
 				return artifact.ArtifactID == expectedArtifact.Id &&
 					artifact.SerializedMetadata != nil &&
 					len(artifact.ArtifactData) == len(expectedArtifact.Data) &&
@@ -289,10 +291,13 @@ func TestCreateArtifact(t *testing.T) {
 
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(mockDatasetModel, nil)
 
+		expectedArtifact := getTestArtifact()
 		dcRepo.MockArtifactRepo.On("Create",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
-				expectedArtifact := getTestArtifact()
 				return artifact.ArtifactID == expectedArtifact.Id &&
 					artifact.SerializedMetadata != nil &&
 					len(artifact.ArtifactData) == len(expectedArtifact.Data) &&
@@ -346,7 +351,7 @@ func TestCreateArtifact(t *testing.T) {
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything, mock.Anything).Return(mockDatasetModel, nil)
 		artifact := getTestArtifact()
 		artifact.Partitions = []*datacatalog.Partition{}
-		dcRepo.MockArtifactRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
+		dcRepo.MockArtifactRepo.On("Create", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		request := &datacatalog.CreateArtifactRequest{Artifact: artifact}
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
@@ -390,13 +395,9 @@ func TestGetArtifact(t *testing.T) {
 
 	t.Run("Get by Id", func(t *testing.T) {
 		dcRepo.MockArtifactRepo.On("Get", mock.Anything,
-			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
-				return artifactKey.ArtifactID == expectedArtifact.Id &&
-					artifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
-					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
-					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
-					artifactKey.DatasetName == expectedArtifact.Dataset.Name
-			})).Return(mockArtifactModel, nil)
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}), expectedArtifact.Id).Return(mockArtifactModel, nil)
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{
@@ -541,11 +542,8 @@ func TestListArtifact(t *testing.T) {
 		}
 
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
-			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Name == expectedDataset.Id.Name &&
-					dataset.Version == expectedDataset.Id.Version
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			})).Return(mockDatasetModel, nil)
 
 		mockArtifacts := []models.Artifact{
@@ -554,11 +552,8 @@ func TestListArtifact(t *testing.T) {
 		}
 
 		dcRepo.MockArtifactRepo.On("List", mock.Anything,
-			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Name == expectedDataset.Id.Name &&
-					dataset.Version == expectedDataset.Id.Version
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			}),
 			mock.MatchedBy(func(listInput models.ListModelsInput) bool {
 				return len(listInput.ModelFilters) == 3 &&
@@ -582,11 +577,8 @@ func TestListArtifact(t *testing.T) {
 		filter := &datacatalog.FilterExpression{Filters: nil}
 
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
-			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Name == expectedDataset.Id.Name &&
-					dataset.Version == expectedDataset.Id.Version
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			})).Return(mockDatasetModel, nil)
 
 		mockArtifacts := []models.Artifact{
@@ -594,11 +586,8 @@ func TestListArtifact(t *testing.T) {
 			mockArtifactModel,
 		}
 		dcRepo.MockArtifactRepo.On("List", mock.Anything,
-			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
-					dataset.Domain == expectedDataset.Id.Domain &&
-					dataset.Name == expectedDataset.Id.Name &&
-					dataset.Version == expectedDataset.Id.Version
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			}),
 			mock.MatchedBy(func(listInput models.ListModelsInput) bool {
 				return len(listInput.ModelFilters) == 0
@@ -632,13 +621,9 @@ func TestUpdateArtifact(t *testing.T) {
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockArtifactRepo.On("Get",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
-				return artifactKey.ArtifactID == expectedArtifact.Id &&
-					artifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
-					artifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
-					artifactKey.DatasetName == expectedArtifact.Dataset.Name &&
-					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
-			})).Return(mockArtifactModel, nil)
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}), expectedArtifact.Id).Return(mockArtifactModel, nil)
 
 		metaData := &datacatalog.Metadata{
 			KeyMap: map[string]string{"key2": "value2"},
@@ -648,6 +633,9 @@ func TestUpdateArtifact(t *testing.T) {
 
 		dcRepo.MockArtifactRepo.On("Update",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
 				return artifact.ArtifactID == expectedArtifact.Id &&
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
@@ -656,7 +644,6 @@ func TestUpdateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
 					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
-
 
 		request := &datacatalog.UpdateArtifactRequest{
 			Dataset: expectedDataset.Id,
@@ -723,6 +710,9 @@ func TestUpdateArtifact(t *testing.T) {
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockArtifactRepo.On("Update",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
 				return artifact.ArtifactID == expectedArtifact.Id &&
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
@@ -808,7 +798,9 @@ func TestUpdateArtifact(t *testing.T) {
 		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
 
 		dcRepo := newMockDataCatalogRepo()
-		dcRepo.MockArtifactRepo.On("Get", mock.Anything, mock.Anything).Return(models.Artifact{}, repoErrors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
+		dcRepo.MockArtifactRepo.On("Get", mock.Anything, mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+			return proto.Equal(testDatasetID, datasetID)
+		}), mock.Anything).Return(models.Artifact{}, repoErrors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
 			Dataset: expectedDataset.Id,
 			Id:      expectedArtifact.Id,
 		}))

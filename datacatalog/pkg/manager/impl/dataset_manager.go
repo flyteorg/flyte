@@ -78,7 +78,7 @@ func (dm *datasetManager) CreateDataset(ctx context.Context, request *datacatalo
 		return nil, err
 	}
 
-	err = dm.repo.DatasetRepo().Create(ctx, *datasetModel)
+	err = dm.repo.DatasetRepo().Create(ctx, request.GetDataset().GetId(), *datasetModel)
 	if err != nil {
 		if errors.IsAlreadyExistsError(err) {
 			logger.Warnf(ctx, "Dataset already exists key: %+v, err %v", request.Dataset, err)
@@ -106,13 +106,11 @@ func (dm *datasetManager) GetDataset(ctx context.Context, request *datacatalog.G
 		dm.systemMetrics.validationErrorCounter.Inc(ctx)
 		return nil, err
 	}
-
-	datasetKey := transformers.FromDatasetID(request.Dataset)
-	datasetModel, err := dm.repo.DatasetRepo().Get(ctx, datasetKey)
+	datasetModel, err := dm.repo.DatasetRepo().Get(ctx, request.GetDataset())
 
 	if err != nil {
 		if errors.IsDoesNotExistError(err) {
-			logger.Warnf(ctx, "Dataset does not exist key: %+v, err %v", datasetKey, err)
+			logger.Warnf(ctx, "Dataset does not exist key: %+v, err %v", request.GetDataset(), err)
 			dm.systemMetrics.doesNotExistCounter.Inc(ctx)
 		} else {
 			logger.Errorf(ctx, "Unable to get dataset request %+v err: %v", request, err)

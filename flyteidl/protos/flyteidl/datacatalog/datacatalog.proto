@@ -291,6 +291,9 @@ message DatasetID {
     string UUID = 5;     // UUID for the dataset (if set the above fields are optional)
     // Optional, partition key applied to the dataset.
     string partition = 6;
+
+    // Optional, org key applied to the resource.
+    string org = 7;
 }
 
 /*

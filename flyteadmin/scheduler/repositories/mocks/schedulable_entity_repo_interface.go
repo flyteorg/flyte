@@ -5,6 +5,8 @@ package mocks
 import (
 	context "context"
 
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+
 	mock "github.com/stretchr/testify/mock"
 
 	models "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
@@ -23,8 +25,8 @@ func (_m SchedulableEntityRepoInterface_Activate) Return(_a0 error) *Schedulable
 	return &SchedulableEntityRepoInterface_Activate{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *SchedulableEntityRepoInterface) OnActivate(ctx context.Context, input models.SchedulableEntity) *SchedulableEntityRepoInterface_Activate {
-	c_call := _m.On("Activate", ctx, input)
+func (_m *SchedulableEntityRepoInterface) OnActivate(ctx context.Context, id *core.Identifier, input models.SchedulableEntity) *SchedulableEntityRepoInterface_Activate {
+	c_call := _m.On("Activate", ctx, id, input)
 	return &SchedulableEntityRepoInterface_Activate{Call: c_call}
 }
 
@@ -33,13 +35,13 @@ func (_m *SchedulableEntityRepoInterface) OnActivateMatch(matchers ...interface{
 	return &SchedulableEntityRepoInterface_Activate{Call: c_call}
 }
 
-// Activate provides a mock function with given fields: ctx, input
-func (_m *SchedulableEntityRepoInterface) Activate(ctx context.Context, input models.SchedulableEntity) error {
-	ret := _m.Called(ctx, input)
+// Activate provides a mock function with given fields: ctx, id, input
+func (_m *SchedulableEntityRepoInterface) Activate(ctx context.Context, id *core.Identifier, input models.SchedulableEntity) error {
+	ret := _m.Called(ctx, id, input)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.SchedulableEntity) error); ok {
-		r0 = rf(ctx, input)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.Identifier, models.SchedulableEntity) error); ok {
+		r0 = rf(ctx, id, input)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -55,8 +57,8 @@ func (_m SchedulableEntityRepoInterface_Create) Return(_a0 error) *SchedulableEn
 	return &SchedulableEntityRepoInterface_Create{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *SchedulableEntityRepoInterface) OnCreate(ctx context.Context, input models.SchedulableEntity) *SchedulableEntityRepoInterface_Create {
-	c_call := _m.On("Create", ctx, input)
+func (_m *SchedulableEntityRepoInterface) OnCreate(ctx context.Context, id *core.Identifier, input models.SchedulableEntity) *SchedulableEntityRepoInterface_Create {
+	c_call := _m.On("Create", ctx, id, input)
 	return &SchedulableEntityRepoInterface_Create{Call: c_call}
 }
 
@@ -65,13 +67,13 @@ func (_m *SchedulableEntityRepoInterface) OnCreateMatch(matchers ...interface{})
 	return &SchedulableEntityRepoInterface_Create{Call: c_call}
 }
 
-// Create provides a mock function with given fields: ctx, input
-func (_m *SchedulableEntityRepoInterface) Create(ctx context.Context, input models.SchedulableEntity) error {
-	ret := _m.Called(ctx, input)
+// Create provides a mock function with given fields: ctx, id, input
+func (_m *SchedulableEntityRepoInterface) Create(ctx context.Context, id *core.Identifier, input models.SchedulableEntity) error {
+	ret := _m.Called(ctx, id, input)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.SchedulableEntity) error); ok {
-		r0 = rf(ctx, input)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.Identifier, models.SchedulableEntity) error); ok {
+		r0 = rf(ctx, id, input)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -87,8 +89,8 @@ func (_m SchedulableEntityRepoInterface_Deactivate) Return(_a0 error) *Schedulab
 	return &SchedulableEntityRepoInterface_Deactivate{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *SchedulableEntityRepoInterface) OnDeactivate(ctx context.Context, ID models.SchedulableEntityKey) *SchedulableEntityRepoInterface_Deactivate {
-	c_call := _m.On("Deactivate", ctx, ID)
+func (_m *SchedulableEntityRepoInterface) OnDeactivate(ctx context.Context, id *core.Identifier) *SchedulableEntityRepoInterface_Deactivate {
+	c_call := _m.On("Deactivate", ctx, id)
 	return &SchedulableEntityRepoInterface_Deactivate{Call: c_call}
 }
 
@@ -97,13 +99,13 @@ func (_m *SchedulableEntityRepoInterface) OnDeactivateMatch(matchers ...interfac
 	return &SchedulableEntityRepoInterface_Deactivate{Call: c_call}
 }
 
-// Deactivate provides a mock function with given fields: ctx, ID
-func (_m *SchedulableEntityRepoInterface) Deactivate(ctx context.Context, ID models.SchedulableEntityKey) error {
-	ret := _m.Called(ctx, ID)
+// Deactivate provides a mock function with given fields: ctx, id
+func (_m *SchedulableEntityRepoInterface) Deactivate(ctx context.Context, id *core.Identifier) error {
+	ret := _m.Called(ctx, id)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.SchedulableEntityKey) error); ok {
-		r0 = rf(ctx, ID)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.Identifier) error); ok {
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -119,8 +121,8 @@ func (_m SchedulableEntityRepoInterface_Get) Return(_a0 models.SchedulableEntity
 	return &SchedulableEntityRepoInterface_Get{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *SchedulableEntityRepoInterface) OnGet(ctx context.Context, ID models.SchedulableEntityKey) *SchedulableEntityRepoInterface_Get {
-	c_call := _m.On("Get", ctx, ID)
+func (_m *SchedulableEntityRepoInterface) OnGet(ctx context.Context, id *core.Identifier) *SchedulableEntityRepoInterface_Get {
+	c_call := _m.On("Get", ctx, id)
 	return &SchedulableEntityRepoInterface_Get{Call: c_call}
 }
 
@@ -129,20 +131,20 @@ func (_m *SchedulableEntityRepoInterface) OnGetMatch(matchers ...interface{}) *S
 	return &SchedulableEntityRepoInterface_Get{Call: c_call}
 }
 
-// Get provides a mock function with given fields: ctx, ID
-func (_m *SchedulableEntityRepoInterface) Get(ctx context.Context, ID models.SchedulableEntityKey) (models.SchedulableEntity, error) {
-	ret := _m.Called(ctx, ID)
+// Get provides a mock function with given fields: ctx, id
+func (_m *SchedulableEntityRepoInterface) Get(ctx context.Context, id *core.Identifier) (models.SchedulableEntity, error) {
+	ret := _m.Called(ctx, id)
 
 	var r0 models.SchedulableEntity
-	if rf, ok := ret.Get(0).(func(context.Context, models.SchedulableEntityKey) models.SchedulableEntity); ok {
-		r0 = rf(ctx, ID)
+	if rf, ok := ret.Get(0).(func(context.Context, *core.Identifier) models.SchedulableEntity); ok {
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Get(0).(models.SchedulableEntity)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.SchedulableEntityKey) error); ok {
-		r1 = rf(ctx, ID)
+	if rf, ok := ret.Get(1).(func(context.Context, *core.Identifier) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}

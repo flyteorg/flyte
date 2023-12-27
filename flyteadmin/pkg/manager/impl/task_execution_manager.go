@@ -249,6 +249,9 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 
 	nodeIDFilter, err := util.GetSingleValueEqualityFilter(
 		common.NodeExecution, shared.NodeID, request.GetNodeExecutionId().NodeId)
+	if err != nil {
+		return nil, err
+	}
 
 	filters, err := util.ParseFilters(request.Filters, common.TaskExecution)
 	if err != nil {

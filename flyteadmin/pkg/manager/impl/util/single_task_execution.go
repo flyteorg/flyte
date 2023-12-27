@@ -72,8 +72,7 @@ func CreateOrGetWorkflowModel(
 	ctx context.Context, db repositoryInterfaces.Repository,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface, taskIdentifier *core.Identifier,
 	task *admin.Task) (*models.Workflow, error) {
-	var workflowIdentifier *core.Identifier
-	workflowIdentifier = proto.Clone(taskIdentifier).(*core.Identifier)
+	workflowIdentifier := proto.Clone(taskIdentifier).(*core.Identifier)
 	workflowIdentifier.Name = generateWorkflowNameFromTask(taskIdentifier.Name)
 	workflowIdentifier.ResourceType = core.ResourceType_WORKFLOW
 	workflowModel, err := db.WorkflowRepo().Get(ctx, workflowIdentifier)
@@ -151,8 +150,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 	var launchPlan *admin.LaunchPlan
 	var err error
 
-	var launchPlanIdentifier *core.Identifier
-	launchPlanIdentifier = proto.Clone(taskIdentifier).(*core.Identifier)
+	launchPlanIdentifier := proto.Clone(taskIdentifier).(*core.Identifier)
 	launchPlanIdentifier.Name = generateWorkflowNameFromTask(taskIdentifier.Name)
 	launchPlanIdentifier.ResourceType = core.ResourceType_LAUNCH_PLAN
 	launchPlan, err = GetLaunchPlan(ctx, db, launchPlanIdentifier)

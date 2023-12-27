@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
@@ -76,20 +77,13 @@ func TestAddTag(t *testing.T) {
 		}
 
 		dcRepo.MockArtifactRepo.On("Get", mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
-				return artifactKey.DatasetProject == expectedTag.DatasetProject &&
-					artifactKey.DatasetDomain == expectedTag.DatasetDomain &&
-					artifactKey.DatasetName == expectedTag.DatasetName &&
-					artifactKey.DatasetVersion == expectedTag.DatasetVersion &&
-					artifactKey.ArtifactID == expectedTag.ArtifactID
-			})).Return(artifact, nil)
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}), expectedTag.ArtifactID).Return(artifact, nil)
 
 		dcRepo.MockDatasetRepo.On("Get", mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
-				return datasetKey.Project == expectedTag.DatasetProject &&
-					datasetKey.Domain == expectedTag.DatasetDomain &&
-					datasetKey.Name == expectedTag.DatasetName &&
-					datasetKey.Version == expectedTag.DatasetVersion
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			})).Return(dataset, nil)
 
 		tagManager := NewTagManager(dcRepo, nil, mockScope.NewTestScope())

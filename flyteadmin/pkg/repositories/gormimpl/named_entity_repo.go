@@ -82,29 +82,6 @@ func getSelectForNamedEntity(tableName string, resourceType core.ResourceType) [
 	}
 }
 
-func getNamedEntityFilters(resourceType core.ResourceType, project string, domain string, name string) ([]common.InlineFilter, error) {
-	entity := common.ResourceTypeToEntity[resourceType]
-
-	filters := make([]common.InlineFilter, 0)
-	projectFilter, err := common.NewSingleValueFilter(entity, common.Equal, Project, project)
-	if err != nil {
-		return nil, err
-	}
-	filters = append(filters, projectFilter)
-	domainFilter, err := common.NewSingleValueFilter(entity, common.Equal, Domain, domain)
-	if err != nil {
-		return nil, err
-	}
-	filters = append(filters, domainFilter)
-	nameFilter, err := common.NewSingleValueFilter(entity, common.Equal, Name, name)
-	if err != nil {
-		return nil, err
-	}
-	filters = append(filters, nameFilter)
-
-	return filters, nil
-}
-
 // Implementation of NamedEntityRepoInterface.
 type NamedEntityRepo struct {
 	db               *gorm.DB

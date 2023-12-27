@@ -5,6 +5,8 @@ package mocks
 import (
 	context "context"
 
+	datacatalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+
 	mock "github.com/stretchr/testify/mock"
 
 	models "github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
@@ -23,8 +25,8 @@ func (_m DatasetRepo_Create) Return(_a0 error) *DatasetRepo_Create {
 	return &DatasetRepo_Create{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *DatasetRepo) OnCreate(ctx context.Context, in models.Dataset) *DatasetRepo_Create {
-	c_call := _m.On("Create", ctx, in)
+func (_m *DatasetRepo) OnCreate(ctx context.Context, id *datacatalog.DatasetID, in models.Dataset) *DatasetRepo_Create {
+	c_call := _m.On("Create", ctx, id, in)
 	return &DatasetRepo_Create{Call: c_call}
 }
 
@@ -33,13 +35,13 @@ func (_m *DatasetRepo) OnCreateMatch(matchers ...interface{}) *DatasetRepo_Creat
 	return &DatasetRepo_Create{Call: c_call}
 }
 
-// Create provides a mock function with given fields: ctx, in
-func (_m *DatasetRepo) Create(ctx context.Context, in models.Dataset) error {
-	ret := _m.Called(ctx, in)
+// Create provides a mock function with given fields: ctx, id, in
+func (_m *DatasetRepo) Create(ctx context.Context, id *datacatalog.DatasetID, in models.Dataset) error {
+	ret := _m.Called(ctx, id, in)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.Dataset) error); ok {
-		r0 = rf(ctx, in)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, models.Dataset) error); ok {
+		r0 = rf(ctx, id, in)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -55,8 +57,8 @@ func (_m DatasetRepo_Get) Return(_a0 models.Dataset, _a1 error) *DatasetRepo_Get
 	return &DatasetRepo_Get{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *DatasetRepo) OnGet(ctx context.Context, in models.DatasetKey) *DatasetRepo_Get {
-	c_call := _m.On("Get", ctx, in)
+func (_m *DatasetRepo) OnGet(ctx context.Context, id *datacatalog.DatasetID) *DatasetRepo_Get {
+	c_call := _m.On("Get", ctx, id)
 	return &DatasetRepo_Get{Call: c_call}
 }
 
@@ -65,20 +67,20 @@ func (_m *DatasetRepo) OnGetMatch(matchers ...interface{}) *DatasetRepo_Get {
 	return &DatasetRepo_Get{Call: c_call}
 }
 
-// Get provides a mock function with given fields: ctx, in
-func (_m *DatasetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dataset, error) {
-	ret := _m.Called(ctx, in)
+// Get provides a mock function with given fields: ctx, id
+func (_m *DatasetRepo) Get(ctx context.Context, id *datacatalog.DatasetID) (models.Dataset, error) {
+	ret := _m.Called(ctx, id)
 
 	var r0 models.Dataset
-	if rf, ok := ret.Get(0).(func(context.Context, models.DatasetKey) models.Dataset); ok {
-		r0 = rf(ctx, in)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID) models.Dataset); ok {
+		r0 = rf(ctx, id)
 	} else {
 		r0 = ret.Get(0).(models.Dataset)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.DatasetKey) error); ok {
-		r1 = rf(ctx, in)
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.DatasetID) error); ok {
+		r1 = rf(ctx, id)
 	} else {
 		r1 = ret.Error(1)
 	}

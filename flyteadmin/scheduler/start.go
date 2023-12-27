@@ -40,8 +40,7 @@ func StartScheduler(ctx context.Context, pluginRegistry *plugins.Registry) error
 		logger.Fatal(ctx, err)
 	}
 	dbScope := schedulerScope.NewSubScope("database")
-	var newRepoFunc repoInterfaces.NewRepositoryFunc
-	newRepoFunc = plugins.Get[repoInterfaces.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
+	newRepoFunc := plugins.Get[repoInterfaces.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
 
 	repo := newRepoFunc(
 		db, errors.NewPostgresErrorTransformer(schedulerScope.NewSubScope("errors")), dbScope)

@@ -73,7 +73,8 @@ func (w *WorkflowManager) getCompiledWorkflow(
 
 	var tasks = make([]*core.CompiledTask, len(reqs.GetRequiredTaskIds()))
 	for idx, taskID := range reqs.GetRequiredTaskIds() {
-		task, err := util.GetTask(ctx, w.db, &taskID)
+		taskIdentifier := taskID
+		task, err := util.GetTask(ctx, w.db, &taskIdentifier)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get task with id [%+v] when compiling workflow with id [%+v] with err %v",
 				taskID, request.Id, err)
@@ -84,8 +85,9 @@ func (w *WorkflowManager) getCompiledWorkflow(
 
 	var launchPlans = make([]compiler.InterfaceProvider, len(reqs.GetRequiredLaunchPlanIds()))
 	for idx, launchPlanID := range reqs.GetRequiredLaunchPlanIds() {
+		launchPlanIdentifier := launchPlanID
 		var launchPlanModel models.LaunchPlan
-		launchPlanModel, err = util.GetLaunchPlanModel(ctx, w.db, &launchPlanID)
+		launchPlanModel, err = util.GetLaunchPlanModel(ctx, w.db, &launchPlanIdentifier)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get launch plan with id [%+v] when compiling workflow with id [%+v] with err %v",
 				launchPlanID, request.Id, err)

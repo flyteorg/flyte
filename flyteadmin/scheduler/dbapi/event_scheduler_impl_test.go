@@ -37,7 +37,7 @@ func TestCreateScheduleInput(t *testing.T) {
 	addScheduleInput, err := eventScheduler.CreateScheduleInput(context.Background(), nil, core.Identifier{
 		Project: "project",
 		Domain:  "domain",
-		Name:    "scheduled_wroflow",
+		Name:    "scheduled_workflow",
 		Version: "v1",
 	}, schedule)
 	assert.Nil(t, err)
@@ -54,7 +54,7 @@ func TestRemoveSchedule(t *testing.T) {
 		Identifier: core.Identifier{
 			Project: "project",
 			Domain:  "domain",
-			Name:    "scheduled_wroflow",
+			Name:    "scheduled_workflow",
 			Version: "v1",
 		},
 	})
@@ -74,16 +74,17 @@ func TestAddSchedule(t *testing.T) {
 			KickoffTimeInputArg: "kickoff_time",
 		}
 
+		id := core.Identifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "scheduled_workflow",
+			Version: "v1",
+		}
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
-		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
+		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, &id, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
-			Identifier: core.Identifier{
-				Project: "project",
-				Domain:  "domain",
-				Name:    "scheduled_wroflow",
-				Version: "v1",
-			},
+			Identifier:         id,
 			ScheduleExpression: schedule,
 		})
 		assert.Nil(t, err)
@@ -100,16 +101,17 @@ func TestAddSchedule(t *testing.T) {
 			KickoffTimeInputArg: "kickoff_time",
 		}
 
+		id := core.Identifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "scheduled_workflow",
+			Version: "v1",
+		}
 		scheduleEntitiesRepo := db.SchedulableEntityRepo().(*schedMocks.SchedulableEntityRepoInterface)
-		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, mock.Anything).Return(nil)
+		scheduleEntitiesRepo.OnActivateMatch(mock.Anything, &id, mock.Anything).Return(nil)
 
 		err := eventScheduler.AddSchedule(context.Background(), interfaces.AddScheduleInput{
-			Identifier: core.Identifier{
-				Project: "project",
-				Domain:  "domain",
-				Name:    "scheduled_wroflow",
-				Version: "v1",
-			},
+			Identifier:         id,
 			ScheduleExpression: schedule,
 		})
 		assert.Nil(t, err)
@@ -131,7 +133,7 @@ func TestAddSchedule(t *testing.T) {
 			Identifier: core.Identifier{
 				Project: "project",
 				Domain:  "domain",
-				Name:    "scheduled_wroflow",
+				Name:    "scheduled_workflow",
 				Version: "v1",
 			},
 			ScheduleExpression: schedule,

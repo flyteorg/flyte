@@ -57,7 +57,7 @@ func (s *eventScheduler) AddSchedule(ctx context.Context, input interfaces.AddSc
 			Version: input.Identifier.Version,
 		},
 	}
-	err := s.db.SchedulableEntityRepo().Activate(ctx, modelInput)
+	err := s.db.SchedulableEntityRepo().Activate(ctx, &input.Identifier, modelInput)
 	if err != nil {
 		return err
 	}
@@ -68,12 +68,7 @@ func (s *eventScheduler) AddSchedule(ctx context.Context, input interfaces.AddSc
 func (s *eventScheduler) RemoveSchedule(ctx context.Context, input interfaces.RemoveScheduleInput) error {
 	logger.Infof(ctx, "Received call to remove schedule [%+v]. Will deactivate it in the scheduler", input.Identifier)
 
-	err := s.db.SchedulableEntityRepo().Deactivate(ctx, models.SchedulableEntityKey{
-		Project: input.Identifier.Project,
-		Domain:  input.Identifier.Domain,
-		Name:    input.Identifier.Name,
-		Version: input.Identifier.Version,
-	})
+	err := s.db.SchedulableEntityRepo().Deactivate(ctx, &input.Identifier)
 
 	if err != nil {
 		return err

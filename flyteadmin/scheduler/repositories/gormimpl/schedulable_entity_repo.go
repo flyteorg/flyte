@@ -21,7 +21,7 @@ type SchedulableEntityRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *SchedulableEntityRepo) Create(ctx context.Context, input models.SchedulableEntity) error {
+func (r *SchedulableEntityRepo) Create(ctx context.Context, id *core.Identifier, input models.SchedulableEntity) error {
 	timer := r.metrics.GetDuration.Start()
 	var record models.SchedulableEntity
 	tx := r.db.Omit("id").FirstOrCreate(&record, input)
@@ -32,16 +32,16 @@ func (r *SchedulableEntityRepo) Create(ctx context.Context, input models.Schedul
 	return nil
 }
 
-func (r *SchedulableEntityRepo) Activate(ctx context.Context, input models.SchedulableEntity) error {
+func (r *SchedulableEntityRepo) Activate(ctx context.Context, id *core.Identifier, input models.SchedulableEntity) error {
 	var schedulableEntity models.SchedulableEntity
 	timer := r.metrics.GetDuration.Start()
 	// Find the existence of a scheduled entity
 	tx := r.db.Where(&models.SchedulableEntity{
 		SchedulableEntityKey: models.SchedulableEntityKey{
-			Project: input.Project,
-			Domain:  input.Domain,
-			Name:    input.Name,
-			Version: input.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}).Take(&schedulableEntity)
 	timer.Stop()
@@ -49,18 +49,18 @@ func (r *SchedulableEntityRepo) Activate(ctx context.Context, input models.Sched
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			// Not found and hence create one
-			return r.Create(ctx, input)
+			return r.Create(ctx, id, input)
 		}
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 
 	// Activate the already existing schedule
-	return activateOrDeactivate(r, input.SchedulableEntityKey, true)
+	return activateOrDeactivate(r, id, true)
 }
 
-func (r *SchedulableEntityRepo) Deactivate(ctx context.Context, ID models.SchedulableEntityKey) error {
+func (r *SchedulableEntityRepo) Deactivate(ctx context.Context, id *core.Identifier) error {
 	// Activate the schedule
-	return activateOrDeactivate(r, ID, false)
+	return activateOrDeactivate(r, id, false)
 }
 
 func (r *SchedulableEntityRepo) GetAll(ctx context.Context) ([]models.SchedulableEntity, error) {
@@ -82,15 +82,15 @@ func (r *SchedulableEntityRepo) GetAll(ctx context.Context) ([]models.Schedulabl
 	return schedulableEntities, nil
 }
 
-func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEntityKey) (models.SchedulableEntity, error) {
+func (r *SchedulableEntityRepo) Get(ctx context.Context, id *core.Identifier) (models.SchedulableEntity, error) {
 	var schedulableEntity models.SchedulableEntity
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Where(&models.SchedulableEntity{
 		SchedulableEntityKey: models.SchedulableEntityKey{
-			Project: ID.Project,
-			Domain:  ID.Domain,
-			Name:    ID.Name,
-			Version: ID.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}).Take(&schedulableEntity)
 	timer.Stop()
@@ -98,12 +98,7 @@ func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEn
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 			return models.SchedulableEntity{},
-				adminErrors.GetMissingEntityError("schedulable entity", &core.Identifier{
-					Project: ID.Project,
-					Domain:  ID.Domain,
-					Name:    ID.Name,
-					Version: ID.Version,
-				})
+				adminErrors.GetMissingEntityError("schedulable entity", id)
 		}
 		return models.SchedulableEntity{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
@@ -112,25 +107,20 @@ func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEn
 }
 
 // Helper function to activate and deactivate a schedule
-func activateOrDeactivate(r *SchedulableEntityRepo, ID models.SchedulableEntityKey, activate bool) error {
+func activateOrDeactivate(r *SchedulableEntityRepo, id *core.Identifier, activate bool) error {
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.Model(&models.SchedulableEntity{}).Where(&models.SchedulableEntity{
 		SchedulableEntityKey: models.SchedulableEntityKey{
-			Project: ID.Project,
-			Domain:  ID.Domain,
-			Name:    ID.Name,
-			Version: ID.Version,
+			Project: id.Project,
+			Domain:  id.Domain,
+			Name:    id.Name,
+			Version: id.Version,
 		},
 	}).Update("active", activate)
 	timer.Stop()
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
-			return adminErrors.GetMissingEntityError("schedulable entity", &core.Identifier{
-				Project: ID.Project,
-				Domain:  ID.Domain,
-				Name:    ID.Name,
-				Version: ID.Version,
-			})
+			return adminErrors.GetMissingEntityError("schedulable entity", id)
 		}
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

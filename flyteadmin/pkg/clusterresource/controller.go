@@ -718,8 +718,7 @@ func NewClusterResourceControllerFromConfig(ctx context.Context, scope promutils
 		}
 		dbScope := scope.NewSubScope("db")
 		pluginRegistry.RegisterDefault(plugins.PluginIDNewRepositoryFunction, repositories.NewGormRepo)
-		var newRepoFunc repoInterfaces.NewRepositoryFunc
-		newRepoFunc = plugins.Get[repoInterfaces.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
+		newRepoFunc := plugins.Get[repoInterfaces.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
 		repo := newRepoFunc(
 			db, errors2.NewPostgresErrorTransformer(dbScope.NewSubScope("errors")), dbScope)
 

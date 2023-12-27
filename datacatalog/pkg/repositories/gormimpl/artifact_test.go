@@ -24,6 +24,14 @@ func init() {
 	labeled.SetMetricKeys(contextutils.AppNameKey)
 }
 
+var testDatasetID = &datacatalog.DatasetID{
+	Project: "testProject",
+	Domain:  "testDomain",
+	Name:    "testName",
+	Version: "testVersion",
+	UUID:    "test-uuid",
+}
+
 func getTestArtifact() models.Artifact {
 	return models.Artifact{
 		ArtifactKey: models.ArtifactKey{
@@ -154,7 +162,7 @@ func TestCreateArtifact(t *testing.T) {
 	artifact.Partitions = partitions
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := artifactRepo.Create(context.Background(), artifact)
+	err := artifactRepo.Create(context.Background(), &datacatalog.DatasetID{}, artifact)
 	assert.NoError(t, err)
 	assert.True(t, artifactCreated)
 	assert.Equal(t, 2, numArtifactDataCreated)
@@ -181,16 +189,13 @@ func TestGetArtifact(t *testing.T) {
 		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(expectedPartitionResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(expectedTagResponse)
-	getInput := models.ArtifactKey{
-		DatasetProject: artifact.DatasetProject,
-		DatasetDomain:  artifact.DatasetDomain,
-		DatasetName:    artifact.DatasetName,
-		DatasetVersion: artifact.DatasetVersion,
-		ArtifactID:     artifact.ArtifactID,
-	}
-
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	response, err := artifactRepo.Get(context.Background(), getInput)
+	response, err := artifactRepo.Get(context.Background(), &datacatalog.DatasetID{
+		Project: artifact.DatasetProject,
+		Domain:  artifact.DatasetDomain,
+		Name:    artifact.DatasetName,
+		Version: artifact.DatasetVersion,
+	}, artifact.ArtifactID)
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
 	assert.Equal(t, artifact.DatasetProject, response.DatasetProject)
@@ -223,12 +228,8 @@ func TestGetArtifactByID(t *testing.T) {
 		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(expectedPartitionResponse)
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(expectedTagResponse)
-	getInput := models.ArtifactKey{
-		ArtifactID: artifact.ArtifactID,
-	}
-
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	response, err := artifactRepo.Get(context.Background(), getInput)
+	response, err := artifactRepo.Get(context.Background(), &datacatalog.DatasetID{}, artifact.ArtifactID)
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
 }
@@ -239,17 +240,14 @@ func TestGetArtifactDoesNotExist(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 
-	getInput := models.ArtifactKey{
-		DatasetProject: artifact.DatasetProject,
-		DatasetDomain:  artifact.DatasetDomain,
-		DatasetName:    artifact.DatasetName,
-		DatasetVersion: artifact.DatasetVersion,
-		ArtifactID:     artifact.ArtifactID,
-	}
-
 	// by default mocket will return nil for any queries
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	_, err := artifactRepo.Get(context.Background(), getInput)
+	_, err := artifactRepo.Get(context.Background(), &datacatalog.DatasetID{
+		Project: artifact.DatasetProject,
+		Domain:  artifact.DatasetDomain,
+		Name:    artifact.DatasetName,
+		Version: artifact.DatasetVersion,
+	}, artifact.ArtifactID)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
@@ -269,7 +267,7 @@ func TestCreateArtifactAlreadyExists(t *testing.T) {
 	)
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := artifactRepo.Create(context.Background(), artifact)
+	err := artifactRepo.Create(context.Background(), testDatasetID, artifact)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
@@ -311,7 +309,7 @@ func TestListArtifactsWithPartition(t *testing.T) {
 		Limit:         10,
 		SortParameter: NewGormSortParameter(datacatalog.PaginationOptions_CREATION_TIME, datacatalog.PaginationOptions_DESCENDING),
 	}
-	artifacts, err := artifactRepo.List(context.Background(), dataset.DatasetKey, listInput)
+	artifacts, err := artifactRepo.List(context.Background(), testDatasetID, listInput)
 	assert.NoError(t, err)
 	assert.Len(t, artifacts, 1)
 	assert.Equal(t, artifacts[0].ArtifactID, artifact.ArtifactID)
@@ -343,7 +341,7 @@ func TestListArtifactsNoPartitions(t *testing.T) {
 		Offset: 10,
 		Limit:  10,
 	}
-	artifacts, err := artifactRepo.List(context.Background(), dataset.DatasetKey, listInput)
+	artifacts, err := artifactRepo.List(context.Background(), testDatasetID, listInput)
 	assert.NoError(t, err)
 	assert.Len(t, artifacts, 1)
 	assert.Equal(t, artifacts[0].ArtifactID, artifact.ArtifactID)
@@ -395,7 +393,7 @@ func TestUpdateArtifact(t *testing.T) {
 	}
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := artifactRepo.Update(ctx, updateInput)
+	err := artifactRepo.Update(ctx, testDatasetID, updateInput)
 	assert.NoError(t, err)
 	assert.True(t, artifactUpdated)
 	assert.True(t, artifactDataDeleted)
@@ -426,7 +424,7 @@ func TestUpdateArtifactDoesNotExist(t *testing.T) {
 	}
 
 	artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := artifactRepo.Update(ctx, updateInput)
+	err := artifactRepo.Update(ctx, testDatasetID, updateInput)
 	assert.Error(t, err)
 	dcErr, ok := err.(apiErrors.DataCatalogError)
 	assert.True(t, ok)
@@ -462,7 +460,7 @@ func TestUpdateArtifactError(t *testing.T) {
 		}
 
 		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-		err := artifactRepo.Update(ctx, updateInput)
+		err := artifactRepo.Update(ctx, testDatasetID, updateInput)
 		assert.Error(t, err)
 		dcErr, ok := err.(apiErrors.DataCatalogError)
 		assert.True(t, ok)
@@ -502,7 +500,7 @@ func TestUpdateArtifactError(t *testing.T) {
 		}
 
 		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-		err := artifactRepo.Update(ctx, updateInput)
+		err := artifactRepo.Update(ctx, testDatasetID, updateInput)
 		assert.Error(t, err)
 		dcErr, ok := err.(apiErrors.DataCatalogError)
 		assert.True(t, ok)
@@ -549,7 +547,7 @@ func TestUpdateArtifactError(t *testing.T) {
 		}
 
 		artifactRepo := NewArtifactRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-		err := artifactRepo.Update(ctx, updateInput)
+		err := artifactRepo.Update(ctx, testDatasetID, updateInput)
 		assert.Error(t, err)
 		dcErr, ok := err.(apiErrors.DataCatalogError)
 		assert.True(t, ok)

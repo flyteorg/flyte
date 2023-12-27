@@ -29,7 +29,7 @@ func NewArtifactRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scop
 }
 
 // Create the artifact in a transaction because ArtifactData will be created and associated along with it
-func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) error {
+func (h *artifactRepo) Create(ctx context.Context, id *datacatalog.DatasetID, artifact models.Artifact) error {
 	timer := h.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
@@ -50,7 +50,7 @@ func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) err
 	return nil
 }
 
-func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.Artifact, error) {
+func (h *artifactRepo) Get(ctx context.Context, id *datacatalog.DatasetID, artifactID string) (models.Artifact, error) {
 	timer := h.repoMetrics.GetDuration.Start(ctx)
 	defer timer.Stop()
 
@@ -63,19 +63,20 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 		Order("artifacts.created_at DESC").
 		First(
 			&artifact,
-			&models.Artifact{ArtifactKey: in},
+			&models.Artifact{ArtifactKey: models.ArtifactKey{
+				DatasetProject: id.Project,
+				DatasetDomain:  id.Domain,
+				DatasetName:    id.Name,
+				DatasetVersion: id.Version,
+				ArtifactID:     artifactID,
+			}},
 		)
 
 	if result.Error != nil {
 		if result.Error.Error() == gorm.ErrRecordNotFound.Error() {
 			return models.Artifact{}, errors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
-				Dataset: &datacatalog.DatasetID{
-					Project: in.DatasetProject,
-					Domain:  in.DatasetDomain,
-					Name:    in.DatasetName,
-					Version: in.DatasetVersion,
-				},
-				Id: in.ArtifactID,
+				Dataset: id,
+				Id:      artifactID,
 			})
 		}
 
@@ -85,7 +86,7 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 	return artifact, nil
 }
 
-func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, in models.ListModelsInput) ([]models.Artifact, error) {
+func (h *artifactRepo) List(ctx context.Context, id *datacatalog.DatasetID, in models.ListModelsInput) ([]models.Artifact, error) {
 	timer := h.repoMetrics.ListDuration.Start(ctx)
 	defer timer.Stop()
 
@@ -93,7 +94,7 @@ func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, i
 	sourceEntity := common.Artifact
 
 	// add filter for dataset
-	datasetUUIDFilter := NewGormValueFilter(common.Equal, "dataset_uuid", datasetKey.UUID)
+	datasetUUIDFilter := NewGormValueFilter(common.Equal, "dataset_uuid", id.UUID)
 	datasetFilter := models.ModelFilter{
 		Entity:       common.Artifact,
 		ValueFilters: []models.ModelValueFilter{datasetUUIDFilter},
@@ -122,7 +123,7 @@ func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, i
 
 // Update updates the given artifact and its associated ArtifactData in database. The ArtifactData entries are upserted
 // (ignoring conflicts, as no updates to the database model are to be expected) and any longer existing data is deleted.
-func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) error {
+func (h *artifactRepo) Update(ctx context.Context, id *datacatalog.DatasetID, artifact models.Artifact) error {
 	timer := h.repoMetrics.UpdateDuration.Start(ctx)
 	defer timer.Stop()
 

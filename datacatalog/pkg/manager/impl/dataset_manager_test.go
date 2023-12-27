@@ -56,6 +56,9 @@ func TestCreateDataset(t *testing.T) {
 		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
 		dcRepo.MockDatasetRepo.On("Create",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
 			mock.MatchedBy(func(dataset models.Dataset) bool {
 
 				return dataset.Name == expectedDataset.Id.Name &&
@@ -77,6 +80,9 @@ func TestCreateDataset(t *testing.T) {
 		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
 		dcRepo.MockDatasetRepo.On("Create",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
 			mock.MatchedBy(func(dataset models.Dataset) bool {
 
 				return dataset.Name == expectedDataset.Id.Name &&
@@ -117,7 +123,7 @@ func TestCreateDataset(t *testing.T) {
 		datasetManager := NewDatasetManager(dcRepo, nil, mockScope.NewTestScope())
 
 		dcRepo.MockDatasetRepo.On("Create",
-			mock.Anything,
+			mock.Anything, mock.Anything,
 			mock.Anything).Return(status.Error(codes.AlreadyExists, "test already exists"))
 		request := &datacatalog.CreateDatasetRequest{
 			Dataset: getTestDataset(),
@@ -160,12 +166,8 @@ func TestGetDataset(t *testing.T) {
 
 		dcRepo.MockDatasetRepo.On("Get",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
-
-				return datasetKey.Name == expectedDataset.Id.Name &&
-					datasetKey.Project == expectedDataset.Id.Project &&
-					datasetKey.Domain == expectedDataset.Id.Domain &&
-					datasetKey.Version == expectedDataset.Id.Version
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			})).Return(*datasetModelResponse, nil)
 		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
 		datasetResponse, err := datasetManager.GetDataset(context.Background(), request)
@@ -181,12 +183,8 @@ func TestGetDataset(t *testing.T) {
 
 		dcRepo.MockDatasetRepo.On("Get",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
-			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
-
-				return datasetKey.Name == expectedDataset.Id.Name &&
-					datasetKey.Project == expectedDataset.Id.Project &&
-					datasetKey.Domain == expectedDataset.Id.Domain &&
-					datasetKey.Version == expectedDataset.Id.Version
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
 			})).Return(models.Dataset{}, errors.NewDataCatalogError(codes.NotFound, "dataset does not exist"))
 		request := &datacatalog.GetDatasetRequest{Dataset: getTestDataset().Id}
 		_, err := datasetManager.GetDataset(context.Background(), request)

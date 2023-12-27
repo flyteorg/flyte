@@ -1,6 +1,8 @@
 package models
 
-import "github.com/flyteorg/flyte/datacatalog/pkg/common"
+import (
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+)
 
 // Inputs to specify to list models
 type ListModelsInput struct {

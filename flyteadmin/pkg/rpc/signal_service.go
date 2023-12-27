@@ -68,8 +68,7 @@ func NewSignalServer(ctx context.Context, configuration runtimeIfaces.Configurat
 		logger.Fatal(ctx, err)
 	}
 	dbScope := adminScope.NewSubScope("database")
-	var newRepoFunc repoInterfaces.NewRepositoryFunc
-	newRepoFunc = plugins.Get[repoInterfaces.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
+	newRepoFunc := plugins.Get[repoInterfaces.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
 
 	repo := newRepoFunc(
 		db, errors.NewPostgresErrorTransformer(adminScope.NewSubScope("errors")), dbScope)

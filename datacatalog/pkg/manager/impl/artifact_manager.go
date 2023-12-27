@@ -67,12 +67,10 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 	}
 
 	ctx = contextutils.WithProjectDomain(ctx, artifact.Dataset.Project, artifact.Dataset.Domain)
-	datasetKey := transformers.FromDatasetID(artifact.Dataset)
-
 	// The dataset must exist for the artifact, let's verify that first
-	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
+	dataset, err := m.repo.DatasetRepo().Get(ctx, request.GetArtifact().GetDataset())
 	if err != nil {
-		logger.Warnf(ctx, "Failed to get dataset for artifact creation %v, err: %v", datasetKey, err)
+		logger.Warnf(ctx, "Failed to get dataset for artifact creation %v, err: %v", request.GetArtifact().GetDataset(), err)
 		m.systemMetrics.createFailureCounter.Inc(ctx)
 		return nil, err
 	}
@@ -111,7 +109,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 		return nil, err
 	}
 
-	err = m.repo.ArtifactRepo().Create(ctx, artifactModel)
+	err = m.repo.ArtifactRepo().Create(ctx, request.GetArtifact().GetDataset(), artifactModel)
 	if err != nil {
 		if errors.IsAlreadyExistsError(err) {
 			logger.Warnf(ctx, "Artifact already exists key: %+v, err %v", artifact.Id, err)
@@ -182,9 +180,8 @@ func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatal
 	key := queryHandle.GetArtifactId()
 	if len(key) > 0 {
 		logger.Debugf(ctx, "Get artifact by id %v", key)
-		artifactKey := transformers.ToArtifactKey(datasetID, key)
 		var err error
-		artifactModel, err = m.repo.ArtifactRepo().Get(ctx, artifactKey)
+		artifactModel, err = m.repo.ArtifactRepo().Get(ctx, datasetID, key)
 
 		if err != nil {
 			if errors.IsDoesNotExistError(err) {
@@ -249,10 +246,9 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 	}
 
 	// Verify the dataset exists before listing artifacts
-	datasetKey := transformers.FromDatasetID(request.Dataset)
-	dataset, err := m.repo.DatasetRepo().Get(ctx, datasetKey)
+	_, err = m.repo.DatasetRepo().Get(ctx, request.GetDataset())
 	if err != nil {
-		logger.Warnf(ctx, "Failed to get dataset for listing artifacts %v, err: %v", datasetKey, err)
+		logger.Warnf(ctx, "Failed to get dataset for listing artifacts %v, err: %v", request.GetDataset(), err)
 		m.systemMetrics.listFailureCounter.Inc(ctx)
 		return nil, err
 	}
@@ -273,7 +269,7 @@ func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalo
 	}
 
 	// Perform the list with the dataset and listInput filters
-	artifactModels, err := m.repo.ArtifactRepo().List(ctx, dataset.DatasetKey, listInput)
+	artifactModels, err := m.repo.ArtifactRepo().List(ctx, request.GetDataset(), listInput)
 	if err != nil {
 		logger.Errorf(ctx, "Unable to list Artifacts err: %v", err)
 		m.systemMetrics.listFailureCounter.Inc(ctx)
@@ -381,7 +377,7 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 	artifactModel.ArtifactData = artifactDataModels
 	logger.Debugf(ctx, "Updating ArtifactModel with %+v", artifactModel)
 
-	err = m.repo.ArtifactRepo().Update(ctx, artifactModel)
+	err = m.repo.ArtifactRepo().Update(ctx, request.GetDataset(), artifactModel)
 	if err != nil {
 		if errors.IsDoesNotExistError(err) {
 			logger.Warnf(ctx, "Artifact does not exist key: %+v, err %v", artifact.Id, err)
