@@ -903,11 +903,6 @@ func TestGetTaskExecutionData(t *testing.T) {
 				Url:   "inputs",
 				Bytes: 100,
 			}, nil
-		} else if uri == "test-output.pb" {
-			return admin.UrlBlob{
-				Url:   "outputs",
-				Bytes: 200,
-			}, nil
 		}
 
 		return admin.UrlBlob{}, errors.New("unexpected input")
@@ -950,10 +945,6 @@ func TestGetTaskExecutionData(t *testing.T) {
 		Inputs: &admin.UrlBlob{
 			Url:   "inputs",
 			Bytes: 100,
-		},
-		Outputs: &admin.UrlBlob{
-			Url:   "outputs",
-			Bytes: 200,
 		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,

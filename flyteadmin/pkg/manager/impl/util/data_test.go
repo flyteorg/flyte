@@ -81,36 +81,6 @@ func TestShouldFetchData(t *testing.T) {
 	})
 }
 
-func TestShouldFetchOutputData(t *testing.T) {
-	t.Run("local config", func(t *testing.T) {
-		assert.True(t, shouldFetchOutputData(&interfaces.RemoteDataConfig{
-			Scheme:         common.Local,
-			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}, "s3://foo/bar.txt"))
-	})
-	t.Run("max size under limit", func(t *testing.T) {
-		assert.True(t, shouldFetchOutputData(&interfaces.RemoteDataConfig{
-			Scheme:         common.AWS,
-			MaxSizeInBytes: 1000,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}, "s3://foo/bar.txt"))
-	})
-	t.Run("output uri empty", func(t *testing.T) {
-		assert.False(t, shouldFetchOutputData(&interfaces.RemoteDataConfig{
-			Scheme:         common.AWS,
-			MaxSizeInBytes: 1000,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}, ""))
-	})
-}
-
 func TestGetInputs(t *testing.T) {
 	inputsURI := "s3://foo/bar/inputs.pb"
 
@@ -180,16 +150,8 @@ func TestGetInputs(t *testing.T) {
 }
 
 func TestGetOutputs(t *testing.T) {
-	expectedURLBlob := admin.UrlBlob{
-		Url:   "s3://foo/signed/outputs.pb",
-		Bytes: 1000,
-	}
 
 	mockRemoteURL := urlMocks.NewMockRemoteURL()
-	mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
-		assert.Equal(t, testOutputsURI, uri)
-		return expectedURLBlob, nil
-	}
 
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
@@ -217,27 +179,21 @@ func TestGetOutputs(t *testing.T) {
 			Enabled: true,
 		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
-		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
 	})
 	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
 			Enabled: false,
 		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
-		assert.Empty(t, outputURLBlob)
 	})
 	t.Run("inline outputs", func(t *testing.T) {
 		mockRemoteURL := urlMocks.NewMockRemoteURL()
-		mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
-			t.Fatal("Should not fetch a remote URL for outputs stored inline for an execution model")
-			return admin.UrlBlob{}, nil
-		}
 		remoteDataConfig := interfaces.RemoteDataConfig{}
 		remoteDataConfig.MaxSizeInBytes = 2000
 
@@ -253,17 +209,12 @@ func TestGetOutputs(t *testing.T) {
 			},
 		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
-		assert.Empty(t, outputURLBlob)
 	})
 	t.Run("inline outputs over limit", func(t *testing.T) {
 		mockRemoteURL := urlMocks.NewMockRemoteURL()
-		mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
-			t.Fatal("Should not fetch a remote URL for outputs stored inline for an execution model")
-			return admin.UrlBlob{}, nil
-		}
 		remoteDataConfig := interfaces.RemoteDataConfig{}
 		remoteDataConfig.MaxSizeInBytes = 0
 
@@ -279,9 +230,8 @@ func TestGetOutputs(t *testing.T) {
 			},
 		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.Nil(t, fullOutputs)
-		assert.Nil(t, outputURLBlob)
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "LIMIT_EXCEEDED")
 	})
@@ -289,18 +239,16 @@ func TestGetOutputs(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
 			Enabled: true,
 		}
-		_, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
+		_, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
 	})
 	t.Run("storage read fails without signed URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
 			Enabled: false,
 		}
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
+		fullOutputs, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorageReadFailure, closure)
 		assert.Error(t, err)
 		assert.Nil(t, fullOutputs)
-		assert.Nil(t, outputURLBlob)
 	})
 }
 

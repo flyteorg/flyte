@@ -3597,12 +3597,7 @@ func TestGetExecutionData(t *testing.T) {
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
 	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
 		ctx context.Context, uri string) (admin.UrlBlob, error) {
-		if uri == outputURI {
-			return admin.UrlBlob{
-				Url:   "outputs",
-				Bytes: 200,
-			}, nil
-		} else if strings.HasSuffix(uri, shared.Inputs) {
+		if strings.HasSuffix(uri, shared.Inputs) {
 			return admin.UrlBlob{
 				Url:   "inputs",
 				Bytes: 200,
@@ -3645,10 +3640,6 @@ func TestGetExecutionData(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
-		Outputs: &admin.UrlBlob{
-			Url:   "outputs",
-			Bytes: 200,
-		},
 		Inputs: &admin.UrlBlob{
 			Url:   "inputs",
 			Bytes: 200,
@@ -3815,12 +3806,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
 	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
 		ctx context.Context, uri string) (admin.UrlBlob, error) {
-		if uri == outputURI {
-			return admin.UrlBlob{
-				Url:   "outputs",
-				Bytes: 200,
-			}, nil
-		} else if strings.HasSuffix(uri, shared.Inputs) {
+		if strings.HasSuffix(uri, shared.Inputs) {
 			return admin.UrlBlob{
 				Url:   "inputs",
 				Bytes: 200,
@@ -3840,10 +3826,6 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
-		Outputs: &admin.UrlBlob{
-			Url:   "outputs",
-			Bytes: 200,
-		},
 		Inputs: &admin.UrlBlob{
 			Url:   "inputs",
 			Bytes: 200,

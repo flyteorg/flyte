@@ -1386,22 +1386,19 @@ func (m *ExecutionManager) GetExecutionData(
 	if err != nil {
 		return nil, err
 	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+	outputs, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, util.ToExecutionClosureInterface(execution.Closure))
 	if err != nil {
 		return nil, err
 	}
 	response := &admin.WorkflowExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
-		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 	}
 
 	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	if response.Outputs.Bytes > 0 {
-		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
-	} else if response.FullOutputs != nil {
+	if response.FullOutputs != nil {
 		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}
 	return response, nil

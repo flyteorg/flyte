@@ -1254,11 +1254,6 @@ func TestGetNodeExecutionData(t *testing.T) {
 				Url:   "inputs",
 				Bytes: 100,
 			}, nil
-		} else if uri == util.OutputsFile {
-			return admin.UrlBlob{
-				Url:   "outputs",
-				Bytes: 200,
-			}, nil
 		}
 
 		return admin.UrlBlob{}, errors.New("unexpected input")
@@ -1301,10 +1296,6 @@ func TestGetNodeExecutionData(t *testing.T) {
 		Inputs: &admin.UrlBlob{
 			Url:   "inputs",
 			Bytes: 100,
-		},
-		Outputs: &admin.UrlBlob{
-			Url:   "outputs",
-			Bytes: 200,
 		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
