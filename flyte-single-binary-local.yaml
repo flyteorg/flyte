@@ -77,15 +77,6 @@ database:
     port: 30001
     dbname: flyte
     options: "sslmode=disable"
-  # Point to cloned repo instead.
-  #
-#  postgres:
-#    username: postgres
-#    password: xxx
-#    host: 127.0.0.1
-#    port: 54328
-#    dbname: app
-#    options: "sslmode=disable"
 cloudEvents:
   enable: true
   cloudEventVersion: v2

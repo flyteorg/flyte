@@ -82,14 +82,13 @@ func (a *ArtifactRegistry) GetClient() artifact.ArtifactRegistryClient {
 // if nil, should either call the default config or return an error
 func NewArtifactRegistry(ctx context.Context, connCfg *admin2.Config, _ ...grpc.DialOption) *ArtifactRegistry {
 
-	var cfg = connCfg
 	if connCfg == nil {
-		//cfg = admin2.GetConfig(ctx)
 		return &ArtifactRegistry{
 			client: nil,
 		}
 	}
-	clients, err := admin2.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+
+	clients, err := admin2.NewClientsetBuilder().WithConfig(connCfg).Build(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create Artifact client")
 		// too many calls to this function to update, just panic for now.

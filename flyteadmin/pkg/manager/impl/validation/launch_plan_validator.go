@@ -61,11 +61,6 @@ func ValidateLaunchPlan(ctx context.Context,
 			return err
 		}
 	}
-	// TODO: Remove redundant validation that occurs with launch plan and the validate method for the message.
-	// Ensure the notification types are validated.
-	if err := request.Validate(); err != nil {
-		return err
-	}
 	return nil
 }
 
