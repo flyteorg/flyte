@@ -81,7 +81,7 @@ func main() {
 	if err := os.MkdirAll(filepath.Dir(renderedManifestPath), 0755); err != nil {
 		log.Fatalf("failed to create destination directory: %s", err)
 	}
-	if err := os.WriteFile(renderedManifestPath, rendered, 0644); err != nil {
+	if err := os.WriteFile(renderedManifestPath, rendered, 0644); err != nil { //nolint:gosec
 		log.Fatalf("failed to write rendered manifest: %s", err)
 	}
 }

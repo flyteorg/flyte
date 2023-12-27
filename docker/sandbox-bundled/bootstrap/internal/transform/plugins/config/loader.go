@@ -76,7 +76,7 @@ func (cl *Loader) Transform(data []byte) ([]byte, error) {
 
 	// Write base resource module
 	baseManifestPath := filepath.Join(workDir, "base.yaml")
-	if err := os.WriteFile(baseManifestPath, data, 0644); err != nil {
+	if err := os.WriteFile(baseManifestPath, data, 0644); err != nil { //nolint:gosec
 		return nil, err
 	}
 
@@ -102,7 +102,7 @@ func (cl *Loader) Transform(data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if err := os.WriteFile(filepath.Join(workDir, "kustomization.yaml"), kyaml, 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(workDir, "kustomization.yaml"), kyaml, 0644); err != nil { //nolint:gosec
 		return nil, err
 	}
 
