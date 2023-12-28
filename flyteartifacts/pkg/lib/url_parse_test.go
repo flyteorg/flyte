@@ -52,7 +52,8 @@ func TestURLParseNameWithSlashes(t *testing.T) {
 	assert.Equal(t, "name/with/slashes", artifactID.ArtifactKey.Name)
 	assert.Equal(t, "", tag)
 
-	artifactID, tag, err = ParseFlyteURL("flyte://av0.1/project/domain/name/with/slashes?ds=2020-01-01")
+	artifactID, _, err = ParseFlyteURL("flyte://av0.1/project/domain/name/with/slashes?ds=2020-01-01")
+	assert.NoError(t, err)
 	assert.Equal(t, "name/with/slashes", artifactID.ArtifactKey.Name)
 	assert.Equal(t, "project", artifactID.ArtifactKey.Project)
 	assert.Equal(t, "domain", artifactID.ArtifactKey.Domain)

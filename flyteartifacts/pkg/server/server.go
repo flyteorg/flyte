@@ -111,12 +111,17 @@ func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactSer
 	coreService := NewCoreService(storage, &blobStore, scope.NewSubScope("server"))
 	triggerHandler, err := NewTriggerEngine(ctx, storage, &coreService, scope.NewSubScope("triggers"))
 	if err != nil {
-		logger.Errorf(ctx, "Failed to create Admin client, stopping server. Error: %v", err)
+		logger.Errorf(ctx, "Failed to create Trigger engine, stopping server. Error: %v", err)
 		panic(err)
 	}
 
 	adminClientCfg := admin2.GetConfig(ctx)
 	clientSet, err := admin2.NewClientsetBuilder().WithConfig(adminClientCfg).Build(ctx)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to create Admin client set, stopping server. Error: %v", err)
+		panic(err)
+	}
+
 	handler := processor.NewServiceCallHandler(ctx, &coreService, createdArtifacts, *clientSet)
 	eventsReceiverAndHandler := processor.NewBackgroundProcessor(ctx, *eventsCfg, &coreService, createdArtifacts, scope.NewSubScope("events"))
 	if eventsReceiverAndHandler != nil {

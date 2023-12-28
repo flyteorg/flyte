@@ -271,6 +271,7 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 	var taskExecID *core.TaskExecutionIdentifier
 	if taskExecID = evt.GetTaskExecId(); taskExecID == nil {
 		logger.Debugf(ctx, "No task execution id to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
+		return nil
 	}
 
 	// Iterate through the output interface. For any outputs that have an artifact ID specified, grab the
@@ -298,10 +299,8 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 				Principal:         evt.Principal,
 			}
 
-			if taskExecID != nil {
-				aSrc.RetryAttempt = taskExecID.RetryAttempt
-				aSrc.TaskId = taskExecID.TaskId
-			}
+			aSrc.RetryAttempt = taskExecID.RetryAttempt
+			aSrc.TaskId = taskExecID.TaskId
 
 			spec := artifact.ArtifactSpec{
 				Value: output,

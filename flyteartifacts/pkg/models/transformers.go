@@ -69,7 +69,7 @@ func CreateArtifactModelFromRequest(ctx context.Context, key *core.ArtifactKey, 
 }
 
 func PartitionsToIdl(partitions map[string]string) *core.Partitions {
-	if partitions == nil || len(partitions) == 0 {
+	if len(partitions) == 0 {
 		return nil
 	}
 

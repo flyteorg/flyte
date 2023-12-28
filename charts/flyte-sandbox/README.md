@@ -11,7 +11,6 @@ A Helm chart for the Flyte local sandbox
 | file://../flyte-binary | flyte-binary | v0.1.10 |
 | https://charts.bitnami.com/bitnami | minio | 12.1.1 |
 | https://charts.bitnami.com/bitnami | postgresql | 12.1.9 |
-| https://charts.bitnami.com/bitnami | redis | 18.0.1 |
 | https://helm.twun.io/ | docker-registry | 2.2.2 |
 | https://kubernetes.github.io/dashboard/ | kubernetes-dashboard | 6.0.0 |
 
@@ -28,6 +27,12 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.database.host | string | `"{{ printf \"%s-postgresql\" .Release.Name | trunc 63 | trimSuffix \"-\" }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
+| flyte-binary.configuration.inline.artifacts.host | string | `"localhost"` |  |
+| flyte-binary.configuration.inline.artifacts.insecure | bool | `true` |  |
+| flyte-binary.configuration.inline.artifacts.port | int | `50051` |  |
+| flyte-binary.configuration.inline.cloudEvents.cloudEventVersion | string | `"v2"` |  |
+| flyte-binary.configuration.inline.cloudEvents.enable | bool | `true` |  |
+| flyte-binary.configuration.inline.cloudEvents.type | string | `"sandbox"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
@@ -101,13 +106,6 @@ A Helm chart for the Flyte local sandbox
 | postgresql.volumePermissions.enabled | bool | `true` |  |
 | postgresql.volumePermissions.image.pullPolicy | string | `"Never"` |  |
 | postgresql.volumePermissions.image.tag | string | `"sandbox"` |  |
-| redis.auth.enabled | bool | `false` |  |
-| redis.enabled | bool | `true` |  |
-| redis.image.pullPolicy | string | `"Never"` |  |
-| redis.image.tag | string | `"sandbox"` |  |
-| redis.master.service.nodePorts.redis | int | `30004` |  |
-| redis.master.service.type | string | `"NodePort"` |  |
-| redis.replica.replicaCount | int | `0` |  |
 | sandbox.buildkit.enabled | bool | `true` |  |
 | sandbox.buildkit.image.pullPolicy | string | `"Never"` |  |
 | sandbox.buildkit.image.repository | string | `"moby/buildkit"` |  |

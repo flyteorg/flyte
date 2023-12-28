@@ -164,8 +164,7 @@ func launchHttpServer(ctx context.Context, cfg *sharedCfg.ServerConfiguration, h
 // getHTTPHandler gets the http handler for the configured security options
 func getHTTPHandler(httpServer *http.ServeMux, _ sharedCfg.ServerSecurityOptions) http.Handler {
 	// not really used yet (reserved for admin)
-	var handler http.Handler
-	handler = httpServer
+	var handler http.Handler = httpServer
 	return handler
 }
 

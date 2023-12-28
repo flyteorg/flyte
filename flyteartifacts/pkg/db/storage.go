@@ -327,7 +327,7 @@ func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.Arti
 		return nil, err
 	}
 	logger.Debugf(ctx, "Found trigger keys: %+v for artifact key %v", triggerKey, key)
-	if triggerKey == nil || len(triggerKey) == 0 {
+	if len(triggerKey) == 0 {
 		logger.Infof(ctx, "No triggers found for artifact key %v", key)
 		return nil, nil
 	}

@@ -138,8 +138,7 @@ func TestQuery3_Find(t *testing.T) {
 
 	res, ct, err := rds.SearchArtifacts(ctx, s)
 	assert.NoError(t, err)
-
-	fmt.Println(res, ct)
+	assert.Equal(t, "", ct)
 
 	s = artifact.SearchArtifactsRequest{
 		ArtifactKey: &core.ArtifactKey{
@@ -153,8 +152,9 @@ func TestQuery3_Find(t *testing.T) {
 		},
 	}
 
-	res, ct, err = rds.SearchArtifacts(ctx, s)
+	_, ct, err = rds.SearchArtifacts(ctx, s)
 	assert.NoError(t, err)
+	assert.Equal(t, "", ct)
 
 	s = artifact.SearchArtifactsRequest{
 		ArtifactKey: &core.ArtifactKey{
