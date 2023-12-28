@@ -413,12 +413,11 @@ func TestGetArtifact(t *testing.T) {
 		expectedTag := getTestTag()
 
 		dcRepo.MockTagRepo.On("Get", mock.Anything,
-			mock.MatchedBy(func(tag models.TagKey) bool {
-				return tag.TagName == expectedTag.TagName &&
-					tag.DatasetProject == expectedTag.DatasetProject &&
-					tag.DatasetDomain == expectedTag.DatasetDomain &&
-					tag.DatasetVersion == expectedTag.DatasetVersion &&
-					tag.DatasetName == expectedTag.DatasetName
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
+			mock.MatchedBy(func(tagName string) bool {
+				return tagName == expectedTag.TagName
 			})).Return(models.Tag{
 			TagKey: models.TagKey{
 				DatasetProject: expectedTag.DatasetProject,
@@ -451,7 +450,7 @@ func TestGetArtifact(t *testing.T) {
 	})
 
 	t.Run("Get does not exist", func(t *testing.T) {
-		dcRepo.MockTagRepo.On("Get", mock.Anything, mock.Anything).Return(
+		dcRepo.MockTagRepo.On("Get", mock.Anything, mock.Anything, mock.Anything).Return(
 			models.Tag{}, errors.NewDataCatalogError(codes.NotFound, "tag with artifact does not exist"))
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
 		artifactResponse, err := artifactManager.GetArtifact(ctx, &datacatalog.GetArtifactRequest{Dataset: getTestDataset().Id, QueryHandle: &datacatalog.GetArtifactRequest_TagName{TagName: "test"}})
@@ -723,12 +722,11 @@ func TestUpdateArtifact(t *testing.T) {
 			})).Return(nil)
 
 		dcRepo.MockTagRepo.On("Get", mock.Anything,
-			mock.MatchedBy(func(tag models.TagKey) bool {
-				return tag.TagName == expectedTag.TagName &&
-					tag.DatasetProject == expectedTag.DatasetProject &&
-					tag.DatasetDomain == expectedTag.DatasetDomain &&
-					tag.DatasetVersion == expectedTag.DatasetVersion &&
-					tag.DatasetName == expectedTag.DatasetName
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
+			mock.MatchedBy(func(tagName string) bool {
+				return tagName == expectedTag.TagName
 			})).Return(models.Tag{
 			TagKey: models.TagKey{
 				DatasetProject: expectedTag.DatasetProject,

@@ -39,6 +39,7 @@
 #include "flyteidl/core/security.pb.h"
 #include "flyteidl/admin/schedule.pb.h"
 #include "flyteidl/admin/common.pb.h"
+#include <google/protobuf/any.pb.h>
 #include <google/protobuf/timestamp.pb.h>
 #include <google/protobuf/wrappers.pb.h>
 // @@protoc_insertion_point(includes)
@@ -1305,6 +1306,15 @@ class LaunchPlanMetadata final :
   ::flyteidl::admin::Schedule* mutable_schedule();
   void set_allocated_schedule(::flyteidl::admin::Schedule* schedule);
 
+  // .google.protobuf.Any launch_conditions = 3;
+  bool has_launch_conditions() const;
+  void clear_launch_conditions();
+  static const int kLaunchConditionsFieldNumber = 3;
+  const ::google::protobuf::Any& launch_conditions() const;
+  ::google::protobuf::Any* release_launch_conditions();
+  ::google::protobuf::Any* mutable_launch_conditions();
+  void set_allocated_launch_conditions(::google::protobuf::Any* launch_conditions);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.LaunchPlanMetadata)
  private:
   class HasBitSetters;
@@ -1312,6 +1322,7 @@ class LaunchPlanMetadata final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Notification > notifications_;
   ::flyteidl::admin::Schedule* schedule_;
+  ::google::protobuf::Any* launch_conditions_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2flaunch_5fplan_2eproto;
 };
@@ -3255,6 +3266,51 @@ inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Notificati
 LaunchPlanMetadata::notifications() const {
   // @@protoc_insertion_point(field_list:flyteidl.admin.LaunchPlanMetadata.notifications)
   return notifications_;
+}
+
+// .google.protobuf.Any launch_conditions = 3;
+inline bool LaunchPlanMetadata::has_launch_conditions() const {
+  return this != internal_default_instance() && launch_conditions_ != nullptr;
+}
+inline const ::google::protobuf::Any& LaunchPlanMetadata::launch_conditions() const {
+  const ::google::protobuf::Any* p = launch_conditions_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.LaunchPlanMetadata.launch_conditions)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
+      &::google::protobuf::_Any_default_instance_);
+}
+inline ::google::protobuf::Any* LaunchPlanMetadata::release_launch_conditions() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.LaunchPlanMetadata.launch_conditions)
+  
+  ::google::protobuf::Any* temp = launch_conditions_;
+  launch_conditions_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Any* LaunchPlanMetadata::mutable_launch_conditions() {
+  
+  if (launch_conditions_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
+    launch_conditions_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.LaunchPlanMetadata.launch_conditions)
+  return launch_conditions_;
+}
+inline void LaunchPlanMetadata::set_allocated_launch_conditions(::google::protobuf::Any* launch_conditions) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(launch_conditions_);
+  }
+  if (launch_conditions) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      launch_conditions = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, launch_conditions, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  launch_conditions_ = launch_conditions;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.LaunchPlanMetadata.launch_conditions)
 }
 
 // -------------------------------------------------------------------

@@ -26,7 +26,7 @@ func NewTagRepo(db *gorm.DB, errorTransformer errors.ErrorTransformer, scope pro
 	}
 }
 
-func (h *tagRepo) Create(ctx context.Context, tag models.Tag) error {
+func (h *tagRepo) Create(ctx context.Context, id *idl_datacatalog.DatasetID, tag models.Tag) error {
 	timer := h.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
@@ -38,7 +38,7 @@ func (h *tagRepo) Create(ctx context.Context, tag models.Tag) error {
 	return nil
 }
 
-func (h *tagRepo) Get(ctx context.Context, in models.TagKey) (models.Tag, error) {
+func (h *tagRepo) Get(ctx context.Context, datasetID *idl_datacatalog.DatasetID, tagName string) (models.Tag, error) {
 	timer := h.repoMetrics.GetDuration.Start(ctx)
 	defer timer.Stop()
 
@@ -51,7 +51,13 @@ func (h *tagRepo) Get(ctx context.Context, in models.TagKey) (models.Tag, error)
 		Preload("Artifact.Tags").
 		Order("tags.created_at DESC").
 		First(&tag, &models.Tag{
-			TagKey: in,
+			TagKey: models.TagKey{
+				DatasetProject: datasetID.Project,
+				DatasetDomain:  datasetID.Domain,
+				DatasetName:    datasetID.Name,
+				DatasetVersion: datasetID.Version,
+				TagName:        tagName,
+			},
 		})
 
 	if result.Error != nil {

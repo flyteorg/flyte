@@ -5,6 +5,8 @@ package mocks
 import (
 	context "context"
 
+	datacatalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+
 	mock "github.com/stretchr/testify/mock"
 
 	models "github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
@@ -23,8 +25,8 @@ func (_m TagRepo_Create) Return(_a0 error) *TagRepo_Create {
 	return &TagRepo_Create{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *TagRepo) OnCreate(ctx context.Context, in models.Tag) *TagRepo_Create {
-	c_call := _m.On("Create", ctx, in)
+func (_m *TagRepo) OnCreate(ctx context.Context, datasetID *datacatalog.DatasetID, in models.Tag) *TagRepo_Create {
+	c_call := _m.On("Create", ctx, datasetID, in)
 	return &TagRepo_Create{Call: c_call}
 }
 
@@ -33,13 +35,13 @@ func (_m *TagRepo) OnCreateMatch(matchers ...interface{}) *TagRepo_Create {
 	return &TagRepo_Create{Call: c_call}
 }
 
-// Create provides a mock function with given fields: ctx, in
-func (_m *TagRepo) Create(ctx context.Context, in models.Tag) error {
-	ret := _m.Called(ctx, in)
+// Create provides a mock function with given fields: ctx, datasetID, in
+func (_m *TagRepo) Create(ctx context.Context, datasetID *datacatalog.DatasetID, in models.Tag) error {
+	ret := _m.Called(ctx, datasetID, in)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, models.Tag) error); ok {
-		r0 = rf(ctx, in)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, models.Tag) error); ok {
+		r0 = rf(ctx, datasetID, in)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -55,8 +57,8 @@ func (_m TagRepo_Get) Return(_a0 models.Tag, _a1 error) *TagRepo_Get {
 	return &TagRepo_Get{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *TagRepo) OnGet(ctx context.Context, in models.TagKey) *TagRepo_Get {
-	c_call := _m.On("Get", ctx, in)
+func (_m *TagRepo) OnGet(ctx context.Context, datasetID *datacatalog.DatasetID, tagName string) *TagRepo_Get {
+	c_call := _m.On("Get", ctx, datasetID, tagName)
 	return &TagRepo_Get{Call: c_call}
 }
 
@@ -65,20 +67,20 @@ func (_m *TagRepo) OnGetMatch(matchers ...interface{}) *TagRepo_Get {
 	return &TagRepo_Get{Call: c_call}
 }
 
-// Get provides a mock function with given fields: ctx, in
-func (_m *TagRepo) Get(ctx context.Context, in models.TagKey) (models.Tag, error) {
-	ret := _m.Called(ctx, in)
+// Get provides a mock function with given fields: ctx, datasetID, tagName
+func (_m *TagRepo) Get(ctx context.Context, datasetID *datacatalog.DatasetID, tagName string) (models.Tag, error) {
+	ret := _m.Called(ctx, datasetID, tagName)
 
 	var r0 models.Tag
-	if rf, ok := ret.Get(0).(func(context.Context, models.TagKey) models.Tag); ok {
-		r0 = rf(ctx, in)
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DatasetID, string) models.Tag); ok {
+		r0 = rf(ctx, datasetID, tagName)
 	} else {
 		r0 = ret.Get(0).(models.Tag)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.TagKey) error); ok {
-		r1 = rf(ctx, in)
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.DatasetID, string) error); ok {
+		r1 = rf(ctx, datasetID, tagName)
 	} else {
 		r1 = ret.Error(1)
 	}

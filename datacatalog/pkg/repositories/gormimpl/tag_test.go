@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/utils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -72,7 +73,7 @@ func TestCreateTag(t *testing.T) {
 	)
 
 	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := tagRepo.Create(context.Background(), getTestTag())
+	err := tagRepo.Create(context.Background(), &datacatalog.DatasetID{}, getTestTag())
 	assert.NoError(t, err)
 	assert.True(t, tagCreated)
 }
@@ -94,16 +95,16 @@ func TestGetTag(t *testing.T) {
 		`SELECT * FROM "partitions" WHERE "partitions"."artifact_id" = $1 ORDER BY partitions.created_at ASC%!(EXTRA string=123)`).WithReply(getDBPartitionResponse(artifact))
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(getDBTagResponse(artifact))
-	getInput := models.TagKey{
-		DatasetProject: artifact.DatasetProject,
-		DatasetDomain:  artifact.DatasetDomain,
-		DatasetName:    artifact.DatasetName,
-		DatasetVersion: artifact.DatasetVersion,
-		TagName:        "test-tag",
-	}
 
 	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	response, err := tagRepo.Get(context.Background(), getInput)
+	response, err := tagRepo.Get(context.Background(),
+		&datacatalog.DatasetID{
+			Project: artifact.DatasetProject,
+			Domain:  artifact.DatasetDomain,
+			Name:    artifact.DatasetName,
+			Version: artifact.DatasetVersion,
+		},
+		"test-tag")
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
 	assert.Equal(t, artifact.ArtifactID, response.Artifact.ArtifactID)
@@ -123,16 +124,14 @@ func TestTagNotFound(t *testing.T) {
 		`SELECT * FROM "tags" WHERE "tags"."dataset_project" = $1 AND "tags"."dataset_name" = $2 AND "tags"."dataset_domain" = $3 AND "tags"."dataset_version" = $4 AND "tags"."tag_name" = $5 ORDER BY tags.created_at DESC,"tags"."created_at" LIMIT 1%!!(string=test-tag)!(string=testVersion)!(string=testDomain)!(string=testName)(EXTRA string=testProject)`).WithError(
 		gorm.ErrRecordNotFound,
 	)
-	getInput := models.TagKey{
-		DatasetProject: artifact.DatasetProject,
-		DatasetDomain:  artifact.DatasetDomain,
-		DatasetName:    artifact.DatasetName,
-		DatasetVersion: artifact.DatasetVersion,
-		TagName:        "test-tag",
-	}
-
 	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	_, err := tagRepo.Get(context.Background(), getInput)
+	_, err := tagRepo.Get(context.Background(), &datacatalog.DatasetID{
+		Project: artifact.DatasetProject,
+		Domain:  artifact.DatasetDomain,
+		Name:    artifact.DatasetName,
+		Version: artifact.DatasetVersion,
+	},
+		"test-tag")
 	assert.Error(t, err)
 	assert.Equal(t, "missing entity of type Tag with identifier ", err.Error())
 }
@@ -148,7 +147,13 @@ func TestTagAlreadyExists(t *testing.T) {
 	)
 
 	tagRepo := NewTagRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
-	err := tagRepo.Create(context.Background(), getTestTag())
+	artifact := getTestArtifact()
+	err := tagRepo.Create(context.Background(), &datacatalog.DatasetID{
+		Project: artifact.DatasetProject,
+		Domain:  artifact.DatasetDomain,
+		Name:    artifact.DatasetName,
+		Version: artifact.DatasetVersion,
+	}, getTestTag())
 	assert.Error(t, err)
 	dcErr, ok := err.(datacatalog_error.DataCatalogError)
 	assert.True(t, ok)

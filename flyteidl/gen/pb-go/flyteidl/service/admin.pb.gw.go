@@ -8335,65 +8335,65 @@ var (
 
 	pattern_AdminService_GetTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "tasks", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
-	pattern_AdminService_GetTask_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "tasks", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
+	pattern_AdminService_GetTask_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "tasks", "org", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
 	pattern_AdminService_ListTaskIds_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "task_ids", "project", "domain"}, ""))
 
-	pattern_AdminService_ListTaskIds_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "tasks", "org", "project", "domain"}, ""))
+	pattern_AdminService_ListTaskIds_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "tasks", "org", "project", "domain"}, ""))
 
 	pattern_AdminService_ListTasks_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "tasks", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_ListTasks_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "tasks", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_ListTasks_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "tasks", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListTasks_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "tasks", "id.project", "id.domain"}, ""))
 
-	pattern_AdminService_ListTasks_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "tasks", "id.org", "id.project", "id.domain"}, ""))
+	pattern_AdminService_ListTasks_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "tasks", "org", "id.org", "id.project", "id.domain"}, ""))
 
 	pattern_AdminService_CreateWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "workflows"}, ""))
 
 	pattern_AdminService_GetWorkflow_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflows", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
-	pattern_AdminService_GetWorkflow_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "workflows", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
+	pattern_AdminService_GetWorkflow_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "workflows", "org", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
 	pattern_AdminService_ListWorkflowIds_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "workflow_ids", "project", "domain"}, ""))
 
-	pattern_AdminService_ListWorkflowIds_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflows", "org", "project", "domain"}, ""))
+	pattern_AdminService_ListWorkflowIds_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflows", "org", "project", "domain"}, ""))
 
 	pattern_AdminService_ListWorkflows_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflows", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_ListWorkflows_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflows", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_ListWorkflows_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "workflows", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListWorkflows_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "workflows", "id.project", "id.domain"}, ""))
 
-	pattern_AdminService_ListWorkflows_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflows", "id.org", "id.project", "id.domain"}, ""))
+	pattern_AdminService_ListWorkflows_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflows", "org", "id.org", "id.project", "id.domain"}, ""))
 
 	pattern_AdminService_CreateLaunchPlan_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "launch_plans"}, ""))
 
 	pattern_AdminService_GetLaunchPlan_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "launch_plans", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
-	pattern_AdminService_GetLaunchPlan_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "launch_plans", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
+	pattern_AdminService_GetLaunchPlan_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "launch_plans", "org", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
 	pattern_AdminService_GetActiveLaunchPlan_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "active_launch_plans", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_GetActiveLaunchPlan_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "active_launch_plans", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_GetActiveLaunchPlan_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "active_launch_plans", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListActiveLaunchPlans_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "active_launch_plans", "project", "domain"}, ""))
 
 	pattern_AdminService_ListLaunchPlanIds_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "launch_plan_ids", "project", "domain"}, ""))
 
-	pattern_AdminService_ListLaunchPlanIds_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "launch_plan_ids", "org", "project", "domain"}, ""))
+	pattern_AdminService_ListLaunchPlanIds_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "launch_plan_ids", "org", "project", "domain"}, ""))
 
 	pattern_AdminService_ListLaunchPlans_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "launch_plans", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_ListLaunchPlans_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "launch_plans", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_ListLaunchPlans_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "launch_plans", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListLaunchPlans_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "launch_plans", "id.project", "id.domain"}, ""))
 
-	pattern_AdminService_ListLaunchPlans_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "launch_plans", "id.org", "id.project", "id.domain"}, ""))
+	pattern_AdminService_ListLaunchPlans_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "launch_plans", "org", "id.org", "id.project", "id.domain"}, ""))
 
 	pattern_AdminService_UpdateLaunchPlan_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "launch_plans", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
-	pattern_AdminService_UpdateLaunchPlan_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "launch_plans", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
+	pattern_AdminService_UpdateLaunchPlan_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "launch_plans", "org", "id.org", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
 	pattern_AdminService_CreateExecution_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "executions"}, ""))
 
@@ -8403,39 +8403,39 @@ var (
 
 	pattern_AdminService_GetExecution_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "executions", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_GetExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "executions", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_GetExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "executions", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_UpdateExecution_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "executions", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_UpdateExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "executions", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_UpdateExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "executions", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_GetExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "data", "executions", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_GetExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "data", "executions", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_GetExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "data", "executions", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListExecutions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "executions", "id.project", "id.domain"}, ""))
 
-	pattern_AdminService_ListExecutions_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "executions", "id.org", "id.project", "id.domain"}, ""))
+	pattern_AdminService_ListExecutions_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "executions", "org", "id.org", "id.project", "id.domain"}, ""))
 
 	pattern_AdminService_TerminateExecution_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "executions", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_TerminateExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "data", "executions", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_TerminateExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "data", "executions", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_GetNodeExecution_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "node_executions", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
 
-	pattern_AdminService_GetNodeExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "node_executions", "id.execution_id.org", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
+	pattern_AdminService_GetNodeExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "node_executions", "org", "id.execution_id.org", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
 
 	pattern_AdminService_ListNodeExecutions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "node_executions", "workflow_execution_id.project", "workflow_execution_id.domain", "workflow_execution_id.name"}, ""))
 
-	pattern_AdminService_ListNodeExecutions_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "node_executions", "workflow_execution_id.org", "workflow_execution_id.project", "workflow_execution_id.domain", "workflow_execution_id.name"}, ""))
+	pattern_AdminService_ListNodeExecutions_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "node_executions", "org", "workflow_execution_id.org", "workflow_execution_id.project", "workflow_execution_id.domain", "workflow_execution_id.name"}, ""))
 
 	pattern_AdminService_ListNodeExecutionsForTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "children", "task_executions", "task_execution_id.node_execution_id.execution_id.project", "task_execution_id.node_execution_id.execution_id.domain", "task_execution_id.node_execution_id.execution_id.name", "task_execution_id.node_execution_id.node_id", "task_execution_id.task_id.project", "task_execution_id.task_id.domain", "task_execution_id.task_id.name", "task_execution_id.task_id.version", "task_execution_id.retry_attempt"}, ""))
 
-	pattern_AdminService_ListNodeExecutionsForTask_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13}, []string{"api", "v1", "children", "task_executions", "task_execution_id.node_execution_id.execution_id.org", "task_execution_id.node_execution_id.execution_id.project", "task_execution_id.node_execution_id.execution_id.domain", "task_execution_id.node_execution_id.execution_id.name", "task_execution_id.node_execution_id.node_id", "task_execution_id.task_id.project", "task_execution_id.task_id.domain", "task_execution_id.task_id.name", "task_execution_id.task_id.version", "task_execution_id.retry_attempt"}, ""))
+	pattern_AdminService_ListNodeExecutionsForTask_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14}, []string{"api", "v1", "children", "task_executions", "org", "task_execution_id.node_execution_id.execution_id.org", "task_execution_id.node_execution_id.execution_id.project", "task_execution_id.node_execution_id.execution_id.domain", "task_execution_id.node_execution_id.execution_id.name", "task_execution_id.node_execution_id.node_id", "task_execution_id.task_id.project", "task_execution_id.task_id.domain", "task_execution_id.task_id.name", "task_execution_id.task_id.version", "task_execution_id.retry_attempt"}, ""))
 
 	pattern_AdminService_GetNodeExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "data", "node_executions", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
 
-	pattern_AdminService_GetNodeExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "data", "node_executions", "id.execution_id.org", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
+	pattern_AdminService_GetNodeExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v1", "data", "node_executions", "org", "id.execution_id.org", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
 
 	pattern_AdminService_RegisterProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 
@@ -8443,9 +8443,9 @@ var (
 
 	pattern_AdminService_UpdateProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "identifier.id"}, ""))
 
-	pattern_AdminService_UpdateProject_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "projects", "identifier.org", "id"}, ""))
+	pattern_AdminService_UpdateProject_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "projects", "org", "identifier.org", "id"}, ""))
 
-	pattern_AdminService_UpdateProject_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "projects", "identifier.org", "identifier.id"}, ""))
+	pattern_AdminService_UpdateProject_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "projects", "org", "identifier.org", "identifier.id"}, ""))
 
 	pattern_AdminService_ListProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 
@@ -8457,83 +8457,83 @@ var (
 
 	pattern_AdminService_GetTaskExecution_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11}, []string{"api", "v1", "task_executions", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
-	pattern_AdminService_GetTaskExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "task_executions", "id.node_execution_id.execution_id.org", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
+	pattern_AdminService_GetTaskExecution_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13}, []string{"api", "v1", "task_executions", "org", "id.node_execution_id.execution_id.org", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
 	pattern_AdminService_ListTaskExecutions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "task_executions", "node_execution_id.execution_id.project", "node_execution_id.execution_id.domain", "node_execution_id.execution_id.name", "node_execution_id.node_id"}, ""))
 
-	pattern_AdminService_ListTaskExecutions_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "task_executions", "node_execution_id.execution_id.org", "node_execution_id.execution_id.project", "node_execution_id.execution_id.domain", "node_execution_id.execution_id.name", "node_execution_id.node_id"}, ""))
+	pattern_AdminService_ListTaskExecutions_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "task_executions", "org", "node_execution_id.execution_id.org", "node_execution_id.execution_id.project", "node_execution_id.execution_id.domain", "node_execution_id.execution_id.name", "node_execution_id.node_id"}, ""))
 
 	pattern_AdminService_GetTaskExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "data", "task_executions", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
-	pattern_AdminService_GetTaskExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13}, []string{"api", "v1", "data", "task_executions", "id.node_execution_id.execution_id.org", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
+	pattern_AdminService_GetTaskExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14}, []string{"api", "v1", "data", "task_executions", "org", "id.node_execution_id.execution_id.org", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
 	pattern_AdminService_UpdateProjectDomainAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "attributes.project", "attributes.domain"}, ""))
 
-	pattern_AdminService_UpdateProjectDomainAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "project_domain_attributes", "attributes.org", "attributes.project", "attributes.domain"}, ""))
+	pattern_AdminService_UpdateProjectDomainAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "project_domain_attributes", "org", "attributes.org", "attributes.project", "attributes.domain"}, ""))
 
 	pattern_AdminService_GetProjectDomainAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "project", "domain"}, ""))
 
-	pattern_AdminService_GetProjectDomainAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "project_domain_attributes", "org", "project", "domain"}, ""))
+	pattern_AdminService_GetProjectDomainAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "project_domain_attributes", "org", "project", "domain"}, ""))
 
 	pattern_AdminService_DeleteProjectDomainAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "project", "domain"}, ""))
 
-	pattern_AdminService_DeleteProjectDomainAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "project_domain_attributes", "org", "project", "domain"}, ""))
+	pattern_AdminService_DeleteProjectDomainAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "project_domain_attributes", "org", "project", "domain"}, ""))
 
 	pattern_AdminService_UpdateProjectAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "project_attributes", "attributes.project"}, ""))
 
-	pattern_AdminService_UpdateProjectAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "attributes.org", "attributes.project"}, ""))
+	pattern_AdminService_UpdateProjectAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "project_domain_attributes", "org", "attributes.org", "attributes.project"}, ""))
 
 	pattern_AdminService_GetProjectAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "project_attributes", "project"}, ""))
 
-	pattern_AdminService_GetProjectAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "org", "project"}, ""))
+	pattern_AdminService_GetProjectAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "org", "project"}, ""))
 
 	pattern_AdminService_DeleteProjectAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "project_attributes", "project"}, ""))
 
-	pattern_AdminService_DeleteProjectAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "org", "project"}, ""))
+	pattern_AdminService_DeleteProjectAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "org", "project"}, ""))
 
 	pattern_AdminService_UpdateWorkflowAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflow_attributes", "attributes.project", "attributes.domain", "attributes.workflow"}, ""))
 
-	pattern_AdminService_UpdateWorkflowAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflow_attributes", "attributes.org", "attributes.project", "attributes.domain", "attributes.workflow"}, ""))
+	pattern_AdminService_UpdateWorkflowAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "workflow_attributes", "org", "attributes.org", "attributes.project", "attributes.domain", "attributes.workflow"}, ""))
 
 	pattern_AdminService_GetWorkflowAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflow_attributes", "project", "domain", "workflow"}, ""))
 
-	pattern_AdminService_GetWorkflowAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflow_attributes", "org", "project", "domain", "workflow"}, ""))
+	pattern_AdminService_GetWorkflowAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflow_attributes", "org", "project", "domain", "workflow"}, ""))
 
 	pattern_AdminService_DeleteWorkflowAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "workflow_attributes", "project", "domain", "workflow"}, ""))
 
-	pattern_AdminService_DeleteWorkflowAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflow_attributes", "org", "project", "domain", "workflow"}, ""))
+	pattern_AdminService_DeleteWorkflowAttributes_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "workflow_attributes", "org", "project", "domain", "workflow"}, ""))
 
 	pattern_AdminService_ListMatchableAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "matchable_attributes"}, ""))
 
 	pattern_AdminService_ListNamedEntities_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "named_entities", "resource_type", "project", "domain"}, ""))
 
-	pattern_AdminService_ListNamedEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "resource_type", "org", "project", "domain"}, ""))
+	pattern_AdminService_ListNamedEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "resource_type", "org", "project", "domain"}, ""))
 
 	pattern_AdminService_GetNamedEntity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_GetNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "named_entities", "resource_type", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_GetNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "named_entities", "resource_type", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_UpdateNamedEntity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_UpdateNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "named_entities", "resource_type", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_UpdateNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "named_entities", "resource_type", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "version"}, ""))
 
 	pattern_AdminService_GetDescriptionEntity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "description_entities", "id.resource_type", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
-	pattern_AdminService_GetDescriptionEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "description_entities", "id.org", "id.resource_type", "id.project", "id.domain", "id.name", "id.version"}, ""))
+	pattern_AdminService_GetDescriptionEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v1", "description_entities", "org", "id.org", "id.resource_type", "id.project", "id.domain", "id.name", "id.version"}, ""))
 
 	pattern_AdminService_ListDescriptionEntities_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "description_entities", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_ListDescriptionEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "description_entities", "resource_type", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_ListDescriptionEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "description_entities", "resource_type", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListDescriptionEntities_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "description_entities", "resource_type", "id.project", "id.domain"}, ""))
 
-	pattern_AdminService_ListDescriptionEntities_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "description_entities", "resource_type", "id.org", "id.project", "id.domain"}, ""))
+	pattern_AdminService_ListDescriptionEntities_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "description_entities", "resource_type", "org", "id.org", "id.project", "id.domain"}, ""))
 
 	pattern_AdminService_GetExecutionMetrics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "metrics", "executions", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_GetExecutionMetrics_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "metrics", "executions", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_GetExecutionMetrics_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "metrics", "executions", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
 )
 
 var (

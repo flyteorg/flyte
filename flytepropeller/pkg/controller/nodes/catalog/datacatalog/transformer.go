@@ -213,11 +213,11 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 		return nil, fmt.Errorf("failed to parse [%v] to integer. Error: %w", val, err)
 	}
 
-	taskId := proto.Clone(&currentID).(*core.Identifier)
-	taskId.Version = GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown")
+	taskID := proto.Clone(&currentID).(*core.Identifier)
+	taskID.Version = GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown")
 
 	return &core.TaskExecutionIdentifier{
-		TaskId:       taskId,
+		TaskId:       taskID,
 		RetryAttempt: uint32(attempt),
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: GetOrDefault(artifactMd.KeyMap, execNodeIDKey, "unknown"),

@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
@@ -85,7 +86,7 @@ func TestCreateTask(t *testing.T) {
 			return models.DescriptionEntity{}, adminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound")
 		})
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
-		mockScope.NewTestScope())
+		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	request := testutils.GetValidTaskRequest()
 	response, err := taskManager.CreateTask(context.Background(), request)
 	assert.NoError(t, err)
@@ -102,7 +103,7 @@ func TestCreateTask(t *testing.T) {
 func TestCreateTask_ValidationError(t *testing.T) {
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), getMockTaskCompiler(),
-		mockScope.NewTestScope())
+		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	request := testutils.GetValidTaskRequest()
 	request.Id = nil
 	response, err := taskManager.CreateTask(context.Background(), request)
@@ -119,7 +120,7 @@ func TestCreateTask_CompilerError(t *testing.T) {
 		})
 	mockRepository := getMockTaskRepository()
 	taskManager := NewTaskManager(mockRepository, getMockConfigForTaskTest(), mockCompiler,
-		mockScope.NewTestScope())
+		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	request := testutils.GetValidTaskRequest()
 	response, err := taskManager.CreateTask(context.Background(), request)
 	assert.EqualError(t, err, expectedErr.Error())
@@ -138,7 +139,7 @@ func TestCreateTask_DatabaseError(t *testing.T) {
 	}
 
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetCreateCallback(taskCreateFunc)
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	request := testutils.GetValidTaskRequest()
 	response, err := taskManager.CreateTask(context.Background(), request)
 	assert.EqualError(t, err, expectedErr.Error())
@@ -166,7 +167,7 @@ func TestGetTask(t *testing.T) {
 		}, nil
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 
 	task, err := taskManager.GetTask(context.Background(), admin.ObjectGetRequest{
 		Id: &taskIdentifier,
@@ -186,7 +187,7 @@ func TestGetTask_DatabaseError(t *testing.T) {
 		return models.Task{}, expectedErr
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	task, err := taskManager.GetTask(context.Background(), admin.ObjectGetRequest{
 		Id: &taskIdentifier,
 	})
@@ -212,7 +213,7 @@ func TestGetTask_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(taskGetFunc)
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 
 	task, err := taskManager.GetTask(context.Background(), admin.ObjectGetRequest{
 		Id: &taskIdentifier,
@@ -260,7 +261,7 @@ func TestListTasks(t *testing.T) {
 		}, nil
 	}
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetListCallback(taskListFunc)
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 
 	taskList, err := taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
 		Id:    namedEntityIdentifier,
@@ -288,7 +289,7 @@ func TestListTasks(t *testing.T) {
 
 func TestListTasks_MissingParameters(t *testing.T) {
 	repository := getMockTaskRepository()
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	_, err := taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Domain: domainValue,
@@ -318,7 +319,7 @@ func TestListTasks_DatabaseError(t *testing.T) {
 	}
 
 	repository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetListCallback(taskListFunc)
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	_, err := taskManager.ListTasks(context.Background(), admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
 			Project: projectValue,
@@ -332,7 +333,7 @@ func TestListTasks_DatabaseError(t *testing.T) {
 
 func TestListUniqueTaskIdentifiers(t *testing.T) {
 	repository := getMockTaskRepository()
-	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope())
+	taskManager := NewTaskManager(repository, getMockConfigForTaskTest(), getMockTaskCompiler(), mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 
 	listFunc := func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error) {
 		// Test that parameters are being passed in

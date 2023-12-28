@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
@@ -22,6 +23,7 @@ import (
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineImpl "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/impl"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -43,6 +45,7 @@ type AdminService struct {
 	DescriptionEntityManager interfaces.DescriptionEntityInterface
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
+	Artifacts                *artifacts.ArtifactRegistry
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -99,7 +102,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
-	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
@@ -114,8 +116,15 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	})
 
 	eventScheduler := workflowScheduler.GetEventScheduler()
+
+	var artifactRegistry *artifacts.ArtifactRegistry
+	if configuration.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		adminClientCfg := admin2.GetConfig(ctx)
+		artifactRegistry = artifacts.NewArtifactRegistry(ctx, adminClientCfg)
+	}
+
 	launchPlanManager := manager.NewLaunchPlanManager(
-		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"))
+		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"), artifactRegistry)
 
 	// Configure admin-specific remote data handler (separate from storage)
 	remoteDataConfig := configuration.ApplicationConfiguration().GetRemoteDataConfig()
@@ -128,9 +137,11 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		RemoteDataStoreClient:    dataStorageClient,
 	}).GetRemoteURLInterface()
 
+	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, repo, dataStorageClient, urlData, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), *configuration.ApplicationConfiguration().GetRemoteDataConfig(), adminScope)
+
 	workflowManager := manager.NewWorkflowManager(
 		repo, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
-		adminScope.NewSubScope("workflow_manager"))
+		adminScope.NewSubScope("workflow_manager"), artifactRegistry)
 	namedEntityManager := manager.NewNamedEntityManager(repo, configuration, adminScope.NewSubScope("named_entity_manager"))
 	descriptionEntityManager := manager.NewDescriptionEntityManager(repo, configuration, adminScope.NewSubScope("description_entity_manager"))
 
@@ -141,7 +152,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
@@ -164,7 +175,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{
 		TaskManager: manager.NewTaskManager(repo, configuration, workflowengineImpl.NewCompiler(),
-			adminScope.NewSubScope("task_manager")),
+			adminScope.NewSubScope("task_manager"), artifactRegistry),
 		WorkflowManager:          workflowManager,
 		LaunchPlanManager:        launchPlanManager,
 		ExecutionManager:         executionManager,
@@ -177,6 +188,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		ResourceManager:          resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
 		MetricsManager: manager.NewMetricsManager(workflowManager, executionManager, nodeExecutionManager,
 			taskExecutionManager, adminScope.NewSubScope("metrics_manager")),
-		Metrics: InitMetrics(adminScope),
+		Metrics:   InitMetrics(adminScope),
+		Artifacts: artifactRegistry,
 	}
 }

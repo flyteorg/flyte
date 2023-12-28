@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/config"
+	"github.com/flyteorg/flyte/datacatalog/pkg/plugins"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 	"github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -14,6 +16,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
+
+var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
 
 var serveCmd = &cobra.Command{
 	Use:   "serve",
@@ -51,7 +55,10 @@ var serveCmd = &cobra.Command{
 			}
 		}
 
-		return datacatalogservice.ServeInsecure(ctx, cfg)
+		pluginRegistry := pluginRegistryStore.Load()
+		pluginRegistry.RegisterDefault(plugins.PluginIDNewRepositoryFunction, repositories.GetRepository)
+
+		return datacatalogservice.ServeInsecure(ctx, cfg, pluginRegistry)
 	},
 }
 

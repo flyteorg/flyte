@@ -46,3 +46,5 @@ func GetRepository(ctx context.Context, repoType RepoConfig, dbConfig database.D
 		panic(fmt.Sprintf("Invalid repoType %v", repoType))
 	}
 }
+
+type NewRepositoryFunc = func(ctx context.Context, repoType RepoConfig, dbConfig database.DbConfig, scope promutils.Scope) RepositoryInterface

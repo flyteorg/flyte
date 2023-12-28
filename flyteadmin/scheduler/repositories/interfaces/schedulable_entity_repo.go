@@ -2,9 +2,9 @@ package interfaces
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 //go:generate mockery -name=SchedulableEntityRepoInterface -output=../mocks -case=underscore

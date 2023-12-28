@@ -59,7 +59,7 @@ func (m *tagManager) AddTag(ctx context.Context, request *datacatalog.AddTagRequ
 	}
 
 	tagKey := transformers.ToTagKey(datasetID, request.Tag.Name)
-	err = m.repo.TagRepo().Create(ctx, models.Tag{
+	err = m.repo.TagRepo().Create(ctx, datasetID, models.Tag{
 		TagKey:      tagKey,
 		ArtifactID:  request.Tag.ArtifactId,
 		DatasetUUID: dataset.UUID,

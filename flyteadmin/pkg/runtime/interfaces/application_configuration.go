@@ -48,6 +48,10 @@ type PostgresConfig struct {
 	Debug        bool   `json:"debug" pflag:" Whether or not to start the database connection with debug mode enabled."`
 }
 
+type FeatureGates struct {
+	EnableArtifacts bool `json:"enableArtifacts" pflag:",Enable artifacts feature."`
+}
+
 // ApplicationConfig is the base configuration to start admin
 type ApplicationConfig struct {
 	// The RoleName key inserted as an annotation (https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/)
@@ -97,6 +101,8 @@ type ApplicationConfig struct {
 
 	// Environment variables to be set for the execution.
 	Envs map[string]string `json:"envs,omitempty"`
+
+	FeatureGates FeatureGates `json:"featureGates" pflag:",Enable experimental features."`
 }
 
 func (a *ApplicationConfig) GetRoleNameKey() string {
@@ -518,6 +524,17 @@ type ExternalEventsConfig struct {
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
 }
 
+//go:generate enumer -type=CloudEventVersion -json -yaml -trimprefix=CloudEventVersion
+type CloudEventVersion uint8
+
+const (
+	// This is the initial version of the cloud events
+	CloudEventVersionv1 CloudEventVersion = iota
+
+	// Version 2 of the cloud events add a lot more information into the event
+	CloudEventVersionv2
+)
+
 type CloudEventsConfig struct {
 	Enable bool `json:"enable"`
 	// Defines the cloud provider that backs the scheduler. In the absence of a specification the no-op, 'local'
@@ -532,6 +549,8 @@ type CloudEventsConfig struct {
 	ReconnectAttempts int `json:"reconnectAttempts"`
 	// Specifies the time interval to wait before attempting to reconnect the notifications processor client.
 	ReconnectDelaySeconds int `json:"reconnectDelaySeconds"`
+	// Transform the raw events into the fuller cloudevent events before publishing
+	CloudEventVersion CloudEventVersion `json:"cloudEventVersion"`
 }
 
 // Configuration specific to notifications handling

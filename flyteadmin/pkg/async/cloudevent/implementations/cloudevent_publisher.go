@@ -14,13 +14,25 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const (
-	cloudEventSource     = "https://github.com/flyteorg/flyteadmin"
+	cloudEventSource     = "https://github.com/flyteorg/flyte/flyteadmin"
 	cloudEventTypePrefix = "com.flyte.resource"
 	jsonSchemaURLKey     = "jsonschemaurl"
 	jsonSchemaURL        = "https://github.com/flyteorg/flyteidl/blob/v0.24.14/jsonschema/workflow_execution.json"
@@ -102,20 +114,400 @@ func (p *Publisher) shouldPublishEvent(notificationType string) bool {
 	return p.events.Has(notificationType)
 }
 
+type CloudEventWrappedPublisher struct {
+	db               repositoryInterfaces.Repository
+	sender           interfaces.Sender
+	systemMetrics    implementations.EventPublisherSystemMetrics
+	storageClient    *storage.DataStore
+	urlData          dataInterfaces.RemoteURLInterface
+	remoteDataConfig runtimeInterfaces.RemoteDataConfig
+}
+
+func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context.Context, rawEvent *event.WorkflowExecutionEvent) (*event.CloudEventWorkflowExecution, error) {
+
+	// Basic error checking
+	if rawEvent == nil {
+		return nil, fmt.Errorf("nothing to publish, WorkflowExecution event is nil")
+	}
+	if rawEvent.ExecutionId == nil {
+		logger.Warningf(ctx, "nil execution id in event [%+v]", rawEvent)
+		return nil, fmt.Errorf("nil execution id in event [%+v]", rawEvent)
+	}
+
+	// For now, don't append any additional information unless succeeded
+	if rawEvent.Phase != core.WorkflowExecution_SUCCEEDED {
+		return &event.CloudEventWorkflowExecution{
+			RawEvent:        rawEvent,
+			OutputData:      nil,
+			OutputInterface: nil,
+		}, nil
+	}
+
+	// TODO: Make this one call to the DB instead of two.
+	executionModel, err := c.db.ExecutionRepo().Get(ctx, rawEvent.ExecutionId)
+	if err != nil {
+		logger.Warningf(ctx, "couldn't find execution [%+v] for cloud event processing", rawEvent.ExecutionId)
+		return nil, err
+	}
+	ex, err := transformers.FromExecutionModel(ctx, executionModel, transformers.DefaultExecutionTransformerOptions)
+	if err != nil {
+		logger.Warningf(ctx, "couldn't transform execution [%+v] for cloud event processing", rawEvent.ExecutionId)
+		return nil, err
+	}
+	if ex.Closure.WorkflowId == nil {
+		logger.Warningf(ctx, "workflow id is nil for execution [%+v]", ex)
+		return nil, fmt.Errorf("workflow id is nil for execution [%+v]", ex)
+	}
+	workflowModel, err := c.db.WorkflowRepo().Get(ctx, ex.Closure.WorkflowId)
+	if err != nil {
+		logger.Warningf(ctx, "couldn't find workflow [%+v] for cloud event processing", ex.Closure.WorkflowId)
+		return nil, err
+	}
+	var workflowInterface core.TypedInterface
+	if workflowModel.TypedInterface != nil && len(workflowModel.TypedInterface) > 0 {
+		err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"artifact eventing - failed to unmarshal TypedInterface for workflow [%+v] with err: %v",
+				workflowModel.ID, err)
+		}
+	}
+
+	// Get inputs to the workflow execution
+	var inputs *core.LiteralMap
+	inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
+		c.storageClient, executionModel.InputsURI.String())
+	if err != nil {
+		logger.Warningf(ctx, "Error fetching input literal map %s", executionModel.InputsURI.String())
+	}
+	// The spec is used to retrieve metadata fields
+	spec := &admin.ExecutionSpec{}
+	err = proto.Unmarshal(executionModel.Spec, spec)
+	if err != nil {
+		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
+	}
+
+	// Get outputs from the workflow execution
+	var outputs *core.LiteralMap
+	if rawEvent.GetOutputData() != nil {
+		outputs = rawEvent.GetOutputData()
+	} else if len(rawEvent.GetOutputUri()) > 0 {
+		// GetInputs actually fetches the data, even though this is an output
+		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig, c.storageClient, rawEvent.GetOutputUri())
+		if err != nil {
+			// gatepr: metric this
+			logger.Warningf(ctx, "Error fetching output literal map %v", rawEvent)
+			return nil, err
+		}
+	}
+
+	return &event.CloudEventWorkflowExecution{
+		RawEvent:           rawEvent,
+		OutputData:         outputs,
+		OutputInterface:    &workflowInterface,
+		InputData:          inputs,
+		ArtifactIds:        spec.GetMetadata().GetArtifactIds(),
+		ReferenceExecution: spec.GetMetadata().GetReferenceExecution(),
+		Principal:          spec.GetMetadata().Principal,
+		LaunchPlanId:       spec.LaunchPlan,
+	}, nil
+}
+
+func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecutionIdentifier) context.Context {
+	ctx = contextutils.WithProjectDomain(ctx, identifier.ExecutionId.Project, identifier.ExecutionId.Domain)
+	ctx = contextutils.WithExecutionID(ctx, identifier.ExecutionId.Name)
+	return contextutils.WithNodeID(ctx, identifier.NodeId)
+}
+
+// This is a rough copy of the ListTaskExecutions function in TaskExecutionManager. It can be deprecated once we move the processing out of Admin itself.
+// Just return the highest retry attempt.
+func (c *CloudEventWrappedPublisher) getLatestTaskExecutions(ctx context.Context, nodeExecutionID core.NodeExecutionIdentifier) (*admin.TaskExecution, error) {
+	ctx = getNodeExecutionContext(ctx, &nodeExecutionID)
+
+	nodeIDFilter, err := util.GetSingleValueEqualityFilter(
+		common.NodeExecution, shared.NodeID, nodeExecutionID.NodeId)
+	if err != nil {
+		return nil, err
+	}
+
+	sort := admin.Sort{
+		Key:       "retry_attempt",
+		Direction: 0,
+	}
+	sortParameter, err := common.NewSortParameter(&sort, models.TaskExecutionColumns)
+	if err != nil {
+		return nil, err
+	}
+
+	output, err := c.db.TaskExecutionRepo().List(ctx, repositoryInterfaces.ListResourceInput{
+		IdentifierScope: util.GetIdentifierScope(nodeExecutionID.ExecutionId),
+		InlineFilters:   []common.InlineFilter{nodeIDFilter},
+		Offset:          0,
+		Limit:           1,
+		SortParameter:   sortParameter,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if output.TaskExecutions == nil || len(output.TaskExecutions) == 0 {
+		logger.Debugf(ctx, "no task executions found for node exec id [%+v]", nodeExecutionID)
+		return nil, nil
+	}
+
+	taskExecutionList, err := transformers.FromTaskExecutionModels(output.TaskExecutions, transformers.DefaultExecutionTransformerOptions)
+	if err != nil {
+		logger.Debugf(ctx, "failed to transform task execution models for node exec id [%+v] with err: %v", nodeExecutionID, err)
+		return nil, err
+	}
+
+	return taskExecutionList[0], nil
+}
+
+func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Context, rawEvent *event.NodeExecutionEvent) (*event.CloudEventNodeExecution, error) {
+	if rawEvent == nil || rawEvent.Id == nil {
+		return nil, fmt.Errorf("nothing to publish, NodeExecution event or ID is nil")
+	}
+
+	// Skip nodes unless they're succeeded and not start nodes
+	if rawEvent.Phase != core.NodeExecution_SUCCEEDED {
+		return &event.CloudEventNodeExecution{
+			RawEvent: rawEvent,
+		}, nil
+	} else if rawEvent.Id.NodeId == "start-node" {
+		return &event.CloudEventNodeExecution{
+			RawEvent: rawEvent,
+		}, nil
+	}
+	// metric
+
+	// This gets the parent workflow execution metadata
+	executionModel, err := c.db.ExecutionRepo().Get(ctx, rawEvent.Id.ExecutionId)
+	if err != nil {
+		logger.Infof(ctx, "couldn't find execution [%+v] for cloud event processing", rawEvent.Id.ExecutionId)
+		return nil, err
+	}
+
+	spec := &admin.ExecutionSpec{}
+	err = proto.Unmarshal(executionModel.Spec, spec)
+	if err != nil {
+		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
+	}
+
+	// Get inputs/outputs
+	// This will likely need to move to the artifact service side, given message size limits.
+	// Replace with call to GetNodeExecutionData
+	var inputs *core.LiteralMap
+	logger.Debugf(ctx, "RawEvent id %v", rawEvent.Id)
+	if len(rawEvent.GetInputUri()) > 0 {
+		inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
+			c.storageClient, rawEvent.GetInputUri())
+		logger.Debugf(ctx, "RawEvent input uri %v, %v", rawEvent.GetInputUri(), inputs)
+
+		if err != nil {
+			fmt.Printf("Error fetching input literal map %v", rawEvent)
+		}
+	} else if rawEvent.GetInputData() != nil {
+		inputs = rawEvent.GetInputData()
+		logger.Debugf(ctx, "RawEvent input data %v, %v", rawEvent.GetInputData(), inputs)
+	} else {
+		logger.Infof(ctx, "Node execution for node exec [%+v] has no input data", rawEvent.Id)
+	}
+
+	// This will likely need to move to the artifact service side, given message size limits.
+	var outputs *core.LiteralMap
+	if rawEvent.GetOutputData() != nil {
+		outputs = rawEvent.GetOutputData()
+	} else if len(rawEvent.GetOutputUri()) > 0 {
+		// GetInputs actually fetches the data, even though this is an output
+		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
+			c.storageClient, rawEvent.GetOutputUri())
+		if err != nil {
+			fmt.Printf("Error fetching output literal map %v", rawEvent)
+			return nil, err
+		}
+	}
+
+	// Fetch the latest task execution if any, and pull out the task interface, if applicable.
+	// These are optional fields... if the node execution doesn't have a task execution then these will be empty.
+	var taskExecID *core.TaskExecutionIdentifier
+	var typedInterface *core.TypedInterface
+
+	lte, err := c.getLatestTaskExecutions(ctx, *rawEvent.Id)
+	if err != nil {
+		logger.Errorf(ctx, "failed to get latest task execution for node exec id [%+v] with err: %v", rawEvent.Id, err)
+		return nil, err
+	}
+	if lte != nil {
+		taskModel, err := c.db.TaskRepo().Get(ctx, lte.Id.TaskId)
+		if err != nil {
+			// TODO: metric this
+			// metric
+			logger.Debugf(ctx, "Failed to get task with task id [%+v] with err %v", lte.Id.TaskId, err)
+			return nil, err
+		}
+		task, err := transformers.FromTaskModel(taskModel)
+		if err != nil {
+			logger.Debugf(ctx, "Failed to transform task model with err %v", err)
+			return nil, err
+		}
+		typedInterface = task.Closure.CompiledTask.Template.Interface
+		taskExecID = lte.Id
+	}
+
+	logger.Debugf(ctx, "RawEvent inputs %v", inputs)
+	return &event.CloudEventNodeExecution{
+		RawEvent:        rawEvent,
+		TaskExecId:      taskExecID,
+		OutputData:      outputs,
+		OutputInterface: typedInterface,
+		InputData:       inputs,
+		ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
+		Principal:       spec.GetMetadata().Principal,
+		LaunchPlanId:    spec.LaunchPlan,
+	}, nil
+}
+
+func (c *CloudEventWrappedPublisher) TransformTaskExecutionEvent(ctx context.Context, rawEvent *event.TaskExecutionEvent) (*event.CloudEventTaskExecution, error) {
+
+	if rawEvent == nil {
+		return nil, fmt.Errorf("nothing to publish, TaskExecution event is nil")
+	}
+
+	return &event.CloudEventTaskExecution{
+		RawEvent: rawEvent,
+	}, nil
+}
+
+func (c *CloudEventWrappedPublisher) Publish(ctx context.Context, notificationType string, msg proto.Message) error {
+	c.systemMetrics.PublishTotal.Inc()
+	logger.Debugf(ctx, "Publishing the following message [%+v]", msg)
+
+	var err error
+	var executionID string
+	var phase string
+	var eventTime time.Time
+	var finalMsg proto.Message
+	// this is a modified notification type. will be used for both event type and publishing topic.
+	var topic string
+	var eventID string
+	var eventSource = cloudEventSource
+
+	switch msgType := msg.(type) {
+	case *admin.WorkflowExecutionEventRequest:
+		topic = "cloudevents.WorkflowExecution"
+		e := msgType.Event
+		executionID = e.ExecutionId.String()
+		phase = e.Phase.String()
+		eventTime = e.OccurredAt.AsTime()
+
+		dummyNodeExecutionID := core.NodeExecutionIdentifier{
+			NodeId:      "end-node",
+			ExecutionId: e.ExecutionId,
+		}
+		// This forms part of the key in the Artifact store,
+		// but it should probably be entirely derived by that service instead.
+		eventSource = common.FlyteURLKeyFromNodeExecutionID(dummyNodeExecutionID)
+		finalMsg, err = c.TransformWorkflowExecutionEvent(ctx, e)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to transform workflow execution event with error: %v", err)
+			return err
+		}
+		eventID = fmt.Sprintf("%v.%v", executionID, phase)
+
+	case *admin.TaskExecutionEventRequest:
+		topic = "cloudevents.TaskExecution"
+		e := msgType.Event
+		executionID = e.TaskId.String()
+		phase = e.Phase.String()
+		eventTime = e.OccurredAt.AsTime()
+		eventID = fmt.Sprintf("%v.%v", executionID, phase)
+
+		if e.ParentNodeExecutionId == nil {
+			return fmt.Errorf("parent node execution id is nil for task execution [%+v]", e)
+		}
+		eventSource = common.FlyteURLKeyFromNodeExecutionIDRetry(*e.ParentNodeExecutionId,
+			int(e.RetryAttempt))
+		finalMsg, err = c.TransformTaskExecutionEvent(ctx, e)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to transform task execution event with error: %v", err)
+			return err
+		}
+	case *admin.NodeExecutionEventRequest:
+		topic = "cloudevents.NodeExecution"
+		e := msgType.Event
+		executionID = msgType.Event.Id.String()
+		phase = e.Phase.String()
+		eventTime = e.OccurredAt.AsTime()
+		eventID = fmt.Sprintf("%v.%v", executionID, phase)
+		eventSource = common.FlyteURLKeyFromNodeExecutionID(*msgType.Event.Id)
+		finalMsg, err = c.TransformNodeExecutionEvent(ctx, e)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to transform node execution event with error: %v", err)
+			return err
+		}
+	case *event.CloudEventExecutionStart:
+		topic = "cloudevents.ExecutionStart"
+		executionID = msgType.ExecutionId.String()
+		eventID = fmt.Sprintf("%v", executionID)
+		eventTime = time.Now()
+		// CloudEventExecutionStart don't have a nested event
+		finalMsg = msgType
+	default:
+		return fmt.Errorf("unsupported event types [%+v]", reflect.TypeOf(msg))
+	}
+
+	// Explicitly jsonpb marshal the proto. Otherwise, event.SetData will use json.Marshal which doesn't work well
+	// with proto oneof fields.
+	marshaler := jsonpb.Marshaler{}
+	buf := bytes.NewBuffer([]byte{})
+	err = marshaler.Marshal(buf, finalMsg)
+	if err != nil {
+		c.systemMetrics.PublishError.Inc()
+		logger.Errorf(ctx, "Failed to jsonpb marshal [%v] with error: %v", msg, err)
+		return fmt.Errorf("failed to jsonpb marshal [%v] with error: %w", msg, err)
+	}
+
+	cloudEvt := cloudevents.NewEvent()
+	// CloudEvent specification: https://github.com/cloudevents/spec/blob/v1.0/spec.md#required-attributes
+	cloudEvt.SetType(fmt.Sprintf("%v.%v", cloudEventTypePrefix, topic))
+	// According to the spec, the combination of source and id should be unique.
+	// Artifact service's uniqueness is project/domain/suffix. project/domain are available from the execution id.
+	// so set the suffix as the source. Can ignore ID since Artifact will only listen to succeeded events.
+	cloudEvt.SetSource(eventSource)
+	cloudEvt.SetID(eventID)
+	cloudEvt.SetTime(eventTime)
+	// TODO: Fill this in after we can get auto-generation in buf.
+	cloudEvt.SetExtension(jsonSchemaURLKey, "")
+
+	if err := cloudEvt.SetData(cloudevents.ApplicationJSON, buf.Bytes()); err != nil {
+		c.systemMetrics.PublishError.Inc()
+		logger.Errorf(ctx, "Failed to encode message [%v] with error: %v", msg, err)
+		return err
+	}
+
+	if err := c.sender.Send(ctx, topic, cloudEvt); err != nil {
+		c.systemMetrics.PublishError.Inc()
+		logger.Errorf(ctx, "Failed to send message [%v] with error: %v", msg, err)
+		return err
+	}
+	c.systemMetrics.PublishSuccess.Inc()
+	return nil
+}
+
 func NewCloudEventsPublisher(sender interfaces.Sender, scope promutils.Scope, eventTypes []string) interfaces.Publisher {
 	eventSet := sets.NewString()
 
-	for _, event := range eventTypes {
-		if event == implementations.AllTypes || event == implementations.AllTypesShort {
+	for _, eventType := range eventTypes {
+		if eventType == implementations.AllTypes || eventType == implementations.AllTypesShort {
 			for _, e := range implementations.SupportedEvents {
 				eventSet = eventSet.Insert(e)
 			}
 			break
 		}
-		if e, found := implementations.SupportedEvents[event]; found {
+		if e, found := implementations.SupportedEvents[eventType]; found {
 			eventSet = eventSet.Insert(e)
 		} else {
-			panic(fmt.Errorf("unsupported event type [%s] in the config", event))
+			panic(fmt.Errorf("unsupported event type [%s] in the config", eventType))
 		}
 	}
 
@@ -123,5 +515,18 @@ func NewCloudEventsPublisher(sender interfaces.Sender, scope promutils.Scope, ev
 		sender:        sender,
 		systemMetrics: implementations.NewEventPublisherSystemMetrics(scope.NewSubScope("cloudevents_publisher")),
 		events:        eventSet,
+	}
+}
+
+func NewCloudEventsWrappedPublisher(
+	db repositoryInterfaces.Repository, sender interfaces.Sender, scope promutils.Scope, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, remoteDataConfig runtimeInterfaces.RemoteDataConfig) interfaces.Publisher {
+
+	return &CloudEventWrappedPublisher{
+		db:               db,
+		sender:           sender,
+		systemMetrics:    implementations.NewEventPublisherSystemMetrics(scope.NewSubScope("cloudevents_publisher")),
+		storageClient:    storageClient,
+		urlData:          urlData,
+		remoteDataConfig: remoteDataConfig,
 	}
 }

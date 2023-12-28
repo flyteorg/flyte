@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/config"
 	"github.com/flyteorg/flyte/datacatalog/pkg/manager/impl"
 	"github.com/flyteorg/flyte/datacatalog/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/datacatalog/pkg/plugins"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
 	catalog "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
@@ -75,7 +76,7 @@ func (s *DataCatalogService) ReleaseReservation(ctx context.Context, request *ca
 	return s.ReservationManager.ReleaseReservation(ctx, request)
 }
 
-func NewDataCatalogService() *DataCatalogService {
+func NewDataCatalogService(pluginRegistry *plugins.Registry) *DataCatalogService {
 	configProvider := runtime.NewConfigurationProvider()
 	dataCatalogConfig := configProvider.ApplicationConfiguration().GetDataCatalogConfig()
 	catalogScope := promutils.NewScope(dataCatalogConfig.MetricsScope).NewSubScope("datacatalog")
@@ -105,7 +106,8 @@ func NewDataCatalogService() *DataCatalogService {
 	}
 
 	dbConfigValues := configProvider.ApplicationConfiguration().GetDbConfig()
-	repos := repositories.GetRepository(ctx, repositories.POSTGRES, *dbConfigValues, catalogScope)
+	newRepoFunc := plugins.Get[repositories.NewRepositoryFunc](pluginRegistry, plugins.PluginIDNewRepositoryFunction)
+	repos := newRepoFunc(ctx, repositories.POSTGRES, *dbConfigValues, catalogScope)
 	logger.Infof(ctx, "Created DB connection.")
 
 	return &DataCatalogService{
@@ -118,8 +120,8 @@ func NewDataCatalogService() *DataCatalogService {
 }
 
 // Create and start the gRPC server
-func ServeInsecure(ctx context.Context, cfg *config.Config) error {
-	grpcServer := newGRPCServer(ctx, cfg)
+func ServeInsecure(ctx context.Context, cfg *config.Config, pluginRegistry *plugins.Registry) error {
+	grpcServer := newGRPCServer(ctx, cfg, pluginRegistry)
 
 	grpcListener, err := net.Listen("tcp", cfg.GetGrpcHostAddress())
 	if err != nil {
@@ -131,7 +133,7 @@ func ServeInsecure(ctx context.Context, cfg *config.Config) error {
 }
 
 // Creates a new GRPC Server with all the configuration
-func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
+func newGRPCServer(_ context.Context, cfg *config.Config, pluginRgistry *plugins.Registry) *grpc.Server {
 	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogServerTracer)
 	grpcServer := grpc.NewServer(
 		grpc.UnaryInterceptor(
@@ -141,7 +143,7 @@ func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 			),
 		),
 	)
-	catalog.RegisterDataCatalogServer(grpcServer, NewDataCatalogService())
+	catalog.RegisterDataCatalogServer(grpcServer, NewDataCatalogService(pluginRgistry))
 
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)

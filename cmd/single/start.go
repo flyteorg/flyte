@@ -9,6 +9,7 @@ import (
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
+	datacatalogPlugins "github.com/flyteorg/flyte/datacatalog/pkg/plugins"
 	datacatalogRepo "github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 	datacatalog "github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/clusterresource"
@@ -45,13 +46,16 @@ const defaultNamespace = "all"
 const propellerDefaultNamespace = "flyte"
 
 var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
+var datacatalogPluginRegistryStore = datacatalogPlugins.NewAtomicRegistry(datacatalogPlugins.NewRegistry())
 
 func startDataCatalog(ctx context.Context, _ DataCatalog) error {
+	pluginRegistry := datacatalogPluginRegistryStore.Load()
+	pluginRegistry.RegisterDefault(plugins.PluginIDNewRepositoryFunction, datacatalogRepo.GetRepository)
 	if err := datacatalogRepo.Migrate(ctx); err != nil {
 		return err
 	}
 	catalogCfg := datacatalogConfig.GetConfig()
-	return datacatalog.ServeInsecure(ctx, catalogCfg)
+	return datacatalog.ServeInsecure(ctx, catalogCfg, pluginRegistry)
 }
 
 func startClusterResourceController(ctx context.Context, pluginRegistry *plugins.Registry) error {

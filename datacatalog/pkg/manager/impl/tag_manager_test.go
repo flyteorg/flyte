@@ -47,6 +47,9 @@ func TestAddTag(t *testing.T) {
 
 	t.Run("HappyPath", func(t *testing.T) {
 		dcRepo.MockTagRepo.On("Create", mock.MatchedBy(func(ctx context.Context) bool { return true }),
+			mock.MatchedBy(func(datasetID *datacatalog.DatasetID) bool {
+				return proto.Equal(testDatasetID, datasetID)
+			}),
 			mock.MatchedBy(func(tag models.Tag) bool {
 				return tag.DatasetProject == expectedTag.DatasetProject &&
 					tag.DatasetDomain == expectedTag.DatasetDomain &&

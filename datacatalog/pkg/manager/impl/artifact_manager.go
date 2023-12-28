@@ -196,8 +196,7 @@ func (m *artifactManager) findArtifact(ctx context.Context, datasetID *datacatal
 		key = queryHandle.GetTagName()
 
 		logger.Debugf(ctx, "Get artifact by tag %v", key)
-		tagKey := transformers.ToTagKey(datasetID, key)
-		tag, err := m.repo.TagRepo().Get(ctx, tagKey)
+		tag, err := m.repo.TagRepo().Get(ctx, datasetID, key)
 
 		if err != nil {
 			if errors.IsDoesNotExistError(err) {

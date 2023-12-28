@@ -175,6 +175,12 @@ pub struct RayJob {
     /// Ray runtime environments: <https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments>
     #[prost(string, tag="2")]
     pub runtime_env: ::prost::alloc::string::String,
+    /// shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+    #[prost(bool, tag="3")]
+    pub shutdown_after_job_finishes: bool,
+    /// ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+    #[prost(int32, tag="4")]
+    pub ttl_seconds_after_finished: i32,
 }
 /// Define Ray cluster defines the desired state of RayCluster
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -186,6 +192,9 @@ pub struct RayCluster {
     /// WorkerGroupSpecs are the specs for the worker pods
     #[prost(message, repeated, tag="2")]
     pub worker_group_spec: ::prost::alloc::vec::Vec<WorkerGroupSpec>,
+    /// Whether to enable autoscaling.
+    #[prost(bool, tag="3")]
+    pub enable_autoscaling: bool,
 }
 /// HeadGroupSpec are the spec for the head pod
 #[allow(clippy::derive_partial_eq_without_eq)]
