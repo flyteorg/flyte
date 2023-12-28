@@ -7261,6 +7261,149 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a CacheEvictionError. */
+        interface ICacheEvictionError {
+
+            /** CacheEvictionError code */
+            code?: (flyteidl.core.CacheEvictionError.Code|null);
+
+            /** CacheEvictionError message */
+            message?: (string|null);
+
+            /** CacheEvictionError nodeExecutionId */
+            nodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** CacheEvictionError taskExecutionId */
+            taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CacheEvictionError workflowExecutionId */
+            workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+        }
+
+        /** Represents a CacheEvictionError. */
+        class CacheEvictionError implements ICacheEvictionError {
+
+            /**
+             * Constructs a new CacheEvictionError.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ICacheEvictionError);
+
+            /** CacheEvictionError code. */
+            public code: flyteidl.core.CacheEvictionError.Code;
+
+            /** CacheEvictionError message. */
+            public message: string;
+
+            /** CacheEvictionError nodeExecutionId. */
+            public nodeExecutionId?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /** CacheEvictionError taskExecutionId. */
+            public taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /** CacheEvictionError workflowExecutionId. */
+            public workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /** CacheEvictionError source. */
+            public source?: ("taskExecutionId"|"workflowExecutionId");
+
+            /**
+             * Creates a new CacheEvictionError instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CacheEvictionError instance
+             */
+            public static create(properties?: flyteidl.core.ICacheEvictionError): flyteidl.core.CacheEvictionError;
+
+            /**
+             * Encodes the specified CacheEvictionError message. Does not implicitly {@link flyteidl.core.CacheEvictionError.verify|verify} messages.
+             * @param message CacheEvictionError message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ICacheEvictionError, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CacheEvictionError message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CacheEvictionError
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.CacheEvictionError;
+
+            /**
+             * Verifies a CacheEvictionError message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace CacheEvictionError {
+
+            /** Code enum. */
+            enum Code {
+                INTERNAL = 0,
+                RESERVATION_NOT_ACQUIRED = 1,
+                DATABASE_UPDATE_FAILED = 2,
+                ARTIFACT_DELETE_FAILED = 3,
+                RESERVATION_NOT_RELEASED = 4
+            }
+        }
+
+        /** Properties of a CacheEvictionErrorList. */
+        interface ICacheEvictionErrorList {
+
+            /** CacheEvictionErrorList errors */
+            errors?: (flyteidl.core.ICacheEvictionError[]|null);
+        }
+
+        /** Represents a CacheEvictionErrorList. */
+        class CacheEvictionErrorList implements ICacheEvictionErrorList {
+
+            /**
+             * Constructs a new CacheEvictionErrorList.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ICacheEvictionErrorList);
+
+            /** CacheEvictionErrorList errors. */
+            public errors: flyteidl.core.ICacheEvictionError[];
+
+            /**
+             * Creates a new CacheEvictionErrorList instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CacheEvictionErrorList instance
+             */
+            public static create(properties?: flyteidl.core.ICacheEvictionErrorList): flyteidl.core.CacheEvictionErrorList;
+
+            /**
+             * Encodes the specified CacheEvictionErrorList message. Does not implicitly {@link flyteidl.core.CacheEvictionErrorList.verify|verify} messages.
+             * @param message CacheEvictionErrorList message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ICacheEvictionErrorList, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CacheEvictionErrorList message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CacheEvictionErrorList
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.CacheEvictionErrorList;
+
+            /**
+             * Verifies a CacheEvictionErrorList message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Span. */
         interface ISpan {
 
@@ -21340,6 +21483,228 @@ export namespace flyteidl {
              * @param [response] PublicClientAuthConfigResponse
              */
             type GetPublicClientConfigCallback = (error: (Error|null), response?: flyteidl.service.PublicClientAuthConfigResponse) => void;
+        }
+
+        /** Properties of an EvictExecutionCacheRequest. */
+        interface IEvictExecutionCacheRequest {
+
+            /** EvictExecutionCacheRequest workflowExecutionId */
+            workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+        }
+
+        /** Represents an EvictExecutionCacheRequest. */
+        class EvictExecutionCacheRequest implements IEvictExecutionCacheRequest {
+
+            /**
+             * Constructs a new EvictExecutionCacheRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.IEvictExecutionCacheRequest);
+
+            /** EvictExecutionCacheRequest workflowExecutionId. */
+            public workflowExecutionId?: (flyteidl.core.IWorkflowExecutionIdentifier|null);
+
+            /**
+             * Creates a new EvictExecutionCacheRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EvictExecutionCacheRequest instance
+             */
+            public static create(properties?: flyteidl.service.IEvictExecutionCacheRequest): flyteidl.service.EvictExecutionCacheRequest;
+
+            /**
+             * Encodes the specified EvictExecutionCacheRequest message. Does not implicitly {@link flyteidl.service.EvictExecutionCacheRequest.verify|verify} messages.
+             * @param message EvictExecutionCacheRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.IEvictExecutionCacheRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EvictExecutionCacheRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EvictExecutionCacheRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.EvictExecutionCacheRequest;
+
+            /**
+             * Verifies an EvictExecutionCacheRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an EvictTaskExecutionCacheRequest. */
+        interface IEvictTaskExecutionCacheRequest {
+
+            /** EvictTaskExecutionCacheRequest taskExecutionId */
+            taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+        }
+
+        /** Represents an EvictTaskExecutionCacheRequest. */
+        class EvictTaskExecutionCacheRequest implements IEvictTaskExecutionCacheRequest {
+
+            /**
+             * Constructs a new EvictTaskExecutionCacheRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.IEvictTaskExecutionCacheRequest);
+
+            /** EvictTaskExecutionCacheRequest taskExecutionId. */
+            public taskExecutionId?: (flyteidl.core.ITaskExecutionIdentifier|null);
+
+            /**
+             * Creates a new EvictTaskExecutionCacheRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EvictTaskExecutionCacheRequest instance
+             */
+            public static create(properties?: flyteidl.service.IEvictTaskExecutionCacheRequest): flyteidl.service.EvictTaskExecutionCacheRequest;
+
+            /**
+             * Encodes the specified EvictTaskExecutionCacheRequest message. Does not implicitly {@link flyteidl.service.EvictTaskExecutionCacheRequest.verify|verify} messages.
+             * @param message EvictTaskExecutionCacheRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.IEvictTaskExecutionCacheRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EvictTaskExecutionCacheRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EvictTaskExecutionCacheRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.EvictTaskExecutionCacheRequest;
+
+            /**
+             * Verifies an EvictTaskExecutionCacheRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an EvictCacheResponse. */
+        interface IEvictCacheResponse {
+
+            /** EvictCacheResponse errors */
+            errors?: (flyteidl.core.ICacheEvictionErrorList|null);
+        }
+
+        /** Represents an EvictCacheResponse. */
+        class EvictCacheResponse implements IEvictCacheResponse {
+
+            /**
+             * Constructs a new EvictCacheResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.service.IEvictCacheResponse);
+
+            /** EvictCacheResponse errors. */
+            public errors?: (flyteidl.core.ICacheEvictionErrorList|null);
+
+            /**
+             * Creates a new EvictCacheResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns EvictCacheResponse instance
+             */
+            public static create(properties?: flyteidl.service.IEvictCacheResponse): flyteidl.service.EvictCacheResponse;
+
+            /**
+             * Encodes the specified EvictCacheResponse message. Does not implicitly {@link flyteidl.service.EvictCacheResponse.verify|verify} messages.
+             * @param message EvictCacheResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.service.IEvictCacheResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an EvictCacheResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns EvictCacheResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.service.EvictCacheResponse;
+
+            /**
+             * Verifies an EvictCacheResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Represents a CacheService */
+        class CacheService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new CacheService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new CacheService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): CacheService;
+
+            /**
+             * Calls EvictExecutionCache.
+             * @param request EvictExecutionCacheRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and EvictCacheResponse
+             */
+            public evictExecutionCache(request: flyteidl.service.IEvictExecutionCacheRequest, callback: flyteidl.service.CacheService.EvictExecutionCacheCallback): void;
+
+            /**
+             * Calls EvictExecutionCache.
+             * @param request EvictExecutionCacheRequest message or plain object
+             * @returns Promise
+             */
+            public evictExecutionCache(request: flyteidl.service.IEvictExecutionCacheRequest): Promise<flyteidl.service.EvictCacheResponse>;
+
+            /**
+             * Calls EvictTaskExecutionCache.
+             * @param request EvictTaskExecutionCacheRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and EvictCacheResponse
+             */
+            public evictTaskExecutionCache(request: flyteidl.service.IEvictTaskExecutionCacheRequest, callback: flyteidl.service.CacheService.EvictTaskExecutionCacheCallback): void;
+
+            /**
+             * Calls EvictTaskExecutionCache.
+             * @param request EvictTaskExecutionCacheRequest message or plain object
+             * @returns Promise
+             */
+            public evictTaskExecutionCache(request: flyteidl.service.IEvictTaskExecutionCacheRequest): Promise<flyteidl.service.EvictCacheResponse>;
+        }
+
+        namespace CacheService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.CacheService#evictExecutionCache}.
+             * @param error Error, if any
+             * @param [response] EvictCacheResponse
+             */
+            type EvictExecutionCacheCallback = (error: (Error|null), response?: flyteidl.service.EvictCacheResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.CacheService#evictTaskExecutionCache}.
+             * @param error Error, if any
+             * @param [response] EvictCacheResponse
+             */
+            type EvictTaskExecutionCacheCallback = (error: (Error|null), response?: flyteidl.service.EvictCacheResponse) => void;
         }
 
         /** Properties of a CreateUploadLocationResponse. */

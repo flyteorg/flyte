@@ -1,3 +1,6 @@
+| 🗑  As of Oct-23 we moved the development of this component to the [monorepo](https://github.com/flyteorg/flyte). 🗑  |
+| - |
+
 # Flyteidl
 
 This is one of the core repositories of Flyte. It contains the Specification of the Flyte Language using protobuf messages, the Backend API specification in gRPC, and Swagger REST. The repo contains the generated clients and protocol message structures in multiple languages. Along with the generated code, the repository also contains the Golang clients for Flyte's backend APIs (the services grouped under FlyteAdmin).

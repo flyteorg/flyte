@@ -47,7 +47,7 @@ func (x SinglePropertyFilter_ComparisonOperator) String() string {
 }
 
 func (SinglePropertyFilter_ComparisonOperator) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{30, 0}
+	return fileDescriptor_275951237ff4368a, []int{36, 0}
 }
 
 type PaginationOptions_SortOrder int32
@@ -72,7 +72,7 @@ func (x PaginationOptions_SortOrder) String() string {
 }
 
 func (PaginationOptions_SortOrder) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{36, 0}
+	return fileDescriptor_275951237ff4368a, []int{42, 0}
 }
 
 type PaginationOptions_SortKey int32
@@ -94,7 +94,7 @@ func (x PaginationOptions_SortKey) String() string {
 }
 
 func (PaginationOptions_SortKey) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{36, 1}
+	return fileDescriptor_275951237ff4368a, []int{42, 1}
 }
 
 //
@@ -901,6 +901,173 @@ func (m *UpdateArtifactResponse) GetArtifactId() string {
 }
 
 //
+// Request message for deleting an Artifact and its associated ArtifactData.
+type DeleteArtifactRequest struct {
+	// ID of dataset the artifact is associated with
+	Dataset *DatasetID `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	// Either ID of artifact or name of tag of existing artifact
+	//
+	// Types that are valid to be assigned to QueryHandle:
+	//	*DeleteArtifactRequest_ArtifactId
+	//	*DeleteArtifactRequest_TagName
+	QueryHandle          isDeleteArtifactRequest_QueryHandle `protobuf_oneof:"query_handle"`
+	XXX_NoUnkeyedLiteral struct{}                            `json:"-"`
+	XXX_unrecognized     []byte                              `json:"-"`
+	XXX_sizecache        int32                               `json:"-"`
+}
+
+func (m *DeleteArtifactRequest) Reset()         { *m = DeleteArtifactRequest{} }
+func (m *DeleteArtifactRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteArtifactRequest) ProtoMessage()    {}
+func (*DeleteArtifactRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{16}
+}
+
+func (m *DeleteArtifactRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteArtifactRequest.Unmarshal(m, b)
+}
+func (m *DeleteArtifactRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteArtifactRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteArtifactRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteArtifactRequest.Merge(m, src)
+}
+func (m *DeleteArtifactRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteArtifactRequest.Size(m)
+}
+func (m *DeleteArtifactRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteArtifactRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteArtifactRequest proto.InternalMessageInfo
+
+func (m *DeleteArtifactRequest) GetDataset() *DatasetID {
+	if m != nil {
+		return m.Dataset
+	}
+	return nil
+}
+
+type isDeleteArtifactRequest_QueryHandle interface {
+	isDeleteArtifactRequest_QueryHandle()
+}
+
+type DeleteArtifactRequest_ArtifactId struct {
+	ArtifactId string `protobuf:"bytes,2,opt,name=artifact_id,json=artifactId,proto3,oneof"`
+}
+
+type DeleteArtifactRequest_TagName struct {
+	TagName string `protobuf:"bytes,3,opt,name=tag_name,json=tagName,proto3,oneof"`
+}
+
+func (*DeleteArtifactRequest_ArtifactId) isDeleteArtifactRequest_QueryHandle() {}
+
+func (*DeleteArtifactRequest_TagName) isDeleteArtifactRequest_QueryHandle() {}
+
+func (m *DeleteArtifactRequest) GetQueryHandle() isDeleteArtifactRequest_QueryHandle {
+	if m != nil {
+		return m.QueryHandle
+	}
+	return nil
+}
+
+func (m *DeleteArtifactRequest) GetArtifactId() string {
+	if x, ok := m.GetQueryHandle().(*DeleteArtifactRequest_ArtifactId); ok {
+		return x.ArtifactId
+	}
+	return ""
+}
+
+func (m *DeleteArtifactRequest) GetTagName() string {
+	if x, ok := m.GetQueryHandle().(*DeleteArtifactRequest_TagName); ok {
+		return x.TagName
+	}
+	return ""
+}
+
+// XXX_OneofWrappers is for the internal use of the proto package.
+func (*DeleteArtifactRequest) XXX_OneofWrappers() []interface{} {
+	return []interface{}{
+		(*DeleteArtifactRequest_ArtifactId)(nil),
+		(*DeleteArtifactRequest_TagName)(nil),
+	}
+}
+
+// Request message for deleting multiple Artifacts and their associated ArtifactData.
+type DeleteArtifactsRequest struct {
+	// List of deletion requests for artifacts to remove
+	Artifacts            []*DeleteArtifactRequest `protobuf:"bytes,1,rep,name=artifacts,proto3" json:"artifacts,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
+	XXX_unrecognized     []byte                   `json:"-"`
+	XXX_sizecache        int32                    `json:"-"`
+}
+
+func (m *DeleteArtifactsRequest) Reset()         { *m = DeleteArtifactsRequest{} }
+func (m *DeleteArtifactsRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteArtifactsRequest) ProtoMessage()    {}
+func (*DeleteArtifactsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{17}
+}
+
+func (m *DeleteArtifactsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteArtifactsRequest.Unmarshal(m, b)
+}
+func (m *DeleteArtifactsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteArtifactsRequest.Marshal(b, m, deterministic)
+}
+func (m *DeleteArtifactsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteArtifactsRequest.Merge(m, src)
+}
+func (m *DeleteArtifactsRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteArtifactsRequest.Size(m)
+}
+func (m *DeleteArtifactsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteArtifactsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteArtifactsRequest proto.InternalMessageInfo
+
+func (m *DeleteArtifactsRequest) GetArtifacts() []*DeleteArtifactRequest {
+	if m != nil {
+		return m.Artifacts
+	}
+	return nil
+}
+
+//
+// Response message for deleting an Artifact.
+type DeleteArtifactResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteArtifactResponse) Reset()         { *m = DeleteArtifactResponse{} }
+func (m *DeleteArtifactResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteArtifactResponse) ProtoMessage()    {}
+func (*DeleteArtifactResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{18}
+}
+
+func (m *DeleteArtifactResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteArtifactResponse.Unmarshal(m, b)
+}
+func (m *DeleteArtifactResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteArtifactResponse.Marshal(b, m, deterministic)
+}
+func (m *DeleteArtifactResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteArtifactResponse.Merge(m, src)
+}
+func (m *DeleteArtifactResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteArtifactResponse.Size(m)
+}
+func (m *DeleteArtifactResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteArtifactResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteArtifactResponse proto.InternalMessageInfo
+
+//
 // ReservationID message that is composed of several string fields.
 type ReservationID struct {
 	// The unique ID for the reserved dataset
@@ -916,7 +1083,7 @@ func (m *ReservationID) Reset()         { *m = ReservationID{} }
 func (m *ReservationID) String() string { return proto.CompactTextString(m) }
 func (*ReservationID) ProtoMessage()    {}
 func (*ReservationID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{16}
+	return fileDescriptor_275951237ff4368a, []int{19}
 }
 
 func (m *ReservationID) XXX_Unmarshal(b []byte) error {
@@ -968,7 +1135,7 @@ func (m *GetOrExtendReservationRequest) Reset()         { *m = GetOrExtendReserv
 func (m *GetOrExtendReservationRequest) String() string { return proto.CompactTextString(m) }
 func (*GetOrExtendReservationRequest) ProtoMessage()    {}
 func (*GetOrExtendReservationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{17}
+	return fileDescriptor_275951237ff4368a, []int{20}
 }
 
 func (m *GetOrExtendReservationRequest) XXX_Unmarshal(b []byte) error {
@@ -1010,6 +1177,47 @@ func (m *GetOrExtendReservationRequest) GetHeartbeatInterval() *duration.Duratio
 	return nil
 }
 
+// Request message for acquiring or extending reservations for multiple artifacts in a single operation.
+type GetOrExtendReservationsRequest struct {
+	// List of reservation requests for artifacts to acquire
+	Reservations         []*GetOrExtendReservationRequest `protobuf:"bytes,1,rep,name=reservations,proto3" json:"reservations,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                         `json:"-"`
+	XXX_unrecognized     []byte                           `json:"-"`
+	XXX_sizecache        int32                            `json:"-"`
+}
+
+func (m *GetOrExtendReservationsRequest) Reset()         { *m = GetOrExtendReservationsRequest{} }
+func (m *GetOrExtendReservationsRequest) String() string { return proto.CompactTextString(m) }
+func (*GetOrExtendReservationsRequest) ProtoMessage()    {}
+func (*GetOrExtendReservationsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{21}
+}
+
+func (m *GetOrExtendReservationsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetOrExtendReservationsRequest.Unmarshal(m, b)
+}
+func (m *GetOrExtendReservationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetOrExtendReservationsRequest.Marshal(b, m, deterministic)
+}
+func (m *GetOrExtendReservationsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetOrExtendReservationsRequest.Merge(m, src)
+}
+func (m *GetOrExtendReservationsRequest) XXX_Size() int {
+	return xxx_messageInfo_GetOrExtendReservationsRequest.Size(m)
+}
+func (m *GetOrExtendReservationsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetOrExtendReservationsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetOrExtendReservationsRequest proto.InternalMessageInfo
+
+func (m *GetOrExtendReservationsRequest) GetReservations() []*GetOrExtendReservationRequest {
+	if m != nil {
+		return m.Reservations
+	}
+	return nil
+}
+
 // A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
 type Reservation struct {
 	// The unique ID for the reservation
@@ -1031,7 +1239,7 @@ func (m *Reservation) Reset()         { *m = Reservation{} }
 func (m *Reservation) String() string { return proto.CompactTextString(m) }
 func (*Reservation) ProtoMessage()    {}
 func (*Reservation) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{18}
+	return fileDescriptor_275951237ff4368a, []int{22}
 }
 
 func (m *Reservation) XXX_Unmarshal(b []byte) error {
@@ -1100,7 +1308,7 @@ func (m *GetOrExtendReservationResponse) Reset()         { *m = GetOrExtendReser
 func (m *GetOrExtendReservationResponse) String() string { return proto.CompactTextString(m) }
 func (*GetOrExtendReservationResponse) ProtoMessage()    {}
 func (*GetOrExtendReservationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{19}
+	return fileDescriptor_275951237ff4368a, []int{23}
 }
 
 func (m *GetOrExtendReservationResponse) XXX_Unmarshal(b []byte) error {
@@ -1128,6 +1336,47 @@ func (m *GetOrExtendReservationResponse) GetReservation() *Reservation {
 	return nil
 }
 
+// List of reservations acquired for multiple artifacts in a single operation.
+type GetOrExtendReservationsResponse struct {
+	// List of (newly created or existing) reservations for artifacts requested
+	Reservations         []*Reservation `protobuf:"bytes,1,rep,name=reservations,proto3" json:"reservations,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
+}
+
+func (m *GetOrExtendReservationsResponse) Reset()         { *m = GetOrExtendReservationsResponse{} }
+func (m *GetOrExtendReservationsResponse) String() string { return proto.CompactTextString(m) }
+func (*GetOrExtendReservationsResponse) ProtoMessage()    {}
+func (*GetOrExtendReservationsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{24}
+}
+
+func (m *GetOrExtendReservationsResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetOrExtendReservationsResponse.Unmarshal(m, b)
+}
+func (m *GetOrExtendReservationsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetOrExtendReservationsResponse.Marshal(b, m, deterministic)
+}
+func (m *GetOrExtendReservationsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetOrExtendReservationsResponse.Merge(m, src)
+}
+func (m *GetOrExtendReservationsResponse) XXX_Size() int {
+	return xxx_messageInfo_GetOrExtendReservationsResponse.Size(m)
+}
+func (m *GetOrExtendReservationsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetOrExtendReservationsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetOrExtendReservationsResponse proto.InternalMessageInfo
+
+func (m *GetOrExtendReservationsResponse) GetReservations() []*Reservation {
+	if m != nil {
+		return m.Reservations
+	}
+	return nil
+}
+
 // Request to release reservation
 type ReleaseReservationRequest struct {
 	// The unique ID for the reservation
@@ -1143,7 +1392,7 @@ func (m *ReleaseReservationRequest) Reset()         { *m = ReleaseReservationReq
 func (m *ReleaseReservationRequest) String() string { return proto.CompactTextString(m) }
 func (*ReleaseReservationRequest) ProtoMessage()    {}
 func (*ReleaseReservationRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{20}
+	return fileDescriptor_275951237ff4368a, []int{25}
 }
 
 func (m *ReleaseReservationRequest) XXX_Unmarshal(b []byte) error {
@@ -1178,6 +1427,47 @@ func (m *ReleaseReservationRequest) GetOwnerId() string {
 	return ""
 }
 
+// Request message for releasing reservations for multiple artifacts in a single operation.
+type ReleaseReservationsRequest struct {
+	// List of reservation requests for artifacts to release
+	Reservations         []*ReleaseReservationRequest `protobuf:"bytes,1,rep,name=reservations,proto3" json:"reservations,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                     `json:"-"`
+	XXX_unrecognized     []byte                       `json:"-"`
+	XXX_sizecache        int32                        `json:"-"`
+}
+
+func (m *ReleaseReservationsRequest) Reset()         { *m = ReleaseReservationsRequest{} }
+func (m *ReleaseReservationsRequest) String() string { return proto.CompactTextString(m) }
+func (*ReleaseReservationsRequest) ProtoMessage()    {}
+func (*ReleaseReservationsRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_275951237ff4368a, []int{26}
+}
+
+func (m *ReleaseReservationsRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ReleaseReservationsRequest.Unmarshal(m, b)
+}
+func (m *ReleaseReservationsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ReleaseReservationsRequest.Marshal(b, m, deterministic)
+}
+func (m *ReleaseReservationsRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ReleaseReservationsRequest.Merge(m, src)
+}
+func (m *ReleaseReservationsRequest) XXX_Size() int {
+	return xxx_messageInfo_ReleaseReservationsRequest.Size(m)
+}
+func (m *ReleaseReservationsRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ReleaseReservationsRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ReleaseReservationsRequest proto.InternalMessageInfo
+
+func (m *ReleaseReservationsRequest) GetReservations() []*ReleaseReservationRequest {
+	if m != nil {
+		return m.Reservations
+	}
+	return nil
+}
+
 // Response to release reservation
 type ReleaseReservationResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -1189,7 +1479,7 @@ func (m *ReleaseReservationResponse) Reset()         { *m = ReleaseReservationRe
 func (m *ReleaseReservationResponse) String() string { return proto.CompactTextString(m) }
 func (*ReleaseReservationResponse) ProtoMessage()    {}
 func (*ReleaseReservationResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{21}
+	return fileDescriptor_275951237ff4368a, []int{27}
 }
 
 func (m *ReleaseReservationResponse) XXX_Unmarshal(b []byte) error {
@@ -1225,7 +1515,7 @@ func (m *Dataset) Reset()         { *m = Dataset{} }
 func (m *Dataset) String() string { return proto.CompactTextString(m) }
 func (*Dataset) ProtoMessage()    {}
 func (*Dataset) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{22}
+	return fileDescriptor_275951237ff4368a, []int{28}
 }
 
 func (m *Dataset) XXX_Unmarshal(b []byte) error {
@@ -1281,7 +1571,7 @@ func (m *Partition) Reset()         { *m = Partition{} }
 func (m *Partition) String() string { return proto.CompactTextString(m) }
 func (*Partition) ProtoMessage()    {}
 func (*Partition) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{23}
+	return fileDescriptor_275951237ff4368a, []int{29}
 }
 
 func (m *Partition) XXX_Unmarshal(b []byte) error {
@@ -1333,7 +1623,7 @@ func (m *DatasetID) Reset()         { *m = DatasetID{} }
 func (m *DatasetID) String() string { return proto.CompactTextString(m) }
 func (*DatasetID) ProtoMessage()    {}
 func (*DatasetID) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{24}
+	return fileDescriptor_275951237ff4368a, []int{30}
 }
 
 func (m *DatasetID) XXX_Unmarshal(b []byte) error {
@@ -1408,7 +1698,7 @@ func (m *Artifact) Reset()         { *m = Artifact{} }
 func (m *Artifact) String() string { return proto.CompactTextString(m) }
 func (*Artifact) ProtoMessage()    {}
 func (*Artifact) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{25}
+	return fileDescriptor_275951237ff4368a, []int{31}
 }
 
 func (m *Artifact) XXX_Unmarshal(b []byte) error {
@@ -1492,7 +1782,7 @@ func (m *ArtifactData) Reset()         { *m = ArtifactData{} }
 func (m *ArtifactData) String() string { return proto.CompactTextString(m) }
 func (*ArtifactData) ProtoMessage()    {}
 func (*ArtifactData) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{26}
+	return fileDescriptor_275951237ff4368a, []int{32}
 }
 
 func (m *ArtifactData) XXX_Unmarshal(b []byte) error {
@@ -1543,7 +1833,7 @@ func (m *Tag) Reset()         { *m = Tag{} }
 func (m *Tag) String() string { return proto.CompactTextString(m) }
 func (*Tag) ProtoMessage()    {}
 func (*Tag) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{27}
+	return fileDescriptor_275951237ff4368a, []int{33}
 }
 
 func (m *Tag) XXX_Unmarshal(b []byte) error {
@@ -1598,7 +1888,7 @@ func (m *Metadata) Reset()         { *m = Metadata{} }
 func (m *Metadata) String() string { return proto.CompactTextString(m) }
 func (*Metadata) ProtoMessage()    {}
 func (*Metadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{28}
+	return fileDescriptor_275951237ff4368a, []int{34}
 }
 
 func (m *Metadata) XXX_Unmarshal(b []byte) error {
@@ -1638,7 +1928,7 @@ func (m *FilterExpression) Reset()         { *m = FilterExpression{} }
 func (m *FilterExpression) String() string { return proto.CompactTextString(m) }
 func (*FilterExpression) ProtoMessage()    {}
 func (*FilterExpression) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{29}
+	return fileDescriptor_275951237ff4368a, []int{35}
 }
 
 func (m *FilterExpression) XXX_Unmarshal(b []byte) error {
@@ -1684,7 +1974,7 @@ func (m *SinglePropertyFilter) Reset()         { *m = SinglePropertyFilter{} }
 func (m *SinglePropertyFilter) String() string { return proto.CompactTextString(m) }
 func (*SinglePropertyFilter) ProtoMessage()    {}
 func (*SinglePropertyFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{30}
+	return fileDescriptor_275951237ff4368a, []int{36}
 }
 
 func (m *SinglePropertyFilter) XXX_Unmarshal(b []byte) error {
@@ -1801,7 +2091,7 @@ func (m *ArtifactPropertyFilter) Reset()         { *m = ArtifactPropertyFilter{}
 func (m *ArtifactPropertyFilter) String() string { return proto.CompactTextString(m) }
 func (*ArtifactPropertyFilter) ProtoMessage()    {}
 func (*ArtifactPropertyFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{31}
+	return fileDescriptor_275951237ff4368a, []int{37}
 }
 
 func (m *ArtifactPropertyFilter) XXX_Unmarshal(b []byte) error {
@@ -1867,7 +2157,7 @@ func (m *TagPropertyFilter) Reset()         { *m = TagPropertyFilter{} }
 func (m *TagPropertyFilter) String() string { return proto.CompactTextString(m) }
 func (*TagPropertyFilter) ProtoMessage()    {}
 func (*TagPropertyFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{32}
+	return fileDescriptor_275951237ff4368a, []int{38}
 }
 
 func (m *TagPropertyFilter) XXX_Unmarshal(b []byte) error {
@@ -1933,7 +2223,7 @@ func (m *PartitionPropertyFilter) Reset()         { *m = PartitionPropertyFilter
 func (m *PartitionPropertyFilter) String() string { return proto.CompactTextString(m) }
 func (*PartitionPropertyFilter) ProtoMessage()    {}
 func (*PartitionPropertyFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{33}
+	return fileDescriptor_275951237ff4368a, []int{39}
 }
 
 func (m *PartitionPropertyFilter) XXX_Unmarshal(b []byte) error {
@@ -1997,7 +2287,7 @@ func (m *KeyValuePair) Reset()         { *m = KeyValuePair{} }
 func (m *KeyValuePair) String() string { return proto.CompactTextString(m) }
 func (*KeyValuePair) ProtoMessage()    {}
 func (*KeyValuePair) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{34}
+	return fileDescriptor_275951237ff4368a, []int{40}
 }
 
 func (m *KeyValuePair) XXX_Unmarshal(b []byte) error {
@@ -2049,7 +2339,7 @@ func (m *DatasetPropertyFilter) Reset()         { *m = DatasetPropertyFilter{} }
 func (m *DatasetPropertyFilter) String() string { return proto.CompactTextString(m) }
 func (*DatasetPropertyFilter) ProtoMessage()    {}
 func (*DatasetPropertyFilter) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{35}
+	return fileDescriptor_275951237ff4368a, []int{41}
 }
 
 func (m *DatasetPropertyFilter) XXX_Unmarshal(b []byte) error {
@@ -2162,7 +2452,7 @@ func (m *PaginationOptions) Reset()         { *m = PaginationOptions{} }
 func (m *PaginationOptions) String() string { return proto.CompactTextString(m) }
 func (*PaginationOptions) ProtoMessage()    {}
 func (*PaginationOptions) Descriptor() ([]byte, []int) {
-	return fileDescriptor_275951237ff4368a, []int{36}
+	return fileDescriptor_275951237ff4368a, []int{42}
 }
 
 func (m *PaginationOptions) XXX_Unmarshal(b []byte) error {
@@ -2231,11 +2521,17 @@ func init() {
 	proto.RegisterType((*ListDatasetsResponse)(nil), "datacatalog.ListDatasetsResponse")
 	proto.RegisterType((*UpdateArtifactRequest)(nil), "datacatalog.UpdateArtifactRequest")
 	proto.RegisterType((*UpdateArtifactResponse)(nil), "datacatalog.UpdateArtifactResponse")
+	proto.RegisterType((*DeleteArtifactRequest)(nil), "datacatalog.DeleteArtifactRequest")
+	proto.RegisterType((*DeleteArtifactsRequest)(nil), "datacatalog.DeleteArtifactsRequest")
+	proto.RegisterType((*DeleteArtifactResponse)(nil), "datacatalog.DeleteArtifactResponse")
 	proto.RegisterType((*ReservationID)(nil), "datacatalog.ReservationID")
 	proto.RegisterType((*GetOrExtendReservationRequest)(nil), "datacatalog.GetOrExtendReservationRequest")
+	proto.RegisterType((*GetOrExtendReservationsRequest)(nil), "datacatalog.GetOrExtendReservationsRequest")
 	proto.RegisterType((*Reservation)(nil), "datacatalog.Reservation")
 	proto.RegisterType((*GetOrExtendReservationResponse)(nil), "datacatalog.GetOrExtendReservationResponse")
+	proto.RegisterType((*GetOrExtendReservationsResponse)(nil), "datacatalog.GetOrExtendReservationsResponse")
 	proto.RegisterType((*ReleaseReservationRequest)(nil), "datacatalog.ReleaseReservationRequest")
+	proto.RegisterType((*ReleaseReservationsRequest)(nil), "datacatalog.ReleaseReservationsRequest")
 	proto.RegisterType((*ReleaseReservationResponse)(nil), "datacatalog.ReleaseReservationResponse")
 	proto.RegisterType((*Dataset)(nil), "datacatalog.Dataset")
 	proto.RegisterType((*Partition)(nil), "datacatalog.Partition")
@@ -2260,6 +2556,7 @@ func init() {
 }
 
 var fileDescriptor_275951237ff4368a = []byte{
+<<<<<<< HEAD
 	// 1675 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x58, 0x4b, 0x6f, 0xdb, 0xc6,
 	0x13, 0x37, 0x25, 0x47, 0x32, 0x47, 0x96, 0x22, 0x6f, 0x6c, 0x47, 0x56, 0x12, 0x5b, 0x61, 0x02,
@@ -2366,6 +2663,123 @@ var fileDescriptor_275951237ff4368a = []byte{
 	0x9d, 0x9a, 0x57, 0x87, 0x59, 0x8e, 0xee, 0xff, 0xd4, 0x82, 0xe7, 0x5d, 0x9d, 0x74, 0x6b, 0xf6,
 	0xd1, 0x43, 0xdd, 0xaa, 0x25, 0x3d, 0x13, 0x1f, 0x65, 0xbc, 0x92, 0x70, 0xe5, 0xdf, 0x00, 0x00,
 	0x00, 0xff, 0xff, 0x62, 0x68, 0x58, 0x86, 0x45, 0x16, 0x00, 0x00,
+=======
+	// 1812 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x59, 0xcd, 0x6f, 0xdb, 0xc8,
+	0x15, 0x37, 0x25, 0x47, 0x32, 0x9f, 0x2c, 0x59, 0x9e, 0xd8, 0x8a, 0xac, 0x4d, 0x6c, 0x85, 0x1b,
+	0xa4, 0xc6, 0x76, 0x57, 0xda, 0xda, 0xbb, 0x8b, 0x26, 0xbb, 0x6d, 0x57, 0xb6, 0x14, 0x5b, 0xeb,
+	0xf8, 0x63, 0xe9, 0x0f, 0x60, 0x93, 0x02, 0xc2, 0xd8, 0x1c, 0xd3, 0xac, 0x29, 0x91, 0x21, 0xc7,
+	0xa9, 0x75, 0x2a, 0x7a, 0x6d, 0x7b, 0x2b, 0x50, 0xa0, 0x87, 0x9e, 0xfa, 0x87, 0xf4, 0x98, 0x9e,
+	0xfa, 0x37, 0x15, 0x43, 0x0e, 0x29, 0x0e, 0x49, 0xd9, 0xb2, 0x0f, 0x41, 0x7b, 0x11, 0x38, 0x33,
+	0xef, 0xfd, 0xe6, 0xbd, 0xf7, 0x9b, 0x8f, 0x37, 0x4f, 0xf0, 0xfc, 0xdc, 0x1c, 0x52, 0x62, 0x68,
+	0x66, 0x53, 0xc3, 0x14, 0x9f, 0x61, 0x8a, 0x4d, 0x4b, 0x8f, 0x7e, 0x37, 0x6c, 0xc7, 0xa2, 0x16,
+	0x2a, 0x44, 0xba, 0x6a, 0x8f, 0x43, 0xa5, 0x33, 0xcb, 0x21, 0x4d, 0xd3, 0xa0, 0xc4, 0xc1, 0xa6,
+	0xeb, 0x8b, 0xd6, 0x96, 0x75, 0xcb, 0xd2, 0x4d, 0xd2, 0xf4, 0x5a, 0xa7, 0x57, 0xe7, 0x4d, 0xed,
+	0xca, 0xc1, 0xd4, 0xb0, 0x06, 0x7c, 0x7c, 0x25, 0x3e, 0x4e, 0x8d, 0x3e, 0x71, 0x29, 0xee, 0xdb,
+	0xbe, 0x80, 0xf2, 0x0a, 0x16, 0x36, 0x1d, 0x82, 0x29, 0x69, 0x63, 0x8a, 0x5d, 0x42, 0x55, 0xf2,
+	0xee, 0x8a, 0xb8, 0x14, 0x35, 0x20, 0xaf, 0xf9, 0x3d, 0x55, 0xa9, 0x2e, 0xad, 0x16, 0xd6, 0x16,
+	0x1a, 0x51, 0x43, 0x03, 0xe9, 0x40, 0x48, 0x79, 0x04, 0x8b, 0x31, 0x1c, 0xd7, 0xb6, 0x06, 0x2e,
+	0x51, 0x3a, 0x30, 0xbf, 0x45, 0x68, 0x0c, 0xfd, 0xcb, 0x38, 0x7a, 0x25, 0x0d, 0xbd, 0xdb, 0x1e,
+	0xe1, 0xb7, 0x01, 0x45, 0x61, 0x7c, 0xf0, 0x3b, 0x5b, 0xf9, 0x37, 0xc9, 0x83, 0x69, 0x39, 0xd4,
+	0x38, 0xc7, 0x67, 0xf7, 0x37, 0x07, 0x3d, 0x85, 0x02, 0xe6, 0x20, 0x3d, 0x43, 0xab, 0x66, 0xea,
+	0xd2, 0xaa, 0xbc, 0x3d, 0xa5, 0x42, 0xd0, 0xd9, 0xd5, 0xd0, 0x27, 0x30, 0x43, 0xb1, 0xde, 0x1b,
+	0xe0, 0x3e, 0xa9, 0x66, 0xf9, 0x78, 0x9e, 0x62, 0x7d, 0x0f, 0xf7, 0xc9, 0x46, 0x09, 0x66, 0xdf,
+	0x5d, 0x11, 0x67, 0xd8, 0xbb, 0xc0, 0x03, 0xcd, 0x24, 0xca, 0x36, 0x3c, 0x14, 0xec, 0xe2, 0xfe,
+	0xfd, 0x02, 0x66, 0x02, 0x44, 0x6e, 0xd9, 0xa2, 0x60, 0x59, 0xa8, 0x10, 0x8a, 0x29, 0x3f, 0x04,
+	0x44, 0xc4, 0x9d, 0xbc, 0x07, 0x56, 0x15, 0x2a, 0x71, 0x2c, 0xce, 0xea, 0x3a, 0x14, 0x5b, 0x9a,
+	0x76, 0x84, 0xf5, 0x00, 0x5d, 0x81, 0x2c, 0xc5, 0x3a, 0x07, 0x2e, 0x0b, 0xc0, 0x4c, 0x8a, 0x0d,
+	0x2a, 0x65, 0x28, 0x05, 0x4a, 0x1c, 0xe6, 0x5f, 0x12, 0x2c, 0xbc, 0x36, 0xdc, 0xd0, 0x71, 0xf7,
+	0xfe, 0x8c, 0x7c, 0x0d, 0xb9, 0x73, 0xc3, 0xa4, 0xc4, 0xf1, 0xc8, 0x28, 0xac, 0x3d, 0x11, 0x14,
+	0x5e, 0x79, 0x43, 0x9d, 0x6b, 0xdb, 0x21, 0xae, 0x6b, 0x58, 0x03, 0x95, 0x0b, 0xa3, 0x5f, 0x03,
+	0xd8, 0x58, 0x37, 0x06, 0xde, 0xa6, 0xf1, 0x78, 0x2a, 0xac, 0x2d, 0x0b, 0xaa, 0x07, 0xe1, 0xf0,
+	0xbe, 0xcd, 0x7e, 0x5d, 0x35, 0xa2, 0xa1, 0x5c, 0xc2, 0x62, 0xcc, 0x01, 0x4e, 0xdd, 0x3a, 0xc8,
+	0x41, 0x1c, 0xdd, 0xaa, 0x54, 0xcf, 0x8e, 0x8f, 0xf7, 0x48, 0x0e, 0x3d, 0x01, 0x18, 0x90, 0x6b,
+	0xda, 0xa3, 0xd6, 0x25, 0x19, 0xf8, 0xab, 0x4a, 0x95, 0x59, 0xcf, 0x11, 0xeb, 0x50, 0xfe, 0x22,
+	0xc1, 0x43, 0x36, 0x1b, 0x77, 0x3f, 0x8c, 0xd6, 0xc8, 0x77, 0xe9, 0xfe, 0xbe, 0x67, 0xee, 0xec,
+	0xbb, 0xee, 0x93, 0x37, 0xb2, 0x86, 0xbb, 0xfe, 0x25, 0xcc, 0x70, 0x56, 0x02, 0xcf, 0xd3, 0xb7,
+	0x65, 0x28, 0x75, 0x9b, 0xdf, 0xff, 0x96, 0x60, 0xf1, 0xd8, 0xd6, 0x52, 0x16, 0xf5, 0x47, 0xdf,
+	0xb9, 0xe8, 0x0b, 0x98, 0x66, 0x50, 0xd5, 0x69, 0xcf, 0xb1, 0xa5, 0x54, 0x4a, 0xd9, 0xb4, 0xaa,
+	0x27, 0x96, 0xd8, 0xe8, 0x2f, 0xa0, 0x12, 0xf7, 0x84, 0x47, 0x6d, 0x45, 0x34, 0x4c, 0xf2, 0x82,
+	0x10, 0x31, 0x4b, 0xf9, 0xbb, 0x04, 0x8b, 0x6d, 0x62, 0x92, 0xff, 0x81, 0x28, 0x24, 0xdc, 0x7a,
+	0x03, 0x15, 0xd1, 0xb4, 0x70, 0x6d, 0x7e, 0x9f, 0xdc, 0x07, 0x8a, 0x68, 0x5d, 0x9a, 0x4b, 0x91,
+	0x4d, 0xc1, 0x4e, 0xa1, 0xb8, 0x0c, 0x3f, 0x3e, 0x30, 0x14, 0x55, 0xe2, 0x12, 0xe7, 0xbd, 0xb7,
+	0x1e, 0xbb, 0x6d, 0xf4, 0x35, 0x00, 0xf7, 0x30, 0x08, 0xe1, 0xf8, 0x58, 0xc8, 0x5c, 0xb2, 0xab,
+	0xa1, 0xa5, 0x88, 0xab, 0xfe, 0xe2, 0x0b, 0x1c, 0x55, 0x3e, 0x48, 0xf0, 0x64, 0x8b, 0xd0, 0x7d,
+	0xa7, 0x73, 0x4d, 0xc9, 0x40, 0x8b, 0x4c, 0x17, 0x38, 0xd8, 0x82, 0x92, 0x33, 0xea, 0x1d, 0xcd,
+	0x5b, 0x13, 0xe6, 0x15, 0xec, 0x54, 0x8b, 0x11, 0x0d, 0x7f, 0x7e, 0xeb, 0xf7, 0x03, 0xe2, 0x84,
+	0x54, 0xa8, 0x79, 0xaf, 0xdd, 0xd5, 0xd0, 0x36, 0xa0, 0x0b, 0x82, 0x1d, 0x7a, 0x4a, 0x30, 0xed,
+	0x19, 0x03, 0xca, 0xb4, 0x4c, 0x7e, 0x4e, 0x2d, 0x35, 0xfc, 0xdb, 0xbd, 0x11, 0xdc, 0xee, 0x8d,
+	0x36, 0xbf, 0xfd, 0xd5, 0xf9, 0x50, 0xa9, 0xcb, 0x75, 0x14, 0x1b, 0x96, 0xd3, 0x1d, 0x09, 0xa9,
+	0xda, 0x83, 0xd9, 0x88, 0x5d, 0x01, 0x5b, 0x9f, 0x09, 0x7e, 0xdc, 0x18, 0x0b, 0x55, 0xd0, 0x57,
+	0xfe, 0x99, 0x81, 0x42, 0x44, 0xe8, 0xff, 0x25, 0x52, 0xe8, 0x05, 0x00, 0xb9, 0xb6, 0x0d, 0x87,
+	0xb8, 0x3d, 0x4c, 0xab, 0xd3, 0xdc, 0xc6, 0x38, 0xc2, 0x51, 0x90, 0x49, 0xa9, 0x32, 0x97, 0x6e,
+	0x79, 0x97, 0x6c, 0x9f, 0x50, 0xec, 0x9d, 0x10, 0xb9, 0x94, 0x4b, 0x76, 0x97, 0x0f, 0xaa, 0xa1,
+	0x98, 0xf2, 0xdb, 0x71, 0xbc, 0x84, 0x27, 0xc3, 0x4b, 0x28, 0x44, 0xa2, 0xc0, 0x83, 0x56, 0x1d,
+	0x17, 0x34, 0x35, 0x2a, 0xac, 0xf4, 0x60, 0x65, 0x2c, 0xeb, 0x1c, 0xfe, 0xbb, 0x54, 0xda, 0xc7,
+	0xe3, 0x8b, 0x24, 0x0f, 0x61, 0x49, 0x25, 0x26, 0xc1, 0x2e, 0xf9, 0xd8, 0x7b, 0x43, 0xb9, 0x80,
+	0x5a, 0x72, 0xea, 0x70, 0x35, 0xff, 0x90, 0xea, 0xd6, 0xf3, 0xd8, 0xcc, 0x63, 0x2c, 0x8f, 0x39,
+	0xf9, 0x38, 0x6d, 0xa6, 0xf0, 0x18, 0xfa, 0x93, 0x04, 0x79, 0x7e, 0xae, 0xa0, 0xe7, 0x90, 0xb9,
+	0xf5, 0xe4, 0xc9, 0x18, 0x9a, 0xb0, 0x50, 0x32, 0x13, 0x2d, 0x14, 0xf4, 0x0c, 0x8a, 0x36, 0x3b,
+	0x15, 0xd9, 0xdc, 0x3b, 0x64, 0xe8, 0x56, 0xb3, 0xf5, 0xec, 0xaa, 0xac, 0x8a, 0x9d, 0xca, 0x3a,
+	0xc8, 0x07, 0x41, 0x07, 0x2a, 0x43, 0xf6, 0x92, 0x0c, 0xf9, 0x5d, 0xc2, 0x3e, 0xd1, 0x02, 0x3c,
+	0x78, 0x8f, 0xcd, 0xab, 0xe0, 0x9c, 0xf3, 0x1b, 0xca, 0x1f, 0x40, 0x0e, 0xcd, 0x43, 0x55, 0xc8,
+	0xdb, 0x8e, 0xf5, 0x3b, 0xc2, 0xf3, 0x44, 0x59, 0x0d, 0x9a, 0x08, 0xc1, 0x74, 0xe4, 0x8c, 0xf4,
+	0xbe, 0x51, 0x05, 0x72, 0x9a, 0xd5, 0xc7, 0x86, 0x9f, 0x3c, 0xc9, 0x2a, 0x6f, 0x31, 0x94, 0xf7,
+	0xc4, 0x61, 0xf9, 0x86, 0xb7, 0x83, 0x64, 0x35, 0x68, 0x32, 0x94, 0xe3, 0xe3, 0x6e, 0xbb, 0xfa,
+	0xc0, 0x47, 0x61, 0xdf, 0xca, 0x87, 0x0c, 0xcc, 0x04, 0xc7, 0x3b, 0x2a, 0x85, 0x31, 0x94, 0xbd,
+	0x58, 0x45, 0xae, 0xb7, 0xcc, 0x64, 0xd7, 0x5b, 0x70, 0x49, 0x67, 0x27, 0xba, 0xa4, 0x05, 0x32,
+	0xa6, 0x27, 0x23, 0xe3, 0x1b, 0x96, 0x3b, 0xf1, 0x30, 0xbb, 0xd5, 0x07, 0xde, 0x3c, 0x95, 0x58,
+	0xee, 0xc4, 0x87, 0xd5, 0x88, 0x24, 0x7a, 0x06, 0xd3, 0x14, 0xeb, 0x6e, 0x35, 0xe7, 0x69, 0x24,
+	0x13, 0x65, 0x6f, 0x94, 0x9d, 0x40, 0x67, 0x5e, 0xe2, 0xad, 0xb1, 0x13, 0x28, 0x7f, 0xfb, 0x09,
+	0xc4, 0xa5, 0x5b, 0x54, 0x39, 0x80, 0xd9, 0xa8, 0x87, 0x21, 0x67, 0x52, 0x84, 0xb3, 0xcf, 0xa3,
+	0x8b, 0x80, 0xd9, 0x1d, 0xbc, 0x31, 0x1b, 0xec, 0x8d, 0xd9, 0x78, 0xed, 0xbf, 0x31, 0x83, 0xc5,
+	0x61, 0x42, 0xf6, 0x08, 0xeb, 0xa9, 0x40, 0x2b, 0x29, 0x69, 0x84, 0x90, 0x44, 0x44, 0xa8, 0xcb,
+	0x4e, 0xf6, 0xd0, 0xfb, 0xa3, 0x04, 0x33, 0x41, 0xbc, 0xd1, 0x4b, 0xc8, 0x5f, 0x92, 0x61, 0xaf,
+	0x8f, 0x6d, 0xbe, 0x7d, 0x9f, 0xa6, 0xf2, 0xd2, 0xd8, 0x21, 0xc3, 0x5d, 0x6c, 0x77, 0x06, 0xd4,
+	0x19, 0xaa, 0xb9, 0x4b, 0xaf, 0x51, 0x7b, 0x01, 0x85, 0x48, 0xf7, 0xa4, 0x5b, 0xe1, 0x65, 0xe6,
+	0x97, 0x92, 0xb2, 0x0f, 0xe5, 0x78, 0xd2, 0x8c, 0xbe, 0x85, 0xbc, 0x9f, 0x36, 0xbb, 0xa9, 0xa6,
+	0x1c, 0x1a, 0x03, 0xdd, 0x24, 0x07, 0x8e, 0x65, 0x13, 0x87, 0x0e, 0x7d, 0x6d, 0x35, 0xd0, 0x50,
+	0xfe, 0x93, 0x85, 0x85, 0x34, 0x09, 0xf4, 0x1b, 0x00, 0x96, 0x79, 0x08, 0xd9, 0xfb, 0x72, 0x7c,
+	0x51, 0x88, 0x3a, 0xdb, 0x53, 0xaa, 0x4c, 0xb1, 0xce, 0x01, 0x7e, 0x84, 0x72, 0xb8, 0xba, 0x7a,
+	0xc2, 0x03, 0xe8, 0x59, 0xfa, 0x6a, 0x4c, 0x80, 0xcd, 0x85, 0xfa, 0x1c, 0x72, 0x0f, 0xe6, 0x42,
+	0x52, 0x39, 0xa2, 0xcf, 0xdd, 0xa7, 0xa9, 0xfb, 0x28, 0x01, 0x58, 0x0a, 0xb4, 0x39, 0xde, 0x0e,
+	0x94, 0x82, 0xa4, 0x8c, 0xc3, 0xf9, 0x7b, 0x4c, 0x49, 0x5b, 0x0a, 0x09, 0xb4, 0x22, 0xd7, 0xe5,
+	0x60, 0x07, 0x30, 0xc3, 0x04, 0x30, 0xb5, 0x9c, 0x2a, 0xd4, 0xa5, 0xd5, 0xd2, 0xda, 0x57, 0xb7,
+	0xf2, 0xd0, 0xd8, 0xb4, 0xfa, 0x36, 0x76, 0x0c, 0x97, 0x3d, 0x63, 0x7c, 0x5d, 0x35, 0x44, 0x51,
+	0xea, 0x80, 0x92, 0xe3, 0x08, 0x20, 0xd7, 0xf9, 0xf1, 0xb8, 0xf5, 0xfa, 0xb0, 0x3c, 0xb5, 0x31,
+	0x0f, 0x73, 0x36, 0x07, 0xe4, 0x1e, 0x28, 0x5b, 0x50, 0x49, 0xf7, 0x3f, 0x9e, 0x59, 0x4b, 0xc9,
+	0xcc, 0x7a, 0x03, 0x60, 0x26, 0xc0, 0x53, 0xbe, 0x83, 0xf9, 0x04, 0xc3, 0x42, 0xea, 0x2d, 0xc5,
+	0x53, 0xef, 0xa8, 0xf6, 0x5b, 0x78, 0x34, 0x86, 0x58, 0xf4, 0x95, 0xbf, 0x75, 0x58, 0x0e, 0x24,
+	0xf1, 0x1c, 0x28, 0x1a, 0xa7, 0x1d, 0x32, 0x3c, 0x61, 0xeb, 0xfd, 0x00, 0x1b, 0x2c, 0xca, 0x6c,
+	0xd3, 0x9c, 0x60, 0x53, 0x00, 0xff, 0x06, 0x66, 0xa3, 0x52, 0x13, 0x5f, 0x26, 0x7f, 0x66, 0xef,
+	0x94, 0x34, 0x36, 0x51, 0x2d, 0x76, 0xb3, 0x30, 0xb7, 0x82, 0xbb, 0x65, 0x21, 0x7a, 0xb7, 0x6c,
+	0x4f, 0xf1, 0x03, 0xa6, 0x2a, 0xde, 0x2e, 0xcc, 0x52, 0x7e, 0xbf, 0xd4, 0x62, 0xf7, 0x0b, 0xc3,
+	0xe2, 0x1d, 0x82, 0x17, 0x7f, 0xcd, 0xc0, 0x7c, 0xe2, 0x19, 0xcb, 0x2c, 0x37, 0x8d, 0xbe, 0xe1,
+	0xdb, 0x51, 0x54, 0xfd, 0x06, 0xeb, 0x8d, 0xbe, 0x40, 0xfd, 0x06, 0xfa, 0x1e, 0xf2, 0xae, 0xe5,
+	0xd0, 0x1d, 0x32, 0xf4, 0x8c, 0x28, 0xc5, 0x72, 0x88, 0x04, 0x78, 0xe3, 0xd0, 0x97, 0x56, 0x03,
+	0x35, 0xf4, 0x0a, 0x64, 0xf6, 0xb9, 0xef, 0x68, 0x7c, 0xf1, 0x97, 0xd6, 0x56, 0x27, 0xc0, 0xf0,
+	0xe4, 0xd5, 0x91, 0xaa, 0xf2, 0x19, 0xc8, 0x61, 0x3f, 0x2a, 0x01, 0xb4, 0x3b, 0x87, 0x9b, 0x9d,
+	0xbd, 0x76, 0x77, 0x6f, 0xab, 0x3c, 0x85, 0x8a, 0x20, 0xb7, 0xc2, 0xa6, 0xa4, 0x3c, 0x86, 0x3c,
+	0xb7, 0x03, 0xcd, 0x43, 0x71, 0x53, 0xed, 0xb4, 0x8e, 0xba, 0xfb, 0x7b, 0xbd, 0xa3, 0xee, 0x6e,
+	0xa7, 0x3c, 0xb5, 0xf6, 0x0f, 0x80, 0x02, 0xe3, 0x68, 0xd3, 0x37, 0x00, 0x9d, 0x40, 0x51, 0x28,
+	0xdf, 0x21, 0xf1, 0x74, 0x4b, 0x2b, 0x11, 0xd6, 0x94, 0x9b, 0x44, 0x78, 0x6e, 0xb9, 0x0b, 0x30,
+	0x2a, 0xdb, 0xa1, 0xe5, 0xf8, 0x53, 0x22, 0x86, 0xb8, 0x32, 0x76, 0x9c, 0xc3, 0xfd, 0x04, 0x25,
+	0xb1, 0x20, 0x85, 0xd2, 0x8c, 0x88, 0xbd, 0x25, 0x6b, 0x9f, 0xde, 0x28, 0xc3, 0xa1, 0x0f, 0xa0,
+	0x10, 0xa9, 0xc0, 0xa1, 0x84, 0x29, 0x71, 0xd0, 0xfa, 0x78, 0x01, 0x8e, 0xd8, 0x82, 0x9c, 0x5f,
+	0xee, 0x42, 0x62, 0xba, 0x2b, 0x14, 0xce, 0x6a, 0x9f, 0xa4, 0x8e, 0x71, 0x88, 0x13, 0x28, 0x0a,
+	0xd5, 0xa5, 0x18, 0x2d, 0x69, 0xa5, 0xb3, 0x18, 0x2d, 0xe9, 0xc5, 0xa9, 0x43, 0x98, 0x8d, 0x56,
+	0x6e, 0x50, 0x3d, 0xa1, 0x13, 0x2b, 0x31, 0xd5, 0x9e, 0xde, 0x20, 0x31, 0x22, 0x47, 0x2c, 0x6d,
+	0xc4, 0xc8, 0x49, 0xad, 0xe0, 0xc4, 0xc8, 0x19, 0x53, 0x1b, 0xf9, 0x09, 0x4a, 0x62, 0x09, 0x00,
+	0x4d, 0x50, 0x43, 0x88, 0x41, 0xa7, 0xd7, 0x10, 0xd0, 0x5b, 0x98, 0x8b, 0x55, 0x2e, 0xd0, 0x4d,
+	0x7a, 0xee, 0x9d, 0xc0, 0xdf, 0x41, 0x25, 0xfd, 0xf5, 0x85, 0xee, 0xf0, 0xaa, 0xae, 0xfd, 0x7c,
+	0x22, 0x59, 0x3e, 0x25, 0x85, 0x47, 0x63, 0x1e, 0x7c, 0x68, 0x12, 0x9c, 0xd0, 0xbf, 0xcf, 0x27,
+	0x13, 0xe6, 0xb3, 0x12, 0x40, 0xc9, 0x07, 0x12, 0x9a, 0xf0, 0xb1, 0x55, 0xfb, 0xd9, 0xad, 0x72,
+	0x7c, 0x1a, 0x1d, 0x1e, 0xa6, 0xbc, 0xf8, 0xd0, 0x6d, 0xfa, 0xee, 0x5d, 0x27, 0xda, 0xf8, 0xd5,
+	0x9b, 0x6f, 0x75, 0x83, 0x5e, 0x5c, 0x9d, 0x36, 0xce, 0xac, 0x7e, 0xd3, 0x4b, 0x8f, 0x2d, 0x47,
+	0x6f, 0x86, 0xff, 0xc5, 0xe8, 0x64, 0xd0, 0xb4, 0x4f, 0xbf, 0xd0, 0xad, 0x66, 0xda, 0x7f, 0x3a,
+	0xa7, 0x39, 0x2f, 0x47, 0x5f, 0xff, 0x6f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x97, 0xce, 0xf9, 0x78,
+	0xf2, 0x19, 0x00, 0x00,
+>>>>>>> pvditt/flyteidl/datacatalog-delete-artifact
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -2398,6 +2812,14 @@ type DataCatalogClient interface {
 	ListDatasets(ctx context.Context, in *ListDatasetsRequest, opts ...grpc.CallOption) (*ListDatasetsResponse, error)
 	// Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
 	UpdateArtifact(ctx context.Context, in *UpdateArtifactRequest, opts ...grpc.CallOption) (*UpdateArtifactResponse, error)
+	// Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+	DeleteArtifact(ctx context.Context, in *DeleteArtifactRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error)
+	// Deletes multiple existing artifacts, removing the stored artifact data from the underlying blob storage.
+	// This endpoint is idempotent, trying to delete an unknown artifact or deleting existing artifact multiple times
+	// will not result in an error.
+	// The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+	// artifacts deleted, however the operation can simply be retried to remove the remaining entries.
+	DeleteArtifacts(ctx context.Context, in *DeleteArtifactsRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error)
 	// Attempts to get or extend a reservation for the corresponding artifact. If one already exists
 	// (ie. another entity owns the reservation) then that reservation is retrieved.
 	// Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -2410,9 +2832,21 @@ type DataCatalogClient interface {
 	// task B may take over the reservation, resulting in two tasks A and B running in parallel. So
 	// a third task C may get the Artifact from A or B, whichever writes last.
 	GetOrExtendReservation(ctx context.Context, in *GetOrExtendReservationRequest, opts ...grpc.CallOption) (*GetOrExtendReservationResponse, error)
+	// Attempts to get or extend reservations for multiple artifacts in a single operation.
+	// The first non-recoverable error encountered will be returned. Note that this might leave some artifacts in a
+	// reserved state if one acquisition fails - retry the operation or release all attempted artifacts (as the release
+	// endpoint is idempotent) to ensure no resources are locked accidentally in case of an error.
+	GetOrExtendReservations(ctx context.Context, in *GetOrExtendReservationsRequest, opts ...grpc.CallOption) (*GetOrExtendReservationsResponse, error)
 	// Release the reservation when the task holding the spot fails so that the other tasks
 	// can grab the spot.
 	ReleaseReservation(ctx context.Context, in *ReleaseReservationRequest, opts ...grpc.CallOption) (*ReleaseReservationResponse, error)
+	// Releases reservations for multiple artifacts in a single operation.
+	// This endpoint is idempotent, trying to release an unknown reservation or releasing existing reservations multiple
+	// times will not result in error.
+	// The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+	// artifacts in their previous reserved state, however the operation can simply be retried to remove the remaining
+	// reservations.
+	ReleaseReservations(ctx context.Context, in *ReleaseReservationsRequest, opts ...grpc.CallOption) (*ReleaseReservationResponse, error)
 }
 
 type dataCatalogClient struct {
@@ -2495,6 +2929,24 @@ func (c *dataCatalogClient) UpdateArtifact(ctx context.Context, in *UpdateArtifa
 	return out, nil
 }
 
+func (c *dataCatalogClient) DeleteArtifact(ctx context.Context, in *DeleteArtifactRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error) {
+	out := new(DeleteArtifactResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/DeleteArtifact", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataCatalogClient) DeleteArtifacts(ctx context.Context, in *DeleteArtifactsRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error) {
+	out := new(DeleteArtifactResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/DeleteArtifacts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dataCatalogClient) GetOrExtendReservation(ctx context.Context, in *GetOrExtendReservationRequest, opts ...grpc.CallOption) (*GetOrExtendReservationResponse, error) {
 	out := new(GetOrExtendReservationResponse)
 	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/GetOrExtendReservation", in, out, opts...)
@@ -2504,9 +2956,27 @@ func (c *dataCatalogClient) GetOrExtendReservation(ctx context.Context, in *GetO
 	return out, nil
 }
 
+func (c *dataCatalogClient) GetOrExtendReservations(ctx context.Context, in *GetOrExtendReservationsRequest, opts ...grpc.CallOption) (*GetOrExtendReservationsResponse, error) {
+	out := new(GetOrExtendReservationsResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/GetOrExtendReservations", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dataCatalogClient) ReleaseReservation(ctx context.Context, in *ReleaseReservationRequest, opts ...grpc.CallOption) (*ReleaseReservationResponse, error) {
 	out := new(ReleaseReservationResponse)
 	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/ReleaseReservation", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataCatalogClient) ReleaseReservations(ctx context.Context, in *ReleaseReservationsRequest, opts ...grpc.CallOption) (*ReleaseReservationResponse, error) {
+	out := new(ReleaseReservationResponse)
+	err := c.cc.Invoke(ctx, "/datacatalog.DataCatalog/ReleaseReservations", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -2533,6 +3003,14 @@ type DataCatalogServer interface {
 	ListDatasets(context.Context, *ListDatasetsRequest) (*ListDatasetsResponse, error)
 	// Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
 	UpdateArtifact(context.Context, *UpdateArtifactRequest) (*UpdateArtifactResponse, error)
+	// Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+	DeleteArtifact(context.Context, *DeleteArtifactRequest) (*DeleteArtifactResponse, error)
+	// Deletes multiple existing artifacts, removing the stored artifact data from the underlying blob storage.
+	// This endpoint is idempotent, trying to delete an unknown artifact or deleting existing artifact multiple times
+	// will not result in an error.
+	// The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+	// artifacts deleted, however the operation can simply be retried to remove the remaining entries.
+	DeleteArtifacts(context.Context, *DeleteArtifactsRequest) (*DeleteArtifactResponse, error)
 	// Attempts to get or extend a reservation for the corresponding artifact. If one already exists
 	// (ie. another entity owns the reservation) then that reservation is retrieved.
 	// Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -2545,9 +3023,21 @@ type DataCatalogServer interface {
 	// task B may take over the reservation, resulting in two tasks A and B running in parallel. So
 	// a third task C may get the Artifact from A or B, whichever writes last.
 	GetOrExtendReservation(context.Context, *GetOrExtendReservationRequest) (*GetOrExtendReservationResponse, error)
+	// Attempts to get or extend reservations for multiple artifacts in a single operation.
+	// The first non-recoverable error encountered will be returned. Note that this might leave some artifacts in a
+	// reserved state if one acquisition fails - retry the operation or release all attempted artifacts (as the release
+	// endpoint is idempotent) to ensure no resources are locked accidentally in case of an error.
+	GetOrExtendReservations(context.Context, *GetOrExtendReservationsRequest) (*GetOrExtendReservationsResponse, error)
 	// Release the reservation when the task holding the spot fails so that the other tasks
 	// can grab the spot.
 	ReleaseReservation(context.Context, *ReleaseReservationRequest) (*ReleaseReservationResponse, error)
+	// Releases reservations for multiple artifacts in a single operation.
+	// This endpoint is idempotent, trying to release an unknown reservation or releasing existing reservations multiple
+	// times will not result in error.
+	// The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+	// artifacts in their previous reserved state, however the operation can simply be retried to remove the remaining
+	// reservations.
+	ReleaseReservations(context.Context, *ReleaseReservationsRequest) (*ReleaseReservationResponse, error)
 }
 
 // UnimplementedDataCatalogServer can be embedded to have forward compatible implementations.
@@ -2578,11 +3068,23 @@ func (*UnimplementedDataCatalogServer) ListDatasets(ctx context.Context, req *Li
 func (*UnimplementedDataCatalogServer) UpdateArtifact(ctx context.Context, req *UpdateArtifactRequest) (*UpdateArtifactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateArtifact not implemented")
 }
+func (*UnimplementedDataCatalogServer) DeleteArtifact(ctx context.Context, req *DeleteArtifactRequest) (*DeleteArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteArtifact not implemented")
+}
+func (*UnimplementedDataCatalogServer) DeleteArtifacts(ctx context.Context, req *DeleteArtifactsRequest) (*DeleteArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteArtifacts not implemented")
+}
 func (*UnimplementedDataCatalogServer) GetOrExtendReservation(ctx context.Context, req *GetOrExtendReservationRequest) (*GetOrExtendReservationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrExtendReservation not implemented")
 }
+func (*UnimplementedDataCatalogServer) GetOrExtendReservations(ctx context.Context, req *GetOrExtendReservationsRequest) (*GetOrExtendReservationsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrExtendReservations not implemented")
+}
 func (*UnimplementedDataCatalogServer) ReleaseReservation(ctx context.Context, req *ReleaseReservationRequest) (*ReleaseReservationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ReleaseReservation not implemented")
+}
+func (*UnimplementedDataCatalogServer) ReleaseReservations(ctx context.Context, req *ReleaseReservationsRequest) (*ReleaseReservationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReleaseReservations not implemented")
 }
 
 func RegisterDataCatalogServer(s *grpc.Server, srv DataCatalogServer) {
@@ -2733,6 +3235,42 @@ func _DataCatalog_UpdateArtifact_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataCatalog_DeleteArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).DeleteArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/DeleteArtifact",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).DeleteArtifact(ctx, req.(*DeleteArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataCatalog_DeleteArtifacts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteArtifactsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).DeleteArtifacts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/DeleteArtifacts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).DeleteArtifacts(ctx, req.(*DeleteArtifactsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DataCatalog_GetOrExtendReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOrExtendReservationRequest)
 	if err := dec(in); err != nil {
@@ -2751,6 +3289,24 @@ func _DataCatalog_GetOrExtendReservation_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataCatalog_GetOrExtendReservations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrExtendReservationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).GetOrExtendReservations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/GetOrExtendReservations",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).GetOrExtendReservations(ctx, req.(*GetOrExtendReservationsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DataCatalog_ReleaseReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ReleaseReservationRequest)
 	if err := dec(in); err != nil {
@@ -2765,6 +3321,24 @@ func _DataCatalog_ReleaseReservation_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(DataCatalogServer).ReleaseReservation(ctx, req.(*ReleaseReservationRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataCatalog_ReleaseReservations_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReleaseReservationsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).ReleaseReservations(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/datacatalog.DataCatalog/ReleaseReservations",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).ReleaseReservations(ctx, req.(*ReleaseReservationsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2806,12 +3380,28 @@ var _DataCatalog_serviceDesc = grpc.ServiceDesc{
 			Handler:    _DataCatalog_UpdateArtifact_Handler,
 		},
 		{
+			MethodName: "DeleteArtifact",
+			Handler:    _DataCatalog_DeleteArtifact_Handler,
+		},
+		{
+			MethodName: "DeleteArtifacts",
+			Handler:    _DataCatalog_DeleteArtifacts_Handler,
+		},
+		{
 			MethodName: "GetOrExtendReservation",
 			Handler:    _DataCatalog_GetOrExtendReservation_Handler,
 		},
 		{
+			MethodName: "GetOrExtendReservations",
+			Handler:    _DataCatalog_GetOrExtendReservations_Handler,
+		},
+		{
 			MethodName: "ReleaseReservation",
 			Handler:    _DataCatalog_ReleaseReservation_Handler,
+		},
+		{
+			MethodName: "ReleaseReservations",
+			Handler:    _DataCatalog_ReleaseReservations_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

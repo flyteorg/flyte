@@ -75,6 +75,27 @@ pub struct PublicClientAuthConfigResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EvictExecutionCacheRequest {
+    /// Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for.
+    #[prost(message, optional, tag="1")]
+    pub workflow_execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EvictTaskExecutionCacheRequest {
+    /// Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for.
+    #[prost(message, optional, tag="1")]
+    pub task_execution_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EvictCacheResponse {
+    /// List of errors encountered during cache eviction (if any).
+    #[prost(message, optional, tag="1")]
+    pub errors: ::core::option::Option<super::core::CacheEvictionErrorList>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateUploadLocationResponse {
     /// SignedUrl specifies the url to use to upload content to (e.g. <https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...>)
     #[prost(string, tag="1")]
