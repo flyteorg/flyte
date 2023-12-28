@@ -1004,6 +1004,8 @@ func (m *SystemMetadata) Validate() error {
 
 	// no validation rules for ExecutionCluster
 
+	// no validation rules for Namespace
+
 	return nil
 }
 
@@ -1375,6 +1377,16 @@ func (m *ExecutionSpec) Validate() error {
 	}
 
 	// no validation rules for OverwriteCache
+
+	if v, ok := interface{}(m.GetEnvs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ExecutionSpecValidationError{
+				field:  "Envs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
 
 	switch m.NotificationOverrides.(type) {
 
@@ -2011,3 +2023,161 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExecutionUpdateResponseValidationError{}
+
+// Validate checks the field values on WorkflowExecutionGetMetricsRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *WorkflowExecutionGetMetricsRequest) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetId()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowExecutionGetMetricsRequestValidationError{
+				field:  "Id",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Depth
+
+	return nil
+}
+
+// WorkflowExecutionGetMetricsRequestValidationError is the validation error
+// returned by WorkflowExecutionGetMetricsRequest.Validate if the designated
+// constraints aren't met.
+type WorkflowExecutionGetMetricsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowExecutionGetMetricsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowExecutionGetMetricsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowExecutionGetMetricsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowExecutionGetMetricsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowExecutionGetMetricsRequestValidationError) ErrorName() string {
+	return "WorkflowExecutionGetMetricsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowExecutionGetMetricsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowExecutionGetMetricsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowExecutionGetMetricsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowExecutionGetMetricsRequestValidationError{}
+
+// Validate checks the field values on WorkflowExecutionGetMetricsResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *WorkflowExecutionGetMetricsResponse) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetSpan()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowExecutionGetMetricsResponseValidationError{
+				field:  "Span",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// WorkflowExecutionGetMetricsResponseValidationError is the validation error
+// returned by WorkflowExecutionGetMetricsResponse.Validate if the designated
+// constraints aren't met.
+type WorkflowExecutionGetMetricsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e WorkflowExecutionGetMetricsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e WorkflowExecutionGetMetricsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e WorkflowExecutionGetMetricsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e WorkflowExecutionGetMetricsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e WorkflowExecutionGetMetricsResponseValidationError) ErrorName() string {
+	return "WorkflowExecutionGetMetricsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e WorkflowExecutionGetMetricsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sWorkflowExecutionGetMetricsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = WorkflowExecutionGetMetricsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = WorkflowExecutionGetMetricsResponseValidationError{}

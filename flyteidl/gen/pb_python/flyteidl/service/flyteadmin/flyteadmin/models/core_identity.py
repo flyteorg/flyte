@@ -35,21 +35,24 @@ class CoreIdentity(object):
     swagger_types = {
         'iam_role': 'str',
         'k8s_service_account': 'str',
-        'oauth2_client': 'CoreOAuth2Client'
+        'oauth2_client': 'CoreOAuth2Client',
+        'execution_identity': 'str'
     }
 
     attribute_map = {
         'iam_role': 'iam_role',
         'k8s_service_account': 'k8s_service_account',
-        'oauth2_client': 'oauth2_client'
+        'oauth2_client': 'oauth2_client',
+        'execution_identity': 'execution_identity'
     }
 
-    def __init__(self, iam_role=None, k8s_service_account=None, oauth2_client=None):  # noqa: E501
+    def __init__(self, iam_role=None, k8s_service_account=None, oauth2_client=None, execution_identity=None):  # noqa: E501
         """CoreIdentity - a model defined in Swagger"""  # noqa: E501
 
         self._iam_role = None
         self._k8s_service_account = None
         self._oauth2_client = None
+        self._execution_identity = None
         self.discriminator = None
 
         if iam_role is not None:
@@ -58,6 +61,8 @@ class CoreIdentity(object):
             self.k8s_service_account = k8s_service_account
         if oauth2_client is not None:
             self.oauth2_client = oauth2_client
+        if execution_identity is not None:
+            self.execution_identity = execution_identity
 
     @property
     def iam_role(self):
@@ -127,6 +132,27 @@ class CoreIdentity(object):
         """
 
         self._oauth2_client = oauth2_client
+
+    @property
+    def execution_identity(self):
+        """Gets the execution_identity of this CoreIdentity.  # noqa: E501
+
+
+        :return: The execution_identity of this CoreIdentity.  # noqa: E501
+        :rtype: str
+        """
+        return self._execution_identity
+
+    @execution_identity.setter
+    def execution_identity(self, execution_identity):
+        """Sets the execution_identity of this CoreIdentity.
+
+
+        :param execution_identity: The execution_identity of this CoreIdentity.  # noqa: E501
+        :type: str
+        """
+
+        self._execution_identity = execution_identity
 
     def to_dict(self):
         """Returns the model properties as a dict"""

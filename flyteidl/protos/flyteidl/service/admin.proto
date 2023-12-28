@@ -626,4 +626,14 @@ service AdminService {
     //   description: "Fetch existing description entity definitions matching input filters."
     // };
   }
+
+  // Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
+  rpc GetExecutionMetrics (flyteidl.admin.WorkflowExecutionGetMetricsRequest) returns (flyteidl.admin.WorkflowExecutionGetMetricsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve metrics from an existing workflow execution."
+    // };
+  };
 }

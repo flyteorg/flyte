@@ -3508,6 +3508,28 @@ public final class Tasks {
     java.lang.String getTagsOrThrow(
         java.lang.String key);
 
+    /**
+     * <pre>
+     * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+     * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+     * identically as, the default PodTemplate configured in FlytePropeller.
+     * </pre>
+     *
+     * <code>string pod_template_name = 12;</code>
+     */
+    java.lang.String getPodTemplateName();
+    /**
+     * <pre>
+     * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+     * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+     * identically as, the default PodTemplate configured in FlytePropeller.
+     * </pre>
+     *
+     * <code>string pod_template_name = 12;</code>
+     */
+    com.google.protobuf.ByteString
+        getPodTemplateNameBytes();
+
     public flyteidl.core.Tasks.TaskMetadata.InterruptibleValueCase getInterruptibleValueCase();
   }
   /**
@@ -3529,6 +3551,7 @@ public final class Tasks {
     private TaskMetadata() {
       discoveryVersion_ = "";
       deprecatedErrorMessage_ = "";
+      podTemplateName_ = "";
     }
 
     @java.lang.Override
@@ -3637,6 +3660,12 @@ public final class Tasks {
                   TagsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
               tags_.getMutableMap().put(
                   tags__.getKey(), tags__.getValue());
+              break;
+            }
+            case 98: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              podTemplateName_ = s;
               break;
             }
             default: {
@@ -4047,6 +4076,52 @@ public final class Tasks {
       return map.get(key);
     }
 
+    public static final int POD_TEMPLATE_NAME_FIELD_NUMBER = 12;
+    private volatile java.lang.Object podTemplateName_;
+    /**
+     * <pre>
+     * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+     * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+     * identically as, the default PodTemplate configured in FlytePropeller.
+     * </pre>
+     *
+     * <code>string pod_template_name = 12;</code>
+     */
+    public java.lang.String getPodTemplateName() {
+      java.lang.Object ref = podTemplateName_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        podTemplateName_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+     * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+     * identically as, the default PodTemplate configured in FlytePropeller.
+     * </pre>
+     *
+     * <code>string pod_template_name = 12;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPodTemplateNameBytes() {
+      java.lang.Object ref = podTemplateName_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        podTemplateName_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4095,6 +4170,9 @@ public final class Tasks {
           internalGetTags(),
           TagsDefaultEntryHolder.defaultEntry,
           11);
+      if (!getPodTemplateNameBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 12, podTemplateName_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -4149,6 +4227,9 @@ public final class Tasks {
         size += com.google.protobuf.CodedOutputStream
             .computeMessageSize(11, tags__);
       }
+      if (!getPodTemplateNameBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(12, podTemplateName_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -4191,6 +4272,8 @@ public final class Tasks {
           != other.getGeneratesDeck()) return false;
       if (!internalGetTags().equals(
           other.internalGetTags())) return false;
+      if (!getPodTemplateName()
+          .equals(other.getPodTemplateName())) return false;
       if (!getInterruptibleValueCase().equals(other.getInterruptibleValueCase())) return false;
       switch (interruptibleValueCase_) {
         case 8:
@@ -4240,6 +4323,8 @@ public final class Tasks {
         hash = (37 * hash) + TAGS_FIELD_NUMBER;
         hash = (53 * hash) + internalGetTags().hashCode();
       }
+      hash = (37 * hash) + POD_TEMPLATE_NAME_FIELD_NUMBER;
+      hash = (53 * hash) + getPodTemplateName().hashCode();
       switch (interruptibleValueCase_) {
         case 8:
           hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
@@ -4437,6 +4522,8 @@ public final class Tasks {
         generatesDeck_ = false;
 
         internalGetMutableTags().clear();
+        podTemplateName_ = "";
+
         interruptibleValueCase_ = 0;
         interruptibleValue_ = null;
         return this;
@@ -4492,6 +4579,7 @@ public final class Tasks {
         result.generatesDeck_ = generatesDeck_;
         result.tags_ = internalGetTags();
         result.tags_.makeImmutable();
+        result.podTemplateName_ = podTemplateName_;
         result.bitField0_ = to_bitField0_;
         result.interruptibleValueCase_ = interruptibleValueCase_;
         onBuilt();
@@ -4570,6 +4658,10 @@ public final class Tasks {
         }
         internalGetMutableTags().mergeFrom(
             other.internalGetTags());
+        if (!other.getPodTemplateName().isEmpty()) {
+          podTemplateName_ = other.podTemplateName_;
+          onChanged();
+        }
         switch (other.getInterruptibleValueCase()) {
           case INTERRUPTIBLE: {
             setInterruptible(other.getInterruptible());
@@ -5558,6 +5650,105 @@ public final class Tasks {
           java.util.Map<java.lang.String, java.lang.String> values) {
         internalGetMutableTags().getMutableMap()
             .putAll(values);
+        return this;
+      }
+
+      private java.lang.Object podTemplateName_ = "";
+      /**
+       * <pre>
+       * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+       * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+       * identically as, the default PodTemplate configured in FlytePropeller.
+       * </pre>
+       *
+       * <code>string pod_template_name = 12;</code>
+       */
+      public java.lang.String getPodTemplateName() {
+        java.lang.Object ref = podTemplateName_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          podTemplateName_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+       * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+       * identically as, the default PodTemplate configured in FlytePropeller.
+       * </pre>
+       *
+       * <code>string pod_template_name = 12;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPodTemplateNameBytes() {
+        java.lang.Object ref = podTemplateName_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          podTemplateName_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+       * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+       * identically as, the default PodTemplate configured in FlytePropeller.
+       * </pre>
+       *
+       * <code>string pod_template_name = 12;</code>
+       */
+      public Builder setPodTemplateName(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        podTemplateName_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+       * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+       * identically as, the default PodTemplate configured in FlytePropeller.
+       * </pre>
+       *
+       * <code>string pod_template_name = 12;</code>
+       */
+      public Builder clearPodTemplateName() {
+        
+        podTemplateName_ = getDefaultInstance().getPodTemplateName();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+       * task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+       * identically as, the default PodTemplate configured in FlytePropeller.
+       * </pre>
+       *
+       * <code>string pod_template_name = 12;</code>
+       */
+      public Builder setPodTemplateNameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        podTemplateName_ = value;
+        onChanged();
         return this;
       }
       @java.lang.Override
@@ -15117,6 +15308,49 @@ public final class Tasks {
      * <code>.google.protobuf.Struct pod_spec = 2;</code>
      */
     com.google.protobuf.StructOrBuilder getPodSpecOrBuilder();
+
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    boolean hasDataConfig();
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    flyteidl.core.Tasks.DataLoadingConfig getDataConfig();
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder();
   }
   /**
    * <pre>
@@ -15183,6 +15417,19 @@ public final class Tasks {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(podSpec_);
                 podSpec_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 26: {
+              flyteidl.core.Tasks.DataLoadingConfig.Builder subBuilder = null;
+              if (dataConfig_ != null) {
+                subBuilder = dataConfig_.toBuilder();
+              }
+              dataConfig_ = input.readMessage(flyteidl.core.Tasks.DataLoadingConfig.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(dataConfig_);
+                dataConfig_ = subBuilder.buildPartial();
               }
 
               break;
@@ -15294,6 +15541,57 @@ public final class Tasks {
       return getPodSpec();
     }
 
+    public static final int DATA_CONFIG_FIELD_NUMBER = 3;
+    private flyteidl.core.Tasks.DataLoadingConfig dataConfig_;
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    public boolean hasDataConfig() {
+      return dataConfig_ != null;
+    }
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    public flyteidl.core.Tasks.DataLoadingConfig getDataConfig() {
+      return dataConfig_ == null ? flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+    }
+    /**
+     * <pre>
+     * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+     * This makes it possible to to run a completely portable container, that uses inputs and outputs
+     * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+     * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+     * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+     * to understand the default paths.
+     * Only K8s
+     * </pre>
+     *
+     * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+     */
+    public flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder() {
+      return getDataConfig();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -15314,6 +15612,9 @@ public final class Tasks {
       if (podSpec_ != null) {
         output.writeMessage(2, getPodSpec());
       }
+      if (dataConfig_ != null) {
+        output.writeMessage(3, getDataConfig());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -15330,6 +15631,10 @@ public final class Tasks {
       if (podSpec_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getPodSpec());
+      }
+      if (dataConfig_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getDataConfig());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -15356,6 +15661,11 @@ public final class Tasks {
         if (!getPodSpec()
             .equals(other.getPodSpec())) return false;
       }
+      if (hasDataConfig() != other.hasDataConfig()) return false;
+      if (hasDataConfig()) {
+        if (!getDataConfig()
+            .equals(other.getDataConfig())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -15374,6 +15684,10 @@ public final class Tasks {
       if (hasPodSpec()) {
         hash = (37 * hash) + POD_SPEC_FIELD_NUMBER;
         hash = (53 * hash) + getPodSpec().hashCode();
+      }
+      if (hasDataConfig()) {
+        hash = (37 * hash) + DATA_CONFIG_FIELD_NUMBER;
+        hash = (53 * hash) + getDataConfig().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -15524,6 +15838,12 @@ public final class Tasks {
           podSpec_ = null;
           podSpecBuilder_ = null;
         }
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = null;
+        } else {
+          dataConfig_ = null;
+          dataConfigBuilder_ = null;
+        }
         return this;
       }
 
@@ -15559,6 +15879,11 @@ public final class Tasks {
           result.podSpec_ = podSpec_;
         } else {
           result.podSpec_ = podSpecBuilder_.build();
+        }
+        if (dataConfigBuilder_ == null) {
+          result.dataConfig_ = dataConfig_;
+        } else {
+          result.dataConfig_ = dataConfigBuilder_.build();
         }
         onBuilt();
         return result;
@@ -15613,6 +15938,9 @@ public final class Tasks {
         }
         if (other.hasPodSpec()) {
           mergePodSpec(other.getPodSpec());
+        }
+        if (other.hasDataConfig()) {
+          mergeDataConfig(other.getDataConfig());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -15974,6 +16302,213 @@ public final class Tasks {
           podSpec_ = null;
         }
         return podSpecBuilder_;
+      }
+
+      private flyteidl.core.Tasks.DataLoadingConfig dataConfig_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder> dataConfigBuilder_;
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public boolean hasDataConfig() {
+        return dataConfigBuilder_ != null || dataConfig_ != null;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfig getDataConfig() {
+        if (dataConfigBuilder_ == null) {
+          return dataConfig_ == null ? flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+        } else {
+          return dataConfigBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder setDataConfig(flyteidl.core.Tasks.DataLoadingConfig value) {
+        if (dataConfigBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          dataConfig_ = value;
+          onChanged();
+        } else {
+          dataConfigBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder setDataConfig(
+          flyteidl.core.Tasks.DataLoadingConfig.Builder builderForValue) {
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = builderForValue.build();
+          onChanged();
+        } else {
+          dataConfigBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder mergeDataConfig(flyteidl.core.Tasks.DataLoadingConfig value) {
+        if (dataConfigBuilder_ == null) {
+          if (dataConfig_ != null) {
+            dataConfig_ =
+              flyteidl.core.Tasks.DataLoadingConfig.newBuilder(dataConfig_).mergeFrom(value).buildPartial();
+          } else {
+            dataConfig_ = value;
+          }
+          onChanged();
+        } else {
+          dataConfigBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public Builder clearDataConfig() {
+        if (dataConfigBuilder_ == null) {
+          dataConfig_ = null;
+          onChanged();
+        } else {
+          dataConfig_ = null;
+          dataConfigBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfig.Builder getDataConfigBuilder() {
+        
+        onChanged();
+        return getDataConfigFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      public flyteidl.core.Tasks.DataLoadingConfigOrBuilder getDataConfigOrBuilder() {
+        if (dataConfigBuilder_ != null) {
+          return dataConfigBuilder_.getMessageOrBuilder();
+        } else {
+          return dataConfig_ == null ?
+              flyteidl.core.Tasks.DataLoadingConfig.getDefaultInstance() : dataConfig_;
+        }
+      }
+      /**
+       * <pre>
+       * BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+       * This makes it possible to to run a completely portable container, that uses inputs and outputs
+       * only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+       * If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+       * are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+       * to understand the default paths.
+       * Only K8s
+       * </pre>
+       *
+       * <code>.flyteidl.core.DataLoadingConfig data_config = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder> 
+          getDataConfigFieldBuilder() {
+        if (dataConfigBuilder_ == null) {
+          dataConfigBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.DataLoadingConfig, flyteidl.core.Tasks.DataLoadingConfig.Builder, flyteidl.core.Tasks.DataLoadingConfigOrBuilder>(
+                  getDataConfig(),
+                  getParentForChildren(),
+                  isClean());
+          dataConfig_ = null;
+        }
+        return dataConfigBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -18151,7 +18686,7 @@ public final class Tasks {
       "ype\030\001 \001(\0162*.flyteidl.core.RuntimeMetadat" +
       "a.RuntimeType\022\017\n\007version\030\002 \001(\t\022\016\n\006flavor" +
       "\030\003 \001(\t\"\'\n\013RuntimeType\022\t\n\005OTHER\020\000\022\r\n\tFLYT" +
-      "E_SDK\020\001\"\263\003\n\014TaskMetadata\022\024\n\014discoverable" +
+      "E_SDK\020\001\"\316\003\n\014TaskMetadata\022\024\n\014discoverable" +
       "\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyteidl.core." +
       "RuntimeMetadata\022*\n\007timeout\030\004 \001(\0132\031.googl" +
       "e.protobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.f" +
@@ -18160,61 +18695,63 @@ public final class Tasks {
       "e\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000\022\032\n\022cach" +
       "e_serializable\030\t \001(\010\022\026\n\016generates_deck\030\n" +
       " \001(\010\0223\n\004tags\030\013 \003(\0132%.flyteidl.core.TaskM" +
-      "etadata.TagsEntry\032+\n\tTagsEntry\022\013\n\003key\030\001 " +
-      "\001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\025\n\023interruptible_" +
-      "value\"\220\004\n\014TaskTemplate\022%\n\002id\030\001 \001(\0132\031.fly" +
-      "teidl.core.Identifier\022\014\n\004type\030\002 \001(\t\022-\n\010m" +
-      "etadata\030\003 \001(\0132\033.flyteidl.core.TaskMetada" +
-      "ta\0220\n\tinterface\030\004 \001(\0132\035.flyteidl.core.Ty" +
-      "pedInterface\022\'\n\006custom\030\005 \001(\0132\027.google.pr" +
-      "otobuf.Struct\022-\n\tcontainer\030\006 \001(\0132\030.flyte" +
-      "idl.core.ContainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025." +
-      "flyteidl.core.K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.fl" +
-      "yteidl.core.SqlH\000\022\031\n\021task_type_version\030\007" +
-      " \001(\005\0228\n\020security_context\030\010 \001(\0132\036.flyteid" +
-      "l.core.SecurityContext\0227\n\006config\030\020 \003(\0132\'" +
-      ".flyteidl.core.TaskTemplate.ConfigEntry\032" +
-      "-\n\013ConfigEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
-      "(\t:\0028\001B\010\n\006target\"\'\n\rContainerPort\022\026\n\016con" +
-      "tainer_port\030\001 \001(\r\"\255\003\n\tContainer\022\r\n\005image" +
-      "\030\001 \001(\t\022\017\n\007command\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n" +
-      "\tresources\030\004 \001(\0132\030.flyteidl.core.Resourc" +
-      "es\022(\n\003env\030\005 \003(\0132\033.flyteidl.core.KeyValue" +
-      "Pair\022/\n\006config\030\006 \003(\0132\033.flyteidl.core.Key" +
-      "ValuePairB\002\030\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl." +
-      "core.ContainerPort\0225\n\013data_config\030\t \001(\0132" +
-      " .flyteidl.core.DataLoadingConfig\022;\n\014arc" +
-      "hitecture\030\n \001(\0162%.flyteidl.core.Containe" +
-      "r.Architecture\"I\n\014Architecture\022\013\n\007UNKNOW" +
-      "N\020\000\022\t\n\005AMD64\020\001\022\t\n\005ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n" +
-      "\006ARM_V7\020\004\"\233\002\n\nIOStrategy\022=\n\rdownload_mod" +
-      "e\030\001 \001(\0162&.flyteidl.core.IOStrategy.Downl" +
-      "oadMode\0229\n\013upload_mode\030\002 \001(\0162$.flyteidl." +
-      "core.IOStrategy.UploadMode\"L\n\014DownloadMo" +
-      "de\022\022\n\016DOWNLOAD_EAGER\020\000\022\023\n\017DOWNLOAD_STREA" +
-      "M\020\001\022\023\n\017DO_NOT_DOWNLOAD\020\002\"E\n\nUploadMode\022\022" +
-      "\n\016UPLOAD_ON_EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\r" +
-      "DO_NOT_UPLOAD\020\002\"\363\001\n\021DataLoadingConfig\022\017\n" +
-      "\007enabled\030\001 \001(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013ou" +
-      "tput_path\030\003 \001(\t\022A\n\006format\030\004 \001(\01621.flytei" +
-      "dl.core.DataLoadingConfig.LiteralMapForm" +
-      "at\022.\n\013io_strategy\030\005 \001(\0132\031.flyteidl.core." +
-      "IOStrategy\"1\n\020LiteralMapFormat\022\010\n\004JSON\020\000" +
-      "\022\010\n\004YAML\020\001\022\t\n\005PROTO\020\002\"g\n\006K8sPod\0222\n\010metad" +
-      "ata\030\001 \001(\0132 .flyteidl.core.K8sObjectMetad" +
-      "ata\022)\n\010pod_spec\030\002 \001(\0132\027.google.protobuf." +
-      "Struct\"\374\001\n\021K8sObjectMetadata\022<\n\006labels\030\001" +
-      " \003(\0132,.flyteidl.core.K8sObjectMetadata.L" +
-      "abelsEntry\022F\n\013annotations\030\002 \003(\01321.flytei" +
-      "dl.core.K8sObjectMetadata.AnnotationsEnt" +
-      "ry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
-      "\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001" +
-      "(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstatemen" +
-      "t\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.core" +
-      ".Sql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020\000\022\010" +
-      "\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4github." +
-      "com/flyteorg/flyteidl/gen/pb-go/flyteidl" +
-      "/coreb\006proto3"
+      "etadata.TagsEntry\022\031\n\021pod_template_name\030\014" +
+      " \001(\t\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
+      "\002 \001(\t:\0028\001B\025\n\023interruptible_value\"\220\004\n\014Tas" +
+      "kTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Id" +
+      "entifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001(\013" +
+      "2\033.flyteidl.core.TaskMetadata\0220\n\tinterfa" +
+      "ce\030\004 \001(\0132\035.flyteidl.core.TypedInterface\022" +
+      "\'\n\006custom\030\005 \001(\0132\027.google.protobuf.Struct" +
+      "\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core.Cont" +
+      "ainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.flyteidl.core" +
+      ".K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.flyteidl.core.S" +
+      "qlH\000\022\031\n\021task_type_version\030\007 \001(\005\0228\n\020secur" +
+      "ity_context\030\010 \001(\0132\036.flyteidl.core.Securi" +
+      "tyContext\0227\n\006config\030\020 \003(\0132\'.flyteidl.cor" +
+      "e.TaskTemplate.ConfigEntry\032-\n\013ConfigEntr" +
+      "y\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006tar" +
+      "get\"\'\n\rContainerPort\022\026\n\016container_port\030\001" +
+      " \001(\r\"\255\003\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007com" +
+      "mand\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources\030\004 " +
+      "\001(\0132\030.flyteidl.core.Resources\022(\n\003env\030\005 \003" +
+      "(\0132\033.flyteidl.core.KeyValuePair\022/\n\006confi" +
+      "g\030\006 \003(\0132\033.flyteidl.core.KeyValuePairB\002\030\001" +
+      "\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.Containe" +
+      "rPort\0225\n\013data_config\030\t \001(\0132 .flyteidl.co" +
+      "re.DataLoadingConfig\022;\n\014architecture\030\n \001" +
+      "(\0162%.flyteidl.core.Container.Architectur" +
+      "e\"I\n\014Architecture\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64\020" +
+      "\001\022\t\n\005ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002\n" +
+      "\nIOStrategy\022=\n\rdownload_mode\030\001 \001(\0162&.fly" +
+      "teidl.core.IOStrategy.DownloadMode\0229\n\013up" +
+      "load_mode\030\002 \001(\0162$.flyteidl.core.IOStrate" +
+      "gy.UploadMode\"L\n\014DownloadMode\022\022\n\016DOWNLOA" +
+      "D_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT" +
+      "_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_E" +
+      "XIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD" +
+      "\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enabled\030\001 \001(" +
+      "\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001" +
+      "(\t\022A\n\006format\030\004 \001(\01621.flyteidl.core.DataL" +
+      "oadingConfig.LiteralMapFormat\022.\n\013io_stra" +
+      "tegy\030\005 \001(\0132\031.flyteidl.core.IOStrategy\"1\n" +
+      "\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n" +
+      "\005PROTO\020\002\"\236\001\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 ." +
+      "flyteidl.core.K8sObjectMetadata\022)\n\010pod_s" +
+      "pec\030\002 \001(\0132\027.google.protobuf.Struct\0225\n\013da" +
+      "ta_config\030\003 \001(\0132 .flyteidl.core.DataLoad" +
+      "ingConfig\"\374\001\n\021K8sObjectMetadata\022<\n\006label" +
+      "s\030\001 \003(\0132,.flyteidl.core.K8sObjectMetadat" +
+      "a.LabelsEntry\022F\n\013annotations\030\002 \003(\01321.fly" +
+      "teidl.core.K8sObjectMetadata.Annotations" +
+      "Entry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val" +
+      "ue\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030" +
+      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstate" +
+      "ment\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.c" +
+      "ore.Sql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020" +
+      "\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4gith" +
+      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
+      "idl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18257,7 +18794,7 @@ public final class Tasks {
     internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskMetadata_descriptor,
-        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "CacheSerializable", "GeneratesDeck", "Tags", "InterruptibleValue", });
+        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "CacheSerializable", "GeneratesDeck", "Tags", "PodTemplateName", "InterruptibleValue", });
     internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor =
       internal_static_flyteidl_core_TaskMetadata_descriptor.getNestedTypes().get(0);
     internal_static_flyteidl_core_TaskMetadata_TagsEntry_fieldAccessorTable = new
@@ -18305,7 +18842,7 @@ public final class Tasks {
     internal_static_flyteidl_core_K8sPod_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_K8sPod_descriptor,
-        new java.lang.String[] { "Metadata", "PodSpec", });
+        new java.lang.String[] { "Metadata", "PodSpec", "DataConfig", });
     internal_static_flyteidl_core_K8sObjectMetadata_descriptor =
       getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable = new

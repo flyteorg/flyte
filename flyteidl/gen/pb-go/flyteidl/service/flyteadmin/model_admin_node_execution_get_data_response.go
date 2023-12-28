@@ -21,4 +21,5 @@ type AdminNodeExecutionGetDataResponse struct {
 	FullOutputs *CoreLiteralMap `json:"full_outputs,omitempty"`
 	// Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
 	DynamicWorkflow *FlyteidladminDynamicWorkflowNodeMetadata `json:"dynamic_workflow,omitempty"`
+	FlyteUrls *AdminFlyteUrLs `json:"flyte_urls,omitempty"`
 }

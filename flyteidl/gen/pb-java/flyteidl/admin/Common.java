@@ -19369,6 +19369,911 @@ public final class Common {
 
   }
 
+  public interface EnvsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.Envs)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    java.util.List<flyteidl.core.Literals.KeyValuePair> 
+        getValuesList();
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    flyteidl.core.Literals.KeyValuePair getValues(int index);
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    int getValuesCount();
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
+        getValuesOrBuilderList();
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    flyteidl.core.Literals.KeyValuePairOrBuilder getValuesOrBuilder(
+        int index);
+  }
+  /**
+   * <pre>
+   * Environment variable values to be applied to an execution resource.
+   * In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+   * to specify how to merge environment variables defined at registration and execution time.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.Envs}
+   */
+  public  static final class Envs extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.Envs)
+      EnvsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Envs.newBuilder() to construct.
+    private Envs(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Envs() {
+      values_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Envs(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                values_ = new java.util.ArrayList<flyteidl.core.Literals.KeyValuePair>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              values_.add(
+                  input.readMessage(flyteidl.core.Literals.KeyValuePair.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          values_ = java.util.Collections.unmodifiableList(values_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_Envs_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_Envs_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.Common.Envs.class, flyteidl.admin.Common.Envs.Builder.class);
+    }
+
+    public static final int VALUES_FIELD_NUMBER = 1;
+    private java.util.List<flyteidl.core.Literals.KeyValuePair> values_;
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    public java.util.List<flyteidl.core.Literals.KeyValuePair> getValuesList() {
+      return values_;
+    }
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    public java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
+        getValuesOrBuilderList() {
+      return values_;
+    }
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    public int getValuesCount() {
+      return values_.size();
+    }
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    public flyteidl.core.Literals.KeyValuePair getValues(int index) {
+      return values_.get(index);
+    }
+    /**
+     * <pre>
+     * Map of custom environment variables to be applied to the execution resource.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+     */
+    public flyteidl.core.Literals.KeyValuePairOrBuilder getValuesOrBuilder(
+        int index) {
+      return values_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < values_.size(); i++) {
+        output.writeMessage(1, values_.get(i));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < values_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, values_.get(i));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.Common.Envs)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.Common.Envs other = (flyteidl.admin.Common.Envs) obj;
+
+      if (!getValuesList()
+          .equals(other.getValuesList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getValuesCount() > 0) {
+        hash = (37 * hash) + VALUES_FIELD_NUMBER;
+        hash = (53 * hash) + getValuesList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.Common.Envs parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.Envs parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.Envs parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.Envs parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.Common.Envs prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Environment variable values to be applied to an execution resource.
+     * In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+     * to specify how to merge environment variables defined at registration and execution time.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.Envs}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.Envs)
+        flyteidl.admin.Common.EnvsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_Envs_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_Envs_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.Common.Envs.class, flyteidl.admin.Common.Envs.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.Common.Envs.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getValuesFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (valuesBuilder_ == null) {
+          values_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          valuesBuilder_.clear();
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_Envs_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.Envs getDefaultInstanceForType() {
+        return flyteidl.admin.Common.Envs.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.Envs build() {
+        flyteidl.admin.Common.Envs result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.Envs buildPartial() {
+        flyteidl.admin.Common.Envs result = new flyteidl.admin.Common.Envs(this);
+        int from_bitField0_ = bitField0_;
+        if (valuesBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            values_ = java.util.Collections.unmodifiableList(values_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.values_ = values_;
+        } else {
+          result.values_ = valuesBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.Common.Envs) {
+          return mergeFrom((flyteidl.admin.Common.Envs)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.Common.Envs other) {
+        if (other == flyteidl.admin.Common.Envs.getDefaultInstance()) return this;
+        if (valuesBuilder_ == null) {
+          if (!other.values_.isEmpty()) {
+            if (values_.isEmpty()) {
+              values_ = other.values_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureValuesIsMutable();
+              values_.addAll(other.values_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.values_.isEmpty()) {
+            if (valuesBuilder_.isEmpty()) {
+              valuesBuilder_.dispose();
+              valuesBuilder_ = null;
+              values_ = other.values_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              valuesBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getValuesFieldBuilder() : null;
+            } else {
+              valuesBuilder_.addAllMessages(other.values_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.Common.Envs parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.Common.Envs) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<flyteidl.core.Literals.KeyValuePair> values_ =
+        java.util.Collections.emptyList();
+      private void ensureValuesIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          values_ = new java.util.ArrayList<flyteidl.core.Literals.KeyValuePair>(values_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Literals.KeyValuePair, flyteidl.core.Literals.KeyValuePair.Builder, flyteidl.core.Literals.KeyValuePairOrBuilder> valuesBuilder_;
+
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public java.util.List<flyteidl.core.Literals.KeyValuePair> getValuesList() {
+        if (valuesBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(values_);
+        } else {
+          return valuesBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public int getValuesCount() {
+        if (valuesBuilder_ == null) {
+          return values_.size();
+        } else {
+          return valuesBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public flyteidl.core.Literals.KeyValuePair getValues(int index) {
+        if (valuesBuilder_ == null) {
+          return values_.get(index);
+        } else {
+          return valuesBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder setValues(
+          int index, flyteidl.core.Literals.KeyValuePair value) {
+        if (valuesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureValuesIsMutable();
+          values_.set(index, value);
+          onChanged();
+        } else {
+          valuesBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder setValues(
+          int index, flyteidl.core.Literals.KeyValuePair.Builder builderForValue) {
+        if (valuesBuilder_ == null) {
+          ensureValuesIsMutable();
+          values_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          valuesBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder addValues(flyteidl.core.Literals.KeyValuePair value) {
+        if (valuesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureValuesIsMutable();
+          values_.add(value);
+          onChanged();
+        } else {
+          valuesBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder addValues(
+          int index, flyteidl.core.Literals.KeyValuePair value) {
+        if (valuesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureValuesIsMutable();
+          values_.add(index, value);
+          onChanged();
+        } else {
+          valuesBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder addValues(
+          flyteidl.core.Literals.KeyValuePair.Builder builderForValue) {
+        if (valuesBuilder_ == null) {
+          ensureValuesIsMutable();
+          values_.add(builderForValue.build());
+          onChanged();
+        } else {
+          valuesBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder addValues(
+          int index, flyteidl.core.Literals.KeyValuePair.Builder builderForValue) {
+        if (valuesBuilder_ == null) {
+          ensureValuesIsMutable();
+          values_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          valuesBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder addAllValues(
+          java.lang.Iterable<? extends flyteidl.core.Literals.KeyValuePair> values) {
+        if (valuesBuilder_ == null) {
+          ensureValuesIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, values_);
+          onChanged();
+        } else {
+          valuesBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder clearValues() {
+        if (valuesBuilder_ == null) {
+          values_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          valuesBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public Builder removeValues(int index) {
+        if (valuesBuilder_ == null) {
+          ensureValuesIsMutable();
+          values_.remove(index);
+          onChanged();
+        } else {
+          valuesBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public flyteidl.core.Literals.KeyValuePair.Builder getValuesBuilder(
+          int index) {
+        return getValuesFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public flyteidl.core.Literals.KeyValuePairOrBuilder getValuesOrBuilder(
+          int index) {
+        if (valuesBuilder_ == null) {
+          return values_.get(index);  } else {
+          return valuesBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public java.util.List<? extends flyteidl.core.Literals.KeyValuePairOrBuilder> 
+           getValuesOrBuilderList() {
+        if (valuesBuilder_ != null) {
+          return valuesBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(values_);
+        }
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public flyteidl.core.Literals.KeyValuePair.Builder addValuesBuilder() {
+        return getValuesFieldBuilder().addBuilder(
+            flyteidl.core.Literals.KeyValuePair.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public flyteidl.core.Literals.KeyValuePair.Builder addValuesBuilder(
+          int index) {
+        return getValuesFieldBuilder().addBuilder(
+            index, flyteidl.core.Literals.KeyValuePair.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Map of custom environment variables to be applied to the execution resource.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.KeyValuePair values = 1;</code>
+       */
+      public java.util.List<flyteidl.core.Literals.KeyValuePair.Builder> 
+           getValuesBuilderList() {
+        return getValuesFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Literals.KeyValuePair, flyteidl.core.Literals.KeyValuePair.Builder, flyteidl.core.Literals.KeyValuePairOrBuilder> 
+          getValuesFieldBuilder() {
+        if (valuesBuilder_ == null) {
+          valuesBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.Literals.KeyValuePair, flyteidl.core.Literals.KeyValuePair.Builder, flyteidl.core.Literals.KeyValuePairOrBuilder>(
+                  values_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          values_ = null;
+        }
+        return valuesBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.Envs)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.Envs)
+    private static final flyteidl.admin.Common.Envs DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.Common.Envs();
+    }
+
+    public static flyteidl.admin.Common.Envs getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Envs>
+        PARSER = new com.google.protobuf.AbstractParser<Envs>() {
+      @java.lang.Override
+      public Envs parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Envs(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Envs> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Envs> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.Common.Envs getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   @java.lang.Deprecated public interface AuthRoleOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.AuthRole)
       com.google.protobuf.MessageOrBuilder {
@@ -20743,6 +21648,837 @@ public final class Common {
 
   }
 
+  public interface FlyteURLsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.FlyteURLs)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    java.lang.String getInputs();
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getInputsBytes();
+
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    java.lang.String getOutputs();
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getOutputsBytes();
+
+    /**
+     * <code>string deck = 3;</code>
+     */
+    java.lang.String getDeck();
+    /**
+     * <code>string deck = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getDeckBytes();
+  }
+  /**
+   * <pre>
+   * These URLs are returned as part of node and task execution data requests.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.FlyteURLs}
+   */
+  public  static final class FlyteURLs extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.FlyteURLs)
+      FlyteURLsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use FlyteURLs.newBuilder() to construct.
+    private FlyteURLs(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private FlyteURLs() {
+      inputs_ = "";
+      outputs_ = "";
+      deck_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FlyteURLs(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              inputs_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              outputs_ = s;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              deck_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.Common.FlyteURLs.class, flyteidl.admin.Common.FlyteURLs.Builder.class);
+    }
+
+    public static final int INPUTS_FIELD_NUMBER = 1;
+    private volatile java.lang.Object inputs_;
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    public java.lang.String getInputs() {
+      java.lang.Object ref = inputs_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        inputs_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string inputs = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getInputsBytes() {
+      java.lang.Object ref = inputs_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        inputs_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OUTPUTS_FIELD_NUMBER = 2;
+    private volatile java.lang.Object outputs_;
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    public java.lang.String getOutputs() {
+      java.lang.Object ref = outputs_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        outputs_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string outputs = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOutputsBytes() {
+      java.lang.Object ref = outputs_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        outputs_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DECK_FIELD_NUMBER = 3;
+    private volatile java.lang.Object deck_;
+    /**
+     * <code>string deck = 3;</code>
+     */
+    public java.lang.String getDeck() {
+      java.lang.Object ref = deck_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        deck_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string deck = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDeckBytes() {
+      java.lang.Object ref = deck_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deck_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getInputsBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, inputs_);
+      }
+      if (!getOutputsBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, outputs_);
+      }
+      if (!getDeckBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, deck_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getInputsBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, inputs_);
+      }
+      if (!getOutputsBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, outputs_);
+      }
+      if (!getDeckBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, deck_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.Common.FlyteURLs)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.Common.FlyteURLs other = (flyteidl.admin.Common.FlyteURLs) obj;
+
+      if (!getInputs()
+          .equals(other.getInputs())) return false;
+      if (!getOutputs()
+          .equals(other.getOutputs())) return false;
+      if (!getDeck()
+          .equals(other.getDeck())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + INPUTS_FIELD_NUMBER;
+      hash = (53 * hash) + getInputs().hashCode();
+      hash = (37 * hash) + OUTPUTS_FIELD_NUMBER;
+      hash = (53 * hash) + getOutputs().hashCode();
+      hash = (37 * hash) + DECK_FIELD_NUMBER;
+      hash = (53 * hash) + getDeck().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.Common.FlyteURLs parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.Common.FlyteURLs prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * These URLs are returned as part of node and task execution data requests.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.FlyteURLs}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.FlyteURLs)
+        flyteidl.admin.Common.FlyteURLsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.Common.FlyteURLs.class, flyteidl.admin.Common.FlyteURLs.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.Common.FlyteURLs.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        inputs_ = "";
+
+        outputs_ = "";
+
+        deck_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.Common.internal_static_flyteidl_admin_FlyteURLs_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.FlyteURLs getDefaultInstanceForType() {
+        return flyteidl.admin.Common.FlyteURLs.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.FlyteURLs build() {
+        flyteidl.admin.Common.FlyteURLs result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.Common.FlyteURLs buildPartial() {
+        flyteidl.admin.Common.FlyteURLs result = new flyteidl.admin.Common.FlyteURLs(this);
+        result.inputs_ = inputs_;
+        result.outputs_ = outputs_;
+        result.deck_ = deck_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.Common.FlyteURLs) {
+          return mergeFrom((flyteidl.admin.Common.FlyteURLs)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.Common.FlyteURLs other) {
+        if (other == flyteidl.admin.Common.FlyteURLs.getDefaultInstance()) return this;
+        if (!other.getInputs().isEmpty()) {
+          inputs_ = other.inputs_;
+          onChanged();
+        }
+        if (!other.getOutputs().isEmpty()) {
+          outputs_ = other.outputs_;
+          onChanged();
+        }
+        if (!other.getDeck().isEmpty()) {
+          deck_ = other.deck_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.Common.FlyteURLs parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.Common.FlyteURLs) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object inputs_ = "";
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public java.lang.String getInputs() {
+        java.lang.Object ref = inputs_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          inputs_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getInputsBytes() {
+        java.lang.Object ref = inputs_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          inputs_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public Builder setInputs(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        inputs_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public Builder clearInputs() {
+        
+        inputs_ = getDefaultInstance().getInputs();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string inputs = 1;</code>
+       */
+      public Builder setInputsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        inputs_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object outputs_ = "";
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public java.lang.String getOutputs() {
+        java.lang.Object ref = outputs_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          outputs_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOutputsBytes() {
+        java.lang.Object ref = outputs_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          outputs_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public Builder setOutputs(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        outputs_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public Builder clearOutputs() {
+        
+        outputs_ = getDefaultInstance().getOutputs();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string outputs = 2;</code>
+       */
+      public Builder setOutputsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        outputs_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object deck_ = "";
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public java.lang.String getDeck() {
+        java.lang.Object ref = deck_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          deck_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDeckBytes() {
+        java.lang.Object ref = deck_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          deck_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public Builder setDeck(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        deck_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public Builder clearDeck() {
+        
+        deck_ = getDefaultInstance().getDeck();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string deck = 3;</code>
+       */
+      public Builder setDeckBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        deck_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.FlyteURLs)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.FlyteURLs)
+    private static final flyteidl.admin.Common.FlyteURLs DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.Common.FlyteURLs();
+    }
+
+    public static flyteidl.admin.Common.FlyteURLs getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FlyteURLs>
+        PARSER = new com.google.protobuf.AbstractParser<FlyteURLs>() {
+      @java.lang.Override
+      public FlyteURLs parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FlyteURLs(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<FlyteURLs> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FlyteURLs> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.Common.FlyteURLs getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_NamedEntityIdentifier_descriptor;
   private static final 
@@ -20854,6 +22590,11 @@ public final class Common {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_Annotations_ValuesEntry_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_Envs_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_Envs_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_AuthRole_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -20863,6 +22604,11 @@ public final class Common {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_FlyteURLs_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -20874,70 +22620,74 @@ public final class Common {
     java.lang.String[] descriptorData = {
       "\n\033flyteidl/admin/common.proto\022\016flyteidl." +
       "admin\032\035flyteidl/core/execution.proto\032\036fl" +
-      "yteidl/core/identifier.proto\"F\n\025NamedEnt" +
-      "ityIdentifier\022\017\n\007project\030\001 \001(\t\022\016\n\006domain" +
-      "\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\"[\n\023NamedEntityMetad" +
-      "ata\022\023\n\013description\030\001 \001(\t\022/\n\005state\030\002 \001(\0162" +
-      " .flyteidl.admin.NamedEntityState\"\253\001\n\013Na" +
-      "medEntity\0222\n\rresource_type\030\001 \001(\0162\033.flyte" +
-      "idl.core.ResourceType\0221\n\002id\030\002 \001(\0132%.flyt" +
-      "eidl.admin.NamedEntityIdentifier\0225\n\010meta" +
-      "data\030\003 \001(\0132#.flyteidl.admin.NamedEntityM" +
-      "etadata\"r\n\004Sort\022\013\n\003key\030\001 \001(\t\0221\n\tdirectio" +
-      "n\030\002 \001(\0162\036.flyteidl.admin.Sort.Direction\"" +
-      "*\n\tDirection\022\016\n\nDESCENDING\020\000\022\r\n\tASCENDIN" +
-      "G\020\001\"\231\001\n NamedEntityIdentifierListRequest" +
-      "\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005lim" +
-      "it\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\013" +
-      "2\024.flyteidl.admin.Sort\022\017\n\007filters\030\006 \001(\t\"" +
-      "\303\001\n\026NamedEntityListRequest\0222\n\rresource_t" +
-      "ype\030\001 \001(\0162\033.flyteidl.core.ResourceType\022\017" +
-      "\n\007project\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\r\n\005limit" +
-      "\030\004 \001(\r\022\r\n\005token\030\005 \001(\t\022%\n\007sort_by\030\006 \001(\0132\024" +
-      ".flyteidl.admin.Sort\022\017\n\007filters\030\007 \001(\t\"c\n" +
-      "\031NamedEntityIdentifierList\0227\n\010entities\030\001" +
-      " \003(\0132%.flyteidl.admin.NamedEntityIdentif" +
-      "ier\022\r\n\005token\030\002 \001(\t\"O\n\017NamedEntityList\022-\n" +
-      "\010entities\030\001 \003(\0132\033.flyteidl.admin.NamedEn" +
-      "tity\022\r\n\005token\030\002 \001(\t\"~\n\025NamedEntityGetReq" +
-      "uest\0222\n\rresource_type\030\001 \001(\0162\033.flyteidl.c" +
-      "ore.ResourceType\0221\n\002id\030\002 \001(\0132%.flyteidl." +
-      "admin.NamedEntityIdentifier\"\270\001\n\030NamedEnt" +
-      "ityUpdateRequest\0222\n\rresource_type\030\001 \001(\0162" +
-      "\033.flyteidl.core.ResourceType\0221\n\002id\030\002 \001(\013" +
-      "2%.flyteidl.admin.NamedEntityIdentifier\022" +
-      "5\n\010metadata\030\003 \001(\0132#.flyteidl.admin.Named" +
-      "EntityMetadata\"\033\n\031NamedEntityUpdateRespo" +
-      "nse\"9\n\020ObjectGetRequest\022%\n\002id\030\001 \001(\0132\031.fl" +
-      "yteidl.core.Identifier\"\236\001\n\023ResourceListR" +
-      "equest\0221\n\002id\030\001 \001(\0132%.flyteidl.admin.Name" +
-      "dEntityIdentifier\022\r\n\005limit\030\002 \001(\r\022\r\n\005toke" +
-      "n\030\003 \001(\t\022\017\n\007filters\030\004 \001(\t\022%\n\007sort_by\030\005 \001(" +
-      "\0132\024.flyteidl.admin.Sort\"-\n\021EmailNotifica" +
-      "tion\022\030\n\020recipients_email\030\001 \003(\t\"1\n\025PagerD" +
-      "utyNotification\022\030\n\020recipients_email\030\001 \003(" +
-      "\t\"-\n\021SlackNotification\022\030\n\020recipients_ema" +
-      "il\030\001 \003(\t\"\363\001\n\014Notification\0226\n\006phases\030\001 \003(" +
-      "\0162&.flyteidl.core.WorkflowExecution.Phas" +
-      "e\0222\n\005email\030\002 \001(\0132!.flyteidl.admin.EmailN" +
-      "otificationH\000\022;\n\npager_duty\030\003 \001(\0132%.flyt" +
-      "eidl.admin.PagerDutyNotificationH\000\0222\n\005sl" +
-      "ack\030\004 \001(\0132!.flyteidl.admin.SlackNotifica" +
-      "tionH\000B\006\n\004type\")\n\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r" +
-      "\n\005bytes\030\002 \001(\003:\002\030\001\"k\n\006Labels\0222\n\006values\030\001 " +
-      "\003(\0132\".flyteidl.admin.Labels.ValuesEntry\032" +
-      "-\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
-      "(\t:\0028\001\"u\n\013Annotations\0227\n\006values\030\001 \003(\0132\'." +
-      "flyteidl.admin.Annotations.ValuesEntry\032-" +
-      "\n\013ValuesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(" +
-      "\t:\0028\001\"N\n\010AuthRole\022\032\n\022assumable_iam_role\030" +
-      "\001 \001(\t\022\"\n\032kubernetes_service_account\030\002 \001(" +
-      "\t:\002\030\001\"5\n\023RawOutputDataConfig\022\036\n\026output_l" +
-      "ocation_prefix\030\001 \001(\t*\\\n\020NamedEntityState" +
-      "\022\027\n\023NAMED_ENTITY_ACTIVE\020\000\022\031\n\025NAMED_ENTIT" +
-      "Y_ARCHIVED\020\001\022\024\n\020SYSTEM_GENERATED\020\002B7Z5gi" +
-      "thub.com/flyteorg/flyteidl/gen/pb-go/fly" +
-      "teidl/adminb\006proto3"
+      "yteidl/core/identifier.proto\032\034flyteidl/c" +
+      "ore/literals.proto\032\037google/protobuf/time" +
+      "stamp.proto\"F\n\025NamedEntityIdentifier\022\017\n\007" +
+      "project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 " +
+      "\001(\t\"[\n\023NamedEntityMetadata\022\023\n\013descriptio" +
+      "n\030\001 \001(\t\022/\n\005state\030\002 \001(\0162 .flyteidl.admin." +
+      "NamedEntityState\"\253\001\n\013NamedEntity\0222\n\rreso" +
+      "urce_type\030\001 \001(\0162\033.flyteidl.core.Resource" +
+      "Type\0221\n\002id\030\002 \001(\0132%.flyteidl.admin.NamedE" +
+      "ntityIdentifier\0225\n\010metadata\030\003 \001(\0132#.flyt" +
+      "eidl.admin.NamedEntityMetadata\"r\n\004Sort\022\013" +
+      "\n\003key\030\001 \001(\t\0221\n\tdirection\030\002 \001(\0162\036.flyteid" +
+      "l.admin.Sort.Direction\"*\n\tDirection\022\016\n\nD" +
+      "ESCENDING\020\000\022\r\n\tASCENDING\020\001\"\231\001\n NamedEnti" +
+      "tyIdentifierListRequest\022\017\n\007project\030\001 \001(\t" +
+      "\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token" +
+      "\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin" +
+      ".Sort\022\017\n\007filters\030\006 \001(\t\"\303\001\n\026NamedEntityLi" +
+      "stRequest\0222\n\rresource_type\030\001 \001(\0162\033.flyte" +
+      "idl.core.ResourceType\022\017\n\007project\030\002 \001(\t\022\016" +
+      "\n\006domain\030\003 \001(\t\022\r\n\005limit\030\004 \001(\r\022\r\n\005token\030\005" +
+      " \001(\t\022%\n\007sort_by\030\006 \001(\0132\024.flyteidl.admin.S" +
+      "ort\022\017\n\007filters\030\007 \001(\t\"c\n\031NamedEntityIdent" +
+      "ifierList\0227\n\010entities\030\001 \003(\0132%.flyteidl.a" +
+      "dmin.NamedEntityIdentifier\022\r\n\005token\030\002 \001(" +
+      "\t\"O\n\017NamedEntityList\022-\n\010entities\030\001 \003(\0132\033" +
+      ".flyteidl.admin.NamedEntity\022\r\n\005token\030\002 \001" +
+      "(\t\"~\n\025NamedEntityGetRequest\0222\n\rresource_" +
+      "type\030\001 \001(\0162\033.flyteidl.core.ResourceType\022" +
+      "1\n\002id\030\002 \001(\0132%.flyteidl.admin.NamedEntity" +
+      "Identifier\"\270\001\n\030NamedEntityUpdateRequest\022" +
+      "2\n\rresource_type\030\001 \001(\0162\033.flyteidl.core.R" +
+      "esourceType\0221\n\002id\030\002 \001(\0132%.flyteidl.admin" +
+      ".NamedEntityIdentifier\0225\n\010metadata\030\003 \001(\013" +
+      "2#.flyteidl.admin.NamedEntityMetadata\"\033\n" +
+      "\031NamedEntityUpdateResponse\"9\n\020ObjectGetR" +
+      "equest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Ident" +
+      "ifier\"\236\001\n\023ResourceListRequest\0221\n\002id\030\001 \001(" +
+      "\0132%.flyteidl.admin.NamedEntityIdentifier" +
+      "\022\r\n\005limit\030\002 \001(\r\022\r\n\005token\030\003 \001(\t\022\017\n\007filter" +
+      "s\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admi" +
+      "n.Sort\"-\n\021EmailNotification\022\030\n\020recipient" +
+      "s_email\030\001 \003(\t\"1\n\025PagerDutyNotification\022\030" +
+      "\n\020recipients_email\030\001 \003(\t\"-\n\021SlackNotific" +
+      "ation\022\030\n\020recipients_email\030\001 \003(\t\"\363\001\n\014Noti" +
+      "fication\0226\n\006phases\030\001 \003(\0162&.flyteidl.core" +
+      ".WorkflowExecution.Phase\0222\n\005email\030\002 \001(\0132" +
+      "!.flyteidl.admin.EmailNotificationH\000\022;\n\n" +
+      "pager_duty\030\003 \001(\0132%.flyteidl.admin.PagerD" +
+      "utyNotificationH\000\0222\n\005slack\030\004 \001(\0132!.flyte" +
+      "idl.admin.SlackNotificationH\000B\006\n\004type\")\n" +
+      "\007UrlBlob\022\013\n\003url\030\001 \001(\t\022\r\n\005bytes\030\002 \001(\003:\002\030\001" +
+      "\"k\n\006Labels\0222\n\006values\030\001 \003(\0132\".flyteidl.ad" +
+      "min.Labels.ValuesEntry\032-\n\013ValuesEntry\022\013\n" +
+      "\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"u\n\013Annotat" +
+      "ions\0227\n\006values\030\001 \003(\0132\'.flyteidl.admin.An" +
+      "notations.ValuesEntry\032-\n\013ValuesEntry\022\013\n\003" +
+      "key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"3\n\004Envs\022+\n\006" +
+      "values\030\001 \003(\0132\033.flyteidl.core.KeyValuePai" +
+      "r\"N\n\010AuthRole\022\032\n\022assumable_iam_role\030\001 \001(" +
+      "\t\022\"\n\032kubernetes_service_account\030\002 \001(\t:\002\030" +
+      "\001\"5\n\023RawOutputDataConfig\022\036\n\026output_locat" +
+      "ion_prefix\030\001 \001(\t\":\n\tFlyteURLs\022\016\n\006inputs\030" +
+      "\001 \001(\t\022\017\n\007outputs\030\002 \001(\t\022\014\n\004deck\030\003 \001(\t*\\\n\020" +
+      "NamedEntityState\022\027\n\023NAMED_ENTITY_ACTIVE\020" +
+      "\000\022\031\n\025NAMED_ENTITY_ARCHIVED\020\001\022\024\n\020SYSTEM_G" +
+      "ENERATED\020\002B7Z5github.com/flyteorg/flytei" +
+      "dl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20952,6 +22702,8 @@ public final class Common {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           flyteidl.core.Execution.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
+          flyteidl.core.Literals.getDescriptor(),
+          com.google.protobuf.TimestampProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_NamedEntityIdentifier_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -21085,20 +22837,34 @@ public final class Common {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Annotations_ValuesEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
-    internal_static_flyteidl_admin_AuthRole_descriptor =
+    internal_static_flyteidl_admin_Envs_descriptor =
       getDescriptor().getMessageTypes().get(20);
+    internal_static_flyteidl_admin_Envs_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_Envs_descriptor,
+        new java.lang.String[] { "Values", });
+    internal_static_flyteidl_admin_AuthRole_descriptor =
+      getDescriptor().getMessageTypes().get(21);
     internal_static_flyteidl_admin_AuthRole_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_AuthRole_descriptor,
         new java.lang.String[] { "AssumableIamRole", "KubernetesServiceAccount", });
     internal_static_flyteidl_admin_RawOutputDataConfig_descriptor =
-      getDescriptor().getMessageTypes().get(21);
+      getDescriptor().getMessageTypes().get(22);
     internal_static_flyteidl_admin_RawOutputDataConfig_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_RawOutputDataConfig_descriptor,
         new java.lang.String[] { "OutputLocationPrefix", });
+    internal_static_flyteidl_admin_FlyteURLs_descriptor =
+      getDescriptor().getMessageTypes().get(23);
+    internal_static_flyteidl_admin_FlyteURLs_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_FlyteURLs_descriptor,
+        new java.lang.String[] { "Inputs", "Outputs", "Deck", });
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
+    flyteidl.core.Literals.getDescriptor();
+    com.google.protobuf.TimestampProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -8,6 +8,7 @@ import "flyteidl/admin/common.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
+import "flyteidl/core/metrics.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
@@ -189,6 +190,9 @@ message SystemMetadata {
 
     // Which execution cluster this execution ran on.
     string execution_cluster = 1;
+
+    // Which kubernetes namespace the execution ran under.
+    string namespace = 2;
 }
 
 // Represents attributes about an execution which are not required to launch the execution but are useful to record.
@@ -309,6 +313,11 @@ message ExecutionSpec {
     // If enabled, all calculations are performed even if cached results would be available, overwriting the stored
     // data once execution finishes successfully.
     bool overwrite_cache = 22;
+
+    // Environment variables to be set for the execution.
+    Envs envs = 23;
+    // Tags to be set for the execution.
+    repeated string tags = 24;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.
@@ -381,3 +390,19 @@ message ExecutionStateChangeDetails {
 }
 
 message ExecutionUpdateResponse {}
+
+// WorkflowExecutionGetMetricsRequest represents a request to retrieve metrics for the specified workflow execution.
+message WorkflowExecutionGetMetricsRequest {
+    // id defines the workflow execution to query for.
+    core.WorkflowExecutionIdentifier id = 1;
+
+    // depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+    int32 depth = 2;
+}
+
+// WorkflowExecutionGetMetricsResponse represents the response containing metrics for the specified workflow execution.
+message WorkflowExecutionGetMetricsResponse {
+    // Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+    // hierarchical structure using Flyte entity references.
+    core.Span span = 1;
+}

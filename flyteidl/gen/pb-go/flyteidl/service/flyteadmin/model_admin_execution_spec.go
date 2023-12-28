@@ -37,4 +37,8 @@ type AdminExecutionSpec struct {
 	Interruptible bool `json:"interruptible,omitempty"`
 	// Allows for all cached values of a workflow and its tasks to be overwritten for a single execution. If enabled, all calculations are performed even if cached results would be available, overwriting the stored data once execution finishes successfully.
 	OverwriteCache bool `json:"overwrite_cache,omitempty"`
+	// Environment variables to be set for the execution.
+	Envs *AdminEnvs `json:"envs,omitempty"`
+	// Tags to be set for the execution.
+	Tags []string `json:"tags,omitempty"`
 }

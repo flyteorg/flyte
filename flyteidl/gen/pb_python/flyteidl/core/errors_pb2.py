@@ -17,22 +17,23 @@ from flyteidl.core import identifier_pb2 as flyteidl_dot_core_dot_identifier__pb
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x66lyteidl/core/errors.proto\x12\rflyteidl.core\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1e\x66lyteidl/core/identifier.proto\"\xe5\x01\n\x0e\x43ontainerError\x12\x12\n\x04\x63ode\x18\x01 \x01(\tR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12\x36\n\x04kind\x18\x03 \x01(\x0e\x32\".flyteidl.core.ContainerError.KindR\x04kind\x12?\n\x06origin\x18\x04 \x01(\x0e\x32\'.flyteidl.core.ExecutionError.ErrorKindR\x06origin\",\n\x04Kind\x12\x13\n\x0fNON_RECOVERABLE\x10\x00\x12\x0f\n\x0bRECOVERABLE\x10\x01\"D\n\rErrorDocument\x12\x33\n\x05\x65rror\x18\x01 \x01(\x0b\x32\x1d.flyteidl.core.ContainerErrorR\x05\x65rror\"\x8b\x04\n\x12\x43\x61\x63heEvictionError\x12:\n\x04\x63ode\x18\x01 \x01(\x0e\x32&.flyteidl.core.CacheEvictionError.CodeR\x04\x63ode\x12\x18\n\x07message\x18\x02 \x01(\tR\x07message\x12R\n\x11node_execution_id\x18\x03 \x01(\x0b\x32&.flyteidl.core.NodeExecutionIdentifierR\x0fnodeExecutionId\x12T\n\x11task_execution_id\x18\x04 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifierH\x00R\x0ftaskExecutionId\x12`\n\x15workflow_execution_id\x18\x05 \x01(\x0b\x32*.flyteidl.core.WorkflowExecutionIdentifierH\x00R\x13workflowExecutionId\"\x88\x01\n\x04\x43ode\x12\x0c\n\x08INTERNAL\x10\x00\x12\x1c\n\x18RESERVATION_NOT_ACQUIRED\x10\x01\x12\x1a\n\x16\x44\x41TABASE_UPDATE_FAILED\x10\x02\x12\x1a\n\x16\x41RTIFACT_DELETE_FAILED\x10\x03\x12\x1c\n\x18RESERVATION_NOT_RELEASED\x10\x04\x42\x08\n\x06source\"S\n\x16\x43\x61\x63heEvictionErrorList\x12\x39\n\x06\x65rrors\x18\x01 \x03(\x0b\x32!.flyteidl.core.CacheEvictionErrorR\x06\x65rrorsB\xab\x01\n\x11\x63om.flyteidl.coreB\x0b\x45rrorsProtoP\x01Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
 
-_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl.core.errors_pb2', globals())
+_globals = globals()
+_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl.core.errors_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\021com.flyteidl.coreB\013ErrorsProtoP\001Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core\242\002\003FCX\252\002\rFlyteidl.Core\312\002\rFlyteidl\\Core\342\002\031Flyteidl\\Core\\GPBMetadata\352\002\016Flyteidl::Core'
-  _CONTAINERERROR._serialized_start=109
-  _CONTAINERERROR._serialized_end=338
-  _CONTAINERERROR_KIND._serialized_start=294
-  _CONTAINERERROR_KIND._serialized_end=338
-  _ERRORDOCUMENT._serialized_start=340
-  _ERRORDOCUMENT._serialized_end=408
-  _CACHEEVICTIONERROR._serialized_start=411
-  _CACHEEVICTIONERROR._serialized_end=934
-  _CACHEEVICTIONERROR_CODE._serialized_start=788
-  _CACHEEVICTIONERROR_CODE._serialized_end=924
-  _CACHEEVICTIONERRORLIST._serialized_start=936
-  _CACHEEVICTIONERRORLIST._serialized_end=1019
+  _globals['_CONTAINERERROR']._serialized_start=109
+  _globals['_CONTAINERERROR']._serialized_end=338
+  _globals['_CONTAINERERROR_KIND']._serialized_start=294
+  _globals['_CONTAINERERROR_KIND']._serialized_end=338
+  _globals['_ERRORDOCUMENT']._serialized_start=340
+  _globals['_ERRORDOCUMENT']._serialized_end=408
+  _globals['_CACHEEVICTIONERROR']._serialized_start=411
+  _globals['_CACHEEVICTIONERROR']._serialized_end=934
+  _globals['_CACHEEVICTIONERROR_CODE']._serialized_start=788
+  _globals['_CACHEEVICTIONERROR_CODE']._serialized_end=924
+  _globals['_CACHEEVICTIONERRORLIST']._serialized_start=936
+  _globals['_CACHEEVICTIONERRORLIST']._serialized_end=1019
 # @@protoc_insertion_point(module_scope)

@@ -40,7 +40,9 @@ type AdminTaskExecutionClosure struct {
 	// A predefined yet extensible Task type identifier.
 	TaskType string `json:"task_type,omitempty"`
 	// Metadata around how a task was executed.
-	Metadata *EventTaskExecutionMetadata `json:"metadata,omitempty"`
+	Metadata *FlyteidleventTaskExecutionMetadata `json:"metadata,omitempty"`
 	// The event version is used to indicate versioned changes in how data is maintained using this proto message. For example, event_verison > 0 means that maps tasks logs use the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.
 	EventVersion int32 `json:"event_version,omitempty"`
+	// A time-series of the phase transition or update explanations. This, when compared to storing a singular reason as previously done, is much more valuable in visualizing and understanding historical evaluations.
+	Reasons []AdminReason `json:"reasons,omitempty"`
 }

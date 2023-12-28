@@ -5,6 +5,8 @@ option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/identifier.proto";
+import "flyteidl/core/literals.proto";
+import "google/protobuf/timestamp.proto";
 
 // Encapsulation of fields that identifies a Flyte resource.
 // A Flyte resource can be a task, workflow or launch plan.
@@ -279,6 +281,14 @@ message Annotations {
     map<string, string> values = 1;
 }
 
+// Environment variable values to be applied to an execution resource.
+// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
+// to specify how to merge environment variables defined at registration and execution time.
+message Envs {
+    // Map of custom environment variables to be applied to the execution resource.
+    repeated flyteidl.core.KeyValuePair values = 1;
+}
+
 // Defines permissions associated with executions created by this launch plan spec.
 // Use either of these roles when they have permissions required by your workflow execution.
 // Deprecated.
@@ -299,4 +309,11 @@ message RawOutputDataConfig {
     // Prefix for where offloaded data from user workflows will be written
     // e.g. s3://bucket/key or s3://bucket/
     string output_location_prefix = 1;
+}
+
+// These URLs are returned as part of node and task execution data requests.
+message FlyteURLs {
+    string inputs      = 1;
+    string outputs     = 2;
+    string deck        = 3;
 }

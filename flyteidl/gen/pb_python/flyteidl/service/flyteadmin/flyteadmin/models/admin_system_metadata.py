@@ -31,21 +31,26 @@ class AdminSystemMetadata(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'execution_cluster': 'str'
+        'execution_cluster': 'str',
+        'namespace': 'str'
     }
 
     attribute_map = {
-        'execution_cluster': 'execution_cluster'
+        'execution_cluster': 'execution_cluster',
+        'namespace': 'namespace'
     }
 
-    def __init__(self, execution_cluster=None):  # noqa: E501
+    def __init__(self, execution_cluster=None, namespace=None):  # noqa: E501
         """AdminSystemMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._execution_cluster = None
+        self._namespace = None
         self.discriminator = None
 
         if execution_cluster is not None:
             self.execution_cluster = execution_cluster
+        if namespace is not None:
+            self.namespace = namespace
 
     @property
     def execution_cluster(self):
@@ -69,6 +74,29 @@ class AdminSystemMetadata(object):
         """
 
         self._execution_cluster = execution_cluster
+
+    @property
+    def namespace(self):
+        """Gets the namespace of this AdminSystemMetadata.  # noqa: E501
+
+        Which kubernetes namespace the execution ran under.  # noqa: E501
+
+        :return: The namespace of this AdminSystemMetadata.  # noqa: E501
+        :rtype: str
+        """
+        return self._namespace
+
+    @namespace.setter
+    def namespace(self, namespace):
+        """Sets the namespace of this AdminSystemMetadata.
+
+        Which kubernetes namespace the execution ran under.  # noqa: E501
+
+        :param namespace: The namespace of this AdminSystemMetadata.  # noqa: E501
+        :type: str
+        """
+
+        self._namespace = namespace
 
     def to_dict(self):
         """Returns the model properties as a dict"""

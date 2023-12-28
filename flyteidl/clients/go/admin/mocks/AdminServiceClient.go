@@ -689,6 +689,54 @@ func (_m *AdminServiceClient) GetExecutionData(ctx context.Context, in *admin.Wo
 	return r0, r1
 }
 
+type AdminServiceClient_GetExecutionMetrics struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetExecutionMetrics) Return(_a0 *admin.WorkflowExecutionGetMetricsResponse, _a1 error) *AdminServiceClient_GetExecutionMetrics {
+	return &AdminServiceClient_GetExecutionMetrics{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetExecutionMetrics(ctx context.Context, in *admin.WorkflowExecutionGetMetricsRequest, opts ...grpc.CallOption) *AdminServiceClient_GetExecutionMetrics {
+	c_call := _m.On("GetExecutionMetrics", ctx, in, opts)
+	return &AdminServiceClient_GetExecutionMetrics{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetExecutionMetricsMatch(matchers ...interface{}) *AdminServiceClient_GetExecutionMetrics {
+	c_call := _m.On("GetExecutionMetrics", matchers...)
+	return &AdminServiceClient_GetExecutionMetrics{Call: c_call}
+}
+
+// GetExecutionMetrics provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetExecutionMetrics(ctx context.Context, in *admin.WorkflowExecutionGetMetricsRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionGetMetricsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.WorkflowExecutionGetMetricsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowExecutionGetMetricsRequest, ...grpc.CallOption) *admin.WorkflowExecutionGetMetricsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowExecutionGetMetricsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowExecutionGetMetricsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetLaunchPlan struct {
 	*mock.Call
 }

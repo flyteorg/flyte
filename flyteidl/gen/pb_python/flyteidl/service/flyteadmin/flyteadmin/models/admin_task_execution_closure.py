@@ -16,11 +16,12 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.admin_reason import AdminReason  # noqa: F401,E501
 from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
 from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
-from flyteadmin.models.event_task_execution_metadata import EventTaskExecutionMetadata  # noqa: F401,E501
+from flyteadmin.models.flyteidlevent_task_execution_metadata import FlyteidleventTaskExecutionMetadata  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
@@ -50,8 +51,9 @@ class AdminTaskExecutionClosure(object):
         'custom_info': 'ProtobufStruct',
         'reason': 'str',
         'task_type': 'str',
-        'metadata': 'EventTaskExecutionMetadata',
-        'event_version': 'int'
+        'metadata': 'FlyteidleventTaskExecutionMetadata',
+        'event_version': 'int',
+        'reasons': 'list[AdminReason]'
     }
 
     attribute_map = {
@@ -68,10 +70,11 @@ class AdminTaskExecutionClosure(object):
         'reason': 'reason',
         'task_type': 'task_type',
         'metadata': 'metadata',
-        'event_version': 'event_version'
+        'event_version': 'event_version',
+        'reasons': 'reasons'
     }
 
-    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None, event_version=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None, event_version=None, reasons=None):  # noqa: E501
         """AdminTaskExecutionClosure - a model defined in Swagger"""  # noqa: E501
 
         self._output_uri = None
@@ -88,6 +91,7 @@ class AdminTaskExecutionClosure(object):
         self._task_type = None
         self._metadata = None
         self._event_version = None
+        self._reasons = None
         self.discriminator = None
 
         if output_uri is not None:
@@ -118,6 +122,8 @@ class AdminTaskExecutionClosure(object):
             self.metadata = metadata
         if event_version is not None:
             self.event_version = event_version
+        if reasons is not None:
+            self.reasons = reasons
 
     @property
     def output_uri(self):
@@ -402,7 +408,7 @@ class AdminTaskExecutionClosure(object):
         Metadata around how a task was executed.  # noqa: E501
 
         :return: The metadata of this AdminTaskExecutionClosure.  # noqa: E501
-        :rtype: EventTaskExecutionMetadata
+        :rtype: FlyteidleventTaskExecutionMetadata
         """
         return self._metadata
 
@@ -413,7 +419,7 @@ class AdminTaskExecutionClosure(object):
         Metadata around how a task was executed.  # noqa: E501
 
         :param metadata: The metadata of this AdminTaskExecutionClosure.  # noqa: E501
-        :type: EventTaskExecutionMetadata
+        :type: FlyteidleventTaskExecutionMetadata
         """
 
         self._metadata = metadata
@@ -440,6 +446,29 @@ class AdminTaskExecutionClosure(object):
         """
 
         self._event_version = event_version
+
+    @property
+    def reasons(self):
+        """Gets the reasons of this AdminTaskExecutionClosure.  # noqa: E501
+
+        A time-series of the phase transition or update explanations. This, when compared to storing a singular reason as previously done, is much more valuable in visualizing and understanding historical evaluations.  # noqa: E501
+
+        :return: The reasons of this AdminTaskExecutionClosure.  # noqa: E501
+        :rtype: list[AdminReason]
+        """
+        return self._reasons
+
+    @reasons.setter
+    def reasons(self, reasons):
+        """Sets the reasons of this AdminTaskExecutionClosure.
+
+        A time-series of the phase transition or update explanations. This, when compared to storing a singular reason as previously done, is much more valuable in visualizing and understanding historical evaluations.  # noqa: E501
+
+        :param reasons: The reasons of this AdminTaskExecutionClosure.  # noqa: E501
+        :type: list[AdminReason]
+        """
+
+        self._reasons = reasons
 
     def to_dict(self):
         """Returns the model properties as a dict"""

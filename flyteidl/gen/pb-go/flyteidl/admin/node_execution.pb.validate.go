@@ -616,6 +616,8 @@ func (m *NodeExecutionClosure) Validate() error {
 
 	// no validation rules for DeckUri
 
+	// no validation rules for DynamicJobSpecUri
+
 	switch m.OutputResult.(type) {
 
 	case *NodeExecutionClosure_OutputUri:
@@ -918,6 +920,8 @@ func (m *DynamicWorkflowNodeMetadata) Validate() error {
 		}
 	}
 
+	// no validation rules for DynamicJobSpecUri
+
 	return nil
 }
 
@@ -1108,6 +1112,16 @@ func (m *NodeExecutionGetDataResponse) Validate() error {
 		if err := v.Validate(); err != nil {
 			return NodeExecutionGetDataResponseValidationError{
 				field:  "DynamicWorkflow",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetFlyteUrls()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NodeExecutionGetDataResponseValidationError{
+				field:  "FlyteUrls",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

@@ -1125,6 +1125,20 @@ class NodeExecutionClosure final :
   ::std::string* release_deck_uri();
   void set_allocated_deck_uri(::std::string* deck_uri);
 
+  // string dynamic_job_spec_uri = 12;
+  void clear_dynamic_job_spec_uri();
+  static const int kDynamicJobSpecUriFieldNumber = 12;
+  const ::std::string& dynamic_job_spec_uri() const;
+  void set_dynamic_job_spec_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_dynamic_job_spec_uri(::std::string&& value);
+  #endif
+  void set_dynamic_job_spec_uri(const char* value);
+  void set_dynamic_job_spec_uri(const char* value, size_t size);
+  ::std::string* mutable_dynamic_job_spec_uri();
+  ::std::string* release_dynamic_job_spec_uri();
+  void set_allocated_dynamic_job_spec_uri(::std::string* dynamic_job_spec_uri);
+
   // .google.protobuf.Timestamp started_at = 4;
   bool has_started_at() const;
   void clear_started_at();
@@ -1241,6 +1255,7 @@ class NodeExecutionClosure final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr deck_uri_;
+  ::google::protobuf::internal::ArenaStringPtr dynamic_job_spec_uri_;
   ::google::protobuf::Timestamp* started_at_;
   ::google::protobuf::Duration* duration_;
   ::google::protobuf::Timestamp* created_at_;
@@ -1611,6 +1626,20 @@ class DynamicWorkflowNodeMetadata final :
 
   // accessors -------------------------------------------------------
 
+  // string dynamic_job_spec_uri = 3;
+  void clear_dynamic_job_spec_uri();
+  static const int kDynamicJobSpecUriFieldNumber = 3;
+  const ::std::string& dynamic_job_spec_uri() const;
+  void set_dynamic_job_spec_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_dynamic_job_spec_uri(::std::string&& value);
+  #endif
+  void set_dynamic_job_spec_uri(const char* value);
+  void set_dynamic_job_spec_uri(const char* value, size_t size);
+  ::std::string* mutable_dynamic_job_spec_uri();
+  ::std::string* release_dynamic_job_spec_uri();
+  void set_allocated_dynamic_job_spec_uri(::std::string* dynamic_job_spec_uri);
+
   // .flyteidl.core.Identifier id = 1;
   bool has_id() const;
   void clear_id();
@@ -1634,6 +1663,7 @@ class DynamicWorkflowNodeMetadata final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr dynamic_job_spec_uri_;
   ::flyteidl::core::Identifier* id_;
   ::flyteidl::core::CompiledWorkflowClosure* compiled_workflow_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -1896,6 +1926,15 @@ class NodeExecutionGetDataResponse final :
   ::flyteidl::admin::DynamicWorkflowNodeMetadata* mutable_dynamic_workflow();
   void set_allocated_dynamic_workflow(::flyteidl::admin::DynamicWorkflowNodeMetadata* dynamic_workflow);
 
+  // .flyteidl.admin.FlyteURLs flyte_urls = 17;
+  bool has_flyte_urls() const;
+  void clear_flyte_urls();
+  static const int kFlyteUrlsFieldNumber = 17;
+  const ::flyteidl::admin::FlyteURLs& flyte_urls() const;
+  ::flyteidl::admin::FlyteURLs* release_flyte_urls();
+  ::flyteidl::admin::FlyteURLs* mutable_flyte_urls();
+  void set_allocated_flyte_urls(::flyteidl::admin::FlyteURLs* flyte_urls);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NodeExecutionGetDataResponse)
  private:
   class HasBitSetters;
@@ -1906,6 +1945,7 @@ class NodeExecutionGetDataResponse final :
   ::flyteidl::core::LiteralMap* full_inputs_;
   ::flyteidl::core::LiteralMap* full_outputs_;
   ::flyteidl::admin::DynamicWorkflowNodeMetadata* dynamic_workflow_;
+  ::flyteidl::admin::FlyteURLs* flyte_urls_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fnode_5fexecution_2eproto;
 };
@@ -3374,6 +3414,59 @@ inline void NodeExecutionClosure::set_allocated_deck_uri(::std::string* deck_uri
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionClosure.deck_uri)
 }
 
+// string dynamic_job_spec_uri = 12;
+inline void NodeExecutionClosure::clear_dynamic_job_spec_uri() {
+  dynamic_job_spec_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NodeExecutionClosure::dynamic_job_spec_uri() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+  return dynamic_job_spec_uri_.GetNoArena();
+}
+inline void NodeExecutionClosure::set_dynamic_job_spec_uri(const ::std::string& value) {
+  
+  dynamic_job_spec_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+}
+#if LANG_CXX11
+inline void NodeExecutionClosure::set_dynamic_job_spec_uri(::std::string&& value) {
+  
+  dynamic_job_spec_uri_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+}
+#endif
+inline void NodeExecutionClosure::set_dynamic_job_spec_uri(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  dynamic_job_spec_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+}
+inline void NodeExecutionClosure::set_dynamic_job_spec_uri(const char* value, size_t size) {
+  
+  dynamic_job_spec_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+}
+inline ::std::string* NodeExecutionClosure::mutable_dynamic_job_spec_uri() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+  return dynamic_job_spec_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NodeExecutionClosure::release_dynamic_job_spec_uri() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+  
+  return dynamic_job_spec_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NodeExecutionClosure::set_allocated_dynamic_job_spec_uri(::std::string* dynamic_job_spec_uri) {
+  if (dynamic_job_spec_uri != nullptr) {
+    
+  } else {
+    
+  }
+  dynamic_job_spec_uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), dynamic_job_spec_uri);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionClosure.dynamic_job_spec_uri)
+}
+
 inline bool NodeExecutionClosure::has_output_result() const {
   return output_result_case() != OUTPUT_RESULT_NOT_SET;
 }
@@ -3649,6 +3742,59 @@ inline void DynamicWorkflowNodeMetadata::set_allocated_compiled_workflow(::flyte
   }
   compiled_workflow_ = compiled_workflow;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.DynamicWorkflowNodeMetadata.compiled_workflow)
+}
+
+// string dynamic_job_spec_uri = 3;
+inline void DynamicWorkflowNodeMetadata::clear_dynamic_job_spec_uri() {
+  dynamic_job_spec_uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DynamicWorkflowNodeMetadata::dynamic_job_spec_uri() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
+  return dynamic_job_spec_uri_.GetNoArena();
+}
+inline void DynamicWorkflowNodeMetadata::set_dynamic_job_spec_uri(const ::std::string& value) {
+  
+  dynamic_job_spec_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
+}
+#if LANG_CXX11
+inline void DynamicWorkflowNodeMetadata::set_dynamic_job_spec_uri(::std::string&& value) {
+  
+  dynamic_job_spec_uri_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
+}
+#endif
+inline void DynamicWorkflowNodeMetadata::set_dynamic_job_spec_uri(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  dynamic_job_spec_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
+}
+inline void DynamicWorkflowNodeMetadata::set_dynamic_job_spec_uri(const char* value, size_t size) {
+  
+  dynamic_job_spec_uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
+}
+inline ::std::string* DynamicWorkflowNodeMetadata::mutable_dynamic_job_spec_uri() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
+  return dynamic_job_spec_uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DynamicWorkflowNodeMetadata::release_dynamic_job_spec_uri() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
+  
+  return dynamic_job_spec_uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DynamicWorkflowNodeMetadata::set_allocated_dynamic_job_spec_uri(::std::string* dynamic_job_spec_uri) {
+  if (dynamic_job_spec_uri != nullptr) {
+    
+  } else {
+    
+  }
+  dynamic_job_spec_uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), dynamic_job_spec_uri);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.DynamicWorkflowNodeMetadata.dynamic_job_spec_uri)
 }
 
 // -------------------------------------------------------------------
@@ -3933,6 +4079,51 @@ inline void NodeExecutionGetDataResponse::set_allocated_dynamic_workflow(::flyte
   }
   dynamic_workflow_ = dynamic_workflow;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionGetDataResponse.dynamic_workflow)
+}
+
+// .flyteidl.admin.FlyteURLs flyte_urls = 17;
+inline bool NodeExecutionGetDataResponse::has_flyte_urls() const {
+  return this != internal_default_instance() && flyte_urls_ != nullptr;
+}
+inline const ::flyteidl::admin::FlyteURLs& NodeExecutionGetDataResponse::flyte_urls() const {
+  const ::flyteidl::admin::FlyteURLs* p = flyte_urls_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::FlyteURLs*>(
+      &::flyteidl::admin::_FlyteURLs_default_instance_);
+}
+inline ::flyteidl::admin::FlyteURLs* NodeExecutionGetDataResponse::release_flyte_urls() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
+  
+  ::flyteidl::admin::FlyteURLs* temp = flyte_urls_;
+  flyte_urls_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::FlyteURLs* NodeExecutionGetDataResponse::mutable_flyte_urls() {
+  
+  if (flyte_urls_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::FlyteURLs>(GetArenaNoVirtual());
+    flyte_urls_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
+  return flyte_urls_;
+}
+inline void NodeExecutionGetDataResponse::set_allocated_flyte_urls(::flyteidl::admin::FlyteURLs* flyte_urls) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(flyte_urls_);
+  }
+  if (flyte_urls) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      flyte_urls = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, flyte_urls, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  flyte_urls_ = flyte_urls;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NodeExecutionGetDataResponse.flyte_urls)
 }
 
 #ifdef __GNUC__

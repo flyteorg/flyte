@@ -101,6 +101,11 @@ message TaskMetadata {
 
     // Arbitrary tags that allow users and the platform to store small but arbitrary labels
     map<string, string> tags = 11;
+
+    // pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this
+    // task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
+    // identically as, the default PodTemplate configured in FlytePropeller.
+    string pod_template_name = 12;
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -263,24 +268,32 @@ message DataLoadingConfig {
 
 // Defines a pod spec and additional pod metadata that is created when a task is executed.
 message K8sPod {
-   // Contains additional metadata for building a kubernetes pod.
-   K8sObjectMetadata metadata = 1;
+    // Contains additional metadata for building a kubernetes pod.
+    K8sObjectMetadata metadata = 1;
 
-   // Defines the primary pod spec created when a task is executed.
-   // This should be a JSON-marshalled pod spec, which can be defined in
-   // - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
-   // - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
-   google.protobuf.Struct pod_spec = 2;
+    // Defines the primary pod spec created when a task is executed.
+    // This should be a JSON-marshalled pod spec, which can be defined in
+    // - go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936
+    // - python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py
+    google.protobuf.Struct pod_spec = 2;
+
+    // BETA: Optional configuration for DataLoading. If not specified, then default values are used.
+    // This makes it possible to to run a completely portable container, that uses inputs and outputs
+    // only from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.
+    // If data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories
+    // are not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation
+    // to understand the default paths.
+    // Only K8s
+    DataLoadingConfig data_config = 3;
 }
 
 // Metadata for building a kubernetes object when a task is executed.
 message K8sObjectMetadata {
+    // Optional labels to add to the pod definition.
+    map<string, string> labels = 1;
 
-  // Optional labels to add to the pod definition.
-  map<string, string> labels = 1;
-
-  // Optional annotations to add to the pod definition.
-  map<string, string> annotations = 2;
+    // Optional annotations to add to the pod definition.
+    map<string, string> annotations = 2;
 }
 
 // Sql represents a generic sql workload with a statement and dialect.

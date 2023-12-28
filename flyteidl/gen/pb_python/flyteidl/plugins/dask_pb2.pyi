@@ -22,11 +22,11 @@ class DaskScheduler(_message.Message):
     def __init__(self, image: _Optional[str] = ..., resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ...) -> None: ...
 
 class DaskWorkerGroup(_message.Message):
-    __slots__ = ["image", "number_of_workers", "resources"]
-    IMAGE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["number_of_workers", "image", "resources"]
     NUMBER_OF_WORKERS_FIELD_NUMBER: _ClassVar[int]
+    IMAGE_FIELD_NUMBER: _ClassVar[int]
     RESOURCES_FIELD_NUMBER: _ClassVar[int]
-    image: str
     number_of_workers: int
+    image: str
     resources: _tasks_pb2.Resources
     def __init__(self, number_of_workers: _Optional[int] = ..., image: _Optional[str] = ..., resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ...) -> None: ...

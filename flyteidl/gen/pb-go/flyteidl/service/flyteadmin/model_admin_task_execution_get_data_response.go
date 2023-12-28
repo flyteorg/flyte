@@ -19,4 +19,5 @@ type AdminTaskExecutionGetDataResponse struct {
 	FullInputs *CoreLiteralMap `json:"full_inputs,omitempty"`
 	// Full_outputs will only be populated if they are under a configured size threshold.
 	FullOutputs *CoreLiteralMap `json:"full_outputs,omitempty"`
+	FlyteUrls *AdminFlyteUrLs `json:"flyte_urls,omitempty"`
 }

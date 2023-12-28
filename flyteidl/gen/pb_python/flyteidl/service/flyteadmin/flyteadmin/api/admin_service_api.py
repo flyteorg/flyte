@@ -333,8 +333,8 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminTaskCreateRequest body: (required)
-        :return: AdminTaskCreateResponse
+        :param FlyteidladminTaskCreateRequest body: (required)
+        :return: FlyteidladminTaskCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -354,8 +354,8 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminTaskCreateRequest body: (required)
-        :return: AdminTaskCreateResponse
+        :param FlyteidladminTaskCreateRequest body: (required)
+        :return: FlyteidladminTaskCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
@@ -413,7 +413,7 @@ class AdminServiceApi(object):
             body=body_params,
             post_params=form_params,
             files=local_var_files,
-            response_type='AdminTaskCreateResponse',  # noqa: E501
+            response_type='FlyteidladminTaskCreateResponse',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),
@@ -1512,6 +1512,123 @@ class AdminServiceApi(object):
             post_params=form_params,
             files=local_var_files,
             response_type='AdminWorkflowExecutionGetDataResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def get_execution_metrics(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+        """Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_execution_metrics(id_project, id_domain, id_name, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User or system provided value for the resource. (required)
+        :param int depth: depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+        :return: AdminWorkflowExecutionGetMetricsResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_execution_metrics_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_execution_metrics_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return data
+
+    def get_execution_metrics_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+        """Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_execution_metrics_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_project: Name of the project the resource belongs to. (required)
+        :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_name: User or system provided value for the resource. (required)
+        :param int depth: depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+        :return: AdminWorkflowExecutionGetMetricsResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_project', 'id_domain', 'id_name', 'depth']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_execution_metrics" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_project' is set
+        if ('id_project' not in params or
+                params['id_project'] is None):
+            raise ValueError("Missing the required parameter `id_project` when calling `get_execution_metrics`")  # noqa: E501
+        # verify the required parameter 'id_domain' is set
+        if ('id_domain' not in params or
+                params['id_domain'] is None):
+            raise ValueError("Missing the required parameter `id_domain` when calling `get_execution_metrics`")  # noqa: E501
+        # verify the required parameter 'id_name' is set
+        if ('id_name' not in params or
+                params['id_name'] is None):
+            raise ValueError("Missing the required parameter `id_name` when calling `get_execution_metrics`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_project' in params:
+            path_params['id.project'] = params['id_project']  # noqa: E501
+        if 'id_domain' in params:
+            path_params['id.domain'] = params['id_domain']  # noqa: E501
+        if 'id_name' in params:
+            path_params['id.name'] = params['id_name']  # noqa: E501
+
+        query_params = []
+        if 'depth' in params:
+            query_params.append(('depth', params['depth']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminWorkflowExecutionGetMetricsResponse',  # noqa: E501
             auth_settings=auth_settings,
             async_req=params.get('async_req'),
             _return_http_data_only=params.get('_return_http_data_only'),

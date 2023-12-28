@@ -51,7 +51,12 @@ message NodeExecutionEvent {
     // by the executor of the node.
     google.protobuf.Timestamp occurred_at = 4;
 
-    string input_uri = 5;
+    oneof input_value {
+        string input_uri = 5;
+
+        // Raw input data consumed by this node execution.
+        core.LiteralMap input_data = 20;
+    }
 
     oneof output_result {
         // URL to the output of the execution, it encodes all the information
@@ -99,6 +104,12 @@ message NodeExecutionEvent {
     // String location uniquely identifying where the deck HTML file is
     // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
     string deck_uri = 19;
+
+    // This timestamp represents the instant when the event was reported by the executing framework. For example,
+    // when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+    // literal inputs are initially copied. The event however will not be sent until after the copy completes.
+    // Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+    google.protobuf.Timestamp reported_at = 21;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched
@@ -127,6 +138,10 @@ message DynamicWorkflowNodeMetadata {
 
     // Represents the compiled representation of the embedded dynamic workflow.
     core.CompiledWorkflowClosure compiled_workflow = 2;
+
+    // dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+    // required to correctly recover partially completed executions where the workflow has already been compiled.
+    string dynamic_job_spec_uri = 3;
 }
 
 message ParentTaskExecutionMetadata {
@@ -137,6 +152,14 @@ message ParentNodeExecutionMetadata {
     // Unique identifier of the parent node id within the execution
     // This is value of core.NodeExecutionIdentifier.node_id of the parent node 
     string node_id = 1;
+}
+
+message EventReason {
+    // An explanation for this event
+    string reason = 1;
+
+    // The time this reason occurred
+    google.protobuf.Timestamp occurred_at = 2;
 }
 
 // Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob.
@@ -165,9 +188,14 @@ message TaskExecutionEvent {
     // by the executor of the task.
     google.protobuf.Timestamp occurred_at = 7;
 
-    // URI of the input file, it encodes all the information
-    // including Cloud source provider. ie., s3://...
-    string input_uri = 8;
+    oneof input_value {
+      // URI of the input file, it encodes all the information
+      // including Cloud source provider. ie., s3://...
+      string input_uri = 8;
+
+      // Raw input data consumed by this task execution.
+      core.LiteralMap input_data = 19;
+    }
 
     oneof output_result {
         // URI to the output of the execution, it will be in a format that encodes all the information
@@ -190,8 +218,11 @@ message TaskExecutionEvent {
     uint32 phase_version = 12;
 
     // An optional explanation for the phase transition.
-    string reason = 13;
+    // Deprecated: Use reasons instead.
+    string reason = 13 [deprecated = true];
 
+    // An optional list of explanations for the phase transition.
+    repeated EventReason reasons = 21;
 
     // A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin
     // this type will be identical, but not all task executions necessarily use pre-registered definitions and this
@@ -206,6 +237,12 @@ message TaskExecutionEvent {
     // TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
     // in this message.
     int32 event_version = 18;
+
+    // This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+    // pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+    // but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+    // facilitates a more accurate portrayal of the evaluation time-series. 
+    google.protobuf.Timestamp reported_at = 20;
 }
 
 // This message contains metadata about external resources produced or used by a specific task execution.

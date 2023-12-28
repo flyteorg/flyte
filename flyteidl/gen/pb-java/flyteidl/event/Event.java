@@ -2143,6 +2143,31 @@ public final class Event {
 
     /**
      * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     */
+    boolean hasInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     */
+    flyteidl.core.Literals.LiteralMap getInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     */
+    flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder();
+
+    /**
+     * <pre>
      * URL to the output of the execution, it encodes all the information
      * including Cloud source provider. ie., s3://...
      * </pre>
@@ -2386,6 +2411,42 @@ public final class Event {
     com.google.protobuf.ByteString
         getDeckUriBytes();
 
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    boolean hasReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    com.google.protobuf.Timestamp getReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder();
+
+    public flyteidl.event.Event.NodeExecutionEvent.InputValueCase getInputValueCase();
+
     public flyteidl.event.Event.NodeExecutionEvent.OutputResultCase getOutputResultCase();
 
     public flyteidl.event.Event.NodeExecutionEvent.TargetMetadataCase getTargetMetadataCase();
@@ -2405,7 +2466,6 @@ public final class Event {
     private NodeExecutionEvent() {
       producerId_ = "";
       phase_ = 0;
-      inputUri_ = "";
       retryGroup_ = "";
       specNodeId_ = "";
       nodeName_ = "";
@@ -2476,8 +2536,8 @@ public final class Event {
             }
             case 42: {
               java.lang.String s = input.readStringRequireUtf8();
-
-              inputUri_ = s;
+              inputValueCase_ = 5;
+              inputValue_ = s;
               break;
             }
             case 50: {
@@ -2607,6 +2667,33 @@ public final class Event {
               deckUri_ = s;
               break;
             }
+            case 162: {
+              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (inputValueCase_ == 20) {
+                subBuilder = ((flyteidl.core.Literals.LiteralMap) inputValue_).toBuilder();
+              }
+              inputValue_ =
+                  input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.LiteralMap) inputValue_);
+                inputValue_ = subBuilder.buildPartial();
+              }
+              inputValueCase_ = 20;
+              break;
+            }
+            case 170: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (reportedAt_ != null) {
+                subBuilder = reportedAt_.toBuilder();
+              }
+              reportedAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(reportedAt_);
+                reportedAt_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -2637,6 +2724,44 @@ public final class Event {
       return flyteidl.event.Event.internal_static_flyteidl_event_NodeExecutionEvent_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
               flyteidl.event.Event.NodeExecutionEvent.class, flyteidl.event.Event.NodeExecutionEvent.Builder.class);
+    }
+
+    private int inputValueCase_ = 0;
+    private java.lang.Object inputValue_;
+    public enum InputValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      INPUT_URI(5),
+      INPUT_DATA(20),
+      INPUTVALUE_NOT_SET(0);
+      private final int value;
+      private InputValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static InputValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static InputValueCase forNumber(int value) {
+        switch (value) {
+          case 5: return INPUT_URI;
+          case 20: return INPUT_DATA;
+          case 0: return INPUTVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public InputValueCase
+    getInputValueCase() {
+      return InputValueCase.forNumber(
+          inputValueCase_);
     }
 
     private int outputResultCase_ = 0;
@@ -2846,19 +2971,23 @@ public final class Event {
     }
 
     public static final int INPUT_URI_FIELD_NUMBER = 5;
-    private volatile java.lang.Object inputUri_;
     /**
      * <code>string input_uri = 5;</code>
      */
     public java.lang.String getInputUri() {
-      java.lang.Object ref = inputUri_;
+      java.lang.Object ref = "";
+      if (inputValueCase_ == 5) {
+        ref = inputValue_;
+      }
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        inputUri_ = s;
+        if (inputValueCase_ == 5) {
+          inputValue_ = s;
+        }
         return s;
       }
     }
@@ -2867,16 +2996,59 @@ public final class Event {
      */
     public com.google.protobuf.ByteString
         getInputUriBytes() {
-      java.lang.Object ref = inputUri_;
+      java.lang.Object ref = "";
+      if (inputValueCase_ == 5) {
+        ref = inputValue_;
+      }
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        inputUri_ = b;
+        if (inputValueCase_ == 5) {
+          inputValue_ = b;
+        }
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int INPUT_DATA_FIELD_NUMBER = 20;
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     */
+    public boolean hasInputData() {
+      return inputValueCase_ == 20;
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     */
+    public flyteidl.core.Literals.LiteralMap getInputData() {
+      if (inputValueCase_ == 20) {
+         return (flyteidl.core.Literals.LiteralMap) inputValue_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this node execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+     */
+    public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
+      if (inputValueCase_ == 20) {
+         return (flyteidl.core.Literals.LiteralMap) inputValue_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
     }
 
     public static final int OUTPUT_URI_FIELD_NUMBER = 6;
@@ -3333,6 +3505,48 @@ public final class Event {
       }
     }
 
+    public static final int REPORTED_AT_FIELD_NUMBER = 21;
+    private com.google.protobuf.Timestamp reportedAt_;
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    public boolean hasReportedAt() {
+      return reportedAt_ != null;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    public com.google.protobuf.Timestamp getReportedAt() {
+      return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example,
+     * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+     * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+     * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+      return getReportedAt();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3359,8 +3573,8 @@ public final class Event {
       if (occurredAt_ != null) {
         output.writeMessage(4, getOccurredAt());
       }
-      if (!getInputUriBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, inputUri_);
+      if (inputValueCase_ == 5) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, inputValue_);
       }
       if (outputResultCase_ == 6) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 6, outputResult_);
@@ -3404,6 +3618,12 @@ public final class Event {
       if (!getDeckUriBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 19, deckUri_);
       }
+      if (inputValueCase_ == 20) {
+        output.writeMessage(20, (flyteidl.core.Literals.LiteralMap) inputValue_);
+      }
+      if (reportedAt_ != null) {
+        output.writeMessage(21, getReportedAt());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3428,8 +3648,8 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getOccurredAt());
       }
-      if (!getInputUriBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, inputUri_);
+      if (inputValueCase_ == 5) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, inputValue_);
       }
       if (outputResultCase_ == 6) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, outputResult_);
@@ -3482,6 +3702,14 @@ public final class Event {
       if (!getDeckUriBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(19, deckUri_);
       }
+      if (inputValueCase_ == 20) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(20, (flyteidl.core.Literals.LiteralMap) inputValue_);
+      }
+      if (reportedAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(21, getReportedAt());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3510,8 +3738,6 @@ public final class Event {
         if (!getOccurredAt()
             .equals(other.getOccurredAt())) return false;
       }
-      if (!getInputUri()
-          .equals(other.getInputUri())) return false;
       if (hasParentTaskMetadata() != other.hasParentTaskMetadata()) return false;
       if (hasParentTaskMetadata()) {
         if (!getParentTaskMetadata()
@@ -3536,6 +3762,24 @@ public final class Event {
           != other.getIsDynamic()) return false;
       if (!getDeckUri()
           .equals(other.getDeckUri())) return false;
+      if (hasReportedAt() != other.hasReportedAt()) return false;
+      if (hasReportedAt()) {
+        if (!getReportedAt()
+            .equals(other.getReportedAt())) return false;
+      }
+      if (!getInputValueCase().equals(other.getInputValueCase())) return false;
+      switch (inputValueCase_) {
+        case 5:
+          if (!getInputUri()
+              .equals(other.getInputUri())) return false;
+          break;
+        case 20:
+          if (!getInputData()
+              .equals(other.getInputData())) return false;
+          break;
+        case 0:
+        default:
+      }
       if (!getOutputResultCase().equals(other.getOutputResultCase())) return false;
       switch (outputResultCase_) {
         case 6:
@@ -3589,8 +3833,6 @@ public final class Event {
         hash = (37 * hash) + OCCURRED_AT_FIELD_NUMBER;
         hash = (53 * hash) + getOccurredAt().hashCode();
       }
-      hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
-      hash = (53 * hash) + getInputUri().hashCode();
       if (hasParentTaskMetadata()) {
         hash = (37 * hash) + PARENT_TASK_METADATA_FIELD_NUMBER;
         hash = (53 * hash) + getParentTaskMetadata().hashCode();
@@ -3615,6 +3857,22 @@ public final class Event {
           getIsDynamic());
       hash = (37 * hash) + DECK_URI_FIELD_NUMBER;
       hash = (53 * hash) + getDeckUri().hashCode();
+      if (hasReportedAt()) {
+        hash = (37 * hash) + REPORTED_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getReportedAt().hashCode();
+      }
+      switch (inputValueCase_) {
+        case 5:
+          hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
+          hash = (53 * hash) + getInputUri().hashCode();
+          break;
+        case 20:
+          hash = (37 * hash) + INPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getInputData().hashCode();
+          break;
+        case 0:
+        default:
+      }
       switch (outputResultCase_) {
         case 6:
           hash = (37 * hash) + OUTPUT_URI_FIELD_NUMBER;
@@ -3792,8 +4050,6 @@ public final class Event {
           occurredAt_ = null;
           occurredAtBuilder_ = null;
         }
-        inputUri_ = "";
-
         if (parentTaskMetadataBuilder_ == null) {
           parentTaskMetadata_ = null;
         } else {
@@ -3820,6 +4076,14 @@ public final class Event {
 
         deckUri_ = "";
 
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
+        inputValueCase_ = 0;
+        inputValue_ = null;
         outputResultCase_ = 0;
         outputResult_ = null;
         targetMetadataCase_ = 0;
@@ -3862,7 +4126,16 @@ public final class Event {
         } else {
           result.occurredAt_ = occurredAtBuilder_.build();
         }
-        result.inputUri_ = inputUri_;
+        if (inputValueCase_ == 5) {
+          result.inputValue_ = inputValue_;
+        }
+        if (inputValueCase_ == 20) {
+          if (inputDataBuilder_ == null) {
+            result.inputValue_ = inputValue_;
+          } else {
+            result.inputValue_ = inputDataBuilder_.build();
+          }
+        }
         if (outputResultCase_ == 6) {
           result.outputResult_ = outputResult_;
         }
@@ -3911,6 +4184,12 @@ public final class Event {
         result.isParent_ = isParent_;
         result.isDynamic_ = isDynamic_;
         result.deckUri_ = deckUri_;
+        if (reportedAtBuilder_ == null) {
+          result.reportedAt_ = reportedAt_;
+        } else {
+          result.reportedAt_ = reportedAtBuilder_.build();
+        }
+        result.inputValueCase_ = inputValueCase_;
         result.outputResultCase_ = outputResultCase_;
         result.targetMetadataCase_ = targetMetadataCase_;
         onBuilt();
@@ -3974,10 +4253,6 @@ public final class Event {
         if (other.hasOccurredAt()) {
           mergeOccurredAt(other.getOccurredAt());
         }
-        if (!other.getInputUri().isEmpty()) {
-          inputUri_ = other.inputUri_;
-          onChanged();
-        }
         if (other.hasParentTaskMetadata()) {
           mergeParentTaskMetadata(other.getParentTaskMetadata());
         }
@@ -4008,6 +4283,24 @@ public final class Event {
         if (!other.getDeckUri().isEmpty()) {
           deckUri_ = other.deckUri_;
           onChanged();
+        }
+        if (other.hasReportedAt()) {
+          mergeReportedAt(other.getReportedAt());
+        }
+        switch (other.getInputValueCase()) {
+          case INPUT_URI: {
+            inputValueCase_ = 5;
+            inputValue_ = other.inputValue_;
+            onChanged();
+            break;
+          }
+          case INPUT_DATA: {
+            mergeInputData(other.getInputData());
+            break;
+          }
+          case INPUTVALUE_NOT_SET: {
+            break;
+          }
         }
         switch (other.getOutputResultCase()) {
           case OUTPUT_URI: {
@@ -4069,6 +4362,21 @@ public final class Event {
         }
         return this;
       }
+      private int inputValueCase_ = 0;
+      private java.lang.Object inputValue_;
+      public InputValueCase
+          getInputValueCase() {
+        return InputValueCase.forNumber(
+            inputValueCase_);
+      }
+
+      public Builder clearInputValue() {
+        inputValueCase_ = 0;
+        inputValue_ = null;
+        onChanged();
+        return this;
+      }
+
       private int outputResultCase_ = 0;
       private java.lang.Object outputResult_;
       public OutputResultCase
@@ -4549,17 +4857,21 @@ public final class Event {
         return occurredAtBuilder_;
       }
 
-      private java.lang.Object inputUri_ = "";
       /**
        * <code>string input_uri = 5;</code>
        */
       public java.lang.String getInputUri() {
-        java.lang.Object ref = inputUri_;
+        java.lang.Object ref = "";
+        if (inputValueCase_ == 5) {
+          ref = inputValue_;
+        }
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          inputUri_ = s;
+          if (inputValueCase_ == 5) {
+            inputValue_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -4570,12 +4882,17 @@ public final class Event {
        */
       public com.google.protobuf.ByteString
           getInputUriBytes() {
-        java.lang.Object ref = inputUri_;
+        java.lang.Object ref = "";
+        if (inputValueCase_ == 5) {
+          ref = inputValue_;
+        }
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          inputUri_ = b;
+          if (inputValueCase_ == 5) {
+            inputValue_ = b;
+          }
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -4589,8 +4906,8 @@ public final class Event {
         if (value == null) {
     throw new NullPointerException();
   }
-  
-        inputUri_ = value;
+  inputValueCase_ = 5;
+        inputValue_ = value;
         onChanged();
         return this;
       }
@@ -4598,9 +4915,11 @@ public final class Event {
        * <code>string input_uri = 5;</code>
        */
       public Builder clearInputUri() {
-        
-        inputUri_ = getDefaultInstance().getInputUri();
-        onChanged();
+        if (inputValueCase_ == 5) {
+          inputValueCase_ = 0;
+          inputValue_ = null;
+          onChanged();
+        }
         return this;
       }
       /**
@@ -4612,10 +4931,182 @@ public final class Event {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        
-        inputUri_ = value;
+        inputValueCase_ = 5;
+        inputValue_ = value;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputDataBuilder_;
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public boolean hasInputData() {
+        return inputValueCase_ == 20;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap getInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 20) {
+            return (flyteidl.core.Literals.LiteralMap) inputValue_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        } else {
+          if (inputValueCase_ == 20) {
+            return inputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public Builder setInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (inputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputValue_ = value;
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 20;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public Builder setInputData(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (inputDataBuilder_ == null) {
+          inputValue_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(builderForValue.build());
+        }
+        inputValueCase_ = 20;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public Builder mergeInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 20 &&
+              inputValue_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
+            inputValue_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) inputValue_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            inputValue_ = value;
+          }
+          onChanged();
+        } else {
+          if (inputValueCase_ == 20) {
+            inputDataBuilder_.mergeFrom(value);
+          }
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 20;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public Builder clearInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 20) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+            onChanged();
+          }
+        } else {
+          if (inputValueCase_ == 20) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+          }
+          inputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap.Builder getInputDataBuilder() {
+        return getInputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
+        if ((inputValueCase_ == 20) && (inputDataBuilder_ != null)) {
+          return inputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (inputValueCase_ == 20) {
+            return (flyteidl.core.Literals.LiteralMap) inputValue_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this node execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 20;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getInputDataFieldBuilder() {
+        if (inputDataBuilder_ == null) {
+          if (!(inputValueCase_ == 20)) {
+            inputValue_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          }
+          inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  (flyteidl.core.Literals.LiteralMap) inputValue_,
+                  getParentForChildren(),
+                  isClean());
+          inputValue_ = null;
+        }
+        inputValueCase_ = 20;
+        onChanged();;
+        return inputDataBuilder_;
       }
 
       /**
@@ -6111,6 +6602,186 @@ public final class Event {
         deckUri_ = value;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.Timestamp reportedAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> reportedAtBuilder_;
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public boolean hasReportedAt() {
+        return reportedAtBuilder_ != null || reportedAt_ != null;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public com.google.protobuf.Timestamp getReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        } else {
+          return reportedAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder setReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          reportedAt_ = value;
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder setReportedAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder mergeReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (reportedAt_ != null) {
+            reportedAt_ =
+              com.google.protobuf.Timestamp.newBuilder(reportedAt_).mergeFrom(value).buildPartial();
+          } else {
+            reportedAt_ = value;
+          }
+          onChanged();
+        } else {
+          reportedAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public Builder clearReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+          onChanged();
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getReportedAtBuilder() {
+        
+        onChanged();
+        return getReportedAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+        if (reportedAtBuilder_ != null) {
+          return reportedAtBuilder_.getMessageOrBuilder();
+        } else {
+          return reportedAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example,
+       * when first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when
+       * literal inputs are initially copied. The event however will not be sent until after the copy completes.
+       * Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 21;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getReportedAtFieldBuilder() {
+        if (reportedAtBuilder_ == null) {
+          reportedAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getReportedAt(),
+                  getParentForChildren(),
+                  isClean());
+          reportedAt_ = null;
+        }
+        return reportedAtBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -8185,6 +8856,26 @@ public final class Event {
      * <code>.flyteidl.core.CompiledWorkflowClosure compiled_workflow = 2;</code>
      */
     flyteidl.core.Compiler.CompiledWorkflowClosureOrBuilder getCompiledWorkflowOrBuilder();
+
+    /**
+     * <pre>
+     * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+     * required to correctly recover partially completed executions where the workflow has already been compiled.
+     * </pre>
+     *
+     * <code>string dynamic_job_spec_uri = 3;</code>
+     */
+    java.lang.String getDynamicJobSpecUri();
+    /**
+     * <pre>
+     * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+     * required to correctly recover partially completed executions where the workflow has already been compiled.
+     * </pre>
+     *
+     * <code>string dynamic_job_spec_uri = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getDynamicJobSpecUriBytes();
   }
   /**
    * <pre>
@@ -8203,6 +8894,7 @@ public final class Event {
       super(builder);
     }
     private DynamicWorkflowNodeMetadata() {
+      dynamicJobSpecUri_ = "";
     }
 
     @java.lang.Override
@@ -8253,6 +8945,12 @@ public final class Event {
                 compiledWorkflow_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              dynamicJobSpecUri_ = s;
               break;
             }
             default: {
@@ -8353,6 +9051,50 @@ public final class Event {
       return getCompiledWorkflow();
     }
 
+    public static final int DYNAMIC_JOB_SPEC_URI_FIELD_NUMBER = 3;
+    private volatile java.lang.Object dynamicJobSpecUri_;
+    /**
+     * <pre>
+     * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+     * required to correctly recover partially completed executions where the workflow has already been compiled.
+     * </pre>
+     *
+     * <code>string dynamic_job_spec_uri = 3;</code>
+     */
+    public java.lang.String getDynamicJobSpecUri() {
+      java.lang.Object ref = dynamicJobSpecUri_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        dynamicJobSpecUri_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+     * required to correctly recover partially completed executions where the workflow has already been compiled.
+     * </pre>
+     *
+     * <code>string dynamic_job_spec_uri = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDynamicJobSpecUriBytes() {
+      java.lang.Object ref = dynamicJobSpecUri_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        dynamicJobSpecUri_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -8373,6 +9115,9 @@ public final class Event {
       if (compiledWorkflow_ != null) {
         output.writeMessage(2, getCompiledWorkflow());
       }
+      if (!getDynamicJobSpecUriBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, dynamicJobSpecUri_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -8389,6 +9134,9 @@ public final class Event {
       if (compiledWorkflow_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getCompiledWorkflow());
+      }
+      if (!getDynamicJobSpecUriBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, dynamicJobSpecUri_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -8415,6 +9163,8 @@ public final class Event {
         if (!getCompiledWorkflow()
             .equals(other.getCompiledWorkflow())) return false;
       }
+      if (!getDynamicJobSpecUri()
+          .equals(other.getDynamicJobSpecUri())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -8434,6 +9184,8 @@ public final class Event {
         hash = (37 * hash) + COMPILED_WORKFLOW_FIELD_NUMBER;
         hash = (53 * hash) + getCompiledWorkflow().hashCode();
       }
+      hash = (37 * hash) + DYNAMIC_JOB_SPEC_URI_FIELD_NUMBER;
+      hash = (53 * hash) + getDynamicJobSpecUri().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -8583,6 +9335,8 @@ public final class Event {
           compiledWorkflow_ = null;
           compiledWorkflowBuilder_ = null;
         }
+        dynamicJobSpecUri_ = "";
+
         return this;
       }
 
@@ -8619,6 +9373,7 @@ public final class Event {
         } else {
           result.compiledWorkflow_ = compiledWorkflowBuilder_.build();
         }
+        result.dynamicJobSpecUri_ = dynamicJobSpecUri_;
         onBuilt();
         return result;
       }
@@ -8672,6 +9427,10 @@ public final class Event {
         }
         if (other.hasCompiledWorkflow()) {
           mergeCompiledWorkflow(other.getCompiledWorkflow());
+        }
+        if (!other.getDynamicJobSpecUri().isEmpty()) {
+          dynamicJobSpecUri_ = other.dynamicJobSpecUri_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -9006,6 +9765,100 @@ public final class Event {
           compiledWorkflow_ = null;
         }
         return compiledWorkflowBuilder_;
+      }
+
+      private java.lang.Object dynamicJobSpecUri_ = "";
+      /**
+       * <pre>
+       * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+       * required to correctly recover partially completed executions where the workflow has already been compiled.
+       * </pre>
+       *
+       * <code>string dynamic_job_spec_uri = 3;</code>
+       */
+      public java.lang.String getDynamicJobSpecUri() {
+        java.lang.Object ref = dynamicJobSpecUri_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          dynamicJobSpecUri_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+       * required to correctly recover partially completed executions where the workflow has already been compiled.
+       * </pre>
+       *
+       * <code>string dynamic_job_spec_uri = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDynamicJobSpecUriBytes() {
+        java.lang.Object ref = dynamicJobSpecUri_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          dynamicJobSpecUri_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+       * required to correctly recover partially completed executions where the workflow has already been compiled.
+       * </pre>
+       *
+       * <code>string dynamic_job_spec_uri = 3;</code>
+       */
+      public Builder setDynamicJobSpecUri(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        dynamicJobSpecUri_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+       * required to correctly recover partially completed executions where the workflow has already been compiled.
+       * </pre>
+       *
+       * <code>string dynamic_job_spec_uri = 3;</code>
+       */
+      public Builder clearDynamicJobSpecUri() {
+        
+        dynamicJobSpecUri_ = getDefaultInstance().getDynamicJobSpecUri();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+       * required to correctly recover partially completed executions where the workflow has already been compiled.
+       * </pre>
+       *
+       * <code>string dynamic_job_spec_uri = 3;</code>
+       */
+      public Builder setDynamicJobSpecUriBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        dynamicJobSpecUri_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -10260,6 +11113,845 @@ public final class Event {
 
   }
 
+  public interface EventReasonOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.event.EventReason)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    java.lang.String getReason();
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getReasonBytes();
+
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    boolean hasOccurredAt();
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    com.google.protobuf.Timestamp getOccurredAt();
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder();
+  }
+  /**
+   * Protobuf type {@code flyteidl.event.EventReason}
+   */
+  public  static final class EventReason extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.event.EventReason)
+      EventReasonOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use EventReason.newBuilder() to construct.
+    private EventReason(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private EventReason() {
+      reason_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private EventReason(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              reason_ = s;
+              break;
+            }
+            case 18: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (occurredAt_ != null) {
+                subBuilder = occurredAt_.toBuilder();
+              }
+              occurredAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(occurredAt_);
+                occurredAt_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.event.Event.EventReason.class, flyteidl.event.Event.EventReason.Builder.class);
+    }
+
+    public static final int REASON_FIELD_NUMBER = 1;
+    private volatile java.lang.Object reason_;
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    public java.lang.String getReason() {
+      java.lang.Object ref = reason_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        reason_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getReasonBytes() {
+      java.lang.Object ref = reason_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        reason_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OCCURRED_AT_FIELD_NUMBER = 2;
+    private com.google.protobuf.Timestamp occurredAt_;
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    public boolean hasOccurredAt() {
+      return occurredAt_ != null;
+    }
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    public com.google.protobuf.Timestamp getOccurredAt() {
+      return occurredAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+    }
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder() {
+      return getOccurredAt();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getReasonBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, reason_);
+      }
+      if (occurredAt_ != null) {
+        output.writeMessage(2, getOccurredAt());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getReasonBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, reason_);
+      }
+      if (occurredAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getOccurredAt());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.event.Event.EventReason)) {
+        return super.equals(obj);
+      }
+      flyteidl.event.Event.EventReason other = (flyteidl.event.Event.EventReason) obj;
+
+      if (!getReason()
+          .equals(other.getReason())) return false;
+      if (hasOccurredAt() != other.hasOccurredAt()) return false;
+      if (hasOccurredAt()) {
+        if (!getOccurredAt()
+            .equals(other.getOccurredAt())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REASON_FIELD_NUMBER;
+      hash = (53 * hash) + getReason().hashCode();
+      if (hasOccurredAt()) {
+        hash = (37 * hash) + OCCURRED_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getOccurredAt().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.event.Event.EventReason parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.EventReason parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.event.Event.EventReason prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.event.EventReason}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.event.EventReason)
+        flyteidl.event.Event.EventReasonOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.event.Event.EventReason.class, flyteidl.event.Event.EventReason.Builder.class);
+      }
+
+      // Construct using flyteidl.event.Event.EventReason.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        reason_ = "";
+
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = null;
+        } else {
+          occurredAt_ = null;
+          occurredAtBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.EventReason getDefaultInstanceForType() {
+        return flyteidl.event.Event.EventReason.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.EventReason build() {
+        flyteidl.event.Event.EventReason result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.EventReason buildPartial() {
+        flyteidl.event.Event.EventReason result = new flyteidl.event.Event.EventReason(this);
+        result.reason_ = reason_;
+        if (occurredAtBuilder_ == null) {
+          result.occurredAt_ = occurredAt_;
+        } else {
+          result.occurredAt_ = occurredAtBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.event.Event.EventReason) {
+          return mergeFrom((flyteidl.event.Event.EventReason)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.event.Event.EventReason other) {
+        if (other == flyteidl.event.Event.EventReason.getDefaultInstance()) return this;
+        if (!other.getReason().isEmpty()) {
+          reason_ = other.reason_;
+          onChanged();
+        }
+        if (other.hasOccurredAt()) {
+          mergeOccurredAt(other.getOccurredAt());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.event.Event.EventReason parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.event.Event.EventReason) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object reason_ = "";
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public java.lang.String getReason() {
+        java.lang.Object ref = reason_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          reason_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getReasonBytes() {
+        java.lang.Object ref = reason_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          reason_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public Builder setReason(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        reason_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public Builder clearReason() {
+        
+        reason_ = getDefaultInstance().getReason();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public Builder setReasonBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        reason_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Timestamp occurredAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> occurredAtBuilder_;
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public boolean hasOccurredAt() {
+        return occurredAtBuilder_ != null || occurredAt_ != null;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public com.google.protobuf.Timestamp getOccurredAt() {
+        if (occurredAtBuilder_ == null) {
+          return occurredAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+        } else {
+          return occurredAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder setOccurredAt(com.google.protobuf.Timestamp value) {
+        if (occurredAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          occurredAt_ = value;
+          onChanged();
+        } else {
+          occurredAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder setOccurredAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          occurredAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder mergeOccurredAt(com.google.protobuf.Timestamp value) {
+        if (occurredAtBuilder_ == null) {
+          if (occurredAt_ != null) {
+            occurredAt_ =
+              com.google.protobuf.Timestamp.newBuilder(occurredAt_).mergeFrom(value).buildPartial();
+          } else {
+            occurredAt_ = value;
+          }
+          onChanged();
+        } else {
+          occurredAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder clearOccurredAt() {
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = null;
+          onChanged();
+        } else {
+          occurredAt_ = null;
+          occurredAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getOccurredAtBuilder() {
+        
+        onChanged();
+        return getOccurredAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder() {
+        if (occurredAtBuilder_ != null) {
+          return occurredAtBuilder_.getMessageOrBuilder();
+        } else {
+          return occurredAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+        }
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getOccurredAtFieldBuilder() {
+        if (occurredAtBuilder_ == null) {
+          occurredAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getOccurredAt(),
+                  getParentForChildren(),
+                  isClean());
+          occurredAt_ = null;
+        }
+        return occurredAtBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.event.EventReason)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.event.EventReason)
+    private static final flyteidl.event.Event.EventReason DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.event.Event.EventReason();
+    }
+
+    public static flyteidl.event.Event.EventReason getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<EventReason>
+        PARSER = new com.google.protobuf.AbstractParser<EventReason>() {
+      @java.lang.Override
+      public EventReason parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new EventReason(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<EventReason> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EventReason> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.event.Event.EventReason getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface TaskExecutionEventOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.event.TaskExecutionEvent)
       com.google.protobuf.MessageOrBuilder {
@@ -10458,6 +12150,31 @@ public final class Event {
 
     /**
      * <pre>
+     * Raw input data consumed by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     */
+    boolean hasInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     */
+    flyteidl.core.Literals.LiteralMap getInputData();
+    /**
+     * <pre>
+     * Raw input data consumed by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     */
+    flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder();
+
+    /**
+     * <pre>
      * URI to the output of the execution, it will be in a format that encodes all the information
      * including Cloud source provider. ie., s3://...
      * </pre>
@@ -10565,20 +12282,66 @@ public final class Event {
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    java.lang.String getReason();
+    @java.lang.Deprecated java.lang.String getReason();
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getReasonBytes();
+
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    java.util.List<flyteidl.event.Event.EventReason> 
+        getReasonsList();
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    flyteidl.event.Event.EventReason getReasons(int index);
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    int getReasonsCount();
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    java.util.List<? extends flyteidl.event.Event.EventReasonOrBuilder> 
+        getReasonsOrBuilderList();
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    flyteidl.event.Event.EventReasonOrBuilder getReasonsOrBuilder(
+        int index);
 
     /**
      * <pre>
@@ -10639,6 +12402,42 @@ public final class Event {
      */
     int getEventVersion();
 
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    boolean hasReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    com.google.protobuf.Timestamp getReportedAt();
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder();
+
+    public flyteidl.event.Event.TaskExecutionEvent.InputValueCase getInputValueCase();
+
     public flyteidl.event.Event.TaskExecutionEvent.OutputResultCase getOutputResultCase();
   }
   /**
@@ -10661,8 +12460,8 @@ public final class Event {
       phase_ = 0;
       producerId_ = "";
       logs_ = java.util.Collections.emptyList();
-      inputUri_ = "";
       reason_ = "";
+      reasons_ = java.util.Collections.emptyList();
       taskType_ = "";
     }
 
@@ -10757,8 +12556,8 @@ public final class Event {
             }
             case 66: {
               java.lang.String s = input.readStringRequireUtf8();
-
-              inputUri_ = s;
+              inputValueCase_ = 8;
+              inputValue_ = s;
               break;
             }
             case 74: {
@@ -10843,6 +12642,42 @@ public final class Event {
               eventVersion_ = input.readInt32();
               break;
             }
+            case 154: {
+              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (inputValueCase_ == 19) {
+                subBuilder = ((flyteidl.core.Literals.LiteralMap) inputValue_).toBuilder();
+              }
+              inputValue_ =
+                  input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.LiteralMap) inputValue_);
+                inputValue_ = subBuilder.buildPartial();
+              }
+              inputValueCase_ = 19;
+              break;
+            }
+            case 162: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (reportedAt_ != null) {
+                subBuilder = reportedAt_.toBuilder();
+              }
+              reportedAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(reportedAt_);
+                reportedAt_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 170: {
+              if (!((mutable_bitField0_ & 0x00008000) != 0)) {
+                reasons_ = new java.util.ArrayList<flyteidl.event.Event.EventReason>();
+                mutable_bitField0_ |= 0x00008000;
+              }
+              reasons_.add(
+                  input.readMessage(flyteidl.event.Event.EventReason.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -10860,6 +12695,9 @@ public final class Event {
       } finally {
         if (((mutable_bitField0_ & 0x00000020) != 0)) {
           logs_ = java.util.Collections.unmodifiableList(logs_);
+        }
+        if (((mutable_bitField0_ & 0x00008000) != 0)) {
+          reasons_ = java.util.Collections.unmodifiableList(reasons_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -10879,6 +12717,44 @@ public final class Event {
     }
 
     private int bitField0_;
+    private int inputValueCase_ = 0;
+    private java.lang.Object inputValue_;
+    public enum InputValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      INPUT_URI(8),
+      INPUT_DATA(19),
+      INPUTVALUE_NOT_SET(0);
+      private final int value;
+      private InputValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static InputValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static InputValueCase forNumber(int value) {
+        switch (value) {
+          case 8: return INPUT_URI;
+          case 19: return INPUT_DATA;
+          case 0: return INPUTVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public InputValueCase
+    getInputValueCase() {
+      return InputValueCase.forNumber(
+          inputValueCase_);
+    }
+
     private int outputResultCase_ = 0;
     private java.lang.Object outputResult_;
     public enum OutputResultCase
@@ -11163,7 +13039,6 @@ public final class Event {
     }
 
     public static final int INPUT_URI_FIELD_NUMBER = 8;
-    private volatile java.lang.Object inputUri_;
     /**
      * <pre>
      * URI of the input file, it encodes all the information
@@ -11173,14 +13048,19 @@ public final class Event {
      * <code>string input_uri = 8;</code>
      */
     public java.lang.String getInputUri() {
-      java.lang.Object ref = inputUri_;
+      java.lang.Object ref = "";
+      if (inputValueCase_ == 8) {
+        ref = inputValue_;
+      }
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        inputUri_ = s;
+        if (inputValueCase_ == 8) {
+          inputValue_ = s;
+        }
         return s;
       }
     }
@@ -11194,16 +13074,59 @@ public final class Event {
      */
     public com.google.protobuf.ByteString
         getInputUriBytes() {
-      java.lang.Object ref = inputUri_;
+      java.lang.Object ref = "";
+      if (inputValueCase_ == 8) {
+        ref = inputValue_;
+      }
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        inputUri_ = b;
+        if (inputValueCase_ == 8) {
+          inputValue_ = b;
+        }
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int INPUT_DATA_FIELD_NUMBER = 19;
+    /**
+     * <pre>
+     * Raw input data consumed by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     */
+    public boolean hasInputData() {
+      return inputValueCase_ == 19;
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     */
+    public flyteidl.core.Literals.LiteralMap getInputData() {
+      if (inputValueCase_ == 19) {
+         return (flyteidl.core.Literals.LiteralMap) inputValue_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Raw input data consumed by this task execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+     */
+    public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
+      if (inputValueCase_ == 19) {
+         return (flyteidl.core.Literals.LiteralMap) inputValue_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
     }
 
     public static final int OUTPUT_URI_FIELD_NUMBER = 9;
@@ -11388,11 +13311,12 @@ public final class Event {
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    public java.lang.String getReason() {
+    @java.lang.Deprecated public java.lang.String getReason() {
       java.lang.Object ref = reason_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -11407,11 +13331,12 @@ public final class Event {
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getReasonBytes() {
       java.lang.Object ref = reason_;
       if (ref instanceof java.lang.String) {
@@ -11423,6 +13348,61 @@ public final class Event {
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int REASONS_FIELD_NUMBER = 21;
+    private java.util.List<flyteidl.event.Event.EventReason> reasons_;
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public java.util.List<flyteidl.event.Event.EventReason> getReasonsList() {
+      return reasons_;
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public java.util.List<? extends flyteidl.event.Event.EventReasonOrBuilder> 
+        getReasonsOrBuilderList() {
+      return reasons_;
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public int getReasonsCount() {
+      return reasons_.size();
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public flyteidl.event.Event.EventReason getReasons(int index) {
+      return reasons_.get(index);
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public flyteidl.event.Event.EventReasonOrBuilder getReasonsOrBuilder(
+        int index) {
+      return reasons_.get(index);
     }
 
     public static final int TASK_TYPE_FIELD_NUMBER = 14;
@@ -11520,6 +13500,48 @@ public final class Event {
       return eventVersion_;
     }
 
+    public static final int REPORTED_AT_FIELD_NUMBER = 20;
+    private com.google.protobuf.Timestamp reportedAt_;
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    public boolean hasReportedAt() {
+      return reportedAt_ != null;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    public com.google.protobuf.Timestamp getReportedAt() {
+      return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+    }
+    /**
+     * <pre>
+     * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+     * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+     * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+     * facilitates a more accurate portrayal of the evaluation time-series. 
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+      return getReportedAt();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -11555,8 +13577,8 @@ public final class Event {
       if (occurredAt_ != null) {
         output.writeMessage(7, getOccurredAt());
       }
-      if (!getInputUriBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 8, inputUri_);
+      if (inputValueCase_ == 8) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 8, inputValue_);
       }
       if (outputResultCase_ == 9) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 9, outputResult_);
@@ -11584,6 +13606,15 @@ public final class Event {
       }
       if (eventVersion_ != 0) {
         output.writeInt32(18, eventVersion_);
+      }
+      if (inputValueCase_ == 19) {
+        output.writeMessage(19, (flyteidl.core.Literals.LiteralMap) inputValue_);
+      }
+      if (reportedAt_ != null) {
+        output.writeMessage(20, getReportedAt());
+      }
+      for (int i = 0; i < reasons_.size(); i++) {
+        output.writeMessage(21, reasons_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -11621,8 +13652,8 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(7, getOccurredAt());
       }
-      if (!getInputUriBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, inputUri_);
+      if (inputValueCase_ == 8) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, inputValue_);
       }
       if (outputResultCase_ == 9) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(9, outputResult_);
@@ -11656,6 +13687,18 @@ public final class Event {
       if (eventVersion_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(18, eventVersion_);
+      }
+      if (inputValueCase_ == 19) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(19, (flyteidl.core.Literals.LiteralMap) inputValue_);
+      }
+      if (reportedAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(20, getReportedAt());
+      }
+      for (int i = 0; i < reasons_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(21, reasons_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -11694,8 +13737,6 @@ public final class Event {
         if (!getOccurredAt()
             .equals(other.getOccurredAt())) return false;
       }
-      if (!getInputUri()
-          .equals(other.getInputUri())) return false;
       if (hasCustomInfo() != other.hasCustomInfo()) return false;
       if (hasCustomInfo()) {
         if (!getCustomInfo()
@@ -11705,6 +13746,8 @@ public final class Event {
           != other.getPhaseVersion()) return false;
       if (!getReason()
           .equals(other.getReason())) return false;
+      if (!getReasonsList()
+          .equals(other.getReasonsList())) return false;
       if (!getTaskType()
           .equals(other.getTaskType())) return false;
       if (hasMetadata() != other.hasMetadata()) return false;
@@ -11714,6 +13757,24 @@ public final class Event {
       }
       if (getEventVersion()
           != other.getEventVersion()) return false;
+      if (hasReportedAt() != other.hasReportedAt()) return false;
+      if (hasReportedAt()) {
+        if (!getReportedAt()
+            .equals(other.getReportedAt())) return false;
+      }
+      if (!getInputValueCase().equals(other.getInputValueCase())) return false;
+      switch (inputValueCase_) {
+        case 8:
+          if (!getInputUri()
+              .equals(other.getInputUri())) return false;
+          break;
+        case 19:
+          if (!getInputData()
+              .equals(other.getInputData())) return false;
+          break;
+        case 0:
+        default:
+      }
       if (!getOutputResultCase().equals(other.getOutputResultCase())) return false;
       switch (outputResultCase_) {
         case 9:
@@ -11764,8 +13825,6 @@ public final class Event {
         hash = (37 * hash) + OCCURRED_AT_FIELD_NUMBER;
         hash = (53 * hash) + getOccurredAt().hashCode();
       }
-      hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
-      hash = (53 * hash) + getInputUri().hashCode();
       if (hasCustomInfo()) {
         hash = (37 * hash) + CUSTOM_INFO_FIELD_NUMBER;
         hash = (53 * hash) + getCustomInfo().hashCode();
@@ -11774,6 +13833,10 @@ public final class Event {
       hash = (53 * hash) + getPhaseVersion();
       hash = (37 * hash) + REASON_FIELD_NUMBER;
       hash = (53 * hash) + getReason().hashCode();
+      if (getReasonsCount() > 0) {
+        hash = (37 * hash) + REASONS_FIELD_NUMBER;
+        hash = (53 * hash) + getReasonsList().hashCode();
+      }
       hash = (37 * hash) + TASK_TYPE_FIELD_NUMBER;
       hash = (53 * hash) + getTaskType().hashCode();
       if (hasMetadata()) {
@@ -11782,6 +13845,22 @@ public final class Event {
       }
       hash = (37 * hash) + EVENT_VERSION_FIELD_NUMBER;
       hash = (53 * hash) + getEventVersion();
+      if (hasReportedAt()) {
+        hash = (37 * hash) + REPORTED_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getReportedAt().hashCode();
+      }
+      switch (inputValueCase_) {
+        case 8:
+          hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
+          hash = (53 * hash) + getInputUri().hashCode();
+          break;
+        case 19:
+          hash = (37 * hash) + INPUT_DATA_FIELD_NUMBER;
+          hash = (53 * hash) + getInputData().hashCode();
+          break;
+        case 0:
+        default:
+      }
       switch (outputResultCase_) {
         case 9:
           hash = (37 * hash) + OUTPUT_URI_FIELD_NUMBER;
@@ -11931,6 +14010,7 @@ public final class Event {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
           getLogsFieldBuilder();
+          getReasonsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -11966,8 +14046,6 @@ public final class Event {
           occurredAt_ = null;
           occurredAtBuilder_ = null;
         }
-        inputUri_ = "";
-
         if (customInfoBuilder_ == null) {
           customInfo_ = null;
         } else {
@@ -11978,6 +14056,12 @@ public final class Event {
 
         reason_ = "";
 
+        if (reasonsBuilder_ == null) {
+          reasons_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00008000);
+        } else {
+          reasonsBuilder_.clear();
+        }
         taskType_ = "";
 
         if (metadataBuilder_ == null) {
@@ -11988,6 +14072,14 @@ public final class Event {
         }
         eventVersion_ = 0;
 
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
+        inputValueCase_ = 0;
+        inputValue_ = null;
         outputResultCase_ = 0;
         outputResult_ = null;
         return this;
@@ -12045,7 +14137,16 @@ public final class Event {
         } else {
           result.occurredAt_ = occurredAtBuilder_.build();
         }
-        result.inputUri_ = inputUri_;
+        if (inputValueCase_ == 8) {
+          result.inputValue_ = inputValue_;
+        }
+        if (inputValueCase_ == 19) {
+          if (inputDataBuilder_ == null) {
+            result.inputValue_ = inputValue_;
+          } else {
+            result.inputValue_ = inputDataBuilder_.build();
+          }
+        }
         if (outputResultCase_ == 9) {
           result.outputResult_ = outputResult_;
         }
@@ -12070,6 +14171,15 @@ public final class Event {
         }
         result.phaseVersion_ = phaseVersion_;
         result.reason_ = reason_;
+        if (reasonsBuilder_ == null) {
+          if (((bitField0_ & 0x00008000) != 0)) {
+            reasons_ = java.util.Collections.unmodifiableList(reasons_);
+            bitField0_ = (bitField0_ & ~0x00008000);
+          }
+          result.reasons_ = reasons_;
+        } else {
+          result.reasons_ = reasonsBuilder_.build();
+        }
         result.taskType_ = taskType_;
         if (metadataBuilder_ == null) {
           result.metadata_ = metadata_;
@@ -12077,7 +14187,13 @@ public final class Event {
           result.metadata_ = metadataBuilder_.build();
         }
         result.eventVersion_ = eventVersion_;
+        if (reportedAtBuilder_ == null) {
+          result.reportedAt_ = reportedAt_;
+        } else {
+          result.reportedAt_ = reportedAtBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
+        result.inputValueCase_ = inputValueCase_;
         result.outputResultCase_ = outputResultCase_;
         onBuilt();
         return result;
@@ -12172,10 +14288,6 @@ public final class Event {
         if (other.hasOccurredAt()) {
           mergeOccurredAt(other.getOccurredAt());
         }
-        if (!other.getInputUri().isEmpty()) {
-          inputUri_ = other.inputUri_;
-          onChanged();
-        }
         if (other.hasCustomInfo()) {
           mergeCustomInfo(other.getCustomInfo());
         }
@@ -12186,6 +14298,32 @@ public final class Event {
           reason_ = other.reason_;
           onChanged();
         }
+        if (reasonsBuilder_ == null) {
+          if (!other.reasons_.isEmpty()) {
+            if (reasons_.isEmpty()) {
+              reasons_ = other.reasons_;
+              bitField0_ = (bitField0_ & ~0x00008000);
+            } else {
+              ensureReasonsIsMutable();
+              reasons_.addAll(other.reasons_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.reasons_.isEmpty()) {
+            if (reasonsBuilder_.isEmpty()) {
+              reasonsBuilder_.dispose();
+              reasonsBuilder_ = null;
+              reasons_ = other.reasons_;
+              bitField0_ = (bitField0_ & ~0x00008000);
+              reasonsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getReasonsFieldBuilder() : null;
+            } else {
+              reasonsBuilder_.addAllMessages(other.reasons_);
+            }
+          }
+        }
         if (!other.getTaskType().isEmpty()) {
           taskType_ = other.taskType_;
           onChanged();
@@ -12195,6 +14333,24 @@ public final class Event {
         }
         if (other.getEventVersion() != 0) {
           setEventVersion(other.getEventVersion());
+        }
+        if (other.hasReportedAt()) {
+          mergeReportedAt(other.getReportedAt());
+        }
+        switch (other.getInputValueCase()) {
+          case INPUT_URI: {
+            inputValueCase_ = 8;
+            inputValue_ = other.inputValue_;
+            onChanged();
+            break;
+          }
+          case INPUT_DATA: {
+            mergeInputData(other.getInputData());
+            break;
+          }
+          case INPUTVALUE_NOT_SET: {
+            break;
+          }
         }
         switch (other.getOutputResultCase()) {
           case OUTPUT_URI: {
@@ -12243,6 +14399,21 @@ public final class Event {
         }
         return this;
       }
+      private int inputValueCase_ = 0;
+      private java.lang.Object inputValue_;
+      public InputValueCase
+          getInputValueCase() {
+        return InputValueCase.forNumber(
+            inputValueCase_);
+      }
+
+      public Builder clearInputValue() {
+        inputValueCase_ = 0;
+        inputValue_ = null;
+        onChanged();
+        return this;
+      }
+
       private int outputResultCase_ = 0;
       private java.lang.Object outputResult_;
       public OutputResultCase
@@ -13250,7 +15421,6 @@ public final class Event {
         return occurredAtBuilder_;
       }
 
-      private java.lang.Object inputUri_ = "";
       /**
        * <pre>
        * URI of the input file, it encodes all the information
@@ -13260,12 +15430,17 @@ public final class Event {
        * <code>string input_uri = 8;</code>
        */
       public java.lang.String getInputUri() {
-        java.lang.Object ref = inputUri_;
+        java.lang.Object ref = "";
+        if (inputValueCase_ == 8) {
+          ref = inputValue_;
+        }
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          inputUri_ = s;
+          if (inputValueCase_ == 8) {
+            inputValue_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -13281,12 +15456,17 @@ public final class Event {
        */
       public com.google.protobuf.ByteString
           getInputUriBytes() {
-        java.lang.Object ref = inputUri_;
+        java.lang.Object ref = "";
+        if (inputValueCase_ == 8) {
+          ref = inputValue_;
+        }
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          inputUri_ = b;
+          if (inputValueCase_ == 8) {
+            inputValue_ = b;
+          }
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -13305,8 +15485,8 @@ public final class Event {
         if (value == null) {
     throw new NullPointerException();
   }
-  
-        inputUri_ = value;
+  inputValueCase_ = 8;
+        inputValue_ = value;
         onChanged();
         return this;
       }
@@ -13319,9 +15499,11 @@ public final class Event {
        * <code>string input_uri = 8;</code>
        */
       public Builder clearInputUri() {
-        
-        inputUri_ = getDefaultInstance().getInputUri();
-        onChanged();
+        if (inputValueCase_ == 8) {
+          inputValueCase_ = 0;
+          inputValue_ = null;
+          onChanged();
+        }
         return this;
       }
       /**
@@ -13338,10 +15520,182 @@ public final class Event {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        
-        inputUri_ = value;
+        inputValueCase_ = 8;
+        inputValue_ = value;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputDataBuilder_;
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public boolean hasInputData() {
+        return inputValueCase_ == 19;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap getInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 19) {
+            return (flyteidl.core.Literals.LiteralMap) inputValue_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        } else {
+          if (inputValueCase_ == 19) {
+            return inputDataBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public Builder setInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (inputDataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          inputValue_ = value;
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 19;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public Builder setInputData(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (inputDataBuilder_ == null) {
+          inputValue_ = builderForValue.build();
+          onChanged();
+        } else {
+          inputDataBuilder_.setMessage(builderForValue.build());
+        }
+        inputValueCase_ = 19;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public Builder mergeInputData(flyteidl.core.Literals.LiteralMap value) {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 19 &&
+              inputValue_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
+            inputValue_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) inputValue_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            inputValue_ = value;
+          }
+          onChanged();
+        } else {
+          if (inputValueCase_ == 19) {
+            inputDataBuilder_.mergeFrom(value);
+          }
+          inputDataBuilder_.setMessage(value);
+        }
+        inputValueCase_ = 19;
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public Builder clearInputData() {
+        if (inputDataBuilder_ == null) {
+          if (inputValueCase_ == 19) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+            onChanged();
+          }
+        } else {
+          if (inputValueCase_ == 19) {
+            inputValueCase_ = 0;
+            inputValue_ = null;
+          }
+          inputDataBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap.Builder getInputDataBuilder() {
+        return getInputDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
+        if ((inputValueCase_ == 19) && (inputDataBuilder_ != null)) {
+          return inputDataBuilder_.getMessageOrBuilder();
+        } else {
+          if (inputValueCase_ == 19) {
+            return (flyteidl.core.Literals.LiteralMap) inputValue_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Raw input data consumed by this task execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap input_data = 19;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getInputDataFieldBuilder() {
+        if (inputDataBuilder_ == null) {
+          if (!(inputValueCase_ == 19)) {
+            inputValue_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          }
+          inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  (flyteidl.core.Literals.LiteralMap) inputValue_,
+                  getParentForChildren(),
+                  isClean());
+          inputValue_ = null;
+        }
+        inputValueCase_ = 19;
+        onChanged();;
+        return inputDataBuilder_;
       }
 
       /**
@@ -13994,11 +16348,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public java.lang.String getReason() {
+      @java.lang.Deprecated public java.lang.String getReason() {
         java.lang.Object ref = reason_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
@@ -14013,11 +16368,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public com.google.protobuf.ByteString
+      @java.lang.Deprecated public com.google.protobuf.ByteString
           getReasonBytes() {
         java.lang.Object ref = reason_;
         if (ref instanceof String) {
@@ -14033,11 +16389,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public Builder setReason(
+      @java.lang.Deprecated public Builder setReason(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -14050,11 +16407,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public Builder clearReason() {
+      @java.lang.Deprecated public Builder clearReason() {
         
         reason_ = getDefaultInstance().getReason();
         onChanged();
@@ -14063,11 +16421,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public Builder setReasonBytes(
+      @java.lang.Deprecated public Builder setReasonBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -14077,6 +16436,318 @@ public final class Event {
         reason_ = value;
         onChanged();
         return this;
+      }
+
+      private java.util.List<flyteidl.event.Event.EventReason> reasons_ =
+        java.util.Collections.emptyList();
+      private void ensureReasonsIsMutable() {
+        if (!((bitField0_ & 0x00008000) != 0)) {
+          reasons_ = new java.util.ArrayList<flyteidl.event.Event.EventReason>(reasons_);
+          bitField0_ |= 0x00008000;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.event.Event.EventReason, flyteidl.event.Event.EventReason.Builder, flyteidl.event.Event.EventReasonOrBuilder> reasonsBuilder_;
+
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public java.util.List<flyteidl.event.Event.EventReason> getReasonsList() {
+        if (reasonsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(reasons_);
+        } else {
+          return reasonsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public int getReasonsCount() {
+        if (reasonsBuilder_ == null) {
+          return reasons_.size();
+        } else {
+          return reasonsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason getReasons(int index) {
+        if (reasonsBuilder_ == null) {
+          return reasons_.get(index);
+        } else {
+          return reasonsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder setReasons(
+          int index, flyteidl.event.Event.EventReason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.set(index, value);
+          onChanged();
+        } else {
+          reasonsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder setReasons(
+          int index, flyteidl.event.Event.EventReason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(flyteidl.event.Event.EventReason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.add(value);
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(
+          int index, flyteidl.event.Event.EventReason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.add(index, value);
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(
+          flyteidl.event.Event.EventReason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.add(builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(
+          int index, flyteidl.event.Event.EventReason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addAllReasons(
+          java.lang.Iterable<? extends flyteidl.event.Event.EventReason> values) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, reasons_);
+          onChanged();
+        } else {
+          reasonsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder clearReasons() {
+        if (reasonsBuilder_ == null) {
+          reasons_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00008000);
+          onChanged();
+        } else {
+          reasonsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder removeReasons(int index) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.remove(index);
+          onChanged();
+        } else {
+          reasonsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason.Builder getReasonsBuilder(
+          int index) {
+        return getReasonsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReasonOrBuilder getReasonsOrBuilder(
+          int index) {
+        if (reasonsBuilder_ == null) {
+          return reasons_.get(index);  } else {
+          return reasonsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public java.util.List<? extends flyteidl.event.Event.EventReasonOrBuilder> 
+           getReasonsOrBuilderList() {
+        if (reasonsBuilder_ != null) {
+          return reasonsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(reasons_);
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason.Builder addReasonsBuilder() {
+        return getReasonsFieldBuilder().addBuilder(
+            flyteidl.event.Event.EventReason.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason.Builder addReasonsBuilder(
+          int index) {
+        return getReasonsFieldBuilder().addBuilder(
+            index, flyteidl.event.Event.EventReason.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public java.util.List<flyteidl.event.Event.EventReason.Builder> 
+           getReasonsBuilderList() {
+        return getReasonsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.event.Event.EventReason, flyteidl.event.Event.EventReason.Builder, flyteidl.event.Event.EventReasonOrBuilder> 
+          getReasonsFieldBuilder() {
+        if (reasonsBuilder_ == null) {
+          reasonsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.event.Event.EventReason, flyteidl.event.Event.EventReason.Builder, flyteidl.event.Event.EventReasonOrBuilder>(
+                  reasons_,
+                  ((bitField0_ & 0x00008000) != 0),
+                  getParentForChildren(),
+                  isClean());
+          reasons_ = null;
+        }
+        return reasonsBuilder_;
       }
 
       private java.lang.Object taskType_ = "";
@@ -14376,6 +17047,186 @@ public final class Event {
         eventVersion_ = 0;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.Timestamp reportedAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> reportedAtBuilder_;
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public boolean hasReportedAt() {
+        return reportedAtBuilder_ != null || reportedAt_ != null;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public com.google.protobuf.Timestamp getReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          return reportedAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        } else {
+          return reportedAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder setReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          reportedAt_ = value;
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder setReportedAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          reportedAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder mergeReportedAt(com.google.protobuf.Timestamp value) {
+        if (reportedAtBuilder_ == null) {
+          if (reportedAt_ != null) {
+            reportedAt_ =
+              com.google.protobuf.Timestamp.newBuilder(reportedAt_).mergeFrom(value).buildPartial();
+          } else {
+            reportedAt_ = value;
+          }
+          onChanged();
+        } else {
+          reportedAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public Builder clearReportedAt() {
+        if (reportedAtBuilder_ == null) {
+          reportedAt_ = null;
+          onChanged();
+        } else {
+          reportedAt_ = null;
+          reportedAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getReportedAtBuilder() {
+        
+        onChanged();
+        return getReportedAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder() {
+        if (reportedAtBuilder_ != null) {
+          return reportedAtBuilder_.getMessageOrBuilder();
+        } else {
+          return reportedAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : reportedAt_;
+        }
+      }
+      /**
+       * <pre>
+       * This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s
+       * pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,
+       * but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps
+       * facilitates a more accurate portrayal of the evaluation time-series. 
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp reported_at = 20;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getReportedAtFieldBuilder() {
+        if (reportedAtBuilder_ == null) {
+          reportedAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getReportedAt(),
+                  getParentForChildren(),
+                  isClean());
+          reportedAt_ = null;
+        }
+        return reportedAtBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -18720,6 +21571,11 @@ public final class Event {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_event_ParentNodeExecutionMetadata_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_event_EventReason_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_event_EventReason_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_event_TaskExecutionEvent_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -18763,77 +21619,87 @@ public final class Event {
       "\noutput_uri\030\005 \001(\tH\000\022.\n\005error\030\006 \001(\0132\035.fly" +
       "teidl.core.ExecutionErrorH\000\0220\n\013output_da" +
       "ta\030\007 \001(\0132\031.flyteidl.core.LiteralMapH\000B\017\n" +
-      "\routput_result\"\234\006\n\022NodeExecutionEvent\0222\n" +
+      "\routput_result\"\217\007\n\022NodeExecutionEvent\0222\n" +
       "\002id\030\001 \001(\0132&.flyteidl.core.NodeExecutionI" +
       "dentifier\022\023\n\013producer_id\030\002 \001(\t\0221\n\005phase\030" +
       "\003 \001(\0162\".flyteidl.core.NodeExecution.Phas" +
       "e\022/\n\013occurred_at\030\004 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022\021\n\tinput_uri\030\005 \001(\t\022\024\n\noutput_" +
-      "uri\030\006 \001(\tH\000\022.\n\005error\030\007 \001(\0132\035.flyteidl.co" +
-      "re.ExecutionErrorH\000\0220\n\013output_data\030\017 \001(\013" +
-      "2\031.flyteidl.core.LiteralMapH\000\022F\n\026workflo" +
-      "w_node_metadata\030\010 \001(\0132$.flyteidl.event.W" +
-      "orkflowNodeMetadataH\001\022>\n\022task_node_metad" +
-      "ata\030\016 \001(\0132 .flyteidl.event.TaskNodeMetad" +
-      "ataH\001\022I\n\024parent_task_metadata\030\t \001(\0132+.fl" +
-      "yteidl.event.ParentTaskExecutionMetadata" +
-      "\022I\n\024parent_node_metadata\030\n \001(\0132+.flyteid" +
-      "l.event.ParentNodeExecutionMetadata\022\023\n\013r" +
-      "etry_group\030\013 \001(\t\022\024\n\014spec_node_id\030\014 \001(\t\022\021" +
-      "\n\tnode_name\030\r \001(\t\022\025\n\revent_version\030\020 \001(\005" +
-      "\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dynamic\030\022 \001(\010\022" +
-      "\020\n\010deck_uri\030\023 \001(\tB\017\n\routput_resultB\021\n\017ta" +
-      "rget_metadata\"X\n\024WorkflowNodeMetadata\022@\n" +
-      "\014execution_id\030\001 \001(\0132*.flyteidl.core.Work" +
-      "flowExecutionIdentifier\"\245\002\n\020TaskNodeMeta" +
-      "data\0227\n\014cache_status\030\001 \001(\0162!.flyteidl.co" +
-      "re.CatalogCacheStatus\0223\n\013catalog_key\030\002 \001" +
-      "(\0132\036.flyteidl.core.CatalogMetadata\022D\n\022re" +
-      "servation_status\030\003 \001(\0162(.flyteidl.core.C" +
-      "atalogReservation.Status\022\026\n\016checkpoint_u" +
-      "ri\030\004 \001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.fly" +
-      "teidl.event.DynamicWorkflowNodeMetadata\"" +
-      "\207\001\n\033DynamicWorkflowNodeMetadata\022%\n\002id\030\001 " +
-      "\001(\0132\031.flyteidl.core.Identifier\022A\n\021compil" +
-      "ed_workflow\030\002 \001(\0132&.flyteidl.core.Compil" +
-      "edWorkflowClosure\"Q\n\033ParentTaskExecution" +
-      "Metadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core.Tas" +
-      "kExecutionIdentifier\".\n\033ParentNodeExecut" +
-      "ionMetadata\022\017\n\007node_id\030\001 \001(\t\"\224\005\n\022TaskExe" +
-      "cutionEvent\022*\n\007task_id\030\001 \001(\0132\031.flyteidl." +
-      "core.Identifier\022H\n\030parent_node_execution" +
-      "_id\030\002 \001(\0132&.flyteidl.core.NodeExecutionI" +
-      "dentifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phas" +
-      "e\030\004 \001(\0162\".flyteidl.core.TaskExecution.Ph" +
-      "ase\022\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026" +
-      ".flyteidl.core.TaskLog\022/\n\013occurred_at\030\007 " +
-      "\001(\0132\032.google.protobuf.Timestamp\022\021\n\tinput" +
-      "_uri\030\010 \001(\t\022\024\n\noutput_uri\030\t \001(\tH\000\022.\n\005erro" +
-      "r\030\n \001(\0132\035.flyteidl.core.ExecutionErrorH\000" +
-      "\0220\n\013output_data\030\021 \001(\0132\031.flyteidl.core.Li" +
-      "teralMapH\000\022,\n\013custom_info\030\013 \001(\0132\027.google" +
-      ".protobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022" +
-      "\016\n\006reason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010me" +
-      "tadata\030\020 \001(\0132%.flyteidl.event.TaskExecut" +
-      "ionMetadata\022\025\n\revent_version\030\022 \001(\005B\017\n\rou" +
-      "tput_result\"\343\001\n\024ExternalResourceInfo\022\023\n\013" +
-      "external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretr" +
-      "y_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteid" +
-      "l.core.TaskExecution.Phase\0227\n\014cache_stat" +
-      "us\030\005 \001(\0162!.flyteidl.core.CatalogCacheSta" +
-      "tus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core.TaskLo" +
-      "g\"?\n\020ResourcePoolInfo\022\030\n\020allocation_toke" +
-      "n\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecu" +
-      "tionMetadata\022\026\n\016generated_name\030\001 \001(\t\022@\n\022" +
-      "external_resources\030\002 \003(\0132$.flyteidl.even" +
-      "t.ExternalResourceInfo\022<\n\022resource_pool_" +
-      "info\030\003 \003(\0132 .flyteidl.event.ResourcePool" +
-      "Info\022\031\n\021plugin_identifier\030\004 \001(\t\022K\n\016insta" +
-      "nce_class\030\020 \001(\01623.flyteidl.event.TaskExe" +
-      "cutionMetadata.InstanceClass\"/\n\rInstance" +
-      "Class\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z" +
-      "5github.com/flyteorg/flyteidl/gen/pb-go/" +
-      "flyteidl/eventb\006proto3"
+      ".Timestamp\022\023\n\tinput_uri\030\005 \001(\tH\000\022/\n\ninput" +
+      "_data\030\024 \001(\0132\031.flyteidl.core.LiteralMapH\000" +
+      "\022\024\n\noutput_uri\030\006 \001(\tH\001\022.\n\005error\030\007 \001(\0132\035." +
+      "flyteidl.core.ExecutionErrorH\001\0220\n\013output" +
+      "_data\030\017 \001(\0132\031.flyteidl.core.LiteralMapH\001" +
+      "\022F\n\026workflow_node_metadata\030\010 \001(\0132$.flyte" +
+      "idl.event.WorkflowNodeMetadataH\002\022>\n\022task" +
+      "_node_metadata\030\016 \001(\0132 .flyteidl.event.Ta" +
+      "skNodeMetadataH\002\022I\n\024parent_task_metadata" +
+      "\030\t \001(\0132+.flyteidl.event.ParentTaskExecut" +
+      "ionMetadata\022I\n\024parent_node_metadata\030\n \001(" +
+      "\0132+.flyteidl.event.ParentNodeExecutionMe" +
+      "tadata\022\023\n\013retry_group\030\013 \001(\t\022\024\n\014spec_node" +
+      "_id\030\014 \001(\t\022\021\n\tnode_name\030\r \001(\t\022\025\n\revent_ve" +
+      "rsion\030\020 \001(\005\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dyn" +
+      "amic\030\022 \001(\010\022\020\n\010deck_uri\030\023 \001(\t\022/\n\013reported" +
+      "_at\030\025 \001(\0132\032.google.protobuf.TimestampB\r\n" +
+      "\013input_valueB\017\n\routput_resultB\021\n\017target_" +
+      "metadata\"X\n\024WorkflowNodeMetadata\022@\n\014exec" +
+      "ution_id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
+      "xecutionIdentifier\"\245\002\n\020TaskNodeMetadata\022" +
+      "7\n\014cache_status\030\001 \001(\0162!.flyteidl.core.Ca" +
+      "talogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132\036." +
+      "flyteidl.core.CatalogMetadata\022D\n\022reserva" +
+      "tion_status\030\003 \001(\0162(.flyteidl.core.Catalo" +
+      "gReservation.Status\022\026\n\016checkpoint_uri\030\004 " +
+      "\001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.flyteidl" +
+      ".event.DynamicWorkflowNodeMetadata\"\245\001\n\033D" +
+      "ynamicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031" +
+      ".flyteidl.core.Identifier\022A\n\021compiled_wo" +
+      "rkflow\030\002 \001(\0132&.flyteidl.core.CompiledWor" +
+      "kflowClosure\022\034\n\024dynamic_job_spec_uri\030\003 \001" +
+      "(\t\"Q\n\033ParentTaskExecutionMetadata\0222\n\002id\030" +
+      "\001 \001(\0132&.flyteidl.core.TaskExecutionIdent" +
+      "ifier\".\n\033ParentNodeExecutionMetadata\022\017\n\007" +
+      "node_id\030\001 \001(\t\"N\n\013EventReason\022\016\n\006reason\030\001" +
+      " \001(\t\022/\n\013occurred_at\030\002 \001(\0132\032.google.proto" +
+      "buf.Timestamp\"\271\006\n\022TaskExecutionEvent\022*\n\007" +
+      "task_id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
+      "\022H\n\030parent_node_execution_id\030\002 \001(\0132&.fly" +
+      "teidl.core.NodeExecutionIdentifier\022\025\n\rre" +
+      "try_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyte" +
+      "idl.core.TaskExecution.Phase\022\023\n\013producer" +
+      "_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core." +
+      "TaskLog\022/\n\013occurred_at\030\007 \001(\0132\032.google.pr" +
+      "otobuf.Timestamp\022\023\n\tinput_uri\030\010 \001(\tH\000\022/\n" +
+      "\ninput_data\030\023 \001(\0132\031.flyteidl.core.Litera" +
+      "lMapH\000\022\024\n\noutput_uri\030\t \001(\tH\001\022.\n\005error\030\n " +
+      "\001(\0132\035.flyteidl.core.ExecutionErrorH\001\0220\n\013" +
+      "output_data\030\021 \001(\0132\031.flyteidl.core.Litera" +
+      "lMapH\001\022,\n\013custom_info\030\013 \001(\0132\027.google.pro" +
+      "tobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022\022\n\006r" +
+      "eason\030\r \001(\tB\002\030\001\022,\n\007reasons\030\025 \003(\0132\033.flyte" +
+      "idl.event.EventReason\022\021\n\ttask_type\030\016 \001(\t" +
+      "\0227\n\010metadata\030\020 \001(\0132%.flyteidl.event.Task" +
+      "ExecutionMetadata\022\025\n\revent_version\030\022 \001(\005" +
+      "\022/\n\013reported_at\030\024 \001(\0132\032.google.protobuf." +
+      "TimestampB\r\n\013input_valueB\017\n\routput_resul" +
+      "t\"\343\001\n\024ExternalResourceInfo\022\023\n\013external_i" +
+      "d\030\001 \001(\t\022\r\n\005index\030\002 \001(\r\022\025\n\rretry_attempt\030" +
+      "\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyteidl.core.Tas" +
+      "kExecution.Phase\0227\n\014cache_status\030\005 \001(\0162!" +
+      ".flyteidl.core.CatalogCacheStatus\022$\n\004log" +
+      "s\030\006 \003(\0132\026.flyteidl.core.TaskLog\"?\n\020Resou" +
+      "rcePoolInfo\022\030\n\020allocation_token\030\001 \001(\t\022\021\n" +
+      "\tnamespace\030\002 \001(\t\"\310\002\n\025TaskExecutionMetada" +
+      "ta\022\026\n\016generated_name\030\001 \001(\t\022@\n\022external_r" +
+      "esources\030\002 \003(\0132$.flyteidl.event.External" +
+      "ResourceInfo\022<\n\022resource_pool_info\030\003 \003(\013" +
+      "2 .flyteidl.event.ResourcePoolInfo\022\031\n\021pl" +
+      "ugin_identifier\030\004 \001(\t\022K\n\016instance_class\030" +
+      "\020 \001(\01623.flyteidl.event.TaskExecutionMeta" +
+      "data.InstanceClass\"/\n\rInstanceClass\022\013\n\007D" +
+      "EFAULT\020\000\022\021\n\rINTERRUPTIBLE\020\001B7Z5github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/e" +
+      "ventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18865,7 +21731,7 @@ public final class Event {
     internal_static_flyteidl_event_NodeExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_NodeExecutionEvent_descriptor,
-        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "InputValue", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_event_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_event_WorkflowNodeMetadata_fieldAccessorTable = new
@@ -18883,7 +21749,7 @@ public final class Event {
     internal_static_flyteidl_event_DynamicWorkflowNodeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_DynamicWorkflowNodeMetadata_descriptor,
-        new java.lang.String[] { "Id", "CompiledWorkflow", });
+        new java.lang.String[] { "Id", "CompiledWorkflow", "DynamicJobSpecUri", });
     internal_static_flyteidl_event_ParentTaskExecutionMetadata_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_event_ParentTaskExecutionMetadata_fieldAccessorTable = new
@@ -18896,26 +21762,32 @@ public final class Event {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_ParentNodeExecutionMetadata_descriptor,
         new java.lang.String[] { "NodeId", });
-    internal_static_flyteidl_event_TaskExecutionEvent_descriptor =
+    internal_static_flyteidl_event_EventReason_descriptor =
       getDescriptor().getMessageTypes().get(7);
+    internal_static_flyteidl_event_EventReason_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_event_EventReason_descriptor,
+        new java.lang.String[] { "Reason", "OccurredAt", });
+    internal_static_flyteidl_event_TaskExecutionEvent_descriptor =
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_event_TaskExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskExecutionEvent_descriptor,
-        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "OutputUri", "Error", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "TaskType", "Metadata", "EventVersion", "OutputResult", });
+        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "Reasons", "TaskType", "Metadata", "EventVersion", "ReportedAt", "InputValue", "OutputResult", });
     internal_static_flyteidl_event_ExternalResourceInfo_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_event_ExternalResourceInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_ExternalResourceInfo_descriptor,
         new java.lang.String[] { "ExternalId", "Index", "RetryAttempt", "Phase", "CacheStatus", "Logs", });
     internal_static_flyteidl_event_ResourcePoolInfo_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_event_ResourcePoolInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_ResourcePoolInfo_descriptor,
         new java.lang.String[] { "AllocationToken", "Namespace", });
     internal_static_flyteidl_event_TaskExecutionMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_event_TaskExecutionMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskExecutionMetadata_descriptor,

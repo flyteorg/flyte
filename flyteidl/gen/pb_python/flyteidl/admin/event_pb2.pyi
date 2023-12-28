@@ -25,12 +25,24 @@ class EventFailureReason(_message.Message):
     incompatible_cluster: EventErrorIncompatibleCluster
     def __init__(self, already_in_terminal_state: _Optional[_Union[EventErrorAlreadyInTerminalState, _Mapping]] = ..., incompatible_cluster: _Optional[_Union[EventErrorIncompatibleCluster, _Mapping]] = ...) -> None: ...
 
-class NodeExecutionEventRequest(_message.Message):
-    __slots__ = ["event", "request_id"]
-    EVENT_FIELD_NUMBER: _ClassVar[int]
+class WorkflowExecutionEventRequest(_message.Message):
+    __slots__ = ["request_id", "event"]
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
-    event: _event_pb2.NodeExecutionEvent
+    EVENT_FIELD_NUMBER: _ClassVar[int]
     request_id: str
+    event: _event_pb2.WorkflowExecutionEvent
+    def __init__(self, request_id: _Optional[str] = ..., event: _Optional[_Union[_event_pb2.WorkflowExecutionEvent, _Mapping]] = ...) -> None: ...
+
+class WorkflowExecutionEventResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class NodeExecutionEventRequest(_message.Message):
+    __slots__ = ["request_id", "event"]
+    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
+    EVENT_FIELD_NUMBER: _ClassVar[int]
+    request_id: str
+    event: _event_pb2.NodeExecutionEvent
     def __init__(self, request_id: _Optional[str] = ..., event: _Optional[_Union[_event_pb2.NodeExecutionEvent, _Mapping]] = ...) -> None: ...
 
 class NodeExecutionEventResponse(_message.Message):
@@ -38,25 +50,13 @@ class NodeExecutionEventResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class TaskExecutionEventRequest(_message.Message):
-    __slots__ = ["event", "request_id"]
-    EVENT_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["request_id", "event"]
     REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
-    event: _event_pb2.TaskExecutionEvent
+    EVENT_FIELD_NUMBER: _ClassVar[int]
     request_id: str
+    event: _event_pb2.TaskExecutionEvent
     def __init__(self, request_id: _Optional[str] = ..., event: _Optional[_Union[_event_pb2.TaskExecutionEvent, _Mapping]] = ...) -> None: ...
 
 class TaskExecutionEventResponse(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
-
-class WorkflowExecutionEventRequest(_message.Message):
-    __slots__ = ["event", "request_id"]
-    EVENT_FIELD_NUMBER: _ClassVar[int]
-    REQUEST_ID_FIELD_NUMBER: _ClassVar[int]
-    event: _event_pb2.WorkflowExecutionEvent
-    request_id: str
-    def __init__(self, request_id: _Optional[str] = ..., event: _Optional[_Union[_event_pb2.WorkflowExecutionEvent, _Mapping]] = ...) -> None: ...
-
-class WorkflowExecutionEventResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...

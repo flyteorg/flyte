@@ -33,4 +33,6 @@ type AdminNodeExecutionClosure struct {
 	WorkflowNodeMetadata *FlyteidladminWorkflowNodeMetadata `json:"workflow_node_metadata,omitempty"`
 	TaskNodeMetadata *FlyteidladminTaskNodeMetadata `json:"task_node_metadata,omitempty"`
 	DeckUri string `json:"deck_uri,omitempty"`
+	// dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for a DynamicWorkflow. This is required to correctly recover partially completed executions where the subworkflow has already been compiled.
+	DynamicJobSpecUri string `json:"dynamic_job_spec_uri,omitempty"`
 }

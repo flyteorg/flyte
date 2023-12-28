@@ -206,8 +206,6 @@ func (m *NodeExecutionEvent) Validate() error {
 		}
 	}
 
-	// no validation rules for InputUri
-
 	if v, ok := interface{}(m.GetParentTaskMetadata()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return NodeExecutionEventValidationError{
@@ -241,6 +239,35 @@ func (m *NodeExecutionEvent) Validate() error {
 	// no validation rules for IsDynamic
 
 	// no validation rules for DeckUri
+
+	if v, ok := interface{}(m.GetReportedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return NodeExecutionEventValidationError{
+				field:  "ReportedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	switch m.InputValue.(type) {
+
+	case *NodeExecutionEvent_InputUri:
+		// no validation rules for InputUri
+
+	case *NodeExecutionEvent_InputData:
+
+		if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return NodeExecutionEventValidationError{
+					field:  "InputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	switch m.OutputResult.(type) {
 
@@ -556,6 +583,8 @@ func (m *DynamicWorkflowNodeMetadata) Validate() error {
 		}
 	}
 
+	// no validation rules for DynamicJobSpecUri
+
 	return nil
 }
 
@@ -764,6 +793,83 @@ var _ interface {
 	ErrorName() string
 } = ParentNodeExecutionMetadataValidationError{}
 
+// Validate checks the field values on EventReason with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *EventReason) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Reason
+
+	if v, ok := interface{}(m.GetOccurredAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return EventReasonValidationError{
+				field:  "OccurredAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// EventReasonValidationError is the validation error returned by
+// EventReason.Validate if the designated constraints aren't met.
+type EventReasonValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EventReasonValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EventReasonValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EventReasonValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EventReasonValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EventReasonValidationError) ErrorName() string { return "EventReasonValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EventReasonValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEventReason.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EventReasonValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EventReasonValidationError{}
+
 // Validate checks the field values on TaskExecutionEvent with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -823,8 +929,6 @@ func (m *TaskExecutionEvent) Validate() error {
 		}
 	}
 
-	// no validation rules for InputUri
-
 	if v, ok := interface{}(m.GetCustomInfo()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return TaskExecutionEventValidationError{
@@ -839,6 +943,21 @@ func (m *TaskExecutionEvent) Validate() error {
 
 	// no validation rules for Reason
 
+	for idx, item := range m.GetReasons() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionEventValidationError{
+					field:  fmt.Sprintf("Reasons[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	// no validation rules for TaskType
 
 	if v, ok := interface{}(m.GetMetadata()).(interface{ Validate() error }); ok {
@@ -852,6 +971,35 @@ func (m *TaskExecutionEvent) Validate() error {
 	}
 
 	// no validation rules for EventVersion
+
+	if v, ok := interface{}(m.GetReportedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskExecutionEventValidationError{
+				field:  "ReportedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	switch m.InputValue.(type) {
+
+	case *TaskExecutionEvent_InputUri:
+		// no validation rules for InputUri
+
+	case *TaskExecutionEvent_InputData:
+
+		if v, ok := interface{}(m.GetInputData()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionEventValidationError{
+					field:  "InputData",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
 
 	switch m.OutputResult.(type) {
 

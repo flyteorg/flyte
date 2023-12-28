@@ -15,4 +15,6 @@ type FlyteidleventDynamicWorkflowNodeMetadata struct {
 	Id *CoreIdentifier `json:"id,omitempty"`
 	// Represents the compiled representation of the embedded dynamic workflow.
 	CompiledWorkflow *CoreCompiledWorkflowClosure `json:"compiled_workflow,omitempty"`
+	// dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is required to correctly recover partially completed executions where the workflow has already been compiled.
+	DynamicJobSpecUri string `json:"dynamic_job_spec_uri,omitempty"`
 }

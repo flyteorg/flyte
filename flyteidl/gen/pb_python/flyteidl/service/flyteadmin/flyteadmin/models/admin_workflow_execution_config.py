@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.admin_annotations import AdminAnnotations  # noqa: F401,E501
+from flyteadmin.models.admin_envs import AdminEnvs  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
 from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
@@ -42,7 +43,8 @@ class AdminWorkflowExecutionConfig(object):
         'labels': 'AdminLabels',
         'annotations': 'AdminAnnotations',
         'interruptible': 'bool',
-        'overwrite_cache': 'bool'
+        'overwrite_cache': 'bool',
+        'envs': 'AdminEnvs'
     }
 
     attribute_map = {
@@ -52,10 +54,11 @@ class AdminWorkflowExecutionConfig(object):
         'labels': 'labels',
         'annotations': 'annotations',
         'interruptible': 'interruptible',
-        'overwrite_cache': 'overwrite_cache'
+        'overwrite_cache': 'overwrite_cache',
+        'envs': 'envs'
     }
 
-    def __init__(self, max_parallelism=None, security_context=None, raw_output_data_config=None, labels=None, annotations=None, interruptible=None, overwrite_cache=None):  # noqa: E501
+    def __init__(self, max_parallelism=None, security_context=None, raw_output_data_config=None, labels=None, annotations=None, interruptible=None, overwrite_cache=None, envs=None):  # noqa: E501
         """AdminWorkflowExecutionConfig - a model defined in Swagger"""  # noqa: E501
 
         self._max_parallelism = None
@@ -65,6 +68,7 @@ class AdminWorkflowExecutionConfig(object):
         self._annotations = None
         self._interruptible = None
         self._overwrite_cache = None
+        self._envs = None
         self.discriminator = None
 
         if max_parallelism is not None:
@@ -81,6 +85,8 @@ class AdminWorkflowExecutionConfig(object):
             self.interruptible = interruptible
         if overwrite_cache is not None:
             self.overwrite_cache = overwrite_cache
+        if envs is not None:
+            self.envs = envs
 
     @property
     def max_parallelism(self):
@@ -242,6 +248,29 @@ class AdminWorkflowExecutionConfig(object):
         """
 
         self._overwrite_cache = overwrite_cache
+
+    @property
+    def envs(self):
+        """Gets the envs of this AdminWorkflowExecutionConfig.  # noqa: E501
+
+        Environment variables to be set for the execution.  # noqa: E501
+
+        :return: The envs of this AdminWorkflowExecutionConfig.  # noqa: E501
+        :rtype: AdminEnvs
+        """
+        return self._envs
+
+    @envs.setter
+    def envs(self, envs):
+        """Sets the envs of this AdminWorkflowExecutionConfig.
+
+        Environment variables to be set for the execution.  # noqa: E501
+
+        :param envs: The envs of this AdminWorkflowExecutionConfig.  # noqa: E501
+        :type: AdminEnvs
+        """
+
+        self._envs = envs
 
     def to_dict(self):
         """Returns the model properties as a dict"""

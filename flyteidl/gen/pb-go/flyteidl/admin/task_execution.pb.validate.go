@@ -474,6 +474,21 @@ func (m *TaskExecutionClosure) Validate() error {
 
 	// no validation rules for EventVersion
 
+	for idx, item := range m.GetReasons() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return TaskExecutionClosureValidationError{
+					field:  fmt.Sprintf("Reasons[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
 	switch m.OutputResult.(type) {
 
 	case *TaskExecutionClosure_OutputUri:
@@ -563,6 +578,82 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TaskExecutionClosureValidationError{}
+
+// Validate checks the field values on Reason with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *Reason) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if v, ok := interface{}(m.GetOccurredAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ReasonValidationError{
+				field:  "OccurredAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	// no validation rules for Message
+
+	return nil
+}
+
+// ReasonValidationError is the validation error returned by Reason.Validate if
+// the designated constraints aren't met.
+type ReasonValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ReasonValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ReasonValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ReasonValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ReasonValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ReasonValidationError) ErrorName() string { return "ReasonValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ReasonValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sReason.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ReasonValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ReasonValidationError{}
 
 // Validate checks the field values on TaskExecutionGetDataRequest with the
 // rules defined in the proto definition for this message. If any rules are
@@ -684,6 +775,16 @@ func (m *TaskExecutionGetDataResponse) Validate() error {
 		if err := v.Validate(); err != nil {
 			return TaskExecutionGetDataResponseValidationError{
 				field:  "FullOutputs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetFlyteUrls()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return TaskExecutionGetDataResponseValidationError{
+				field:  "FlyteUrls",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

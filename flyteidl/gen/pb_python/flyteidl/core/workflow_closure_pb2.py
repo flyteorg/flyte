@@ -17,12 +17,13 @@ from flyteidl.core import tasks_pb2 as flyteidl_dot_core_dot_tasks__pb2
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n$flyteidl/core/workflow_closure.proto\x12\rflyteidl.core\x1a\x1c\x66lyteidl/core/workflow.proto\x1a\x19\x66lyteidl/core/tasks.proto\"\x81\x01\n\x0fWorkflowClosure\x12;\n\x08workflow\x18\x01 \x01(\x0b\x32\x1f.flyteidl.core.WorkflowTemplateR\x08workflow\x12\x31\n\x05tasks\x18\x02 \x03(\x0b\x32\x1b.flyteidl.core.TaskTemplateR\x05tasksB\xb4\x01\n\x11\x63om.flyteidl.coreB\x14WorkflowClosureProtoP\x01Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
 
-_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl.core.workflow_closure_pb2', globals())
+_globals = globals()
+_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl.core.workflow_closure_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\021com.flyteidl.coreB\024WorkflowClosureProtoP\001Z4github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core\242\002\003FCX\252\002\rFlyteidl.Core\312\002\rFlyteidl\\Core\342\002\031Flyteidl\\Core\\GPBMetadata\352\002\016Flyteidl::Core'
-  _WORKFLOWCLOSURE._serialized_start=113
-  _WORKFLOWCLOSURE._serialized_end=242
+  _globals['_WORKFLOWCLOSURE']._serialized_start=113
+  _globals['_WORKFLOWCLOSURE']._serialized_end=242
 # @@protoc_insertion_point(module_scope)

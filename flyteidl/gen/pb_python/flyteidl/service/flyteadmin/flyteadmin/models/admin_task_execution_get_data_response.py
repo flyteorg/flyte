@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.admin_flyte_ur_ls import AdminFlyteURLs  # noqa: F401,E501
 from flyteadmin.models.admin_url_blob import AdminUrlBlob  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 
@@ -37,23 +38,26 @@ class AdminTaskExecutionGetDataResponse(object):
         'inputs': 'AdminUrlBlob',
         'outputs': 'AdminUrlBlob',
         'full_inputs': 'CoreLiteralMap',
-        'full_outputs': 'CoreLiteralMap'
+        'full_outputs': 'CoreLiteralMap',
+        'flyte_urls': 'AdminFlyteURLs'
     }
 
     attribute_map = {
         'inputs': 'inputs',
         'outputs': 'outputs',
         'full_inputs': 'full_inputs',
-        'full_outputs': 'full_outputs'
+        'full_outputs': 'full_outputs',
+        'flyte_urls': 'flyte_urls'
     }
 
-    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None):  # noqa: E501
+    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None, flyte_urls=None):  # noqa: E501
         """AdminTaskExecutionGetDataResponse - a model defined in Swagger"""  # noqa: E501
 
         self._inputs = None
         self._outputs = None
         self._full_inputs = None
         self._full_outputs = None
+        self._flyte_urls = None
         self.discriminator = None
 
         if inputs is not None:
@@ -64,6 +68,8 @@ class AdminTaskExecutionGetDataResponse(object):
             self.full_inputs = full_inputs
         if full_outputs is not None:
             self.full_outputs = full_outputs
+        if flyte_urls is not None:
+            self.flyte_urls = flyte_urls
 
     @property
     def inputs(self):
@@ -156,6 +162,27 @@ class AdminTaskExecutionGetDataResponse(object):
         """
 
         self._full_outputs = full_outputs
+
+    @property
+    def flyte_urls(self):
+        """Gets the flyte_urls of this AdminTaskExecutionGetDataResponse.  # noqa: E501
+
+
+        :return: The flyte_urls of this AdminTaskExecutionGetDataResponse.  # noqa: E501
+        :rtype: AdminFlyteURLs
+        """
+        return self._flyte_urls
+
+    @flyte_urls.setter
+    def flyte_urls(self, flyte_urls):
+        """Sets the flyte_urls of this AdminTaskExecutionGetDataResponse.
+
+
+        :param flyte_urls: The flyte_urls of this AdminTaskExecutionGetDataResponse.  # noqa: E501
+        :type: AdminFlyteURLs
+        """
+
+        self._flyte_urls = flyte_urls
 
     def to_dict(self):
         """Returns the model properties as a dict"""

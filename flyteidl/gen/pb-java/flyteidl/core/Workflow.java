@@ -8949,6 +8949,1065 @@ public final class Workflow {
 
   }
 
+  public interface ArrayNodeOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.ArrayNode)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * node is the sub-node that will be executed for each element in the array.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Node node = 1;</code>
+     */
+    boolean hasNode();
+    /**
+     * <pre>
+     * node is the sub-node that will be executed for each element in the array.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Node node = 1;</code>
+     */
+    flyteidl.core.Workflow.Node getNode();
+    /**
+     * <pre>
+     * node is the sub-node that will be executed for each element in the array.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Node node = 1;</code>
+     */
+    flyteidl.core.Workflow.NodeOrBuilder getNodeOrBuilder();
+
+    /**
+     * <pre>
+     * parallelism defines the minimum number of instances to bring up concurrently at any given
+     * point. Note that this is an optimistic restriction and that, due to network partitioning or
+     * other failures, the actual number of currently running instances might be more. This has to
+     * be a positive number if assigned. Default value is size.
+     * </pre>
+     *
+     * <code>uint32 parallelism = 2;</code>
+     */
+    int getParallelism();
+
+    /**
+     * <pre>
+     * min_successes is an absolute number of the minimum number of successful completions of
+     * sub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful
+     * and outputs will be computed. This has to be a non-negative number if assigned. Default
+     * value is size (if specified).
+     * </pre>
+     *
+     * <code>uint32 min_successes = 3;</code>
+     */
+    int getMinSuccesses();
+
+    /**
+     * <pre>
+     * If the array job size is not known beforehand, the min_success_ratio can instead be used
+     * to determine when an ArrayNode can be marked successful.
+     * </pre>
+     *
+     * <code>float min_success_ratio = 4;</code>
+     */
+    float getMinSuccessRatio();
+
+    public flyteidl.core.Workflow.ArrayNode.SuccessCriteriaCase getSuccessCriteriaCase();
+  }
+  /**
+   * <pre>
+   * ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input
+   * values. An ArrayNode can be executed with configurable parallelism (separate from the parent
+   * workflow) and can be configured to succeed when a certain number of sub-nodes succeed.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.ArrayNode}
+   */
+  public  static final class ArrayNode extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.ArrayNode)
+      ArrayNodeOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ArrayNode.newBuilder() to construct.
+    private ArrayNode(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ArrayNode() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ArrayNode(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Workflow.Node.Builder subBuilder = null;
+              if (node_ != null) {
+                subBuilder = node_.toBuilder();
+              }
+              node_ = input.readMessage(flyteidl.core.Workflow.Node.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(node_);
+                node_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 16: {
+
+              parallelism_ = input.readUInt32();
+              break;
+            }
+            case 24: {
+              successCriteriaCase_ = 3;
+              successCriteria_ = input.readUInt32();
+              break;
+            }
+            case 37: {
+              successCriteriaCase_ = 4;
+              successCriteria_ = input.readFloat();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_ArrayNode_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_ArrayNode_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Workflow.ArrayNode.class, flyteidl.core.Workflow.ArrayNode.Builder.class);
+    }
+
+    private int successCriteriaCase_ = 0;
+    private java.lang.Object successCriteria_;
+    public enum SuccessCriteriaCase
+        implements com.google.protobuf.Internal.EnumLite {
+      MIN_SUCCESSES(3),
+      MIN_SUCCESS_RATIO(4),
+      SUCCESSCRITERIA_NOT_SET(0);
+      private final int value;
+      private SuccessCriteriaCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static SuccessCriteriaCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static SuccessCriteriaCase forNumber(int value) {
+        switch (value) {
+          case 3: return MIN_SUCCESSES;
+          case 4: return MIN_SUCCESS_RATIO;
+          case 0: return SUCCESSCRITERIA_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public SuccessCriteriaCase
+    getSuccessCriteriaCase() {
+      return SuccessCriteriaCase.forNumber(
+          successCriteriaCase_);
+    }
+
+    public static final int NODE_FIELD_NUMBER = 1;
+    private flyteidl.core.Workflow.Node node_;
+    /**
+     * <pre>
+     * node is the sub-node that will be executed for each element in the array.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Node node = 1;</code>
+     */
+    public boolean hasNode() {
+      return node_ != null;
+    }
+    /**
+     * <pre>
+     * node is the sub-node that will be executed for each element in the array.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Node node = 1;</code>
+     */
+    public flyteidl.core.Workflow.Node getNode() {
+      return node_ == null ? flyteidl.core.Workflow.Node.getDefaultInstance() : node_;
+    }
+    /**
+     * <pre>
+     * node is the sub-node that will be executed for each element in the array.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Node node = 1;</code>
+     */
+    public flyteidl.core.Workflow.NodeOrBuilder getNodeOrBuilder() {
+      return getNode();
+    }
+
+    public static final int PARALLELISM_FIELD_NUMBER = 2;
+    private int parallelism_;
+    /**
+     * <pre>
+     * parallelism defines the minimum number of instances to bring up concurrently at any given
+     * point. Note that this is an optimistic restriction and that, due to network partitioning or
+     * other failures, the actual number of currently running instances might be more. This has to
+     * be a positive number if assigned. Default value is size.
+     * </pre>
+     *
+     * <code>uint32 parallelism = 2;</code>
+     */
+    public int getParallelism() {
+      return parallelism_;
+    }
+
+    public static final int MIN_SUCCESSES_FIELD_NUMBER = 3;
+    /**
+     * <pre>
+     * min_successes is an absolute number of the minimum number of successful completions of
+     * sub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful
+     * and outputs will be computed. This has to be a non-negative number if assigned. Default
+     * value is size (if specified).
+     * </pre>
+     *
+     * <code>uint32 min_successes = 3;</code>
+     */
+    public int getMinSuccesses() {
+      if (successCriteriaCase_ == 3) {
+        return (java.lang.Integer) successCriteria_;
+      }
+      return 0;
+    }
+
+    public static final int MIN_SUCCESS_RATIO_FIELD_NUMBER = 4;
+    /**
+     * <pre>
+     * If the array job size is not known beforehand, the min_success_ratio can instead be used
+     * to determine when an ArrayNode can be marked successful.
+     * </pre>
+     *
+     * <code>float min_success_ratio = 4;</code>
+     */
+    public float getMinSuccessRatio() {
+      if (successCriteriaCase_ == 4) {
+        return (java.lang.Float) successCriteria_;
+      }
+      return 0F;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (node_ != null) {
+        output.writeMessage(1, getNode());
+      }
+      if (parallelism_ != 0) {
+        output.writeUInt32(2, parallelism_);
+      }
+      if (successCriteriaCase_ == 3) {
+        output.writeUInt32(
+            3, (int)((java.lang.Integer) successCriteria_));
+      }
+      if (successCriteriaCase_ == 4) {
+        output.writeFloat(
+            4, (float)((java.lang.Float) successCriteria_));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (node_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getNode());
+      }
+      if (parallelism_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(2, parallelism_);
+      }
+      if (successCriteriaCase_ == 3) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt32Size(
+              3, (int)((java.lang.Integer) successCriteria_));
+      }
+      if (successCriteriaCase_ == 4) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(
+              4, (float)((java.lang.Float) successCriteria_));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Workflow.ArrayNode)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Workflow.ArrayNode other = (flyteidl.core.Workflow.ArrayNode) obj;
+
+      if (hasNode() != other.hasNode()) return false;
+      if (hasNode()) {
+        if (!getNode()
+            .equals(other.getNode())) return false;
+      }
+      if (getParallelism()
+          != other.getParallelism()) return false;
+      if (!getSuccessCriteriaCase().equals(other.getSuccessCriteriaCase())) return false;
+      switch (successCriteriaCase_) {
+        case 3:
+          if (getMinSuccesses()
+              != other.getMinSuccesses()) return false;
+          break;
+        case 4:
+          if (java.lang.Float.floatToIntBits(getMinSuccessRatio())
+              != java.lang.Float.floatToIntBits(
+                  other.getMinSuccessRatio())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasNode()) {
+        hash = (37 * hash) + NODE_FIELD_NUMBER;
+        hash = (53 * hash) + getNode().hashCode();
+      }
+      hash = (37 * hash) + PARALLELISM_FIELD_NUMBER;
+      hash = (53 * hash) + getParallelism();
+      switch (successCriteriaCase_) {
+        case 3:
+          hash = (37 * hash) + MIN_SUCCESSES_FIELD_NUMBER;
+          hash = (53 * hash) + getMinSuccesses();
+          break;
+        case 4:
+          hash = (37 * hash) + MIN_SUCCESS_RATIO_FIELD_NUMBER;
+          hash = (53 * hash) + java.lang.Float.floatToIntBits(
+              getMinSuccessRatio());
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.ArrayNode parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Workflow.ArrayNode prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input
+     * values. An ArrayNode can be executed with configurable parallelism (separate from the parent
+     * workflow) and can be configured to succeed when a certain number of sub-nodes succeed.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.ArrayNode}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.ArrayNode)
+        flyteidl.core.Workflow.ArrayNodeOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_ArrayNode_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_ArrayNode_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Workflow.ArrayNode.class, flyteidl.core.Workflow.ArrayNode.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Workflow.ArrayNode.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (nodeBuilder_ == null) {
+          node_ = null;
+        } else {
+          node_ = null;
+          nodeBuilder_ = null;
+        }
+        parallelism_ = 0;
+
+        successCriteriaCase_ = 0;
+        successCriteria_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_ArrayNode_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.ArrayNode getDefaultInstanceForType() {
+        return flyteidl.core.Workflow.ArrayNode.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.ArrayNode build() {
+        flyteidl.core.Workflow.ArrayNode result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.ArrayNode buildPartial() {
+        flyteidl.core.Workflow.ArrayNode result = new flyteidl.core.Workflow.ArrayNode(this);
+        if (nodeBuilder_ == null) {
+          result.node_ = node_;
+        } else {
+          result.node_ = nodeBuilder_.build();
+        }
+        result.parallelism_ = parallelism_;
+        if (successCriteriaCase_ == 3) {
+          result.successCriteria_ = successCriteria_;
+        }
+        if (successCriteriaCase_ == 4) {
+          result.successCriteria_ = successCriteria_;
+        }
+        result.successCriteriaCase_ = successCriteriaCase_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Workflow.ArrayNode) {
+          return mergeFrom((flyteidl.core.Workflow.ArrayNode)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Workflow.ArrayNode other) {
+        if (other == flyteidl.core.Workflow.ArrayNode.getDefaultInstance()) return this;
+        if (other.hasNode()) {
+          mergeNode(other.getNode());
+        }
+        if (other.getParallelism() != 0) {
+          setParallelism(other.getParallelism());
+        }
+        switch (other.getSuccessCriteriaCase()) {
+          case MIN_SUCCESSES: {
+            setMinSuccesses(other.getMinSuccesses());
+            break;
+          }
+          case MIN_SUCCESS_RATIO: {
+            setMinSuccessRatio(other.getMinSuccessRatio());
+            break;
+          }
+          case SUCCESSCRITERIA_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Workflow.ArrayNode parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Workflow.ArrayNode) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int successCriteriaCase_ = 0;
+      private java.lang.Object successCriteria_;
+      public SuccessCriteriaCase
+          getSuccessCriteriaCase() {
+        return SuccessCriteriaCase.forNumber(
+            successCriteriaCase_);
+      }
+
+      public Builder clearSuccessCriteria() {
+        successCriteriaCase_ = 0;
+        successCriteria_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      private flyteidl.core.Workflow.Node node_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.Node, flyteidl.core.Workflow.Node.Builder, flyteidl.core.Workflow.NodeOrBuilder> nodeBuilder_;
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public boolean hasNode() {
+        return nodeBuilder_ != null || node_ != null;
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public flyteidl.core.Workflow.Node getNode() {
+        if (nodeBuilder_ == null) {
+          return node_ == null ? flyteidl.core.Workflow.Node.getDefaultInstance() : node_;
+        } else {
+          return nodeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public Builder setNode(flyteidl.core.Workflow.Node value) {
+        if (nodeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          node_ = value;
+          onChanged();
+        } else {
+          nodeBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public Builder setNode(
+          flyteidl.core.Workflow.Node.Builder builderForValue) {
+        if (nodeBuilder_ == null) {
+          node_ = builderForValue.build();
+          onChanged();
+        } else {
+          nodeBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public Builder mergeNode(flyteidl.core.Workflow.Node value) {
+        if (nodeBuilder_ == null) {
+          if (node_ != null) {
+            node_ =
+              flyteidl.core.Workflow.Node.newBuilder(node_).mergeFrom(value).buildPartial();
+          } else {
+            node_ = value;
+          }
+          onChanged();
+        } else {
+          nodeBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public Builder clearNode() {
+        if (nodeBuilder_ == null) {
+          node_ = null;
+          onChanged();
+        } else {
+          node_ = null;
+          nodeBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public flyteidl.core.Workflow.Node.Builder getNodeBuilder() {
+        
+        onChanged();
+        return getNodeFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      public flyteidl.core.Workflow.NodeOrBuilder getNodeOrBuilder() {
+        if (nodeBuilder_ != null) {
+          return nodeBuilder_.getMessageOrBuilder();
+        } else {
+          return node_ == null ?
+              flyteidl.core.Workflow.Node.getDefaultInstance() : node_;
+        }
+      }
+      /**
+       * <pre>
+       * node is the sub-node that will be executed for each element in the array.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Node node = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.Node, flyteidl.core.Workflow.Node.Builder, flyteidl.core.Workflow.NodeOrBuilder> 
+          getNodeFieldBuilder() {
+        if (nodeBuilder_ == null) {
+          nodeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Workflow.Node, flyteidl.core.Workflow.Node.Builder, flyteidl.core.Workflow.NodeOrBuilder>(
+                  getNode(),
+                  getParentForChildren(),
+                  isClean());
+          node_ = null;
+        }
+        return nodeBuilder_;
+      }
+
+      private int parallelism_ ;
+      /**
+       * <pre>
+       * parallelism defines the minimum number of instances to bring up concurrently at any given
+       * point. Note that this is an optimistic restriction and that, due to network partitioning or
+       * other failures, the actual number of currently running instances might be more. This has to
+       * be a positive number if assigned. Default value is size.
+       * </pre>
+       *
+       * <code>uint32 parallelism = 2;</code>
+       */
+      public int getParallelism() {
+        return parallelism_;
+      }
+      /**
+       * <pre>
+       * parallelism defines the minimum number of instances to bring up concurrently at any given
+       * point. Note that this is an optimistic restriction and that, due to network partitioning or
+       * other failures, the actual number of currently running instances might be more. This has to
+       * be a positive number if assigned. Default value is size.
+       * </pre>
+       *
+       * <code>uint32 parallelism = 2;</code>
+       */
+      public Builder setParallelism(int value) {
+        
+        parallelism_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * parallelism defines the minimum number of instances to bring up concurrently at any given
+       * point. Note that this is an optimistic restriction and that, due to network partitioning or
+       * other failures, the actual number of currently running instances might be more. This has to
+       * be a positive number if assigned. Default value is size.
+       * </pre>
+       *
+       * <code>uint32 parallelism = 2;</code>
+       */
+      public Builder clearParallelism() {
+        
+        parallelism_ = 0;
+        onChanged();
+        return this;
+      }
+
+      /**
+       * <pre>
+       * min_successes is an absolute number of the minimum number of successful completions of
+       * sub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful
+       * and outputs will be computed. This has to be a non-negative number if assigned. Default
+       * value is size (if specified).
+       * </pre>
+       *
+       * <code>uint32 min_successes = 3;</code>
+       */
+      public int getMinSuccesses() {
+        if (successCriteriaCase_ == 3) {
+          return (java.lang.Integer) successCriteria_;
+        }
+        return 0;
+      }
+      /**
+       * <pre>
+       * min_successes is an absolute number of the minimum number of successful completions of
+       * sub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful
+       * and outputs will be computed. This has to be a non-negative number if assigned. Default
+       * value is size (if specified).
+       * </pre>
+       *
+       * <code>uint32 min_successes = 3;</code>
+       */
+      public Builder setMinSuccesses(int value) {
+        successCriteriaCase_ = 3;
+        successCriteria_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * min_successes is an absolute number of the minimum number of successful completions of
+       * sub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful
+       * and outputs will be computed. This has to be a non-negative number if assigned. Default
+       * value is size (if specified).
+       * </pre>
+       *
+       * <code>uint32 min_successes = 3;</code>
+       */
+      public Builder clearMinSuccesses() {
+        if (successCriteriaCase_ == 3) {
+          successCriteriaCase_ = 0;
+          successCriteria_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      /**
+       * <pre>
+       * If the array job size is not known beforehand, the min_success_ratio can instead be used
+       * to determine when an ArrayNode can be marked successful.
+       * </pre>
+       *
+       * <code>float min_success_ratio = 4;</code>
+       */
+      public float getMinSuccessRatio() {
+        if (successCriteriaCase_ == 4) {
+          return (java.lang.Float) successCriteria_;
+        }
+        return 0F;
+      }
+      /**
+       * <pre>
+       * If the array job size is not known beforehand, the min_success_ratio can instead be used
+       * to determine when an ArrayNode can be marked successful.
+       * </pre>
+       *
+       * <code>float min_success_ratio = 4;</code>
+       */
+      public Builder setMinSuccessRatio(float value) {
+        successCriteriaCase_ = 4;
+        successCriteria_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If the array job size is not known beforehand, the min_success_ratio can instead be used
+       * to determine when an ArrayNode can be marked successful.
+       * </pre>
+       *
+       * <code>float min_success_ratio = 4;</code>
+       */
+      public Builder clearMinSuccessRatio() {
+        if (successCriteriaCase_ == 4) {
+          successCriteriaCase_ = 0;
+          successCriteria_ = null;
+          onChanged();
+        }
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.ArrayNode)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.ArrayNode)
+    private static final flyteidl.core.Workflow.ArrayNode DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Workflow.ArrayNode();
+    }
+
+    public static flyteidl.core.Workflow.ArrayNode getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ArrayNode>
+        PARSER = new com.google.protobuf.AbstractParser<ArrayNode>() {
+      @java.lang.Override
+      public ArrayNode parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ArrayNode(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ArrayNode> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ArrayNode> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Workflow.ArrayNode getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface NodeMetadataOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.NodeMetadata)
       com.google.protobuf.MessageOrBuilder {
@@ -11257,6 +12316,34 @@ public final class Workflow {
      */
     flyteidl.core.Workflow.GateNodeOrBuilder getGateNodeOrBuilder();
 
+    /**
+     * <pre>
+     * Information about the sub-node executions for each value in the list of this nodes
+     * inputs values.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+     */
+    boolean hasArrayNode();
+    /**
+     * <pre>
+     * Information about the sub-node executions for each value in the list of this nodes
+     * inputs values.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+     */
+    flyteidl.core.Workflow.ArrayNode getArrayNode();
+    /**
+     * <pre>
+     * Information about the sub-node executions for each value in the list of this nodes
+     * inputs values.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+     */
+    flyteidl.core.Workflow.ArrayNodeOrBuilder getArrayNodeOrBuilder();
+
     public flyteidl.core.Workflow.Node.TargetCase getTargetCase();
   }
   /**
@@ -11409,6 +12496,20 @@ public final class Workflow {
               targetCase_ = 9;
               break;
             }
+            case 82: {
+              flyteidl.core.Workflow.ArrayNode.Builder subBuilder = null;
+              if (targetCase_ == 10) {
+                subBuilder = ((flyteidl.core.Workflow.ArrayNode) target_).toBuilder();
+              }
+              target_ =
+                  input.readMessage(flyteidl.core.Workflow.ArrayNode.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Workflow.ArrayNode) target_);
+                target_ = subBuilder.buildPartial();
+              }
+              targetCase_ = 10;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -11459,6 +12560,7 @@ public final class Workflow {
       WORKFLOW_NODE(7),
       BRANCH_NODE(8),
       GATE_NODE(9),
+      ARRAY_NODE(10),
       TARGET_NOT_SET(0);
       private final int value;
       private TargetCase(int value) {
@@ -11478,6 +12580,7 @@ public final class Workflow {
           case 7: return WORKFLOW_NODE;
           case 8: return BRANCH_NODE;
           case 9: return GATE_NODE;
+          case 10: return ARRAY_NODE;
           case 0: return TARGET_NOT_SET;
           default: return null;
         }
@@ -11900,6 +13003,47 @@ public final class Workflow {
       return flyteidl.core.Workflow.GateNode.getDefaultInstance();
     }
 
+    public static final int ARRAY_NODE_FIELD_NUMBER = 10;
+    /**
+     * <pre>
+     * Information about the sub-node executions for each value in the list of this nodes
+     * inputs values.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+     */
+    public boolean hasArrayNode() {
+      return targetCase_ == 10;
+    }
+    /**
+     * <pre>
+     * Information about the sub-node executions for each value in the list of this nodes
+     * inputs values.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+     */
+    public flyteidl.core.Workflow.ArrayNode getArrayNode() {
+      if (targetCase_ == 10) {
+         return (flyteidl.core.Workflow.ArrayNode) target_;
+      }
+      return flyteidl.core.Workflow.ArrayNode.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Information about the sub-node executions for each value in the list of this nodes
+     * inputs values.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+     */
+    public flyteidl.core.Workflow.ArrayNodeOrBuilder getArrayNodeOrBuilder() {
+      if (targetCase_ == 10) {
+         return (flyteidl.core.Workflow.ArrayNode) target_;
+      }
+      return flyteidl.core.Workflow.ArrayNode.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -11940,6 +13084,9 @@ public final class Workflow {
       }
       if (targetCase_ == 9) {
         output.writeMessage(9, (flyteidl.core.Workflow.GateNode) target_);
+      }
+      if (targetCase_ == 10) {
+        output.writeMessage(10, (flyteidl.core.Workflow.ArrayNode) target_);
       }
       unknownFields.writeTo(output);
     }
@@ -11989,6 +13136,10 @@ public final class Workflow {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(9, (flyteidl.core.Workflow.GateNode) target_);
       }
+      if (targetCase_ == 10) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(10, (flyteidl.core.Workflow.ArrayNode) target_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -12034,6 +13185,10 @@ public final class Workflow {
         case 9:
           if (!getGateNode()
               .equals(other.getGateNode())) return false;
+          break;
+        case 10:
+          if (!getArrayNode()
+              .equals(other.getArrayNode())) return false;
           break;
         case 0:
         default:
@@ -12083,6 +13238,10 @@ public final class Workflow {
         case 9:
           hash = (37 * hash) + GATE_NODE_FIELD_NUMBER;
           hash = (53 * hash) + getGateNode().hashCode();
+          break;
+        case 10:
+          hash = (37 * hash) + ARRAY_NODE_FIELD_NUMBER;
+          hash = (53 * hash) + getArrayNode().hashCode();
           break;
         case 0:
         default:
@@ -12336,6 +13495,13 @@ public final class Workflow {
             result.target_ = gateNodeBuilder_.build();
           }
         }
+        if (targetCase_ == 10) {
+          if (arrayNodeBuilder_ == null) {
+            result.target_ = target_;
+          } else {
+            result.target_ = arrayNodeBuilder_.build();
+          }
+        }
         result.bitField0_ = to_bitField0_;
         result.targetCase_ = targetCase_;
         onBuilt();
@@ -12470,6 +13636,10 @@ public final class Workflow {
           }
           case GATE_NODE: {
             mergeGateNode(other.getGateNode());
+            break;
+          }
+          case ARRAY_NODE: {
+            mergeArrayNode(other.getArrayNode());
             break;
           }
           case TARGET_NOT_SET: {
@@ -14280,6 +15450,187 @@ public final class Workflow {
         targetCase_ = 9;
         onChanged();;
         return gateNodeBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.ArrayNode, flyteidl.core.Workflow.ArrayNode.Builder, flyteidl.core.Workflow.ArrayNodeOrBuilder> arrayNodeBuilder_;
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public boolean hasArrayNode() {
+        return targetCase_ == 10;
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public flyteidl.core.Workflow.ArrayNode getArrayNode() {
+        if (arrayNodeBuilder_ == null) {
+          if (targetCase_ == 10) {
+            return (flyteidl.core.Workflow.ArrayNode) target_;
+          }
+          return flyteidl.core.Workflow.ArrayNode.getDefaultInstance();
+        } else {
+          if (targetCase_ == 10) {
+            return arrayNodeBuilder_.getMessage();
+          }
+          return flyteidl.core.Workflow.ArrayNode.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public Builder setArrayNode(flyteidl.core.Workflow.ArrayNode value) {
+        if (arrayNodeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          target_ = value;
+          onChanged();
+        } else {
+          arrayNodeBuilder_.setMessage(value);
+        }
+        targetCase_ = 10;
+        return this;
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public Builder setArrayNode(
+          flyteidl.core.Workflow.ArrayNode.Builder builderForValue) {
+        if (arrayNodeBuilder_ == null) {
+          target_ = builderForValue.build();
+          onChanged();
+        } else {
+          arrayNodeBuilder_.setMessage(builderForValue.build());
+        }
+        targetCase_ = 10;
+        return this;
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public Builder mergeArrayNode(flyteidl.core.Workflow.ArrayNode value) {
+        if (arrayNodeBuilder_ == null) {
+          if (targetCase_ == 10 &&
+              target_ != flyteidl.core.Workflow.ArrayNode.getDefaultInstance()) {
+            target_ = flyteidl.core.Workflow.ArrayNode.newBuilder((flyteidl.core.Workflow.ArrayNode) target_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            target_ = value;
+          }
+          onChanged();
+        } else {
+          if (targetCase_ == 10) {
+            arrayNodeBuilder_.mergeFrom(value);
+          }
+          arrayNodeBuilder_.setMessage(value);
+        }
+        targetCase_ = 10;
+        return this;
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public Builder clearArrayNode() {
+        if (arrayNodeBuilder_ == null) {
+          if (targetCase_ == 10) {
+            targetCase_ = 0;
+            target_ = null;
+            onChanged();
+          }
+        } else {
+          if (targetCase_ == 10) {
+            targetCase_ = 0;
+            target_ = null;
+          }
+          arrayNodeBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public flyteidl.core.Workflow.ArrayNode.Builder getArrayNodeBuilder() {
+        return getArrayNodeFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      public flyteidl.core.Workflow.ArrayNodeOrBuilder getArrayNodeOrBuilder() {
+        if ((targetCase_ == 10) && (arrayNodeBuilder_ != null)) {
+          return arrayNodeBuilder_.getMessageOrBuilder();
+        } else {
+          if (targetCase_ == 10) {
+            return (flyteidl.core.Workflow.ArrayNode) target_;
+          }
+          return flyteidl.core.Workflow.ArrayNode.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Information about the sub-node executions for each value in the list of this nodes
+       * inputs values.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ArrayNode array_node = 10;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.ArrayNode, flyteidl.core.Workflow.ArrayNode.Builder, flyteidl.core.Workflow.ArrayNodeOrBuilder> 
+          getArrayNodeFieldBuilder() {
+        if (arrayNodeBuilder_ == null) {
+          if (!(targetCase_ == 10)) {
+            target_ = flyteidl.core.Workflow.ArrayNode.getDefaultInstance();
+          }
+          arrayNodeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Workflow.ArrayNode, flyteidl.core.Workflow.ArrayNode.Builder, flyteidl.core.Workflow.ArrayNodeOrBuilder>(
+                  (flyteidl.core.Workflow.ArrayNode) target_,
+                  getParentForChildren(),
+                  isClean());
+          target_ = null;
+        }
+        targetCase_ = 10;
+        onChanged();;
+        return arrayNodeBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -19730,6 +21081,11 @@ public final class Workflow {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_GateNode_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_ArrayNode_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_ArrayNode_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_NodeMetadata_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -19811,43 +21167,48 @@ public final class Workflow {
       "ditionH\000\0220\n\006signal\030\002 \001(\0132\036.flyteidl.core" +
       ".SignalConditionH\000\022.\n\005sleep\030\003 \001(\0132\035.flyt" +
       "eidl.core.SleepConditionH\000B\013\n\tcondition\"" +
-      "\247\001\n\014NodeMetadata\022\014\n\004name\030\001 \001(\t\022*\n\007timeou" +
-      "t\030\004 \001(\0132\031.google.protobuf.Duration\022-\n\007re" +
-      "tries\030\005 \001(\0132\034.flyteidl.core.RetryStrateg" +
-      "y\022\027\n\rinterruptible\030\006 \001(\010H\000B\025\n\023interrupti" +
-      "ble_value\"#\n\005Alias\022\013\n\003var\030\001 \001(\t\022\r\n\005alias" +
-      "\030\002 \001(\t\"\200\003\n\004Node\022\n\n\002id\030\001 \001(\t\022-\n\010metadata\030" +
-      "\002 \001(\0132\033.flyteidl.core.NodeMetadata\022&\n\006in" +
-      "puts\030\003 \003(\0132\026.flyteidl.core.Binding\022\031\n\021up" +
-      "stream_node_ids\030\004 \003(\t\022,\n\016output_aliases\030" +
-      "\005 \003(\0132\024.flyteidl.core.Alias\022,\n\ttask_node" +
-      "\030\006 \001(\0132\027.flyteidl.core.TaskNodeH\000\0224\n\rwor" +
-      "kflow_node\030\007 \001(\0132\033.flyteidl.core.Workflo" +
-      "wNodeH\000\0220\n\013branch_node\030\010 \001(\0132\031.flyteidl." +
-      "core.BranchNodeH\000\022,\n\tgate_node\030\t \001(\0132\027.f" +
-      "lyteidl.core.GateNodeH\000B\010\n\006target\"\315\002\n\020Wo" +
-      "rkflowMetadata\022;\n\022quality_of_service\030\001 \001" +
-      "(\0132\037.flyteidl.core.QualityOfService\022C\n\no" +
-      "n_failure\030\002 \001(\0162/.flyteidl.core.Workflow" +
-      "Metadata.OnFailurePolicy\0227\n\004tags\030\003 \003(\0132)" +
-      ".flyteidl.core.WorkflowMetadata.TagsEntr" +
-      "y\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
-      "(\t:\0028\001\"Q\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDI" +
-      "ATELY\020\000\022(\n$FAIL_AFTER_EXECUTABLE_NODES_C" +
-      "OMPLETE\020\001\"1\n\030WorkflowMetadataDefaults\022\025\n" +
-      "\rinterruptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplat" +
-      "e\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
-      "\0221\n\010metadata\030\002 \001(\0132\037.flyteidl.core.Workf" +
-      "lowMetadata\0220\n\tinterface\030\003 \001(\0132\035.flyteid" +
-      "l.core.TypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.f" +
-      "lyteidl.core.Node\022\'\n\007outputs\030\005 \003(\0132\026.fly" +
-      "teidl.core.Binding\022)\n\014failure_node\030\006 \001(\013" +
-      "2\023.flyteidl.core.Node\022B\n\021metadata_defaul" +
-      "ts\030\007 \001(\0132\'.flyteidl.core.WorkflowMetadat" +
-      "aDefaults\"@\n\021TaskNodeOverrides\022+\n\tresour" +
-      "ces\030\001 \001(\0132\030.flyteidl.core.ResourcesB6Z4g" +
-      "ithub.com/flyteorg/flyteidl/gen/pb-go/fl" +
-      "yteidl/coreb\006proto3"
+      "\215\001\n\tArrayNode\022!\n\004node\030\001 \001(\0132\023.flyteidl.c" +
+      "ore.Node\022\023\n\013parallelism\030\002 \001(\r\022\027\n\rmin_suc" +
+      "cesses\030\003 \001(\rH\000\022\033\n\021min_success_ratio\030\004 \001(" +
+      "\002H\000B\022\n\020success_criteria\"\247\001\n\014NodeMetadata" +
+      "\022\014\n\004name\030\001 \001(\t\022*\n\007timeout\030\004 \001(\0132\031.google" +
+      ".protobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.fl" +
+      "yteidl.core.RetryStrategy\022\027\n\rinterruptib" +
+      "le\030\006 \001(\010H\000B\025\n\023interruptible_value\"#\n\005Ali" +
+      "as\022\013\n\003var\030\001 \001(\t\022\r\n\005alias\030\002 \001(\t\"\260\003\n\004Node\022" +
+      "\n\n\002id\030\001 \001(\t\022-\n\010metadata\030\002 \001(\0132\033.flyteidl" +
+      ".core.NodeMetadata\022&\n\006inputs\030\003 \003(\0132\026.fly" +
+      "teidl.core.Binding\022\031\n\021upstream_node_ids\030" +
+      "\004 \003(\t\022,\n\016output_aliases\030\005 \003(\0132\024.flyteidl" +
+      ".core.Alias\022,\n\ttask_node\030\006 \001(\0132\027.flyteid" +
+      "l.core.TaskNodeH\000\0224\n\rworkflow_node\030\007 \001(\013" +
+      "2\033.flyteidl.core.WorkflowNodeH\000\0220\n\013branc" +
+      "h_node\030\010 \001(\0132\031.flyteidl.core.BranchNodeH" +
+      "\000\022,\n\tgate_node\030\t \001(\0132\027.flyteidl.core.Gat" +
+      "eNodeH\000\022.\n\narray_node\030\n \001(\0132\030.flyteidl.c" +
+      "ore.ArrayNodeH\000B\010\n\006target\"\315\002\n\020WorkflowMe" +
+      "tadata\022;\n\022quality_of_service\030\001 \001(\0132\037.fly" +
+      "teidl.core.QualityOfService\022C\n\non_failur" +
+      "e\030\002 \001(\0162/.flyteidl.core.WorkflowMetadata" +
+      ".OnFailurePolicy\0227\n\004tags\030\003 \003(\0132).flyteid" +
+      "l.core.WorkflowMetadata.TagsEntry\032+\n\tTag" +
+      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"Q" +
+      "\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020\000\022" +
+      "(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLETE\020" +
+      "\001\"1\n\030WorkflowMetadataDefaults\022\025\n\rinterru" +
+      "ptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id\030" +
+      "\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010meta" +
+      "data\030\002 \001(\0132\037.flyteidl.core.WorkflowMetad" +
+      "ata\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core.T" +
+      "ypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl." +
+      "core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.co" +
+      "re.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyte" +
+      "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013" +
+      "2\'.flyteidl.core.WorkflowMetadataDefault" +
+      "s\"@\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001(" +
+      "\0132\030.flyteidl.core.ResourcesB6Z4github.co" +
+      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
+      "oreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -19924,26 +21285,32 @@ public final class Workflow {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_GateNode_descriptor,
         new java.lang.String[] { "Approve", "Signal", "Sleep", "Condition", });
-    internal_static_flyteidl_core_NodeMetadata_descriptor =
+    internal_static_flyteidl_core_ArrayNode_descriptor =
       getDescriptor().getMessageTypes().get(9);
+    internal_static_flyteidl_core_ArrayNode_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_ArrayNode_descriptor,
+        new java.lang.String[] { "Node", "Parallelism", "MinSuccesses", "MinSuccessRatio", "SuccessCriteria", });
+    internal_static_flyteidl_core_NodeMetadata_descriptor =
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_core_NodeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_NodeMetadata_descriptor,
         new java.lang.String[] { "Name", "Timeout", "Retries", "Interruptible", "InterruptibleValue", });
     internal_static_flyteidl_core_Alias_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_core_Alias_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Alias_descriptor,
         new java.lang.String[] { "Var", "Alias", });
     internal_static_flyteidl_core_Node_descriptor =
-      getDescriptor().getMessageTypes().get(11);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_flyteidl_core_Node_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Node_descriptor,
-        new java.lang.String[] { "Id", "Metadata", "Inputs", "UpstreamNodeIds", "OutputAliases", "TaskNode", "WorkflowNode", "BranchNode", "GateNode", "Target", });
+        new java.lang.String[] { "Id", "Metadata", "Inputs", "UpstreamNodeIds", "OutputAliases", "TaskNode", "WorkflowNode", "BranchNode", "GateNode", "ArrayNode", "Target", });
     internal_static_flyteidl_core_WorkflowMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(12);
+      getDescriptor().getMessageTypes().get(13);
     internal_static_flyteidl_core_WorkflowMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowMetadata_descriptor,
@@ -19955,19 +21322,19 @@ public final class Workflow {
         internal_static_flyteidl_core_WorkflowMetadata_TagsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor =
-      getDescriptor().getMessageTypes().get(13);
+      getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_core_WorkflowMetadataDefaults_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowMetadataDefaults_descriptor,
         new java.lang.String[] { "Interruptible", });
     internal_static_flyteidl_core_WorkflowTemplate_descriptor =
-      getDescriptor().getMessageTypes().get(14);
+      getDescriptor().getMessageTypes().get(15);
     internal_static_flyteidl_core_WorkflowTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_WorkflowTemplate_descriptor,
         new java.lang.String[] { "Id", "Metadata", "Interface", "Nodes", "Outputs", "FailureNode", "MetadataDefaults", });
     internal_static_flyteidl_core_TaskNodeOverrides_descriptor =
-      getDescriptor().getMessageTypes().get(15);
+      getDescriptor().getMessageTypes().get(16);
     internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskNodeOverrides_descriptor,

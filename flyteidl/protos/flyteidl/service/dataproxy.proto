@@ -8,6 +8,8 @@ import "google/api/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "flyteidl/core/identifier.proto";
+import "flyteidl/core/literals.proto";
+
 
 message CreateUploadLocationResponse {
   // SignedUrl specifies the url to use to upload content to (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
@@ -21,6 +23,10 @@ message CreateUploadLocationResponse {
 }
 
 // CreateUploadLocationRequest specified request for the CreateUploadLocation API.
+// The implementation in data proxy service will create the s3 location with some server side configured prefixes,
+// and then:
+//   - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR
+//   - project/domain/filename_root (if present)/filename (if present).
 message CreateUploadLocationRequest {
   // Project to create the upload location for
   // +required
@@ -43,6 +49,12 @@ message CreateUploadLocationRequest {
   // generated path.
   // +required
   bytes content_md5 = 5;
+
+  // If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+  // this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+  // in data proxy config. This option is useful when uploading multiple files.
+  // +optional
+  string filename_root = 6;
 }
 
 // CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
@@ -96,10 +108,46 @@ message CreateDownloadLinkRequest {
 // CreateDownloadLinkResponse defines the response for the generated links
 message CreateDownloadLinkResponse {
   // SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+  repeated string signed_url = 1 [deprecated = true];
+
+  // ExpiresAt defines when will the signed URL expire.
+  google.protobuf.Timestamp expires_at = 2 [deprecated = true];
+
+  // New wrapper object containing the signed urls and expiration time
+  PreSignedURLs pre_signed_urls = 3;
+}
+
+// Wrapper object since the message is shared across this and the GetDataResponse
+message PreSignedURLs {
+  // SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
   repeated string signed_url = 1;
 
   // ExpiresAt defines when will the signed URL expire.
   google.protobuf.Timestamp expires_at = 2;
+}
+
+// General request artifact to retrieve data from a Flyte artifact url.
+message GetDataRequest {
+  // A unique identifier in the form of flyte://<something> that uniquely, for a given Flyte
+  // backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+  // e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+  //      flyte://v1/proj/development/execid/n2/i (for node execution input)
+  //      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+  string flyte_url = 1;
+}
+
+message GetDataResponse {
+  oneof data {
+    // literal map data will be returned
+    core.LiteralMap literal_map = 1;
+
+    // Flyte deck html will be returned as a signed url users can download
+    PreSignedURLs pre_signed_urls = 2;
+
+    // Single literal will be returned. This is returned when the user/url requests a specific output or input
+    // by name. See the o3 example above.
+    core.Literal literal = 3;
+  }
 }
 
 // DataProxyService defines an RPC Service that allows access to user-data in a controlled manner.
@@ -135,5 +183,12 @@ service DataProxyService {
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Creates a read-only http location that is accessible for tasks at runtime."
     // };
+  }
+
+  rpc GetData (GetDataRequest) returns (GetDataResponse) {
+    // Takes an address like flyte://v1/proj/development/execid/n2/0/i and return the actual data
+    option (google.api.http) = {
+      get: "/api/v1/data"
+    };
   }
 }

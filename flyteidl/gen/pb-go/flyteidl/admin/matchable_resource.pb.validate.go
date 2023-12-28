@@ -614,6 +614,16 @@ func (m *WorkflowExecutionConfig) Validate() error {
 
 	// no validation rules for OverwriteCache
 
+	if v, ok := interface{}(m.GetEnvs()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return WorkflowExecutionConfigValidationError{
+				field:  "Envs",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	return nil
 }
 

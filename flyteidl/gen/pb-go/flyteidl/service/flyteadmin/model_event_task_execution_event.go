@@ -26,6 +26,8 @@ type EventTaskExecutionEvent struct {
 	OccurredAt time.Time `json:"occurred_at,omitempty"`
 	// URI of the input file, it encodes all the information including Cloud source provider. ie., s3://...
 	InputUri string `json:"input_uri,omitempty"`
+	// Raw input data consumed by this task execution.
+	InputData *CoreLiteralMap `json:"input_data,omitempty"`
 	// URI to the output of the execution, it will be in a format that encodes all the information including Cloud source provider. ie., s3://...
 	OutputUri string `json:"output_uri,omitempty"`
 	Error_ *CoreExecutionError `json:"error,omitempty"`
@@ -35,12 +37,16 @@ type EventTaskExecutionEvent struct {
 	CustomInfo *ProtobufStruct `json:"custom_info,omitempty"`
 	// Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc) that should be recorded regardless of the lack of phase change. The version field should be incremented when metadata changes across the duration of an individual phase.
 	PhaseVersion int64 `json:"phase_version,omitempty"`
-	// An optional explanation for the phase transition.
+	// An optional explanation for the phase transition. Deprecated: Use reasons instead.
 	Reason string `json:"reason,omitempty"`
+	// An optional list of explanations for the phase transition.
+	Reasons []EventEventReason `json:"reasons,omitempty"`
 	// A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin this type will be identical, but not all task executions necessarily use pre-registered definitions and this type is useful to render the task in the UI, filter task executions, etc.
 	TaskType string `json:"task_type,omitempty"`
 	// Metadata around how a task was executed.
-	Metadata *EventTaskExecutionMetadata `json:"metadata,omitempty"`
+	Metadata *FlyteidleventTaskExecutionMetadata `json:"metadata,omitempty"`
 	// The event version is used to indicate versioned changes in how data is reported using this proto message. For example, event_verison > 0 means that maps tasks report logs using the TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog in this message.
 	EventVersion int32 `json:"event_version,omitempty"`
+	// This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s pod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes, but this event will not be reported until the pod is marked as completed. Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
+	ReportedAt time.Time `json:"reported_at,omitempty"`
 }

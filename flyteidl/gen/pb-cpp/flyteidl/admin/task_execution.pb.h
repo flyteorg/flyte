@@ -49,7 +49,7 @@ struct TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[7]
+  static const ::google::protobuf::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -58,6 +58,9 @@ struct TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto {
 void AddDescriptors_flyteidl_2fadmin_2ftask_5fexecution_2eproto();
 namespace flyteidl {
 namespace admin {
+class Reason;
+class ReasonDefaultTypeInternal;
+extern ReasonDefaultTypeInternal _Reason_default_instance_;
 class TaskExecution;
 class TaskExecutionDefaultTypeInternal;
 extern TaskExecutionDefaultTypeInternal _TaskExecution_default_instance_;
@@ -83,6 +86,7 @@ extern TaskExecutionListRequestDefaultTypeInternal _TaskExecutionListRequest_def
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::admin::Reason* Arena::CreateMaybeMessage<::flyteidl::admin::Reason>(Arena*);
 template<> ::flyteidl::admin::TaskExecution* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecution>(Arena*);
 template<> ::flyteidl::admin::TaskExecutionClosure* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecutionClosure>(Arena*);
 template<> ::flyteidl::admin::TaskExecutionGetDataRequest* Arena::CreateMaybeMessage<::flyteidl::admin::TaskExecutionGetDataRequest>(Arena*);
@@ -768,6 +772,18 @@ class TaskExecutionClosure final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
       logs() const;
 
+  // repeated .flyteidl.admin.Reason reasons = 18;
+  int reasons_size() const;
+  void clear_reasons();
+  static const int kReasonsFieldNumber = 18;
+  ::flyteidl::admin::Reason* mutable_reasons(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Reason >*
+      mutable_reasons();
+  const ::flyteidl::admin::Reason& reasons(int index) const;
+  ::flyteidl::admin::Reason* add_reasons();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Reason >&
+      reasons() const;
+
   // string reason = 10;
   void clear_reason();
   static const int kReasonFieldNumber = 10;
@@ -911,6 +927,7 @@ class TaskExecutionClosure final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > logs_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Reason > reasons_;
   ::google::protobuf::internal::ArenaStringPtr reason_;
   ::google::protobuf::internal::ArenaStringPtr task_type_;
   ::google::protobuf::Timestamp* started_at_;
@@ -930,6 +947,136 @@ class TaskExecutionClosure final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
+  friend struct ::TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Reason final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Reason) */ {
+ public:
+  Reason();
+  virtual ~Reason();
+
+  Reason(const Reason& from);
+
+  inline Reason& operator=(const Reason& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Reason(Reason&& from) noexcept
+    : Reason() {
+    *this = ::std::move(from);
+  }
+
+  inline Reason& operator=(Reason&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Reason& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Reason* internal_default_instance() {
+    return reinterpret_cast<const Reason*>(
+               &_Reason_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(Reason* other);
+  friend void swap(Reason& a, Reason& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Reason* New() const final {
+    return CreateMaybeMessage<Reason>(nullptr);
+  }
+
+  Reason* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Reason>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Reason& from);
+  void MergeFrom(const Reason& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Reason* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string message = 2;
+  void clear_message();
+  static const int kMessageFieldNumber = 2;
+  const ::std::string& message() const;
+  void set_message(const ::std::string& value);
+  #if LANG_CXX11
+  void set_message(::std::string&& value);
+  #endif
+  void set_message(const char* value);
+  void set_message(const char* value, size_t size);
+  ::std::string* mutable_message();
+  ::std::string* release_message();
+  void set_allocated_message(::std::string* message);
+
+  // .google.protobuf.Timestamp occurred_at = 1;
+  bool has_occurred_at() const;
+  void clear_occurred_at();
+  static const int kOccurredAtFieldNumber = 1;
+  const ::google::protobuf::Timestamp& occurred_at() const;
+  ::google::protobuf::Timestamp* release_occurred_at();
+  ::google::protobuf::Timestamp* mutable_occurred_at();
+  void set_allocated_occurred_at(::google::protobuf::Timestamp* occurred_at);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.Reason)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr message_;
+  ::google::protobuf::Timestamp* occurred_at_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto;
 };
 // -------------------------------------------------------------------
@@ -972,7 +1119,7 @@ class TaskExecutionGetDataRequest final :
                &_TaskExecutionGetDataRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(TaskExecutionGetDataRequest* other);
   friend void swap(TaskExecutionGetDataRequest& a, TaskExecutionGetDataRequest& b) {
@@ -1087,7 +1234,7 @@ class TaskExecutionGetDataResponse final :
                &_TaskExecutionGetDataResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(TaskExecutionGetDataResponse* other);
   friend void swap(TaskExecutionGetDataResponse& a, TaskExecutionGetDataResponse& b) {
@@ -1180,6 +1327,15 @@ class TaskExecutionGetDataResponse final :
   ::flyteidl::core::LiteralMap* mutable_full_outputs();
   void set_allocated_full_outputs(::flyteidl::core::LiteralMap* full_outputs);
 
+  // .flyteidl.admin.FlyteURLs flyte_urls = 5;
+  bool has_flyte_urls() const;
+  void clear_flyte_urls();
+  static const int kFlyteUrlsFieldNumber = 5;
+  const ::flyteidl::admin::FlyteURLs& flyte_urls() const;
+  ::flyteidl::admin::FlyteURLs* release_flyte_urls();
+  ::flyteidl::admin::FlyteURLs* mutable_flyte_urls();
+  void set_allocated_flyte_urls(::flyteidl::admin::FlyteURLs* flyte_urls);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.TaskExecutionGetDataResponse)
  private:
   class HasBitSetters;
@@ -1189,6 +1345,7 @@ class TaskExecutionGetDataResponse final :
   ::flyteidl::admin::UrlBlob* outputs_;
   ::flyteidl::core::LiteralMap* full_inputs_;
   ::flyteidl::core::LiteralMap* full_outputs_;
+  ::flyteidl::admin::FlyteURLs* flyte_urls_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2ftask_5fexecution_2eproto;
 };
@@ -2318,6 +2475,36 @@ inline void TaskExecutionClosure::set_event_version(::google::protobuf::int32 va
   // @@protoc_insertion_point(field_set:flyteidl.admin.TaskExecutionClosure.event_version)
 }
 
+// repeated .flyteidl.admin.Reason reasons = 18;
+inline int TaskExecutionClosure::reasons_size() const {
+  return reasons_.size();
+}
+inline void TaskExecutionClosure::clear_reasons() {
+  reasons_.Clear();
+}
+inline ::flyteidl::admin::Reason* TaskExecutionClosure::mutable_reasons(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionClosure.reasons)
+  return reasons_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Reason >*
+TaskExecutionClosure::mutable_reasons() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.TaskExecutionClosure.reasons)
+  return &reasons_;
+}
+inline const ::flyteidl::admin::Reason& TaskExecutionClosure::reasons(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionClosure.reasons)
+  return reasons_.Get(index);
+}
+inline ::flyteidl::admin::Reason* TaskExecutionClosure::add_reasons() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.TaskExecutionClosure.reasons)
+  return reasons_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Reason >&
+TaskExecutionClosure::reasons() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.TaskExecutionClosure.reasons)
+  return reasons_;
+}
+
 inline bool TaskExecutionClosure::has_output_result() const {
   return output_result_case() != OUTPUT_RESULT_NOT_SET;
 }
@@ -2327,6 +2514,109 @@ inline void TaskExecutionClosure::clear_has_output_result() {
 inline TaskExecutionClosure::OutputResultCase TaskExecutionClosure::output_result_case() const {
   return TaskExecutionClosure::OutputResultCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// Reason
+
+// .google.protobuf.Timestamp occurred_at = 1;
+inline bool Reason::has_occurred_at() const {
+  return this != internal_default_instance() && occurred_at_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& Reason::occurred_at() const {
+  const ::google::protobuf::Timestamp* p = occurred_at_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Reason.occurred_at)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* Reason::release_occurred_at() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Reason.occurred_at)
+  
+  ::google::protobuf::Timestamp* temp = occurred_at_;
+  occurred_at_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* Reason::mutable_occurred_at() {
+  
+  if (occurred_at_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    occurred_at_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Reason.occurred_at)
+  return occurred_at_;
+}
+inline void Reason::set_allocated_occurred_at(::google::protobuf::Timestamp* occurred_at) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(occurred_at_);
+  }
+  if (occurred_at) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(occurred_at)->GetArena();
+    if (message_arena != submessage_arena) {
+      occurred_at = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, occurred_at, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  occurred_at_ = occurred_at;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Reason.occurred_at)
+}
+
+// string message = 2;
+inline void Reason::clear_message() {
+  message_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Reason::message() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Reason.message)
+  return message_.GetNoArena();
+}
+inline void Reason::set_message(const ::std::string& value) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Reason.message)
+}
+#if LANG_CXX11
+inline void Reason::set_message(::std::string&& value) {
+  
+  message_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Reason.message)
+}
+#endif
+inline void Reason::set_message(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Reason.message)
+}
+inline void Reason::set_message(const char* value, size_t size) {
+  
+  message_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Reason.message)
+}
+inline ::std::string* Reason::mutable_message() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Reason.message)
+  return message_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Reason::release_message() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Reason.message)
+  
+  return message_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Reason::set_allocated_message(::std::string* message) {
+  if (message != nullptr) {
+    
+  } else {
+    
+  }
+  message_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), message);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Reason.message)
+}
+
 // -------------------------------------------------------------------
 
 // TaskExecutionGetDataRequest
@@ -2560,9 +2850,56 @@ inline void TaskExecutionGetDataResponse::set_allocated_full_outputs(::flyteidl:
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.full_outputs)
 }
 
+// .flyteidl.admin.FlyteURLs flyte_urls = 5;
+inline bool TaskExecutionGetDataResponse::has_flyte_urls() const {
+  return this != internal_default_instance() && flyte_urls_ != nullptr;
+}
+inline const ::flyteidl::admin::FlyteURLs& TaskExecutionGetDataResponse::flyte_urls() const {
+  const ::flyteidl::admin::FlyteURLs* p = flyte_urls_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.TaskExecutionGetDataResponse.flyte_urls)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::FlyteURLs*>(
+      &::flyteidl::admin::_FlyteURLs_default_instance_);
+}
+inline ::flyteidl::admin::FlyteURLs* TaskExecutionGetDataResponse::release_flyte_urls() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.TaskExecutionGetDataResponse.flyte_urls)
+  
+  ::flyteidl::admin::FlyteURLs* temp = flyte_urls_;
+  flyte_urls_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::FlyteURLs* TaskExecutionGetDataResponse::mutable_flyte_urls() {
+  
+  if (flyte_urls_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::FlyteURLs>(GetArenaNoVirtual());
+    flyte_urls_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.TaskExecutionGetDataResponse.flyte_urls)
+  return flyte_urls_;
+}
+inline void TaskExecutionGetDataResponse::set_allocated_flyte_urls(::flyteidl::admin::FlyteURLs* flyte_urls) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(flyte_urls_);
+  }
+  if (flyte_urls) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      flyte_urls = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, flyte_urls, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  flyte_urls_ = flyte_urls;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.TaskExecutionGetDataResponse.flyte_urls)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -261,6 +261,23 @@ func TestMakeDefaultLiteralForType(t *testing.T) {
 			Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_StringValue{StringValue: "x"}}}}}}
 		assert.Equal(t, expected, l)
 	})
+
+	t.Run("union", func(t *testing.T) {
+		l, err := MakeDefaultLiteralForType(
+			&core.LiteralType{
+				Type: &core.LiteralType_UnionType{
+					UnionType: &core.UnionType{
+						Variants: []*core.LiteralType{
+							{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+							{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}},
+						},
+					},
+				},
+			},
+		)
+		assert.NoError(t, err)
+		assert.Equal(t, "*core.Union", reflect.TypeOf(l.GetScalar().GetUnion()).String())
+	})
 }
 
 func TestMustMakeDefaultLiteralForType(t *testing.T) {
@@ -674,5 +691,75 @@ func TestMakeLiteralForType(t *testing.T) {
 		l, err = MakeLiteralForType(literalType, "")
 		assert.NoError(t, err)
 		assert.Equal(t, "", l.GetScalar().GetPrimitive().GetStringValue())
+	})
+
+	t.Run("Structured Data Set", func(t *testing.T) {
+		var dataSetColumns []*core.StructuredDatasetType_DatasetColumn
+		dataSetColumns = append(dataSetColumns, &core.StructuredDatasetType_DatasetColumn{
+			Name: "Price",
+			LiteralType: &core.LiteralType{
+				Type: &core.LiteralType_Simple{
+					Simple: core.SimpleType_FLOAT,
+				},
+			},
+		})
+		var literalType = &core.LiteralType{Type: &core.LiteralType_StructuredDatasetType{StructuredDatasetType: &core.StructuredDatasetType{
+			Columns: dataSetColumns,
+			Format:  "testFormat",
+		}}}
+
+		expectedLV := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_StructuredDataset{
+				StructuredDataset: &core.StructuredDataset{
+					Uri: "s3://blah/blah/blah",
+					Metadata: &core.StructuredDatasetMetadata{
+						StructuredDatasetType: &core.StructuredDatasetType{
+							Columns: dataSetColumns,
+							Format:  "testFormat",
+						},
+					},
+				},
+			},
+		}}}
+		lv, err := MakeLiteralForType(literalType, "s3://blah/blah/blah")
+		assert.NoError(t, err)
+
+		assert.Equal(t, expectedLV, lv)
+
+		expectedVal, err := ExtractFromLiteral(expectedLV)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(lv)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVal, actualVal)
+	})
+
+	t.Run("Union", func(t *testing.T) {
+		var literalType = &core.LiteralType{
+			Type: &core.LiteralType_UnionType{
+				UnionType: &core.UnionType{
+					Variants: []*core.LiteralType{
+						{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}},
+						{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}},
+					},
+				},
+			},
+		}
+		expectedLV := &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+			Value: &core.Scalar_Union{
+				Union: &core.Union{
+					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}},
+					Value: &core.Literal{Value: &core.Literal_Scalar{Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{Primitive: &core.Primitive{Value: &core.Primitive_FloatValue{FloatValue: 0.1}}}}}},
+				},
+			},
+		}}}
+		lv, err := MakeLiteralForType(literalType, float64(0.1))
+		assert.NoError(t, err)
+		assert.Equal(t, expectedLV, lv)
+		expectedVal, err := ExtractFromLiteral(expectedLV)
+		assert.NoError(t, err)
+		actualVal, err := ExtractFromLiteral(lv)
+		assert.NoError(t, err)
+		assert.Equal(t, expectedVal, actualVal)
 	})
 }

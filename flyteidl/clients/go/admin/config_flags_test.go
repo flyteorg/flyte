@@ -463,4 +463,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_httpProxyURL", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.HTTPProxyURL.String()
+
+			cmdFlags.Set("httpProxyURL", testValue)
+			if vString, err := cmdFlags.GetString("httpProxyURL"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.HTTPProxyURL)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

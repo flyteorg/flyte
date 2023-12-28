@@ -11212,6 +11212,30 @@ public final class Types {
      */
     com.google.protobuf.ByteString
         getVarBytes();
+
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    java.util.List<flyteidl.core.Types.PromiseAttribute> 
+        getAttrPathList();
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    flyteidl.core.Types.PromiseAttribute getAttrPath(int index);
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    int getAttrPathCount();
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    java.util.List<? extends flyteidl.core.Types.PromiseAttributeOrBuilder> 
+        getAttrPathOrBuilderList();
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    flyteidl.core.Types.PromiseAttributeOrBuilder getAttrPathOrBuilder(
+        int index);
   }
   /**
    * <pre>
@@ -11233,6 +11257,7 @@ public final class Types {
     private OutputReference() {
       nodeId_ = "";
       var_ = "";
+      attrPath_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -11271,6 +11296,15 @@ public final class Types {
               var_ = s;
               break;
             }
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
+                attrPath_ = new java.util.ArrayList<flyteidl.core.Types.PromiseAttribute>();
+                mutable_bitField0_ |= 0x00000004;
+              }
+              attrPath_.add(
+                  input.readMessage(flyteidl.core.Types.PromiseAttribute.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -11286,6 +11320,9 @@ public final class Types {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
+          attrPath_ = java.util.Collections.unmodifiableList(attrPath_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -11303,6 +11340,7 @@ public final class Types {
               flyteidl.core.Types.OutputReference.class, flyteidl.core.Types.OutputReference.Builder.class);
     }
 
+    private int bitField0_;
     public static final int NODE_ID_FIELD_NUMBER = 1;
     private volatile java.lang.Object nodeId_;
     /**
@@ -11387,6 +11425,41 @@ public final class Types {
       }
     }
 
+    public static final int ATTR_PATH_FIELD_NUMBER = 3;
+    private java.util.List<flyteidl.core.Types.PromiseAttribute> attrPath_;
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    public java.util.List<flyteidl.core.Types.PromiseAttribute> getAttrPathList() {
+      return attrPath_;
+    }
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    public java.util.List<? extends flyteidl.core.Types.PromiseAttributeOrBuilder> 
+        getAttrPathOrBuilderList() {
+      return attrPath_;
+    }
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    public int getAttrPathCount() {
+      return attrPath_.size();
+    }
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    public flyteidl.core.Types.PromiseAttribute getAttrPath(int index) {
+      return attrPath_.get(index);
+    }
+    /**
+     * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+     */
+    public flyteidl.core.Types.PromiseAttributeOrBuilder getAttrPathOrBuilder(
+        int index) {
+      return attrPath_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -11407,6 +11480,9 @@ public final class Types {
       if (!getVarBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, var_);
       }
+      for (int i = 0; i < attrPath_.size(); i++) {
+        output.writeMessage(3, attrPath_.get(i));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -11421,6 +11497,10 @@ public final class Types {
       }
       if (!getVarBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, var_);
+      }
+      for (int i = 0; i < attrPath_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, attrPath_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -11441,6 +11521,8 @@ public final class Types {
           .equals(other.getNodeId())) return false;
       if (!getVar()
           .equals(other.getVar())) return false;
+      if (!getAttrPathList()
+          .equals(other.getAttrPathList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -11456,6 +11538,10 @@ public final class Types {
       hash = (53 * hash) + getNodeId().hashCode();
       hash = (37 * hash) + VAR_FIELD_NUMBER;
       hash = (53 * hash) + getVar().hashCode();
+      if (getAttrPathCount() > 0) {
+        hash = (37 * hash) + ATTR_PATH_FIELD_NUMBER;
+        hash = (53 * hash) + getAttrPathList().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -11589,6 +11675,7 @@ public final class Types {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
+          getAttrPathFieldBuilder();
         }
       }
       @java.lang.Override
@@ -11598,6 +11685,12 @@ public final class Types {
 
         var_ = "";
 
+        if (attrPathBuilder_ == null) {
+          attrPath_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        } else {
+          attrPathBuilder_.clear();
+        }
         return this;
       }
 
@@ -11624,8 +11717,20 @@ public final class Types {
       @java.lang.Override
       public flyteidl.core.Types.OutputReference buildPartial() {
         flyteidl.core.Types.OutputReference result = new flyteidl.core.Types.OutputReference(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.nodeId_ = nodeId_;
         result.var_ = var_;
+        if (attrPathBuilder_ == null) {
+          if (((bitField0_ & 0x00000004) != 0)) {
+            attrPath_ = java.util.Collections.unmodifiableList(attrPath_);
+            bitField0_ = (bitField0_ & ~0x00000004);
+          }
+          result.attrPath_ = attrPath_;
+        } else {
+          result.attrPath_ = attrPathBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -11682,6 +11787,32 @@ public final class Types {
           var_ = other.var_;
           onChanged();
         }
+        if (attrPathBuilder_ == null) {
+          if (!other.attrPath_.isEmpty()) {
+            if (attrPath_.isEmpty()) {
+              attrPath_ = other.attrPath_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+            } else {
+              ensureAttrPathIsMutable();
+              attrPath_.addAll(other.attrPath_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.attrPath_.isEmpty()) {
+            if (attrPathBuilder_.isEmpty()) {
+              attrPathBuilder_.dispose();
+              attrPathBuilder_ = null;
+              attrPath_ = other.attrPath_;
+              bitField0_ = (bitField0_ & ~0x00000004);
+              attrPathBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getAttrPathFieldBuilder() : null;
+            } else {
+              attrPathBuilder_.addAllMessages(other.attrPath_);
+            }
+          }
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -11710,6 +11841,7 @@ public final class Types {
         }
         return this;
       }
+      private int bitField0_;
 
       private java.lang.Object nodeId_ = "";
       /**
@@ -11888,6 +12020,246 @@ public final class Types {
         onChanged();
         return this;
       }
+
+      private java.util.List<flyteidl.core.Types.PromiseAttribute> attrPath_ =
+        java.util.Collections.emptyList();
+      private void ensureAttrPathIsMutable() {
+        if (!((bitField0_ & 0x00000004) != 0)) {
+          attrPath_ = new java.util.ArrayList<flyteidl.core.Types.PromiseAttribute>(attrPath_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Types.PromiseAttribute, flyteidl.core.Types.PromiseAttribute.Builder, flyteidl.core.Types.PromiseAttributeOrBuilder> attrPathBuilder_;
+
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public java.util.List<flyteidl.core.Types.PromiseAttribute> getAttrPathList() {
+        if (attrPathBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(attrPath_);
+        } else {
+          return attrPathBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public int getAttrPathCount() {
+        if (attrPathBuilder_ == null) {
+          return attrPath_.size();
+        } else {
+          return attrPathBuilder_.getCount();
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public flyteidl.core.Types.PromiseAttribute getAttrPath(int index) {
+        if (attrPathBuilder_ == null) {
+          return attrPath_.get(index);
+        } else {
+          return attrPathBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder setAttrPath(
+          int index, flyteidl.core.Types.PromiseAttribute value) {
+        if (attrPathBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAttrPathIsMutable();
+          attrPath_.set(index, value);
+          onChanged();
+        } else {
+          attrPathBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder setAttrPath(
+          int index, flyteidl.core.Types.PromiseAttribute.Builder builderForValue) {
+        if (attrPathBuilder_ == null) {
+          ensureAttrPathIsMutable();
+          attrPath_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          attrPathBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder addAttrPath(flyteidl.core.Types.PromiseAttribute value) {
+        if (attrPathBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAttrPathIsMutable();
+          attrPath_.add(value);
+          onChanged();
+        } else {
+          attrPathBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder addAttrPath(
+          int index, flyteidl.core.Types.PromiseAttribute value) {
+        if (attrPathBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureAttrPathIsMutable();
+          attrPath_.add(index, value);
+          onChanged();
+        } else {
+          attrPathBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder addAttrPath(
+          flyteidl.core.Types.PromiseAttribute.Builder builderForValue) {
+        if (attrPathBuilder_ == null) {
+          ensureAttrPathIsMutable();
+          attrPath_.add(builderForValue.build());
+          onChanged();
+        } else {
+          attrPathBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder addAttrPath(
+          int index, flyteidl.core.Types.PromiseAttribute.Builder builderForValue) {
+        if (attrPathBuilder_ == null) {
+          ensureAttrPathIsMutable();
+          attrPath_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          attrPathBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder addAllAttrPath(
+          java.lang.Iterable<? extends flyteidl.core.Types.PromiseAttribute> values) {
+        if (attrPathBuilder_ == null) {
+          ensureAttrPathIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, attrPath_);
+          onChanged();
+        } else {
+          attrPathBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder clearAttrPath() {
+        if (attrPathBuilder_ == null) {
+          attrPath_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000004);
+          onChanged();
+        } else {
+          attrPathBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public Builder removeAttrPath(int index) {
+        if (attrPathBuilder_ == null) {
+          ensureAttrPathIsMutable();
+          attrPath_.remove(index);
+          onChanged();
+        } else {
+          attrPathBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public flyteidl.core.Types.PromiseAttribute.Builder getAttrPathBuilder(
+          int index) {
+        return getAttrPathFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public flyteidl.core.Types.PromiseAttributeOrBuilder getAttrPathOrBuilder(
+          int index) {
+        if (attrPathBuilder_ == null) {
+          return attrPath_.get(index);  } else {
+          return attrPathBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public java.util.List<? extends flyteidl.core.Types.PromiseAttributeOrBuilder> 
+           getAttrPathOrBuilderList() {
+        if (attrPathBuilder_ != null) {
+          return attrPathBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(attrPath_);
+        }
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public flyteidl.core.Types.PromiseAttribute.Builder addAttrPathBuilder() {
+        return getAttrPathFieldBuilder().addBuilder(
+            flyteidl.core.Types.PromiseAttribute.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public flyteidl.core.Types.PromiseAttribute.Builder addAttrPathBuilder(
+          int index) {
+        return getAttrPathFieldBuilder().addBuilder(
+            index, flyteidl.core.Types.PromiseAttribute.getDefaultInstance());
+      }
+      /**
+       * <code>repeated .flyteidl.core.PromiseAttribute attr_path = 3;</code>
+       */
+      public java.util.List<flyteidl.core.Types.PromiseAttribute.Builder> 
+           getAttrPathBuilderList() {
+        return getAttrPathFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Types.PromiseAttribute, flyteidl.core.Types.PromiseAttribute.Builder, flyteidl.core.Types.PromiseAttributeOrBuilder> 
+          getAttrPathFieldBuilder() {
+        if (attrPathBuilder_ == null) {
+          attrPathBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.Types.PromiseAttribute, flyteidl.core.Types.PromiseAttribute.Builder, flyteidl.core.Types.PromiseAttributeOrBuilder>(
+                  attrPath_,
+                  ((bitField0_ & 0x00000004) != 0),
+                  getParentForChildren(),
+                  isClean());
+          attrPath_ = null;
+        }
+        return attrPathBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -11936,6 +12308,727 @@ public final class Types {
 
     @java.lang.Override
     public flyteidl.core.Types.OutputReference getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface PromiseAttributeOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.PromiseAttribute)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string string_value = 1;</code>
+     */
+    java.lang.String getStringValue();
+    /**
+     * <code>string string_value = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getStringValueBytes();
+
+    /**
+     * <code>int32 int_value = 2;</code>
+     */
+    int getIntValue();
+
+    public flyteidl.core.Types.PromiseAttribute.ValueCase getValueCase();
+  }
+  /**
+   * Protobuf type {@code flyteidl.core.PromiseAttribute}
+   */
+  public  static final class PromiseAttribute extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.PromiseAttribute)
+      PromiseAttributeOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use PromiseAttribute.newBuilder() to construct.
+    private PromiseAttribute(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private PromiseAttribute() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PromiseAttribute(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+              valueCase_ = 1;
+              value_ = s;
+              break;
+            }
+            case 16: {
+              valueCase_ = 2;
+              value_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Types.internal_static_flyteidl_core_PromiseAttribute_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Types.internal_static_flyteidl_core_PromiseAttribute_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Types.PromiseAttribute.class, flyteidl.core.Types.PromiseAttribute.Builder.class);
+    }
+
+    private int valueCase_ = 0;
+    private java.lang.Object value_;
+    public enum ValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      STRING_VALUE(1),
+      INT_VALUE(2),
+      VALUE_NOT_SET(0);
+      private final int value;
+      private ValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static ValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static ValueCase forNumber(int value) {
+        switch (value) {
+          case 1: return STRING_VALUE;
+          case 2: return INT_VALUE;
+          case 0: return VALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public ValueCase
+    getValueCase() {
+      return ValueCase.forNumber(
+          valueCase_);
+    }
+
+    public static final int STRING_VALUE_FIELD_NUMBER = 1;
+    /**
+     * <code>string string_value = 1;</code>
+     */
+    public java.lang.String getStringValue() {
+      java.lang.Object ref = "";
+      if (valueCase_ == 1) {
+        ref = value_;
+      }
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (valueCase_ == 1) {
+          value_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>string string_value = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getStringValueBytes() {
+      java.lang.Object ref = "";
+      if (valueCase_ == 1) {
+        ref = value_;
+      }
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        if (valueCase_ == 1) {
+          value_ = b;
+        }
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int INT_VALUE_FIELD_NUMBER = 2;
+    /**
+     * <code>int32 int_value = 2;</code>
+     */
+    public int getIntValue() {
+      if (valueCase_ == 2) {
+        return (java.lang.Integer) value_;
+      }
+      return 0;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (valueCase_ == 1) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, value_);
+      }
+      if (valueCase_ == 2) {
+        output.writeInt32(
+            2, (int)((java.lang.Integer) value_));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (valueCase_ == 1) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, value_);
+      }
+      if (valueCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(
+              2, (int)((java.lang.Integer) value_));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Types.PromiseAttribute)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Types.PromiseAttribute other = (flyteidl.core.Types.PromiseAttribute) obj;
+
+      if (!getValueCase().equals(other.getValueCase())) return false;
+      switch (valueCase_) {
+        case 1:
+          if (!getStringValue()
+              .equals(other.getStringValue())) return false;
+          break;
+        case 2:
+          if (getIntValue()
+              != other.getIntValue()) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      switch (valueCase_) {
+        case 1:
+          hash = (37 * hash) + STRING_VALUE_FIELD_NUMBER;
+          hash = (53 * hash) + getStringValue().hashCode();
+          break;
+        case 2:
+          hash = (37 * hash) + INT_VALUE_FIELD_NUMBER;
+          hash = (53 * hash) + getIntValue();
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Types.PromiseAttribute parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Types.PromiseAttribute prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.core.PromiseAttribute}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.PromiseAttribute)
+        flyteidl.core.Types.PromiseAttributeOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Types.internal_static_flyteidl_core_PromiseAttribute_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Types.internal_static_flyteidl_core_PromiseAttribute_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Types.PromiseAttribute.class, flyteidl.core.Types.PromiseAttribute.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Types.PromiseAttribute.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        valueCase_ = 0;
+        value_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Types.internal_static_flyteidl_core_PromiseAttribute_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Types.PromiseAttribute getDefaultInstanceForType() {
+        return flyteidl.core.Types.PromiseAttribute.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Types.PromiseAttribute build() {
+        flyteidl.core.Types.PromiseAttribute result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Types.PromiseAttribute buildPartial() {
+        flyteidl.core.Types.PromiseAttribute result = new flyteidl.core.Types.PromiseAttribute(this);
+        if (valueCase_ == 1) {
+          result.value_ = value_;
+        }
+        if (valueCase_ == 2) {
+          result.value_ = value_;
+        }
+        result.valueCase_ = valueCase_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Types.PromiseAttribute) {
+          return mergeFrom((flyteidl.core.Types.PromiseAttribute)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Types.PromiseAttribute other) {
+        if (other == flyteidl.core.Types.PromiseAttribute.getDefaultInstance()) return this;
+        switch (other.getValueCase()) {
+          case STRING_VALUE: {
+            valueCase_ = 1;
+            value_ = other.value_;
+            onChanged();
+            break;
+          }
+          case INT_VALUE: {
+            setIntValue(other.getIntValue());
+            break;
+          }
+          case VALUE_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Types.PromiseAttribute parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Types.PromiseAttribute) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int valueCase_ = 0;
+      private java.lang.Object value_;
+      public ValueCase
+          getValueCase() {
+        return ValueCase.forNumber(
+            valueCase_);
+      }
+
+      public Builder clearValue() {
+        valueCase_ = 0;
+        value_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      /**
+       * <code>string string_value = 1;</code>
+       */
+      public java.lang.String getStringValue() {
+        java.lang.Object ref = "";
+        if (valueCase_ == 1) {
+          ref = value_;
+        }
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (valueCase_ == 1) {
+            value_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string string_value = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getStringValueBytes() {
+        java.lang.Object ref = "";
+        if (valueCase_ == 1) {
+          ref = value_;
+        }
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          if (valueCase_ == 1) {
+            value_ = b;
+          }
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string string_value = 1;</code>
+       */
+      public Builder setStringValue(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  valueCase_ = 1;
+        value_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string string_value = 1;</code>
+       */
+      public Builder clearStringValue() {
+        if (valueCase_ == 1) {
+          valueCase_ = 0;
+          value_ = null;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>string string_value = 1;</code>
+       */
+      public Builder setStringValueBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        valueCase_ = 1;
+        value_ = value;
+        onChanged();
+        return this;
+      }
+
+      /**
+       * <code>int32 int_value = 2;</code>
+       */
+      public int getIntValue() {
+        if (valueCase_ == 2) {
+          return (java.lang.Integer) value_;
+        }
+        return 0;
+      }
+      /**
+       * <code>int32 int_value = 2;</code>
+       */
+      public Builder setIntValue(int value) {
+        valueCase_ = 2;
+        value_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 int_value = 2;</code>
+       */
+      public Builder clearIntValue() {
+        if (valueCase_ == 2) {
+          valueCase_ = 0;
+          value_ = null;
+          onChanged();
+        }
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.PromiseAttribute)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.PromiseAttribute)
+    private static final flyteidl.core.Types.PromiseAttribute DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Types.PromiseAttribute();
+    }
+
+    public static flyteidl.core.Types.PromiseAttribute getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<PromiseAttribute>
+        PARSER = new com.google.protobuf.AbstractParser<PromiseAttribute>() {
+      @java.lang.Override
+      public PromiseAttribute parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new PromiseAttribute(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<PromiseAttribute> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<PromiseAttribute> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Types.PromiseAttribute getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -12763,6 +13856,11 @@ public final class Types {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_OutputReference_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_PromiseAttribute_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_PromiseAttribute_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_Error_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -12813,14 +13911,18 @@ public final class Types {
       " \001(\0132\027.google.protobuf.Struct\0221\n\nannotat" +
       "ion\030\t \001(\0132\035.flyteidl.core.TypeAnnotation" +
       "\022/\n\tstructure\030\013 \001(\0132\034.flyteidl.core.Type" +
-      "StructureB\006\n\004type\"/\n\017OutputReference\022\017\n\007" +
-      "node_id\030\001 \001(\t\022\013\n\003var\030\002 \001(\t\"0\n\005Error\022\026\n\016f" +
-      "ailed_node_id\030\001 \001(\t\022\017\n\007message\030\002 \001(\t*\206\001\n" +
-      "\nSimpleType\022\010\n\004NONE\020\000\022\013\n\007INTEGER\020\001\022\t\n\005FL" +
-      "OAT\020\002\022\n\n\006STRING\020\003\022\013\n\007BOOLEAN\020\004\022\014\n\010DATETI" +
-      "ME\020\005\022\014\n\010DURATION\020\006\022\n\n\006BINARY\020\007\022\t\n\005ERROR\020" +
-      "\010\022\n\n\006STRUCT\020\tB6Z4github.com/flyteorg/fly" +
-      "teidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "StructureB\006\n\004type\"c\n\017OutputReference\022\017\n\007" +
+      "node_id\030\001 \001(\t\022\013\n\003var\030\002 \001(\t\0222\n\tattr_path\030" +
+      "\003 \003(\0132\037.flyteidl.core.PromiseAttribute\"H" +
+      "\n\020PromiseAttribute\022\026\n\014string_value\030\001 \001(\t" +
+      "H\000\022\023\n\tint_value\030\002 \001(\005H\000B\007\n\005value\"0\n\005Erro" +
+      "r\022\026\n\016failed_node_id\030\001 \001(\t\022\017\n\007message\030\002 \001" +
+      "(\t*\206\001\n\nSimpleType\022\010\n\004NONE\020\000\022\013\n\007INTEGER\020\001" +
+      "\022\t\n\005FLOAT\020\002\022\n\n\006STRING\020\003\022\013\n\007BOOLEAN\020\004\022\014\n\010" +
+      "DATETIME\020\005\022\014\n\010DURATION\020\006\022\n\n\006BINARY\020\007\022\t\n\005" +
+      "ERROR\020\010\022\n\n\006STRUCT\020\tB6Z4github.com/flyteo" +
+      "rg/flyteidl/gen/pb-go/flyteidl/coreb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12900,9 +14002,15 @@ public final class Types {
     internal_static_flyteidl_core_OutputReference_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_OutputReference_descriptor,
-        new java.lang.String[] { "NodeId", "Var", });
-    internal_static_flyteidl_core_Error_descriptor =
+        new java.lang.String[] { "NodeId", "Var", "AttrPath", });
+    internal_static_flyteidl_core_PromiseAttribute_descriptor =
       getDescriptor().getMessageTypes().get(9);
+    internal_static_flyteidl_core_PromiseAttribute_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_PromiseAttribute_descriptor,
+        new java.lang.String[] { "StringValue", "IntValue", "Value", });
+    internal_static_flyteidl_core_Error_descriptor =
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_core_Error_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Error_descriptor,
