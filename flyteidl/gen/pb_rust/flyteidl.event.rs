@@ -393,23 +393,19 @@ pub struct CloudEventWorkflowExecution {
     #[prost(message, optional, tag="1")]
     pub raw_event: ::core::option::Option<WorkflowExecutionEvent>,
     #[prost(message, optional, tag="2")]
-    pub output_data: ::core::option::Option<super::core::LiteralMap>,
-    #[prost(message, optional, tag="3")]
     pub output_interface: ::core::option::Option<super::core::TypedInterface>,
-    #[prost(message, optional, tag="4")]
-    pub input_data: ::core::option::Option<super::core::LiteralMap>,
     /// The following are ExecutionMetadata fields
     /// We can't have the ExecutionMetadata object directly because of import cycle
-    #[prost(message, repeated, tag="5")]
+    #[prost(message, repeated, tag="3")]
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
-    #[prost(message, optional, tag="6")]
+    #[prost(message, optional, tag="4")]
     pub reference_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
-    #[prost(string, tag="7")]
+    #[prost(string, tag="5")]
     pub principal: ::prost::alloc::string::String,
     /// The ID of the LP that generated the execution that generated the Artifact.
     /// Here for provenance information.
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-    #[prost(message, optional, tag="8")]
+    #[prost(message, optional, tag="6")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -420,24 +416,19 @@ pub struct CloudEventNodeExecution {
     /// The relevant task execution if applicable
     #[prost(message, optional, tag="2")]
     pub task_exec_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
-    /// Hydrated output
-    #[prost(message, optional, tag="3")]
-    pub output_data: ::core::option::Option<super::core::LiteralMap>,
     /// The typed interface for the task that produced the event.
-    #[prost(message, optional, tag="4")]
+    #[prost(message, optional, tag="3")]
     pub output_interface: ::core::option::Option<super::core::TypedInterface>,
-    #[prost(message, optional, tag="5")]
-    pub input_data: ::core::option::Option<super::core::LiteralMap>,
     /// The following are ExecutionMetadata fields
     /// We can't have the ExecutionMetadata object directly because of import cycle
-    #[prost(message, repeated, tag="6")]
+    #[prost(message, repeated, tag="4")]
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
-    #[prost(string, tag="7")]
+    #[prost(string, tag="5")]
     pub principal: ::prost::alloc::string::String,
     /// The ID of the LP that generated the execution that generated the Artifact.
     /// Here for provenance information.
     /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-    #[prost(message, optional, tag="8")]
+    #[prost(message, optional, tag="6")]
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

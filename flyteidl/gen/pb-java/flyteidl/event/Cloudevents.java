@@ -32,43 +32,17 @@ public final class Cloudevents {
     flyteidl.event.Event.WorkflowExecutionEventOrBuilder getRawEventOrBuilder();
 
     /**
-     * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-     */
-    boolean hasOutputData();
-    /**
-     * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-     */
-    flyteidl.core.Literals.LiteralMap getOutputData();
-    /**
-     * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-     */
-    flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
-
-    /**
-     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
      */
     boolean hasOutputInterface();
     /**
-     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
      */
     flyteidl.core.Interface.TypedInterface getOutputInterface();
     /**
-     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
      */
     flyteidl.core.Interface.TypedInterfaceOrBuilder getOutputInterfaceOrBuilder();
-
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-     */
-    boolean hasInputData();
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-     */
-    flyteidl.core.Literals.LiteralMap getInputData();
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-     */
-    flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder();
 
     /**
      * <pre>
@@ -76,7 +50,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     java.util.List<flyteidl.core.ArtifactId.ArtifactID> 
         getArtifactIdsList();
@@ -86,7 +60,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index);
     /**
@@ -95,7 +69,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     int getArtifactIdsCount();
     /**
@@ -104,7 +78,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
         getArtifactIdsOrBuilderList();
@@ -114,30 +88,30 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
         int index);
 
     /**
-     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
      */
     boolean hasReferenceExecution();
     /**
-     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
      */
     flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getReferenceExecution();
     /**
-     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
      */
     flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getReferenceExecutionOrBuilder();
 
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     java.lang.String getPrincipal();
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     com.google.protobuf.ByteString
         getPrincipalBytes();
@@ -149,7 +123,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     boolean hasLaunchPlanId();
     /**
@@ -159,7 +133,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId();
     /**
@@ -169,7 +143,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder();
   }
@@ -233,19 +207,6 @@ public final class Cloudevents {
               break;
             }
             case 18: {
-              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
-              if (outputData_ != null) {
-                subBuilder = outputData_.toBuilder();
-              }
-              outputData_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(outputData_);
-                outputData_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            case 26: {
               flyteidl.core.Interface.TypedInterface.Builder subBuilder = null;
               if (outputInterface_ != null) {
                 subBuilder = outputInterface_.toBuilder();
@@ -258,29 +219,16 @@ public final class Cloudevents {
 
               break;
             }
-            case 34: {
-              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
-              if (inputData_ != null) {
-                subBuilder = inputData_.toBuilder();
-              }
-              inputData_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(inputData_);
-                inputData_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            case 42: {
-              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
+            case 26: {
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
                 artifactIds_ = new java.util.ArrayList<flyteidl.core.ArtifactId.ArtifactID>();
-                mutable_bitField0_ |= 0x00000010;
+                mutable_bitField0_ |= 0x00000004;
               }
               artifactIds_.add(
                   input.readMessage(flyteidl.core.ArtifactId.ArtifactID.parser(), extensionRegistry));
               break;
             }
-            case 50: {
+            case 34: {
               flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder subBuilder = null;
               if (referenceExecution_ != null) {
                 subBuilder = referenceExecution_.toBuilder();
@@ -293,13 +241,13 @@ public final class Cloudevents {
 
               break;
             }
-            case 58: {
+            case 42: {
               java.lang.String s = input.readStringRequireUtf8();
 
               principal_ = s;
               break;
             }
-            case 66: {
+            case 50: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (launchPlanId_ != null) {
                 subBuilder = launchPlanId_.toBuilder();
@@ -327,7 +275,7 @@ public final class Cloudevents {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000010) != 0)) {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
           artifactIds_ = java.util.Collections.unmodifiableList(artifactIds_);
         }
         this.unknownFields = unknownFields.build();
@@ -369,70 +317,28 @@ public final class Cloudevents {
       return getRawEvent();
     }
 
-    public static final int OUTPUT_DATA_FIELD_NUMBER = 2;
-    private flyteidl.core.Literals.LiteralMap outputData_;
-    /**
-     * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-     */
-    public boolean hasOutputData() {
-      return outputData_ != null;
-    }
-    /**
-     * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-     */
-    public flyteidl.core.Literals.LiteralMap getOutputData() {
-      return outputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputData_;
-    }
-    /**
-     * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-     */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
-      return getOutputData();
-    }
-
-    public static final int OUTPUT_INTERFACE_FIELD_NUMBER = 3;
+    public static final int OUTPUT_INTERFACE_FIELD_NUMBER = 2;
     private flyteidl.core.Interface.TypedInterface outputInterface_;
     /**
-     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
      */
     public boolean hasOutputInterface() {
       return outputInterface_ != null;
     }
     /**
-     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
      */
     public flyteidl.core.Interface.TypedInterface getOutputInterface() {
       return outputInterface_ == null ? flyteidl.core.Interface.TypedInterface.getDefaultInstance() : outputInterface_;
     }
     /**
-     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
      */
     public flyteidl.core.Interface.TypedInterfaceOrBuilder getOutputInterfaceOrBuilder() {
       return getOutputInterface();
     }
 
-    public static final int INPUT_DATA_FIELD_NUMBER = 4;
-    private flyteidl.core.Literals.LiteralMap inputData_;
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-     */
-    public boolean hasInputData() {
-      return inputData_ != null;
-    }
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-     */
-    public flyteidl.core.Literals.LiteralMap getInputData() {
-      return inputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputData_;
-    }
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-     */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
-      return getInputData();
-    }
-
-    public static final int ARTIFACT_IDS_FIELD_NUMBER = 5;
+    public static final int ARTIFACT_IDS_FIELD_NUMBER = 3;
     private java.util.List<flyteidl.core.ArtifactId.ArtifactID> artifactIds_;
     /**
      * <pre>
@@ -440,7 +346,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     public java.util.List<flyteidl.core.ArtifactId.ArtifactID> getArtifactIdsList() {
       return artifactIds_;
@@ -451,7 +357,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     public java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
         getArtifactIdsOrBuilderList() {
@@ -463,7 +369,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     public int getArtifactIdsCount() {
       return artifactIds_.size();
@@ -474,7 +380,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     public flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index) {
       return artifactIds_.get(index);
@@ -485,38 +391,38 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
      */
     public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
         int index) {
       return artifactIds_.get(index);
     }
 
-    public static final int REFERENCE_EXECUTION_FIELD_NUMBER = 6;
+    public static final int REFERENCE_EXECUTION_FIELD_NUMBER = 4;
     private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier referenceExecution_;
     /**
-     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
      */
     public boolean hasReferenceExecution() {
       return referenceExecution_ != null;
     }
     /**
-     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
      */
     public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getReferenceExecution() {
       return referenceExecution_ == null ? flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : referenceExecution_;
     }
     /**
-     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
      */
     public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getReferenceExecutionOrBuilder() {
       return getReferenceExecution();
     }
 
-    public static final int PRINCIPAL_FIELD_NUMBER = 7;
+    public static final int PRINCIPAL_FIELD_NUMBER = 5;
     private volatile java.lang.Object principal_;
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     public java.lang.String getPrincipal() {
       java.lang.Object ref = principal_;
@@ -531,7 +437,7 @@ public final class Cloudevents {
       }
     }
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     public com.google.protobuf.ByteString
         getPrincipalBytes() {
@@ -547,7 +453,7 @@ public final class Cloudevents {
       }
     }
 
-    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 8;
+    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 6;
     private flyteidl.core.IdentifierOuterClass.Identifier launchPlanId_;
     /**
      * <pre>
@@ -556,7 +462,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     public boolean hasLaunchPlanId() {
       return launchPlanId_ != null;
@@ -568,7 +474,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
       return launchPlanId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : launchPlanId_;
@@ -580,7 +486,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
       return getLaunchPlanId();
@@ -603,26 +509,20 @@ public final class Cloudevents {
       if (rawEvent_ != null) {
         output.writeMessage(1, getRawEvent());
       }
-      if (outputData_ != null) {
-        output.writeMessage(2, getOutputData());
-      }
       if (outputInterface_ != null) {
-        output.writeMessage(3, getOutputInterface());
-      }
-      if (inputData_ != null) {
-        output.writeMessage(4, getInputData());
+        output.writeMessage(2, getOutputInterface());
       }
       for (int i = 0; i < artifactIds_.size(); i++) {
-        output.writeMessage(5, artifactIds_.get(i));
+        output.writeMessage(3, artifactIds_.get(i));
       }
       if (referenceExecution_ != null) {
-        output.writeMessage(6, getReferenceExecution());
+        output.writeMessage(4, getReferenceExecution());
       }
       if (!getPrincipalBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, principal_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, principal_);
       }
       if (launchPlanId_ != null) {
-        output.writeMessage(8, getLaunchPlanId());
+        output.writeMessage(6, getLaunchPlanId());
       }
       unknownFields.writeTo(output);
     }
@@ -637,32 +537,24 @@ public final class Cloudevents {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getRawEvent());
       }
-      if (outputData_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getOutputData());
-      }
       if (outputInterface_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getOutputInterface());
-      }
-      if (inputData_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getInputData());
+          .computeMessageSize(2, getOutputInterface());
       }
       for (int i = 0; i < artifactIds_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, artifactIds_.get(i));
+          .computeMessageSize(3, artifactIds_.get(i));
       }
       if (referenceExecution_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, getReferenceExecution());
+          .computeMessageSize(4, getReferenceExecution());
       }
       if (!getPrincipalBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, principal_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, principal_);
       }
       if (launchPlanId_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, getLaunchPlanId());
+          .computeMessageSize(6, getLaunchPlanId());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -684,20 +576,10 @@ public final class Cloudevents {
         if (!getRawEvent()
             .equals(other.getRawEvent())) return false;
       }
-      if (hasOutputData() != other.hasOutputData()) return false;
-      if (hasOutputData()) {
-        if (!getOutputData()
-            .equals(other.getOutputData())) return false;
-      }
       if (hasOutputInterface() != other.hasOutputInterface()) return false;
       if (hasOutputInterface()) {
         if (!getOutputInterface()
             .equals(other.getOutputInterface())) return false;
-      }
-      if (hasInputData() != other.hasInputData()) return false;
-      if (hasInputData()) {
-        if (!getInputData()
-            .equals(other.getInputData())) return false;
       }
       if (!getArtifactIdsList()
           .equals(other.getArtifactIdsList())) return false;
@@ -728,17 +610,9 @@ public final class Cloudevents {
         hash = (37 * hash) + RAW_EVENT_FIELD_NUMBER;
         hash = (53 * hash) + getRawEvent().hashCode();
       }
-      if (hasOutputData()) {
-        hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
-        hash = (53 * hash) + getOutputData().hashCode();
-      }
       if (hasOutputInterface()) {
         hash = (37 * hash) + OUTPUT_INTERFACE_FIELD_NUMBER;
         hash = (53 * hash) + getOutputInterface().hashCode();
-      }
-      if (hasInputData()) {
-        hash = (37 * hash) + INPUT_DATA_FIELD_NUMBER;
-        hash = (53 * hash) + getInputData().hashCode();
       }
       if (getArtifactIdsCount() > 0) {
         hash = (37 * hash) + ARTIFACT_IDS_FIELD_NUMBER;
@@ -899,27 +773,15 @@ public final class Cloudevents {
           rawEvent_ = null;
           rawEventBuilder_ = null;
         }
-        if (outputDataBuilder_ == null) {
-          outputData_ = null;
-        } else {
-          outputData_ = null;
-          outputDataBuilder_ = null;
-        }
         if (outputInterfaceBuilder_ == null) {
           outputInterface_ = null;
         } else {
           outputInterface_ = null;
           outputInterfaceBuilder_ = null;
         }
-        if (inputDataBuilder_ == null) {
-          inputData_ = null;
-        } else {
-          inputData_ = null;
-          inputDataBuilder_ = null;
-        }
         if (artifactIdsBuilder_ == null) {
           artifactIds_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000004);
         } else {
           artifactIdsBuilder_.clear();
         }
@@ -970,25 +832,15 @@ public final class Cloudevents {
         } else {
           result.rawEvent_ = rawEventBuilder_.build();
         }
-        if (outputDataBuilder_ == null) {
-          result.outputData_ = outputData_;
-        } else {
-          result.outputData_ = outputDataBuilder_.build();
-        }
         if (outputInterfaceBuilder_ == null) {
           result.outputInterface_ = outputInterface_;
         } else {
           result.outputInterface_ = outputInterfaceBuilder_.build();
         }
-        if (inputDataBuilder_ == null) {
-          result.inputData_ = inputData_;
-        } else {
-          result.inputData_ = inputDataBuilder_.build();
-        }
         if (artifactIdsBuilder_ == null) {
-          if (((bitField0_ & 0x00000010) != 0)) {
+          if (((bitField0_ & 0x00000004) != 0)) {
             artifactIds_ = java.util.Collections.unmodifiableList(artifactIds_);
-            bitField0_ = (bitField0_ & ~0x00000010);
+            bitField0_ = (bitField0_ & ~0x00000004);
           }
           result.artifactIds_ = artifactIds_;
         } else {
@@ -1057,20 +909,14 @@ public final class Cloudevents {
         if (other.hasRawEvent()) {
           mergeRawEvent(other.getRawEvent());
         }
-        if (other.hasOutputData()) {
-          mergeOutputData(other.getOutputData());
-        }
         if (other.hasOutputInterface()) {
           mergeOutputInterface(other.getOutputInterface());
-        }
-        if (other.hasInputData()) {
-          mergeInputData(other.getInputData());
         }
         if (artifactIdsBuilder_ == null) {
           if (!other.artifactIds_.isEmpty()) {
             if (artifactIds_.isEmpty()) {
               artifactIds_ = other.artifactIds_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000004);
             } else {
               ensureArtifactIdsIsMutable();
               artifactIds_.addAll(other.artifactIds_);
@@ -1083,7 +929,7 @@ public final class Cloudevents {
               artifactIdsBuilder_.dispose();
               artifactIdsBuilder_ = null;
               artifactIds_ = other.artifactIds_;
-              bitField0_ = (bitField0_ & ~0x00000010);
+              bitField0_ = (bitField0_ & ~0x00000004);
               artifactIdsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getArtifactIdsFieldBuilder() : null;
@@ -1249,134 +1095,17 @@ public final class Cloudevents {
         return rawEventBuilder_;
       }
 
-      private flyteidl.core.Literals.LiteralMap outputData_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public boolean hasOutputData() {
-        return outputDataBuilder_ != null || outputData_ != null;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap getOutputData() {
-        if (outputDataBuilder_ == null) {
-          return outputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputData_;
-        } else {
-          return outputDataBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          outputData_ = value;
-          onChanged();
-        } else {
-          outputDataBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public Builder setOutputData(
-          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (outputDataBuilder_ == null) {
-          outputData_ = builderForValue.build();
-          onChanged();
-        } else {
-          outputDataBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
-          if (outputData_ != null) {
-            outputData_ =
-              flyteidl.core.Literals.LiteralMap.newBuilder(outputData_).mergeFrom(value).buildPartial();
-          } else {
-            outputData_ = value;
-          }
-          onChanged();
-        } else {
-          outputDataBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public Builder clearOutputData() {
-        if (outputDataBuilder_ == null) {
-          outputData_ = null;
-          onChanged();
-        } else {
-          outputData_ = null;
-          outputDataBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
-        
-        onChanged();
-        return getOutputDataFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
-        if (outputDataBuilder_ != null) {
-          return outputDataBuilder_.getMessageOrBuilder();
-        } else {
-          return outputData_ == null ?
-              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputData_;
-        }
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap output_data = 2;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getOutputDataFieldBuilder() {
-        if (outputDataBuilder_ == null) {
-          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
-                  getOutputData(),
-                  getParentForChildren(),
-                  isClean());
-          outputData_ = null;
-        }
-        return outputDataBuilder_;
-      }
-
       private flyteidl.core.Interface.TypedInterface outputInterface_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> outputInterfaceBuilder_;
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public boolean hasOutputInterface() {
         return outputInterfaceBuilder_ != null || outputInterface_ != null;
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public flyteidl.core.Interface.TypedInterface getOutputInterface() {
         if (outputInterfaceBuilder_ == null) {
@@ -1386,7 +1115,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public Builder setOutputInterface(flyteidl.core.Interface.TypedInterface value) {
         if (outputInterfaceBuilder_ == null) {
@@ -1402,7 +1131,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public Builder setOutputInterface(
           flyteidl.core.Interface.TypedInterface.Builder builderForValue) {
@@ -1416,7 +1145,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public Builder mergeOutputInterface(flyteidl.core.Interface.TypedInterface value) {
         if (outputInterfaceBuilder_ == null) {
@@ -1434,7 +1163,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public Builder clearOutputInterface() {
         if (outputInterfaceBuilder_ == null) {
@@ -1448,7 +1177,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public flyteidl.core.Interface.TypedInterface.Builder getOutputInterfaceBuilder() {
         
@@ -1456,7 +1185,7 @@ public final class Cloudevents {
         return getOutputInterfaceFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       public flyteidl.core.Interface.TypedInterfaceOrBuilder getOutputInterfaceOrBuilder() {
         if (outputInterfaceBuilder_ != null) {
@@ -1467,7 +1196,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 2;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> 
@@ -1483,129 +1212,12 @@ public final class Cloudevents {
         return outputInterfaceBuilder_;
       }
 
-      private flyteidl.core.Literals.LiteralMap inputData_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputDataBuilder_;
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public boolean hasInputData() {
-        return inputDataBuilder_ != null || inputData_ != null;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap getInputData() {
-        if (inputDataBuilder_ == null) {
-          return inputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputData_;
-        } else {
-          return inputDataBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public Builder setInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          inputData_ = value;
-          onChanged();
-        } else {
-          inputDataBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public Builder setInputData(
-          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (inputDataBuilder_ == null) {
-          inputData_ = builderForValue.build();
-          onChanged();
-        } else {
-          inputDataBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public Builder mergeInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
-          if (inputData_ != null) {
-            inputData_ =
-              flyteidl.core.Literals.LiteralMap.newBuilder(inputData_).mergeFrom(value).buildPartial();
-          } else {
-            inputData_ = value;
-          }
-          onChanged();
-        } else {
-          inputDataBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public Builder clearInputData() {
-        if (inputDataBuilder_ == null) {
-          inputData_ = null;
-          onChanged();
-        } else {
-          inputData_ = null;
-          inputDataBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap.Builder getInputDataBuilder() {
-        
-        onChanged();
-        return getInputDataFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
-        if (inputDataBuilder_ != null) {
-          return inputDataBuilder_.getMessageOrBuilder();
-        } else {
-          return inputData_ == null ?
-              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputData_;
-        }
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 4;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getInputDataFieldBuilder() {
-        if (inputDataBuilder_ == null) {
-          inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
-                  getInputData(),
-                  getParentForChildren(),
-                  isClean());
-          inputData_ = null;
-        }
-        return inputDataBuilder_;
-      }
-
       private java.util.List<flyteidl.core.ArtifactId.ArtifactID> artifactIds_ =
         java.util.Collections.emptyList();
       private void ensureArtifactIdsIsMutable() {
-        if (!((bitField0_ & 0x00000010) != 0)) {
+        if (!((bitField0_ & 0x00000004) != 0)) {
           artifactIds_ = new java.util.ArrayList<flyteidl.core.ArtifactId.ArtifactID>(artifactIds_);
-          bitField0_ |= 0x00000010;
+          bitField0_ |= 0x00000004;
          }
       }
 
@@ -1618,7 +1230,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public java.util.List<flyteidl.core.ArtifactId.ArtifactID> getArtifactIdsList() {
         if (artifactIdsBuilder_ == null) {
@@ -1633,7 +1245,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public int getArtifactIdsCount() {
         if (artifactIdsBuilder_ == null) {
@@ -1648,7 +1260,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index) {
         if (artifactIdsBuilder_ == null) {
@@ -1663,7 +1275,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder setArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID value) {
@@ -1685,7 +1297,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder setArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
@@ -1704,7 +1316,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder addArtifactIds(flyteidl.core.ArtifactId.ArtifactID value) {
         if (artifactIdsBuilder_ == null) {
@@ -1725,7 +1337,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder addArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID value) {
@@ -1747,7 +1359,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder addArtifactIds(
           flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
@@ -1766,7 +1378,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder addArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
@@ -1785,7 +1397,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder addAllArtifactIds(
           java.lang.Iterable<? extends flyteidl.core.ArtifactId.ArtifactID> values) {
@@ -1805,12 +1417,12 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder clearArtifactIds() {
         if (artifactIdsBuilder_ == null) {
           artifactIds_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000010);
+          bitField0_ = (bitField0_ & ~0x00000004);
           onChanged();
         } else {
           artifactIdsBuilder_.clear();
@@ -1823,7 +1435,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public Builder removeArtifactIds(int index) {
         if (artifactIdsBuilder_ == null) {
@@ -1841,7 +1453,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID.Builder getArtifactIdsBuilder(
           int index) {
@@ -1853,7 +1465,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
           int index) {
@@ -1868,7 +1480,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
            getArtifactIdsOrBuilderList() {
@@ -1884,7 +1496,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID.Builder addArtifactIdsBuilder() {
         return getArtifactIdsFieldBuilder().addBuilder(
@@ -1896,7 +1508,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID.Builder addArtifactIdsBuilder(
           int index) {
@@ -1909,7 +1521,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 5;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 3;</code>
        */
       public java.util.List<flyteidl.core.ArtifactId.ArtifactID.Builder> 
            getArtifactIdsBuilderList() {
@@ -1922,7 +1534,7 @@ public final class Cloudevents {
           artifactIdsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder>(
                   artifactIds_,
-                  ((bitField0_ & 0x00000010) != 0),
+                  ((bitField0_ & 0x00000004) != 0),
                   getParentForChildren(),
                   isClean());
           artifactIds_ = null;
@@ -1934,13 +1546,13 @@ public final class Cloudevents {
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> referenceExecutionBuilder_;
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public boolean hasReferenceExecution() {
         return referenceExecutionBuilder_ != null || referenceExecution_ != null;
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getReferenceExecution() {
         if (referenceExecutionBuilder_ == null) {
@@ -1950,7 +1562,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public Builder setReferenceExecution(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
         if (referenceExecutionBuilder_ == null) {
@@ -1966,7 +1578,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public Builder setReferenceExecution(
           flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder builderForValue) {
@@ -1980,7 +1592,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public Builder mergeReferenceExecution(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
         if (referenceExecutionBuilder_ == null) {
@@ -1998,7 +1610,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public Builder clearReferenceExecution() {
         if (referenceExecutionBuilder_ == null) {
@@ -2012,7 +1624,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder getReferenceExecutionBuilder() {
         
@@ -2020,7 +1632,7 @@ public final class Cloudevents {
         return getReferenceExecutionFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getReferenceExecutionOrBuilder() {
         if (referenceExecutionBuilder_ != null) {
@@ -2031,7 +1643,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 6;</code>
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier reference_execution = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> 
@@ -2049,7 +1661,7 @@ public final class Cloudevents {
 
       private java.lang.Object principal_ = "";
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public java.lang.String getPrincipal() {
         java.lang.Object ref = principal_;
@@ -2064,7 +1676,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public com.google.protobuf.ByteString
           getPrincipalBytes() {
@@ -2080,7 +1692,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder setPrincipal(
           java.lang.String value) {
@@ -2093,7 +1705,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder clearPrincipal() {
         
@@ -2102,7 +1714,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder setPrincipalBytes(
           com.google.protobuf.ByteString value) {
@@ -2126,7 +1738,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public boolean hasLaunchPlanId() {
         return launchPlanIdBuilder_ != null || launchPlanId_ != null;
@@ -2138,7 +1750,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -2154,7 +1766,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder setLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -2176,7 +1788,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder setLaunchPlanId(
           flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
@@ -2196,7 +1808,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder mergeLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -2220,7 +1832,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder clearLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -2240,7 +1852,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier.Builder getLaunchPlanIdBuilder() {
         
@@ -2254,7 +1866,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
         if (launchPlanIdBuilder_ != null) {
@@ -2271,7 +1883,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
@@ -2383,35 +1995,10 @@ public final class Cloudevents {
 
     /**
      * <pre>
-     * Hydrated output
-     * </pre>
-     *
-     * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-     */
-    boolean hasOutputData();
-    /**
-     * <pre>
-     * Hydrated output
-     * </pre>
-     *
-     * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-     */
-    flyteidl.core.Literals.LiteralMap getOutputData();
-    /**
-     * <pre>
-     * Hydrated output
-     * </pre>
-     *
-     * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-     */
-    flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder();
-
-    /**
-     * <pre>
      * The typed interface for the task that produced the event.
      * </pre>
      *
-     * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
      */
     boolean hasOutputInterface();
     /**
@@ -2419,7 +2006,7 @@ public final class Cloudevents {
      * The typed interface for the task that produced the event.
      * </pre>
      *
-     * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
      */
     flyteidl.core.Interface.TypedInterface getOutputInterface();
     /**
@@ -2427,22 +2014,9 @@ public final class Cloudevents {
      * The typed interface for the task that produced the event.
      * </pre>
      *
-     * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
      */
     flyteidl.core.Interface.TypedInterfaceOrBuilder getOutputInterfaceOrBuilder();
-
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-     */
-    boolean hasInputData();
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-     */
-    flyteidl.core.Literals.LiteralMap getInputData();
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-     */
-    flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder();
 
     /**
      * <pre>
@@ -2450,7 +2024,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     java.util.List<flyteidl.core.ArtifactId.ArtifactID> 
         getArtifactIdsList();
@@ -2460,7 +2034,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index);
     /**
@@ -2469,7 +2043,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     int getArtifactIdsCount();
     /**
@@ -2478,7 +2052,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
         getArtifactIdsOrBuilderList();
@@ -2488,17 +2062,17 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
         int index);
 
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     java.lang.String getPrincipal();
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     com.google.protobuf.ByteString
         getPrincipalBytes();
@@ -2510,7 +2084,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     boolean hasLaunchPlanId();
     /**
@@ -2520,7 +2094,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId();
     /**
@@ -2530,7 +2104,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder();
   }
@@ -2602,19 +2176,6 @@ public final class Cloudevents {
               break;
             }
             case 26: {
-              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
-              if (outputData_ != null) {
-                subBuilder = outputData_.toBuilder();
-              }
-              outputData_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(outputData_);
-                outputData_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            case 34: {
               flyteidl.core.Interface.TypedInterface.Builder subBuilder = null;
               if (outputInterface_ != null) {
                 subBuilder = outputInterface_.toBuilder();
@@ -2627,35 +2188,22 @@ public final class Cloudevents {
 
               break;
             }
-            case 42: {
-              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
-              if (inputData_ != null) {
-                subBuilder = inputData_.toBuilder();
-              }
-              inputData_ = input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(inputData_);
-                inputData_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            case 50: {
-              if (!((mutable_bitField0_ & 0x00000020) != 0)) {
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
                 artifactIds_ = new java.util.ArrayList<flyteidl.core.ArtifactId.ArtifactID>();
-                mutable_bitField0_ |= 0x00000020;
+                mutable_bitField0_ |= 0x00000008;
               }
               artifactIds_.add(
                   input.readMessage(flyteidl.core.ArtifactId.ArtifactID.parser(), extensionRegistry));
               break;
             }
-            case 58: {
+            case 42: {
               java.lang.String s = input.readStringRequireUtf8();
 
               principal_ = s;
               break;
             }
-            case 66: {
+            case 50: {
               flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
               if (launchPlanId_ != null) {
                 subBuilder = launchPlanId_.toBuilder();
@@ -2683,7 +2231,7 @@ public final class Cloudevents {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
-        if (((mutable_bitField0_ & 0x00000020) != 0)) {
+        if (((mutable_bitField0_ & 0x00000008) != 0)) {
           artifactIds_ = java.util.Collections.unmodifiableList(artifactIds_);
         }
         this.unknownFields = unknownFields.build();
@@ -2758,47 +2306,14 @@ public final class Cloudevents {
       return getTaskExecId();
     }
 
-    public static final int OUTPUT_DATA_FIELD_NUMBER = 3;
-    private flyteidl.core.Literals.LiteralMap outputData_;
-    /**
-     * <pre>
-     * Hydrated output
-     * </pre>
-     *
-     * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-     */
-    public boolean hasOutputData() {
-      return outputData_ != null;
-    }
-    /**
-     * <pre>
-     * Hydrated output
-     * </pre>
-     *
-     * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-     */
-    public flyteidl.core.Literals.LiteralMap getOutputData() {
-      return outputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputData_;
-    }
-    /**
-     * <pre>
-     * Hydrated output
-     * </pre>
-     *
-     * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-     */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
-      return getOutputData();
-    }
-
-    public static final int OUTPUT_INTERFACE_FIELD_NUMBER = 4;
+    public static final int OUTPUT_INTERFACE_FIELD_NUMBER = 3;
     private flyteidl.core.Interface.TypedInterface outputInterface_;
     /**
      * <pre>
      * The typed interface for the task that produced the event.
      * </pre>
      *
-     * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
      */
     public boolean hasOutputInterface() {
       return outputInterface_ != null;
@@ -2808,7 +2323,7 @@ public final class Cloudevents {
      * The typed interface for the task that produced the event.
      * </pre>
      *
-     * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
      */
     public flyteidl.core.Interface.TypedInterface getOutputInterface() {
       return outputInterface_ == null ? flyteidl.core.Interface.TypedInterface.getDefaultInstance() : outputInterface_;
@@ -2818,34 +2333,13 @@ public final class Cloudevents {
      * The typed interface for the task that produced the event.
      * </pre>
      *
-     * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+     * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
      */
     public flyteidl.core.Interface.TypedInterfaceOrBuilder getOutputInterfaceOrBuilder() {
       return getOutputInterface();
     }
 
-    public static final int INPUT_DATA_FIELD_NUMBER = 5;
-    private flyteidl.core.Literals.LiteralMap inputData_;
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-     */
-    public boolean hasInputData() {
-      return inputData_ != null;
-    }
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-     */
-    public flyteidl.core.Literals.LiteralMap getInputData() {
-      return inputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputData_;
-    }
-    /**
-     * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-     */
-    public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
-      return getInputData();
-    }
-
-    public static final int ARTIFACT_IDS_FIELD_NUMBER = 6;
+    public static final int ARTIFACT_IDS_FIELD_NUMBER = 4;
     private java.util.List<flyteidl.core.ArtifactId.ArtifactID> artifactIds_;
     /**
      * <pre>
@@ -2853,7 +2347,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     public java.util.List<flyteidl.core.ArtifactId.ArtifactID> getArtifactIdsList() {
       return artifactIds_;
@@ -2864,7 +2358,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     public java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
         getArtifactIdsOrBuilderList() {
@@ -2876,7 +2370,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     public int getArtifactIdsCount() {
       return artifactIds_.size();
@@ -2887,7 +2381,7 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     public flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index) {
       return artifactIds_.get(index);
@@ -2898,17 +2392,17 @@ public final class Cloudevents {
      * We can't have the ExecutionMetadata object directly because of import cycle
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
      */
     public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
         int index) {
       return artifactIds_.get(index);
     }
 
-    public static final int PRINCIPAL_FIELD_NUMBER = 7;
+    public static final int PRINCIPAL_FIELD_NUMBER = 5;
     private volatile java.lang.Object principal_;
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     public java.lang.String getPrincipal() {
       java.lang.Object ref = principal_;
@@ -2923,7 +2417,7 @@ public final class Cloudevents {
       }
     }
     /**
-     * <code>string principal = 7;</code>
+     * <code>string principal = 5;</code>
      */
     public com.google.protobuf.ByteString
         getPrincipalBytes() {
@@ -2939,7 +2433,7 @@ public final class Cloudevents {
       }
     }
 
-    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 8;
+    public static final int LAUNCH_PLAN_ID_FIELD_NUMBER = 6;
     private flyteidl.core.IdentifierOuterClass.Identifier launchPlanId_;
     /**
      * <pre>
@@ -2948,7 +2442,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     public boolean hasLaunchPlanId() {
       return launchPlanId_ != null;
@@ -2960,7 +2454,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
       return launchPlanId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : launchPlanId_;
@@ -2972,7 +2466,7 @@ public final class Cloudevents {
      * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
      * </pre>
      *
-     * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+     * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
      */
     public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
       return getLaunchPlanId();
@@ -2998,23 +2492,17 @@ public final class Cloudevents {
       if (taskExecId_ != null) {
         output.writeMessage(2, getTaskExecId());
       }
-      if (outputData_ != null) {
-        output.writeMessage(3, getOutputData());
-      }
       if (outputInterface_ != null) {
-        output.writeMessage(4, getOutputInterface());
-      }
-      if (inputData_ != null) {
-        output.writeMessage(5, getInputData());
+        output.writeMessage(3, getOutputInterface());
       }
       for (int i = 0; i < artifactIds_.size(); i++) {
-        output.writeMessage(6, artifactIds_.get(i));
+        output.writeMessage(4, artifactIds_.get(i));
       }
       if (!getPrincipalBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, principal_);
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, principal_);
       }
       if (launchPlanId_ != null) {
-        output.writeMessage(8, getLaunchPlanId());
+        output.writeMessage(6, getLaunchPlanId());
       }
       unknownFields.writeTo(output);
     }
@@ -3033,28 +2521,20 @@ public final class Cloudevents {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getTaskExecId());
       }
-      if (outputData_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getOutputData());
-      }
       if (outputInterface_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getOutputInterface());
-      }
-      if (inputData_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, getInputData());
+          .computeMessageSize(3, getOutputInterface());
       }
       for (int i = 0; i < artifactIds_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(6, artifactIds_.get(i));
+          .computeMessageSize(4, artifactIds_.get(i));
       }
       if (!getPrincipalBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, principal_);
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, principal_);
       }
       if (launchPlanId_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, getLaunchPlanId());
+          .computeMessageSize(6, getLaunchPlanId());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3081,20 +2561,10 @@ public final class Cloudevents {
         if (!getTaskExecId()
             .equals(other.getTaskExecId())) return false;
       }
-      if (hasOutputData() != other.hasOutputData()) return false;
-      if (hasOutputData()) {
-        if (!getOutputData()
-            .equals(other.getOutputData())) return false;
-      }
       if (hasOutputInterface() != other.hasOutputInterface()) return false;
       if (hasOutputInterface()) {
         if (!getOutputInterface()
             .equals(other.getOutputInterface())) return false;
-      }
-      if (hasInputData() != other.hasInputData()) return false;
-      if (hasInputData()) {
-        if (!getInputData()
-            .equals(other.getInputData())) return false;
       }
       if (!getArtifactIdsList()
           .equals(other.getArtifactIdsList())) return false;
@@ -3124,17 +2594,9 @@ public final class Cloudevents {
         hash = (37 * hash) + TASK_EXEC_ID_FIELD_NUMBER;
         hash = (53 * hash) + getTaskExecId().hashCode();
       }
-      if (hasOutputData()) {
-        hash = (37 * hash) + OUTPUT_DATA_FIELD_NUMBER;
-        hash = (53 * hash) + getOutputData().hashCode();
-      }
       if (hasOutputInterface()) {
         hash = (37 * hash) + OUTPUT_INTERFACE_FIELD_NUMBER;
         hash = (53 * hash) + getOutputInterface().hashCode();
-      }
-      if (hasInputData()) {
-        hash = (37 * hash) + INPUT_DATA_FIELD_NUMBER;
-        hash = (53 * hash) + getInputData().hashCode();
       }
       if (getArtifactIdsCount() > 0) {
         hash = (37 * hash) + ARTIFACT_IDS_FIELD_NUMBER;
@@ -3292,27 +2754,15 @@ public final class Cloudevents {
           taskExecId_ = null;
           taskExecIdBuilder_ = null;
         }
-        if (outputDataBuilder_ == null) {
-          outputData_ = null;
-        } else {
-          outputData_ = null;
-          outputDataBuilder_ = null;
-        }
         if (outputInterfaceBuilder_ == null) {
           outputInterface_ = null;
         } else {
           outputInterface_ = null;
           outputInterfaceBuilder_ = null;
         }
-        if (inputDataBuilder_ == null) {
-          inputData_ = null;
-        } else {
-          inputData_ = null;
-          inputDataBuilder_ = null;
-        }
         if (artifactIdsBuilder_ == null) {
           artifactIds_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000008);
         } else {
           artifactIdsBuilder_.clear();
         }
@@ -3362,25 +2812,15 @@ public final class Cloudevents {
         } else {
           result.taskExecId_ = taskExecIdBuilder_.build();
         }
-        if (outputDataBuilder_ == null) {
-          result.outputData_ = outputData_;
-        } else {
-          result.outputData_ = outputDataBuilder_.build();
-        }
         if (outputInterfaceBuilder_ == null) {
           result.outputInterface_ = outputInterface_;
         } else {
           result.outputInterface_ = outputInterfaceBuilder_.build();
         }
-        if (inputDataBuilder_ == null) {
-          result.inputData_ = inputData_;
-        } else {
-          result.inputData_ = inputDataBuilder_.build();
-        }
         if (artifactIdsBuilder_ == null) {
-          if (((bitField0_ & 0x00000020) != 0)) {
+          if (((bitField0_ & 0x00000008) != 0)) {
             artifactIds_ = java.util.Collections.unmodifiableList(artifactIds_);
-            bitField0_ = (bitField0_ & ~0x00000020);
+            bitField0_ = (bitField0_ & ~0x00000008);
           }
           result.artifactIds_ = artifactIds_;
         } else {
@@ -3447,20 +2887,14 @@ public final class Cloudevents {
         if (other.hasTaskExecId()) {
           mergeTaskExecId(other.getTaskExecId());
         }
-        if (other.hasOutputData()) {
-          mergeOutputData(other.getOutputData());
-        }
         if (other.hasOutputInterface()) {
           mergeOutputInterface(other.getOutputInterface());
-        }
-        if (other.hasInputData()) {
-          mergeInputData(other.getInputData());
         }
         if (artifactIdsBuilder_ == null) {
           if (!other.artifactIds_.isEmpty()) {
             if (artifactIds_.isEmpty()) {
               artifactIds_ = other.artifactIds_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000008);
             } else {
               ensureArtifactIdsIsMutable();
               artifactIds_.addAll(other.artifactIds_);
@@ -3473,7 +2907,7 @@ public final class Cloudevents {
               artifactIdsBuilder_.dispose();
               artifactIdsBuilder_ = null;
               artifactIds_ = other.artifactIds_;
-              bitField0_ = (bitField0_ & ~0x00000020);
+              bitField0_ = (bitField0_ & ~0x00000008);
               artifactIdsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getArtifactIdsFieldBuilder() : null;
@@ -3789,159 +3223,6 @@ public final class Cloudevents {
         return taskExecIdBuilder_;
       }
 
-      private flyteidl.core.Literals.LiteralMap outputData_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> outputDataBuilder_;
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public boolean hasOutputData() {
-        return outputDataBuilder_ != null || outputData_ != null;
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap getOutputData() {
-        if (outputDataBuilder_ == null) {
-          return outputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputData_;
-        } else {
-          return outputDataBuilder_.getMessage();
-        }
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public Builder setOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          outputData_ = value;
-          onChanged();
-        } else {
-          outputDataBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public Builder setOutputData(
-          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (outputDataBuilder_ == null) {
-          outputData_ = builderForValue.build();
-          onChanged();
-        } else {
-          outputDataBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public Builder mergeOutputData(flyteidl.core.Literals.LiteralMap value) {
-        if (outputDataBuilder_ == null) {
-          if (outputData_ != null) {
-            outputData_ =
-              flyteidl.core.Literals.LiteralMap.newBuilder(outputData_).mergeFrom(value).buildPartial();
-          } else {
-            outputData_ = value;
-          }
-          onChanged();
-        } else {
-          outputDataBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public Builder clearOutputData() {
-        if (outputDataBuilder_ == null) {
-          outputData_ = null;
-          onChanged();
-        } else {
-          outputData_ = null;
-          outputDataBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap.Builder getOutputDataBuilder() {
-        
-        onChanged();
-        return getOutputDataFieldBuilder().getBuilder();
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getOutputDataOrBuilder() {
-        if (outputDataBuilder_ != null) {
-          return outputDataBuilder_.getMessageOrBuilder();
-        } else {
-          return outputData_ == null ?
-              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : outputData_;
-        }
-      }
-      /**
-       * <pre>
-       * Hydrated output
-       * </pre>
-       *
-       * <code>.flyteidl.core.LiteralMap output_data = 3;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getOutputDataFieldBuilder() {
-        if (outputDataBuilder_ == null) {
-          outputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
-                  getOutputData(),
-                  getParentForChildren(),
-                  isClean());
-          outputData_ = null;
-        }
-        return outputDataBuilder_;
-      }
-
       private flyteidl.core.Interface.TypedInterface outputInterface_;
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> outputInterfaceBuilder_;
@@ -3950,7 +3231,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public boolean hasOutputInterface() {
         return outputInterfaceBuilder_ != null || outputInterface_ != null;
@@ -3960,7 +3241,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public flyteidl.core.Interface.TypedInterface getOutputInterface() {
         if (outputInterfaceBuilder_ == null) {
@@ -3974,7 +3255,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public Builder setOutputInterface(flyteidl.core.Interface.TypedInterface value) {
         if (outputInterfaceBuilder_ == null) {
@@ -3994,7 +3275,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public Builder setOutputInterface(
           flyteidl.core.Interface.TypedInterface.Builder builderForValue) {
@@ -4012,7 +3293,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public Builder mergeOutputInterface(flyteidl.core.Interface.TypedInterface value) {
         if (outputInterfaceBuilder_ == null) {
@@ -4034,7 +3315,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public Builder clearOutputInterface() {
         if (outputInterfaceBuilder_ == null) {
@@ -4052,7 +3333,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public flyteidl.core.Interface.TypedInterface.Builder getOutputInterfaceBuilder() {
         
@@ -4064,7 +3345,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       public flyteidl.core.Interface.TypedInterfaceOrBuilder getOutputInterfaceOrBuilder() {
         if (outputInterfaceBuilder_ != null) {
@@ -4079,7 +3360,7 @@ public final class Cloudevents {
        * The typed interface for the task that produced the event.
        * </pre>
        *
-       * <code>.flyteidl.core.TypedInterface output_interface = 4;</code>
+       * <code>.flyteidl.core.TypedInterface output_interface = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> 
@@ -4095,129 +3376,12 @@ public final class Cloudevents {
         return outputInterfaceBuilder_;
       }
 
-      private flyteidl.core.Literals.LiteralMap inputData_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> inputDataBuilder_;
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public boolean hasInputData() {
-        return inputDataBuilder_ != null || inputData_ != null;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap getInputData() {
-        if (inputDataBuilder_ == null) {
-          return inputData_ == null ? flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputData_;
-        } else {
-          return inputDataBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public Builder setInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          inputData_ = value;
-          onChanged();
-        } else {
-          inputDataBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public Builder setInputData(
-          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
-        if (inputDataBuilder_ == null) {
-          inputData_ = builderForValue.build();
-          onChanged();
-        } else {
-          inputDataBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public Builder mergeInputData(flyteidl.core.Literals.LiteralMap value) {
-        if (inputDataBuilder_ == null) {
-          if (inputData_ != null) {
-            inputData_ =
-              flyteidl.core.Literals.LiteralMap.newBuilder(inputData_).mergeFrom(value).buildPartial();
-          } else {
-            inputData_ = value;
-          }
-          onChanged();
-        } else {
-          inputDataBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public Builder clearInputData() {
-        if (inputDataBuilder_ == null) {
-          inputData_ = null;
-          onChanged();
-        } else {
-          inputData_ = null;
-          inputDataBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public flyteidl.core.Literals.LiteralMap.Builder getInputDataBuilder() {
-        
-        onChanged();
-        return getInputDataFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      public flyteidl.core.Literals.LiteralMapOrBuilder getInputDataOrBuilder() {
-        if (inputDataBuilder_ != null) {
-          return inputDataBuilder_.getMessageOrBuilder();
-        } else {
-          return inputData_ == null ?
-              flyteidl.core.Literals.LiteralMap.getDefaultInstance() : inputData_;
-        }
-      }
-      /**
-       * <code>.flyteidl.core.LiteralMap input_data = 5;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
-          getInputDataFieldBuilder() {
-        if (inputDataBuilder_ == null) {
-          inputDataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
-                  getInputData(),
-                  getParentForChildren(),
-                  isClean());
-          inputData_ = null;
-        }
-        return inputDataBuilder_;
-      }
-
       private java.util.List<flyteidl.core.ArtifactId.ArtifactID> artifactIds_ =
         java.util.Collections.emptyList();
       private void ensureArtifactIdsIsMutable() {
-        if (!((bitField0_ & 0x00000020) != 0)) {
+        if (!((bitField0_ & 0x00000008) != 0)) {
           artifactIds_ = new java.util.ArrayList<flyteidl.core.ArtifactId.ArtifactID>(artifactIds_);
-          bitField0_ |= 0x00000020;
+          bitField0_ |= 0x00000008;
          }
       }
 
@@ -4230,7 +3394,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public java.util.List<flyteidl.core.ArtifactId.ArtifactID> getArtifactIdsList() {
         if (artifactIdsBuilder_ == null) {
@@ -4245,7 +3409,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public int getArtifactIdsCount() {
         if (artifactIdsBuilder_ == null) {
@@ -4260,7 +3424,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index) {
         if (artifactIdsBuilder_ == null) {
@@ -4275,7 +3439,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder setArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID value) {
@@ -4297,7 +3461,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder setArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
@@ -4316,7 +3480,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder addArtifactIds(flyteidl.core.ArtifactId.ArtifactID value) {
         if (artifactIdsBuilder_ == null) {
@@ -4337,7 +3501,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder addArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID value) {
@@ -4359,7 +3523,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder addArtifactIds(
           flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
@@ -4378,7 +3542,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder addArtifactIds(
           int index, flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
@@ -4397,7 +3561,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder addAllArtifactIds(
           java.lang.Iterable<? extends flyteidl.core.ArtifactId.ArtifactID> values) {
@@ -4417,12 +3581,12 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder clearArtifactIds() {
         if (artifactIdsBuilder_ == null) {
           artifactIds_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000020);
+          bitField0_ = (bitField0_ & ~0x00000008);
           onChanged();
         } else {
           artifactIdsBuilder_.clear();
@@ -4435,7 +3599,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public Builder removeArtifactIds(int index) {
         if (artifactIdsBuilder_ == null) {
@@ -4453,7 +3617,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID.Builder getArtifactIdsBuilder(
           int index) {
@@ -4465,7 +3629,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
           int index) {
@@ -4480,7 +3644,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
            getArtifactIdsOrBuilderList() {
@@ -4496,7 +3660,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID.Builder addArtifactIdsBuilder() {
         return getArtifactIdsFieldBuilder().addBuilder(
@@ -4508,7 +3672,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public flyteidl.core.ArtifactId.ArtifactID.Builder addArtifactIdsBuilder(
           int index) {
@@ -4521,7 +3685,7 @@ public final class Cloudevents {
        * We can't have the ExecutionMetadata object directly because of import cycle
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 6;</code>
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
        */
       public java.util.List<flyteidl.core.ArtifactId.ArtifactID.Builder> 
            getArtifactIdsBuilderList() {
@@ -4534,7 +3698,7 @@ public final class Cloudevents {
           artifactIdsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
               flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder>(
                   artifactIds_,
-                  ((bitField0_ & 0x00000020) != 0),
+                  ((bitField0_ & 0x00000008) != 0),
                   getParentForChildren(),
                   isClean());
           artifactIds_ = null;
@@ -4544,7 +3708,7 @@ public final class Cloudevents {
 
       private java.lang.Object principal_ = "";
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public java.lang.String getPrincipal() {
         java.lang.Object ref = principal_;
@@ -4559,7 +3723,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public com.google.protobuf.ByteString
           getPrincipalBytes() {
@@ -4575,7 +3739,7 @@ public final class Cloudevents {
         }
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder setPrincipal(
           java.lang.String value) {
@@ -4588,7 +3752,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder clearPrincipal() {
         
@@ -4597,7 +3761,7 @@ public final class Cloudevents {
         return this;
       }
       /**
-       * <code>string principal = 7;</code>
+       * <code>string principal = 5;</code>
        */
       public Builder setPrincipalBytes(
           com.google.protobuf.ByteString value) {
@@ -4621,7 +3785,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public boolean hasLaunchPlanId() {
         return launchPlanIdBuilder_ != null || launchPlanId_ != null;
@@ -4633,7 +3797,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier getLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -4649,7 +3813,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder setLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -4671,7 +3835,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder setLaunchPlanId(
           flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
@@ -4691,7 +3855,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder mergeLaunchPlanId(flyteidl.core.IdentifierOuterClass.Identifier value) {
         if (launchPlanIdBuilder_ == null) {
@@ -4715,7 +3879,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public Builder clearLaunchPlanId() {
         if (launchPlanIdBuilder_ == null) {
@@ -4735,7 +3899,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public flyteidl.core.IdentifierOuterClass.Identifier.Builder getLaunchPlanIdBuilder() {
         
@@ -4749,7 +3913,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getLaunchPlanIdOrBuilder() {
         if (launchPlanIdBuilder_ != null) {
@@ -4766,7 +3930,7 @@ public final class Cloudevents {
        * Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
        * </pre>
        *
-       * <code>.flyteidl.core.Identifier launch_plan_id = 8;</code>
+       * <code>.flyteidl.core.Identifier launch_plan_id = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
@@ -7474,40 +6638,35 @@ public final class Cloudevents {
       "flyteidl/core/literals.proto\032\035flyteidl/c" +
       "ore/interface.proto\032\037flyteidl/core/artif" +
       "act_id.proto\032\036flyteidl/core/identifier.p" +
-      "roto\032\037google/protobuf/timestamp.proto\"\260\003" +
+      "roto\032\037google/protobuf/timestamp.proto\"\321\002" +
       "\n\033CloudEventWorkflowExecution\0229\n\traw_eve" +
       "nt\030\001 \001(\0132&.flyteidl.event.WorkflowExecut" +
-      "ionEvent\022.\n\013output_data\030\002 \001(\0132\031.flyteidl" +
-      ".core.LiteralMap\0227\n\020output_interface\030\003 \001" +
-      "(\0132\035.flyteidl.core.TypedInterface\022-\n\ninp" +
-      "ut_data\030\004 \001(\0132\031.flyteidl.core.LiteralMap" +
-      "\022/\n\014artifact_ids\030\005 \003(\0132\031.flyteidl.core.A" +
-      "rtifactID\022G\n\023reference_execution\030\006 \001(\0132*" +
-      ".flyteidl.core.WorkflowExecutionIdentifi" +
-      "er\022\021\n\tprincipal\030\007 \001(\t\0221\n\016launch_plan_id\030" +
-      "\010 \001(\0132\031.flyteidl.core.Identifier\"\235\003\n\027Clo" +
-      "udEventNodeExecution\0225\n\traw_event\030\001 \001(\0132" +
-      "\".flyteidl.event.NodeExecutionEvent\022<\n\014t" +
-      "ask_exec_id\030\002 \001(\0132&.flyteidl.core.TaskEx" +
-      "ecutionIdentifier\022.\n\013output_data\030\003 \001(\0132\031" +
-      ".flyteidl.core.LiteralMap\0227\n\020output_inte" +
-      "rface\030\004 \001(\0132\035.flyteidl.core.TypedInterfa" +
-      "ce\022-\n\ninput_data\030\005 \001(\0132\031.flyteidl.core.L" +
-      "iteralMap\022/\n\014artifact_ids\030\006 \003(\0132\031.flytei" +
-      "dl.core.ArtifactID\022\021\n\tprincipal\030\007 \001(\t\0221\n" +
-      "\016launch_plan_id\030\010 \001(\0132\031.flyteidl.core.Id" +
-      "entifier\"P\n\027CloudEventTaskExecution\0225\n\tr" +
-      "aw_event\030\001 \001(\0132\".flyteidl.event.TaskExec" +
-      "utionEvent\"\232\002\n\030CloudEventExecutionStart\022" +
-      "@\n\014execution_id\030\001 \001(\0132*.flyteidl.core.Wo" +
-      "rkflowExecutionIdentifier\0221\n\016launch_plan" +
-      "_id\030\002 \001(\0132\031.flyteidl.core.Identifier\022.\n\013" +
-      "workflow_id\030\003 \001(\0132\031.flyteidl.core.Identi" +
-      "fier\022/\n\014artifact_ids\030\004 \003(\0132\031.flyteidl.co" +
-      "re.ArtifactID\022\025\n\rartifact_keys\030\005 \003(\t\022\021\n\t" +
-      "principal\030\006 \001(\tB=Z;github.com/flyteorg/f" +
-      "lyte/flyteidl/gen/pb-go/flyteidl/eventb\006" +
-      "proto3"
+      "ionEvent\0227\n\020output_interface\030\002 \001(\0132\035.fly" +
+      "teidl.core.TypedInterface\022/\n\014artifact_id" +
+      "s\030\003 \003(\0132\031.flyteidl.core.ArtifactID\022G\n\023re" +
+      "ference_execution\030\004 \001(\0132*.flyteidl.core." +
+      "WorkflowExecutionIdentifier\022\021\n\tprincipal" +
+      "\030\005 \001(\t\0221\n\016launch_plan_id\030\006 \001(\0132\031.flyteid" +
+      "l.core.Identifier\"\276\002\n\027CloudEventNodeExec" +
+      "ution\0225\n\traw_event\030\001 \001(\0132\".flyteidl.even" +
+      "t.NodeExecutionEvent\022<\n\014task_exec_id\030\002 \001" +
+      "(\0132&.flyteidl.core.TaskExecutionIdentifi" +
+      "er\0227\n\020output_interface\030\003 \001(\0132\035.flyteidl." +
+      "core.TypedInterface\022/\n\014artifact_ids\030\004 \003(" +
+      "\0132\031.flyteidl.core.ArtifactID\022\021\n\tprincipa" +
+      "l\030\005 \001(\t\0221\n\016launch_plan_id\030\006 \001(\0132\031.flytei" +
+      "dl.core.Identifier\"P\n\027CloudEventTaskExec" +
+      "ution\0225\n\traw_event\030\001 \001(\0132\".flyteidl.even" +
+      "t.TaskExecutionEvent\"\232\002\n\030CloudEventExecu" +
+      "tionStart\022@\n\014execution_id\030\001 \001(\0132*.flytei" +
+      "dl.core.WorkflowExecutionIdentifier\0221\n\016l" +
+      "aunch_plan_id\030\002 \001(\0132\031.flyteidl.core.Iden" +
+      "tifier\022.\n\013workflow_id\030\003 \001(\0132\031.flyteidl.c" +
+      "ore.Identifier\022/\n\014artifact_ids\030\004 \003(\0132\031.f" +
+      "lyteidl.core.ArtifactID\022\025\n\rartifact_keys" +
+      "\030\005 \003(\t\022\021\n\tprincipal\030\006 \001(\tB=Z;github.com/" +
+      "flyteorg/flyte/flyteidl/gen/pb-go/flytei" +
+      "dl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7532,13 +6691,13 @@ public final class Cloudevents {
     internal_static_flyteidl_event_CloudEventWorkflowExecution_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventWorkflowExecution_descriptor,
-        new java.lang.String[] { "RawEvent", "OutputData", "OutputInterface", "InputData", "ArtifactIds", "ReferenceExecution", "Principal", "LaunchPlanId", });
+        new java.lang.String[] { "RawEvent", "OutputInterface", "ArtifactIds", "ReferenceExecution", "Principal", "LaunchPlanId", });
     internal_static_flyteidl_event_CloudEventNodeExecution_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_event_CloudEventNodeExecution_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventNodeExecution_descriptor,
-        new java.lang.String[] { "RawEvent", "TaskExecId", "OutputData", "OutputInterface", "InputData", "ArtifactIds", "Principal", "LaunchPlanId", });
+        new java.lang.String[] { "RawEvent", "TaskExecId", "OutputInterface", "ArtifactIds", "Principal", "LaunchPlanId", });
     internal_static_flyteidl_event_CloudEventTaskExecution_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_event_CloudEventTaskExecution_fieldAccessorTable = new
