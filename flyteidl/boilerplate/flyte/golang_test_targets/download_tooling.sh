@@ -16,19 +16,10 @@ set -e
 # List of tools to go get
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
-<<<<<<< HEAD
 	"github.com/EngHabu/mockery/cmd/mockery"
 	"github.com/golangci/golangci-lint/cmd/golangci-lint"
 	"github.com/alvaroloes/enumer"
 	"github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
-=======
-  "github.com/EngHabu/mockery/cmd/mockery"
-  "github.com/flyteorg/flytestdlib/cli/pflags@latest"
-  "github.com/golangci/golangci-lint/cmd/golangci-lint"
-  "github.com/daixiang0/gci"
-  "github.com/alvaroloes/enumer"
-  "github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
->>>>>>> pvditt/flyteidl/datacatalog-delete-artifact
 )
 
 tmp_dir=$(mktemp -d -t gotooling-XXX)

@@ -171,18 +171,6 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 
 const char descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto[] =
   "\n\032flyteidl/core/errors.proto\022\rflyteidl.c"
-<<<<<<< HEAD
-  "ore\032\035flyteidl/core/execution.proto\"\310\001\n\016C"
-  "ontainerError\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002"
-  " \001(\t\0220\n\004kind\030\003 \001(\0162\".flyteidl.core.Conta"
-  "inerError.Kind\0227\n\006origin\030\004 \001(\0162\'.flyteid"
-  "l.core.ExecutionError.ErrorKind\",\n\004Kind\022"
-  "\023\n\017NON_RECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n"
-  "\rErrorDocument\022,\n\005error\030\001 \001(\0132\035.flyteidl"
-  ".core.ContainerErrorB<Z:github.com/flyte"
-  "org/flyte/flyteidl/gen/pb-go/flyteidl/co"
-  "reb\006proto3"
-=======
   "ore\032\035flyteidl/core/execution.proto\032\036flyt"
   "eidl/core/identifier.proto\"\310\001\n\016Container"
   "Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\0220\n\004"
@@ -204,19 +192,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto[] =
   "\022\032\n\026ARTIFACT_DELETE_FAILED\020\003\022\034\n\030RESERVAT"
   "ION_NOT_RELEASED\020\004B\010\n\006source\"K\n\026CacheEvi"
   "ctionErrorList\0221\n\006errors\030\001 \003(\0132!.flyteid"
-  "l.core.CacheEvictionErrorB6Z4github.com/"
-  "flyteorg/flyteidl/gen/pb-go/flyteidl/cor"
-  "eb\006proto3"
->>>>>>> pvditt/flyteidl/datacatalog-delete-artifact
+  "l.core.CacheEvictionErrorB<Z:github.com/"
+  "flyteorg/flyte/flyteidl/gen/pb-go/flytei"
+  "dl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2ferrors_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2ferrors_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto,
-<<<<<<< HEAD
-  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 410,
-=======
-  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 969,
->>>>>>> pvditt/flyteidl/datacatalog-delete-artifact
+  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 975,
 };
 
 void AddDescriptors_flyteidl_2fcore_2ferrors_2eproto() {

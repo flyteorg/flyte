@@ -1285,61 +1285,35 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 75, -1, sizeof(::datacatalog::ListDatasetsRequest)},
   { 82, -1, sizeof(::datacatalog::ListDatasetsResponse)},
   { 89, -1, sizeof(::datacatalog::UpdateArtifactRequest)},
-<<<<<<< HEAD
   { 100, -1, sizeof(::datacatalog::UpdateArtifactResponse)},
-  { 106, -1, sizeof(::datacatalog::ReservationID)},
-  { 113, -1, sizeof(::datacatalog::GetOrExtendReservationRequest)},
-  { 121, -1, sizeof(::datacatalog::Reservation)},
-  { 131, -1, sizeof(::datacatalog::GetOrExtendReservationResponse)},
-  { 137, -1, sizeof(::datacatalog::ReleaseReservationRequest)},
-  { 144, -1, sizeof(::datacatalog::ReleaseReservationResponse)},
-  { 149, -1, sizeof(::datacatalog::Dataset)},
-  { 157, -1, sizeof(::datacatalog::Partition)},
-  { 164, -1, sizeof(::datacatalog::DatasetID)},
-  { 174, -1, sizeof(::datacatalog::Artifact)},
-  { 186, -1, sizeof(::datacatalog::ArtifactData)},
-  { 193, -1, sizeof(::datacatalog::Tag)},
-  { 201, 208, sizeof(::datacatalog::Metadata_KeyMapEntry_DoNotUse)},
-  { 210, -1, sizeof(::datacatalog::Metadata)},
-  { 216, -1, sizeof(::datacatalog::FilterExpression)},
-  { 222, -1, sizeof(::datacatalog::SinglePropertyFilter)},
-  { 233, -1, sizeof(::datacatalog::ArtifactPropertyFilter)},
-  { 240, -1, sizeof(::datacatalog::TagPropertyFilter)},
-  { 247, -1, sizeof(::datacatalog::PartitionPropertyFilter)},
-  { 254, -1, sizeof(::datacatalog::KeyValuePair)},
-  { 261, -1, sizeof(::datacatalog::DatasetPropertyFilter)},
-  { 271, -1, sizeof(::datacatalog::PaginationOptions)},
-=======
-  { 99, -1, sizeof(::datacatalog::UpdateArtifactResponse)},
-  { 105, -1, sizeof(::datacatalog::DeleteArtifactRequest)},
-  { 114, -1, sizeof(::datacatalog::DeleteArtifactsRequest)},
-  { 120, -1, sizeof(::datacatalog::DeleteArtifactResponse)},
-  { 125, -1, sizeof(::datacatalog::ReservationID)},
-  { 132, -1, sizeof(::datacatalog::GetOrExtendReservationRequest)},
-  { 140, -1, sizeof(::datacatalog::GetOrExtendReservationsRequest)},
-  { 146, -1, sizeof(::datacatalog::Reservation)},
-  { 156, -1, sizeof(::datacatalog::GetOrExtendReservationResponse)},
-  { 162, -1, sizeof(::datacatalog::GetOrExtendReservationsResponse)},
-  { 168, -1, sizeof(::datacatalog::ReleaseReservationRequest)},
-  { 175, -1, sizeof(::datacatalog::ReleaseReservationsRequest)},
-  { 181, -1, sizeof(::datacatalog::ReleaseReservationResponse)},
-  { 186, -1, sizeof(::datacatalog::Dataset)},
-  { 194, -1, sizeof(::datacatalog::Partition)},
-  { 201, -1, sizeof(::datacatalog::DatasetID)},
-  { 211, -1, sizeof(::datacatalog::Artifact)},
-  { 223, -1, sizeof(::datacatalog::ArtifactData)},
-  { 230, -1, sizeof(::datacatalog::Tag)},
-  { 238, 245, sizeof(::datacatalog::Metadata_KeyMapEntry_DoNotUse)},
-  { 247, -1, sizeof(::datacatalog::Metadata)},
-  { 253, -1, sizeof(::datacatalog::FilterExpression)},
-  { 259, -1, sizeof(::datacatalog::SinglePropertyFilter)},
-  { 270, -1, sizeof(::datacatalog::ArtifactPropertyFilter)},
-  { 277, -1, sizeof(::datacatalog::TagPropertyFilter)},
-  { 284, -1, sizeof(::datacatalog::PartitionPropertyFilter)},
-  { 291, -1, sizeof(::datacatalog::KeyValuePair)},
-  { 298, -1, sizeof(::datacatalog::DatasetPropertyFilter)},
-  { 308, -1, sizeof(::datacatalog::PaginationOptions)},
->>>>>>> pvditt/flyteidl/datacatalog-delete-artifact
+  { 106, -1, sizeof(::datacatalog::DeleteArtifactRequest)},
+  { 115, -1, sizeof(::datacatalog::DeleteArtifactsRequest)},
+  { 121, -1, sizeof(::datacatalog::DeleteArtifactResponse)},
+  { 126, -1, sizeof(::datacatalog::ReservationID)},
+  { 133, -1, sizeof(::datacatalog::GetOrExtendReservationRequest)},
+  { 141, -1, sizeof(::datacatalog::GetOrExtendReservationsRequest)},
+  { 147, -1, sizeof(::datacatalog::Reservation)},
+  { 157, -1, sizeof(::datacatalog::GetOrExtendReservationResponse)},
+  { 163, -1, sizeof(::datacatalog::GetOrExtendReservationsResponse)},
+  { 169, -1, sizeof(::datacatalog::ReleaseReservationRequest)},
+  { 176, -1, sizeof(::datacatalog::ReleaseReservationsRequest)},
+  { 182, -1, sizeof(::datacatalog::ReleaseReservationResponse)},
+  { 187, -1, sizeof(::datacatalog::Dataset)},
+  { 195, -1, sizeof(::datacatalog::Partition)},
+  { 202, -1, sizeof(::datacatalog::DatasetID)},
+  { 212, -1, sizeof(::datacatalog::Artifact)},
+  { 224, -1, sizeof(::datacatalog::ArtifactData)},
+  { 231, -1, sizeof(::datacatalog::Tag)},
+  { 239, 246, sizeof(::datacatalog::Metadata_KeyMapEntry_DoNotUse)},
+  { 248, -1, sizeof(::datacatalog::Metadata)},
+  { 254, -1, sizeof(::datacatalog::FilterExpression)},
+  { 260, -1, sizeof(::datacatalog::SinglePropertyFilter)},
+  { 271, -1, sizeof(::datacatalog::ArtifactPropertyFilter)},
+  { 278, -1, sizeof(::datacatalog::TagPropertyFilter)},
+  { 285, -1, sizeof(::datacatalog::PartitionPropertyFilter)},
+  { 292, -1, sizeof(::datacatalog::KeyValuePair)},
+  { 299, -1, sizeof(::datacatalog::DatasetPropertyFilter)},
+  { 309, -1, sizeof(::datacatalog::PaginationOptions)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -1428,222 +1402,125 @@ const char descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eprot
   "\t\"\315\001\n\025UpdateArtifactRequest\022\'\n\007dataset\030\001"
   " \001(\0132\026.datacatalog.DatasetID\022\025\n\013artifact"
   "_id\030\002 \001(\tH\000\022\022\n\010tag_name\030\003 \001(\tH\000\022\'\n\004data\030"
-<<<<<<< HEAD
   "\004 \003(\0132\031.datacatalog.ArtifactData\022\'\n\010meta"
   "data\030\005 \001(\0132\025.datacatalog.MetadataB\016\n\014que"
   "ry_handle\"-\n\026UpdateArtifactResponse\022\023\n\013a"
-  "rtifact_id\030\001 \001(\t\"M\n\rReservationID\022*\n\ndat"
-  "aset_id\030\001 \001(\0132\026.datacatalog.DatasetID\022\020\n"
-  "\010tag_name\030\002 \001(\t\"\234\001\n\035GetOrExtendReservati"
-  "onRequest\0222\n\016reservation_id\030\001 \001(\0132\032.data"
-  "catalog.ReservationID\022\020\n\010owner_id\030\002 \001(\t\022"
-  "5\n\022heartbeat_interval\030\003 \001(\0132\031.google.pro"
-  "tobuf.Duration\"\343\001\n\013Reservation\0222\n\016reserv"
-  "ation_id\030\001 \001(\0132\032.datacatalog.Reservation"
-  "ID\022\020\n\010owner_id\030\002 \001(\t\0225\n\022heartbeat_interv"
-  "al\030\003 \001(\0132\031.google.protobuf.Duration\022.\n\ne"
-  "xpires_at\030\004 \001(\0132\032.google.protobuf.Timest"
-  "amp\022\'\n\010metadata\030\006 \001(\0132\025.datacatalog.Meta"
-  "data\"O\n\036GetOrExtendReservationResponse\022-"
-  "\n\013reservation\030\001 \001(\0132\030.datacatalog.Reserv"
-  "ation\"a\n\031ReleaseReservationRequest\0222\n\016re"
-  "servation_id\030\001 \001(\0132\032.datacatalog.Reserva"
-  "tionID\022\020\n\010owner_id\030\002 \001(\t\"\034\n\032ReleaseReser"
-  "vationResponse\"m\n\007Dataset\022\"\n\002id\030\001 \001(\0132\026."
-  "datacatalog.DatasetID\022\'\n\010metadata\030\002 \001(\0132"
-  "\025.datacatalog.Metadata\022\025\n\rpartitionKeys\030"
-  "\003 \003(\t\"\'\n\tPartition\022\013\n\003key\030\001 \001(\t\022\r\n\005value"
-  "\030\002 \001(\t\"Y\n\tDatasetID\022\017\n\007project\030\001 \001(\t\022\014\n\004"
-  "name\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\017\n\007version\030\004 "
-  "\001(\t\022\014\n\004UUID\030\005 \001(\t\"\215\002\n\010Artifact\022\n\n\002id\030\001 \001"
-  "(\t\022\'\n\007dataset\030\002 \001(\0132\026.datacatalog.Datase"
-  "tID\022\'\n\004data\030\003 \003(\0132\031.datacatalog.Artifact"
-  "Data\022\'\n\010metadata\030\004 \001(\0132\025.datacatalog.Met"
-  "adata\022*\n\npartitions\030\005 \003(\0132\026.datacatalog."
-  "Partition\022\036\n\004tags\030\006 \003(\0132\020.datacatalog.Ta"
-  "g\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf."
-  "Timestamp\"C\n\014ArtifactData\022\014\n\004name\030\001 \001(\t\022"
-  "%\n\005value\030\002 \001(\0132\026.flyteidl.core.Literal\"Q"
-  "\n\003Tag\022\014\n\004name\030\001 \001(\t\022\023\n\013artifact_id\030\002 \001(\t"
-  "\022\'\n\007dataset\030\003 \001(\0132\026.datacatalog.DatasetI"
-  "D\"m\n\010Metadata\0222\n\007key_map\030\001 \003(\0132!.datacat"
-  "alog.Metadata.KeyMapEntry\032-\n\013KeyMapEntry"
-  "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"F\n\020Filt"
-  "erExpression\0222\n\007filters\030\001 \003(\0132!.datacata"
-  "log.SinglePropertyFilter\"\211\003\n\024SinglePrope"
-  "rtyFilter\0224\n\ntag_filter\030\001 \001(\0132\036.datacata"
-  "log.TagPropertyFilterH\000\022@\n\020partition_fil"
-  "ter\030\002 \001(\0132$.datacatalog.PartitionPropert"
-  "yFilterH\000\022>\n\017artifact_filter\030\003 \001(\0132#.dat"
-  "acatalog.ArtifactPropertyFilterH\000\022<\n\016dat"
-  "aset_filter\030\004 \001(\0132\".datacatalog.DatasetP"
-  "ropertyFilterH\000\022F\n\010operator\030\n \001(\01624.data"
-  "catalog.SinglePropertyFilter.ComparisonO"
-  "perator\" \n\022ComparisonOperator\022\n\n\006EQUALS\020"
-  "\000B\021\n\017property_filter\";\n\026ArtifactProperty"
-  "Filter\022\025\n\013artifact_id\030\001 \001(\tH\000B\n\n\010propert"
-  "y\"3\n\021TagPropertyFilter\022\022\n\010tag_name\030\001 \001(\t"
-  "H\000B\n\n\010property\"S\n\027PartitionPropertyFilte"
-  "r\022,\n\007key_val\030\001 \001(\0132\031.datacatalog.KeyValu"
-  "ePairH\000B\n\n\010property\"*\n\014KeyValuePair\022\013\n\003k"
-  "ey\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"k\n\025DatasetProper"
-  "tyFilter\022\021\n\007project\030\001 \001(\tH\000\022\016\n\004name\030\002 \001("
-  "\tH\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007version\030\004 \001(\tH\000"
-  "B\n\n\010property\"\361\001\n\021PaginationOptions\022\r\n\005li"
-  "mit\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001("
-  "\0162&.datacatalog.PaginationOptions.SortKe"
-  "y\022;\n\tsortOrder\030\004 \001(\0162(.datacatalog.Pagin"
-  "ationOptions.SortOrder\"*\n\tSortOrder\022\016\n\nD"
-  "ESCENDING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n"
-  "\rCREATION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCrea"
-  "teDataset\022!.datacatalog.CreateDatasetReq"
-  "uest\032\".datacatalog.CreateDatasetResponse"
-  "\022M\n\nGetDataset\022\036.datacatalog.GetDatasetR"
-  "equest\032\037.datacatalog.GetDatasetResponse\022"
-  "Y\n\016CreateArtifact\022\".datacatalog.CreateAr"
-  "tifactRequest\032#.datacatalog.CreateArtifa"
-  "ctResponse\022P\n\013GetArtifact\022\037.datacatalog."
-  "GetArtifactRequest\032 .datacatalog.GetArti"
-  "factResponse\022A\n\006AddTag\022\032.datacatalog.Add"
-  "TagRequest\032\033.datacatalog.AddTagResponse\022"
-  "V\n\rListArtifacts\022!.datacatalog.ListArtif"
-  "actsRequest\032\".datacatalog.ListArtifactsR"
-  "esponse\022S\n\014ListDatasets\022 .datacatalog.Li"
-  "stDatasetsRequest\032!.datacatalog.ListData"
-  "setsResponse\022Y\n\016UpdateArtifact\022\".datacat"
-  "alog.UpdateArtifactRequest\032#.datacatalog"
-  ".UpdateArtifactResponse\022q\n\026GetOrExtendRe"
-  "servation\022*.datacatalog.GetOrExtendReser"
-  "vationRequest\032+.datacatalog.GetOrExtendR"
-  "eservationResponse\022e\n\022ReleaseReservation"
-  "\022&.datacatalog.ReleaseReservationRequest"
-  "\032\'.datacatalog.ReleaseReservationRespons"
-  "eBCZAgithub.com/flyteorg/flyte/flyteidl/"
-  "gen/pb-go/flyteidl/datacatalogb\006proto3"
-=======
-  "\004 \003(\0132\031.datacatalog.ArtifactDataB\016\n\014quer"
-  "y_handle\"-\n\026UpdateArtifactResponse\022\023\n\013ar"
-  "tifact_id\030\001 \001(\t\"{\n\025DeleteArtifactRequest"
-  "\022\'\n\007dataset\030\001 \001(\0132\026.datacatalog.DatasetI"
-  "D\022\025\n\013artifact_id\030\002 \001(\tH\000\022\022\n\010tag_name\030\003 \001"
-  "(\tH\000B\016\n\014query_handle\"O\n\026DeleteArtifactsR"
-  "equest\0225\n\tartifacts\030\001 \003(\0132\".datacatalog."
-  "DeleteArtifactRequest\"\030\n\026DeleteArtifactR"
-  "esponse\"M\n\rReservationID\022*\n\ndataset_id\030\001"
-  " \001(\0132\026.datacatalog.DatasetID\022\020\n\010tag_name"
-  "\030\002 \001(\t\"\234\001\n\035GetOrExtendReservationRequest"
-  "\0222\n\016reservation_id\030\001 \001(\0132\032.datacatalog.R"
-  "eservationID\022\020\n\010owner_id\030\002 \001(\t\0225\n\022heartb"
-  "eat_interval\030\003 \001(\0132\031.google.protobuf.Dur"
-  "ation\"b\n\036GetOrExtendReservationsRequest\022"
-  "@\n\014reservations\030\001 \003(\0132*.datacatalog.GetO"
-  "rExtendReservationRequest\"\343\001\n\013Reservatio"
-  "n\0222\n\016reservation_id\030\001 \001(\0132\032.datacatalog."
+  "rtifact_id\030\001 \001(\t\"{\n\025DeleteArtifactReques"
+  "t\022\'\n\007dataset\030\001 \001(\0132\026.datacatalog.Dataset"
+  "ID\022\025\n\013artifact_id\030\002 \001(\tH\000\022\022\n\010tag_name\030\003 "
+  "\001(\tH\000B\016\n\014query_handle\"O\n\026DeleteArtifacts"
+  "Request\0225\n\tartifacts\030\001 \003(\0132\".datacatalog"
+  ".DeleteArtifactRequest\"\030\n\026DeleteArtifact"
+  "Response\"M\n\rReservationID\022*\n\ndataset_id\030"
+  "\001 \001(\0132\026.datacatalog.DatasetID\022\020\n\010tag_nam"
+  "e\030\002 \001(\t\"\234\001\n\035GetOrExtendReservationReques"
+  "t\0222\n\016reservation_id\030\001 \001(\0132\032.datacatalog."
   "ReservationID\022\020\n\010owner_id\030\002 \001(\t\0225\n\022heart"
   "beat_interval\030\003 \001(\0132\031.google.protobuf.Du"
-  "ration\022.\n\nexpires_at\030\004 \001(\0132\032.google.prot"
-  "obuf.Timestamp\022\'\n\010metadata\030\006 \001(\0132\025.datac"
-  "atalog.Metadata\"O\n\036GetOrExtendReservatio"
-  "nResponse\022-\n\013reservation\030\001 \001(\0132\030.datacat"
-  "alog.Reservation\"Q\n\037GetOrExtendReservati"
-  "onsResponse\022.\n\014reservations\030\001 \003(\0132\030.data"
-  "catalog.Reservation\"a\n\031ReleaseReservatio"
-  "nRequest\0222\n\016reservation_id\030\001 \001(\0132\032.datac"
-  "atalog.ReservationID\022\020\n\010owner_id\030\002 \001(\t\"Z"
-  "\n\032ReleaseReservationsRequest\022<\n\014reservat"
-  "ions\030\001 \003(\0132&.datacatalog.ReleaseReservat"
-  "ionRequest\"\034\n\032ReleaseReservationResponse"
-  "\"m\n\007Dataset\022\"\n\002id\030\001 \001(\0132\026.datacatalog.Da"
-  "tasetID\022\'\n\010metadata\030\002 \001(\0132\025.datacatalog."
-  "Metadata\022\025\n\rpartitionKeys\030\003 \003(\t\"\'\n\tParti"
-  "tion\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"Y\n\tData"
-  "setID\022\017\n\007project\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\016\n\006"
-  "domain\030\003 \001(\t\022\017\n\007version\030\004 \001(\t\022\014\n\004UUID\030\005 "
-  "\001(\t\"\215\002\n\010Artifact\022\n\n\002id\030\001 \001(\t\022\'\n\007dataset\030"
-  "\002 \001(\0132\026.datacatalog.DatasetID\022\'\n\004data\030\003 "
-  "\003(\0132\031.datacatalog.ArtifactData\022\'\n\010metada"
-  "ta\030\004 \001(\0132\025.datacatalog.Metadata\022*\n\nparti"
-  "tions\030\005 \003(\0132\026.datacatalog.Partition\022\036\n\004t"
-  "ags\030\006 \003(\0132\020.datacatalog.Tag\022.\n\ncreated_a"
-  "t\030\007 \001(\0132\032.google.protobuf.Timestamp\"C\n\014A"
-  "rtifactData\022\014\n\004name\030\001 \001(\t\022%\n\005value\030\002 \001(\013"
-  "2\026.flyteidl.core.Literal\"Q\n\003Tag\022\014\n\004name\030"
-  "\001 \001(\t\022\023\n\013artifact_id\030\002 \001(\t\022\'\n\007dataset\030\003 "
-  "\001(\0132\026.datacatalog.DatasetID\"m\n\010Metadata\022"
-  "2\n\007key_map\030\001 \003(\0132!.datacatalog.Metadata."
-  "KeyMapEntry\032-\n\013KeyMapEntry\022\013\n\003key\030\001 \001(\t\022"
-  "\r\n\005value\030\002 \001(\t:\0028\001\"F\n\020FilterExpression\0222"
-  "\n\007filters\030\001 \003(\0132!.datacatalog.SingleProp"
-  "ertyFilter\"\211\003\n\024SinglePropertyFilter\0224\n\nt"
-  "ag_filter\030\001 \001(\0132\036.datacatalog.TagPropert"
-  "yFilterH\000\022@\n\020partition_filter\030\002 \001(\0132$.da"
-  "tacatalog.PartitionPropertyFilterH\000\022>\n\017a"
-  "rtifact_filter\030\003 \001(\0132#.datacatalog.Artif"
-  "actPropertyFilterH\000\022<\n\016dataset_filter\030\004 "
-  "\001(\0132\".datacatalog.DatasetPropertyFilterH"
-  "\000\022F\n\010operator\030\n \001(\01624.datacatalog.Single"
-  "PropertyFilter.ComparisonOperator\" \n\022Com"
-  "parisonOperator\022\n\n\006EQUALS\020\000B\021\n\017property_"
-  "filter\";\n\026ArtifactPropertyFilter\022\025\n\013arti"
-  "fact_id\030\001 \001(\tH\000B\n\n\010property\"3\n\021TagProper"
-  "tyFilter\022\022\n\010tag_name\030\001 \001(\tH\000B\n\n\010property"
-  "\"S\n\027PartitionPropertyFilter\022,\n\007key_val\030\001"
-  " \001(\0132\031.datacatalog.KeyValuePairH\000B\n\n\010pro"
-  "perty\"*\n\014KeyValuePair\022\013\n\003key\030\001 \001(\t\022\r\n\005va"
-  "lue\030\002 \001(\t\"k\n\025DatasetPropertyFilter\022\021\n\007pr"
-  "oject\030\001 \001(\tH\000\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain\030"
-  "\003 \001(\tH\000\022\021\n\007version\030\004 \001(\tH\000B\n\n\010property\"\361"
-  "\001\n\021PaginationOptions\022\r\n\005limit\030\001 \001(\r\022\r\n\005t"
-  "oken\030\002 \001(\t\0227\n\007sortKey\030\003 \001(\0162&.datacatalo"
-  "g.PaginationOptions.SortKey\022;\n\tsortOrder"
-  "\030\004 \001(\0162(.datacatalog.PaginationOptions.S"
-  "ortOrder\"*\n\tSortOrder\022\016\n\nDESCENDING\020\000\022\r\n"
-  "\tASCENDING\020\001\"\034\n\007SortKey\022\021\n\rCREATION_TIME"
-  "\020\0002\235\n\n\013DataCatalog\022V\n\rCreateDataset\022!.da"
-  "tacatalog.CreateDatasetRequest\032\".datacat"
-  "alog.CreateDatasetResponse\022M\n\nGetDataset"
-  "\022\036.datacatalog.GetDatasetRequest\032\037.datac"
-  "atalog.GetDatasetResponse\022Y\n\016CreateArtif"
-  "act\022\".datacatalog.CreateArtifactRequest\032"
-  "#.datacatalog.CreateArtifactResponse\022P\n\013"
-  "GetArtifact\022\037.datacatalog.GetArtifactReq"
-  "uest\032 .datacatalog.GetArtifactResponse\022A"
-  "\n\006AddTag\022\032.datacatalog.AddTagRequest\032\033.d"
-  "atacatalog.AddTagResponse\022V\n\rListArtifac"
-  "ts\022!.datacatalog.ListArtifactsRequest\032\"."
-  "datacatalog.ListArtifactsResponse\022S\n\014Lis"
-  "tDatasets\022 .datacatalog.ListDatasetsRequ"
-  "est\032!.datacatalog.ListDatasetsResponse\022Y"
-  "\n\016UpdateArtifact\022\".datacatalog.UpdateArt"
-  "ifactRequest\032#.datacatalog.UpdateArtifac"
-  "tResponse\022Y\n\016DeleteArtifact\022\".datacatalo"
-  "g.DeleteArtifactRequest\032#.datacatalog.De"
-  "leteArtifactResponse\022[\n\017DeleteArtifacts\022"
-  "#.datacatalog.DeleteArtifactsRequest\032#.d"
-  "atacatalog.DeleteArtifactResponse\022q\n\026Get"
-  "OrExtendReservation\022*.datacatalog.GetOrE"
-  "xtendReservationRequest\032+.datacatalog.Ge"
-  "tOrExtendReservationResponse\022t\n\027GetOrExt"
-  "endReservations\022+.datacatalog.GetOrExten"
-  "dReservationsRequest\032,.datacatalog.GetOr"
-  "ExtendReservationsResponse\022e\n\022ReleaseRes"
-  "ervation\022&.datacatalog.ReleaseReservatio"
-  "nRequest\032\'.datacatalog.ReleaseReservatio"
-  "nResponse\022g\n\023ReleaseReservations\022\'.datac"
-  "atalog.ReleaseReservationsRequest\032\'.data"
-  "catalog.ReleaseReservationResponseB=Z;gi"
-  "thub.com/flyteorg/flyteidl/gen/pb-go/fly"
-  "teidl/datacatalogb\006proto3"
->>>>>>> pvditt/flyteidl/datacatalog-delete-artifact
+  "ration\"b\n\036GetOrExtendReservationsRequest"
+  "\022@\n\014reservations\030\001 \003(\0132*.datacatalog.Get"
+  "OrExtendReservationRequest\"\343\001\n\013Reservati"
+  "on\0222\n\016reservation_id\030\001 \001(\0132\032.datacatalog"
+  ".ReservationID\022\020\n\010owner_id\030\002 \001(\t\0225\n\022hear"
+  "tbeat_interval\030\003 \001(\0132\031.google.protobuf.D"
+  "uration\022.\n\nexpires_at\030\004 \001(\0132\032.google.pro"
+  "tobuf.Timestamp\022\'\n\010metadata\030\006 \001(\0132\025.data"
+  "catalog.Metadata\"O\n\036GetOrExtendReservati"
+  "onResponse\022-\n\013reservation\030\001 \001(\0132\030.dataca"
+  "talog.Reservation\"Q\n\037GetOrExtendReservat"
+  "ionsResponse\022.\n\014reservations\030\001 \003(\0132\030.dat"
+  "acatalog.Reservation\"a\n\031ReleaseReservati"
+  "onRequest\0222\n\016reservation_id\030\001 \001(\0132\032.data"
+  "catalog.ReservationID\022\020\n\010owner_id\030\002 \001(\t\""
+  "Z\n\032ReleaseReservationsRequest\022<\n\014reserva"
+  "tions\030\001 \003(\0132&.datacatalog.ReleaseReserva"
+  "tionRequest\"\034\n\032ReleaseReservationRespons"
+  "e\"m\n\007Dataset\022\"\n\002id\030\001 \001(\0132\026.datacatalog.D"
+  "atasetID\022\'\n\010metadata\030\002 \001(\0132\025.datacatalog"
+  ".Metadata\022\025\n\rpartitionKeys\030\003 \003(\t\"\'\n\tPart"
+  "ition\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"Y\n\tDat"
+  "asetID\022\017\n\007project\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\016\n"
+  "\006domain\030\003 \001(\t\022\017\n\007version\030\004 \001(\t\022\014\n\004UUID\030\005"
+  " \001(\t\"\215\002\n\010Artifact\022\n\n\002id\030\001 \001(\t\022\'\n\007dataset"
+  "\030\002 \001(\0132\026.datacatalog.DatasetID\022\'\n\004data\030\003"
+  " \003(\0132\031.datacatalog.ArtifactData\022\'\n\010metad"
+  "ata\030\004 \001(\0132\025.datacatalog.Metadata\022*\n\npart"
+  "itions\030\005 \003(\0132\026.datacatalog.Partition\022\036\n\004"
+  "tags\030\006 \003(\0132\020.datacatalog.Tag\022.\n\ncreated_"
+  "at\030\007 \001(\0132\032.google.protobuf.Timestamp\"C\n\014"
+  "ArtifactData\022\014\n\004name\030\001 \001(\t\022%\n\005value\030\002 \001("
+  "\0132\026.flyteidl.core.Literal\"Q\n\003Tag\022\014\n\004name"
+  "\030\001 \001(\t\022\023\n\013artifact_id\030\002 \001(\t\022\'\n\007dataset\030\003"
+  " \001(\0132\026.datacatalog.DatasetID\"m\n\010Metadata"
+  "\0222\n\007key_map\030\001 \003(\0132!.datacatalog.Metadata"
+  ".KeyMapEntry\032-\n\013KeyMapEntry\022\013\n\003key\030\001 \001(\t"
+  "\022\r\n\005value\030\002 \001(\t:\0028\001\"F\n\020FilterExpression\022"
+  "2\n\007filters\030\001 \003(\0132!.datacatalog.SinglePro"
+  "pertyFilter\"\211\003\n\024SinglePropertyFilter\0224\n\n"
+  "tag_filter\030\001 \001(\0132\036.datacatalog.TagProper"
+  "tyFilterH\000\022@\n\020partition_filter\030\002 \001(\0132$.d"
+  "atacatalog.PartitionPropertyFilterH\000\022>\n\017"
+  "artifact_filter\030\003 \001(\0132#.datacatalog.Arti"
+  "factPropertyFilterH\000\022<\n\016dataset_filter\030\004"
+  " \001(\0132\".datacatalog.DatasetPropertyFilter"
+  "H\000\022F\n\010operator\030\n \001(\01624.datacatalog.Singl"
+  "ePropertyFilter.ComparisonOperator\" \n\022Co"
+  "mparisonOperator\022\n\n\006EQUALS\020\000B\021\n\017property"
+  "_filter\";\n\026ArtifactPropertyFilter\022\025\n\013art"
+  "ifact_id\030\001 \001(\tH\000B\n\n\010property\"3\n\021TagPrope"
+  "rtyFilter\022\022\n\010tag_name\030\001 \001(\tH\000B\n\n\010propert"
+  "y\"S\n\027PartitionPropertyFilter\022,\n\007key_val\030"
+  "\001 \001(\0132\031.datacatalog.KeyValuePairH\000B\n\n\010pr"
+  "operty\"*\n\014KeyValuePair\022\013\n\003key\030\001 \001(\t\022\r\n\005v"
+  "alue\030\002 \001(\t\"k\n\025DatasetPropertyFilter\022\021\n\007p"
+  "roject\030\001 \001(\tH\000\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain"
+  "\030\003 \001(\tH\000\022\021\n\007version\030\004 \001(\tH\000B\n\n\010property\""
+  "\361\001\n\021PaginationOptions\022\r\n\005limit\030\001 \001(\r\022\r\n\005"
+  "token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(\0162&.datacatal"
+  "og.PaginationOptions.SortKey\022;\n\tsortOrde"
+  "r\030\004 \001(\0162(.datacatalog.PaginationOptions."
+  "SortOrder\"*\n\tSortOrder\022\016\n\nDESCENDING\020\000\022\r"
+  "\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n\rCREATION_TIM"
+  "E\020\0002\235\n\n\013DataCatalog\022V\n\rCreateDataset\022!.d"
+  "atacatalog.CreateDatasetRequest\032\".dataca"
+  "talog.CreateDatasetResponse\022M\n\nGetDatase"
+  "t\022\036.datacatalog.GetDatasetRequest\032\037.data"
+  "catalog.GetDatasetResponse\022Y\n\016CreateArti"
+  "fact\022\".datacatalog.CreateArtifactRequest"
+  "\032#.datacatalog.CreateArtifactResponse\022P\n"
+  "\013GetArtifact\022\037.datacatalog.GetArtifactRe"
+  "quest\032 .datacatalog.GetArtifactResponse\022"
+  "A\n\006AddTag\022\032.datacatalog.AddTagRequest\032\033."
+  "datacatalog.AddTagResponse\022V\n\rListArtifa"
+  "cts\022!.datacatalog.ListArtifactsRequest\032\""
+  ".datacatalog.ListArtifactsResponse\022S\n\014Li"
+  "stDatasets\022 .datacatalog.ListDatasetsReq"
+  "uest\032!.datacatalog.ListDatasetsResponse\022"
+  "Y\n\016UpdateArtifact\022\".datacatalog.UpdateAr"
+  "tifactRequest\032#.datacatalog.UpdateArtifa"
+  "ctResponse\022Y\n\016DeleteArtifact\022\".datacatal"
+  "og.DeleteArtifactRequest\032#.datacatalog.D"
+  "eleteArtifactResponse\022[\n\017DeleteArtifacts"
+  "\022#.datacatalog.DeleteArtifactsRequest\032#."
+  "datacatalog.DeleteArtifactResponse\022q\n\026Ge"
+  "tOrExtendReservation\022*.datacatalog.GetOr"
+  "ExtendReservationRequest\032+.datacatalog.G"
+  "etOrExtendReservationResponse\022t\n\027GetOrEx"
+  "tendReservations\022+.datacatalog.GetOrExte"
+  "ndReservationsRequest\032,.datacatalog.GetO"
+  "rExtendReservationsResponse\022e\n\022ReleaseRe"
+  "servation\022&.datacatalog.ReleaseReservati"
+  "onRequest\032\'.datacatalog.ReleaseReservati"
+  "onResponse\022g\n\023ReleaseReservations\022\'.data"
+  "catalog.ReleaseReservationsRequest\032\'.dat"
+  "acatalog.ReleaseReservationResponseBCZAg"
+  "ithub.com/flyteorg/flyte/flyteidl/gen/pb"
+  "-go/flyteidl/datacatalogb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto = {
   false, InitDefaults_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 
   descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eproto,
-<<<<<<< HEAD
-  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 4918,
-=======
-  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 5785,
->>>>>>> pvditt/flyteidl/datacatalog-delete-artifact
+  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 5832,
 };
 
 void AddDescriptors_flyteidl_2fdatacatalog_2fdatacatalog_2eproto() {
