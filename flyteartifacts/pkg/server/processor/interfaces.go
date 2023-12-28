@@ -15,7 +15,7 @@ type EventsHandlerInterface interface {
 // EventsProcessorInterface is a copy of the notifications processor in admin except that start takes a context
 type EventsProcessorInterface interface {
 	// StartProcessing whatever it is that needs to be processed.
-	StartProcessing(ctx context.Context)
+	StartProcessing(ctx context.Context, handler EventsHandlerInterface)
 
 	// StopProcessing is called when the server is shutting down.
 	StopProcessing() error

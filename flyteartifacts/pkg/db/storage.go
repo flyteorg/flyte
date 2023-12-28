@@ -549,6 +549,8 @@ func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {
 	dbCfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration).ArtifactDatabaseConfig
 	logConfig := logger.GetConfig()
 
+	logger.Debugf(ctx, "Artifact database config: %v", dbCfg)
+
 	db, err := database.GetDB(ctx, &dbCfg, logConfig)
 	if err != nil {
 		logger.Fatal(ctx, err)

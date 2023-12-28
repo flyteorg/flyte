@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/db"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/server/processor"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -113,11 +114,15 @@ func NewArtifactService(ctx context.Context, scope promutils.Scope) *ArtifactSer
 		logger.Errorf(ctx, "Failed to create Admin client, stopping server. Error: %v", err)
 		panic(err)
 	}
+
+	adminClientCfg := admin2.GetConfig(ctx)
+	clientSet, err := admin2.NewClientsetBuilder().WithConfig(adminClientCfg).Build(ctx)
+	handler := processor.NewServiceCallHandler(ctx, &coreService, createdArtifacts, *clientSet)
 	eventsReceiverAndHandler := processor.NewBackgroundProcessor(ctx, *eventsCfg, &coreService, createdArtifacts, scope.NewSubScope("events"))
 	if eventsReceiverAndHandler != nil {
 		go func() {
 			logger.Info(ctx, "Starting Artifact service background processing...")
-			eventsReceiverAndHandler.StartProcessing(ctx)
+			eventsReceiverAndHandler.StartProcessing(ctx, handler)
 		}()
 	}
 

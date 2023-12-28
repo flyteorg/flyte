@@ -303,40 +303,6 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
 	}
 
-	// Get inputs/outputs
-	// This will likely need to move to the artifact service side, given message size limits.
-	// Replace with call to GetNodeExecutionData
-	var inputs *core.LiteralMap
-	logger.Debugf(ctx, "RawEvent id %v", rawEvent.Id)
-	if len(rawEvent.GetInputUri()) > 0 {
-		inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
-			c.storageClient, rawEvent.GetInputUri())
-		logger.Debugf(ctx, "RawEvent input uri %v, %v", rawEvent.GetInputUri(), inputs)
-
-		if err != nil {
-			fmt.Printf("Error fetching input literal map %v", rawEvent)
-		}
-	} else if rawEvent.GetInputData() != nil {
-		inputs = rawEvent.GetInputData()
-		logger.Debugf(ctx, "RawEvent input data %v, %v", rawEvent.GetInputData(), inputs)
-	} else {
-		logger.Infof(ctx, "Node execution for node exec [%+v] has no input data", rawEvent.Id)
-	}
-
-	// This will likely need to move to the artifact service side, given message size limits.
-	var outputs *core.LiteralMap
-	if rawEvent.GetOutputData() != nil {
-		outputs = rawEvent.GetOutputData()
-	} else if len(rawEvent.GetOutputUri()) > 0 {
-		// GetInputs actually fetches the data, even though this is an output
-		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
-			c.storageClient, rawEvent.GetOutputUri())
-		if err != nil {
-			fmt.Printf("Error fetching output literal map %v", rawEvent)
-			return nil, err
-		}
-	}
-
 	// Fetch the latest task execution if any, and pull out the task interface, if applicable.
 	// These are optional fields... if the node execution doesn't have a task execution then these will be empty.
 	var taskExecID *core.TaskExecutionIdentifier
@@ -369,13 +335,10 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 		taskExecID = lte.Id
 	}
 
-	logger.Debugf(ctx, "RawEvent inputs %v", inputs)
 	return &event.CloudEventNodeExecution{
 		RawEvent:        rawEvent,
 		TaskExecId:      taskExecID,
-		OutputData:      outputs,
 		OutputInterface: typedInterface,
-		InputData:       inputs,
 		ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
 		Principal:       spec.GetMetadata().Principal,
 		LaunchPlanId:    spec.LaunchPlan,

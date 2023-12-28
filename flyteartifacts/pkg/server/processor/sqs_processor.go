@@ -1,36 +1,42 @@
 package processor
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"time"
+
 	"github.com/NYTimes/gizmo/pubsub"
+	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
+	"github.com/cloudevents/sdk-go/v2/event"
+	flyteEvents "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"time"
 )
 
 type PubSubProcessor struct {
 	sub pubsub.Subscriber
 }
 
-func (p *PubSubProcessor) StartProcessing(ctx context.Context) {
+func (p *PubSubProcessor) StartProcessing(ctx context.Context, handler EventsHandlerInterface) {
 	for {
 		logger.Warningf(context.Background(), "Starting notifications processor")
-		err := p.run()
+		err := p.run(ctx, handler)
 		logger.Errorf(context.Background(), "error with running processor err: [%v] ", err)
 		time.Sleep(1000 * 1000 * 1000 * 5)
 	}
 }
 
-// todo: i think we can easily add context
-func (p *PubSubProcessor) run() error {
+func (p *PubSubProcessor) run(ctx context.Context, handler EventsHandlerInterface) error {
 	var err error
 	for msg := range p.sub.Start() {
 		// gatepr: add metrics
 		// Currently this is safe because Gizmo takes a string and casts it to a byte array.
 		stringMsg := string(msg.Message())
-
 		var snsJSONFormat map[string]interface{}
 
 		// Typically, SNS populates SQS. This results in the message body of SQS having the SNS message format.
@@ -38,7 +44,7 @@ func (p *PubSubProcessor) run() error {
 		// The notification published is stored in the message field after unmarshalling the SQS message.
 		if err := json.Unmarshal(msg.Message(), &snsJSONFormat); err != nil {
 			//p.systemMetrics.MessageDecodingError.Inc()
-			logger.Errorf(context.Background(), "failed to unmarshall JSON message [%s] from processor with err: %v", stringMsg, err)
+			logger.Errorf(context.Background(), "failed to unmarshal JSON message [%s] from processor with err: %v", stringMsg, err)
 			p.markMessageDone(msg)
 			continue
 		}
@@ -70,8 +76,13 @@ func (p *PubSubProcessor) run() error {
 			p.markMessageDone(msg)
 			continue
 		}
-		logger.Infof(context.Background(), "incoming message bytes [%v]", incomingMessageBytes)
-		// handle message
+		err = p.handleMessage(ctx, incomingMessageBytes, handler)
+		if err != nil {
+			logger.Errorf(context.Background(), "error handling message [%v] with err: %v", snsJSONFormat, err)
+			//p.systemMetrics.MessageHandlingError.Inc()
+			p.markMessageDone(msg)
+			continue
+		}
 		p.markMessageDone(msg)
 	}
 
@@ -85,6 +96,54 @@ func (p *PubSubProcessor) run() error {
 
 	// If there are no errors, nil will be returned.
 	return err
+}
+
+func (p *PubSubProcessor) handleMessage(ctx context.Context, msgBytes []byte, handler EventsHandlerInterface) error {
+	ce := &event.Event{}
+	err := pbcloudevents.Protobuf.Unmarshal(msgBytes, ce)
+	if err != nil {
+		logger.Errorf(context.Background(), "error with unmarshalling message [%v]", err)
+		return err
+	}
+
+	logger.Debugf(ctx, "Cloud event received message type [%s]", ce.Type())
+	// ce data should be a jsonpb Marshaled proto message, one of
+	// - event.CloudEventTaskExecution
+	// - event.CloudEventNodeExecution
+	// - event.CloudEventWorkflowExecution
+	// - event.CloudEventExecutionStart
+	ceData := bytes.NewReader(ce.Data())
+	unmarshaler := jsonpb.Unmarshaler{}
+	// Use the type to determine which proto message to unmarshal to.
+	var flyteEvent proto.Message
+	if ce.Type() == "com.flyte.resource.cloudevents.TaskExecution" {
+		flyteEvent = &flyteEvents.CloudEventTaskExecution{}
+		err = unmarshaler.Unmarshal(ceData, flyteEvent)
+	} else if ce.Type() == "com.flyte.resource.cloudevents.WorkflowExecution" {
+		flyteEvent = &flyteEvents.CloudEventWorkflowExecution{}
+		err = unmarshaler.Unmarshal(ceData, flyteEvent)
+	} else if ce.Type() == "com.flyte.resource.cloudevents.NodeExecution" {
+		flyteEvent = &flyteEvents.CloudEventNodeExecution{}
+		err = unmarshaler.Unmarshal(ceData, flyteEvent)
+	} else if ce.Type() == "com.flyte.resource.cloudevents.ExecutionStart" {
+		flyteEvent = &flyteEvents.CloudEventExecutionStart{}
+		err = unmarshaler.Unmarshal(ceData, flyteEvent)
+	} else {
+		logger.Infof(ctx, "Ignoring cloud event type [%s]", ce.Type())
+		return nil
+	}
+
+	if err != nil {
+		logger.Errorf(ctx, "error unmarshalling message [%s] [%v]", ce.Type(), err)
+		return err
+	}
+	err = handler.HandleEvent(ctx, ce, flyteEvent)
+	if err != nil {
+		logger.Errorf(context.Background(), "error handling event on topic [%v]", err)
+		return err
+	}
+
+	return nil
 }
 
 func (p *PubSubProcessor) markMessageDone(message pubsub.SubscriberMessage) {
