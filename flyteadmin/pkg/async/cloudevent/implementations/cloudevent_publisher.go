@@ -181,13 +181,6 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		}
 	}
 
-	// Get inputs to the workflow execution
-	var inputs *core.LiteralMap
-	inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
-		c.storageClient, executionModel.InputsURI.String())
-	if err != nil {
-		logger.Warningf(ctx, "Error fetching input literal map %s", executionModel.InputsURI.String())
-	}
 	// The spec is used to retrieve metadata fields
 	spec := &admin.ExecutionSpec{}
 	err = proto.Unmarshal(executionModel.Spec, spec)
@@ -195,25 +188,9 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		fmt.Printf("there was an error with spec %v %v", err, executionModel.Spec)
 	}
 
-	// Get outputs from the workflow execution
-	var outputs *core.LiteralMap
-	if rawEvent.GetOutputData() != nil {
-		outputs = rawEvent.GetOutputData()
-	} else if len(rawEvent.GetOutputUri()) > 0 {
-		// GetInputs actually fetches the data, even though this is an output
-		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig, c.storageClient, rawEvent.GetOutputUri())
-		if err != nil {
-			// gatepr: metric this
-			logger.Warningf(ctx, "Error fetching output literal map %v", rawEvent)
-			return nil, err
-		}
-	}
-
 	return &event.CloudEventWorkflowExecution{
 		RawEvent:           rawEvent,
-		OutputData:         outputs,
 		OutputInterface:    &workflowInterface,
-		InputData:          inputs,
 		ArtifactIds:        spec.GetMetadata().GetArtifactIds(),
 		ReferenceExecution: spec.GetMetadata().GetReferenceExecution(),
 		Principal:          spec.GetMetadata().Principal,
