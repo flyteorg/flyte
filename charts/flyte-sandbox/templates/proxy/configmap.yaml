@@ -85,6 +85,10 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
+                                                  prefix: "/artifacts/api"
+                                              route:
+                                                  cluster: artifact_http
+                                            - match:
                                                   prefix: "/flyteidl.service.AdminService"
                                               route:
                                                   cluster: flyte_grpc
@@ -111,7 +115,7 @@ data:
                                             - match:
                                                   prefix: "/flyteidl.artifact.ArtifactRegistry"
                                               route:
-                                                  cluster: artifact
+                                                  cluster: artifact_grpc
                                             {{- end }}
                                             {{- if index .Values "kubernetes-dashboard" "enabled" }}
                                             - match:
@@ -176,6 +180,34 @@ data:
                                           address: {{ include "flyte-sandbox.localHeadlessService" . }}
                                           {{- end }}
                                           port_value: 8089
+            - name: artifact_http
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: artifact_http
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 50050
+            - name: artifact_grpc
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: artifact_grpc
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 50051
             {{- end }}
             {{- if index .Values "kubernetes-dashboard" "enabled" }}
             - name: kubernetes-dashboard
@@ -207,19 +239,4 @@ data:
                                           address: {{ .Release.Name }}-minio
                                           port_value: 9001
             {{- end }}
-            - name: artifact
-              connect_timeout: 0.25s
-              type: STRICT_DNS
-              lb_policy: ROUND_ROBIN
-              http2_protocol_options: {}
-              load_assignment:
-                  cluster_name: artifact
-                  endpoints:
-                      - lb_endpoints:
-                            - endpoint:
-                                  address:
-                                      socket_address:
-                                          address: artifact-service
-                                          port_value: 50051
-
 {{- end }}

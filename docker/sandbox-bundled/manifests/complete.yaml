@@ -488,6 +488,14 @@ data:
           auth_type: accesskey
       container: my-s3-bucket
   100-inline-config.yaml: |
+    artifacts:
+      host: localhost
+      insecure: true
+      port: 50051
+    cloudEvents:
+      cloudEventVersion: v2
+      enable: true
+      type: sandbox
     plugins:
       k8s:
         default-env-vars:
@@ -647,6 +655,10 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
+                                                  prefix: "/artifacts/api"
+                                              route:
+                                                  cluster: artifact_http
+                                            - match:
                                                   prefix: "/flyteidl.service.AdminService"
                                               route:
                                                   cluster: flyte_grpc
@@ -670,6 +682,10 @@ data:
                                                   prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/flyteidl.artifact.ArtifactRegistry"
+                                              route:
+                                                  cluster: artifact_grpc
                                             - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
@@ -720,6 +736,34 @@ data:
                                       socket_address:
                                           address: flyte-sandbox-grpc
                                           port_value: 8089
+            - name: artifact_http
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: artifact_http
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 50050
+            - name: artifact_grpc
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: artifact_grpc
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 50051
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -796,7 +840,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: QU5jN3V6ZjA4Y0tFbzZ0dw==
+  haSharedSecret: WkdDR3A3UlFIWENkMWpEcQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1194,7 +1238,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 52331d07774723e1045269ebc8e4cdf95e1bdd85ab104699149cae45f1eb0327
+        checksum/configuration: 93e689ddbfa941c82feb17f470000d27f19135f8cbef340de2640b49f85afc1d
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1359,7 +1403,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 436cdf2d6630635a2652233c83f71c617facb2fda8edabb639ab7dfa0f15e46f
+        checksum/secret: e70faf6ad14b50de7dd3002016d5d375414d99dc2e86f7112f0413f42b6b9613
       labels:
         app: docker-registry
         release: flyte-sandbox

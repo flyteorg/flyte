@@ -19,4 +19,10 @@ subsets:
       - name: webhook
         port: 9443
         protocol: TCP
+      - name: artifact-http
+        port: 50050
+        protocol: TCP
+      - name: artifact-grpc
+        port: 50051
+        protocol: TCP
 {{- end }}
