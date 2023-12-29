@@ -123,7 +123,9 @@ func (c *recursiveNodeExecutor) SetInputsForStartNode(ctx context.Context, execC
 	outputFile := v1alpha1.GetOutputsFile(nodeStatus.GetOutputDir())
 
 	so := storage.Options{}
-	if err := c.store.WriteProtobuf(ctx, outputFile, so, inputs); err != nil {
+	if err := c.store.WriteProtobuf(ctx, outputFile, so, &core.OutputData{
+		Outputs: inputs.GetInputs(),
+	}); err != nil {
 		logger.Errorf(ctx, "Failed to write protobuf (metadata). Error [%v]", err)
 		return interfaces.NodeStatusUndefined, errors.Wrapf(errors.CausedByError, startNode.GetID(), err, "Failed to store workflow inputs (as start node)")
 	}

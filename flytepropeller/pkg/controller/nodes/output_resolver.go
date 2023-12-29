@@ -74,19 +74,23 @@ func (r remoteFileOutputResolver) ExtractOutput(ctx context.Context, nl executor
 
 func resolveSubtaskOutput(ctx context.Context, store storage.ProtobufStore, nodeID string, outputsFileRef storage.DataReference,
 	idx int, varName string) (*core.Literal, error) {
-	d := &core.LiteralMap{}
+
+	oldOutputs := &core.LiteralMap{}
+	outputs := &core.OutputData{}
 	// TODO we should do a head before read and if head results in not found then fail
-	if err := store.ReadProtobuf(ctx, outputsFileRef, d); err != nil {
+	if msgIndex, err := store.ReadProtobufAny(ctx, outputsFileRef, outputs, oldOutputs); err != nil {
 		return nil, errors.Wrapf(errors.CausedByError, nodeID, err, "Failed to GetPrevious data from outputDir [%v]",
 			outputsFileRef)
+	} else if msgIndex == 0 {
+		oldOutputs = outputs.GetOutputs()
 	}
 
-	if d.Literals == nil {
+	if oldOutputs.Literals == nil {
 		return nil, errors.Errorf(errors.OutputsNotFoundError, nodeID,
 			"Outputs not found at [%v]", outputsFileRef)
 	}
 
-	l, ok := d.Literals[varName]
+	l, ok := oldOutputs.Literals[varName]
 	if !ok {
 		return nil, errors.Errorf(errors.BadSpecificationError, nodeID, "Output of array tasks is expected to be "+
 			"a single literal map entry named 'array' of type LiteralCollection.")
@@ -109,18 +113,21 @@ func resolveSubtaskOutput(ctx context.Context, store storage.ProtobufStore, node
 func resolveSingleOutput(ctx context.Context, store storage.ProtobufStore, nodeID string, outputsFileRef storage.DataReference,
 	varName string) (*core.Literal, error) {
 
-	d := &core.LiteralMap{}
-	if err := store.ReadProtobuf(ctx, outputsFileRef, d); err != nil {
+	oldOutputs := &core.LiteralMap{}
+	outputs := &core.OutputData{}
+	if msgIndex, err := store.ReadProtobufAny(ctx, outputsFileRef, outputs, oldOutputs); err != nil {
 		return nil, errors.Wrapf(errors.CausedByError, nodeID, err, "Failed to GetPrevious data from outputDir [%v]",
 			outputsFileRef)
+	} else if msgIndex == 0 {
+		oldOutputs = outputs.GetOutputs()
 	}
 
-	if d.Literals == nil {
+	if oldOutputs.Literals == nil {
 		return nil, errors.Errorf(errors.OutputsNotFoundError, nodeID,
 			"Outputs not found at [%v]", outputsFileRef)
 	}
 
-	l, ok := d.Literals[varName]
+	l, ok := oldOutputs.Literals[varName]
 	if !ok {
 		return nil, errors.Errorf(errors.OutputsNotFoundError, nodeID,
 			"Failed to find [%v].[%v]", nodeID, varName)
