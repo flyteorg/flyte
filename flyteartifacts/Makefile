@@ -1,4 +1,4 @@
-include ../boilerplate/flyte/golang_test_targets/Makefile
+include boilerplate/flyte/golang_test_targets/Makefile
 
 .PHONY: linux_compile
 linux_compile: export CGO_ENABLED ?= 0
