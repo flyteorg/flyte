@@ -32,7 +32,7 @@ func PartitionsIdlToHstore(idlPartitions *core.Partitions) pgtype.Hstore {
 }
 
 func HstoreToIdlPartitions(hs pgtype.Hstore) *core.Partitions {
-	if hs == nil || len(hs) == 0 {
+	if len(hs) == 0 {
 		return nil
 	}
 	m := make(map[string]*core.LabelValue, len(hs))

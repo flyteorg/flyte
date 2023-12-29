@@ -75,9 +75,8 @@ func startArtifact(ctx context.Context, cfg Artifacts) error {
 	// Roughly copies main/NewMigrateCmd
 	logger.Infof(ctx, "Artifacts: running database migrations if any...")
 	migs := artifactsServer.GetMigrations(ctx)
-	initializationSql := "create extension if not exists hstore;"
 	dbConfig := artifactsServer.GetDbConfig()
-	err := database.Migrate(context.Background(), dbConfig, migs, initializationSql)
+	err := database.Migrate(context.Background(), dbConfig, migs)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to run Artifacts database migrations. Error: %v", err)
 		return err

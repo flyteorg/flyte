@@ -5,6 +5,9 @@ import (
 	"fmt"
 	event2 "github.com/cloudevents/sdk-go/v2/event"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/lib"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	adminPb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
@@ -14,8 +17,9 @@ import (
 
 // ServiceCallHandler will take events and call the grpc endpoints directly. The service should most likely be local.
 type ServiceCallHandler struct {
-	service artifact.ArtifactRegistryServer
-	created chan<- artifact.Artifact
+	service      artifact.ArtifactRegistryServer
+	created      chan<- artifact.Artifact
+	adminClients admin.Clientset
 }
 
 func (s *ServiceCallHandler) HandleEvent(ctx context.Context, cloudEvent *event2.Event, msg proto.Message) error {
@@ -65,16 +69,37 @@ func (s *ServiceCallHandler) HandleEventWorkflowExec(ctx context.Context, source
 		return nil
 	}
 
+	// TODO: add check for evt.OutputInterface.Outputs.Variables if its empty, then we early exit
+
 	execID := evt.RawEvent.ExecutionId
-	if evt.GetOutputData().GetLiterals() == nil || len(evt.OutputData.Literals) == 0 {
-		logger.Debugf(ctx, "No output data to process for workflow event from [%v]", execID)
+	req := adminPb.WorkflowExecutionGetDataRequest{
+		Id: execID,
+	}
+
+	client := s.adminClients.AdminClient()
+	executionData, err := client.GetExecutionData(ctx, &req) // use this to get input/output data
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get node executionData data for [%v] with error: %v", execID, err)
+		return err
+	}
+
+	if executionData.Inputs != nil {
+		logger.Debugf(ctx, "DEBUGART WE: Deprecated inputs was set to: %v", executionData.Inputs)
+	} else if executionData.Outputs != nil {
+		logger.Debugf(ctx, "DEBUGART WE: Deprecated outputs was set to: %v", executionData.Outputs)
+	}
+
+	if executionData.FullInputs == nil {
+		logger.Debugf(ctx, "FullInputs is nil for %s", execID)
+	} else if executionData.FullOutputs == nil {
+		logger.Debugf(ctx, "FullOutputs is nil for %s", execID)
 	}
 
 	for varName, variable := range evt.OutputInterface.Outputs.Variables {
 		if variable.GetArtifactPartialId() != nil {
 			logger.Debugf(ctx, "Processing workflow output for %s, artifact name %s, from %v", varName, variable.GetArtifactPartialId().ArtifactKey.Name, execID)
 
-			output := evt.OutputData.Literals[varName]
+			output := executionData.FullOutputs.GetLiterals()[varName]
 
 			// Add a tracking tag to the Literal before saving.
 			version := fmt.Sprintf("%s/%s", source, varName)
@@ -99,7 +124,7 @@ func (s *ServiceCallHandler) HandleEventWorkflowExec(ctx context.Context, source
 				ctx,
 				*variable.GetArtifactPartialId(),
 				variable,
-				evt.InputData,
+				executionData.FullInputs,
 			)
 			if err != nil {
 				logger.Errorf(ctx, "failed processing [%s] variable [%v] with error: %v", varName, variable, err)
@@ -214,17 +239,27 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 	// metric
 
 	execID := evt.RawEvent.Id.ExecutionId
-	if evt.GetOutputData().GetLiterals() == nil || len(evt.OutputData.Literals) == 0 {
-		logger.Debugf(ctx, "No output data to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
+
+	req := adminPb.NodeExecutionGetDataRequest{
+		Id: &core.NodeExecutionIdentifier{NodeId: evt.RawEvent.Id.NodeId, ExecutionId: execID},
+	}
+	client := s.adminClients.AdminClient()
+
+	executionData, err := client.GetNodeExecutionData(ctx, &req)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get node execution data for [%v] with error: %v", execID, err)
+		return err
 	}
 
 	if evt.OutputInterface == nil {
-		if evt.GetOutputData() != nil {
+		if executionData.FullOutputs != nil && len(executionData.FullOutputs.GetLiterals()) > 0 {
 			// metric this as error
 			logger.Errorf(ctx, "No output interface to process for task event from [%s] node %s, but output data is not nil", execID, evt.RawEvent.Id.NodeId)
 		}
 		logger.Debugf(ctx, "No output interface to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
 		return nil
+	} else if len(executionData.GetFullOutputs().GetLiterals()) > 0 && len(evt.GetOutputInterface().GetOutputs().GetVariables()) == 0 {
+		return fmt.Errorf("output interface is empty but output data is not nil for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
 	}
 
 	if evt.RawEvent.GetTaskNodeMetadata() != nil {
@@ -236,10 +271,8 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 	var taskExecID *core.TaskExecutionIdentifier
 	if taskExecID = evt.GetTaskExecId(); taskExecID == nil {
 		logger.Debugf(ctx, "No task execution id to process for task event from [%s] node %s", execID, evt.RawEvent.Id.NodeId)
+		return nil
 	}
-
-	// See note on the cloudevent_publisher side, we'll have to call one of the get data endpoints to get the actual data
-	// rather than reading them here. But read here for now.
 
 	// Iterate through the output interface. For any outputs that have an artifact ID specified, grab the
 	// output Literal and construct a Create request and call the service.
@@ -247,7 +280,10 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 		if variable.GetArtifactPartialId() != nil {
 			logger.Debugf(ctx, "Processing output for %s, artifact name %s, from %v", varName, variable.GetArtifactPartialId().ArtifactKey.Name, execID)
 
-			output := evt.OutputData.Literals[varName]
+			output, ok := executionData.FullOutputs.GetLiterals()[varName]
+			if !ok {
+				return fmt.Errorf("output [%s] not found in output data", varName)
+			}
 
 			// Add a tracking tag to the Literal before saving.
 			version := fmt.Sprintf("%s/%d/%s", source, taskExecID.RetryAttempt, varName)
@@ -263,10 +299,8 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 				Principal:         evt.Principal,
 			}
 
-			if taskExecID != nil {
-				aSrc.RetryAttempt = taskExecID.RetryAttempt
-				aSrc.TaskId = taskExecID.TaskId
-			}
+			aSrc.RetryAttempt = taskExecID.RetryAttempt
+			aSrc.TaskId = taskExecID.TaskId
 
 			spec := artifact.ArtifactSpec{
 				Value: output,
@@ -277,7 +311,7 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 				ctx,
 				*variable.GetArtifactPartialId(),
 				variable,
-				evt.InputData,
+				executionData.FullInputs,
 			)
 			if err != nil {
 				logger.Errorf(ctx, "failed processing [%s] variable [%v] with error: %v", varName, variable, err)
@@ -318,10 +352,11 @@ func (s *ServiceCallHandler) HandleEventNodeExec(ctx context.Context, source str
 	return nil
 }
 
-func NewServiceCallHandler(ctx context.Context, svc artifact.ArtifactRegistryServer, created chan<- artifact.Artifact) EventsHandlerInterface {
+func NewServiceCallHandler(ctx context.Context, svc artifact.ArtifactRegistryServer, created chan<- artifact.Artifact, adminClients admin.Clientset) EventsHandlerInterface {
 	logger.Infof(ctx, "Creating new service call handler")
 	return &ServiceCallHandler{
-		service: svc,
-		created: created,
+		service:      svc,
+		created:      created,
+		adminClients: adminClients,
 	}
 }

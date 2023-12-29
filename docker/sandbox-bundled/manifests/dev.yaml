@@ -374,6 +374,10 @@ data:
                                               route:
                                                   cluster: flyte
                                             - match:
+                                                  prefix: "/artifacts/api"
+                                              route:
+                                                  cluster: artifact_http
+                                            - match:
                                                   prefix: "/flyteidl.service.AdminService"
                                               route:
                                                   cluster: flyte_grpc
@@ -397,6 +401,10 @@ data:
                                                   prefix: "/flyteidl.service.SignalService"
                                               route:
                                                   cluster: flyte_grpc
+                                            - match:
+                                                  prefix: "/flyteidl.artifact.ArtifactRegistry"
+                                              route:
+                                                  cluster: artifact_grpc
                                             - match:
                                                   path: "/kubernetes-dashboard"
                                               redirect:
@@ -447,6 +455,34 @@ data:
                                       socket_address:
                                           address: flyte-sandbox-local
                                           port_value: 8089
+            - name: artifact_http
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: artifact_http
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 50050
+            - name: artifact_grpc
+              connect_timeout: 0.25s
+              type: STRICT_DNS
+              lb_policy: ROUND_ROBIN
+              http2_protocol_options: {}
+              load_assignment:
+                  cluster_name: artifact_grpc
+                  endpoints:
+                      - lb_endpoints:
+                            - endpoint:
+                                  address:
+                                      socket_address:
+                                          address: flyte-sandbox-local
+                                          port_value: 50051
             - name: kubernetes-dashboard
               connect_timeout: 0.25s
               type: STRICT_DNS
@@ -499,7 +535,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: MGNlbmFPenJydE1hNlB0Sw==
+  haSharedSecret: YVdudG42ZklJTWZGTmpUZw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -605,6 +641,12 @@ subsets:
   - name: webhook
     port: 9443
     protocol: TCP
+  - name: artifact-http
+    port: 50050
+    protocol: TCP
+  - name: artifact-grpc
+    port: 50051
+    protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -674,6 +716,12 @@ spec:
     protocol: TCP
   - name: webhook
     port: 9443
+    protocol: TCP
+  - name: artifact-http
+    port: 50050
+    protocol: TCP
+  - name: artifact-grpc
+    port: 50051
     protocol: TCP
 ---
 apiVersion: v1
@@ -933,7 +981,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 05cc4dc3bf13796e3a35e79da36baf286c81f80b207628f1f64197c80a04130c
+        checksum/secret: 460f5a9ea128429763eb9a5cc9e25c1cd84e1a2a5f032853085c8061f0e20da4
       labels:
         app: docker-registry
         release: flyte-sandbox

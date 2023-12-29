@@ -17,7 +17,7 @@ func NewBackgroundProcessor(ctx context.Context, processorConfiguration configur
 	var sub pubsub.Subscriber
 	switch processorConfiguration.CloudProvider {
 	case configCommon.CloudDeploymentAWS:
-		// TODO: When we start using this, the created channel will also need to be added to the pubsubprocessor
+		ff := false
 		sqsConfig := gizmoAWS.SQSConfig{
 			QueueName:           processorConfiguration.Subscriber.QueueName,
 			QueueOwnerAccountID: processorConfiguration.Subscriber.AccountID,
@@ -25,8 +25,7 @@ func NewBackgroundProcessor(ctx context.Context, processorConfiguration configur
 			// Gizmo by default will decode the SQS message using Base64 decoding.
 			// However, the message body of SQS is the SNS message format which isn't Base64 encoded.
 			// gatepr: Understand this when we do sqs testing
-			// TODO:
-			//ConsumeBase64: &enable64decoding,
+			ConsumeBase64: &ff,
 		}
 		sqsConfig.Region = processorConfiguration.Region
 		var err error
@@ -43,8 +42,8 @@ func NewBackgroundProcessor(ctx context.Context, processorConfiguration configur
 	case configCommon.CloudDeploymentGCP:
 		panic("Artifacts not implemented for GCP")
 	case configCommon.CloudDeploymentSandbox:
-		handler := NewServiceCallHandler(ctx, service, created)
-		return NewSandboxCloudEventProcessor(handler)
+		//
+		return NewSandboxCloudEventProcessor()
 	case configCommon.CloudDeploymentLocal:
 		fallthrough
 	default:

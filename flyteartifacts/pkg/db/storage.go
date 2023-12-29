@@ -327,7 +327,7 @@ func (r *RDSStorage) GetTriggersByArtifactKey(ctx context.Context, key core.Arti
 		return nil, err
 	}
 	logger.Debugf(ctx, "Found trigger keys: %+v for artifact key %v", triggerKey, key)
-	if triggerKey == nil || len(triggerKey) == 0 {
+	if len(triggerKey) == 0 {
 		logger.Infof(ctx, "No triggers found for artifact key %v", key)
 		return nil, nil
 	}
@@ -548,6 +548,8 @@ func (r *RDSStorage) FindByWorkflowExec(ctx context.Context, request *artifact.F
 func NewStorage(ctx context.Context, scope promutils.Scope) *RDSStorage {
 	dbCfg := configuration.ApplicationConfig.GetConfig().(*configuration.ApplicationConfiguration).ArtifactDatabaseConfig
 	logConfig := logger.GetConfig()
+
+	logger.Debugf(ctx, "Artifact database config: %v", dbCfg)
 
 	db, err := database.GetDB(ctx, &dbCfg, logConfig)
 	if err != nil {

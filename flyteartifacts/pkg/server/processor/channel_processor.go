@@ -15,13 +15,12 @@ import (
 
 type SandboxCloudEventsReceiver struct {
 	subChan <-chan sandboxutils.SandboxMessage
-	Handler EventsHandlerInterface
 }
 
-func (p *SandboxCloudEventsReceiver) StartProcessing(ctx context.Context) {
+func (p *SandboxCloudEventsReceiver) StartProcessing(ctx context.Context, handler EventsHandlerInterface) {
 	for {
 		logger.Warningf(context.Background(), "Starting SandBox notifications processor")
-		err := p.run(ctx)
+		err := p.run(ctx, handler)
 		if err != nil {
 			logger.Errorf(context.Background(), "error with running processor err: [%v], sleeping and restarting", err)
 			time.Sleep(1000 * 1000 * 1000 * 1)
@@ -33,7 +32,7 @@ func (p *SandboxCloudEventsReceiver) StartProcessing(ctx context.Context) {
 	logger.Warning(context.Background(), "Sandbox cloud event processor has stopped because context cancelled")
 }
 
-func (p *SandboxCloudEventsReceiver) handleMessage(ctx context.Context, sandboxMsg sandboxutils.SandboxMessage) error {
+func (p *SandboxCloudEventsReceiver) handleMessage(ctx context.Context, sandboxMsg sandboxutils.SandboxMessage, handler EventsHandlerInterface) error {
 	ce := &event.Event{}
 	err := pbcloudevents.Protobuf.Unmarshal(sandboxMsg.Raw, ce)
 	if err != nil {
@@ -72,7 +71,7 @@ func (p *SandboxCloudEventsReceiver) handleMessage(ctx context.Context, sandboxM
 		return err
 	}
 
-	err = p.Handler.HandleEvent(ctx, ce, flyteEvent)
+	err = handler.HandleEvent(ctx, ce, flyteEvent)
 	if err != nil {
 		logger.Errorf(context.Background(), "error handling event on topic [%s] [%v]", sandboxMsg.Topic, err)
 		return err
@@ -80,7 +79,7 @@ func (p *SandboxCloudEventsReceiver) handleMessage(ctx context.Context, sandboxM
 	return nil
 }
 
-func (p *SandboxCloudEventsReceiver) run(ctx context.Context) error {
+func (p *SandboxCloudEventsReceiver) run(ctx context.Context, handler EventsHandlerInterface) error {
 	for {
 		select {
 		case <-ctx.Done():
@@ -91,7 +90,7 @@ func (p *SandboxCloudEventsReceiver) run(ctx context.Context) error {
 			// metric
 			logger.Debugf(ctx, "received message [%v]", sandboxMsg)
 			if sandboxMsg.Raw != nil {
-				err := p.handleMessage(ctx, sandboxMsg)
+				err := p.handleMessage(ctx, sandboxMsg, handler)
 				if err != nil {
 					// Assuming that handle message will return a fair number of errors
 					// add metric
@@ -109,9 +108,8 @@ func (p *SandboxCloudEventsReceiver) StopProcessing() error {
 	return nil
 }
 
-func NewSandboxCloudEventProcessor(eventsHandler EventsHandlerInterface) *SandboxCloudEventsReceiver {
+func NewSandboxCloudEventProcessor() *SandboxCloudEventsReceiver {
 	return &SandboxCloudEventsReceiver{
-		Handler: eventsHandler,
 		subChan: sandboxutils.MsgChan,
 	}
 }

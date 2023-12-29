@@ -60,7 +60,7 @@ func (e *TriggerEngine) evaluateAndHandleTrigger(ctx context.Context, trigger mo
 		// They must either both have no partitions, or both have the same partitions.
 		var thisIDPartitions = make(map[string]string)
 		if triggeringArtifactID.GetPartitions().GetValue() != nil {
-			for k, _ := range triggeringArtifactID.GetPartitions().GetValue() {
+			for k := range triggeringArtifactID.GetPartitions().GetValue() {
 				thisIDPartitions[k] = "placeholder"
 			}
 		}
@@ -72,7 +72,7 @@ func (e *TriggerEngine) evaluateAndHandleTrigger(ctx context.Context, trigger mo
 		// Build a query map of partitions for this triggering artifact while at it.
 		queryPartitions := map[string]*core.LabelValue{}
 		if len(thisIDPartitions) > 0 {
-			for k, _ := range thisIDPartitions {
+			for k := range thisIDPartitions {
 				if incomingValue, ok := incomingPartitions[k]; !ok {
 					return fmt.Errorf("trigger %s has different partitions [%v] [%+v]", trigger.Name, incoming.GetArtifactId(), triggeringArtifactID)
 				} else {

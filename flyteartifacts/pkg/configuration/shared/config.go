@@ -5,8 +5,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
-const sharedServer = "sharedServer"
-
 type Metrics struct {
 	MetricsScope    string      `json:"metricsScope" pflag:",MetricsScope"`
 	Port            config.Port `json:"port" pflag:",Profile port to start listen for pprof and metric handlers on."`
@@ -34,23 +32,6 @@ type ServerConfiguration struct {
 	GrpcServerReflection       bool                  `json:"grpcServerReflection" pflag:",Enable GRPC Server Reflection"`
 	Security                   ServerSecurityOptions `json:"security"`
 	MaxConcurrentStreams       int                   `json:"maxConcurrentStreams" pflag:",Limit on the number of concurrent streams to each ServerTransport."`
-}
-
-var sharedServerConfiguration = ServerConfiguration{
-	Metrics: Metrics{
-		MetricsScope:    "service:",
-		Port:            config.Port{Port: 10254},
-		ProfilerEnabled: false,
-	},
-	Port:                       config.Port{Port: 8089},
-	HttpPort:                   config.Port{Port: 8088},
-	GrpcMaxResponseStatusBytes: 320000,
-	GrpcServerReflection:       false,
-	Security: ServerSecurityOptions{
-		Secure:  false,
-		UseAuth: false,
-	},
-	MaxConcurrentStreams: 100,
 }
 
 func (s ServerConfiguration) GetGrpcHostAddress() string {
