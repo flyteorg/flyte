@@ -514,6 +514,9 @@ data:
       cloudEventVersion: v2
       enable: true
       type: sandbox
+    flyteadmin:
+      featureGates:
+        enableArtifacts: true
     plugins:
       k8s:
         default-env-vars:
@@ -858,7 +861,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: bkVuc0pmTEgwZEp0QUVSbQ==
+  haSharedSecret: UGJnMklaMkJQUDNZekZnSQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1256,7 +1259,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 9502021d87030cfe424e840eee4c26900579d180008686827db9d9ef3f723a5b
+        checksum/configuration: 9e539e6f6c99d5c7e262b393ccaf10163e49501a72e500108d7abf1fa28efec7
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1421,7 +1424,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 63b35e1a77beeb576299ff75680ecfdebf9034eab5c85af9b0c24646b1e3007c
+        checksum/secret: 7b29a08bc860be390e60c5d9743e190acd5efbba619e25a49355fbeeba42030e
       labels:
         app: docker-registry
         release: flyte-sandbox

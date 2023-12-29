@@ -51,6 +51,9 @@ flyte-binary:
         enable: true
         cloudEventVersion: v2
         type: sandbox
+      flyteadmin:
+        featureGates:
+          enableArtifacts: true
       artifactsServer:
         artifactBlobStoreConfig:
           type: stow
