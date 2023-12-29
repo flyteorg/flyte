@@ -3,6 +3,7 @@ package adminservice
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"runtime/debug"
 
 	"github.com/golang/protobuf/proto"
@@ -27,7 +28,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type AdminService struct {
@@ -62,7 +62,7 @@ func (m *AdminService) interceptPanic(ctx context.Context, request proto.Message
 const defaultRetries = 3
 
 func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, configuration runtimeIfaces.Configuration,
-	kubeConfig, master string, dataStorageClient *storage.DataStore, adminScope promutils.Scope) *AdminService {
+	kubeConfig, master string, dataStorageClient common.DatastoreClient, adminScope promutils.Scope) *AdminService {
 	applicationConfiguration := configuration.ApplicationConfiguration().GetTopLevelConfig()
 
 	panicCounter := adminScope.MustNewCounter("initialization_panic",
@@ -95,7 +95,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		repo)
 	workflowBuilder := workflowengineImpl.NewFlyteWorkflowBuilder(
 		adminScope.NewSubScope("builder").NewSubScope("flytepropeller"))
-	workflowExecutor := workflowengineImpl.NewK8sWorkflowExecutor(configuration, execCluster, workflowBuilder, dataStorageClient)
+	workflowExecutor := workflowengineImpl.NewK8sWorkflowExecutor(configuration, execCluster, workflowBuilder)
 	logger.Info(ctx, "Successfully created a workflow executor engine")
 	pluginRegistry.RegisterDefault(plugins.PluginIDWorkflowExecutor, workflowExecutor)
 
@@ -149,7 +149,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	go func() {
 		executionEventWriter.Run()
 	}()
-
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
 		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry)

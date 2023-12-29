@@ -10,24 +10,16 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	dataMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
+	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
 )
 
-func getMockStore() *storage.DataStore {
-	pbStore := &storageMocks.ComposedProtobufStore{}
-	pbStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(_ mock.Arguments) {
-
-	})
-
-	mockStore := &storage.DataStore{
-		ComposedProtobufStore: pbStore,
-		ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
-	}
-	return mockStore
+func getMockStore() common.DatastoreClient {
+	dataStore := &commonMocks.DatastoreClient{}
+	dataStore.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil).Return(nil)
+	return dataStore
 }
 
 var remoteCfg = runtimeInterfaces.RemoteDataConfig{

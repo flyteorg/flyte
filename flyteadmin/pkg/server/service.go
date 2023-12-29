@@ -126,13 +126,14 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	serverOpts = append(serverOpts, opts...)
 	grpcServer := grpc.NewServer(serverOpts...)
 	grpcprometheus.Register(grpcServer)
-	dataStorageClient, err := storage.NewDataStore(storageCfg, scope.NewSubScope("storage"))
+	dataStore, err := storage.NewDataStore(storageCfg, scope.NewSubScope("storage"))
 	if err != nil {
 		logger.Error(ctx, "Failed to initialize storage config")
 		panic(err)
 	}
-
 	configuration := runtime2.NewConfigurationProvider()
+	dataStorageClient := common.NewClient(configuration.ApplicationConfiguration().GetTopLevelConfig().GetMetadataStoragePrefix(), dataStore)
+
 	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin"))
 	service.RegisterAdminServiceServer(grpcServer, adminServer)
 	if cfg.Security.UseAuth {
@@ -140,7 +141,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 		service.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
 	}
 
-	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, adminServer.NodeExecutionManager, dataStorageClient, adminServer.TaskExecutionManager)
+	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, adminServer.NodeExecutionManager, dataStore, adminServer.TaskExecutionManager)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize dataProxy service. Error: %w", err)
 	}

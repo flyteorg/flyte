@@ -120,7 +120,7 @@ func (r *ResourceRepo) Get(ctx context.Context, resourceID interfaces.ResourceID
 
 	if (tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound)) || len(resources) == 0 {
 		return models.Resource{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound,
-			"Resource [%+v] not found", ID)
+			"Resource [%+v] not found", resourceID)
 	} else if tx.Error != nil {
 		return models.Resource{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}

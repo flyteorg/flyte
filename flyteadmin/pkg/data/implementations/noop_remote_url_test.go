@@ -2,12 +2,12 @@ package implementations
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/mocks"
+	"github.com/stretchr/testify/mock"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const noopFileSize = int64(1256)
@@ -26,13 +26,10 @@ func (m MockMetadata) Etag() string {
 	return "etag"
 }
 
-func getMockStorage() storage.DataStore {
-	mockStorage := commonMocks.GetMockStorageClient()
-	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).HeadCb =
-		func(ctx context.Context, reference storage.DataReference) (storage.Metadata, error) {
-			return MockMetadata{}, nil
-		}
-	return *mockStorage
+func getMockStorage() common.DatastoreClient {
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnHeadMatch(mock.Anything, mock.Anything).Return(MockMetadata{}, nil)
+	return mockStorage
 }
 
 func TestNoopRemoteURLGet(t *testing.T) {

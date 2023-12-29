@@ -53,7 +53,7 @@ func GetWorkflowModel(
 }
 
 func FetchAndGetWorkflowClosure(ctx context.Context,
-	store *storage.DataStore,
+	store common.DatastoreClient,
 	remoteLocationIdentifier string) (*admin.WorkflowClosure, error) {
 	closure := &admin.WorkflowClosure{}
 
@@ -68,7 +68,7 @@ func FetchAndGetWorkflowClosure(ctx context.Context,
 func GetWorkflow(
 	ctx context.Context,
 	repo repoInterfaces.Repository,
-	store *storage.DataStore,
+	store common.DatastoreClient,
 	identifier *core.Identifier) (*admin.Workflow, error) {
 	workflowModel, err := GetWorkflowModel(ctx, repo, identifier)
 	if err != nil {

@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/mocks"
+	"github.com/stretchr/testify/mock"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -12,7 +15,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
-	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
@@ -28,7 +30,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	engine "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const remoteClosureIdentifier = "s3://flyte/metadata/admin/remote closure id"
@@ -106,23 +107,17 @@ func getMockWorkflowCompiler() workflowengineInterfaces.Compiler {
 	return mockCompiler
 }
 
-func getMockStorage() *storage.DataStore {
-	mockStorage := commonMocks.GetMockStorageClient()
-	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
-			return nil
-		}
-	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			return nil
-		}
+func getMockStorage() common.DatastoreClient {
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnOffloadWorkflowClosureMatch(mock.Anything, mock.Anything, mock.Anything).Return(remoteClosureIdentifier, nil)
+	mockStorage.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 	return mockStorage
 }
 
 func TestSetWorkflowDefaults(t *testing.T) {
 	workflowManager := NewWorkflowManager(
 		getMockRepository(returnWorkflowOnGet),
-		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(), storagePrefix,
+		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), &mocks.DatastoreClient{}, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	request := testutils.GetWorkflowRequest()
 	finalizedRequest, err := workflowManager.(*WorkflowManager).setDefaults(request)
@@ -163,7 +158,7 @@ func TestCreateWorkflow(t *testing.T) {
 func TestCreateWorkflow_ValidationError(t *testing.T) {
 	workflowManager := NewWorkflowManager(
 		repositoryMocks.NewMockRepository(),
-		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(), storagePrefix,
+		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), &mocks.DatastoreClient{}, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	request := testutils.GetWorkflowRequest()
 	request.Id = nil
@@ -173,14 +168,18 @@ func TestCreateWorkflow_ValidationError(t *testing.T) {
 }
 
 func TestCreateWorkflow_ExistingWorkflow(t *testing.T) {
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			workflowClosure := testutils.GetWorkflowClosure()
-			bytes, _ := proto.Marshal(workflowClosure)
-			_ = proto.Unmarshal(bytes, msg)
-			return nil
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, mock.Anything, func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testutils.GetWorkflowClosure())
+		if err != nil {
+			t.Fail()
 		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	}).Return(nil)
 	workflowManager := NewWorkflowManager(
 		getMockRepository(returnWorkflowOnGet),
 		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
@@ -191,16 +190,17 @@ func TestCreateWorkflow_ExistingWorkflow(t *testing.T) {
 }
 
 func TestCreateWorkflow_ExistingWorkflow_Different(t *testing.T) {
-	mockStorageClient := commonMocks.GetMockStorageClient()
-
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			_ = proto.Unmarshal(workflowClosureBytes, msg)
-			return nil
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, remoteClosureIdentifier, func(msg proto.Message) bool {
+		err := proto.Unmarshal(workflowClosureBytes, msg)
+		if err != nil {
+			t.Fail()
 		}
+		return true
+	}).Return(nil)
 	workflowManager := NewWorkflowManager(
 		getMockRepository(returnWorkflowOnGet),
-		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
+		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), &mocks.DatastoreClient{}, storagePrefix, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
@@ -292,15 +292,18 @@ func TestGetWorkflow(t *testing.T) {
 		}, nil
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			assert.Equal(t, remoteClosureIdentifier, reference.String())
-			workflowClosure := testutils.GetWorkflowClosure()
-			bytes, _ := proto.Marshal(workflowClosure)
-			_ = proto.Unmarshal(bytes, msg)
-			return nil
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, remoteClosureIdentifier, func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testutils.GetWorkflowClosure())
+		if err != nil {
+			t.Fail()
 		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	}).Return(nil)
 	workflowManager := NewWorkflowManager(
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
@@ -324,7 +327,7 @@ func TestGetWorkflow_DatabaseError(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 	workflowManager := NewWorkflowManager(
-		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(),
+		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), &mocks.DatastoreClient{},
 		storagePrefix, mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	workflow, err := workflowManager.GetWorkflow(context.Background(), admin.ObjectGetRequest{
 		Id: &workflowIdentifier,
@@ -352,12 +355,8 @@ func TestGetWorkflow_TransformerError(t *testing.T) {
 		}, nil
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			assert.Equal(t, remoteClosureIdentifier, reference.String())
-			return errors.New("womp womp")
-		}
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(errors.New("womp womp"))
 
 	workflowManager := NewWorkflowManager(
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix,
@@ -410,13 +409,18 @@ func TestListWorkflows(t *testing.T) {
 		}, nil
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetListCallback(workflowListFunc)
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			assert.Equal(t, remoteClosureIdentifier, reference.String())
-			assert.True(t, proto.Equal(testutils.GetWorkflowClosure(), msg))
-			return nil
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, remoteClosureIdentifier, func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testutils.GetWorkflowClosure())
+		if err != nil {
+			t.Fail()
 		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	}).Return(nil)
 	workflowManager := NewWorkflowManager(
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
@@ -460,7 +464,7 @@ func TestListWorkflows(t *testing.T) {
 func TestListWorkflows_MissingParameters(t *testing.T) {
 	workflowManager := NewWorkflowManager(
 		repositoryMocks.NewMockRepository(),
-		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(), storagePrefix,
+		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), &mocks.DatastoreClient{}, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	_, err := workflowManager.ListWorkflows(context.Background(), admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
@@ -492,7 +496,7 @@ func TestListWorkflows_DatabaseError(t *testing.T) {
 
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetListCallback(workflowListFunc)
 	workflowManager := NewWorkflowManager(repository,
-		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), commonMocks.GetMockStorageClient(), storagePrefix,
+		getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), &mocks.DatastoreClient{}, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))
 	_, err := workflowManager.ListWorkflows(context.Background(), admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
@@ -538,13 +542,18 @@ func TestWorkflowManager_ListWorkflowIdentifiers(t *testing.T) {
 		}, nil
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetListIdentifiersFunc(workflowListIdsFunc)
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			assert.Equal(t, remoteClosureIdentifier, reference.String())
-			assert.True(t, proto.Equal(testutils.GetWorkflowClosure(), msg))
-			return nil
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, remoteClosureIdentifier, func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testutils.GetWorkflowClosure())
+		if err != nil {
+			t.Fail()
 		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	}).Return(nil)
 	workflowManager := NewWorkflowManager(
 		repository, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(), mockStorageClient, storagePrefix,
 		mockScope.NewTestScope(), artifacts.NewArtifactRegistry(context.Background(), nil))

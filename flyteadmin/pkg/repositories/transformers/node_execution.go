@@ -16,7 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type ToNodeExecutionModelInput struct {
@@ -25,7 +24,7 @@ type ToNodeExecutionModelInput struct {
 	ParentID                     *uint
 	DynamicWorkflowRemoteClosure string
 	InlineEventDataPolicy        interfaces.InlineEventDataPolicy
-	StorageClient                *storage.DataStore
+	StorageClient                common.DatastoreClient
 }
 
 func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
@@ -48,7 +47,7 @@ func addNodeRunningState(request *admin.NodeExecutionEventRequest, nodeExecution
 func addTerminalState(
 	ctx context.Context,
 	request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
-	closure *admin.NodeExecutionClosure, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
+	closure *admin.NodeExecutionClosure, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient common.DatastoreClient) error {
 	if closure.StartedAt == nil {
 		logger.Warning(context.Background(), "node execution is missing StartedAt")
 	} else {
@@ -74,9 +73,8 @@ func addTerminalState(
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
-				request.Event.Id.NodeId, OutputsObjectSuffix)
+			uri, err := storageClient.OffloadNodeExecutionLiteralMap(ctx, request.Event.GetOutputData(),
+				request.Event.Id, OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}
@@ -205,7 +203,7 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 func UpdateNodeExecutionModel(
 	ctx context.Context, request *admin.NodeExecutionEventRequest, nodeExecutionModel *models.NodeExecution,
 	targetExecution *core.WorkflowExecutionIdentifier, dynamicWorkflowRemoteClosure string,
-	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient common.DatastoreClient) error {
 	err := handleNodeExecutionInputs(ctx, nodeExecutionModel, request, storageClient)
 	if err != nil {
 		return err
@@ -375,7 +373,7 @@ func GetNodeExecutionInternalData(internalData []byte) (*genModel.NodeExecutionI
 func handleNodeExecutionInputs(ctx context.Context,
 	nodeExecutionModel *models.NodeExecution,
 	request *admin.NodeExecutionEventRequest,
-	storageClient *storage.DataStore) error {
+	storageClient common.DatastoreClient) error {
 	if len(nodeExecutionModel.InputURI) > 0 {
 		// Inputs are static over the duration of the node execution, no need to update them when they're already set
 		return nil
@@ -385,9 +383,8 @@ func handleNodeExecutionInputs(ctx context.Context,
 		logger.Debugf(ctx, "saving node execution input URI [%s]", request.Event.GetInputUri())
 		nodeExecutionModel.InputURI = request.Event.GetInputUri()
 	case *event.NodeExecutionEvent_InputData:
-		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetInputData(),
-			request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
-			request.Event.Id.NodeId, InputsObjectSuffix)
+		uri, err := storageClient.OffloadNodeExecutionLiteralMap(ctx, request.Event.GetInputData(),
+			request.Event.Id, InputsObjectSuffix)
 		if err != nil {
 			return err
 		}

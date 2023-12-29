@@ -28,7 +28,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const (
@@ -118,7 +117,7 @@ type CloudEventWrappedPublisher struct {
 	db               repositoryInterfaces.Repository
 	sender           interfaces.Sender
 	systemMetrics    implementations.EventPublisherSystemMetrics
-	storageClient    *storage.DataStore
+	storageClient    common.DatastoreClient
 	urlData          dataInterfaces.RemoteURLInterface
 	remoteDataConfig runtimeInterfaces.RemoteDataConfig
 }
@@ -519,7 +518,7 @@ func NewCloudEventsPublisher(sender interfaces.Sender, scope promutils.Scope, ev
 }
 
 func NewCloudEventsWrappedPublisher(
-	db repositoryInterfaces.Repository, sender interfaces.Sender, scope promutils.Scope, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, remoteDataConfig runtimeInterfaces.RemoteDataConfig) interfaces.Publisher {
+	db repositoryInterfaces.Repository, sender interfaces.Sender, scope promutils.Scope, storageClient common.DatastoreClient, urlData dataInterfaces.RemoteURLInterface, remoteDataConfig runtimeInterfaces.RemoteDataConfig) interfaces.Publisher {
 
 	return &CloudEventWrappedPublisher{
 		db:               db,

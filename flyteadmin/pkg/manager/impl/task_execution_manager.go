@@ -28,7 +28,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type taskExecutionMetrics struct {
@@ -48,7 +47,7 @@ type taskExecutionMetrics struct {
 type TaskExecutionManager struct {
 	db                   repoInterfaces.Repository
 	config               runtimeInterfaces.Configuration
-	storageClient        *storage.DataStore
+	storageClient        common.DatastoreClient
 	metrics              taskExecutionMetrics
 	urlData              dataInterfaces.RemoteURLInterface
 	notificationClient   notificationInterfaces.Publisher
@@ -345,7 +344,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 }
 
 func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
-	storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
+	storageClient common.DatastoreClient, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
 	publisher notificationInterfaces.Publisher, cloudEventsPublisher cloudeventInterfaces.Publisher) interfaces.TaskExecutionInterface {
 
 	metrics := taskExecutionMetrics{

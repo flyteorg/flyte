@@ -49,7 +49,7 @@ type NodeExecutionManager struct {
 	db                  repoInterfaces.Repository
 	config              runtimeInterfaces.Configuration
 	storagePrefix       []string
-	storageClient       *storage.DataStore
+	storageClient       common.DatastoreClient
 	metrics             nodeExecutionMetrics
 	urlData             dataInterfaces.RemoteURLInterface
 	eventPublisher      notificationInterfaces.Publisher
@@ -177,22 +177,8 @@ func formatDynamicWorkflowID(identifier *core.Identifier) string {
 func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
 	ctx context.Context, nodeID *core.NodeExecutionIdentifier, workflowID *core.Identifier,
 	compiledWorkflowClosure *core.CompiledWorkflowClosure) (storage.DataReference, error) {
-	nestedSubKeys := []string{
-		nodeID.ExecutionId.Project,
-		nodeID.ExecutionId.Domain,
-		nodeID.ExecutionId.Name,
-		nodeID.NodeId,
-		formatDynamicWorkflowID(workflowID),
-	}
-	nestedKeys := append(m.storagePrefix, nestedSubKeys...)
-	remoteClosureDataRef, err := m.storageClient.ConstructReference(ctx, m.storageClient.GetBaseContainerFQN(ctx), nestedKeys...)
-
-	if err != nil {
-		return "", errors.NewFlyteAdminErrorf(codes.Internal,
-			"Failed to produce remote closure data reference for dynamic workflow yielded by node id [%+v] with workflow id [%+v]; err: %v", nodeID, workflowID, err)
-	}
-
-	err = m.storageClient.WriteProtobuf(ctx, remoteClosureDataRef, defaultStorageOptions, compiledWorkflowClosure)
+	dynamicWorkflowID := formatDynamicWorkflowID(workflowID)
+	remoteClosureDataRef, err := m.storageClient.OffloadCompiledWorkflowClosure(ctx, compiledWorkflowClosure, workflowID, dynamicWorkflowID)
 	if err != nil {
 		return "", errors.NewFlyteAdminErrorf(codes.Internal,
 			"Failed to upload dynamic workflow closure for node id [%+v] and workflow id [%+v] with err: %v", nodeID, workflowID, err)
@@ -531,7 +517,7 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 }
 
 func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
-	storagePrefix []string, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
+	storagePrefix []string, storageClient common.DatastoreClient, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.NodeExecutionEventWriter) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{

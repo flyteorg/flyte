@@ -30,7 +30,7 @@ func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob a
 
 // GetInputs returns an inputs URL blob and if config settings permit, inline inputs data for an execution.
 func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
-	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, inputURI string) (
+	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient common.DatastoreClient, inputURI string) (
 	*core.LiteralMap, *admin.UrlBlob, error) {
 	var inputsURLBlob admin.UrlBlob
 	var fullInputs core.LiteralMap
@@ -96,7 +96,7 @@ func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosu
 
 // GetOutputs returns an outputs URL blob and if config settings permit, inline outputs data for an execution.
 func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
-	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, closure ExecutionClosure) (
+	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient common.DatastoreClient, closure ExecutionClosure) (
 	*core.LiteralMap, *admin.UrlBlob, error) {
 	var outputsURLBlob admin.UrlBlob
 	var fullOutputs = &core.LiteralMap{}

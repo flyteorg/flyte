@@ -3,7 +3,9 @@ package impl
 import (
 	"context"
 	"errors"
-	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/stretchr/testify/mock"
 	"testing"
 	"time"
 
@@ -14,7 +16,6 @@ import (
 
 	eventWriterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	dataMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
@@ -28,7 +29,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var occurredAt = time.Now().UTC()
@@ -163,8 +163,10 @@ func TestCreateNodeEvent(t *testing.T) {
 
 	mockDbEventWriter := &eventWriterMocks.NodeExecutionEventWriter{}
 	mockDbEventWriter.On("Write", request)
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnOffloadCompiledWorkflowClosureMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("s3://bucket/admin/metadata/project/domain/name/node id/proj_domain_dynamic_wf_abc123", nil)
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(),
-		[]string{"admin", "metadata"}, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL,
+		[]string{"admin", "metadata"}, mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL,
 		&mockPublisher, &mockPublisher, mockDbEventWriter)
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
 	assert.Nil(t, err)
@@ -229,8 +231,10 @@ func TestCreateNodeEvent_Update(t *testing.T) {
 
 	mockDbEventWriter := &eventWriterMocks.NodeExecutionEventWriter{}
 	mockDbEventWriter.On("Write", request)
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnOffloadCompiledWorkflowClosureMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("s3://bucket/admin/metadata/project/domain/name/node id/proj_domain_dynamic_wf_abc123", nil)
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(),
-		[]string{"admin", "metadata"}, getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, mockDbEventWriter)
+		[]string{"admin", "metadata"}, mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, mockDbEventWriter)
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
 	assert.Nil(t, err)
 	assert.NotNil(t, resp)
@@ -251,7 +255,7 @@ func TestCreateNodeEvent_MissingExecution(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(func(ctx context.Context, id *core.WorkflowExecutionIdentifier) (models.Execution, error) {
 		return models.Execution{}, expectedErr
 	})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
 	assert.EqualError(t, err, "Failed to get existing execution id: [project:\"project\" domain:\"domain\" name:\"name\" ] with err: expected error")
 	assert.Nil(t, resp)
@@ -270,7 +274,10 @@ func TestCreateNodeEvent_CreateDatabaseError(t *testing.T) {
 		func(ctx context.Context, input *models.NodeExecution) error {
 			return expectedErr
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnOffloadCompiledWorkflowClosureMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("s3://bucket/admin/metadata/project/domain/name/node id/proj_domain_dynamic_wf_abc123", nil)
+
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
 	assert.EqualError(t, err, expectedErr.Error())
 	assert.Nil(t, resp)
@@ -305,7 +312,10 @@ func TestCreateNodeEvent_UpdateDatabaseError(t *testing.T) {
 		func(ctx context.Context, nodeExecution *models.NodeExecution) error {
 			return expectedErr
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnOffloadCompiledWorkflowClosureMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("s3://bucket/admin/metadata/project/domain/name/node id/proj_domain_dynamic_wf_abc123", nil)
+
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
 	assert.EqualError(t, err, expectedErr.Error())
 	assert.Nil(t, resp)
@@ -334,7 +344,10 @@ func TestCreateNodeEvent_UpdateTerminalEventError(t *testing.T) {
 				StartedAt: &occurredAt,
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnOffloadCompiledWorkflowClosureMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("s3://bucket/admin/metadata/project/domain/name/node id/proj_domain_dynamic_wf_abc123", nil)
+
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
 	assert.Nil(t, resp)
 	assert.NotNil(t, err)
@@ -369,7 +382,10 @@ func TestCreateNodeEvent_UpdateDuplicateEventError(t *testing.T) {
 				StartedAt: &occurredAt,
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnOffloadCompiledWorkflowClosureMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return("s3://bucket/admin/metadata/project/domain/name/node id/proj_domain_dynamic_wf_abc123", nil)
+
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
 	assert.Equal(t, codes.AlreadyExists, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, resp)
@@ -404,7 +420,7 @@ func TestCreateNodeEvent_FirstEventIsTerminal(t *testing.T) {
 	}
 	mockDbEventWriter := &eventWriterMocks.NodeExecutionEventWriter{}
 	mockDbEventWriter.On("Write", succeededRequest)
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, mockDbEventWriter)
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, mockDbEventWriter)
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), succeededRequest)
 	assert.NotNil(t, resp)
 	assert.Nil(t, err)
@@ -589,7 +605,7 @@ func TestGetNodeExecution(t *testing.T) {
 				InternalData:          internalDataBytes,
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
@@ -653,7 +669,7 @@ func TestGetNodeExecutionParentNode(t *testing.T) {
 				},
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
@@ -707,7 +723,7 @@ func TestGetNodeExecutionEventVersion0(t *testing.T) {
 			}, nil
 		})
 
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
@@ -727,7 +743,7 @@ func TestGetNodeExecution_DatabaseError(t *testing.T) {
 		func(ctx context.Context, id *core.NodeExecutionIdentifier) (models.NodeExecution, error) {
 			return models.NodeExecution{}, expectedErr
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
@@ -755,7 +771,7 @@ func TestGetNodeExecution_TransformerError(t *testing.T) {
 				InternalData: internalDataBytes,
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecution, err := nodeExecManager.GetNodeExecution(context.Background(), admin.NodeExecutionGetRequest{
 		Id: &nodeExecutionIdentifier,
 	})
@@ -832,7 +848,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 				NodeExecutionMetadata: metadataBytes,
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -922,7 +938,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 				},
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -956,7 +972,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 }
 
 func TestListNodeExecutions_InvalidParams(t *testing.T) {
-	nodeExecManager := NewNodeExecutionManager(nil, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(nil, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	_, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		Filters: "eq(execution.project, project)",
 	})
@@ -982,7 +998,7 @@ func TestListNodeExecutions_DatabaseError(t *testing.T) {
 			interfaces.NodeExecutionCollectionOutput, error) {
 			return interfaces.NodeExecutionCollectionOutput{}, expectedErr
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -1021,7 +1037,7 @@ func TestListNodeExecutions_TransformerError(t *testing.T) {
 				},
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -1049,7 +1065,7 @@ func TestListNodeExecutions_NothingToReturn(t *testing.T) {
 			listExecutionsCalled = true
 			return interfaces.ExecutionCollectionOutput{}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 
 	_, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
@@ -1128,7 +1144,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 				},
 			}, nil
 		})
-	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
+	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), &mocks.DatastoreClient{}, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecutions, err := nodeExecManager.ListNodeExecutionsForTask(context.Background(), admin.NodeExecutionForTaskListRequest{
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -1232,7 +1248,8 @@ func TestGetNodeExecutionData(t *testing.T) {
 
 		return admin.UrlBlob{}, errors.New("unexpected input")
 	}
-	mockStorage := commonMocks.GetMockStorageClient()
+
+	mockStorage := &mocks.DatastoreClient{}
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": testutils.MakeStringLiteral("foo-value-1"),
@@ -1243,24 +1260,47 @@ func TestGetNodeExecutionData(t *testing.T) {
 			"bar": testutils.MakeStringLiteral("bar-value-1"),
 		},
 	}
-
-	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-		if reference.String() == "input uri" {
-			marshalled, _ := proto.Marshal(fullInputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
-		} else if reference.String() == util.OutputsFile {
-			marshalled, _ := proto.Marshal(fullOutputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
-		} else if reference.String() == dynamicWorkflowClosureRef {
-			marshalled, _ := proto.Marshal(&dynamicWorkflowClosure)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+	mockStorage.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+		return ref == storage.DataReference("input uri")
+	}), mock.MatchedBy(func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(fullInputs)
+		if err != nil {
+			t.Errorf("failed to marshal inputs: %v", err)
 		}
-		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
-	}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Errorf("failed to unmarshal inputs: %v", err)
+		}
+		return true
+	})).Return(nil)
+
+	mockStorage.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+		return ref == storage.DataReference("outputs.pb")
+	}), mock.MatchedBy(func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(fullOutputs)
+		if err != nil {
+			t.Errorf("failed to marshal outputs: %v", err)
+		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Errorf("failed to unmarshal outputs: %v", err)
+		}
+		return true
+	})).Return(nil)
+	mockStorage.OnReadProtobufMatch(mock.Anything, mock.MatchedBy(func(ref storage.DataReference) bool {
+		return ref == storage.DataReference(dynamicWorkflowClosureRef)
+	}), mock.MatchedBy(func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(&dynamicWorkflowClosure)
+		if err != nil {
+			t.Errorf("failed to marshal dynamic wflow closure: %v", err)
+		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Errorf("failed to unmarshal dynamic wflow closure: %v", err)
+		}
+		return true
+	})).Return(nil)
+
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), mockStorage, mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	dataResponse, err := nodeExecManager.GetNodeExecutionData(context.Background(), admin.NodeExecutionGetDataRequest{
 		Id: &nodeExecutionIdentifier,

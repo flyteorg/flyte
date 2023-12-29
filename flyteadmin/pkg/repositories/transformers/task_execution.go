@@ -2,15 +2,13 @@ package transformers
 
 import (
 	"context"
-	"sort"
-	"strconv"
-
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	_struct "github.com/golang/protobuf/ptypes/struct"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/protobuf/encoding/protojson"
+	"sort"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -20,7 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var empty _struct.Struct
@@ -29,7 +26,7 @@ var jsonEmpty, _ = protojson.Marshal(&empty)
 type CreateTaskExecutionModelInput struct {
 	Request               *admin.TaskExecutionEventRequest
 	InlineEventDataPolicy interfaces.InlineEventDataPolicy
-	StorageClient         *storage.DataStore
+	StorageClient         common.DatastoreClient
 }
 
 func addTaskStartedState(request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
@@ -52,7 +49,7 @@ func addTaskTerminalState(
 	ctx context.Context,
 	request *admin.TaskExecutionEventRequest,
 	taskExecutionModel *models.TaskExecution, closure *admin.TaskExecutionClosure,
-	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient common.DatastoreClient) error {
 	if taskExecutionModel.StartedAt == nil {
 		logger.Warning(context.Background(), "task execution is missing StartedAt")
 	} else {
@@ -82,11 +79,12 @@ func addTaskTerminalState(
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
-				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
-				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
-				strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), OutputsObjectSuffix)
+			uri, err := storageClient.OffloadTaskExecutionLiteralMap(ctx, request.Event.GetOutputData(),
+				&core.TaskExecutionIdentifier{
+					TaskId:          request.Event.TaskId,
+					NodeExecutionId: request.Event.ParentNodeExecutionId,
+					RetryAttempt:    request.Event.RetryAttempt,
+				}, OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}
@@ -373,7 +371,7 @@ func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExe
 }
 
 func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
-	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient common.DatastoreClient) error {
 	err := handleTaskExecutionInputs(ctx, taskExecutionModel, request, storageClient)
 	if err != nil {
 		return err
@@ -511,7 +509,7 @@ func FromTaskExecutionModels(taskExecutionModels []models.TaskExecution, opts *E
 }
 
 func handleTaskExecutionInputs(ctx context.Context, taskExecutionModel *models.TaskExecution,
-	request *admin.TaskExecutionEventRequest, storageClient *storage.DataStore) error {
+	request *admin.TaskExecutionEventRequest, client common.DatastoreClient) error {
 	if len(taskExecutionModel.InputURI) > 0 {
 		// Inputs are static over the duration of the task execution, no need to update them when they're already set
 		return nil
@@ -520,11 +518,12 @@ func handleTaskExecutionInputs(ctx context.Context, taskExecutionModel *models.T
 	case *event.TaskExecutionEvent_InputUri:
 		taskExecutionModel.InputURI = request.GetEvent().GetInputUri()
 	case *event.TaskExecutionEvent_InputData:
-		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.GetEvent().GetInputData(),
-			request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
-			request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
-			request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
-			strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), InputsObjectSuffix)
+		uri, err := client.OffloadTaskExecutionLiteralMap(ctx, request.GetEvent().GetInputData(),
+			&core.TaskExecutionIdentifier{
+				TaskId:          request.Event.TaskId,
+				NodeExecutionId: request.Event.ParentNodeExecutionId,
+				RetryAttempt:    request.Event.RetryAttempt,
+			}, InputsObjectSuffix)
 		if err != nil {
 			return err
 		}

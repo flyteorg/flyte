@@ -44,7 +44,7 @@ type WorkflowManager struct {
 	db               repoInterfaces.Repository
 	config           runtimeInterfaces.Configuration
 	compiler         workflowengineInterfaces.Compiler
-	storageClient    *storage.DataStore
+	storageClient    common.DatastoreClient
 	storagePrefix    []string
 	metrics          workflowMetrics
 	artifactRegistry *artifacts.ArtifactRegistry
@@ -123,18 +123,6 @@ func (w *WorkflowManager) getCompiledWorkflow(
 	}, nil
 }
 
-func (w *WorkflowManager) createDataReference(
-	ctx context.Context, identifier *core.Identifier) (storage.DataReference, error) {
-	nestedSubKeys := []string{
-		identifier.Project,
-		identifier.Domain,
-		identifier.Name,
-		identifier.Version,
-	}
-	nestedKeys := append(w.storagePrefix, nestedSubKeys...)
-	return w.storageClient.ConstructReference(ctx, w.storageClient.GetBaseContainerFQN(ctx), nestedKeys...)
-}
-
 func (w *WorkflowManager) CreateWorkflow(
 	ctx context.Context,
 	request admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
@@ -180,23 +168,15 @@ func (w *WorkflowManager) CreateWorkflow(
 			request.Id, err)
 		return nil, err
 	}
-
-	remoteClosureDataRef, err := w.createDataReference(ctx, request.Spec.Template.Id)
-	if err != nil {
-		logger.Infof(ctx, "failed to construct data reference for workflow closure with id [%+v] with err %v",
-			request.Id, err)
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"failed to construct data reference for workflow closure with id [%+v] and err %v", request.Id, err)
-	}
-	err = w.storageClient.WriteProtobuf(ctx, remoteClosureDataRef, defaultStorageOptions, &workflowClosure)
+	remoteClosureDataRef, err := w.storageClient.OffloadWorkflowClosure(ctx, &workflowClosure, request.Spec.Template.Id)
 
 	if err != nil {
 		logger.Infof(ctx,
-			"failed to write marshaled workflow with id [%+v] to storage %s with err %v and base container: %s",
-			request.Id, remoteClosureDataRef.String(), err, w.storageClient.GetBaseContainerFQN(ctx))
+			"failed to write marshaled workflow with id [%+v] to storage %s with err %v ",
+			request.Id, remoteClosureDataRef.String(), err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"failed to write marshaled workflow [%+v] to storage %s with err %v and base container: %s",
-			request.Id, remoteClosureDataRef.String(), err, w.storageClient.GetBaseContainerFQN(ctx))
+			"failed to write marshaled workflow [%+v] to storage %s with err %v",
+			request.Id, remoteClosureDataRef.String(), err)
 	}
 	// Save the workflow & its reference to the offloaded, compiled workflow in the database.
 	workflowModel, err := transformers.CreateWorkflowModel(
@@ -355,7 +335,7 @@ func NewWorkflowManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration,
 	compiler workflowengineInterfaces.Compiler,
-	storageClient *storage.DataStore,
+	storageClient common.DatastoreClient,
 	storagePrefix []string,
 	scope promutils.Scope,
 	artifactRegistry *artifacts.ArtifactRegistry) interfaces.WorkflowInterface {

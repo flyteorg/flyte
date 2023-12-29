@@ -79,7 +79,7 @@ type executionUserMetrics struct {
 type ExecutionManager struct {
 	db                        repositoryInterfaces.Repository
 	config                    runtimeInterfaces.Configuration
-	storageClient             *storage.DataStore
+	storageClient             common.DatastoreClient
 	queueAllocator            executions.QueueAllocator
 	_clock                    clock.Clock
 	systemMetrics             executionSystemMetrics
@@ -519,11 +519,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := m.storageClient.OffloadExecutionLiteralMap(ctx, request.Inputs, workflowExecutionID, shared.Inputs)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+	userInputsURI, err := m.storageClient.OffloadExecutionLiteralMap(ctx, request.Inputs, workflowExecutionID, shared.UserInputs)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1071,11 +1071,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := m.storageClient.OffloadExecutionLiteralMap(ctx, executionInputs, workflowExecutionID, shared.Inputs)
 	if err != nil {
 		return nil, nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+	userInputsURI, err := m.storageClient.OffloadExecutionLiteralMap(ctx, request.Inputs, workflowExecutionID, shared.UserInputs)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1692,7 +1692,7 @@ func (m *ExecutionManager) GetExecutionData(
 		if err := proto.Unmarshal(executionModel.Closure, closure); err != nil {
 			return nil, err
 		}
-		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.ComputedInputs, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
+		newInputsURI, err := m.storageClient.OffloadExecutionLiteralMap(ctx, closure.ComputedInputs, request.Id, shared.Inputs)
 		if err != nil {
 			return nil, err
 		}
@@ -1936,7 +1936,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 }
 
 func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
-	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
+	storageClient common.DatastoreClient, systemScope promutils.Scope, userScope promutils.Scope,
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,

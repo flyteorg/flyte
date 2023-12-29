@@ -185,7 +185,7 @@ func reassignCluster(ctx context.Context, cluster string, executionID *core.Work
 func UpdateExecutionModelState(
 	ctx context.Context,
 	execution *models.Execution, request admin.WorkflowExecutionEventRequest,
-	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
+	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient common.DatastoreClient) error {
 	var executionClosure admin.ExecutionClosure
 	err := proto.Unmarshal(execution.Closure, &executionClosure)
 	if err != nil {
@@ -247,8 +247,8 @@ func UpdateExecutionModelState(
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
+			uri, err := storageClient.OffloadExecutionLiteralMap(
+				ctx, request.Event.GetOutputData(), request.Event.ExecutionId, OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}

@@ -22,7 +22,7 @@ type RemoteDataHandlerConfig struct {
 	Region                   string
 	SignedURLDurationMinutes int
 	SigningPrincipal         string
-	RemoteDataStoreClient    *storage.DataStore
+	RemoteDataStoreClient    common.DatastoreClient
 }
 
 type RemoteDataHandler interface {
@@ -87,7 +87,7 @@ func GetRemoteDataHandler(cfg RemoteDataHandlerConfig) RemoteDataHandler {
 		logger.Infof(context.Background(),
 			"Using default noop remote url implementation for cloud provider type [%s]", cfg.CloudProvider)
 		return &remoteDataHandler{
-			remoteURL: implementations.NewNoopRemoteURL(*cfg.RemoteDataStoreClient),
+			remoteURL: implementations.NewNoopRemoteURL(cfg.RemoteDataStoreClient),
 		}
 	}
 }

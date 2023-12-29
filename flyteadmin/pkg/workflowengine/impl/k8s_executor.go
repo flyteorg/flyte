@@ -13,7 +13,6 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var deletePropagationBackground = v1.DeletePropagationBackground
@@ -26,7 +25,6 @@ type K8sWorkflowExecutor struct {
 	config           runtimeInterfaces.Configuration
 	executionCluster execClusterInterfaces.ClusterInterface
 	workflowBuilder  interfaces.FlyteWorkflowBuilder
-	storageClient    *storage.DataStore
 }
 
 func (e K8sWorkflowExecutor) ID() string {
@@ -95,12 +93,11 @@ func (e K8sWorkflowExecutor) Abort(ctx context.Context, data interfaces.AbortDat
 	return nil
 }
 
-func NewK8sWorkflowExecutor(config runtimeInterfaces.Configuration, executionCluster execClusterInterfaces.ClusterInterface, workflowBuilder interfaces.FlyteWorkflowBuilder, client *storage.DataStore) *K8sWorkflowExecutor {
+func NewK8sWorkflowExecutor(config runtimeInterfaces.Configuration, executionCluster execClusterInterfaces.ClusterInterface, workflowBuilder interfaces.FlyteWorkflowBuilder) *K8sWorkflowExecutor {
 
 	return &K8sWorkflowExecutor{
 		config:           config,
 		executionCluster: executionCluster,
 		workflowBuilder:  workflowBuilder,
-		storageClient:    client,
 	}
 }

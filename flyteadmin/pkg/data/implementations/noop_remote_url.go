@@ -2,6 +2,7 @@ package implementations
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 
 	"google.golang.org/grpc/codes"
 
@@ -13,7 +14,7 @@ import (
 
 // No-op implementation of a RemoteURLInterface
 type NoopRemoteURL struct {
-	remoteDataStoreClient storage.DataStore
+	remoteDataStoreClient common.DatastoreClient
 }
 
 func (n *NoopRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, error) {
@@ -28,7 +29,7 @@ func (n *NoopRemoteURL) Get(ctx context.Context, uri string) (admin.UrlBlob, err
 	}, nil
 }
 
-func NewNoopRemoteURL(remoteDataStoreClient storage.DataStore) interfaces.RemoteURLInterface {
+func NewNoopRemoteURL(remoteDataStoreClient common.DatastoreClient) interfaces.RemoteURLInterface {
 	return &NoopRemoteURL{
 		remoteDataStoreClient: remoteDataStoreClient,
 	}

@@ -158,6 +158,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
+	github.com/samber/lo v1.39.0 // indirect
 	github.com/sendgrid/rest v2.6.8+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.2 // indirect
 	github.com/spf13/afero v1.9.2 // indirect

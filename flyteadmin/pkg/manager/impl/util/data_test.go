@@ -2,13 +2,14 @@ package util
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/mocks"
+	"github.com/stretchr/testify/mock"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	urlMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -127,14 +128,18 @@ func TestGetInputs(t *testing.T) {
 		MaxSizeInBytes: 2000,
 	}
 
-	mockStorage := commonMocks.GetMockStorageClient()
-	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-		assert.Equal(t, inputsURI, reference.String())
-		marshalled, _ := proto.Marshal(testLiteralMap)
-		_ = proto.Unmarshal(marshalled, msg)
-		return nil
-	}
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnReadProtobufMatch(mock.Anything, storage.DataReference(inputsURI), mock.MatchedBy(func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testLiteralMap)
+		if err != nil {
+			t.Fail()
+		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	})).Return(nil)
 
 	t.Run("should sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
@@ -171,14 +176,18 @@ func TestGetOutputs(t *testing.T) {
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
 	}
-	mockStorage := commonMocks.GetMockStorageClient()
-	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-		assert.Equal(t, testOutputsURI, reference.String())
-		marshalled, _ := proto.Marshal(testLiteralMap)
-		_ = proto.Unmarshal(marshalled, msg)
-		return nil
-	}
+	mockStorage := &mocks.DatastoreClient{}
+	mockStorage.OnReadProtobufMatch(mock.Anything, storage.DataReference(testOutputsURI), mock.MatchedBy(func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testLiteralMap)
+		if err != nil {
+			t.Fail()
+		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	})).Return(nil)
 	closure := &admin.NodeExecutionClosure{
 		OutputResult: &admin.NodeExecutionClosure_OutputUri{
 			OutputUri: testOutputsURI,
@@ -212,13 +221,11 @@ func TestGetOutputs(t *testing.T) {
 		}
 		remoteDataConfig := interfaces.RemoteDataConfig{}
 		remoteDataConfig.MaxSizeInBytes = 2000
-
-		mockStorage := commonMocks.GetMockStorageClient()
-		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-			ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		mockStorage := &mocks.DatastoreClient{}
+		mockStorage.OnReadProtobufMatch(mock.Anything, storage.DataReference(testOutputsURI), mock.MatchedBy(func(msg proto.Message) bool {
 			t.Fatal("Should not fetch when outputs stored inline for an execution model")
-			return nil
-		}
+			return true
+		})).Return(nil)
 		closure := &admin.NodeExecutionClosure{
 			OutputResult: &admin.NodeExecutionClosure_OutputData{
 				OutputData: testLiteralMap,

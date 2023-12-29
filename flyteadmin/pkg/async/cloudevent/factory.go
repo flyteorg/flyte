@@ -22,10 +22,9 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/sandboxutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Repository, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, cloudEventsConfig runtimeInterfaces.CloudEventsConfig, remoteDataConfig runtimeInterfaces.RemoteDataConfig, scope promutils.Scope) interfaces.Publisher {
+func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Repository, storageClient common.DatastoreClient, urlData dataInterfaces.RemoteURLInterface, cloudEventsConfig runtimeInterfaces.CloudEventsConfig, remoteDataConfig runtimeInterfaces.RemoteDataConfig, scope promutils.Scope) interfaces.Publisher {
 	if !cloudEventsConfig.Enable {
 		logger.Infof(ctx, "CloudEvents are disabled, config is [+%v]", cloudEventsConfig)
 		return implementations.NewNoopPublish()

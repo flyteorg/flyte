@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/mocks"
+	"github.com/stretchr/testify/mock"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -12,7 +14,6 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -183,26 +184,27 @@ func TestGetWorkflowModel_DatabaseError(t *testing.T) {
 }
 
 func TestFetchAndGetWorkflowClosure(t *testing.T) {
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			assert.Equal(t, remoteClosureIdentifier, reference.String())
-			compiledWorkflowClosure := testutils.GetWorkflowClosure()
-			workflowBytes, _ := proto.Marshal(compiledWorkflowClosure)
-			_ = proto.Unmarshal(workflowBytes, msg)
-			return nil
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, storage.DataReference(remoteClosureIdentifier), mock.MatchedBy(func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testutils.GetWorkflowClosure())
+		if err != nil {
+			t.Fail()
 		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	})).Return(nil)
+
 	closure, err := FetchAndGetWorkflowClosure(context.Background(), mockStorageClient, remoteClosureIdentifier)
 	assert.Nil(t, err)
 	assert.NotNil(t, closure)
 }
 
 func TestFetchAndGetWorkflowClosure_RemoteReadError(t *testing.T) {
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			return errExpected
-		}
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, mock.Anything, mock.Anything).Return(errExpected)
 	closure, err := FetchAndGetWorkflowClosure(context.Background(), mockStorageClient, remoteClosureIdentifier)
 	assert.Equal(t, codes.Internal, err.(flyteAdminErrors.FlyteAdminError).Code())
 	assert.Nil(t, closure)
@@ -228,15 +230,18 @@ func TestGetWorkflow(t *testing.T) {
 	}
 	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetGetCallback(workflowGetFunc)
 
-	mockStorageClient := commonMocks.GetMockStorageClient()
-	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb =
-		func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-			assert.Equal(t, remoteClosureIdentifier, reference.String())
-			compiledWorkflowClosure := testutils.GetWorkflowClosure()
-			workflowBytes, _ := proto.Marshal(compiledWorkflowClosure)
-			_ = proto.Unmarshal(workflowBytes, msg)
-			return nil
+	mockStorageClient := &mocks.DatastoreClient{}
+	mockStorageClient.OnReadProtobufMatch(mock.Anything, storage.DataReference(remoteClosureIdentifier), mock.MatchedBy(func(msg proto.Message) bool {
+		marshalled, err := proto.Marshal(testutils.GetWorkflowClosure())
+		if err != nil {
+			t.Fail()
 		}
+		err = proto.Unmarshal(marshalled, msg)
+		if err != nil {
+			t.Fail()
+		}
+		return true
+	})).Return(nil)
 	workflow, err := GetWorkflow(
 		context.Background(), repository, mockStorageClient, &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
