@@ -508,10 +508,28 @@ data:
           auth_type: accesskey
       container: my-s3-bucket
   100-inline-config.yaml: |
-    artifacts:
-      host: localhost
-      insecure: true
-      port: 50051
+    artifactsProcessor:
+      cloudProvider: Sandbox
+    artifactsServer:
+      artifactBlobStoreConfig:
+        stow:
+          config:
+            access_key_id: minio
+            auth_type: accesskey
+            disable_ssl: true
+            endpoint: http://localhost:30002
+            secret_key: miniostorage
+            v2_signing: true
+          kind: s3
+        type: stow
+      artifactDatabaseConfig:
+        postgres:
+          dbname: artifacts
+          host: 'flyte-sandbox-postgresql'
+          options: sslmode=disable
+          password: postgres
+          port: 5432
+          username: postgres
     cloudEvents:
       cloudEventVersion: v2
       enable: true
@@ -860,7 +878,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: aWlPaFNYOWRSbGdjVlFLeg==
+  haSharedSecret: YnZWQm1tMm9ETTY3enZUcQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1290,7 +1308,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 0a0002f590cf88cb6728dae902bdacd7d0b5e0d8011bd70d0e4e232bdcbae9cf
+        checksum/configuration: c3f03f3b03d7909e7fac95f3490d43d9e50cf4759a67ac38d4c1992f08f64ce3
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1455,7 +1473,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 6385cddefb883d2c3cf21197a394b04d7b3e8c6a29d6e023662e21fdee556ba1
+        checksum/secret: db210d75941d85245039373f167036040860dde6eb2db965c9a482e496483240
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1797,7 +1815,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: ghcr.io/flyteorg/flyteagent:1.10.1
+        image: ghcr.io/flyteorg/flyteagent:1.10.2
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

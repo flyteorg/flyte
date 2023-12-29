@@ -11,7 +11,6 @@ RUN mkdir /artifacts
 
 WORKDIR /go/src/github.com/flyteorg/flyte/flyteartifacts/
 
-COPY boilerplate ../boilerplate
 COPY datacatalog ../datacatalog
 COPY flyteadmin ../flyteadmin
 COPY flyteartifacts .

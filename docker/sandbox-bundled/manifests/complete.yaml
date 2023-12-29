@@ -488,10 +488,28 @@ data:
           auth_type: accesskey
       container: my-s3-bucket
   100-inline-config.yaml: |
-    artifacts:
-      host: localhost
-      insecure: true
-      port: 50051
+    artifactsProcessor:
+      cloudProvider: Sandbox
+    artifactsServer:
+      artifactBlobStoreConfig:
+        stow:
+          config:
+            access_key_id: minio
+            auth_type: accesskey
+            disable_ssl: true
+            endpoint: http://localhost:30002
+            secret_key: miniostorage
+            v2_signing: true
+          kind: s3
+        type: stow
+      artifactDatabaseConfig:
+        postgres:
+          dbname: artifacts
+          host: 'flyte-sandbox-postgresql'
+          options: sslmode=disable
+          password: postgres
+          port: 5432
+          username: postgres
     cloudEvents:
       cloudEventVersion: v2
       enable: true
@@ -840,7 +858,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: WkdDR3A3UlFIWENkMWpEcQ==
+  haSharedSecret: RTRFWEhLQ1c3V3h5N1JpQg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1238,7 +1256,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 93e689ddbfa941c82feb17f470000d27f19135f8cbef340de2640b49f85afc1d
+        checksum/configuration: 3e7625f0de3a210017c0f2ab5b8ad17a9ccac048a5a06f6466b8d762d8aa27d7
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1403,7 +1421,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e70faf6ad14b50de7dd3002016d5d375414d99dc2e86f7112f0413f42b6b9613
+        checksum/secret: 266445a61b2ef5d294e608c36659f8c3c6605c1b718d73870eb7e0584783504a
       labels:
         app: docker-registry
         release: flyte-sandbox

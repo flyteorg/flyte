@@ -51,10 +51,28 @@ flyte-binary:
         enable: true
         cloudEventVersion: v2
         type: sandbox
-      artifacts:
-        host: localhost
-        port: 50051
-        insecure: true
+      artifactsServer:
+        artifactBlobStoreConfig:
+          type: stow
+          stow:
+            kind: s3
+            config:
+              disable_ssl: true
+              v2_signing: true
+              endpoint: http://localhost:30002
+              auth_type: accesskey
+              access_key_id: minio
+              secret_key: miniostorage
+        artifactDatabaseConfig:
+          postgres:
+            username: postgres
+            password: postgres
+            host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}'
+            port: 5432
+            dbname: artifacts
+            options: "sslmode=disable"
+      artifactsProcessor:
+        cloudProvider: Sandbox
       storage:
         signedURL:
           stowConfigOverride:
