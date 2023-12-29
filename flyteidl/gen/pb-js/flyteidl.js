@@ -17525,6 +17525,361 @@
                 return ErrorDocument;
             })();
     
+            core.CacheEvictionError = (function() {
+    
+                /**
+                 * Properties of a CacheEvictionError.
+                 * @memberof flyteidl.core
+                 * @interface ICacheEvictionError
+                 * @property {flyteidl.core.CacheEvictionError.Code|null} [code] CacheEvictionError code
+                 * @property {string|null} [message] CacheEvictionError message
+                 * @property {flyteidl.core.INodeExecutionIdentifier|null} [nodeExecutionId] CacheEvictionError nodeExecutionId
+                 * @property {flyteidl.core.ITaskExecutionIdentifier|null} [taskExecutionId] CacheEvictionError taskExecutionId
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [workflowExecutionId] CacheEvictionError workflowExecutionId
+                 */
+    
+                /**
+                 * Constructs a new CacheEvictionError.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a CacheEvictionError.
+                 * @implements ICacheEvictionError
+                 * @constructor
+                 * @param {flyteidl.core.ICacheEvictionError=} [properties] Properties to set
+                 */
+                function CacheEvictionError(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * CacheEvictionError code.
+                 * @member {flyteidl.core.CacheEvictionError.Code} code
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @instance
+                 */
+                CacheEvictionError.prototype.code = 0;
+    
+                /**
+                 * CacheEvictionError message.
+                 * @member {string} message
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @instance
+                 */
+                CacheEvictionError.prototype.message = "";
+    
+                /**
+                 * CacheEvictionError nodeExecutionId.
+                 * @member {flyteidl.core.INodeExecutionIdentifier|null|undefined} nodeExecutionId
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @instance
+                 */
+                CacheEvictionError.prototype.nodeExecutionId = null;
+    
+                /**
+                 * CacheEvictionError taskExecutionId.
+                 * @member {flyteidl.core.ITaskExecutionIdentifier|null|undefined} taskExecutionId
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @instance
+                 */
+                CacheEvictionError.prototype.taskExecutionId = null;
+    
+                /**
+                 * CacheEvictionError workflowExecutionId.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} workflowExecutionId
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @instance
+                 */
+                CacheEvictionError.prototype.workflowExecutionId = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * CacheEvictionError source.
+                 * @member {"taskExecutionId"|"workflowExecutionId"|undefined} source
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @instance
+                 */
+                Object.defineProperty(CacheEvictionError.prototype, "source", {
+                    get: $util.oneOfGetter($oneOfFields = ["taskExecutionId", "workflowExecutionId"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new CacheEvictionError instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @static
+                 * @param {flyteidl.core.ICacheEvictionError=} [properties] Properties to set
+                 * @returns {flyteidl.core.CacheEvictionError} CacheEvictionError instance
+                 */
+                CacheEvictionError.create = function create(properties) {
+                    return new CacheEvictionError(properties);
+                };
+    
+                /**
+                 * Encodes the specified CacheEvictionError message. Does not implicitly {@link flyteidl.core.CacheEvictionError.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @static
+                 * @param {flyteidl.core.ICacheEvictionError} message CacheEvictionError message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                CacheEvictionError.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.code != null && message.hasOwnProperty("code"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.code);
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.message);
+                    if (message.nodeExecutionId != null && message.hasOwnProperty("nodeExecutionId"))
+                        $root.flyteidl.core.NodeExecutionIdentifier.encode(message.nodeExecutionId, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.taskExecutionId != null && message.hasOwnProperty("taskExecutionId"))
+                        $root.flyteidl.core.TaskExecutionIdentifier.encode(message.taskExecutionId, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.workflowExecutionId != null && message.hasOwnProperty("workflowExecutionId"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.workflowExecutionId, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a CacheEvictionError message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.CacheEvictionError} CacheEvictionError
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                CacheEvictionError.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.CacheEvictionError();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.code = reader.int32();
+                            break;
+                        case 2:
+                            message.message = reader.string();
+                            break;
+                        case 3:
+                            message.nodeExecutionId = $root.flyteidl.core.NodeExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.taskExecutionId = $root.flyteidl.core.TaskExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.workflowExecutionId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a CacheEvictionError message.
+                 * @function verify
+                 * @memberof flyteidl.core.CacheEvictionError
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                CacheEvictionError.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.code != null && message.hasOwnProperty("code"))
+                        switch (message.code) {
+                        default:
+                            return "code: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            break;
+                        }
+                    if (message.message != null && message.hasOwnProperty("message"))
+                        if (!$util.isString(message.message))
+                            return "message: string expected";
+                    if (message.nodeExecutionId != null && message.hasOwnProperty("nodeExecutionId")) {
+                        var error = $root.flyteidl.core.NodeExecutionIdentifier.verify(message.nodeExecutionId);
+                        if (error)
+                            return "nodeExecutionId." + error;
+                    }
+                    if (message.taskExecutionId != null && message.hasOwnProperty("taskExecutionId")) {
+                        properties.source = 1;
+                        {
+                            var error = $root.flyteidl.core.TaskExecutionIdentifier.verify(message.taskExecutionId);
+                            if (error)
+                                return "taskExecutionId." + error;
+                        }
+                    }
+                    if (message.workflowExecutionId != null && message.hasOwnProperty("workflowExecutionId")) {
+                        if (properties.source === 1)
+                            return "source: multiple values";
+                        properties.source = 1;
+                        {
+                            var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.workflowExecutionId);
+                            if (error)
+                                return "workflowExecutionId." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                /**
+                 * Code enum.
+                 * @name flyteidl.core.CacheEvictionError.Code
+                 * @enum {string}
+                 * @property {number} INTERNAL=0 INTERNAL value
+                 * @property {number} RESERVATION_NOT_ACQUIRED=1 RESERVATION_NOT_ACQUIRED value
+                 * @property {number} DATABASE_UPDATE_FAILED=2 DATABASE_UPDATE_FAILED value
+                 * @property {number} ARTIFACT_DELETE_FAILED=3 ARTIFACT_DELETE_FAILED value
+                 * @property {number} RESERVATION_NOT_RELEASED=4 RESERVATION_NOT_RELEASED value
+                 */
+                CacheEvictionError.Code = (function() {
+                    var valuesById = {}, values = Object.create(valuesById);
+                    values[valuesById[0] = "INTERNAL"] = 0;
+                    values[valuesById[1] = "RESERVATION_NOT_ACQUIRED"] = 1;
+                    values[valuesById[2] = "DATABASE_UPDATE_FAILED"] = 2;
+                    values[valuesById[3] = "ARTIFACT_DELETE_FAILED"] = 3;
+                    values[valuesById[4] = "RESERVATION_NOT_RELEASED"] = 4;
+                    return values;
+                })();
+    
+                return CacheEvictionError;
+            })();
+    
+            core.CacheEvictionErrorList = (function() {
+    
+                /**
+                 * Properties of a CacheEvictionErrorList.
+                 * @memberof flyteidl.core
+                 * @interface ICacheEvictionErrorList
+                 * @property {Array.<flyteidl.core.ICacheEvictionError>|null} [errors] CacheEvictionErrorList errors
+                 */
+    
+                /**
+                 * Constructs a new CacheEvictionErrorList.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a CacheEvictionErrorList.
+                 * @implements ICacheEvictionErrorList
+                 * @constructor
+                 * @param {flyteidl.core.ICacheEvictionErrorList=} [properties] Properties to set
+                 */
+                function CacheEvictionErrorList(properties) {
+                    this.errors = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * CacheEvictionErrorList errors.
+                 * @member {Array.<flyteidl.core.ICacheEvictionError>} errors
+                 * @memberof flyteidl.core.CacheEvictionErrorList
+                 * @instance
+                 */
+                CacheEvictionErrorList.prototype.errors = $util.emptyArray;
+    
+                /**
+                 * Creates a new CacheEvictionErrorList instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.CacheEvictionErrorList
+                 * @static
+                 * @param {flyteidl.core.ICacheEvictionErrorList=} [properties] Properties to set
+                 * @returns {flyteidl.core.CacheEvictionErrorList} CacheEvictionErrorList instance
+                 */
+                CacheEvictionErrorList.create = function create(properties) {
+                    return new CacheEvictionErrorList(properties);
+                };
+    
+                /**
+                 * Encodes the specified CacheEvictionErrorList message. Does not implicitly {@link flyteidl.core.CacheEvictionErrorList.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.CacheEvictionErrorList
+                 * @static
+                 * @param {flyteidl.core.ICacheEvictionErrorList} message CacheEvictionErrorList message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                CacheEvictionErrorList.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.errors != null && message.errors.length)
+                        for (var i = 0; i < message.errors.length; ++i)
+                            $root.flyteidl.core.CacheEvictionError.encode(message.errors[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a CacheEvictionErrorList message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.CacheEvictionErrorList
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.CacheEvictionErrorList} CacheEvictionErrorList
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                CacheEvictionErrorList.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.CacheEvictionErrorList();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.errors && message.errors.length))
+                                message.errors = [];
+                            message.errors.push($root.flyteidl.core.CacheEvictionError.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a CacheEvictionErrorList message.
+                 * @function verify
+                 * @memberof flyteidl.core.CacheEvictionErrorList
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                CacheEvictionErrorList.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.errors != null && message.hasOwnProperty("errors")) {
+                        if (!Array.isArray(message.errors))
+                            return "errors: array expected";
+                        for (var i = 0; i < message.errors.length; ++i) {
+                            var error = $root.flyteidl.core.CacheEvictionError.verify(message.errors[i]);
+                            if (error)
+                                return "errors." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return CacheEvictionErrorList;
+            })();
+    
             core.Span = (function() {
     
                 /**
@@ -50032,6 +50387,443 @@
                  */
     
                 return AuthMetadataService;
+            })();
+    
+            service.EvictExecutionCacheRequest = (function() {
+    
+                /**
+                 * Properties of an EvictExecutionCacheRequest.
+                 * @memberof flyteidl.service
+                 * @interface IEvictExecutionCacheRequest
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [workflowExecutionId] EvictExecutionCacheRequest workflowExecutionId
+                 */
+    
+                /**
+                 * Constructs a new EvictExecutionCacheRequest.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents an EvictExecutionCacheRequest.
+                 * @implements IEvictExecutionCacheRequest
+                 * @constructor
+                 * @param {flyteidl.service.IEvictExecutionCacheRequest=} [properties] Properties to set
+                 */
+                function EvictExecutionCacheRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * EvictExecutionCacheRequest workflowExecutionId.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} workflowExecutionId
+                 * @memberof flyteidl.service.EvictExecutionCacheRequest
+                 * @instance
+                 */
+                EvictExecutionCacheRequest.prototype.workflowExecutionId = null;
+    
+                /**
+                 * Creates a new EvictExecutionCacheRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.EvictExecutionCacheRequest
+                 * @static
+                 * @param {flyteidl.service.IEvictExecutionCacheRequest=} [properties] Properties to set
+                 * @returns {flyteidl.service.EvictExecutionCacheRequest} EvictExecutionCacheRequest instance
+                 */
+                EvictExecutionCacheRequest.create = function create(properties) {
+                    return new EvictExecutionCacheRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified EvictExecutionCacheRequest message. Does not implicitly {@link flyteidl.service.EvictExecutionCacheRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.EvictExecutionCacheRequest
+                 * @static
+                 * @param {flyteidl.service.IEvictExecutionCacheRequest} message EvictExecutionCacheRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                EvictExecutionCacheRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.workflowExecutionId != null && message.hasOwnProperty("workflowExecutionId"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.workflowExecutionId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an EvictExecutionCacheRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.EvictExecutionCacheRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.EvictExecutionCacheRequest} EvictExecutionCacheRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                EvictExecutionCacheRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.EvictExecutionCacheRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.workflowExecutionId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an EvictExecutionCacheRequest message.
+                 * @function verify
+                 * @memberof flyteidl.service.EvictExecutionCacheRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                EvictExecutionCacheRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.workflowExecutionId != null && message.hasOwnProperty("workflowExecutionId")) {
+                        var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.workflowExecutionId);
+                        if (error)
+                            return "workflowExecutionId." + error;
+                    }
+                    return null;
+                };
+    
+                return EvictExecutionCacheRequest;
+            })();
+    
+            service.EvictTaskExecutionCacheRequest = (function() {
+    
+                /**
+                 * Properties of an EvictTaskExecutionCacheRequest.
+                 * @memberof flyteidl.service
+                 * @interface IEvictTaskExecutionCacheRequest
+                 * @property {flyteidl.core.ITaskExecutionIdentifier|null} [taskExecutionId] EvictTaskExecutionCacheRequest taskExecutionId
+                 */
+    
+                /**
+                 * Constructs a new EvictTaskExecutionCacheRequest.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents an EvictTaskExecutionCacheRequest.
+                 * @implements IEvictTaskExecutionCacheRequest
+                 * @constructor
+                 * @param {flyteidl.service.IEvictTaskExecutionCacheRequest=} [properties] Properties to set
+                 */
+                function EvictTaskExecutionCacheRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * EvictTaskExecutionCacheRequest taskExecutionId.
+                 * @member {flyteidl.core.ITaskExecutionIdentifier|null|undefined} taskExecutionId
+                 * @memberof flyteidl.service.EvictTaskExecutionCacheRequest
+                 * @instance
+                 */
+                EvictTaskExecutionCacheRequest.prototype.taskExecutionId = null;
+    
+                /**
+                 * Creates a new EvictTaskExecutionCacheRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.EvictTaskExecutionCacheRequest
+                 * @static
+                 * @param {flyteidl.service.IEvictTaskExecutionCacheRequest=} [properties] Properties to set
+                 * @returns {flyteidl.service.EvictTaskExecutionCacheRequest} EvictTaskExecutionCacheRequest instance
+                 */
+                EvictTaskExecutionCacheRequest.create = function create(properties) {
+                    return new EvictTaskExecutionCacheRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified EvictTaskExecutionCacheRequest message. Does not implicitly {@link flyteidl.service.EvictTaskExecutionCacheRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.EvictTaskExecutionCacheRequest
+                 * @static
+                 * @param {flyteidl.service.IEvictTaskExecutionCacheRequest} message EvictTaskExecutionCacheRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                EvictTaskExecutionCacheRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.taskExecutionId != null && message.hasOwnProperty("taskExecutionId"))
+                        $root.flyteidl.core.TaskExecutionIdentifier.encode(message.taskExecutionId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an EvictTaskExecutionCacheRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.EvictTaskExecutionCacheRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.EvictTaskExecutionCacheRequest} EvictTaskExecutionCacheRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                EvictTaskExecutionCacheRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.EvictTaskExecutionCacheRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.taskExecutionId = $root.flyteidl.core.TaskExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an EvictTaskExecutionCacheRequest message.
+                 * @function verify
+                 * @memberof flyteidl.service.EvictTaskExecutionCacheRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                EvictTaskExecutionCacheRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.taskExecutionId != null && message.hasOwnProperty("taskExecutionId")) {
+                        var error = $root.flyteidl.core.TaskExecutionIdentifier.verify(message.taskExecutionId);
+                        if (error)
+                            return "taskExecutionId." + error;
+                    }
+                    return null;
+                };
+    
+                return EvictTaskExecutionCacheRequest;
+            })();
+    
+            service.EvictCacheResponse = (function() {
+    
+                /**
+                 * Properties of an EvictCacheResponse.
+                 * @memberof flyteidl.service
+                 * @interface IEvictCacheResponse
+                 * @property {flyteidl.core.ICacheEvictionErrorList|null} [errors] EvictCacheResponse errors
+                 */
+    
+                /**
+                 * Constructs a new EvictCacheResponse.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents an EvictCacheResponse.
+                 * @implements IEvictCacheResponse
+                 * @constructor
+                 * @param {flyteidl.service.IEvictCacheResponse=} [properties] Properties to set
+                 */
+                function EvictCacheResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * EvictCacheResponse errors.
+                 * @member {flyteidl.core.ICacheEvictionErrorList|null|undefined} errors
+                 * @memberof flyteidl.service.EvictCacheResponse
+                 * @instance
+                 */
+                EvictCacheResponse.prototype.errors = null;
+    
+                /**
+                 * Creates a new EvictCacheResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.service.EvictCacheResponse
+                 * @static
+                 * @param {flyteidl.service.IEvictCacheResponse=} [properties] Properties to set
+                 * @returns {flyteidl.service.EvictCacheResponse} EvictCacheResponse instance
+                 */
+                EvictCacheResponse.create = function create(properties) {
+                    return new EvictCacheResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified EvictCacheResponse message. Does not implicitly {@link flyteidl.service.EvictCacheResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.service.EvictCacheResponse
+                 * @static
+                 * @param {flyteidl.service.IEvictCacheResponse} message EvictCacheResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                EvictCacheResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.errors != null && message.hasOwnProperty("errors"))
+                        $root.flyteidl.core.CacheEvictionErrorList.encode(message.errors, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an EvictCacheResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.service.EvictCacheResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.service.EvictCacheResponse} EvictCacheResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                EvictCacheResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.EvictCacheResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.errors = $root.flyteidl.core.CacheEvictionErrorList.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an EvictCacheResponse message.
+                 * @function verify
+                 * @memberof flyteidl.service.EvictCacheResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                EvictCacheResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.errors != null && message.hasOwnProperty("errors")) {
+                        var error = $root.flyteidl.core.CacheEvictionErrorList.verify(message.errors);
+                        if (error)
+                            return "errors." + error;
+                    }
+                    return null;
+                };
+    
+                return EvictCacheResponse;
+            })();
+    
+            service.CacheService = (function() {
+    
+                /**
+                 * Constructs a new CacheService service.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a CacheService
+                 * @extends $protobuf.rpc.Service
+                 * @constructor
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 */
+                function CacheService(rpcImpl, requestDelimited, responseDelimited) {
+                    $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+                }
+    
+                (CacheService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = CacheService;
+    
+                /**
+                 * Creates new CacheService service using the specified rpc implementation.
+                 * @function create
+                 * @memberof flyteidl.service.CacheService
+                 * @static
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 * @returns {CacheService} RPC service. Useful where requests and/or responses are streamed.
+                 */
+                CacheService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                    return new this(rpcImpl, requestDelimited, responseDelimited);
+                };
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.CacheService#evictExecutionCache}.
+                 * @memberof flyteidl.service.CacheService
+                 * @typedef EvictExecutionCacheCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.service.EvictCacheResponse} [response] EvictCacheResponse
+                 */
+    
+                /**
+                 * Calls EvictExecutionCache.
+                 * @function evictExecutionCache
+                 * @memberof flyteidl.service.CacheService
+                 * @instance
+                 * @param {flyteidl.service.IEvictExecutionCacheRequest} request EvictExecutionCacheRequest message or plain object
+                 * @param {flyteidl.service.CacheService.EvictExecutionCacheCallback} callback Node-style callback called with the error, if any, and EvictCacheResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(CacheService.prototype.evictExecutionCache = function evictExecutionCache(request, callback) {
+                    return this.rpcCall(evictExecutionCache, $root.flyteidl.service.EvictExecutionCacheRequest, $root.flyteidl.service.EvictCacheResponse, request, callback);
+                }, "name", { value: "EvictExecutionCache" });
+    
+                /**
+                 * Calls EvictExecutionCache.
+                 * @function evictExecutionCache
+                 * @memberof flyteidl.service.CacheService
+                 * @instance
+                 * @param {flyteidl.service.IEvictExecutionCacheRequest} request EvictExecutionCacheRequest message or plain object
+                 * @returns {Promise<flyteidl.service.EvictCacheResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.CacheService#evictTaskExecutionCache}.
+                 * @memberof flyteidl.service.CacheService
+                 * @typedef EvictTaskExecutionCacheCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.service.EvictCacheResponse} [response] EvictCacheResponse
+                 */
+    
+                /**
+                 * Calls EvictTaskExecutionCache.
+                 * @function evictTaskExecutionCache
+                 * @memberof flyteidl.service.CacheService
+                 * @instance
+                 * @param {flyteidl.service.IEvictTaskExecutionCacheRequest} request EvictTaskExecutionCacheRequest message or plain object
+                 * @param {flyteidl.service.CacheService.EvictTaskExecutionCacheCallback} callback Node-style callback called with the error, if any, and EvictCacheResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(CacheService.prototype.evictTaskExecutionCache = function evictTaskExecutionCache(request, callback) {
+                    return this.rpcCall(evictTaskExecutionCache, $root.flyteidl.service.EvictTaskExecutionCacheRequest, $root.flyteidl.service.EvictCacheResponse, request, callback);
+                }, "name", { value: "EvictTaskExecutionCache" });
+    
+                /**
+                 * Calls EvictTaskExecutionCache.
+                 * @function evictTaskExecutionCache
+                 * @memberof flyteidl.service.CacheService
+                 * @instance
+                 * @param {flyteidl.service.IEvictTaskExecutionCacheRequest} request EvictTaskExecutionCacheRequest message or plain object
+                 * @returns {Promise<flyteidl.service.EvictCacheResponse>} Promise
+                 * @variation 2
+                 */
+    
+                return CacheService;
             })();
     
             service.CreateUploadLocationResponse = (function() {

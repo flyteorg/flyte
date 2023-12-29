@@ -1,0 +1,20 @@
+name: Invoke Workflow
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        COMPONENT: [flyteadmin, flytepropeller, flyteconsole, flytecopilot, flyteplugins, datacatalog, flytectl]
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update flyteidl version
+        run: |
+          WORKFLOW_ID=$(curl -sS https://api.github.com/repos/flyteorg/${{matrix.COMPONENT}}/actions/workflows | jq '.workflows[] | select(.path == ".github/workflows/upgrade_automation.yml") | {id}' | jq .id)
+          curl  -X POST -H "Accept: application/vnd.github.v3+json" https://api.github.com/repos/flyteorg/${{matrix.COMPONENT}}/actions/workflows/$WORKFLOW_ID/dispatches -H "Authorization: token ${{ secrets.FLYTE_BOT_PAT }}" -d '{"ref":"master", "inputs": {"component": "flyteidl"}}'
+        shell: bash
