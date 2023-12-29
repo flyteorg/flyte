@@ -44,7 +44,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 func TestGetLogsForContainerInPod_NoPlugins(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{})
 	assert.NoError(t, err)
-	l, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), nil, 0, " Suffix", nil, nil)
+	l, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), nil, 0, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, l)
 }
@@ -56,7 +56,7 @@ func TestGetLogsForContainerInPod_NoLogs(t *testing.T) {
 		CloudwatchLogGroup:  "/kubernetes/flyte-production",
 	})
 	assert.NoError(t, err)
-	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), nil, 0, " Suffix", nil, nil)
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), nil, 0, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
@@ -87,7 +87,7 @@ func TestGetLogsForContainerInPod_BadIndex(t *testing.T) {
 	}
 	pod.Name = podName
 
-	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 1, " Suffix", nil, nil)
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 1, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
@@ -112,7 +112,7 @@ func TestGetLogsForContainerInPod_MissingStatus(t *testing.T) {
 	}
 	pod.Name = podName
 
-	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 1, " Suffix", nil, nil)
+	p, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 1, " Suffix", nil)
 	assert.NoError(t, err)
 	assert.Nil(t, p)
 }
@@ -142,7 +142,7 @@ func TestGetLogsForContainerInPod_Cloudwatch(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
@@ -172,7 +172,7 @@ func TestGetLogsForContainerInPod_K8s(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
@@ -205,7 +205,7 @@ func TestGetLogsForContainerInPod_All(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 2)
 }
@@ -236,7 +236,7 @@ func TestGetLogsForContainerInPod_Stackdriver(t *testing.T) {
 	}
 	pod.Name = podName
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil)
 	assert.Nil(t, err)
 	assert.Len(t, logs, 1)
 }
@@ -252,7 +252,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 
 			IsStackDriverEnabled:   true,
 			StackDriverTemplateURI: "https://sd-my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-		}, nil, []*core.TaskLog{
+		}, []*core.TaskLog{
 			{
 				Uri:           "https://k8s-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
@@ -275,7 +275,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 		assertTestSucceeded(t, &LogConfig{
 			IsStackDriverEnabled:   true,
 			StackDriverTemplateURI: "https://sd-my-log-server/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-		}, nil, []*core.TaskLog{
+		}, []*core.TaskLog{
 			{
 				Uri:           "https://sd-my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 				MessageFormat: core.TaskLog_JSON,
@@ -285,7 +285,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 	})
 }
 
-func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog) {
+func assertTestSucceeded(tb testing.TB, config *LogConfig, expectedTaskLogs []*core.TaskLog) {
 	logPlugin, err := InitializeLogPlugins(config)
 	assert.NoError(tb, err)
 
@@ -310,7 +310,7 @@ func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.Ta
 		},
 	}
 
-	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " my-Suffix", nil, taskTemplate)
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " my-Suffix", nil)
 	assert.Nil(tb, err)
 	assert.Len(tb, logs, len(expectedTaskLogs))
 	if diff := deep.Equal(logs, expectedTaskLogs); len(diff) > 0 {
@@ -337,7 +337,7 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 				Scheme:        tasklog.TemplateSchemeTaskExecution,
 			},
 		},
-	}, nil, []*core.TaskLog{
+	}, []*core.TaskLog{
 		{
 			Uri:           "https://my-log-server/my-namespace/my-pod/ContainerName/ContainerID",
 			MessageFormat: core.TaskLog_JSON,
@@ -349,32 +349,4 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 			Name:          "Internal my-Suffix",
 		},
 	})
-}
-
-func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
-	assertTestSucceeded(t,
-		&LogConfig{
-			IsKubernetesEnabled:   true,
-			KubernetesTemplateURI: "https://k8s.com",
-			IsFlyinEnabled:        true,
-			FlyinTemplateURI:      "https://flyin.mydomain.com:{{ .port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-		},
-		&core.TaskTemplate{
-			Config: map[string]string{
-				"link_type": "vscode",
-				"port":      "65535",
-			},
-		},
-		[]*core.TaskLog{
-			{
-				Uri:           "https://k8s.com",
-				MessageFormat: core.TaskLog_JSON,
-				Name:          "Kubernetes Logs my-Suffix",
-			},
-			{
-				Uri:           "https://flyin.mydomain.com:65535/my-namespace/my-pod/ContainerName/ContainerID",
-				MessageFormat: core.TaskLog_JSON,
-				Name:          "Flyin Logs my-Suffix",
-			},
-		})
 }

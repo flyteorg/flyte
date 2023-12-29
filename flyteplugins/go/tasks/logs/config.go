@@ -28,9 +28,6 @@ type LogConfig struct {
 	StackdriverLogResourceName string              `json:"stackdriver-logresourcename" pflag:",Name of the logresource in stackdriver"`
 	StackDriverTemplateURI     tasklog.TemplateURI `json:"stackdriver-template-uri" pflag:",Template Uri to use when building stackdriver log links"`
 
-	IsFlyinEnabled   bool                `json:"flyin-enabled" pflag:",Enable Log-links to flyin logs"`
-	FlyinTemplateURI tasklog.TemplateURI `json:"flyin-template-uri" pflag:",Template Uri to use when building flyin log links"`
-
 	Templates []tasklog.TemplateLogPlugin `json:"templates" pflag:"-,"`
 }
 

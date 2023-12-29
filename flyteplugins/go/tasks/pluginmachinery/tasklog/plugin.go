@@ -14,7 +14,6 @@ type TemplateScheme int
 const (
 	TemplateSchemePod TemplateScheme = iota
 	TemplateSchemeTaskExecution
-	TemplateSchemeFlyin
 )
 
 // TemplateURI is a URI that accepts templates. See: go/tasks/pluginmachinery/tasklog/template.go for available templates.
@@ -31,7 +30,6 @@ type TemplateVarsByScheme struct {
 	Common        TemplateVars
 	Pod           TemplateVars
 	TaskExecution TemplateVars
-	Flyin         TemplateVars
 }
 
 // Input contains all available information about task's execution that a log plugin can use to construct task's
@@ -50,7 +48,6 @@ type Input struct {
 	PodUID                    string
 	TaskExecutionID           pluginsCore.TaskExecutionID
 	ExtraTemplateVarsByScheme *TemplateVarsByScheme
-	TaskTemplate              *core.TaskTemplate
 }
 
 // Output contains all task logs a plugin generates for a given Input.

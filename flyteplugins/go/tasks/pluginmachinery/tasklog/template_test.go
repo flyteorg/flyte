@@ -74,24 +74,6 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		LogName:         "main_logs",
 		TaskExecutionID: dummyTaskExecID(),
 	}
-	flyinBase := Input{
-		HostName:             "my-host",
-		PodName:              "my-pod",
-		PodUID:               "my-pod-uid",
-		Namespace:            "my-namespace",
-		ContainerName:        "my-container",
-		ContainerID:          "docker://containerID",
-		LogName:              "main_logs",
-		PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
-		PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
-		PodUnixStartTime:     123,
-		PodUnixFinishTime:    12345,
-		TaskTemplate: &core.TaskTemplate{
-			Config: map[string]string{
-				"port": "1234",
-			},
-		},
-	}
 
 	tests := []struct {
 		name        string
@@ -218,50 +200,6 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			TemplateVars{
 				{testRegexes.Bar, "bar"},
 				{testRegexes.Baz, "baz"},
-			},
-		},
-		{
-			"flyin happy path",
-			TemplateSchemeFlyin,
-			flyinBase,
-			nil,
-			nil,
-			TemplateVars{
-				{defaultRegexes.Port, "1234"},
-			},
-			nil,
-		},
-		{
-			"flyin and pod happy path",
-			TemplateSchemeFlyin,
-			flyinBase,
-			nil,
-			TemplateVars{
-				{defaultRegexes.LogName, "main_logs"},
-				{defaultRegexes.Port, "1234"},
-				{defaultRegexes.PodName, "my-pod"},
-				{defaultRegexes.PodUID, "my-pod-uid"},
-				{defaultRegexes.Namespace, "my-namespace"},
-				{defaultRegexes.ContainerName, "my-container"},
-				{defaultRegexes.ContainerID, "containerID"},
-				{defaultRegexes.Hostname, "my-host"},
-				{defaultRegexes.PodRFC3339StartTime, "1970-01-01T01:02:03+01:00"},
-				{defaultRegexes.PodRFC3339FinishTime, "1970-01-01T04:25:45+01:00"},
-				{defaultRegexes.PodUnixStartTime, "123"},
-				{defaultRegexes.PodUnixFinishTime, "12345"},
-			},
-			nil,
-			nil,
-		},
-		{
-			"pod with port not affected",
-			TemplateSchemePod,
-			podBase,
-			nil,
-			nil,
-			nil,
-			TemplateVars{
-				{defaultRegexes.Port, "1234"},
 			},
 		},
 	}
@@ -534,76 +472,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 						Name:          "main_logs",
 					},
 				},
-			},
-		},
-		{
-			"flyin",
-			TemplateLogPlugin{
-				Scheme:        TemplateSchemeFlyin,
-				TemplateURIs:  []TemplateURI{"vscode://flyin:{{ .port }}/{{ .podName }}"},
-				MessageFormat: core.TaskLog_JSON,
-			},
-			args{
-				input: Input{
-					PodName: "my-pod-name",
-					TaskTemplate: &core.TaskTemplate{
-						Config: map[string]string{
-							"link_type": "vscode",
-							"port":      "1234",
-						},
-					},
-				},
-			},
-			Output{
-				TaskLogs: []*core.TaskLog{
-					{
-						Uri:           "vscode://flyin:1234/my-pod-name",
-						MessageFormat: core.TaskLog_JSON,
-					},
-				},
-			},
-		},
-		{
-			"flyin - default port",
-			TemplateLogPlugin{
-				Scheme:        TemplateSchemeFlyin,
-				TemplateURIs:  []TemplateURI{"vscode://flyin:{{ .port }}/{{ .podName }}"},
-				MessageFormat: core.TaskLog_JSON,
-			},
-			args{
-				input: Input{
-					PodName: "my-pod-name",
-					TaskTemplate: &core.TaskTemplate{
-						Config: map[string]string{
-							"link_type": "vscode",
-						},
-					},
-				},
-			},
-			Output{
-				TaskLogs: []*core.TaskLog{
-					{
-						Uri:           "vscode://flyin:8080/my-pod-name",
-						MessageFormat: core.TaskLog_JSON,
-					},
-				},
-			},
-		},
-		{
-			"flyin - no link_type in task template",
-			TemplateLogPlugin{
-				Scheme:        TemplateSchemeFlyin,
-				TemplateURIs:  []TemplateURI{"vscode://flyin:{{ .port }}/{{ .podName }}"},
-				MessageFormat: core.TaskLog_JSON,
-				DisplayName:   "Flyin Logs",
-			},
-			args{
-				input: Input{
-					PodName: "my-pod-name",
-				},
-			},
-			Output{
-				TaskLogs: []*core.TaskLog{},
 			},
 		},
 	}
