@@ -1,0 +1,48 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
+// import "protoc-gen-swagger/options/annotations.proto";
+
+import "flyteidl/core/errors.proto";
+import "flyteidl/core/identifier.proto";
+
+message EvictExecutionCacheRequest {
+  // Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for.
+  core.WorkflowExecutionIdentifier workflow_execution_id = 1;
+}
+
+message EvictTaskExecutionCacheRequest {
+  // Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for.
+  core.TaskExecutionIdentifier task_execution_id = 1;
+}
+
+message EvictCacheResponse {
+  // List of errors encountered during cache eviction (if any).
+  core.CacheEvictionErrorList errors = 1;
+}
+
+// CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
+service CacheService {
+  // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
+  rpc EvictExecutionCache (EvictExecutionCacheRequest) returns (EvictCacheResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/cache/executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Evicts all cached data for the referenced (workflow) execution."
+    // };
+  }
+
+  // Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
+  rpc EvictTaskExecutionCache (EvictTaskExecutionCacheRequest) returns (EvictCacheResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Evicts all cached data for the referenced task execution."
+    // };
+  }
+}

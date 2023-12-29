@@ -58,14 +58,34 @@ class DataCatalogStub(object):
                 request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.FromString,
                 )
+        self.DeleteArtifact = channel.unary_unary(
+                '/datacatalog.DataCatalog/DeleteArtifact',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.FromString,
+                )
+        self.DeleteArtifacts = channel.unary_unary(
+                '/datacatalog.DataCatalog/DeleteArtifacts',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.FromString,
+                )
         self.GetOrExtendReservation = channel.unary_unary(
                 '/datacatalog.DataCatalog/GetOrExtendReservation',
                 request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationResponse.FromString,
                 )
+        self.GetOrExtendReservations = channel.unary_unary(
+                '/datacatalog.DataCatalog/GetOrExtendReservations',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationsResponse.FromString,
+                )
         self.ReleaseReservation = channel.unary_unary(
                 '/datacatalog.DataCatalog/ReleaseReservation',
                 request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationResponse.FromString,
+                )
+        self.ReleaseReservations = channel.unary_unary(
+                '/datacatalog.DataCatalog/ReleaseReservations',
+                request_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationsRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationResponse.FromString,
                 )
 
@@ -135,6 +155,24 @@ class DataCatalogServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def DeleteArtifact(self, request, context):
+        """Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def DeleteArtifacts(self, request, context):
+        """Deletes multiple existing artifacts, removing the stored artifact data from the underlying blob storage.
+        This endpoint is idempotent, trying to delete an unknown artifact or deleting existing artifact multiple times
+        will not result in an error.
+        The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+        artifacts deleted, however the operation can simply be retried to remove the remaining entries.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetOrExtendReservation(self, request, context):
         """Attempts to get or extend a reservation for the corresponding artifact. If one already exists
         (ie. another entity owns the reservation) then that reservation is retrieved.
@@ -152,9 +190,31 @@ class DataCatalogServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetOrExtendReservations(self, request, context):
+        """Attempts to get or extend reservations for multiple artifacts in a single operation.
+        The first non-recoverable error encountered will be returned. Note that this might leave some artifacts in a
+        reserved state if one acquisition fails - retry the operation or release all attempted artifacts (as the release
+        endpoint is idempotent) to ensure no resources are locked accidentally in case of an error.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def ReleaseReservation(self, request, context):
         """Release the reservation when the task holding the spot fails so that the other tasks
         can grab the spot.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ReleaseReservations(self, request, context):
+        """Releases reservations for multiple artifacts in a single operation.
+        This endpoint is idempotent, trying to release an unknown reservation or releasing existing reservations multiple
+        times will not result in error.
+        The first non-recoverable error encountered will be returned. Note that this might leave some of the requested
+        artifacts in their previous reserved state, however the operation can simply be retried to remove the remaining
+        reservations.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -203,14 +263,34 @@ def add_DataCatalogServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactRequest.FromString,
                     response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.UpdateArtifactResponse.SerializeToString,
             ),
+            'DeleteArtifact': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteArtifact,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.SerializeToString,
+            ),
+            'DeleteArtifacts': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeleteArtifacts,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactsRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.SerializeToString,
+            ),
             'GetOrExtendReservation': grpc.unary_unary_rpc_method_handler(
                     servicer.GetOrExtendReservation,
                     request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationRequest.FromString,
                     response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationResponse.SerializeToString,
             ),
+            'GetOrExtendReservations': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOrExtendReservations,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationsRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationsResponse.SerializeToString,
+            ),
             'ReleaseReservation': grpc.unary_unary_rpc_method_handler(
                     servicer.ReleaseReservation,
                     request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationRequest.FromString,
+                    response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationResponse.SerializeToString,
+            ),
+            'ReleaseReservations': grpc.unary_unary_rpc_method_handler(
+                    servicer.ReleaseReservations,
+                    request_deserializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationsRequest.FromString,
                     response_serializer=flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationResponse.SerializeToString,
             ),
     }
@@ -364,6 +444,40 @@ class DataCatalog(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
+    def DeleteArtifact(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/DeleteArtifact',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def DeleteArtifacts(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/DeleteArtifacts',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactsRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.DeleteArtifactResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
     def GetOrExtendReservation(request,
             target,
             options=(),
@@ -381,6 +495,23 @@ class DataCatalog(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
+    def GetOrExtendReservations(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/GetOrExtendReservations',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationsRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.GetOrExtendReservationsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
     def ReleaseReservation(request,
             target,
             options=(),
@@ -393,6 +524,23 @@ class DataCatalog(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/ReleaseReservation',
             flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationRequest.SerializeToString,
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ReleaseReservations(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/datacatalog.DataCatalog/ReleaseReservations',
+            flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationsRequest.SerializeToString,
             flyteidl_dot_datacatalog_dot_datacatalog__pb2.ReleaseReservationResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

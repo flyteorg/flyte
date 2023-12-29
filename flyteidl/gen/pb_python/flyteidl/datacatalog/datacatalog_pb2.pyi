@@ -19,6 +19,87 @@ class CreateDatasetResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
+<<<<<<< HEAD
+=======
+class Dataset(_message.Message):
+    __slots__ = ["id", "metadata", "partitionKeys"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    PARTITIONKEYS_FIELD_NUMBER: _ClassVar[int]
+    id: DatasetID
+    metadata: Metadata
+    partitionKeys: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, id: _Optional[_Union[DatasetID, _Mapping]] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ..., partitionKeys: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class DatasetID(_message.Message):
+    __slots__ = ["UUID", "domain", "name", "project", "version"]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    UUID: str
+    UUID_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    domain: str
+    name: str
+    project: str
+    version: str
+    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ..., UUID: _Optional[str] = ...) -> None: ...
+
+class DatasetPropertyFilter(_message.Message):
+    __slots__ = ["domain", "name", "project", "version"]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    VERSION_FIELD_NUMBER: _ClassVar[int]
+    domain: str
+    name: str
+    project: str
+    version: str
+    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
+
+class DeleteArtifactRequest(_message.Message):
+    __slots__ = ["artifact_id", "dataset", "tag_name"]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
+    DATASET_FIELD_NUMBER: _ClassVar[int]
+    TAG_NAME_FIELD_NUMBER: _ClassVar[int]
+    artifact_id: str
+    dataset: DatasetID
+    tag_name: str
+    def __init__(self, dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., artifact_id: _Optional[str] = ..., tag_name: _Optional[str] = ...) -> None: ...
+
+class DeleteArtifactResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class DeleteArtifactsRequest(_message.Message):
+    __slots__ = ["artifacts"]
+    ARTIFACTS_FIELD_NUMBER: _ClassVar[int]
+    artifacts: _containers.RepeatedCompositeFieldContainer[DeleteArtifactRequest]
+    def __init__(self, artifacts: _Optional[_Iterable[_Union[DeleteArtifactRequest, _Mapping]]] = ...) -> None: ...
+
+class FilterExpression(_message.Message):
+    __slots__ = ["filters"]
+    FILTERS_FIELD_NUMBER: _ClassVar[int]
+    filters: _containers.RepeatedCompositeFieldContainer[SinglePropertyFilter]
+    def __init__(self, filters: _Optional[_Iterable[_Union[SinglePropertyFilter, _Mapping]]] = ...) -> None: ...
+
+class GetArtifactRequest(_message.Message):
+    __slots__ = ["artifact_id", "dataset", "tag_name"]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
+    DATASET_FIELD_NUMBER: _ClassVar[int]
+    TAG_NAME_FIELD_NUMBER: _ClassVar[int]
+    artifact_id: str
+    dataset: DatasetID
+    tag_name: str
+    def __init__(self, dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., artifact_id: _Optional[str] = ..., tag_name: _Optional[str] = ...) -> None: ...
+
+class GetArtifactResponse(_message.Message):
+    __slots__ = ["artifact"]
+    ARTIFACT_FIELD_NUMBER: _ClassVar[int]
+    artifact: Artifact
+    def __init__(self, artifact: _Optional[_Union[Artifact, _Mapping]] = ...) -> None: ...
+
+>>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
 class GetDatasetRequest(_message.Message):
     __slots__ = ["dataset"]
     DATASET_FIELD_NUMBER: _ClassVar[int]
@@ -47,6 +128,7 @@ class GetArtifactResponse(_message.Message):
     artifact: Artifact
     def __init__(self, artifact: _Optional[_Union[Artifact, _Mapping]] = ...) -> None: ...
 
+<<<<<<< HEAD
 class CreateArtifactRequest(_message.Message):
     __slots__ = ["artifact"]
     ARTIFACT_FIELD_NUMBER: _ClassVar[int]
@@ -66,6 +148,27 @@ class AddTagRequest(_message.Message):
 class AddTagResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+=======
+class GetOrExtendReservationsRequest(_message.Message):
+    __slots__ = ["reservations"]
+    RESERVATIONS_FIELD_NUMBER: _ClassVar[int]
+    reservations: _containers.RepeatedCompositeFieldContainer[GetOrExtendReservationRequest]
+    def __init__(self, reservations: _Optional[_Iterable[_Union[GetOrExtendReservationRequest, _Mapping]]] = ...) -> None: ...
+
+class GetOrExtendReservationsResponse(_message.Message):
+    __slots__ = ["reservations"]
+    RESERVATIONS_FIELD_NUMBER: _ClassVar[int]
+    reservations: _containers.RepeatedCompositeFieldContainer[Reservation]
+    def __init__(self, reservations: _Optional[_Iterable[_Union[Reservation, _Mapping]]] = ...) -> None: ...
+
+class KeyValuePair(_message.Message):
+    __slots__ = ["key", "value"]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
+    key: str
+    value: str
+    def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+>>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
 
 class ListArtifactsRequest(_message.Message):
     __slots__ = ["dataset", "filter", "pagination"]
@@ -252,11 +355,86 @@ class Metadata(_message.Message):
     key_map: _containers.ScalarMap[str, str]
     def __init__(self, key_map: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
+<<<<<<< HEAD
 class FilterExpression(_message.Message):
     __slots__ = ["filters"]
     FILTERS_FIELD_NUMBER: _ClassVar[int]
     filters: _containers.RepeatedCompositeFieldContainer[SinglePropertyFilter]
     def __init__(self, filters: _Optional[_Iterable[_Union[SinglePropertyFilter, _Mapping]]] = ...) -> None: ...
+=======
+class PaginationOptions(_message.Message):
+    __slots__ = ["limit", "sortKey", "sortOrder", "token"]
+    class SortKey(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+    class SortOrder(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+    ASCENDING: PaginationOptions.SortOrder
+    CREATION_TIME: PaginationOptions.SortKey
+    DESCENDING: PaginationOptions.SortOrder
+    LIMIT_FIELD_NUMBER: _ClassVar[int]
+    SORTKEY_FIELD_NUMBER: _ClassVar[int]
+    SORTORDER_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    limit: int
+    sortKey: PaginationOptions.SortKey
+    sortOrder: PaginationOptions.SortOrder
+    token: str
+    def __init__(self, limit: _Optional[int] = ..., token: _Optional[str] = ..., sortKey: _Optional[_Union[PaginationOptions.SortKey, str]] = ..., sortOrder: _Optional[_Union[PaginationOptions.SortOrder, str]] = ...) -> None: ...
+
+class Partition(_message.Message):
+    __slots__ = ["key", "value"]
+    KEY_FIELD_NUMBER: _ClassVar[int]
+    VALUE_FIELD_NUMBER: _ClassVar[int]
+    key: str
+    value: str
+    def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+
+class PartitionPropertyFilter(_message.Message):
+    __slots__ = ["key_val"]
+    KEY_VAL_FIELD_NUMBER: _ClassVar[int]
+    key_val: KeyValuePair
+    def __init__(self, key_val: _Optional[_Union[KeyValuePair, _Mapping]] = ...) -> None: ...
+
+class ReleaseReservationRequest(_message.Message):
+    __slots__ = ["owner_id", "reservation_id"]
+    OWNER_ID_FIELD_NUMBER: _ClassVar[int]
+    RESERVATION_ID_FIELD_NUMBER: _ClassVar[int]
+    owner_id: str
+    reservation_id: ReservationID
+    def __init__(self, reservation_id: _Optional[_Union[ReservationID, _Mapping]] = ..., owner_id: _Optional[str] = ...) -> None: ...
+
+class ReleaseReservationResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ReleaseReservationsRequest(_message.Message):
+    __slots__ = ["reservations"]
+    RESERVATIONS_FIELD_NUMBER: _ClassVar[int]
+    reservations: _containers.RepeatedCompositeFieldContainer[ReleaseReservationRequest]
+    def __init__(self, reservations: _Optional[_Iterable[_Union[ReleaseReservationRequest, _Mapping]]] = ...) -> None: ...
+
+class Reservation(_message.Message):
+    __slots__ = ["expires_at", "heartbeat_interval", "metadata", "owner_id", "reservation_id"]
+    EXPIRES_AT_FIELD_NUMBER: _ClassVar[int]
+    HEARTBEAT_INTERVAL_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
+    OWNER_ID_FIELD_NUMBER: _ClassVar[int]
+    RESERVATION_ID_FIELD_NUMBER: _ClassVar[int]
+    expires_at: _timestamp_pb2.Timestamp
+    heartbeat_interval: _duration_pb2.Duration
+    metadata: Metadata
+    owner_id: str
+    reservation_id: ReservationID
+    def __init__(self, reservation_id: _Optional[_Union[ReservationID, _Mapping]] = ..., owner_id: _Optional[str] = ..., heartbeat_interval: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., expires_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ...) -> None: ...
+
+class ReservationID(_message.Message):
+    __slots__ = ["dataset_id", "tag_name"]
+    DATASET_ID_FIELD_NUMBER: _ClassVar[int]
+    TAG_NAME_FIELD_NUMBER: _ClassVar[int]
+    dataset_id: DatasetID
+    tag_name: str
+    def __init__(self, dataset_id: _Optional[_Union[DatasetID, _Mapping]] = ..., tag_name: _Optional[str] = ...) -> None: ...
+>>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
 
 class SinglePropertyFilter(_message.Message):
     __slots__ = ["tag_filter", "partition_filter", "artifact_filter", "dataset_filter", "operator"]
