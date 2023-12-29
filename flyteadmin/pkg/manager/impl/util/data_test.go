@@ -2,6 +2,8 @@ package util
 
 import (
 	"context"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
+	protoV2 "google.golang.org/protobuf/proto"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -17,9 +19,19 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-var testLiteralMap = &core.LiteralMap{
-	Literals: map[string]*core.Literal{
-		"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
+var testInputData = &core.InputData{
+	Inputs: &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
+		},
+	},
+}
+
+var testOutputData = &core.OutputData{
+	Outputs: &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
+		},
 	},
 }
 
@@ -131,19 +143,19 @@ func TestGetInputs(t *testing.T) {
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		assert.Equal(t, inputsURI, reference.String())
-		marshalled, _ := proto.Marshal(testLiteralMap)
-		_ = proto.Unmarshal(marshalled, msg)
-		return nil
+		marshalled, _ := proto.Marshal(testInputData)
+		return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 	}
 
 	t.Run("should sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
 			Enabled: true,
 		}
+
 		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
-		assert.True(t, proto.Equal(inputURLBlob, &expectedURLBlob))
+		commonTestUtils.AssertProtoEqual(t, testInputData, fullInputs)
+		commonTestUtils.AssertProtoEqual(t, &expectedURLBlob, inputURLBlob)
 	})
 	t.Run("should not sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
@@ -151,7 +163,7 @@ func TestGetInputs(t *testing.T) {
 		}
 		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
+		assert.True(t, proto.Equal(fullInputs, testInputData))
 		assert.Empty(t, inputURLBlob)
 	})
 }
@@ -175,10 +187,10 @@ func TestGetOutputs(t *testing.T) {
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		assert.Equal(t, testOutputsURI, reference.String())
-		marshalled, _ := proto.Marshal(testLiteralMap)
-		_ = proto.Unmarshal(marshalled, msg)
-		return nil
+		marshalled, _ := proto.Marshal(testOutputData)
+		return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 	}
+
 	closure := &admin.NodeExecutionClosure{
 		OutputResult: &admin.NodeExecutionClosure_OutputUri{
 			OutputUri: testOutputsURI,
@@ -191,8 +203,8 @@ func TestGetOutputs(t *testing.T) {
 
 		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
-		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
+		commonTestUtils.AssertProtoEqual(t, testOutputData, fullOutputs)
+		commonTestUtils.AssertProtoEqual(t, &expectedURLBlob, outputURLBlob)
 	})
 	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
@@ -201,7 +213,7 @@ func TestGetOutputs(t *testing.T) {
 
 		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
+		commonTestUtils.AssertProtoEqual(t, fullOutputs, testOutputData)
 		assert.Empty(t, outputURLBlob)
 	})
 	t.Run("inline outputs", func(t *testing.T) {
@@ -220,14 +232,14 @@ func TestGetOutputs(t *testing.T) {
 			return nil
 		}
 		closure := &admin.NodeExecutionClosure{
-			OutputResult: &admin.NodeExecutionClosure_OutputData{
-				OutputData: testLiteralMap,
+			OutputResult: &admin.NodeExecutionClosure_FullOutputs{
+				FullOutputs: testOutputData,
 			},
 		}
 
 		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
+		assert.True(t, proto.Equal(fullOutputs, testOutputData))
 		assert.Empty(t, outputURLBlob)
 	})
 }
@@ -248,26 +260,26 @@ func TestWorkflowExecutionClosure(t *testing.T) {
 	})
 	t.Run("outputs inline", func(t *testing.T) {
 		workflowExecutionClosure := admin.ExecutionClosure{
-			OutputResult: &admin.ExecutionClosure_OutputData{
-				OutputData: testLiteralMap,
+			OutputResult: &admin.ExecutionClosure_FullOutputs{
+				FullOutputs: testOutputData,
 			},
 		}
 		closureImpl := ToExecutionClosureInterface(&workflowExecutionClosure)
 		assert.Empty(t, closureImpl.GetOutputUri())
-		assert.True(t, proto.Equal(testLiteralMap, closureImpl.GetOutputData()))
+		commonTestUtils.AssertProtoEqual(t, testOutputData, closureImpl.GetFullOutputs())
 	})
 	t.Run("outputs inline - historical/deprecated format", func(t *testing.T) {
 		workflowExecutionClosure := admin.ExecutionClosure{
 			OutputResult: &admin.ExecutionClosure_Outputs{
 				Outputs: &admin.LiteralMapBlob{
 					Data: &admin.LiteralMapBlob_Values{
-						Values: testLiteralMap,
+						Values: testOutputData.GetOutputs(),
 					},
 				},
 			},
 		}
 		closureImpl := ToExecutionClosureInterface(&workflowExecutionClosure)
 		assert.Empty(t, closureImpl.GetOutputUri())
-		assert.True(t, proto.Equal(testLiteralMap, closureImpl.GetOutputData()))
+		commonTestUtils.AssertProtoEqual(t, testOutputData, closureImpl.GetFullOutputs())
 	})
 }

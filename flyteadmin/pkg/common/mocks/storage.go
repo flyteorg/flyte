@@ -3,13 +3,13 @@ package mocks
 import (
 	"context"
 	"fmt"
+	protoV2 "google.golang.org/protobuf/proto"
 	"io"
 	"net/url"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/golang/protobuf/proto"
 )
 
 type NopCloser struct {
@@ -35,6 +35,19 @@ func (t *TestDataStore) Head(ctx context.Context, reference storage.DataReferenc
 
 func (t *TestDataStore) ReadProtobuf(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 	return t.ReadProtobufCb(ctx, reference, msg)
+}
+
+// ReadProtobufAny retrieves the entire blob from blobstore and unmarshals it to the passed protobuf
+func (t *TestDataStore) ReadProtobufAny(ctx context.Context, reference storage.DataReference, msg ...proto.Message) (msgIndex int, err error) {
+	for i, m := range msg {
+		empty := protoV2.Clone(proto.MessageV2(m))
+		err = t.ReadProtobuf(ctx, reference, m)
+		if err == nil && !protoV2.Equal(empty, proto.MessageV2(m)) {
+			return i, nil
+		}
+	}
+
+	return -1, err
 }
 
 func (t *TestDataStore) WriteProtobuf(

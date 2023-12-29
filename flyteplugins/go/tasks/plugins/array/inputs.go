@@ -15,8 +15,9 @@ type arrayJobInputReader struct {
 }
 
 // GetInputPath overrides the inputpath to return the prefix path for array jobs
-func (i arrayJobInputReader) GetInputPath() storage.DataReference {
-	return i.GetInputPrefixPath()
+func (i arrayJobInputReader) GetInputPath(ctx context.Context) (storage.DataReference, error) {
+	// TODO (haytham): Does this need to copy the input data using the old format to the prefix path?
+	return i.GetInputPrefixPath(), nil
 }
 
 // GetInputDataPath overrides the inputpath to return the prefix path for array jobs

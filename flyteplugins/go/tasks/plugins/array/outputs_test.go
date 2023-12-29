@@ -173,7 +173,9 @@ func Test_appendSubTaskOutput(t *testing.T) {
 		"var1": 5,
 		"var2": "hello",
 	}
-	validOutputs := coreutils.MustMakeLiteral(nativeMap).GetMap()
+	validOutputs := &core.OutputData{
+		Outputs: coreutils.MustMakeLiteral(nativeMap).GetMap(),
+	}
 
 	t.Run("append to empty", func(t *testing.T) {
 		expected := map[string]interface{}{
@@ -181,9 +183,12 @@ func Test_appendSubTaskOutput(t *testing.T) {
 			"var2": []interface{}{coreutils.MustMakeLiteral("hello")},
 		}
 
-		actual := &core.LiteralMap{
-			Literals: map[string]*core.Literal{},
+		actual := &core.OutputData{
+			Outputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{},
+			},
 		}
+
 		appendSubTaskOutput(actual, validOutputs, 1)
 		assert.Equal(t, actual, coreutils.MustMakeLiteral(expected).GetMap())
 	})
@@ -194,10 +199,12 @@ func Test_appendSubTaskOutput(t *testing.T) {
 			"var2": []interface{}{nilLiteral, coreutils.MustMakeLiteral("hello")},
 		}).GetMap()
 
-		actual := coreutils.MustMakeLiteral(map[string]interface{}{
-			"var1": []interface{}{nilLiteral},
-			"var2": []interface{}{nilLiteral},
-		}).GetMap()
+		actual := &core.OutputData{
+			Outputs: coreutils.MustMakeLiteral(map[string]interface{}{
+				"var1": []interface{}{nilLiteral},
+				"var2": []interface{}{nilLiteral},
+			}).GetMap(),
+		}
 
 		appendSubTaskOutput(actual, validOutputs, 1)
 		assert.Equal(t, actual, expected)

@@ -363,9 +363,9 @@ func TestToK8sContainer(t *testing.T) {
 	taskReader.On("Read", mock.Anything).Return(taskTemplate, nil)
 
 	inputReader := &mocks2.InputReader{}
-	inputReader.OnGetInputPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.OnGetInputDataPath().Return(storage.DataReference("test-data-reference"))
 	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("test-data-reference-prefix"))
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.OnGetMatch(mock.Anything).Return(&core.InputData{}, nil)
 
 	outputWriter := &mocks2.OutputWriter{}
 	outputWriter.OnGetOutputPrefixPath().Return("")
@@ -464,7 +464,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
-	mockInputReader.OnGetInputPath().Return(mockInputPath)
+	mockInputReader.OnGetInputDataPath().Return(mockInputPath)
 	mockInputReader.OnGetInputPrefixPath().Return(mockInputPath)
 	mockInputReader.On("Get", mock.Anything).Return(nil, nil)
 
@@ -493,7 +493,7 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 	}, nil)
 	container := &v1.Container{
 		Command: []string{
-			"{{ .Input }}",
+			"{{ .InputData }}",
 		},
 		Args: []string{
 			"{{ .OutputPrefix }}",

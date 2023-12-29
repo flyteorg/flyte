@@ -275,6 +275,7 @@ func GetQueryInfo(ctx context.Context, tCtx core.TaskExecutionContext) (
 			Inputs:           tCtx.InputReader(),
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 		})
 	if err != nil {
 		return "", "", []string{}, 0, "", err

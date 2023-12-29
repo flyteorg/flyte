@@ -4,6 +4,7 @@ package aws
 import (
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"time"
 
 	"github.com/NYTimes/gizmo/pubsub"
@@ -70,15 +71,27 @@ func (e *workflowExecutor) resolveKickoffTimeArg(
 	}
 	for name := range launchPlan.Closure.ExpectedInputs.Parameters {
 		if name == request.KickoffTimeArg {
-			ts, err := ptypes.TimestampProto(request.KickoffTime)
-			if err != nil {
+			ts := timestamppb.New(request.KickoffTime)
+			if err := ts.CheckValid(); err != nil {
 				logger.Warningf(context.Background(),
 					"failed to serialize kickoff time %+v to timestamp proto for scheduled workflow execution with "+
 						"launchPlan [%+v]", request.KickoffTime, launchPlan.Id)
 				return errors.NewFlyteAdminErrorf(
 					codes.Internal, "could not serialize kickoff time %+v to timestamp proto", request.KickoffTime)
 			}
-			executionRequest.Inputs.Literals[name] = &core.Literal{
+			if executionRequest.InputData == nil {
+				executionRequest.InputData = &core.InputData{}
+			}
+
+			if executionRequest.GetInputData().Inputs == nil {
+				executionRequest.InputData.Inputs = &core.LiteralMap{}
+			}
+
+			if executionRequest.GetInputData().GetInputs().Literals == nil {
+				executionRequest.InputData.Inputs.Literals = map[string]*core.Literal{}
+			}
+
+			executionRequest.InputData.Inputs.Literals[name] = &core.Literal{
 				Value: &core.Literal_Scalar{
 					Scalar: &core.Scalar{
 						Value: &core.Scalar_Primitive{
@@ -91,6 +104,7 @@ func (e *workflowExecutor) resolveKickoffTimeArg(
 					},
 				},
 			}
+
 			return nil
 		}
 	}
@@ -160,10 +174,13 @@ func (e *workflowExecutor) formulateExecutionCreateRequest(
 			// No dynamic notifications are configured either.
 		},
 		// No additional inputs beyond the to-be-filled-out kickoff time arg are specified.
-		Inputs: &core.LiteralMap{
-			Literals: map[string]*core.Literal{},
+		InputData: &core.InputData{
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{},
+			},
 		},
 	}
+
 	return executionRequest
 }
 

@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang/protobuf/proto"
+	protoV1 "github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
+
 	errs "github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 
@@ -32,7 +34,7 @@ type DefaultProtobufStore struct {
 	metrics *protoMetrics
 }
 
-func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference DataReference, msg ...proto.Message) (msgIndex int, err error) {
+func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference DataReference, msg ...protoV1.Message) (msgIndex int, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.DefaultProtobufStore/ReadProtobuf")
 	defer span.End()
 
@@ -58,7 +60,12 @@ func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference Dat
 	var lastErr error
 	for i, m := range msg {
 		t := s.metrics.UnmarshalTime.Start()
-		err = proto.Unmarshal(docContents, m)
+		var mCopy proto.Message
+		if len(msg) > 1 {
+			mCopy = proto.Clone(protoV1.MessageV2(m))
+		}
+
+		err = proto.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(docContents, protoV1.MessageV2(m))
 		t.Stop()
 		if err != nil {
 			s.metrics.UnmarshalFailure.Inc()
@@ -66,23 +73,25 @@ func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference Dat
 			continue
 		}
 
-		return i, nil
+		if len(msg) == 1 || !proto.Equal(mCopy, protoV1.MessageV2(m)) {
+			return i, nil
+		}
 	}
 
 	return -1, lastErr
 }
 
-func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataReference, msg proto.Message) error {
+func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataReference, msg protoV1.Message) error {
 	_, err := s.ReadProtobufAny(ctx, reference, msg)
 	return err
 }
 
-func (s DefaultProtobufStore) WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error {
+func (s DefaultProtobufStore) WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg protoV1.Message) error {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.DefaultProtobufStore/WriteProtobuf")
 	defer span.End()
 
 	t := s.metrics.MarshalTime.Start()
-	raw, err := proto.Marshal(msg)
+	raw, err := protoV1.Marshal(msg)
 	t.Stop()
 	if err != nil {
 		s.metrics.MarshalFailure.Inc()

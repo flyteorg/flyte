@@ -117,7 +117,7 @@ func generateTaskSignatureHash(ctx context.Context, taskInterface core.TypedInte
 
 // Generate a tag by hashing the input values
 func GenerateArtifactTagName(ctx context.Context, inputs *core.InputData) (string, error) {
-	hashString, err := catalog.HashLiteralMap(ctx, inputs)
+	hashString, err := catalog.HashInputData(ctx, inputs)
 	if err != nil {
 		return "", err
 	}

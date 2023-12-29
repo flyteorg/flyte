@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	protoV2 "google.golang.org/protobuf/proto"
 	"strings"
 	"testing"
 	"time"
@@ -58,16 +59,18 @@ const (
 	rawOutput = "raw_output"
 )
 
-var spec = testutils.GetExecutionRequest().Spec
-var specBytes, _ = proto.Marshal(spec)
-var phase = core.WorkflowExecution_RUNNING.String()
-var closure = admin.ExecutionClosure{
-	Phase: core.WorkflowExecution_RUNNING,
-	StateChangeDetails: &admin.ExecutionStateChangeDetails{
-		State:      admin.ExecutionState_EXECUTION_ACTIVE,
-		OccurredAt: testutils.MockCreatedAtProto,
-	},
-}
+var (
+	spec         = testutils.GetExecutionRequest().Spec
+	specBytes, _ = proto.Marshal(spec)
+	phase        = core.WorkflowExecution_RUNNING.String()
+	closure      = admin.ExecutionClosure{
+		Phase: core.WorkflowExecution_RUNNING,
+		StateChangeDetails: &admin.ExecutionStateChangeDetails{
+			State:      admin.ExecutionState_EXECUTION_ACTIVE,
+			OccurredAt: testutils.MockCreatedAtProto,
+		},
+	}
+)
 var closureBytes, _ = proto.Marshal(&closure)
 
 var executionIdentifier = core.WorkflowExecutionIdentifier{
@@ -75,16 +78,20 @@ var executionIdentifier = core.WorkflowExecutionIdentifier{
 	Domain:  "domain",
 	Name:    "name",
 }
-var mockPublisher notificationMocks.MockPublisher
-var mockExecutionRemoteURL = dataMocks.NewMockRemoteURL()
-var requestedAt = time.Now()
-var testCluster = "C1"
-var outputURI = "output uri"
+
+var (
+	mockPublisher          notificationMocks.MockPublisher
+	mockExecutionRemoteURL = dataMocks.NewMockRemoteURL()
+	requestedAt            = time.Now()
+	testCluster            = "C1"
+	outputURI              = "output uri"
+)
 
 var resourceDefaults = runtimeInterfaces.TaskResourceSet{
 	CPU:    resource.MustParse("200m"),
 	Memory: resource.MustParse("200Gi"),
 }
+
 var resourceLimits = runtimeInterfaces.TaskResourceSet{
 	CPU:    resource.MustParse("300m"),
 	Memory: resource.MustParse("500Gi"),
@@ -238,7 +245,8 @@ func setDefaultTaskCallbackForExecTest(repository interfaces.Repository) {
 func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 	mockStorage := commonMocks.GetMockStorageClient()
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		ctx context.Context, reference storage.DataReference, msg proto.Message,
+	) error {
 		if val, ok := mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).Store[reference]; ok {
 			_ = proto.Unmarshal(val, msg)
 			return nil
@@ -246,7 +254,8 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 		return fmt.Errorf("could not find value in storage [%v]", reference.String())
 	}
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(
-		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message,
+	) error {
 		bytes, err := proto.Marshal(msg)
 		if err != nil {
 			return err
@@ -294,11 +303,14 @@ func TestCreateExecution(t *testing.T) {
 		Values: map[string]string{
 			"label3": "3",
 			"label2": "1", // common label, will be dropped
-		}}
+		},
+	}
 	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(
-		ctx context.Context, projectID string) (models.Project, error) {
+		ctx context.Context, projectID string,
+	) (models.Project, error) {
 		return transformers.CreateProjectModel(&admin.Project{
-			Labels: &labels}), nil
+			Labels: &labels,
+		}), nil
 	}
 
 	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
@@ -309,7 +321,7 @@ func TestCreateExecution(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, principal, spec.Metadata.Principal)
 			assert.Equal(t, rawOutput, spec.RawOutputDataConfig.OutputLocationPrefix)
-			assert.True(t, proto.Equal(spec.ClusterAssignment, &clusterAssignment))
+			commonTestUtils.AssertProtoEqual(t, spec.ClusterAssignment, &clusterAssignment)
 			assert.Equal(t, "launch_plan", input.LaunchEntity)
 			assert.Equal(t, spec.GetMetadata().GetSystemMetadata().Namespace, "project-domain")
 			return nil
@@ -387,7 +399,10 @@ func TestCreateExecution(t *testing.T) {
 	assert.NoError(t, err)
 	ctx := identity.WithContext(context.Background())
 	response, err := execManager.CreateExecution(ctx, request, requestedAt)
-	assert.Nil(t, err)
+	if !assert.Nil(t, err) {
+		t.Log(err.Error())
+		t.FailNow()
+	}
 
 	expectedResponse := &admin.ExecutionCreateResponse{
 		Id: &executionIdentifier,
@@ -454,7 +469,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 			err := proto.Unmarshal(input.Spec, &spec)
 			assert.NoError(t, err)
 			assert.Equal(t, admin.ExecutionMetadata_CHILD_WORKFLOW, spec.Metadata.Mode)
-			assert.True(t, proto.Equal(&parentNodeExecutionID, spec.Metadata.ParentNodeExecution))
+			commonTestUtils.AssertProtoEqual(t, &parentNodeExecutionID, spec.Metadata.ParentNodeExecution)
 			assert.EqualValues(t, input.ParentNodeExecutionID, 1)
 			assert.EqualValues(t, input.SourceExecutionID, 2)
 			assert.Equal(t, 2, int(spec.Metadata.Nesting))
@@ -606,14 +621,20 @@ func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 	setDefaultLpCallbackForExecTest(repository)
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
-	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(),
+		getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(),
+		&mockPublisher, mockExecutionRemoteURL, nil, nil, nil,
+		nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
 	request := testutils.GetExecutionRequest()
-	request.Inputs = &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
+	request.InputData = &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
+			},
 		},
 	}
+
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.EqualError(t, err, "invalid input foo-1")
 	assert.Nil(t, response)
@@ -721,7 +742,7 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 		}
 		assert.Nil(t, closureValue.ComputedInputs)
 
-		var userInputs, inputs core.LiteralMap
+		var userInputs, inputs core.InputData
 		if err := storageClient.ReadProtobuf(ctx, input.UserInputsURI, &userInputs); err != nil {
 			return err
 		}
@@ -729,12 +750,12 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 			return err
 		}
 		fooValue := coreutils.MustMakeLiteral("foo-value-1")
-		assert.Equal(t, 1, len(userInputs.Literals))
-		assert.EqualValues(t, userInputs.Literals["foo"], fooValue)
+		assert.Equal(t, 1, len(userInputs.GetInputs().GetLiterals()))
+		assert.EqualValues(t, userInputs.GetInputs().GetLiterals()["foo"], fooValue)
 		barValue := coreutils.MustMakeLiteral("bar-value")
-		assert.Equal(t, len(inputs.Literals), 2)
-		assert.EqualValues(t, inputs.Literals["foo"], fooValue)
-		assert.EqualValues(t, inputs.Literals["bar"], barValue)
+		assert.Equal(t, len(inputs.GetInputs().GetLiterals()), 2)
+		assert.EqualValues(t, inputs.GetInputs().GetLiterals()["foo"], fooValue)
+		assert.EqualValues(t, inputs.GetInputs().GetLiterals()["bar"], barValue)
 		assert.Equal(t, core.WorkflowExecution_UNDEFINED, closureValue.Phase)
 		assert.Equal(t, createdAt, *input.ExecutionCreatedAt)
 		assert.Equal(t, 1, len(closureValue.Notifications))
@@ -758,7 +779,7 @@ func TestCreateExecutionVerifyDbModel(t *testing.T) {
 
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&executionIdentifier, response.Id))
+	commonTestUtils.AssertProtoEqual(t, &executionIdentifier, response.Id)
 }
 
 func TestCreateExecutionDefaultNotifications(t *testing.T) {
@@ -799,11 +820,11 @@ func TestCreateExecutionDefaultNotifications(t *testing.T) {
 
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
+	commonTestUtils.AssertProtoEqual(t, &core.WorkflowExecutionIdentifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
-	}, response.Id))
+	}, response.Id)
 }
 
 func TestCreateExecutionDisableNotifications(t *testing.T) {
@@ -838,11 +859,11 @@ func TestCreateExecutionDisableNotifications(t *testing.T) {
 
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
+	commonTestUtils.AssertProtoEqual(t, &core.WorkflowExecutionIdentifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
-	}, response.Id))
+	}, response.Id)
 }
 
 func TestCreateExecutionNoNotifications(t *testing.T) {
@@ -889,7 +910,6 @@ func TestCreateExecutionNoNotifications(t *testing.T) {
 	// Create a callback method to validate no notifications are set when storing the
 	// resulting models.Execution by CreateExecution.
 	exCreateFunc := func(ctx context.Context, input models.Execution) error {
-
 		var closureValue admin.ExecutionClosure
 		err := proto.Unmarshal(input.Closure, &closureValue)
 		if err != nil {
@@ -908,11 +928,11 @@ func TestCreateExecutionNoNotifications(t *testing.T) {
 
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&core.WorkflowExecutionIdentifier{
+	commonTestUtils.AssertProtoEqual(t, &core.WorkflowExecutionIdentifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
-	}, response.Id))
+	}, response.Id)
 }
 
 func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
@@ -1052,10 +1072,16 @@ func TestCreateExecutionInterruptible(t *testing.T) {
 			mockExecutor.OnID().Return("testMockExecutor")
 			r := plugins.NewRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(),
+				getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(),
+				&mockPublisher, mockExecutionRemoteURL, nil, nil, nil,
+				nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
 
 			_, err := execManager.CreateExecution(context.Background(), request, requestedAt)
-			assert.Nil(t, err)
+			if !assert.Nil(t, err) {
+				t.Log(err.Error())
+				t.FailNow()
+			}
 		})
 	}
 }
@@ -1264,11 +1290,12 @@ func TestCreateExecution_CustomNamespaceMappingConfig(t *testing.T) {
 
 	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&executionIdentifier, response.Id))
+	commonTestUtils.AssertProtoEqual(t, &executionIdentifier, response.Id)
 }
 
 func makeExecutionGetFunc(
-	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
+	t *testing.T, closureBytes []byte, startTime *time.Time,
+) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
@@ -1294,7 +1321,8 @@ func makeExecutionGetFunc(
 }
 
 func makeLegacyExecutionGetFunc(
-	t *testing.T, closureBytes []byte, startTime *time.Time) repositoryMocks.GetExecutionFunc {
+	t *testing.T, closureBytes []byte, startTime *time.Time,
+) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
@@ -1320,7 +1348,8 @@ func makeLegacyExecutionGetFunc(
 }
 
 func makeExecutionInterruptibleGetFunc(
-	t *testing.T, closureBytes []byte, startTime *time.Time, interruptible *bool) repositoryMocks.GetExecutionFunc {
+	t *testing.T, closureBytes []byte, startTime *time.Time, interruptible *bool,
+) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
@@ -1357,7 +1386,8 @@ func makeExecutionInterruptibleGetFunc(
 }
 
 func makeExecutionOverwriteCacheGetFunc(
-	t *testing.T, closureBytes []byte, startTime *time.Time, overwriteCache bool) repositoryMocks.GetExecutionFunc {
+	t *testing.T, closureBytes []byte, startTime *time.Time, overwriteCache bool,
+) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
@@ -1390,7 +1420,8 @@ func makeExecutionOverwriteCacheGetFunc(
 }
 
 func makeExecutionWithEnvs(
-	t *testing.T, closureBytes []byte, startTime *time.Time, envs []*core.KeyValuePair) repositoryMocks.GetExecutionFunc {
+	t *testing.T, closureBytes []byte, startTime *time.Time, envs []*core.KeyValuePair,
+) repositoryMocks.GetExecutionFunc {
 	return func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		assert.Equal(t, "project", input.Project)
 		assert.Equal(t, "domain", input.Domain)
@@ -1479,7 +1510,7 @@ func TestRelaunchExecution(t *testing.T) {
 		},
 	}
 	assert.True(t, createCalled)
-	assert.True(t, proto.Equal(expectedResponse, response))
+	commonTestUtils.AssertProtoEqual(t, expectedResponse, response)
 
 	// TODO: Test with inputs
 }
@@ -1844,7 +1875,7 @@ func TestRecoverExecution(t *testing.T) {
 		},
 	}
 	assert.True(t, createCalled)
-	assert.True(t, proto.Equal(expectedResponse, response))
+	commonTestUtils.AssertProtoEqual(t, expectedResponse, response)
 }
 
 func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
@@ -1914,7 +1945,7 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 		NodeId: "parent",
 	}
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
-		assert.True(t, proto.Equal(&parentNodeExecution, &input.NodeExecutionIdentifier))
+		commonTestUtils.AssertProtoEqual(t, &parentNodeExecution, &input.NodeExecutionIdentifier)
 
 		return models.NodeExecution{
 			BaseModel: models.BaseModel{
@@ -1947,7 +1978,7 @@ func TestRecoverExecution_RecoveredChildNode(t *testing.T) {
 		},
 	}
 	assert.True(t, createCalled)
-	assert.True(t, proto.Equal(expectedResponse, response))
+	commonTestUtils.AssertProtoEqual(t, expectedResponse, response)
 }
 
 func TestRecoverExecution_GetExistingFailure(t *testing.T) {
@@ -1994,7 +2025,8 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 	expectedErr := errors.New("foo")
 	mockStorage := commonMocks.GetMockStorageClient()
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		ctx context.Context, reference storage.DataReference, msg proto.Message,
+	) error {
 		return expectedErr
 	}
 	r := plugins.NewRegistry()
@@ -2084,7 +2116,7 @@ func TestRecoverExecutionInterruptibleOverride(t *testing.T) {
 		},
 	}
 	assert.True(t, createCalled)
-	assert.True(t, proto.Equal(expectedResponse, response))
+	commonTestUtils.AssertProtoEqual(t, expectedResponse, response)
 }
 
 func TestRecoverExecutionOverwriteCacheOverride(t *testing.T) {
@@ -2239,8 +2271,8 @@ func TestCreateWorkflowEvent(t *testing.T) {
 	}
 	closureBytes, _ := proto.Marshal(&closure)
 	updateExecutionFunc := func(
-		context context.Context, execution models.Execution) error {
-
+		context context.Context, execution models.Execution,
+	) error {
 		assert.Equal(t, "project", execution.Project)
 		assert.Equal(t, "domain", execution.Domain)
 		assert.Equal(t, "name", execution.Name)
@@ -2427,7 +2459,8 @@ func TestCreateWorkflowEvent_StartedRunning(t *testing.T) {
 	}
 	closureBytes, _ := proto.Marshal(&closure)
 	updateExecutionFunc := func(
-		context context.Context, execution models.Execution) error {
+		context context.Context, execution models.Execution,
+	) error {
 		assert.Equal(t, "project", execution.Project)
 		assert.Equal(t, "domain", execution.Domain)
 		assert.Equal(t, "name", execution.Name)
@@ -2578,7 +2611,8 @@ func TestCreateWorkflowEvent_ClusterReassignmentOnQueued(t *testing.T) {
 	)
 	newCluster := "C2"
 	updateExecutionFunc := func(
-		context context.Context, execution models.Execution) error {
+		context context.Context, execution models.Execution,
+	) error {
 		assert.Equal(t, core.WorkflowExecution_QUEUED.String(), execution.Phase)
 		assert.Equal(t, newCluster, execution.Cluster)
 		return nil
@@ -2616,7 +2650,8 @@ func TestCreateWorkflowEvent_InvalidEvent(t *testing.T) {
 		Message: "bar baz",
 	}
 	updateExecutionFunc := func(
-		context context.Context, execution models.Execution) error {
+		context context.Context, execution models.Execution,
+	) error {
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
@@ -2717,7 +2752,8 @@ func TestCreateWorkflowEvent_DatabaseUpdateError(t *testing.T) {
 	}
 	expectedErr := errors.New("expected error")
 	updateExecutionFunc := func(
-		context context.Context, execution models.Execution) error {
+		context context.Context, execution models.Execution,
+	) error {
 		return expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
@@ -2985,7 +3021,8 @@ func TestUpdateExecution(t *testing.T) {
 func TestListExecutions(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	executionListFunc := func(
-		ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
+		ctx context.Context, input interfaces.ListResourceInput,
+	) (interfaces.ExecutionCollectionOutput, error) {
 		var projectFilter, domainFilter, nameFilter bool
 		for _, filter := range input.InlineFilters {
 			assert.Equal(t, common.Execution, filter.GetEntity())
@@ -3108,7 +3145,8 @@ func TestListExecutions_DatabaseError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	expectedErr := errors.New("expected error")
 	executionListFunc := func(
-		ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
+		ctx context.Context, input interfaces.ListResourceInput,
+	) (interfaces.ExecutionCollectionOutput, error) {
 		return interfaces.ExecutionCollectionOutput{}, expectedErr
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetListCallback(executionListFunc)
@@ -3129,7 +3167,8 @@ func TestListExecutions_DatabaseError(t *testing.T) {
 func TestListExecutions_TransformerError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	executionListFunc := func(
-		ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
+		ctx context.Context, input interfaces.ListResourceInput,
+	) (interfaces.ExecutionCollectionOutput, error) {
 		return interfaces.ExecutionCollectionOutput{
 			Executions: []models.Execution{
 				{
@@ -3176,7 +3215,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
 		nil, nil, nil, nil)
 
-	var myExecManager = &ExecutionManager{
+	myExecManager := &ExecutionManager{
 		db:                 repository,
 		config:             mockRuntime,
 		storageClient:      getMockStorageForExecTest(context.Background()),
@@ -3199,7 +3238,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 			ExecutionId: &executionIdentifier,
 		},
 	}
-	var execClosure = admin.ExecutionClosure{
+	execClosure := admin.ExecutionClosure{
 		Notifications: testutils.GetExecutionRequest().Spec.GetNotifications().Notifications,
 		WorkflowId: &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
@@ -3209,7 +3248,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 			Version:      "wf_version",
 		},
 	}
-	var extraNotifications = []*admin.Notification{
+	extraNotifications := []*admin.Notification{
 		{
 			Phases: []core.WorkflowExecution_Phase{
 				core.WorkflowExecution_FAILED,
@@ -3258,7 +3297,7 @@ func TestExecutionManager_PublishNotifications(t *testing.T) {
 func TestExecutionManager_PublishNotificationsTransformError(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider(), repository)
-	var execManager = &ExecutionManager{
+	execManager := &ExecutionManager{
 		db:                 repository,
 		config:             getMockExecutionsConfigProvider(),
 		storageClient:      getMockStorageForExecTest(context.Background()),
@@ -3315,7 +3354,7 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 			[]runtimeInterfaces.ExecutionQueue{}, []runtimeInterfaces.WorkflowConfig{}),
 		nil, nil, nil, nil)
 
-	var myExecManager = &ExecutionManager{
+	myExecManager := &ExecutionManager{
 		db:                 repository,
 		config:             mockRuntime,
 		storageClient:      getMockStorageForExecTest(context.Background()),
@@ -3338,7 +3377,7 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 			ExecutionId: &executionIdentifier,
 		},
 	}
-	var execClosure = admin.ExecutionClosure{
+	execClosure := admin.ExecutionClosure{
 		Notifications: testutils.GetExecutionRequest().Spec.GetNotifications().Notifications,
 		WorkflowId: &core.Identifier{
 			ResourceType: core.ResourceType_WORKFLOW,
@@ -3362,14 +3401,13 @@ func TestExecutionManager_TestExecutionManager_PublishNotificationsTransformErro
 		Spec:         getExpectedSpecBytes(),
 	}
 	assert.Nil(t, myExecManager.publishNotifications(context.Background(), workflowRequest, executionModel))
-
 }
 
 func TestExecutionManager_PublishNotificationsNoPhaseMatch(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	queue := executions.NewQueueAllocator(getMockExecutionsConfigProvider(), repository)
 
-	var myExecManager = &ExecutionManager{
+	myExecManager := &ExecutionManager{
 		db:                 repository,
 		config:             getMockExecutionsConfigProvider(),
 		storageClient:      getMockStorageForExecTest(context.Background()),
@@ -3389,7 +3427,7 @@ func TestExecutionManager_PublishNotificationsNoPhaseMatch(t *testing.T) {
 			ExecutionId: &executionIdentifier,
 		},
 	}
-	var execClosure = admin.ExecutionClosure{
+	execClosure := admin.ExecutionClosure{
 		Notifications: testutils.GetExecutionRequest().Spec.GetNotifications().Notifications,
 	}
 	execClosureBytes, _ := proto.Marshal(&execClosure)
@@ -3415,7 +3453,8 @@ func TestTerminateExecution(t *testing.T) {
 
 	abortCause := "abort cause"
 	updateExecutionFunc := func(
-		context context.Context, execution models.Execution) error {
+		context context.Context, execution models.Execution,
+	) error {
 		assert.Equal(t, "project", execution.Project)
 		assert.Equal(t, "domain", execution.Domain)
 		assert.Equal(t, "name", execution.Name)
@@ -3469,7 +3508,7 @@ func TestTerminateExecution(t *testing.T) {
 }
 
 func TestTerminateExecution_PropellerError(t *testing.T) {
-	var expectedError = errors.New("expected error")
+	expectedError := errors.New("expected error")
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(expectedError)
@@ -3480,7 +3519,8 @@ func TestTerminateExecution_PropellerError(t *testing.T) {
 	updateCalled := false
 	repository := repositoryMocks.NewMockRepository()
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(func(
-		context context.Context, execution models.Execution) error {
+		context context.Context, execution models.Execution,
+	) error {
 		updateCalled = true
 		assert.Equal(t, core.WorkflowExecution_ABORTING.String(), execution.Phase)
 		return nil
@@ -3506,9 +3546,10 @@ func TestTerminateExecution_DatabaseError(t *testing.T) {
 	executionGetFunc := makeExecutionGetFunc(t, []byte{}, &startTime)
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 
-	var expectedError = errors.New("expected error")
+	expectedError := errors.New("expected error")
 	updateExecutionFunc := func(
-		context context.Context, execution models.Execution) error {
+		context context.Context, execution models.Execution,
+	) error {
 		return expectedError
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetUpdateCallback(updateExecutionFunc)
@@ -3532,7 +3573,7 @@ func TestTerminateExecution_DatabaseError(t *testing.T) {
 }
 
 func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
-	var expectedError = errors.New("expected error")
+	expectedError := errors.New("expected error")
 
 	mockExecutor := workflowengineMocks.WorkflowExecutor{}
 	mockExecutor.OnAbortMatch(mock.Anything, mock.Anything).Return(expectedError)
@@ -3566,7 +3607,7 @@ func TestTerminateExecution_AlreadyTerminated(t *testing.T) {
 func TestGetExecutionData(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
-	var closure = admin.ExecutionClosure{
+	closure := admin.ExecutionClosure{
 		Phase: core.WorkflowExecution_RUNNING,
 		OutputResult: &admin.ExecutionClosure_Outputs{
 			Outputs: &admin.LiteralMapBlob{
@@ -3576,7 +3617,8 @@ func TestGetExecutionData(t *testing.T) {
 			},
 		},
 	}
-	var closureBytes, _ = proto.Marshal(&closure)
+
+	closureBytes, _ := proto.Marshal(&closure)
 
 	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		return models.Execution{
@@ -3596,7 +3638,8 @@ func TestGetExecutionData(t *testing.T) {
 	}
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
 	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
-		ctx context.Context, uri string) (admin.UrlBlob, error) {
+		ctx context.Context, uri string,
+	) (admin.UrlBlob, error) {
 		if uri == outputURI {
 			return admin.UrlBlob{
 				Url:   "outputs",
@@ -3611,28 +3654,31 @@ func TestGetExecutionData(t *testing.T) {
 
 		return admin.UrlBlob{}, errors.New("unexpected input")
 	}
+
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"foo": testutils.MakeStringLiteral("foo-value-1"),
 		},
 	}
+
 	fullOutputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
 			"bar": testutils.MakeStringLiteral("bar-value-1"),
 		},
 	}
+
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
-		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		ctx context.Context, reference storage.DataReference, msg proto.Message,
+	) error {
 		if reference.String() == "inputs" {
 			marshalled, _ := proto.Marshal(fullInputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+			return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 		} else if reference.String() == outputURI {
 			marshalled, _ := proto.Marshal(fullOutputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+			return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 		}
+
 		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
 	}
 
@@ -3644,7 +3690,7 @@ func TestGetExecutionData(t *testing.T) {
 		Id: &executionIdentifier,
 	})
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
+	expected := &admin.WorkflowExecutionGetDataResponse{
 		Outputs: &admin.UrlBlob{
 			Url:   "outputs",
 			Bytes: 200,
@@ -3655,7 +3701,15 @@ func TestGetExecutionData(t *testing.T) {
 		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
-	}, dataResponse))
+		InputData:   migrateInputData(nil, fullInputs),
+		OutputData: &core.OutputData{
+			Outputs: fullOutputs,
+		},
+	}
+	if !assert.True(t, proto.Equal(expected, dataResponse)) {
+		t.Logf("Expected: %v", proto.MarshalTextString(expected))
+		t.Logf("Actual: %v", proto.MarshalTextString(dataResponse))
+	}
 }
 
 func TestResolveStringMap_RuntimeLimitsObserved(t *testing.T) {
@@ -3683,7 +3737,8 @@ func TestAddPluginOverrides(t *testing.T) {
 
 	db := repositoryMocks.NewMockRepository()
 	db.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (
-		models.Resource, error) {
+		models.Resource, error,
+	) {
 		assert.Equal(t, project, ID.Project)
 		assert.Equal(t, domain, ID.Domain)
 		assert.Equal(t, workflowName, ID.Workflow)
@@ -3732,7 +3787,8 @@ func TestPluginOverrides_ResourceGetFailure(t *testing.T) {
 
 	db := repositoryMocks.NewMockRepository()
 	db.ResourceRepo().(*repositoryMocks.MockResourceRepo).GetFunction = func(ctx context.Context, ID interfaces.ResourceID) (
-		models.Resource, error) {
+		models.Resource, error,
+	) {
 		return models.Resource{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.Aborted, "uh oh")
 	}
 	r := plugins.NewRegistry()
@@ -3792,7 +3848,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 			},
 		},
 	}
-	var closureBytes, _ = proto.Marshal(closure)
+	closureBytes, _ := proto.Marshal(closure)
 
 	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
 		return models.Execution{
@@ -3814,7 +3870,8 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 	}
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
 	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
-		ctx context.Context, uri string) (admin.UrlBlob, error) {
+		ctx context.Context, uri string,
+	) (admin.UrlBlob, error) {
 		if uri == outputURI {
 			return admin.UrlBlob{
 				Url:   "outputs",
@@ -3839,7 +3896,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 		Id: &executionIdentifier,
 	})
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
+	commonTestUtils.AssertProtoEqual(t, &admin.WorkflowExecutionGetDataResponse{
 		Outputs: &admin.UrlBlob{
 			Url:   "outputs",
 			Bytes: 200,
@@ -3853,12 +3910,17 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 				"foo": testutils.MakeStringLiteral("foo-value-1"),
 			},
 		},
-		FullOutputs: &core.LiteralMap{},
-	}, dataResponse))
-	var inputs core.LiteralMap
+		InputData: migrateInputData(nil, &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": testutils.MakeStringLiteral("foo-value-1"),
+			},
+		}),
+		OutputData: &core.OutputData{},
+	}, dataResponse)
+	var inputs core.InputData
 	err = storageClient.ReadProtobuf(context.Background(), storage.DataReference("s3://bucket/metadata/project/domain/name/inputs"), &inputs)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&inputs, closure.ComputedInputs))
+	commonTestUtils.AssertProtoEqual(t, inputs.GetInputs(), closure.ComputedInputs)
 }
 
 func TestCreateExecution_LegacyClient(t *testing.T) {
@@ -3928,7 +3990,7 @@ func TestRelaunchExecution_LegacyModel(t *testing.T) {
 		assert.Equal(t, "default_raw_output", spec.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, admin.ExecutionMetadata_RELAUNCH, spec.Metadata.Mode)
 		assert.Equal(t, int32(admin.ExecutionMetadata_RELAUNCH), input.Mode)
-		assert.True(t, proto.Equal(spec.Inputs, getLegacySpec().Inputs))
+		commonTestUtils.AssertProtoEqual(t, spec.Inputs, getLegacySpec().Inputs)
 		return nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(exCreateFunc)
@@ -3954,23 +4016,24 @@ func TestRelaunchExecution_LegacyModel(t *testing.T) {
 		},
 	}
 	assert.True(t, createCalled)
-	assert.True(t, proto.Equal(expectedResponse, response))
+	commonTestUtils.AssertProtoEqual(t, expectedResponse, response)
 
-	var userInputs core.LiteralMap
+	var userInputs core.InputData
 	err = storageClient.ReadProtobuf(context.Background(), "s3://bucket/metadata/project/domain/relaunchy/user_inputs", &userInputs)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&userInputs, getLegacySpec().Inputs))
+	commonTestUtils.AssertProtoEqual(t, userInputs.GetInputs(), getLegacySpec().Inputs)
 
-	var inputs core.LiteralMap
+	var inputs core.InputData
 	err = storageClient.ReadProtobuf(context.Background(), "s3://bucket/metadata/project/domain/relaunchy/inputs", &inputs)
 	assert.Nil(t, err)
-	assert.True(t, proto.Equal(&inputs, existingClosure.ComputedInputs))
+	commonTestUtils.AssertProtoEqual(t, inputs.GetInputs(), existingClosure.ComputedInputs)
 }
 
 func TestListExecutions_LegacyModel(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	executionListFunc := func(
-		ctx context.Context, input interfaces.ListResourceInput) (interfaces.ExecutionCollectionOutput, error) {
+		ctx context.Context, input interfaces.ListResourceInput,
+	) (interfaces.ExecutionCollectionOutput, error) {
 		var projectFilter, domainFilter, nameFilter bool
 		for _, filter := range input.InlineFilters {
 			assert.Equal(t, common.Execution, filter.GetEntity())
@@ -4048,8 +4111,8 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 		if idx == 0 {
 			assert.Equal(t, "my awesome execution", execution.Id.Name)
 		}
-		assert.True(t, proto.Equal(spec, execution.Spec))
-		assert.True(t, proto.Equal(&closure, execution.Closure))
+		commonTestUtils.AssertProtoEqual(t, spec, execution.Spec)
+		commonTestUtils.AssertProtoEqual(t, &closure, execution.Closure)
 	}
 	assert.Empty(t, executionList.Token)
 }
@@ -4095,7 +4158,7 @@ func TestSetDefaults(t *testing.T) {
 			EphemeralStorage: resource.MustParse("501Mi"),
 		},
 	})
-	assert.True(t, proto.Equal(
+	commonTestUtils.AssertProtoEqual(t,
 		&core.Container{
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
@@ -4136,7 +4199,7 @@ func TestSetDefaults(t *testing.T) {
 				},
 			},
 		},
-		task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
+		task.Template.GetContainer(), "%+v", task.Template.GetContainer())
 }
 
 func TestSetDefaults_MissingRequests_ExistingRequestsPreserved(t *testing.T) {
@@ -4179,7 +4242,7 @@ func TestSetDefaults_MissingRequests_ExistingRequestsPreserved(t *testing.T) {
 			EphemeralStorage: resource.MustParse("100"),
 		},
 	})
-	assert.True(t, proto.Equal(
+	commonTestUtils.AssertProtoEqual(t,
 		&core.Container{
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
@@ -4212,7 +4275,7 @@ func TestSetDefaults_MissingRequests_ExistingRequestsPreserved(t *testing.T) {
 				},
 			},
 		},
-		task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
+		task.Template.GetContainer(), "%+v", task.Template.GetContainer())
 }
 
 func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
@@ -4251,7 +4314,7 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 			},
 			Limits: taskConfigLimits,
 		})
-		assert.True(t, proto.Equal(
+		commonTestUtils.AssertProtoEqual(t,
 			&core.Container{
 				Resources: &core.Resources{
 					Requests: []*core.Resources_ResourceEntry{
@@ -4276,7 +4339,7 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 					},
 				},
 			},
-			task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
+			task.Template.GetContainer(), "%+v", task.Template.GetContainer())
 	})
 
 	t.Run("respect non-required resources when defaults exist in config", func(t *testing.T) {
@@ -4291,7 +4354,7 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 				EphemeralStorage: resource.MustParse("1"),
 			},
 		})
-		assert.True(t, proto.Equal(
+		commonTestUtils.AssertProtoEqual(t,
 			&core.Container{
 				Resources: &core.Resources{
 					Requests: []*core.Resources_ResourceEntry{
@@ -4324,13 +4387,13 @@ func TestSetDefaults_OptionalRequiredResources(t *testing.T) {
 					},
 				},
 			},
-			task.Template.GetContainer()), fmt.Sprintf("%+v", task.Template.GetContainer()))
+			task.Template.GetContainer(), "%+v", task.Template.GetContainer())
 	})
-
 }
+
 func TestCreateSingleTaskExecution(t *testing.T) {
 	repository := getMockRepositoryForExecTest()
-	var getCalledCount = 0
+	getCalledCount := 0
 	var newlyCreatedWorkflow models.Workflow
 	workflowCreateFunc := func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
 		newlyCreatedWorkflow = input
@@ -4460,7 +4523,7 @@ func TestCreateSingleTaskExecution(t *testing.T) {
 			}, input.ExecutionKey)
 			assert.Equal(t, "task", input.LaunchEntity)
 			assert.Equal(t, "UNDEFINED", input.Phase)
-			assert.True(t, proto.Equal(taskIdentifier, spec.LaunchPlan))
+			commonTestUtils.AssertProtoEqual(t, taskIdentifier, spec.LaunchPlan)
 			return nil
 		})
 
@@ -4568,15 +4631,19 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		config:          applicationConfig,
 	}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
-		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		request managerInterfaces.ResourceRequest,
+	) (*managerInterfaces.ResourceResponse, error) {
 		// two requests will be made, one with empty domain and one with filled in domain
-		assert.Contains(t, []managerInterfaces.ResourceRequest{{
-			Project:      workflowIdentifier.Project,
-			Domain:       workflowIdentifier.Domain,
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-		}, {Project: workflowIdentifier.Project,
-			Domain:       "",
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+		assert.Contains(t, []managerInterfaces.ResourceRequest{
+			{
+				Project:      workflowIdentifier.Project,
+				Domain:       workflowIdentifier.Domain,
+				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+			}, {
+				Project:      workflowIdentifier.Project,
+				Domain:       "",
+				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+			},
 		}, request)
 		projectDomainResponse := &managerInterfaces.ResourceResponse{
 			Attributes: &admin.MatchingAttributes{
@@ -4688,8 +4755,8 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 		assert.Equal(t, requestMaxParallelism, execConfig.MaxParallelism)
 		assert.Equal(t, launchPlanInterruptible, execConfig.Interruptible.Value)
 		assert.Equal(t, launchPlanOverwriteCache, execConfig.OverwriteCache)
-		assert.True(t, proto.Equal(launchPlan.Spec.SecurityContext, execConfig.SecurityContext))
-		assert.True(t, proto.Equal(launchPlan.Spec.Annotations, execConfig.Annotations))
+		commonTestUtils.AssertProtoEqual(t, launchPlan.Spec.SecurityContext, execConfig.SecurityContext)
+		commonTestUtils.AssertProtoEqual(t, launchPlan.Spec.Annotations, execConfig.Annotations)
 		assert.Equal(t, requestOutputLocationPrefix, execConfig.RawOutputDataConfig.OutputLocationPrefix)
 		assert.Equal(t, requestLabels, execConfig.GetLabels().Values)
 		assert.Equal(t, launchPlanEnvironmentVariables, execConfig.GetEnvs().Values)
@@ -4821,14 +4888,18 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	})
 	t.Run("matchable resource partial config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
-			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+			request managerInterfaces.ResourceRequest,
+		) (*managerInterfaces.ResourceResponse, error) {
+			assert.Contains(t, []managerInterfaces.ResourceRequest{
+				{
+					Project:      workflowIdentifier.Project,
+					Domain:       workflowIdentifier.Domain,
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				}, {
+					Project:      workflowIdentifier.Project,
+					Domain:       "",
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				},
 			}, request)
 
 			return &managerInterfaces.ResourceResponse{
@@ -4868,14 +4939,18 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	})
 	t.Run("matchable resource with no config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
-			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+			request managerInterfaces.ResourceRequest,
+		) (*managerInterfaces.ResourceResponse, error) {
+			assert.Contains(t, []managerInterfaces.ResourceRequest{
+				{
+					Project:      workflowIdentifier.Project,
+					Domain:       workflowIdentifier.Domain,
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				}, {
+					Project:      workflowIdentifier.Project,
+					Domain:       "",
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				},
 			}, request)
 			return &managerInterfaces.ResourceResponse{
 				Attributes: &admin.MatchingAttributes{
@@ -4906,14 +4981,18 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	})
 	t.Run("fetch security context from deprecated config", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
-			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+			request managerInterfaces.ResourceRequest,
+		) (*managerInterfaces.ResourceResponse, error) {
+			assert.Contains(t, []managerInterfaces.ResourceRequest{
+				{
+					Project:      workflowIdentifier.Project,
+					Domain:       workflowIdentifier.Domain,
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				}, {
+					Project:      workflowIdentifier.Project,
+					Domain:       "",
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				},
 			}, request)
 
 			return &managerInterfaces.ResourceResponse{
@@ -4949,16 +5028,20 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	})
 	t.Run("matchable resource workflow resource", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
-			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-				Workflow:     workflowIdentifier.Name,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				Workflow:     "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+			request managerInterfaces.ResourceRequest,
+		) (*managerInterfaces.ResourceResponse, error) {
+			assert.Contains(t, []managerInterfaces.ResourceRequest{
+				{
+					Project:      workflowIdentifier.Project,
+					Domain:       workflowIdentifier.Domain,
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+					Workflow:     workflowIdentifier.Name,
+				}, {
+					Project:      workflowIdentifier.Project,
+					Domain:       "",
+					Workflow:     "",
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				},
 			}, request)
 
 			return &managerInterfaces.ResourceResponse{
@@ -5003,14 +5086,18 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 	})
 	t.Run("matchable resource failure", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
-			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+			request managerInterfaces.ResourceRequest,
+		) (*managerInterfaces.ResourceResponse, error) {
+			assert.Contains(t, []managerInterfaces.ResourceRequest{
+				{
+					Project:      workflowIdentifier.Project,
+					Domain:       workflowIdentifier.Domain,
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				}, {
+					Project:      workflowIdentifier.Project,
+					Domain:       "",
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				},
 			}, request)
 			return nil, fmt.Errorf("failed to fetch the resources")
 		}
@@ -5035,14 +5122,18 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 
 	t.Run("application configuration", func(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
-			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-			assert.Contains(t, []managerInterfaces.ResourceRequest{{
-				Project:      workflowIdentifier.Project,
-				Domain:       workflowIdentifier.Domain,
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-			}, {Project: workflowIdentifier.Project,
-				Domain:       "",
-				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+			request managerInterfaces.ResourceRequest,
+		) (*managerInterfaces.ResourceResponse, error) {
+			assert.Contains(t, []managerInterfaces.ResourceRequest{
+				{
+					Project:      workflowIdentifier.Project,
+					Domain:       workflowIdentifier.Domain,
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				}, {
+					Project:      workflowIdentifier.Project,
+					Domain:       "",
+					ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+				},
 			}, request)
 			return &managerInterfaces.ResourceResponse{
 				Attributes: &admin.MatchingAttributes{
@@ -5319,14 +5410,18 @@ func TestGetExecutionConfigOverrides(t *testing.T) {
 func TestGetExecutionConfig(t *testing.T) {
 	resourceManager := managerMocks.MockResourceManager{}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
-		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
-		assert.Contains(t, []managerInterfaces.ResourceRequest{{
-			Project:      workflowIdentifier.Project,
-			Domain:       workflowIdentifier.Domain,
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
-		}, {Project: workflowIdentifier.Project,
-			Domain:       "",
-			ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG},
+		request managerInterfaces.ResourceRequest,
+	) (*managerInterfaces.ResourceResponse, error) {
+		assert.Contains(t, []managerInterfaces.ResourceRequest{
+			{
+				Project:      workflowIdentifier.Project,
+				Domain:       workflowIdentifier.Domain,
+				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+			}, {
+				Project:      workflowIdentifier.Project,
+				Domain:       "",
+				ResourceType: admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG,
+			},
 		}, request)
 		return &managerInterfaces.ResourceResponse{
 			Attributes: &admin.MatchingAttributes{
@@ -5358,7 +5453,8 @@ func TestGetExecutionConfig(t *testing.T) {
 func TestGetExecutionConfig_Spec(t *testing.T) {
 	resourceManager := managerMocks.MockResourceManager{}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
-		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		request managerInterfaces.ResourceRequest,
+	) (*managerInterfaces.ResourceResponse, error) {
 		return nil, nil
 	}
 	applicationConfig := runtime.NewConfigurationProvider()
@@ -5399,7 +5495,8 @@ func TestGetExecutionConfig_Spec(t *testing.T) {
 
 	resourceManager = managerMocks.MockResourceManager{}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
-		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		request managerInterfaces.ResourceRequest,
+	) (*managerInterfaces.ResourceResponse, error) {
 		return nil, nil
 	}
 	executionManager = ExecutionManager{
@@ -5425,7 +5522,8 @@ func TestGetClusterAssignment(t *testing.T) {
 	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	resourceManager := managerMocks.MockResourceManager{}
 	resourceManager.GetResourceFunc = func(ctx context.Context,
-		request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
+		request managerInterfaces.ResourceRequest,
+	) (*managerInterfaces.ResourceResponse, error) {
 		assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
 			Project:      workflowIdentifier.Project,
 			Domain:       workflowIdentifier.Domain,
@@ -5450,7 +5548,7 @@ func TestGetClusterAssignment(t *testing.T) {
 			Spec:    &admin.ExecutionSpec{},
 		})
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(ca, &clusterAssignment))
+		commonTestUtils.AssertProtoEqual(t, ca, &clusterAssignment)
 	})
 	t.Run("value from request", func(t *testing.T) {
 		reqClusterAssignment := admin.ClusterAssignment{ClusterPoolName: "swimming-pool"}
@@ -5462,7 +5560,7 @@ func TestGetClusterAssignment(t *testing.T) {
 			},
 		})
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(ca, &reqClusterAssignment))
+		commonTestUtils.AssertProtoEqual(t, ca, &reqClusterAssignment)
 	})
 	t.Run("value from config", func(t *testing.T) {
 		customCP := "my_cp"
@@ -5531,7 +5629,8 @@ func TestResolvePermissions(t *testing.T) {
 			RunAs: &core.Identity{
 				IamRole:           assumableIamRole,
 				K8SServiceAccount: k8sServiceAccount,
-			}}, sc)
+			},
+		}, sc)
 	})
 	t.Run("use request values security context", func(t *testing.T) {
 		execRequest := &admin.ExecutionCreateRequest{
@@ -5719,5 +5818,4 @@ func TestAddStateFilter(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "state <> ?", expression.Query)
 	})
-
 }

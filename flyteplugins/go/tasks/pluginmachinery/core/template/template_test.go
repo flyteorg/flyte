@@ -26,15 +26,18 @@ func (d dummyInputReader) GetInputPrefixPath() storage.DataReference {
 	return d.inputPrefix
 }
 
-func (d dummyInputReader) GetInputPath() storage.DataReference {
+func (d dummyInputReader) GetInputPath(ctx context.Context) (storage.DataReference, error) {
+	return d.inputPath, nil
+}
+func (d dummyInputReader) GetInputDataPath() storage.DataReference {
 	return d.inputPath
 }
 
-func (d dummyInputReader) Get(ctx context.Context) (*core.LiteralMap, error) {
+func (d dummyInputReader) Get(ctx context.Context) (*core.InputData, error) {
 	if d.inputErr {
 		return nil, fmt.Errorf("expected input fetch error")
 	}
-	return d.inputs, nil
+	return &core.InputData{Inputs: d.inputs}, nil
 }
 
 type dummyOutputPaths struct {

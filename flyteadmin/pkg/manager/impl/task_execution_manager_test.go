@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
+	protoV2 "google.golang.org/protobuf/proto"
 	"testing"
 	"time"
 
@@ -927,12 +929,10 @@ func TestGetTaskExecutionData(t *testing.T) {
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		if reference.String() == "input-uri.pb" {
 			marshalled, _ := proto.Marshal(fullInputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+			return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 		} else if reference.String() == "test-output.pb" {
 			marshalled, _ := proto.Marshal(fullOutputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+			return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 		}
 		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
 	}
@@ -946,7 +946,7 @@ func TestGetTaskExecutionData(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.True(t, getTaskCalled)
-	assert.True(t, proto.Equal(&admin.TaskExecutionGetDataResponse{
+	commonTestUtils.AssertProtoEqual(t, &admin.TaskExecutionGetDataResponse{
 		Inputs: &admin.UrlBlob{
 			Url:   "inputs",
 			Bytes: 100,
@@ -957,10 +957,14 @@ func TestGetTaskExecutionData(t *testing.T) {
 		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
+		InputData:   migrateInputData(nil, fullOutputs),
+		OutputData: &core.OutputData{
+			Outputs: fullOutputs,
+		},
 		FlyteUrls: &admin.FlyteURLs{
 			Inputs:  "flyte://v1/project/domain/name/node-id/1/i",
 			Outputs: "flyte://v1/project/domain/name/node-id/1/o",
-			Deck:    "",
+			//Deck:    "",
 		},
-	}, dataResponse))
+	}, dataResponse)
 }

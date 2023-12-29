@@ -118,8 +118,8 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 
 	ir := &mocks2.InputReader{}
 	ir.OnGetInputPrefixPath().Return("/prefix/")
-	ir.OnGetInputPath().Return("/prefix/inputs.pb")
-	ir.OnGetMatch(mock.Anything).Return(&core2.LiteralMap{}, nil)
+	ir.OnGetInputDataPath().Return("/prefix/inputs.pb")
+	ir.OnGetMatch(mock.Anything).Return(&core2.InputData{}, nil)
 
 	composedProtobufStore := &stdmocks.ComposedProtobufStore{}
 	matchedBy := mock.MatchedBy(func(s storage.DataReference) bool {

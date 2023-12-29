@@ -399,12 +399,14 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 		}
 
-		outputLiteralMap := &idlcore.LiteralMap{
-			Literals: outputLiterals,
+		outputs := &idlcore.OutputData{
+			Outputs: &idlcore.LiteralMap{
+				Literals: outputLiterals,
+			},
 		}
 
 		outputFile := v1alpha1.GetOutputsFile(nCtx.NodeStatus().GetOutputDir())
-		if err := nCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputLiteralMap); err != nil {
+		if err := nCtx.DataStore().WriteProtobuf(ctx, outputFile, storage.Options{}, outputs); err != nil {
 			return handler.UnknownTransition, err
 		}
 

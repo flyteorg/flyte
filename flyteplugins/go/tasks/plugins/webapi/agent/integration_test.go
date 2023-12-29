@@ -50,9 +50,11 @@ func (m *MockClient) CreateTask(_ context.Context, createTaskRequest *admin.Crea
 
 func (m *MockClient) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
 	if req.GetTaskType() == "bigquery_query_job_task" {
-		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
-			Literals: map[string]*flyteIdlCore.Literal{
-				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.OutputData{
+			Outputs: &flyteIdlCore.LiteralMap{
+				Literals: map[string]*flyteIdlCore.Literal{
+					"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+				},
 			},
 		}}}, nil
 	}
@@ -99,7 +101,9 @@ func TestEndToEnd(t *testing.T) {
 	st, err := utils.MarshalPbToStruct(&sparkJob)
 	assert.NoError(t, err)
 
-	inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	inputs := &flyteIdlCore.InputData{
+		Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"x": 1}).GetMap(),
+	}
 	template := flyteIdlCore.TaskTemplate{
 		Type:   "bigquery_query_job_task",
 		Custom: st,
@@ -144,7 +148,7 @@ func TestEndToEnd(t *testing.T) {
 		tCtx.OnTaskReader().Return(tr)
 		inputReader := &ioMocks.InputReader{}
 		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+		inputReader.OnGetInputDataPath().Return(basePrefix + "/inputs.pb")
 		inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
 		tCtx.OnInputReader().Return(inputReader)
 
@@ -178,7 +182,7 @@ func TestEndToEnd(t *testing.T) {
 		tCtx.OnTaskReader().Return(tr)
 		inputReader := &ioMocks.InputReader{}
 		inputReader.OnGetInputPrefixPath().Return(basePrefix)
-		inputReader.OnGetInputPath().Return(basePrefix + "/inputs.pb")
+		inputReader.OnGetInputDataPath().Return(basePrefix + "/inputs.pb")
 		inputReader.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnInputReader().Return(inputReader)
 

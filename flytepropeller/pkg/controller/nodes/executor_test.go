@@ -1709,9 +1709,9 @@ func TestNodeExecutionEventStartNode(t *testing.T) {
 	tID := &core.TaskExecutionIdentifier{
 		NodeExecutionId: nID,
 	}
-	p := handler.PhaseInfoQueued("r", &core.LiteralMap{})
+	p := handler.PhaseInfoQueued("r", &core.InputData{Inputs: &core.LiteralMap{}})
 	inputReader := &mocks3.InputReader{}
-	inputReader.OnGetInputPath().Return("reference")
+	inputReader.OnGetInputDataPath().Return("reference")
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
@@ -2050,7 +2050,7 @@ func TestRecover(t *testing.T) {
 	})
 
 	ir := &mocks3.InputReader{}
-	ir.OnGetInputPath().Return(inputsPath)
+	ir.OnGetInputDataPath().Return(inputsPath)
 
 	ns := &mocks.ExecutableNodeStatus{}
 	ns.OnGetOutputDir().Return(storage.DataReference("out"))

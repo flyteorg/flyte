@@ -191,7 +191,7 @@ func Test_ExtractQueryInfo(t *testing.T) {
 
 			ir := &mocks3.InputReader{}
 			tCtx.OnInputReader().Return(ir)
-			ir.OnGetInputPath().Return(storage.DataReference("s3://something"))
+			ir.OnGetInputDataPath().Return(storage.DataReference("s3://something"))
 			ir.OnGetInputPrefixPath().Return(storage.DataReference("s3://something/2"))
 			ir.OnGet(ctx).Return(nil, nil)
 

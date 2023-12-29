@@ -55,7 +55,7 @@ func hashify(literal *core.Literal) *core.Literal {
 	return literal
 }
 
-func HashLiteralMap(ctx context.Context, inputData *core.InputData) (string, error) {
+func HashInputData(ctx context.Context, inputData *core.InputData) (string, error) {
 	// TODO (haytham): We should hash everything in the inputData proto.
 	literalMap := inputData.GetInputs()
 	if literalMap == nil || len(literalMap.GetLiterals()) == 0 {

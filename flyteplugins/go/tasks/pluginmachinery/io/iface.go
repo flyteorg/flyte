@@ -17,7 +17,7 @@ type InputFilePaths interface {
 	GetInputPrefixPath() storage.DataReference
 	// GetInputPath returns a path for where the protobuf encoded inputs of type `core.LiteralMap` can be found.
 	// The returned value is a URN in the configured storage backend
-	GetInputPath() storage.DataReference
+	GetInputPath(ctx context.Context) (storage.DataReference, error)
 	// GetInputDataPath returns a path for where the protobuf encoded inputs of type `core.InputData` can be found.
 	// The returned value is a URN in the configured storage backend
 	GetInputDataPath() storage.DataReference

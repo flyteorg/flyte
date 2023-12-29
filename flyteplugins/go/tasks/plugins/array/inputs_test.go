@@ -26,7 +26,7 @@ func TestGetInputReader(t *testing.T) {
 		inputReader := GetInputReader(taskCtx, &core.TaskTemplate{
 			TaskTypeVersion: 0,
 		})
-		assert.Equal(t, inputReader.GetInputPath().String(), "test-data-prefix")
+		assert.Equal(t, inputReader.GetInputDataPath().String(), "test-data-prefix")
 	})
 
 	t.Run("task_type_version == 1", func(t *testing.T) {
@@ -36,6 +36,6 @@ func TestGetInputReader(t *testing.T) {
 		inputReader := GetInputReader(taskCtx, &core.TaskTemplate{
 			TaskTypeVersion: 1,
 		})
-		assert.Equal(t, inputReader.GetInputPath().String(), "test-data-reference")
+		assert.Equal(t, inputReader.GetInputDataPath().String(), "test-data-reference")
 	})
 }

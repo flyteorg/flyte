@@ -406,7 +406,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		logger.Errorf(ctx, "Storage configuration missing.")
 	}
 
-	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
+	store, err := storage.NewDataStoreWithContext(ctx, sCfg, scope.NewSubScope("metastore"))
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
 	}

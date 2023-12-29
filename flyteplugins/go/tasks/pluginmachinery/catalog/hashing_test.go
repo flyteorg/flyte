@@ -616,8 +616,10 @@ func TestHashLiteralMap_LiteralsWithHashSet(t *testing.T) {
 			assert.Equal(t, tt.expectedLiteral, hashify(tt.literal))
 
 			// Double-check that generating a tag is successful
-			literalMap := &core.LiteralMap{Literals: map[string]*core.Literal{"o0": tt.literal}}
-			hash, err := HashLiteralMap(context.TODO(), literalMap)
+			literalMap := &core.InputData{
+				Inputs: &core.LiteralMap{Literals: map[string]*core.Literal{"o0": tt.literal}},
+			}
+			hash, err := HashInputData(context.TODO(), literalMap)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, hash)
 		})
@@ -629,25 +631,31 @@ func TestInputValueSorted(t *testing.T) {
 	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
 	assert.NoError(t, err)
 
-	hash, err := HashLiteralMap(context.TODO(), literalMap)
+	inputData := &core.InputData{
+		Inputs: literalMap,
+	}
+	hash, err := HashInputData(context.TODO(), inputData)
 	assert.NoError(t, err)
 	assert.Equal(t, "GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", hash)
 
 	literalMap, err = coreutils.MakeLiteralMap(map[string]interface{}{"2": 2, "1": 1})
 	assert.NoError(t, err)
 
-	hashDupe, err := HashLiteralMap(context.TODO(), literalMap)
+	inputData = &core.InputData{
+		Inputs: literalMap,
+	}
+	hashDupe, err := HashInputData(context.TODO(), inputData)
 	assert.NoError(t, err)
 	assert.Equal(t, hashDupe, hash)
 }
 
 // Ensure that empty inputs are hashed the same way
 func TestNoInputValues(t *testing.T) {
-	hash, err := HashLiteralMap(context.TODO(), nil)
+	hash, err := HashInputData(context.TODO(), nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", hash)
 
-	hashDupe, err := HashLiteralMap(context.TODO(), &core.LiteralMap{Literals: nil})
+	hashDupe, err := HashInputData(context.TODO(), &core.InputData{Inputs: &core.LiteralMap{Literals: nil}})
 	assert.NoError(t, err)
 	assert.Equal(t, "GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", hashDupe)
 	assert.Equal(t, hashDupe, hash)

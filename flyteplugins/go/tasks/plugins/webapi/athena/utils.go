@@ -104,6 +104,7 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 			Inputs:           tCtx.InputReader(),
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          task.GetMetadata().GetRuntime(),
 		})
 		if err != nil {
 			return QueryInfo{}, err
@@ -135,6 +136,7 @@ func extractQueryInfo(ctx context.Context, tCtx webapi.TaskExecutionContextReade
 			Inputs:           tCtx.InputReader(),
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          task.GetMetadata().GetRuntime(),
 		})
 		if err != nil {
 			return QueryInfo{}, err

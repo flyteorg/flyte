@@ -31,9 +31,9 @@ func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob a
 // GetInputs returns an inputs URL blob and if config settings permit, inline inputs data for an execution.
 func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, inputURI string) (
-	*core.LiteralMap, *admin.UrlBlob, error) {
+	*core.InputData, *admin.UrlBlob, error) {
 	var inputsURLBlob admin.UrlBlob
-	var fullInputs core.LiteralMap
+	var fullInputs core.InputData
 
 	if len(inputURI) == 0 {
 		return &fullInputs, &inputsURLBlob, nil
@@ -48,13 +48,19 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	}
 
 	if shouldFetchData(remoteDataConfig, inputsURLBlob) {
-		err = storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
+		oldInputs := &core.LiteralMap{}
+		msgIndex, err := storageClient.ReadProtobufAny(ctx, storage.DataReference(inputURI), &fullInputs, oldInputs)
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the input data.
 			logger.Warningf(ctx, "Failed to read inputs from URI [%s] with err: %v", inputURI, err)
+		} else if msgIndex == 1 {
+			fullInputs = core.InputData{
+				Inputs: oldInputs,
+			}
 		}
 	}
+
 	return &fullInputs, &inputsURLBlob, nil
 }
 
@@ -62,6 +68,7 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 type ExecutionClosure interface {
 	GetOutputUri() string //nolint
 	GetOutputData() *core.LiteralMap
+	GetFullOutputs() *core.OutputData
 }
 
 // Wrapper around an admin.ExecutionClosure object which conforms to the output interface
@@ -86,6 +93,20 @@ func (c workflowExecutionClosure) GetOutputData() *core.LiteralMap {
 	return c.ExecutionClosure.GetOutputData()
 }
 
+func (c workflowExecutionClosure) GetFullOutputs() *core.OutputData {
+	if c.ExecutionClosure.GetOutputs() != nil && c.ExecutionClosure.GetOutputs().GetValues() != nil {
+		return &core.OutputData{
+			Outputs: c.ExecutionClosure.GetOutputs().GetValues(),
+		}
+	} else if oldOutputs := c.ExecutionClosure.GetOutputData(); oldOutputs != nil {
+		return &core.OutputData{
+			Outputs: oldOutputs,
+		}
+	}
+
+	return c.ExecutionClosure.GetFullOutputs()
+}
+
 // ToExecutionClosureInterface converts a workflow execution closure to an implementation of the ExecutionClosure
 // interface for use in producing execution output data.
 func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosure {
@@ -97,9 +118,9 @@ func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosu
 // GetOutputs returns an outputs URL blob and if config settings permit, inline outputs data for an execution.
 func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, closure ExecutionClosure) (
-	*core.LiteralMap, *admin.UrlBlob, error) {
+	*core.OutputData, *admin.UrlBlob, error) {
 	var outputsURLBlob admin.UrlBlob
-	var fullOutputs = &core.LiteralMap{}
+	var fullOutputs = &core.OutputData{}
 	if closure == nil {
 		return fullOutputs, &outputsURLBlob, nil
 	}
@@ -112,18 +133,31 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 		}
 	}
 
-	if closure.GetOutputData() != nil {
+	if closure.GetFullOutputs() != nil {
+		if int64(proto.Size(closure.GetFullOutputs())) < remoteDataConfig.MaxSizeInBytes {
+			fullOutputs = closure.GetFullOutputs()
+		} else {
+			logger.Debugf(ctx, "execution closure contains output data that exceeds max data size for responses")
+		}
+	} else if closure.GetOutputData() != nil {
 		if int64(proto.Size(closure.GetOutputData())) < remoteDataConfig.MaxSizeInBytes {
-			fullOutputs = closure.GetOutputData()
+			fullOutputs = &core.OutputData{
+				Outputs: closure.GetOutputData(),
+			}
 		} else {
 			logger.Debugf(ctx, "execution closure contains output data that exceeds max data size for responses")
 		}
 	} else if shouldFetchOutputData(remoteDataConfig, outputsURLBlob, closure.GetOutputUri()) {
-		err := storageClient.ReadProtobuf(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs)
+		oldOutputs := &core.LiteralMap{}
+		msgIndex, err := storageClient.ReadProtobufAny(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs, oldOutputs)
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the output data.
 			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", closure.GetOutputUri(), err)
+		} else if msgIndex == 1 {
+			fullOutputs = &core.OutputData{
+				Outputs: oldOutputs,
+			}
 		}
 	}
 

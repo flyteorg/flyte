@@ -119,7 +119,7 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 
 	// InputReader
 	inputFilePaths := &pluginmocks.InputFilePaths{}
-	inputFilePaths.OnGetInputPath().Return(storage.DataReference("s3://bucket/input"))
+	inputFilePaths.OnGetInputDataPath().Return(storage.DataReference("s3://bucket/input"))
 	nCtx.OnInputReader().Return(
 		newStaticInputReader(
 			inputFilePaths,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"time"
 
 	"github.com/golang/protobuf/proto"
@@ -551,17 +552,17 @@ type NodeStatusVisitor interface {
 type EnqueueWorkflow func(workflowID WorkflowID)
 
 func GetOutputsFile(outputDir DataReference) DataReference {
-	return outputDir + "/outputs.pb"
+	return outputDir + "/" + ioutils.OutputsSuffix
 }
 
 func GetInputsFile(inputDir DataReference) DataReference {
-	return inputDir + "/inputs.pb"
+	return inputDir + "/" + ioutils.InputsSuffix
 }
 
 func GetInputDataFile(inputDir DataReference) DataReference {
-	return inputDir + "/inputs_data.pb"
+	return inputDir + "/" + ioutils.InputDataSuffix
 }
 
 func GetDeckFile(inputDir DataReference) DataReference {
-	return inputDir + "/deck.html"
+	return inputDir + "/" + ioutils.DeckSuffix
 }

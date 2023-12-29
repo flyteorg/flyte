@@ -189,7 +189,7 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 		}
 	} else {
 		tev.InputValue = &event.TaskExecutionEvent_InputUri{
-			InputUri: input.InputReader.GetInputPath().String(),
+			InputUri: input.InputReader.GetInputDataPath().String(),
 		}
 	}
 

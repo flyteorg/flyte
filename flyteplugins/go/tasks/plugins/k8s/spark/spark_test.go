@@ -351,8 +351,8 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskCtx := &mocks.TaskExecutionContext{}
 	inputReader := &pluginIOMocks.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("/input/prefix")
-	inputReader.OnGetInputPath().Return("/input")
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.OnGetInputDataPath().Return("/input")
+	inputReader.OnGetMatch(mock.Anything).Return(&core.InputData{}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &pluginIOMocks.OutputWriter{}

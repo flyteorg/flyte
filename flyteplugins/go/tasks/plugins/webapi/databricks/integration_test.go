@@ -60,7 +60,7 @@ func TestEndToEnd(t *testing.T) {
 		sparkJob := plugins.SparkJob{DatabricksConf: databricksConfig, DatabricksToken: "token", SparkConf: map[string]string{"spark.driver.bindAddress": "127.0.0.1"}}
 		st, err := utils.MarshalPbToStruct(&sparkJob)
 		assert.NoError(t, err)
-		inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+		inputs := &flyteIdlCore.InputData{Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"x": 1}).GetMap()}
 		template := flyteIdlCore.TaskTemplate{
 			Type:   "databricks",
 			Custom: st,

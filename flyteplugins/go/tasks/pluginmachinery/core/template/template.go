@@ -21,6 +21,7 @@ package template
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/util/version"
 	"reflect"
 	"regexp"
 	"strings"
@@ -38,16 +39,19 @@ var alphaNumericOnly = regexp.MustCompile("[^a-zA-Z0-9_]+")
 var startsWithAlpha = regexp.MustCompile("^[^a-zA-Z_]+")
 
 // Regexes for Supported templates
-var inputFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
-var inputPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
-var inputDataFileRegex = regexp.MustCompile(`(?i){{\s*[\.$]InputData\s*}}`)
-var outputRegex = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
-var inputVarRegex = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
-var rawOutputDataPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
-var perRetryUniqueKey = regexp.MustCompile(`(?i){{\s*[\.$]PerRetryUniqueKey\s*}}`)
-var taskTemplateRegex = regexp.MustCompile(`(?i){{\s*[\.$]TaskTemplatePath\s*}}`)
-var prevCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]PrevCheckpointPrefix\s*}}`)
-var currCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]CheckpointOutputPrefix\s*}}`)
+var (
+	inputFileRegex            = regexp.MustCompile(`(?i){{\s*[\.$]Input\s*}}`)
+	inputPrefixRegex          = regexp.MustCompile(`(?i){{\s*[\.$]InputPrefix\s*}}`)
+	outputRegex               = regexp.MustCompile(`(?i){{\s*[\.$]OutputPrefix\s*}}`)
+	inputVarRegex             = regexp.MustCompile(`(?i){{\s*[\.$]Inputs\.(?P<input_name>[^}\s]+)\s*}}`)
+	rawOutputDataPrefixRegex  = regexp.MustCompile(`(?i){{\s*[\.$]RawOutputDataPrefix\s*}}`)
+	perRetryUniqueKey         = regexp.MustCompile(`(?i){{\s*[\.$]PerRetryUniqueKey\s*}}`)
+	taskTemplateRegex         = regexp.MustCompile(`(?i){{\s*[\.$]TaskTemplatePath\s*}}`)
+	prevCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]PrevCheckpointPrefix\s*}}`)
+	currCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]CheckpointOutputPrefix\s*}}`)
+	// TODO(haytham): write down the right version once we release flytekit
+	inputDataWrapperMinVersion = version.MustParseSemantic("v1.10.3")
+)
 
 type ErrorCollection struct {
 	Errors []error
@@ -62,12 +66,19 @@ func (e ErrorCollection) Error() string {
 	return sb.String()
 }
 
+type RuntimeMetadata interface {
+	GetType() idlCore.RuntimeMetadata_RuntimeType
+	GetVersion() string
+	GetFlavor() string
+}
+
 // Parameters struct is used by the Templating Engine to replace the templated parameters
 type Parameters struct {
 	TaskExecMetadata core.TaskExecutionMetadata
 	Inputs           io.InputReader
 	OutputPath       io.OutputFilePaths
 	Task             core.TaskTemplatePath
+	Runtime          RuntimeMetadata
 }
 
 // Render Evaluates templates in each command with the equivalent value from passed args. Templates are case-insensitive
@@ -104,9 +115,7 @@ func Render(ctx context.Context, inputTemplate []string, params Parameters) ([]s
 }
 
 func render(ctx context.Context, inputTemplate string, params Parameters, perRetryKey string) (string, error) {
-	val := inputFileRegex.ReplaceAllString(inputTemplate, params.Inputs.GetInputPath().String())
-	val = inputDataFileRegex.ReplaceAllString(val, params.Inputs.GetInputDataPath().String())
-	val = outputRegex.ReplaceAllString(val, params.OutputPath.GetOutputPrefixPath().String())
+	val := outputRegex.ReplaceAllString(inputTemplate, params.OutputPath.GetOutputPrefixPath().String())
 	val = inputPrefixRegex.ReplaceAllString(val, params.Inputs.GetInputPrefixPath().String())
 	val = rawOutputDataPrefixRegex.ReplaceAllString(val, params.OutputPath.GetRawOutputPrefix().String())
 	prevCheckpoint := params.OutputPath.GetPreviousCheckpointsPrefix().String()
@@ -116,6 +125,34 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 	val = prevCheckpointPrefixRegex.ReplaceAllString(val, prevCheckpoint)
 	val = currCheckpointPrefixRegex.ReplaceAllString(val, params.OutputPath.GetCheckpointPrefix().String())
 	val = perRetryUniqueKey.ReplaceAllString(val, perRetryKey)
+
+	// Input format has been updated, check if flytekit has been updated to the new version, the GetInputPath()
+	// itself will upload the input (can be expensive) to the remote location
+	if inputFileRegex.MatchString(val) {
+		useNewFormat := true
+		if params.Runtime.GetType() == idlCore.RuntimeMetadata_FLYTE_SDK {
+			v, err := version.ParseSemantic(params.Runtime.GetVersion())
+			if err != nil {
+				logger.Warnf(ctx, "Failed to parse version [%v] to determine the input path behavior. Proceeding with InputDataWrapper format.", params.Runtime.GetVersion())
+			} else if !v.AtLeast(inputDataWrapperMinVersion) {
+				useNewFormat = false
+			}
+		} else {
+			useNewFormat = false
+		}
+
+		if useNewFormat {
+			val = inputFileRegex.ReplaceAllString(val, params.Inputs.GetInputDataPath().String())
+		} else {
+			p, err := params.Inputs.GetInputPath(ctx)
+			if err != nil {
+				logger.Debugf(ctx, "Failed to substitute Input Template reference - reason %s", err)
+				return "", fmt.Errorf("failed to substitute input template reference - reason %w", err)
+			}
+
+			val = inputFileRegex.ReplaceAllString(val, p.String())
+		}
+	}
 
 	// For Task template, we will replace only if there is a match. This is because, task template replacement
 	// may be expensive, as we may offload

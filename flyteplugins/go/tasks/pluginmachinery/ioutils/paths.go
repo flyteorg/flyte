@@ -9,9 +9,9 @@ import (
 
 const (
 	// InputsSuffix specifies the name of the file that contains the task inputs in the form core.LiteralMap
-	InputsSuffix = "inputs.pb"
+	InputsSuffix = "inputs_old.pb"
 	// InputDataSuffix specifies the name of the file that contains the task inputs in the form core.LiteralMap
-	InputDataSuffix = "input_data.pb"
+	InputDataSuffix = "inputs.pb"
 	// TaskTemplateSuffix In case a task requests for a task template, it is passed into the task using this filename.
 	// The format is of type core.TaskTemplate
 	TaskTemplateSuffix = "task.pb"
@@ -21,9 +21,9 @@ const (
 	// OutputsSuffix specifies that outputs are assumed to be written to this "file"/"suffix" under the given prefix
 	// The outputs file has a format of core.LiteralMap
 	OutputsSuffix = "outputs.pb"
-	// deckSuffix specifies that deck file are assumed to be written to this "file"/"suffix" under the given prefix
+	// DeckSuffix specifies that deck file are assumed to be written to this "file"/"suffix" under the given prefix
 	// The deck file has a format of HTML
-	deckSuffix = "deck.html"
+	DeckSuffix = "deck.html"
 	// ErrorsSuffix specifies that the errors are written to this prefix/file under the given prefix. The Error File
 	// has a format of core.ErrorDocument
 	ErrorsSuffix      = "error.pb"

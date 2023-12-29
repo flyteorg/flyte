@@ -2,6 +2,7 @@ package ioutils
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,18 +13,20 @@ import (
 
 func TestInMemoryOutputReader(t *testing.T) {
 	deckPath := storage.DataReference("s3://bucket/key")
-	lt := map[string]*flyteIdlCore.Literal{
-		"results": {
-			Value: &flyteIdlCore.Literal_Scalar{
-				Scalar: &flyteIdlCore.Scalar{
-					Value: &flyteIdlCore.Scalar_Primitive{
-						Primitive: &flyteIdlCore.Primitive{Value: &flyteIdlCore.Primitive_Integer{Integer: 3}},
+	lt := &flyteIdlCore.OutputData{
+		Outputs: coreutils.MustMakeLiteral(map[string]*flyteIdlCore.Literal{
+			"results": {
+				Value: &flyteIdlCore.Literal_Scalar{
+					Scalar: &flyteIdlCore.Scalar{
+						Value: &flyteIdlCore.Scalar_Primitive{
+							Primitive: &flyteIdlCore.Primitive{Value: &flyteIdlCore.Primitive_Integer{Integer: 3}},
+						},
 					},
 				},
 			},
-		},
+		}).GetMap(),
 	}
-	or := NewInMemoryOutputReader(&flyteIdlCore.OutputData{Outputs: &flyteIdlCore.LiteralMap{Literals: lt}}, &deckPath, nil)
+	or := NewInMemoryOutputReader(lt, &deckPath, nil)
 
 	assert.Equal(t, &deckPath, or.DeckPath)
 	ctx := context.TODO()

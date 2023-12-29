@@ -396,11 +396,14 @@ func CreateNoopResourceManager(ctx context.Context, scope promutils.Scope) resou
 
 func Test_task_Handle_NoCatalog(t *testing.T) {
 
-	inputs := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo": coreutils.MustMakeLiteral("bar"),
+	inputs := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": coreutils.MustMakeLiteral("bar"),
+			},
 		},
 	}
+
 	createNodeContext := func(pluginPhase pluginCore.Phase, pluginVer uint32, pluginResp fakeplugins.NextPhaseState, recorder interfaces.EventRecorder, ttype string, s *taskNodeStateHolder, allowIncrementParallelism bool) *nodeMocks.NodeExecutionContext {
 		wfExecID := &core.WorkflowExecutionIdentifier{
 			Project: "project",
@@ -474,7 +477,7 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		n.OnGetResources().Return(res)
 
 		ir := &ioMocks.InputReader{}
-		ir.OnGetInputPath().Return("input")
+		ir.OnGetInputDataPath().Return("input")
 		ir.OnGetMatch(mock.Anything).Return(inputs, nil)
 		nCtx := &nodeMocks.NodeExecutionContext{}
 		nCtx.OnNodeExecutionMetadata().Return(nm)

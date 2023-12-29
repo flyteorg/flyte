@@ -94,12 +94,12 @@ type InputReader_GetInputPath struct {
 	*mock.Call
 }
 
-func (_m InputReader_GetInputPath) Return(_a0 storage.DataReference) *InputReader_GetInputPath {
-	return &InputReader_GetInputPath{Call: _m.Call.Return(_a0)}
+func (_m InputReader_GetInputPath) Return(_a0 storage.DataReference, _a1 error) *InputReader_GetInputPath {
+	return &InputReader_GetInputPath{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *InputReader) OnGetInputPath() *InputReader_GetInputPath {
-	c_call := _m.On("GetInputPath")
+func (_m *InputReader) OnGetInputPath(ctx context.Context) *InputReader_GetInputPath {
+	c_call := _m.On("GetInputPath", ctx)
 	return &InputReader_GetInputPath{Call: c_call}
 }
 
@@ -108,18 +108,25 @@ func (_m *InputReader) OnGetInputPathMatch(matchers ...interface{}) *InputReader
 	return &InputReader_GetInputPath{Call: c_call}
 }
 
-// GetInputPath provides a mock function with given fields:
-func (_m *InputReader) GetInputPath() storage.DataReference {
-	ret := _m.Called()
+// GetInputPath provides a mock function with given fields: ctx
+func (_m *InputReader) GetInputPath(ctx context.Context) (storage.DataReference, error) {
+	ret := _m.Called(ctx)
 
 	var r0 storage.DataReference
-	if rf, ok := ret.Get(0).(func() storage.DataReference); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(context.Context) storage.DataReference); ok {
+		r0 = rf(ctx)
 	} else {
 		r0 = ret.Get(0).(storage.DataReference)
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 type InputReader_GetInputPrefixPath struct {
