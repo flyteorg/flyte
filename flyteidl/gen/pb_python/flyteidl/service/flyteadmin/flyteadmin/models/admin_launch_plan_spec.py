@@ -19,6 +19,7 @@ import six
 from flyteadmin.models.admin_annotations import AdminAnnotations  # noqa: F401,E501
 from flyteadmin.models.admin_auth import AdminAuth  # noqa: F401,E501
 from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
+from flyteadmin.models.admin_envs import AdminEnvs  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_launch_plan_metadata import AdminLaunchPlanMetadata  # noqa: F401,E501
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
@@ -57,7 +58,8 @@ class AdminLaunchPlanSpec(object):
         'raw_output_data_config': 'AdminRawOutputDataConfig',
         'max_parallelism': 'int',
         'interruptible': 'bool',
-        'overwrite_cache': 'bool'
+        'overwrite_cache': 'bool',
+        'envs': 'AdminEnvs'
     }
 
     attribute_map = {
@@ -75,10 +77,11 @@ class AdminLaunchPlanSpec(object):
         'raw_output_data_config': 'raw_output_data_config',
         'max_parallelism': 'max_parallelism',
         'interruptible': 'interruptible',
-        'overwrite_cache': 'overwrite_cache'
+        'overwrite_cache': 'overwrite_cache',
+        'envs': 'envs'
     }
 
-    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None, interruptible=None, overwrite_cache=None):  # noqa: E501
+    def __init__(self, workflow_id=None, entity_metadata=None, default_inputs=None, fixed_inputs=None, role=None, labels=None, annotations=None, auth=None, auth_role=None, security_context=None, quality_of_service=None, raw_output_data_config=None, max_parallelism=None, interruptible=None, overwrite_cache=None, envs=None):  # noqa: E501
         """AdminLaunchPlanSpec - a model defined in Swagger"""  # noqa: E501
 
         self._workflow_id = None
@@ -96,6 +99,7 @@ class AdminLaunchPlanSpec(object):
         self._max_parallelism = None
         self._interruptible = None
         self._overwrite_cache = None
+        self._envs = None
         self.discriminator = None
 
         if workflow_id is not None:
@@ -128,6 +132,8 @@ class AdminLaunchPlanSpec(object):
             self.interruptible = interruptible
         if overwrite_cache is not None:
             self.overwrite_cache = overwrite_cache
+        if envs is not None:
+            self.envs = envs
 
     @property
     def workflow_id(self):
@@ -463,6 +469,29 @@ class AdminLaunchPlanSpec(object):
         """
 
         self._overwrite_cache = overwrite_cache
+
+    @property
+    def envs(self):
+        """Gets the envs of this AdminLaunchPlanSpec.  # noqa: E501
+
+        Environment variables to be set for the execution.  # noqa: E501
+
+        :return: The envs of this AdminLaunchPlanSpec.  # noqa: E501
+        :rtype: AdminEnvs
+        """
+        return self._envs
+
+    @envs.setter
+    def envs(self, envs):
+        """Sets the envs of this AdminLaunchPlanSpec.
+
+        Environment variables to be set for the execution.  # noqa: E501
+
+        :param envs: The envs of this AdminLaunchPlanSpec.  # noqa: E501
+        :type: AdminEnvs
+        """
+
+        self._envs = envs
 
     def to_dict(self):
         """Returns the model properties as a dict"""

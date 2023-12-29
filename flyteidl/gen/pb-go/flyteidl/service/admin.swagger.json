@@ -1482,6 +1482,54 @@
         ]
       }
     },
+    "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "GetExecutionMetrics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionGetMetricsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "depth",
+            "description": "depth defines the number of Flyte entity levels to traverse when breaking down execution details.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.",
@@ -2442,7 +2490,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/adminTaskCreateResponse"
+              "$ref": "#/definitions/flyteidladminTaskCreateResponse"
             }
           }
         },
@@ -2452,7 +2500,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/adminTaskCreateRequest"
+              "$ref": "#/definitions/flyteidladminTaskCreateRequest"
             }
           }
         ],
@@ -3661,6 +3709,19 @@
       },
       "description": "Defines an email notification specification."
     },
+    "adminEnvs": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Map of custom environment variables to be applied to the execution resource."
+        }
+      },
+      "description": "Environment variable values to be applied to an execution resource.\nIn the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined\nto specify how to merge environment variables defined at registration and execution time."
+    },
     "adminExecution": {
       "type": "object",
       "properties": {
@@ -3957,6 +4018,17 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
+        },
+        "envs": {
+          "$ref": "#/definitions/adminEnvs",
+          "description": "Environment variables to be set for the execution."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Tags to be set for the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -4043,6 +4115,21 @@
       ],
       "default": "MINUTE",
       "description": "Represents a frequency at which to run a schedule."
+    },
+    "adminFlyteURLs": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "string"
+        },
+        "outputs": {
+          "type": "string"
+        },
+        "deck": {
+          "type": "string"
+        }
+      },
+      "description": "These URLs are returned as part of node and task execution data requests."
     },
     "adminGetVersionResponse": {
       "type": "object",
@@ -4227,6 +4314,10 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
+        },
+        "envs": {
+          "$ref": "#/definitions/adminEnvs",
+          "description": "Environment variables to be set for the execution."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -4512,6 +4603,10 @@
         "deck_uri": {
           "type": "string",
           "title": "String location uniquely identifying where the deck HTML file is.\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
+        },
+        "dynamic_job_spec_uri": {
+          "type": "string",
+          "description": "dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for a DynamicWorkflow. This is required\nto correctly recover partially completed executions where the subworkflow has already been compiled."
         }
       },
       "description": "Container for node execution details and results."
@@ -4555,6 +4650,9 @@
         "dynamic_workflow": {
           "$ref": "#/definitions/flyteidladminDynamicWorkflowNodeMetadata",
           "description": "Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here."
+        },
+        "flyte_urls": {
+          "$ref": "#/definitions/adminFlyteURLs"
         }
       },
       "description": "Response structure for NodeExecutionGetDataRequest which contains inputs and outputs for a node execution."
@@ -4867,6 +4965,21 @@
       },
       "description": "Encapsulates user settings pertaining to offloaded data (i.e. Blobs, Schema, query data, etc.).\nSee https://github.com/flyteorg/flyte/issues/211 for more background information."
     },
+    "adminReason": {
+      "type": "object",
+      "properties": {
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "occurred_at is the timestamp indicating the instant that this reason happened."
+        },
+        "message": {
+          "type": "string",
+          "description": "message is the explanation for the most recent phase transition or status update."
+        }
+      },
+      "description": "Reason is a single message annotated with a timestamp to indicate the instant the reason occurred."
+    },
     "adminSchedule": {
       "type": "object",
       "properties": {
@@ -4929,6 +5042,10 @@
         "execution_cluster": {
           "type": "string",
           "description": "Which execution cluster this execution ran on."
+        },
+        "namespace": {
+          "type": "string",
+          "description": "Which kubernetes namespace the execution ran under."
         }
       },
       "description": "Represents system, rather than user-facing, metadata about an execution."
@@ -4965,24 +5082,6 @@
         }
       },
       "description": "Compute task attributes which include values derived from the TaskSpec, as well as plugin-specific data\nand task metadata."
-    },
-    "adminTaskCreateRequest": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "$ref": "#/definitions/coreIdentifier",
-          "title": "id represents the unique identifier of the task.\n+required"
-        },
-        "spec": {
-          "$ref": "#/definitions/adminTaskSpec",
-          "title": "Represents the specification for task.\n+required"
-        }
-      },
-      "title": "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task` for more details"
-    },
-    "adminTaskCreateResponse": {
-      "type": "object",
-      "description": "Represents a response structure if task creation succeeds."
     },
     "adminTaskExecutionClosure": {
       "type": "object",
@@ -5042,13 +5141,20 @@
           "description": "A predefined yet extensible Task type identifier."
         },
         "metadata": {
-          "$ref": "#/definitions/eventTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidleventTaskExecutionMetadata",
           "description": "Metadata around how a task was executed."
         },
         "event_version": {
           "type": "integer",
           "format": "int32",
           "description": "The event version is used to indicate versioned changes in how data is maintained using this\nproto message. For example, event_verison \u003e 0 means that maps tasks logs use the\nTaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog\nin this message."
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminReason"
+          },
+          "description": "A time-series of the phase transition or update explanations. This, when compared to storing a singular reason\nas previously done, is much more valuable in visualizing and understanding historical evaluations."
         }
       },
       "description": "Container for task execution details and results."
@@ -5088,6 +5194,10 @@
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Full_outputs will only be populated if they are under a configured size threshold."
+        },
+        "flyte_urls": {
+          "$ref": "#/definitions/adminFlyteURLs",
+          "title": "flyte tiny url to fetch a core.LiteralMap of task execution's IO\nDeck will be empty for task"
         }
       },
       "description": "Response structure for TaskExecutionGetDataRequest which contains inputs and outputs for a task execution."
@@ -5357,6 +5467,10 @@
           "type": "boolean",
           "format": "boolean",
           "description": "Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.\nIf enabled, all calculations are performed even if cached results would be available, overwriting the stored\ndata once execution finishes successfully."
+        },
+        "envs": {
+          "$ref": "#/definitions/adminEnvs",
+          "description": "Environment variables to be set for the execution."
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."
@@ -5399,6 +5513,16 @@
         }
       },
       "description": "Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution."
+    },
+    "adminWorkflowExecutionGetMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "span": {
+          "$ref": "#/definitions/coreSpan",
+          "description": "Span defines the top-level breakdown of the workflows execution. More precise information is nested in a\nhierarchical structure using Flyte entity references."
+        }
+      },
+      "description": "WorkflowExecutionGetMetricsResponse represents the response containing metrics for the specified workflow execution."
     },
     "adminWorkflowList": {
       "type": "object",
@@ -5461,6 +5585,31 @@
         }
       },
       "description": "ApproveCondition represents a dependency on an external approval. During execution, this will manifest as a boolean\nsignal with the provided signal_id."
+    },
+    "coreArrayNode": {
+      "type": "object",
+      "properties": {
+        "node": {
+          "$ref": "#/definitions/coreNode",
+          "description": "node is the sub-node that will be executed for each element in the array."
+        },
+        "parallelism": {
+          "type": "integer",
+          "format": "int64",
+          "description": "parallelism defines the minimum number of instances to bring up concurrently at any given\npoint. Note that this is an optimistic restriction and that, due to network partitioning or\nother failures, the actual number of currently running instances might be more. This has to\nbe a positive number if assigned. Default value is size."
+        },
+        "min_successes": {
+          "type": "integer",
+          "format": "int64",
+          "description": "min_successes is an absolute number of the minimum number of successful completions of\nsub-nodes. As soon as this criteria is met, the ArrayNode will be marked as successful\nand outputs will be computed. This has to be a non-negative number if assigned. Default\nvalue is size (if specified)."
+        },
+        "min_success_ratio": {
+          "type": "number",
+          "format": "float",
+          "description": "If the array job size is not known beforehand, the min_success_ratio can instead be used\nto determine when an ArrayNode can be marked successful."
+        }
+      },
+      "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
     },
     "coreBinary": {
       "type": "object",
@@ -5949,6 +6098,10 @@
         "oauth2_client": {
           "$ref": "#/definitions/coreOAuth2Client",
           "description": "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when\nmaking external calls."
+        },
+        "execution_identity": {
+          "type": "string",
+          "title": "execution_identity references the subject who makes the execution"
         }
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
@@ -6020,6 +6173,10 @@
         "pod_spec": {
           "$ref": "#/definitions/protobufStruct",
           "title": "Defines the primary pod spec created when a task is executed.\nThis should be a JSON-marshalled pod spec, which can be defined in\n- go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936\n- python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py"
+        },
+        "data_config": {
+          "$ref": "#/definitions/coreDataLoadingConfig",
+          "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
         }
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
@@ -6181,6 +6338,10 @@
         "gate_node": {
           "$ref": "#/definitions/coreGateNode",
           "description": "Information about the condition to evaluate in this node."
+        },
+        "array_node": {
+          "$ref": "#/definitions/coreArrayNode",
+          "description": "Information about the sub-node executions for each value in the list of this nodes\ninputs values."
         }
       },
       "description": "A Workflow graph Node. One unit of execution in the graph. Each node can be linked to a Task, a Workflow or a branch\nnode."
@@ -6294,6 +6455,10 @@
         "var": {
           "type": "string",
           "title": "Or one of this node's input variables"
+        },
+        "scalar": {
+          "$ref": "#/definitions/coreScalar",
+          "title": "Replace the primitive field"
         }
       },
       "description": "Defines an operand to a comparison expression."
@@ -6308,6 +6473,12 @@
         "var": {
           "type": "string",
           "description": "Variable name must refer to an output variable for the node."
+        },
+        "attr_path": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/corePromiseAttribute"
+          }
         }
       },
       "description": "A reference to an output produced by a node. The type can be retrieved -and validated- from\nthe underlying interface of the node."
@@ -6371,6 +6542,18 @@
         }
       },
       "title": "Primitive Types"
+    },
+    "corePromiseAttribute": {
+      "type": "object",
+      "properties": {
+        "string_value": {
+          "type": "string"
+        },
+        "int_value": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
     },
     "coreQualityOfService": {
       "type": "object",
@@ -6603,6 +6786,45 @@
       },
       "description": "SleepCondition represents a dependency on waiting for the specified duration."
     },
+    "coreSpan": {
+      "type": "object",
+      "properties": {
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "start_time defines the instance this span began."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "end_time defines the instance this span completed."
+        },
+        "workflow_id": {
+          "$ref": "#/definitions/coreWorkflowExecutionIdentifier",
+          "description": "workflow_id is the id of the workflow execution this Span represents."
+        },
+        "node_id": {
+          "$ref": "#/definitions/coreNodeExecutionIdentifier",
+          "description": "node_id is the id of the node execution this Span represents."
+        },
+        "task_id": {
+          "$ref": "#/definitions/coreTaskExecutionIdentifier",
+          "description": "task_id is the id of the task execution this Span represents."
+        },
+        "operation_id": {
+          "type": "string",
+          "description": "operation_id is the id of a unique operation that this Span represents."
+        },
+        "spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreSpan"
+          },
+          "description": "spans defines a collection of Spans that breakdown this execution."
+        }
+      },
+      "description": "Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation\nwhich uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more\nprecise definitions."
+    },
     "coreSql": {
       "type": "object",
       "properties": {
@@ -6759,6 +6981,10 @@
             "type": "string"
           },
           "title": "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
+        },
+        "pod_template_name": {
+          "type": "string",
+          "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
         }
       },
       "title": "Task Metadata"
@@ -7054,6 +7280,20 @@
       },
       "description": "Flyte Workflow Structure that encapsulates task, branch and subworkflow nodes to form a statically analyzable,\ndirected acyclic graph."
     },
+    "eventEventReason": {
+      "type": "object",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "title": "An explanation for this event"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time this reason occurred"
+        }
+      }
+    },
     "eventExternalResourceInfo": {
       "type": "object",
       "properties": {
@@ -7111,6 +7351,10 @@
         "input_uri": {
           "type": "string"
         },
+        "input_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw input data consumed by this node execution."
+        },
         "output_uri": {
           "type": "string",
           "description": "URL to the output of the execution, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
@@ -7166,6 +7410,11 @@
         "deck_uri": {
           "type": "string",
           "title": "String location uniquely identifying where the deck HTML file is\nNativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)"
+        },
+        "reported_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "This timestamp represents the instant when the event was reported by the executing framework. For example,\nwhen first processing a node the `occurred_at` timestamp should be the instant propeller makes progress, so when\nliteral inputs are initially copied. The event however will not be sent until after the copy completes.\nExtracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series."
         }
       }
     },
@@ -7240,6 +7489,10 @@
           "type": "string",
           "description": "URI of the input file, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
         },
+        "input_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw input data consumed by this task execution."
+        },
         "output_uri": {
           "type": "string",
           "description": "URI to the output of the execution, it will be in a format that encodes all the information\nincluding Cloud source provider. ie., s3://..."
@@ -7263,54 +7516,35 @@
         },
         "reason": {
           "type": "string",
-          "description": "An optional explanation for the phase transition."
+          "description": "An optional explanation for the phase transition.\nDeprecated: Use reasons instead."
+        },
+        "reasons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventEventReason"
+          },
+          "description": "An optional list of explanations for the phase transition."
         },
         "task_type": {
           "type": "string",
           "description": "A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin\nthis type will be identical, but not all task executions necessarily use pre-registered definitions and this\ntype is useful to render the task in the UI, filter task executions, etc."
         },
         "metadata": {
-          "$ref": "#/definitions/eventTaskExecutionMetadata",
+          "$ref": "#/definitions/flyteidleventTaskExecutionMetadata",
           "description": "Metadata around how a task was executed."
         },
         "event_version": {
           "type": "integer",
           "format": "int32",
           "description": "The event version is used to indicate versioned changes in how data is reported using this\nproto message. For example, event_verison \u003e 0 means that maps tasks report logs using the\nTaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog\nin this message."
+        },
+        "reported_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "This timestamp represents the instant when the event was reported by the executing framework. For example, a k8s\npod task may be marked completed at (ie. `occurred_at`) the instant the container running user code completes,\nbut this event will not be reported until the pod is marked as completed. Extracting both of these timestamps\nfacilitates a more accurate portrayal of the evaluation time-series."
         }
       },
       "description": "Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob."
-    },
-    "eventTaskExecutionMetadata": {
-      "type": "object",
-      "properties": {
-        "generated_name": {
-          "type": "string",
-          "description": "Unique, generated name for this task execution used by the backend."
-        },
-        "external_resources": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/eventExternalResourceInfo"
-          },
-          "description": "Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution."
-        },
-        "resource_pool_info": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/eventResourcePoolInfo"
-          },
-          "description": "Includes additional data on concurrent resource management used during execution..\nThis is a repeated field because a plugin can request multiple resource allocations during execution."
-        },
-        "plugin_identifier": {
-          "type": "string",
-          "description": "The identifier of the plugin used to execute this task."
-        },
-        "instance_class": {
-          "$ref": "#/definitions/TaskExecutionMetadataInstanceClass"
-        }
-      },
-      "description": "Holds metadata around how a task was executed.\nAs a task transitions across event phases during execution some attributes, such its generated name, generated external resources,\nand more may grow in size but not change necessarily based on the phase transition that sparked the event update.\nMetadata is a container for these attributes across the task execution lifecycle."
     },
     "eventWorkflowExecutionEvent": {
       "type": "object",
@@ -7355,6 +7589,10 @@
         "compiled_workflow": {
           "$ref": "#/definitions/coreCompiledWorkflowClosure",
           "description": "Represents the compiled representation of the embedded dynamic workflow."
+        },
+        "dynamic_job_spec_uri": {
+          "type": "string",
+          "description": "dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is\nrequired to correctly recover partially completed executions where the subworkflow has already been compiled."
         }
       },
       "description": "For dynamic workflow nodes we capture information about the dynamic workflow definition that gets generated."
@@ -7380,6 +7618,24 @@
         }
       },
       "description": "Encapsulates all details for a single node execution entity.\nA node represents a component in the overall workflow graph. A node launch a task, multiple tasks, an entire nested\nsub-workflow, or even a separate child-workflow execution.\nThe same task can be called repeatedly in a single workflow but each node is unique."
+    },
+    "flyteidladminTaskCreateRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "title": "id represents the unique identifier of the task.\n+required"
+        },
+        "spec": {
+          "$ref": "#/definitions/adminTaskSpec",
+          "title": "Represents the specification for task.\n+required"
+        }
+      },
+      "title": "Represents a request structure to create a revision of a task.\nSee :ref:`ref_flyteidl.admin.Task` for more details"
+    },
+    "flyteidladminTaskCreateResponse": {
+      "type": "object",
+      "description": "Represents a response structure if task creation succeeds."
     },
     "flyteidladminTaskExecution": {
       "type": "object",
@@ -7442,9 +7698,44 @@
         "compiled_workflow": {
           "$ref": "#/definitions/coreCompiledWorkflowClosure",
           "description": "Represents the compiled representation of the embedded dynamic workflow."
+        },
+        "dynamic_job_spec_uri": {
+          "type": "string",
+          "description": "dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is\nrequired to correctly recover partially completed executions where the workflow has already been compiled."
         }
       },
       "description": "For dynamic workflow nodes we send information about the dynamic workflow definition that gets generated."
+    },
+    "flyteidleventTaskExecutionMetadata": {
+      "type": "object",
+      "properties": {
+        "generated_name": {
+          "type": "string",
+          "description": "Unique, generated name for this task execution used by the backend."
+        },
+        "external_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventExternalResourceInfo"
+          },
+          "description": "Additional data on external resources on other back-ends or platforms (e.g. Hive, Qubole, etc) launched by this task execution."
+        },
+        "resource_pool_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventResourcePoolInfo"
+          },
+          "description": "Includes additional data on concurrent resource management used during execution..\nThis is a repeated field because a plugin can request multiple resource allocations during execution."
+        },
+        "plugin_identifier": {
+          "type": "string",
+          "description": "The identifier of the plugin used to execute this task."
+        },
+        "instance_class": {
+          "$ref": "#/definitions/TaskExecutionMetadataInstanceClass"
+        }
+      },
+      "description": "Holds metadata around how a task was executed.\nAs a task transitions across event phases during execution some attributes, such its generated name, generated external resources,\nand more may grow in size but not change necessarily based on the phase transition that sparked the event update.\nMetadata is a container for these attributes across the task execution lifecycle."
     },
     "flyteidleventTaskNodeMetadata": {
       "type": "object",

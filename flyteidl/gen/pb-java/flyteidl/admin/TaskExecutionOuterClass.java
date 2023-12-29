@@ -4634,6 +4634,55 @@ public final class TaskExecutionOuterClass {
      */
     int getEventVersion();
 
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    java.util.List<flyteidl.admin.TaskExecutionOuterClass.Reason> 
+        getReasonsList();
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    flyteidl.admin.TaskExecutionOuterClass.Reason getReasons(int index);
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    int getReasonsCount();
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    java.util.List<? extends flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder> 
+        getReasonsOrBuilderList();
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder getReasonsOrBuilder(
+        int index);
+
     public flyteidl.admin.TaskExecutionOuterClass.TaskExecutionClosure.OutputResultCase getOutputResultCase();
   }
   /**
@@ -4657,6 +4706,7 @@ public final class TaskExecutionOuterClass {
       logs_ = java.util.Collections.emptyList();
       reason_ = "";
       taskType_ = "";
+      reasons_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -4827,6 +4877,15 @@ public final class TaskExecutionOuterClass {
               eventVersion_ = input.readInt32();
               break;
             }
+            case 146: {
+              if (!((mutable_bitField0_ & 0x00004000) != 0)) {
+                reasons_ = new java.util.ArrayList<flyteidl.admin.TaskExecutionOuterClass.Reason>();
+                mutable_bitField0_ |= 0x00004000;
+              }
+              reasons_.add(
+                  input.readMessage(flyteidl.admin.TaskExecutionOuterClass.Reason.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -4844,6 +4903,9 @@ public final class TaskExecutionOuterClass {
       } finally {
         if (((mutable_bitField0_ & 0x00000010) != 0)) {
           logs_ = java.util.Collections.unmodifiableList(logs_);
+        }
+        if (((mutable_bitField0_ & 0x00004000) != 0)) {
+          reasons_ = java.util.Collections.unmodifiableList(reasons_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5413,6 +5475,66 @@ public final class TaskExecutionOuterClass {
       return eventVersion_;
     }
 
+    public static final int REASONS_FIELD_NUMBER = 18;
+    private java.util.List<flyteidl.admin.TaskExecutionOuterClass.Reason> reasons_;
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    public java.util.List<flyteidl.admin.TaskExecutionOuterClass.Reason> getReasonsList() {
+      return reasons_;
+    }
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    public java.util.List<? extends flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder> 
+        getReasonsOrBuilderList() {
+      return reasons_;
+    }
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    public int getReasonsCount() {
+      return reasons_.size();
+    }
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    public flyteidl.admin.TaskExecutionOuterClass.Reason getReasons(int index) {
+      return reasons_.get(index);
+    }
+    /**
+     * <pre>
+     * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+     * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+     */
+    public flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder getReasonsOrBuilder(
+        int index) {
+      return reasons_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -5468,6 +5590,9 @@ public final class TaskExecutionOuterClass {
       }
       if (eventVersion_ != 0) {
         output.writeInt32(17, eventVersion_);
+      }
+      for (int i = 0; i < reasons_.size(); i++) {
+        output.writeMessage(18, reasons_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -5531,6 +5656,10 @@ public final class TaskExecutionOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(17, eventVersion_);
       }
+      for (int i = 0; i < reasons_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(18, reasons_.get(i));
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -5585,6 +5714,8 @@ public final class TaskExecutionOuterClass {
       }
       if (getEventVersion()
           != other.getEventVersion()) return false;
+      if (!getReasonsList()
+          .equals(other.getReasonsList())) return false;
       if (!getOutputResultCase().equals(other.getOutputResultCase())) return false;
       switch (outputResultCase_) {
         case 1:
@@ -5649,6 +5780,10 @@ public final class TaskExecutionOuterClass {
       }
       hash = (37 * hash) + EVENT_VERSION_FIELD_NUMBER;
       hash = (53 * hash) + getEventVersion();
+      if (getReasonsCount() > 0) {
+        hash = (37 * hash) + REASONS_FIELD_NUMBER;
+        hash = (53 * hash) + getReasonsList().hashCode();
+      }
       switch (outputResultCase_) {
         case 1:
           hash = (37 * hash) + OUTPUT_URI_FIELD_NUMBER;
@@ -5798,6 +5933,7 @@ public final class TaskExecutionOuterClass {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
           getLogsFieldBuilder();
+          getReasonsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -5853,6 +5989,12 @@ public final class TaskExecutionOuterClass {
         }
         eventVersion_ = 0;
 
+        if (reasonsBuilder_ == null) {
+          reasons_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00004000);
+        } else {
+          reasonsBuilder_.clear();
+        }
         outputResultCase_ = 0;
         outputResult_ = null;
         return this;
@@ -5943,6 +6085,15 @@ public final class TaskExecutionOuterClass {
           result.metadata_ = metadataBuilder_.build();
         }
         result.eventVersion_ = eventVersion_;
+        if (reasonsBuilder_ == null) {
+          if (((bitField0_ & 0x00004000) != 0)) {
+            reasons_ = java.util.Collections.unmodifiableList(reasons_);
+            bitField0_ = (bitField0_ & ~0x00004000);
+          }
+          result.reasons_ = reasons_;
+        } else {
+          result.reasons_ = reasonsBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         result.outputResultCase_ = outputResultCase_;
         onBuilt();
@@ -6050,6 +6201,32 @@ public final class TaskExecutionOuterClass {
         }
         if (other.getEventVersion() != 0) {
           setEventVersion(other.getEventVersion());
+        }
+        if (reasonsBuilder_ == null) {
+          if (!other.reasons_.isEmpty()) {
+            if (reasons_.isEmpty()) {
+              reasons_ = other.reasons_;
+              bitField0_ = (bitField0_ & ~0x00004000);
+            } else {
+              ensureReasonsIsMutable();
+              reasons_.addAll(other.reasons_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.reasons_.isEmpty()) {
+            if (reasonsBuilder_.isEmpty()) {
+              reasonsBuilder_.dispose();
+              reasonsBuilder_ = null;
+              reasons_ = other.reasons_;
+              bitField0_ = (bitField0_ & ~0x00004000);
+              reasonsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getReasonsFieldBuilder() : null;
+            } else {
+              reasonsBuilder_.addAllMessages(other.reasons_);
+            }
+          }
         }
         switch (other.getOutputResultCase()) {
           case OUTPUT_URI: {
@@ -8092,6 +8269,336 @@ public final class TaskExecutionOuterClass {
         onChanged();
         return this;
       }
+
+      private java.util.List<flyteidl.admin.TaskExecutionOuterClass.Reason> reasons_ =
+        java.util.Collections.emptyList();
+      private void ensureReasonsIsMutable() {
+        if (!((bitField0_ & 0x00004000) != 0)) {
+          reasons_ = new java.util.ArrayList<flyteidl.admin.TaskExecutionOuterClass.Reason>(reasons_);
+          bitField0_ |= 0x00004000;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.admin.TaskExecutionOuterClass.Reason, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder, flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder> reasonsBuilder_;
+
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public java.util.List<flyteidl.admin.TaskExecutionOuterClass.Reason> getReasonsList() {
+        if (reasonsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(reasons_);
+        } else {
+          return reasonsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public int getReasonsCount() {
+        if (reasonsBuilder_ == null) {
+          return reasons_.size();
+        } else {
+          return reasonsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public flyteidl.admin.TaskExecutionOuterClass.Reason getReasons(int index) {
+        if (reasonsBuilder_ == null) {
+          return reasons_.get(index);
+        } else {
+          return reasonsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder setReasons(
+          int index, flyteidl.admin.TaskExecutionOuterClass.Reason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.set(index, value);
+          onChanged();
+        } else {
+          reasonsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder setReasons(
+          int index, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder addReasons(flyteidl.admin.TaskExecutionOuterClass.Reason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.add(value);
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder addReasons(
+          int index, flyteidl.admin.TaskExecutionOuterClass.Reason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.add(index, value);
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder addReasons(
+          flyteidl.admin.TaskExecutionOuterClass.Reason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.add(builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder addReasons(
+          int index, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder addAllReasons(
+          java.lang.Iterable<? extends flyteidl.admin.TaskExecutionOuterClass.Reason> values) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, reasons_);
+          onChanged();
+        } else {
+          reasonsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder clearReasons() {
+        if (reasonsBuilder_ == null) {
+          reasons_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00004000);
+          onChanged();
+        } else {
+          reasonsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public Builder removeReasons(int index) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.remove(index);
+          onChanged();
+        } else {
+          reasonsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public flyteidl.admin.TaskExecutionOuterClass.Reason.Builder getReasonsBuilder(
+          int index) {
+        return getReasonsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder getReasonsOrBuilder(
+          int index) {
+        if (reasonsBuilder_ == null) {
+          return reasons_.get(index);  } else {
+          return reasonsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public java.util.List<? extends flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder> 
+           getReasonsOrBuilderList() {
+        if (reasonsBuilder_ != null) {
+          return reasonsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(reasons_);
+        }
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public flyteidl.admin.TaskExecutionOuterClass.Reason.Builder addReasonsBuilder() {
+        return getReasonsFieldBuilder().addBuilder(
+            flyteidl.admin.TaskExecutionOuterClass.Reason.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public flyteidl.admin.TaskExecutionOuterClass.Reason.Builder addReasonsBuilder(
+          int index) {
+        return getReasonsFieldBuilder().addBuilder(
+            index, flyteidl.admin.TaskExecutionOuterClass.Reason.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+       * as previously done, is much more valuable in visualizing and understanding historical evaluations.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.admin.Reason reasons = 18;</code>
+       */
+      public java.util.List<flyteidl.admin.TaskExecutionOuterClass.Reason.Builder> 
+           getReasonsBuilderList() {
+        return getReasonsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.admin.TaskExecutionOuterClass.Reason, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder, flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder> 
+          getReasonsFieldBuilder() {
+        if (reasonsBuilder_ == null) {
+          reasonsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.admin.TaskExecutionOuterClass.Reason, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder, flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder>(
+                  reasons_,
+                  ((bitField0_ & 0x00004000) != 0),
+                  getParentForChildren(),
+                  isClean());
+          reasons_ = null;
+        }
+        return reasonsBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -8140,6 +8647,853 @@ public final class TaskExecutionOuterClass {
 
     @java.lang.Override
     public flyteidl.admin.TaskExecutionOuterClass.TaskExecutionClosure getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ReasonOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.Reason)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * occurred_at is the timestamp indicating the instant that this reason happened.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+     */
+    boolean hasOccurredAt();
+    /**
+     * <pre>
+     * occurred_at is the timestamp indicating the instant that this reason happened.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+     */
+    com.google.protobuf.Timestamp getOccurredAt();
+    /**
+     * <pre>
+     * occurred_at is the timestamp indicating the instant that this reason happened.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder();
+
+    /**
+     * <pre>
+     * message is the explanation for the most recent phase transition or status update.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    java.lang.String getMessage();
+    /**
+     * <pre>
+     * message is the explanation for the most recent phase transition or status update.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getMessageBytes();
+  }
+  /**
+   * <pre>
+   * Reason is a single message annotated with a timestamp to indicate the instant the reason occurred.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.Reason}
+   */
+  public  static final class Reason extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.Reason)
+      ReasonOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use Reason.newBuilder() to construct.
+    private Reason(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private Reason() {
+      message_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private Reason(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (occurredAt_ != null) {
+                subBuilder = occurredAt_.toBuilder();
+              }
+              occurredAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(occurredAt_);
+                occurredAt_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              message_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.TaskExecutionOuterClass.internal_static_flyteidl_admin_Reason_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.TaskExecutionOuterClass.internal_static_flyteidl_admin_Reason_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.TaskExecutionOuterClass.Reason.class, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder.class);
+    }
+
+    public static final int OCCURRED_AT_FIELD_NUMBER = 1;
+    private com.google.protobuf.Timestamp occurredAt_;
+    /**
+     * <pre>
+     * occurred_at is the timestamp indicating the instant that this reason happened.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+     */
+    public boolean hasOccurredAt() {
+      return occurredAt_ != null;
+    }
+    /**
+     * <pre>
+     * occurred_at is the timestamp indicating the instant that this reason happened.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+     */
+    public com.google.protobuf.Timestamp getOccurredAt() {
+      return occurredAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+    }
+    /**
+     * <pre>
+     * occurred_at is the timestamp indicating the instant that this reason happened.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder() {
+      return getOccurredAt();
+    }
+
+    public static final int MESSAGE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object message_;
+    /**
+     * <pre>
+     * message is the explanation for the most recent phase transition or status update.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    public java.lang.String getMessage() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        message_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * message is the explanation for the most recent phase transition or status update.
+     * </pre>
+     *
+     * <code>string message = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMessageBytes() {
+      java.lang.Object ref = message_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        message_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (occurredAt_ != null) {
+        output.writeMessage(1, getOccurredAt());
+      }
+      if (!getMessageBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, message_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (occurredAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getOccurredAt());
+      }
+      if (!getMessageBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, message_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.TaskExecutionOuterClass.Reason)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.TaskExecutionOuterClass.Reason other = (flyteidl.admin.TaskExecutionOuterClass.Reason) obj;
+
+      if (hasOccurredAt() != other.hasOccurredAt()) return false;
+      if (hasOccurredAt()) {
+        if (!getOccurredAt()
+            .equals(other.getOccurredAt())) return false;
+      }
+      if (!getMessage()
+          .equals(other.getMessage())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasOccurredAt()) {
+        hash = (37 * hash) + OCCURRED_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getOccurredAt().hashCode();
+      }
+      hash = (37 * hash) + MESSAGE_FIELD_NUMBER;
+      hash = (53 * hash) + getMessage().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.TaskExecutionOuterClass.Reason prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Reason is a single message annotated with a timestamp to indicate the instant the reason occurred.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.Reason}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.Reason)
+        flyteidl.admin.TaskExecutionOuterClass.ReasonOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.TaskExecutionOuterClass.internal_static_flyteidl_admin_Reason_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.TaskExecutionOuterClass.internal_static_flyteidl_admin_Reason_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.TaskExecutionOuterClass.Reason.class, flyteidl.admin.TaskExecutionOuterClass.Reason.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.TaskExecutionOuterClass.Reason.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = null;
+        } else {
+          occurredAt_ = null;
+          occurredAtBuilder_ = null;
+        }
+        message_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.TaskExecutionOuterClass.internal_static_flyteidl_admin_Reason_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.TaskExecutionOuterClass.Reason getDefaultInstanceForType() {
+        return flyteidl.admin.TaskExecutionOuterClass.Reason.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.TaskExecutionOuterClass.Reason build() {
+        flyteidl.admin.TaskExecutionOuterClass.Reason result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.TaskExecutionOuterClass.Reason buildPartial() {
+        flyteidl.admin.TaskExecutionOuterClass.Reason result = new flyteidl.admin.TaskExecutionOuterClass.Reason(this);
+        if (occurredAtBuilder_ == null) {
+          result.occurredAt_ = occurredAt_;
+        } else {
+          result.occurredAt_ = occurredAtBuilder_.build();
+        }
+        result.message_ = message_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.TaskExecutionOuterClass.Reason) {
+          return mergeFrom((flyteidl.admin.TaskExecutionOuterClass.Reason)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.TaskExecutionOuterClass.Reason other) {
+        if (other == flyteidl.admin.TaskExecutionOuterClass.Reason.getDefaultInstance()) return this;
+        if (other.hasOccurredAt()) {
+          mergeOccurredAt(other.getOccurredAt());
+        }
+        if (!other.getMessage().isEmpty()) {
+          message_ = other.message_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.TaskExecutionOuterClass.Reason parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.TaskExecutionOuterClass.Reason) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private com.google.protobuf.Timestamp occurredAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> occurredAtBuilder_;
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public boolean hasOccurredAt() {
+        return occurredAtBuilder_ != null || occurredAt_ != null;
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public com.google.protobuf.Timestamp getOccurredAt() {
+        if (occurredAtBuilder_ == null) {
+          return occurredAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+        } else {
+          return occurredAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public Builder setOccurredAt(com.google.protobuf.Timestamp value) {
+        if (occurredAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          occurredAt_ = value;
+          onChanged();
+        } else {
+          occurredAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public Builder setOccurredAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          occurredAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public Builder mergeOccurredAt(com.google.protobuf.Timestamp value) {
+        if (occurredAtBuilder_ == null) {
+          if (occurredAt_ != null) {
+            occurredAt_ =
+              com.google.protobuf.Timestamp.newBuilder(occurredAt_).mergeFrom(value).buildPartial();
+          } else {
+            occurredAt_ = value;
+          }
+          onChanged();
+        } else {
+          occurredAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public Builder clearOccurredAt() {
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = null;
+          onChanged();
+        } else {
+          occurredAt_ = null;
+          occurredAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getOccurredAtBuilder() {
+        
+        onChanged();
+        return getOccurredAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder() {
+        if (occurredAtBuilder_ != null) {
+          return occurredAtBuilder_.getMessageOrBuilder();
+        } else {
+          return occurredAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+        }
+      }
+      /**
+       * <pre>
+       * occurred_at is the timestamp indicating the instant that this reason happened.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getOccurredAtFieldBuilder() {
+        if (occurredAtBuilder_ == null) {
+          occurredAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getOccurredAt(),
+                  getParentForChildren(),
+                  isClean());
+          occurredAt_ = null;
+        }
+        return occurredAtBuilder_;
+      }
+
+      private java.lang.Object message_ = "";
+      /**
+       * <pre>
+       * message is the explanation for the most recent phase transition or status update.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public java.lang.String getMessage() {
+        java.lang.Object ref = message_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          message_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * message is the explanation for the most recent phase transition or status update.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMessageBytes() {
+        java.lang.Object ref = message_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          message_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * message is the explanation for the most recent phase transition or status update.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public Builder setMessage(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * message is the explanation for the most recent phase transition or status update.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public Builder clearMessage() {
+        
+        message_ = getDefaultInstance().getMessage();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * message is the explanation for the most recent phase transition or status update.
+       * </pre>
+       *
+       * <code>string message = 2;</code>
+       */
+      public Builder setMessageBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        message_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.Reason)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.Reason)
+    private static final flyteidl.admin.TaskExecutionOuterClass.Reason DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.TaskExecutionOuterClass.Reason();
+    }
+
+    public static flyteidl.admin.TaskExecutionOuterClass.Reason getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<Reason>
+        PARSER = new com.google.protobuf.AbstractParser<Reason>() {
+      @java.lang.Override
+      public Reason parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new Reason(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<Reason> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<Reason> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.TaskExecutionOuterClass.Reason getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -8945,6 +10299,34 @@ public final class TaskExecutionOuterClass {
      * <code>.flyteidl.core.LiteralMap full_outputs = 4;</code>
      */
     flyteidl.core.Literals.LiteralMapOrBuilder getFullOutputsOrBuilder();
+
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    boolean hasFlyteUrls();
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    flyteidl.admin.Common.FlyteURLs getFlyteUrls();
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    flyteidl.admin.Common.FlyteURLsOrBuilder getFlyteUrlsOrBuilder();
   }
   /**
    * <pre>
@@ -9037,6 +10419,19 @@ public final class TaskExecutionOuterClass {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(fullOutputs_);
                 fullOutputs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              flyteidl.admin.Common.FlyteURLs.Builder subBuilder = null;
+              if (flyteUrls_ != null) {
+                subBuilder = flyteUrls_.toBuilder();
+              }
+              flyteUrls_ = input.readMessage(flyteidl.admin.Common.FlyteURLs.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(flyteUrls_);
+                flyteUrls_ = subBuilder.buildPartial();
               }
 
               break;
@@ -9211,6 +10606,42 @@ public final class TaskExecutionOuterClass {
       return getFullOutputs();
     }
 
+    public static final int FLYTE_URLS_FIELD_NUMBER = 5;
+    private flyteidl.admin.Common.FlyteURLs flyteUrls_;
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    public boolean hasFlyteUrls() {
+      return flyteUrls_ != null;
+    }
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    public flyteidl.admin.Common.FlyteURLs getFlyteUrls() {
+      return flyteUrls_ == null ? flyteidl.admin.Common.FlyteURLs.getDefaultInstance() : flyteUrls_;
+    }
+    /**
+     * <pre>
+     * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+     * Deck will be empty for task
+     * </pre>
+     *
+     * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+     */
+    public flyteidl.admin.Common.FlyteURLsOrBuilder getFlyteUrlsOrBuilder() {
+      return getFlyteUrls();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -9237,6 +10668,9 @@ public final class TaskExecutionOuterClass {
       if (fullOutputs_ != null) {
         output.writeMessage(4, getFullOutputs());
       }
+      if (flyteUrls_ != null) {
+        output.writeMessage(5, getFlyteUrls());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -9261,6 +10695,10 @@ public final class TaskExecutionOuterClass {
       if (fullOutputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getFullOutputs());
+      }
+      if (flyteUrls_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getFlyteUrls());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -9297,6 +10735,11 @@ public final class TaskExecutionOuterClass {
         if (!getFullOutputs()
             .equals(other.getFullOutputs())) return false;
       }
+      if (hasFlyteUrls() != other.hasFlyteUrls()) return false;
+      if (hasFlyteUrls()) {
+        if (!getFlyteUrls()
+            .equals(other.getFlyteUrls())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -9323,6 +10766,10 @@ public final class TaskExecutionOuterClass {
       if (hasFullOutputs()) {
         hash = (37 * hash) + FULL_OUTPUTS_FIELD_NUMBER;
         hash = (53 * hash) + getFullOutputs().hashCode();
+      }
+      if (hasFlyteUrls()) {
+        hash = (37 * hash) + FLYTE_URLS_FIELD_NUMBER;
+        hash = (53 * hash) + getFlyteUrls().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -9485,6 +10932,12 @@ public final class TaskExecutionOuterClass {
           fullOutputs_ = null;
           fullOutputsBuilder_ = null;
         }
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrls_ = null;
+        } else {
+          flyteUrls_ = null;
+          flyteUrlsBuilder_ = null;
+        }
         return this;
       }
 
@@ -9530,6 +10983,11 @@ public final class TaskExecutionOuterClass {
           result.fullOutputs_ = fullOutputs_;
         } else {
           result.fullOutputs_ = fullOutputsBuilder_.build();
+        }
+        if (flyteUrlsBuilder_ == null) {
+          result.flyteUrls_ = flyteUrls_;
+        } else {
+          result.flyteUrls_ = flyteUrlsBuilder_.build();
         }
         onBuilt();
         return result;
@@ -9590,6 +11048,9 @@ public final class TaskExecutionOuterClass {
         }
         if (other.hasFullOutputs()) {
           mergeFullOutputs(other.getFullOutputs());
+        }
+        if (other.hasFlyteUrls()) {
+          mergeFlyteUrls(other.getFlyteUrls());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -10249,6 +11710,168 @@ public final class TaskExecutionOuterClass {
         }
         return fullOutputsBuilder_;
       }
+
+      private flyteidl.admin.Common.FlyteURLs flyteUrls_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.FlyteURLs, flyteidl.admin.Common.FlyteURLs.Builder, flyteidl.admin.Common.FlyteURLsOrBuilder> flyteUrlsBuilder_;
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public boolean hasFlyteUrls() {
+        return flyteUrlsBuilder_ != null || flyteUrls_ != null;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public flyteidl.admin.Common.FlyteURLs getFlyteUrls() {
+        if (flyteUrlsBuilder_ == null) {
+          return flyteUrls_ == null ? flyteidl.admin.Common.FlyteURLs.getDefaultInstance() : flyteUrls_;
+        } else {
+          return flyteUrlsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder setFlyteUrls(flyteidl.admin.Common.FlyteURLs value) {
+        if (flyteUrlsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          flyteUrls_ = value;
+          onChanged();
+        } else {
+          flyteUrlsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder setFlyteUrls(
+          flyteidl.admin.Common.FlyteURLs.Builder builderForValue) {
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrls_ = builderForValue.build();
+          onChanged();
+        } else {
+          flyteUrlsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder mergeFlyteUrls(flyteidl.admin.Common.FlyteURLs value) {
+        if (flyteUrlsBuilder_ == null) {
+          if (flyteUrls_ != null) {
+            flyteUrls_ =
+              flyteidl.admin.Common.FlyteURLs.newBuilder(flyteUrls_).mergeFrom(value).buildPartial();
+          } else {
+            flyteUrls_ = value;
+          }
+          onChanged();
+        } else {
+          flyteUrlsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public Builder clearFlyteUrls() {
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrls_ = null;
+          onChanged();
+        } else {
+          flyteUrls_ = null;
+          flyteUrlsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public flyteidl.admin.Common.FlyteURLs.Builder getFlyteUrlsBuilder() {
+        
+        onChanged();
+        return getFlyteUrlsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      public flyteidl.admin.Common.FlyteURLsOrBuilder getFlyteUrlsOrBuilder() {
+        if (flyteUrlsBuilder_ != null) {
+          return flyteUrlsBuilder_.getMessageOrBuilder();
+        } else {
+          return flyteUrls_ == null ?
+              flyteidl.admin.Common.FlyteURLs.getDefaultInstance() : flyteUrls_;
+        }
+      }
+      /**
+       * <pre>
+       * flyte tiny url to fetch a core.LiteralMap of task execution's IO
+       * Deck will be empty for task
+       * </pre>
+       *
+       * <code>.flyteidl.admin.FlyteURLs flyte_urls = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.FlyteURLs, flyteidl.admin.Common.FlyteURLs.Builder, flyteidl.admin.Common.FlyteURLsOrBuilder> 
+          getFlyteUrlsFieldBuilder() {
+        if (flyteUrlsBuilder_ == null) {
+          flyteUrlsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.FlyteURLs, flyteidl.admin.Common.FlyteURLs.Builder, flyteidl.admin.Common.FlyteURLsOrBuilder>(
+                  getFlyteUrls(),
+                  getParentForChildren(),
+                  isClean());
+          flyteUrls_ = null;
+        }
+        return flyteUrlsBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -10328,6 +11951,11 @@ public final class TaskExecutionOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_TaskExecutionClosure_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_Reason_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_Reason_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_TaskExecutionGetDataRequest_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -10366,7 +11994,7 @@ public final class TaskExecutionOuterClass {
       "in.TaskExecutionClosure\022\021\n\tis_parent\030\004 \001" +
       "(\010\"Z\n\021TaskExecutionList\0226\n\017task_executio" +
       "ns\030\001 \003(\0132\035.flyteidl.admin.TaskExecution\022" +
-      "\r\n\005token\030\002 \001(\t\"\336\004\n\024TaskExecutionClosure\022" +
+      "\r\n\005token\030\002 \001(\t\"\207\005\n\024TaskExecutionClosure\022" +
       "\030\n\noutput_uri\030\001 \001(\tB\002\030\001H\000\022.\n\005error\030\002 \001(\013" +
       "2\035.flyteidl.core.ExecutionErrorH\000\0224\n\013out" +
       "put_data\030\014 \001(\0132\031.flyteidl.core.LiteralMa" +
@@ -10381,16 +12009,20 @@ public final class TaskExecutionOuterClass {
       "obuf.Struct\022\016\n\006reason\030\n \001(\t\022\021\n\ttask_type" +
       "\030\013 \001(\t\0227\n\010metadata\030\020 \001(\0132%.flyteidl.even" +
       "t.TaskExecutionMetadata\022\025\n\revent_version" +
-      "\030\021 \001(\005B\017\n\routput_result\"Q\n\033TaskExecution" +
-      "GetDataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.co" +
-      "re.TaskExecutionIdentifier\"\332\001\n\034TaskExecu" +
-      "tionGetDataResponse\022+\n\006inputs\030\001 \001(\0132\027.fl" +
-      "yteidl.admin.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(" +
-      "\0132\027.flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_i" +
-      "nputs\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/" +
-      "\n\014full_outputs\030\004 \001(\0132\031.flyteidl.core.Lit" +
-      "eralMapB7Z5github.com/flyteorg/flyteidl/" +
-      "gen/pb-go/flyteidl/adminb\006proto3"
+      "\030\021 \001(\005\022\'\n\007reasons\030\022 \003(\0132\026.flyteidl.admin" +
+      ".ReasonB\017\n\routput_result\"J\n\006Reason\022/\n\013oc" +
+      "curred_at\030\001 \001(\0132\032.google.protobuf.Timest" +
+      "amp\022\017\n\007message\030\002 \001(\t\"Q\n\033TaskExecutionGet" +
+      "DataRequest\0222\n\002id\030\001 \001(\0132&.flyteidl.core." +
+      "TaskExecutionIdentifier\"\211\002\n\034TaskExecutio" +
+      "nGetDataResponse\022+\n\006inputs\030\001 \001(\0132\027.flyte" +
+      "idl.admin.UrlBlobB\002\030\001\022,\n\007outputs\030\002 \001(\0132\027" +
+      ".flyteidl.admin.UrlBlobB\002\030\001\022.\n\013full_inpu" +
+      "ts\030\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014f" +
+      "ull_outputs\030\004 \001(\0132\031.flyteidl.core.Litera" +
+      "lMap\022-\n\nflyte_urls\030\005 \001(\0132\031.flyteidl.admi" +
+      "n.FlyteURLsB7Z5github.com/flyteorg/flyte" +
+      "idl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -10441,19 +12073,25 @@ public final class TaskExecutionOuterClass {
     internal_static_flyteidl_admin_TaskExecutionClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskExecutionClosure_descriptor,
-        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "Reason", "TaskType", "Metadata", "EventVersion", "OutputResult", });
-    internal_static_flyteidl_admin_TaskExecutionGetDataRequest_descriptor =
+        new java.lang.String[] { "OutputUri", "Error", "OutputData", "Phase", "Logs", "StartedAt", "Duration", "CreatedAt", "UpdatedAt", "CustomInfo", "Reason", "TaskType", "Metadata", "EventVersion", "Reasons", "OutputResult", });
+    internal_static_flyteidl_admin_Reason_descriptor =
       getDescriptor().getMessageTypes().get(5);
+    internal_static_flyteidl_admin_Reason_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_Reason_descriptor,
+        new java.lang.String[] { "OccurredAt", "Message", });
+    internal_static_flyteidl_admin_TaskExecutionGetDataRequest_descriptor =
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_TaskExecutionGetDataRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskExecutionGetDataRequest_descriptor,
         new java.lang.String[] { "Id", });
     internal_static_flyteidl_admin_TaskExecutionGetDataResponse_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_admin_TaskExecutionGetDataResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_TaskExecutionGetDataResponse_descriptor,
-        new java.lang.String[] { "Inputs", "Outputs", "FullInputs", "FullOutputs", });
+        new java.lang.String[] { "Inputs", "Outputs", "FullInputs", "FullOutputs", "FlyteUrls", });
     flyteidl.admin.Common.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();

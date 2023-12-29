@@ -589,6 +589,47 @@ func (_m *AdminServiceServer) GetExecutionData(_a0 context.Context, _a1 *admin.W
 	return r0, r1
 }
 
+type AdminServiceServer_GetExecutionMetrics struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetExecutionMetrics) Return(_a0 *admin.WorkflowExecutionGetMetricsResponse, _a1 error) *AdminServiceServer_GetExecutionMetrics {
+	return &AdminServiceServer_GetExecutionMetrics{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetExecutionMetrics(_a0 context.Context, _a1 *admin.WorkflowExecutionGetMetricsRequest) *AdminServiceServer_GetExecutionMetrics {
+	c_call := _m.On("GetExecutionMetrics", _a0, _a1)
+	return &AdminServiceServer_GetExecutionMetrics{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetExecutionMetricsMatch(matchers ...interface{}) *AdminServiceServer_GetExecutionMetrics {
+	c_call := _m.On("GetExecutionMetrics", matchers...)
+	return &AdminServiceServer_GetExecutionMetrics{Call: c_call}
+}
+
+// GetExecutionMetrics provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetExecutionMetrics(_a0 context.Context, _a1 *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.WorkflowExecutionGetMetricsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.WorkflowExecutionGetMetricsRequest) *admin.WorkflowExecutionGetMetricsResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.WorkflowExecutionGetMetricsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.WorkflowExecutionGetMetricsRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_GetLaunchPlan struct {
 	*mock.Call
 }

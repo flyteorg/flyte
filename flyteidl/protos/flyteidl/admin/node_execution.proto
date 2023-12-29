@@ -167,6 +167,10 @@ message NodeExecutionClosure {
     // String location uniquely identifying where the deck HTML file is.
     // NativeUrl specifies the url in the format of the configured storage provider (e.g. s3://my-bucket/randomstring/suffix.tar)
     string deck_uri = 11;
+
+    // dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for a DynamicWorkflow. This is required
+    // to correctly recover partially completed executions where the subworkflow has already been compiled.
+    string dynamic_job_spec_uri = 12;
 }
 
 // Metadata for a WorkflowNode
@@ -192,6 +196,10 @@ message DynamicWorkflowNodeMetadata {
 
     // Represents the compiled representation of the embedded dynamic workflow.
     core.CompiledWorkflowClosure compiled_workflow = 2;
+
+    // dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for this DynamicWorkflow. This is
+    // required to correctly recover partially completed executions where the subworkflow has already been compiled.
+    string dynamic_job_spec_uri = 3;
 }
 
 // Request structure to fetch inputs and output for a node execution.
@@ -219,5 +227,7 @@ message NodeExecutionGetDataResponse {
 
     // Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
     DynamicWorkflowNodeMetadata dynamic_workflow = 16;
-}
 
+    FlyteURLs flyte_urls = 17;
+
+}

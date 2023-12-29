@@ -326,6 +326,7 @@ class Operand final :
   enum ValCase {
     kPrimitive = 1,
     kVar = 2,
+    kScalar = 3,
     VAL_NOT_SET = 0,
   };
 
@@ -392,14 +393,14 @@ class Operand final :
 
   // accessors -------------------------------------------------------
 
-  // .flyteidl.core.Primitive primitive = 1;
-  bool has_primitive() const;
-  void clear_primitive();
-  static const int kPrimitiveFieldNumber = 1;
-  const ::flyteidl::core::Primitive& primitive() const;
-  ::flyteidl::core::Primitive* release_primitive();
-  ::flyteidl::core::Primitive* mutable_primitive();
-  void set_allocated_primitive(::flyteidl::core::Primitive* primitive);
+  // .flyteidl.core.Primitive primitive = 1 [deprecated = true];
+  PROTOBUF_DEPRECATED bool has_primitive() const;
+  PROTOBUF_DEPRECATED void clear_primitive();
+  PROTOBUF_DEPRECATED static const int kPrimitiveFieldNumber = 1;
+  PROTOBUF_DEPRECATED const ::flyteidl::core::Primitive& primitive() const;
+  PROTOBUF_DEPRECATED ::flyteidl::core::Primitive* release_primitive();
+  PROTOBUF_DEPRECATED ::flyteidl::core::Primitive* mutable_primitive();
+  PROTOBUF_DEPRECATED void set_allocated_primitive(::flyteidl::core::Primitive* primitive);
 
   // string var = 2;
   private:
@@ -418,6 +419,15 @@ class Operand final :
   ::std::string* release_var();
   void set_allocated_var(::std::string* var);
 
+  // .flyteidl.core.Scalar scalar = 3;
+  bool has_scalar() const;
+  void clear_scalar();
+  static const int kScalarFieldNumber = 3;
+  const ::flyteidl::core::Scalar& scalar() const;
+  ::flyteidl::core::Scalar* release_scalar();
+  ::flyteidl::core::Scalar* mutable_scalar();
+  void set_allocated_scalar(::flyteidl::core::Scalar* scalar);
+
   void clear_val();
   ValCase val_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.Operand)
@@ -425,6 +435,7 @@ class Operand final :
   class HasBitSetters;
   void set_has_primitive();
   void set_has_var();
+  void set_has_scalar();
 
   inline bool has_val() const;
   inline void clear_has_val();
@@ -434,6 +445,7 @@ class Operand final :
     ValUnion() {}
     ::flyteidl::core::Primitive* primitive_;
     ::google::protobuf::internal::ArenaStringPtr var_;
+    ::flyteidl::core::Scalar* scalar_;
   } val_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -872,7 +884,7 @@ inline void ComparisonExpression::set_allocated_right_value(::flyteidl::core::Op
 
 // Operand
 
-// .flyteidl.core.Primitive primitive = 1;
+// .flyteidl.core.Primitive primitive = 1 [deprecated = true];
 inline bool Operand::has_primitive() const {
   return val_case() == kPrimitive;
 }
@@ -997,6 +1009,41 @@ inline void Operand::set_allocated_var(::std::string* var) {
     val_.var_.UnsafeSetDefault(var);
   }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Operand.var)
+}
+
+// .flyteidl.core.Scalar scalar = 3;
+inline bool Operand::has_scalar() const {
+  return val_case() == kScalar;
+}
+inline void Operand::set_has_scalar() {
+  _oneof_case_[0] = kScalar;
+}
+inline ::flyteidl::core::Scalar* Operand::release_scalar() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Operand.scalar)
+  if (has_scalar()) {
+    clear_has_val();
+      ::flyteidl::core::Scalar* temp = val_.scalar_;
+    val_.scalar_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::Scalar& Operand::scalar() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Operand.scalar)
+  return has_scalar()
+      ? *val_.scalar_
+      : *reinterpret_cast< ::flyteidl::core::Scalar*>(&::flyteidl::core::_Scalar_default_instance_);
+}
+inline ::flyteidl::core::Scalar* Operand::mutable_scalar() {
+  if (!has_scalar()) {
+    clear_val();
+    set_has_scalar();
+    val_.scalar_ = CreateMaybeMessage< ::flyteidl::core::Scalar >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Operand.scalar)
+  return val_.scalar_;
 }
 
 inline bool Operand::has_val() const {

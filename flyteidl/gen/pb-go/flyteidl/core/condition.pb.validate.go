@@ -149,6 +149,18 @@ func (m *Operand) Validate() error {
 	case *Operand_Var:
 		// no validation rules for Var
 
+	case *Operand_Scalar:
+
+		if v, ok := interface{}(m.GetScalar()).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return OperandValidationError{
+					field:  "Scalar",
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
 	}
 
 	return nil

@@ -43,7 +43,8 @@ class CoreTaskMetadata(object):
         'interruptible': 'bool',
         'cache_serializable': 'bool',
         'generates_deck': 'bool',
-        'tags': 'dict(str, str)'
+        'tags': 'dict(str, str)',
+        'pod_template_name': 'str'
     }
 
     attribute_map = {
@@ -56,10 +57,11 @@ class CoreTaskMetadata(object):
         'interruptible': 'interruptible',
         'cache_serializable': 'cache_serializable',
         'generates_deck': 'generates_deck',
-        'tags': 'tags'
+        'tags': 'tags',
+        'pod_template_name': 'pod_template_name'
     }
 
-    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None):  # noqa: E501
+    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None, pod_template_name=None):  # noqa: E501
         """CoreTaskMetadata - a model defined in Swagger"""  # noqa: E501
 
         self._discoverable = None
@@ -72,6 +74,7 @@ class CoreTaskMetadata(object):
         self._cache_serializable = None
         self._generates_deck = None
         self._tags = None
+        self._pod_template_name = None
         self.discriminator = None
 
         if discoverable is not None:
@@ -94,6 +97,8 @@ class CoreTaskMetadata(object):
             self.generates_deck = generates_deck
         if tags is not None:
             self.tags = tags
+        if pod_template_name is not None:
+            self.pod_template_name = pod_template_name
 
     @property
     def discoverable(self):
@@ -318,6 +323,29 @@ class CoreTaskMetadata(object):
         """
 
         self._tags = tags
+
+    @property
+    def pod_template_name(self):
+        """Gets the pod_template_name of this CoreTaskMetadata.  # noqa: E501
+
+        pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied identically as, the default PodTemplate configured in FlytePropeller.  # noqa: E501
+
+        :return: The pod_template_name of this CoreTaskMetadata.  # noqa: E501
+        :rtype: str
+        """
+        return self._pod_template_name
+
+    @pod_template_name.setter
+    def pod_template_name(self, pod_template_name):
+        """Sets the pod_template_name of this CoreTaskMetadata.
+
+        pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied identically as, the default PodTemplate configured in FlytePropeller.  # noqa: E501
+
+        :param pod_template_name: The pod_template_name of this CoreTaskMetadata.  # noqa: E501
+        :type: str
+        """
+
+        self._pod_template_name = pod_template_name
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -13,4 +13,5 @@ package flyteadmin
 type CoreOperand struct {
 	Primitive *CorePrimitive `json:"primitive,omitempty"`
 	Var_ string `json:"var,omitempty"`
+	Scalar *CoreScalar `json:"scalar,omitempty"`
 }

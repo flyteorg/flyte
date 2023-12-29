@@ -1251,10 +1251,38 @@ public final class Dataproxy {
      * <code>bytes content_md5 = 5;</code>
      */
     com.google.protobuf.ByteString getContentMd5();
+
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    java.lang.String getFilenameRoot();
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getFilenameRootBytes();
   }
   /**
    * <pre>
    * CreateUploadLocationRequest specified request for the CreateUploadLocation API.
+   * The implementation in data proxy service will create the s3 location with some server side configured prefixes,
+   * and then:
+   *   - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR
+   *   - project/domain/filename_root (if present)/filename (if present).
    * </pre>
    *
    * Protobuf type {@code flyteidl.service.CreateUploadLocationRequest}
@@ -1273,6 +1301,7 @@ public final class Dataproxy {
       domain_ = "";
       filename_ = "";
       contentMd5_ = com.google.protobuf.ByteString.EMPTY;
+      filenameRoot_ = "";
     }
 
     @java.lang.Override
@@ -1333,6 +1362,12 @@ public final class Dataproxy {
             case 42: {
 
               contentMd5_ = input.readBytes();
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              filenameRoot_ = s;
               break;
             }
             default: {
@@ -1553,6 +1588,54 @@ public final class Dataproxy {
       return contentMd5_;
     }
 
+    public static final int FILENAME_ROOT_FIELD_NUMBER = 6;
+    private volatile java.lang.Object filenameRoot_;
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    public java.lang.String getFilenameRoot() {
+      java.lang.Object ref = filenameRoot_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        filenameRoot_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+     * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+     * in data proxy config. This option is useful when uploading multiple files.
+     * +optional
+     * </pre>
+     *
+     * <code>string filename_root = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFilenameRootBytes() {
+      java.lang.Object ref = filenameRoot_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        filenameRoot_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1582,6 +1665,9 @@ public final class Dataproxy {
       if (!contentMd5_.isEmpty()) {
         output.writeBytes(5, contentMd5_);
       }
+      if (!getFilenameRootBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, filenameRoot_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1607,6 +1693,9 @@ public final class Dataproxy {
       if (!contentMd5_.isEmpty()) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(5, contentMd5_);
+      }
+      if (!getFilenameRootBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, filenameRoot_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1636,6 +1725,8 @@ public final class Dataproxy {
       }
       if (!getContentMd5()
           .equals(other.getContentMd5())) return false;
+      if (!getFilenameRoot()
+          .equals(other.getFilenameRoot())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1659,6 +1750,8 @@ public final class Dataproxy {
       }
       hash = (37 * hash) + CONTENT_MD5_FIELD_NUMBER;
       hash = (53 * hash) + getContentMd5().hashCode();
+      hash = (37 * hash) + FILENAME_ROOT_FIELD_NUMBER;
+      hash = (53 * hash) + getFilenameRoot().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1757,6 +1850,10 @@ public final class Dataproxy {
     /**
      * <pre>
      * CreateUploadLocationRequest specified request for the CreateUploadLocation API.
+     * The implementation in data proxy service will create the s3 location with some server side configured prefixes,
+     * and then:
+     *   - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR
+     *   - project/domain/filename_root (if present)/filename (if present).
      * </pre>
      *
      * Protobuf type {@code flyteidl.service.CreateUploadLocationRequest}
@@ -1810,6 +1907,8 @@ public final class Dataproxy {
         }
         contentMd5_ = com.google.protobuf.ByteString.EMPTY;
 
+        filenameRoot_ = "";
+
         return this;
       }
 
@@ -1845,6 +1944,7 @@ public final class Dataproxy {
           result.expiresIn_ = expiresInBuilder_.build();
         }
         result.contentMd5_ = contentMd5_;
+        result.filenameRoot_ = filenameRoot_;
         onBuilt();
         return result;
       }
@@ -1910,6 +2010,10 @@ public final class Dataproxy {
         }
         if (other.getContentMd5() != com.google.protobuf.ByteString.EMPTY) {
           setContentMd5(other.getContentMd5());
+        }
+        if (!other.getFilenameRoot().isEmpty()) {
+          filenameRoot_ = other.filenameRoot_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2436,6 +2540,110 @@ public final class Dataproxy {
       public Builder clearContentMd5() {
         
         contentMd5_ = getDefaultInstance().getContentMd5();
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object filenameRoot_ = "";
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public java.lang.String getFilenameRoot() {
+        java.lang.Object ref = filenameRoot_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          filenameRoot_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFilenameRootBytes() {
+        java.lang.Object ref = filenameRoot_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          filenameRoot_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public Builder setFilenameRoot(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        filenameRoot_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public Builder clearFilenameRoot() {
+        
+        filenameRoot_ = getDefaultInstance().getFilenameRoot();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included
+       * this makes the upload location deterministic. The native url will still be prefixed by the upload location prefix
+       * in data proxy config. This option is useful when uploading multiple files.
+       * +optional
+       * </pre>
+       *
+       * <code>string filename_root = 6;</code>
+       */
+      public Builder setFilenameRootBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        filenameRoot_ = value;
         onChanged();
         return this;
       }
@@ -5411,34 +5619,34 @@ public final class Dataproxy {
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    java.util.List<java.lang.String>
+    @java.lang.Deprecated java.util.List<java.lang.String>
         getSignedUrlList();
     /**
      * <pre>
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    int getSignedUrlCount();
+    @java.lang.Deprecated int getSignedUrlCount();
     /**
      * <pre>
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    java.lang.String getSignedUrl(int index);
+    @java.lang.Deprecated java.lang.String getSignedUrl(int index);
     /**
      * <pre>
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getSignedUrlBytes(int index);
 
     /**
@@ -5446,25 +5654,50 @@ public final class Dataproxy {
      * ExpiresAt defines when will the signed URL expire.
      * </pre>
      *
-     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
      */
-    boolean hasExpiresAt();
+    @java.lang.Deprecated boolean hasExpiresAt();
     /**
      * <pre>
      * ExpiresAt defines when will the signed URL expire.
      * </pre>
      *
-     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
      */
-    com.google.protobuf.Timestamp getExpiresAt();
+    @java.lang.Deprecated com.google.protobuf.Timestamp getExpiresAt();
     /**
      * <pre>
      * ExpiresAt defines when will the signed URL expire.
      * </pre>
      *
-     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
      */
-    com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder();
+    @java.lang.Deprecated com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder();
+
+    /**
+     * <pre>
+     * New wrapper object containing the signed urls and expiration time
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+     */
+    boolean hasPreSignedUrls();
+    /**
+     * <pre>
+     * New wrapper object containing the signed urls and expiration time
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+     */
+    flyteidl.service.Dataproxy.PreSignedURLs getPreSignedUrls();
+    /**
+     * <pre>
+     * New wrapper object containing the signed urls and expiration time
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+     */
+    flyteidl.service.Dataproxy.PreSignedURLsOrBuilder getPreSignedUrlsOrBuilder();
   }
   /**
    * <pre>
@@ -5532,6 +5765,19 @@ public final class Dataproxy {
 
               break;
             }
+            case 26: {
+              flyteidl.service.Dataproxy.PreSignedURLs.Builder subBuilder = null;
+              if (preSignedUrls_ != null) {
+                subBuilder = preSignedUrls_.toBuilder();
+              }
+              preSignedUrls_ = input.readMessage(flyteidl.service.Dataproxy.PreSignedURLs.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(preSignedUrls_);
+                preSignedUrls_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -5575,9 +5821,9 @@ public final class Dataproxy {
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    public com.google.protobuf.ProtocolStringList
+    @java.lang.Deprecated public com.google.protobuf.ProtocolStringList
         getSignedUrlList() {
       return signedUrl_;
     }
@@ -5586,9 +5832,9 @@ public final class Dataproxy {
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    public int getSignedUrlCount() {
+    @java.lang.Deprecated public int getSignedUrlCount() {
       return signedUrl_.size();
     }
     /**
@@ -5596,9 +5842,9 @@ public final class Dataproxy {
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    public java.lang.String getSignedUrl(int index) {
+    @java.lang.Deprecated public java.lang.String getSignedUrl(int index) {
       return signedUrl_.get(index);
     }
     /**
@@ -5606,9 +5852,9 @@ public final class Dataproxy {
      * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
      * </pre>
      *
-     * <code>repeated string signed_url = 1;</code>
+     * <code>repeated string signed_url = 1 [deprecated = true];</code>
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getSignedUrlBytes(int index) {
       return signedUrl_.getByteString(index);
     }
@@ -5620,9 +5866,9 @@ public final class Dataproxy {
      * ExpiresAt defines when will the signed URL expire.
      * </pre>
      *
-     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
      */
-    public boolean hasExpiresAt() {
+    @java.lang.Deprecated public boolean hasExpiresAt() {
       return expiresAt_ != null;
     }
     /**
@@ -5630,9 +5876,9 @@ public final class Dataproxy {
      * ExpiresAt defines when will the signed URL expire.
      * </pre>
      *
-     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
      */
-    public com.google.protobuf.Timestamp getExpiresAt() {
+    @java.lang.Deprecated public com.google.protobuf.Timestamp getExpiresAt() {
       return expiresAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : expiresAt_;
     }
     /**
@@ -5640,10 +5886,43 @@ public final class Dataproxy {
      * ExpiresAt defines when will the signed URL expire.
      * </pre>
      *
-     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
      */
-    public com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder() {
+    @java.lang.Deprecated public com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder() {
       return getExpiresAt();
+    }
+
+    public static final int PRE_SIGNED_URLS_FIELD_NUMBER = 3;
+    private flyteidl.service.Dataproxy.PreSignedURLs preSignedUrls_;
+    /**
+     * <pre>
+     * New wrapper object containing the signed urls and expiration time
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+     */
+    public boolean hasPreSignedUrls() {
+      return preSignedUrls_ != null;
+    }
+    /**
+     * <pre>
+     * New wrapper object containing the signed urls and expiration time
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+     */
+    public flyteidl.service.Dataproxy.PreSignedURLs getPreSignedUrls() {
+      return preSignedUrls_ == null ? flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance() : preSignedUrls_;
+    }
+    /**
+     * <pre>
+     * New wrapper object containing the signed urls and expiration time
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+     */
+    public flyteidl.service.Dataproxy.PreSignedURLsOrBuilder getPreSignedUrlsOrBuilder() {
+      return getPreSignedUrls();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5666,6 +5945,9 @@ public final class Dataproxy {
       if (expiresAt_ != null) {
         output.writeMessage(2, getExpiresAt());
       }
+      if (preSignedUrls_ != null) {
+        output.writeMessage(3, getPreSignedUrls());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -5686,6 +5968,10 @@ public final class Dataproxy {
       if (expiresAt_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getExpiresAt());
+      }
+      if (preSignedUrls_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getPreSignedUrls());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5709,6 +5995,11 @@ public final class Dataproxy {
         if (!getExpiresAt()
             .equals(other.getExpiresAt())) return false;
       }
+      if (hasPreSignedUrls() != other.hasPreSignedUrls()) return false;
+      if (hasPreSignedUrls()) {
+        if (!getPreSignedUrls()
+            .equals(other.getPreSignedUrls())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5727,6 +6018,10 @@ public final class Dataproxy {
       if (hasExpiresAt()) {
         hash = (37 * hash) + EXPIRES_AT_FIELD_NUMBER;
         hash = (53 * hash) + getExpiresAt().hashCode();
+      }
+      if (hasPreSignedUrls()) {
+        hash = (37 * hash) + PRE_SIGNED_URLS_FIELD_NUMBER;
+        hash = (53 * hash) + getPreSignedUrls().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -5873,6 +6168,12 @@ public final class Dataproxy {
           expiresAt_ = null;
           expiresAtBuilder_ = null;
         }
+        if (preSignedUrlsBuilder_ == null) {
+          preSignedUrls_ = null;
+        } else {
+          preSignedUrls_ = null;
+          preSignedUrlsBuilder_ = null;
+        }
         return this;
       }
 
@@ -5910,6 +6211,11 @@ public final class Dataproxy {
           result.expiresAt_ = expiresAt_;
         } else {
           result.expiresAt_ = expiresAtBuilder_.build();
+        }
+        if (preSignedUrlsBuilder_ == null) {
+          result.preSignedUrls_ = preSignedUrls_;
+        } else {
+          result.preSignedUrls_ = preSignedUrlsBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -5973,6 +6279,9 @@ public final class Dataproxy {
         if (other.hasExpiresAt()) {
           mergeExpiresAt(other.getExpiresAt());
         }
+        if (other.hasPreSignedUrls()) {
+          mergePreSignedUrls(other.getPreSignedUrls());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -5993,6 +6302,1095 @@ public final class Dataproxy {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
         } catch (com.google.protobuf.InvalidProtocolBufferException e) {
           parsedMessage = (flyteidl.service.Dataproxy.CreateDownloadLinkResponse) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.LazyStringList signedUrl_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureSignedUrlIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          signedUrl_ = new com.google.protobuf.LazyStringArrayList(signedUrl_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public com.google.protobuf.ProtocolStringList
+          getSignedUrlList() {
+        return signedUrl_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public int getSignedUrlCount() {
+        return signedUrl_.size();
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public java.lang.String getSignedUrl(int index) {
+        return signedUrl_.get(index);
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public com.google.protobuf.ByteString
+          getSignedUrlBytes(int index) {
+        return signedUrl_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder setSignedUrl(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureSignedUrlIsMutable();
+        signedUrl_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder addSignedUrl(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureSignedUrlIsMutable();
+        signedUrl_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder addAllSignedUrl(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureSignedUrlIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, signedUrl_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder clearSignedUrl() {
+        signedUrl_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+       * </pre>
+       *
+       * <code>repeated string signed_url = 1 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder addSignedUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureSignedUrlIsMutable();
+        signedUrl_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Timestamp expiresAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> expiresAtBuilder_;
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public boolean hasExpiresAt() {
+        return expiresAtBuilder_ != null || expiresAt_ != null;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public com.google.protobuf.Timestamp getExpiresAt() {
+        if (expiresAtBuilder_ == null) {
+          return expiresAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : expiresAt_;
+        } else {
+          return expiresAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder setExpiresAt(com.google.protobuf.Timestamp value) {
+        if (expiresAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          expiresAt_ = value;
+          onChanged();
+        } else {
+          expiresAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder setExpiresAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (expiresAtBuilder_ == null) {
+          expiresAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          expiresAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder mergeExpiresAt(com.google.protobuf.Timestamp value) {
+        if (expiresAtBuilder_ == null) {
+          if (expiresAt_ != null) {
+            expiresAt_ =
+              com.google.protobuf.Timestamp.newBuilder(expiresAt_).mergeFrom(value).buildPartial();
+          } else {
+            expiresAt_ = value;
+          }
+          onChanged();
+        } else {
+          expiresAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public Builder clearExpiresAt() {
+        if (expiresAtBuilder_ == null) {
+          expiresAt_ = null;
+          onChanged();
+        } else {
+          expiresAt_ = null;
+          expiresAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public com.google.protobuf.Timestamp.Builder getExpiresAtBuilder() {
+        
+        onChanged();
+        return getExpiresAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      @java.lang.Deprecated public com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder() {
+        if (expiresAtBuilder_ != null) {
+          return expiresAtBuilder_.getMessageOrBuilder();
+        } else {
+          return expiresAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : expiresAt_;
+        }
+      }
+      /**
+       * <pre>
+       * ExpiresAt defines when will the signed URL expire.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp expires_at = 2 [deprecated = true];</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getExpiresAtFieldBuilder() {
+        if (expiresAtBuilder_ == null) {
+          expiresAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getExpiresAt(),
+                  getParentForChildren(),
+                  isClean());
+          expiresAt_ = null;
+        }
+        return expiresAtBuilder_;
+      }
+
+      private flyteidl.service.Dataproxy.PreSignedURLs preSignedUrls_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.service.Dataproxy.PreSignedURLs, flyteidl.service.Dataproxy.PreSignedURLs.Builder, flyteidl.service.Dataproxy.PreSignedURLsOrBuilder> preSignedUrlsBuilder_;
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public boolean hasPreSignedUrls() {
+        return preSignedUrlsBuilder_ != null || preSignedUrls_ != null;
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public flyteidl.service.Dataproxy.PreSignedURLs getPreSignedUrls() {
+        if (preSignedUrlsBuilder_ == null) {
+          return preSignedUrls_ == null ? flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance() : preSignedUrls_;
+        } else {
+          return preSignedUrlsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public Builder setPreSignedUrls(flyteidl.service.Dataproxy.PreSignedURLs value) {
+        if (preSignedUrlsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          preSignedUrls_ = value;
+          onChanged();
+        } else {
+          preSignedUrlsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public Builder setPreSignedUrls(
+          flyteidl.service.Dataproxy.PreSignedURLs.Builder builderForValue) {
+        if (preSignedUrlsBuilder_ == null) {
+          preSignedUrls_ = builderForValue.build();
+          onChanged();
+        } else {
+          preSignedUrlsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public Builder mergePreSignedUrls(flyteidl.service.Dataproxy.PreSignedURLs value) {
+        if (preSignedUrlsBuilder_ == null) {
+          if (preSignedUrls_ != null) {
+            preSignedUrls_ =
+              flyteidl.service.Dataproxy.PreSignedURLs.newBuilder(preSignedUrls_).mergeFrom(value).buildPartial();
+          } else {
+            preSignedUrls_ = value;
+          }
+          onChanged();
+        } else {
+          preSignedUrlsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public Builder clearPreSignedUrls() {
+        if (preSignedUrlsBuilder_ == null) {
+          preSignedUrls_ = null;
+          onChanged();
+        } else {
+          preSignedUrls_ = null;
+          preSignedUrlsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public flyteidl.service.Dataproxy.PreSignedURLs.Builder getPreSignedUrlsBuilder() {
+        
+        onChanged();
+        return getPreSignedUrlsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      public flyteidl.service.Dataproxy.PreSignedURLsOrBuilder getPreSignedUrlsOrBuilder() {
+        if (preSignedUrlsBuilder_ != null) {
+          return preSignedUrlsBuilder_.getMessageOrBuilder();
+        } else {
+          return preSignedUrls_ == null ?
+              flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance() : preSignedUrls_;
+        }
+      }
+      /**
+       * <pre>
+       * New wrapper object containing the signed urls and expiration time
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.service.Dataproxy.PreSignedURLs, flyteidl.service.Dataproxy.PreSignedURLs.Builder, flyteidl.service.Dataproxy.PreSignedURLsOrBuilder> 
+          getPreSignedUrlsFieldBuilder() {
+        if (preSignedUrlsBuilder_ == null) {
+          preSignedUrlsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.service.Dataproxy.PreSignedURLs, flyteidl.service.Dataproxy.PreSignedURLs.Builder, flyteidl.service.Dataproxy.PreSignedURLsOrBuilder>(
+                  getPreSignedUrls(),
+                  getParentForChildren(),
+                  isClean());
+          preSignedUrls_ = null;
+        }
+        return preSignedUrlsBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.service.CreateDownloadLinkResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.service.CreateDownloadLinkResponse)
+    private static final flyteidl.service.Dataproxy.CreateDownloadLinkResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.service.Dataproxy.CreateDownloadLinkResponse();
+    }
+
+    public static flyteidl.service.Dataproxy.CreateDownloadLinkResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CreateDownloadLinkResponse>
+        PARSER = new com.google.protobuf.AbstractParser<CreateDownloadLinkResponse>() {
+      @java.lang.Override
+      public CreateDownloadLinkResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CreateDownloadLinkResponse(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CreateDownloadLinkResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CreateDownloadLinkResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.service.Dataproxy.CreateDownloadLinkResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface PreSignedURLsOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.service.PreSignedURLs)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    java.util.List<java.lang.String>
+        getSignedUrlList();
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    int getSignedUrlCount();
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    java.lang.String getSignedUrl(int index);
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getSignedUrlBytes(int index);
+
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expire.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    boolean hasExpiresAt();
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expire.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    com.google.protobuf.Timestamp getExpiresAt();
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expire.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder();
+  }
+  /**
+   * <pre>
+   * Wrapper object since the message is shared across this and the GetDataResponse
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.service.PreSignedURLs}
+   */
+  public  static final class PreSignedURLs extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.service.PreSignedURLs)
+      PreSignedURLsOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use PreSignedURLs.newBuilder() to construct.
+    private PreSignedURLs(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private PreSignedURLs() {
+      signedUrl_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private PreSignedURLs(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                signedUrl_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              signedUrl_.add(s);
+              break;
+            }
+            case 18: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (expiresAt_ != null) {
+                subBuilder = expiresAt_.toBuilder();
+              }
+              expiresAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(expiresAt_);
+                expiresAt_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          signedUrl_ = signedUrl_.getUnmodifiableView();
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_PreSignedURLs_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_PreSignedURLs_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.service.Dataproxy.PreSignedURLs.class, flyteidl.service.Dataproxy.PreSignedURLs.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int SIGNED_URL_FIELD_NUMBER = 1;
+    private com.google.protobuf.LazyStringList signedUrl_;
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getSignedUrlList() {
+      return signedUrl_;
+    }
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    public int getSignedUrlCount() {
+      return signedUrl_.size();
+    }
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    public java.lang.String getSignedUrl(int index) {
+      return signedUrl_.get(index);
+    }
+    /**
+     * <pre>
+     * SignedUrl specifies the url to use to download content from (e.g. https://my-bucket.s3.amazonaws.com/randomstring/suffix.tar?X-...)
+     * </pre>
+     *
+     * <code>repeated string signed_url = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSignedUrlBytes(int index) {
+      return signedUrl_.getByteString(index);
+    }
+
+    public static final int EXPIRES_AT_FIELD_NUMBER = 2;
+    private com.google.protobuf.Timestamp expiresAt_;
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expire.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    public boolean hasExpiresAt() {
+      return expiresAt_ != null;
+    }
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expire.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    public com.google.protobuf.Timestamp getExpiresAt() {
+      return expiresAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : expiresAt_;
+    }
+    /**
+     * <pre>
+     * ExpiresAt defines when will the signed URL expire.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp expires_at = 2;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getExpiresAtOrBuilder() {
+      return getExpiresAt();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < signedUrl_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, signedUrl_.getRaw(i));
+      }
+      if (expiresAt_ != null) {
+        output.writeMessage(2, getExpiresAt());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < signedUrl_.size(); i++) {
+          dataSize += computeStringSizeNoTag(signedUrl_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getSignedUrlList().size();
+      }
+      if (expiresAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getExpiresAt());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.service.Dataproxy.PreSignedURLs)) {
+        return super.equals(obj);
+      }
+      flyteidl.service.Dataproxy.PreSignedURLs other = (flyteidl.service.Dataproxy.PreSignedURLs) obj;
+
+      if (!getSignedUrlList()
+          .equals(other.getSignedUrlList())) return false;
+      if (hasExpiresAt() != other.hasExpiresAt()) return false;
+      if (hasExpiresAt()) {
+        if (!getExpiresAt()
+            .equals(other.getExpiresAt())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getSignedUrlCount() > 0) {
+        hash = (37 * hash) + SIGNED_URL_FIELD_NUMBER;
+        hash = (53 * hash) + getSignedUrlList().hashCode();
+      }
+      if (hasExpiresAt()) {
+        hash = (37 * hash) + EXPIRES_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getExpiresAt().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.PreSignedURLs parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.service.Dataproxy.PreSignedURLs prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Wrapper object since the message is shared across this and the GetDataResponse
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.service.PreSignedURLs}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.service.PreSignedURLs)
+        flyteidl.service.Dataproxy.PreSignedURLsOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_PreSignedURLs_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_PreSignedURLs_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.service.Dataproxy.PreSignedURLs.class, flyteidl.service.Dataproxy.PreSignedURLs.Builder.class);
+      }
+
+      // Construct using flyteidl.service.Dataproxy.PreSignedURLs.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        signedUrl_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        if (expiresAtBuilder_ == null) {
+          expiresAt_ = null;
+        } else {
+          expiresAt_ = null;
+          expiresAtBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_PreSignedURLs_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.PreSignedURLs getDefaultInstanceForType() {
+        return flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.PreSignedURLs build() {
+        flyteidl.service.Dataproxy.PreSignedURLs result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.PreSignedURLs buildPartial() {
+        flyteidl.service.Dataproxy.PreSignedURLs result = new flyteidl.service.Dataproxy.PreSignedURLs(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((bitField0_ & 0x00000001) != 0)) {
+          signedUrl_ = signedUrl_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.signedUrl_ = signedUrl_;
+        if (expiresAtBuilder_ == null) {
+          result.expiresAt_ = expiresAt_;
+        } else {
+          result.expiresAt_ = expiresAtBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.service.Dataproxy.PreSignedURLs) {
+          return mergeFrom((flyteidl.service.Dataproxy.PreSignedURLs)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.service.Dataproxy.PreSignedURLs other) {
+        if (other == flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance()) return this;
+        if (!other.signedUrl_.isEmpty()) {
+          if (signedUrl_.isEmpty()) {
+            signedUrl_ = other.signedUrl_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureSignedUrlIsMutable();
+            signedUrl_.addAll(other.signedUrl_);
+          }
+          onChanged();
+        }
+        if (other.hasExpiresAt()) {
+          mergeExpiresAt(other.getExpiresAt());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.service.Dataproxy.PreSignedURLs parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.service.Dataproxy.PreSignedURLs) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
           if (parsedMessage != null) {
@@ -6298,41 +7696,1996 @@ public final class Dataproxy {
       }
 
 
-      // @@protoc_insertion_point(builder_scope:flyteidl.service.CreateDownloadLinkResponse)
+      // @@protoc_insertion_point(builder_scope:flyteidl.service.PreSignedURLs)
     }
 
-    // @@protoc_insertion_point(class_scope:flyteidl.service.CreateDownloadLinkResponse)
-    private static final flyteidl.service.Dataproxy.CreateDownloadLinkResponse DEFAULT_INSTANCE;
+    // @@protoc_insertion_point(class_scope:flyteidl.service.PreSignedURLs)
+    private static final flyteidl.service.Dataproxy.PreSignedURLs DEFAULT_INSTANCE;
     static {
-      DEFAULT_INSTANCE = new flyteidl.service.Dataproxy.CreateDownloadLinkResponse();
+      DEFAULT_INSTANCE = new flyteidl.service.Dataproxy.PreSignedURLs();
     }
 
-    public static flyteidl.service.Dataproxy.CreateDownloadLinkResponse getDefaultInstance() {
+    public static flyteidl.service.Dataproxy.PreSignedURLs getDefaultInstance() {
       return DEFAULT_INSTANCE;
     }
 
-    private static final com.google.protobuf.Parser<CreateDownloadLinkResponse>
-        PARSER = new com.google.protobuf.AbstractParser<CreateDownloadLinkResponse>() {
+    private static final com.google.protobuf.Parser<PreSignedURLs>
+        PARSER = new com.google.protobuf.AbstractParser<PreSignedURLs>() {
       @java.lang.Override
-      public CreateDownloadLinkResponse parsePartialFrom(
+      public PreSignedURLs parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
-        return new CreateDownloadLinkResponse(input, extensionRegistry);
+        return new PreSignedURLs(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<CreateDownloadLinkResponse> parser() {
+    public static com.google.protobuf.Parser<PreSignedURLs> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<CreateDownloadLinkResponse> getParserForType() {
+    public com.google.protobuf.Parser<PreSignedURLs> getParserForType() {
       return PARSER;
     }
 
     @java.lang.Override
-    public flyteidl.service.Dataproxy.CreateDownloadLinkResponse getDefaultInstanceForType() {
+    public flyteidl.service.Dataproxy.PreSignedURLs getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface GetDataRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.service.GetDataRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
+     * <code>string flyte_url = 1;</code>
+     */
+    java.lang.String getFlyteUrl();
+    /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
+     * <code>string flyte_url = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getFlyteUrlBytes();
+  }
+  /**
+   * <pre>
+   * General request artifact to retrieve data from a Flyte artifact url.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.service.GetDataRequest}
+   */
+  public  static final class GetDataRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.service.GetDataRequest)
+      GetDataRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GetDataRequest.newBuilder() to construct.
+    private GetDataRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GetDataRequest() {
+      flyteUrl_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GetDataRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              flyteUrl_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.service.Dataproxy.GetDataRequest.class, flyteidl.service.Dataproxy.GetDataRequest.Builder.class);
+    }
+
+    public static final int FLYTE_URL_FIELD_NUMBER = 1;
+    private volatile java.lang.Object flyteUrl_;
+    /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
+     * <code>string flyte_url = 1;</code>
+     */
+    public java.lang.String getFlyteUrl() {
+      java.lang.Object ref = flyteUrl_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        flyteUrl_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+     * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+     * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+     *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+     *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+     * </pre>
+     *
+     * <code>string flyte_url = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getFlyteUrlBytes() {
+      java.lang.Object ref = flyteUrl_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        flyteUrl_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getFlyteUrlBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, flyteUrl_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getFlyteUrlBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, flyteUrl_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.service.Dataproxy.GetDataRequest)) {
+        return super.equals(obj);
+      }
+      flyteidl.service.Dataproxy.GetDataRequest other = (flyteidl.service.Dataproxy.GetDataRequest) obj;
+
+      if (!getFlyteUrl()
+          .equals(other.getFlyteUrl())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + FLYTE_URL_FIELD_NUMBER;
+      hash = (53 * hash) + getFlyteUrl().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.GetDataRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.service.Dataproxy.GetDataRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * General request artifact to retrieve data from a Flyte artifact url.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.service.GetDataRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.service.GetDataRequest)
+        flyteidl.service.Dataproxy.GetDataRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.service.Dataproxy.GetDataRequest.class, flyteidl.service.Dataproxy.GetDataRequest.Builder.class);
+      }
+
+      // Construct using flyteidl.service.Dataproxy.GetDataRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        flyteUrl_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.GetDataRequest getDefaultInstanceForType() {
+        return flyteidl.service.Dataproxy.GetDataRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.GetDataRequest build() {
+        flyteidl.service.Dataproxy.GetDataRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.GetDataRequest buildPartial() {
+        flyteidl.service.Dataproxy.GetDataRequest result = new flyteidl.service.Dataproxy.GetDataRequest(this);
+        result.flyteUrl_ = flyteUrl_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.service.Dataproxy.GetDataRequest) {
+          return mergeFrom((flyteidl.service.Dataproxy.GetDataRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.service.Dataproxy.GetDataRequest other) {
+        if (other == flyteidl.service.Dataproxy.GetDataRequest.getDefaultInstance()) return this;
+        if (!other.getFlyteUrl().isEmpty()) {
+          flyteUrl_ = other.flyteUrl_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.service.Dataproxy.GetDataRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.service.Dataproxy.GetDataRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object flyteUrl_ = "";
+      /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
+       * <code>string flyte_url = 1;</code>
+       */
+      public java.lang.String getFlyteUrl() {
+        java.lang.Object ref = flyteUrl_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          flyteUrl_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
+       * <code>string flyte_url = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getFlyteUrlBytes() {
+        java.lang.Object ref = flyteUrl_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          flyteUrl_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
+       * <code>string flyte_url = 1;</code>
+       */
+      public Builder setFlyteUrl(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        flyteUrl_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
+       * <code>string flyte_url = 1;</code>
+       */
+      public Builder clearFlyteUrl() {
+        
+        flyteUrl_ = getDefaultInstance().getFlyteUrl();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A unique identifier in the form of flyte://&lt;something&gt; that uniquely, for a given Flyte
+       * backend, identifies a Flyte artifact ([i]nput, [o]utput, flyte [d]eck, etc.).
+       * e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
+       *      flyte://v1/proj/development/execid/n2/i (for node execution input)
+       *      flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)
+       * </pre>
+       *
+       * <code>string flyte_url = 1;</code>
+       */
+      public Builder setFlyteUrlBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        flyteUrl_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.service.GetDataRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.service.GetDataRequest)
+    private static final flyteidl.service.Dataproxy.GetDataRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.service.Dataproxy.GetDataRequest();
+    }
+
+    public static flyteidl.service.Dataproxy.GetDataRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GetDataRequest>
+        PARSER = new com.google.protobuf.AbstractParser<GetDataRequest>() {
+      @java.lang.Override
+      public GetDataRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GetDataRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GetDataRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GetDataRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.service.Dataproxy.GetDataRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface GetDataResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.service.GetDataResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * literal map data will be returned
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+     */
+    boolean hasLiteralMap();
+    /**
+     * <pre>
+     * literal map data will be returned
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+     */
+    flyteidl.core.Literals.LiteralMap getLiteralMap();
+    /**
+     * <pre>
+     * literal map data will be returned
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+     */
+    flyteidl.core.Literals.LiteralMapOrBuilder getLiteralMapOrBuilder();
+
+    /**
+     * <pre>
+     * Flyte deck html will be returned as a signed url users can download
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+     */
+    boolean hasPreSignedUrls();
+    /**
+     * <pre>
+     * Flyte deck html will be returned as a signed url users can download
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+     */
+    flyteidl.service.Dataproxy.PreSignedURLs getPreSignedUrls();
+    /**
+     * <pre>
+     * Flyte deck html will be returned as a signed url users can download
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+     */
+    flyteidl.service.Dataproxy.PreSignedURLsOrBuilder getPreSignedUrlsOrBuilder();
+
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    boolean hasLiteral();
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    flyteidl.core.Literals.Literal getLiteral();
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder();
+
+    public flyteidl.service.Dataproxy.GetDataResponse.DataCase getDataCase();
+  }
+  /**
+   * Protobuf type {@code flyteidl.service.GetDataResponse}
+   */
+  public  static final class GetDataResponse extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.service.GetDataResponse)
+      GetDataResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GetDataResponse.newBuilder() to construct.
+    private GetDataResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GetDataResponse() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GetDataResponse(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Literals.LiteralMap.Builder subBuilder = null;
+              if (dataCase_ == 1) {
+                subBuilder = ((flyteidl.core.Literals.LiteralMap) data_).toBuilder();
+              }
+              data_ =
+                  input.readMessage(flyteidl.core.Literals.LiteralMap.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.LiteralMap) data_);
+                data_ = subBuilder.buildPartial();
+              }
+              dataCase_ = 1;
+              break;
+            }
+            case 18: {
+              flyteidl.service.Dataproxy.PreSignedURLs.Builder subBuilder = null;
+              if (dataCase_ == 2) {
+                subBuilder = ((flyteidl.service.Dataproxy.PreSignedURLs) data_).toBuilder();
+              }
+              data_ =
+                  input.readMessage(flyteidl.service.Dataproxy.PreSignedURLs.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.service.Dataproxy.PreSignedURLs) data_);
+                data_ = subBuilder.buildPartial();
+              }
+              dataCase_ = 2;
+              break;
+            }
+            case 26: {
+              flyteidl.core.Literals.Literal.Builder subBuilder = null;
+              if (dataCase_ == 3) {
+                subBuilder = ((flyteidl.core.Literals.Literal) data_).toBuilder();
+              }
+              data_ =
+                  input.readMessage(flyteidl.core.Literals.Literal.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.Literal) data_);
+                data_ = subBuilder.buildPartial();
+              }
+              dataCase_ = 3;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.service.Dataproxy.GetDataResponse.class, flyteidl.service.Dataproxy.GetDataResponse.Builder.class);
+    }
+
+    private int dataCase_ = 0;
+    private java.lang.Object data_;
+    public enum DataCase
+        implements com.google.protobuf.Internal.EnumLite {
+      LITERAL_MAP(1),
+      PRE_SIGNED_URLS(2),
+      LITERAL(3),
+      DATA_NOT_SET(0);
+      private final int value;
+      private DataCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static DataCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static DataCase forNumber(int value) {
+        switch (value) {
+          case 1: return LITERAL_MAP;
+          case 2: return PRE_SIGNED_URLS;
+          case 3: return LITERAL;
+          case 0: return DATA_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public DataCase
+    getDataCase() {
+      return DataCase.forNumber(
+          dataCase_);
+    }
+
+    public static final int LITERAL_MAP_FIELD_NUMBER = 1;
+    /**
+     * <pre>
+     * literal map data will be returned
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+     */
+    public boolean hasLiteralMap() {
+      return dataCase_ == 1;
+    }
+    /**
+     * <pre>
+     * literal map data will be returned
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+     */
+    public flyteidl.core.Literals.LiteralMap getLiteralMap() {
+      if (dataCase_ == 1) {
+         return (flyteidl.core.Literals.LiteralMap) data_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * literal map data will be returned
+     * </pre>
+     *
+     * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+     */
+    public flyteidl.core.Literals.LiteralMapOrBuilder getLiteralMapOrBuilder() {
+      if (dataCase_ == 1) {
+         return (flyteidl.core.Literals.LiteralMap) data_;
+      }
+      return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+    }
+
+    public static final int PRE_SIGNED_URLS_FIELD_NUMBER = 2;
+    /**
+     * <pre>
+     * Flyte deck html will be returned as a signed url users can download
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+     */
+    public boolean hasPreSignedUrls() {
+      return dataCase_ == 2;
+    }
+    /**
+     * <pre>
+     * Flyte deck html will be returned as a signed url users can download
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+     */
+    public flyteidl.service.Dataproxy.PreSignedURLs getPreSignedUrls() {
+      if (dataCase_ == 2) {
+         return (flyteidl.service.Dataproxy.PreSignedURLs) data_;
+      }
+      return flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Flyte deck html will be returned as a signed url users can download
+     * </pre>
+     *
+     * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+     */
+    public flyteidl.service.Dataproxy.PreSignedURLsOrBuilder getPreSignedUrlsOrBuilder() {
+      if (dataCase_ == 2) {
+         return (flyteidl.service.Dataproxy.PreSignedURLs) data_;
+      }
+      return flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
+    }
+
+    public static final int LITERAL_FIELD_NUMBER = 3;
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    public boolean hasLiteral() {
+      return dataCase_ == 3;
+    }
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    public flyteidl.core.Literals.Literal getLiteral() {
+      if (dataCase_ == 3) {
+         return (flyteidl.core.Literals.Literal) data_;
+      }
+      return flyteidl.core.Literals.Literal.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Single literal will be returned. This is returned when the user/url requests a specific output or input
+     * by name. See the o3 example above.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Literal literal = 3;</code>
+     */
+    public flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder() {
+      if (dataCase_ == 3) {
+         return (flyteidl.core.Literals.Literal) data_;
+      }
+      return flyteidl.core.Literals.Literal.getDefaultInstance();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (dataCase_ == 1) {
+        output.writeMessage(1, (flyteidl.core.Literals.LiteralMap) data_);
+      }
+      if (dataCase_ == 2) {
+        output.writeMessage(2, (flyteidl.service.Dataproxy.PreSignedURLs) data_);
+      }
+      if (dataCase_ == 3) {
+        output.writeMessage(3, (flyteidl.core.Literals.Literal) data_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (dataCase_ == 1) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, (flyteidl.core.Literals.LiteralMap) data_);
+      }
+      if (dataCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, (flyteidl.service.Dataproxy.PreSignedURLs) data_);
+      }
+      if (dataCase_ == 3) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, (flyteidl.core.Literals.Literal) data_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.service.Dataproxy.GetDataResponse)) {
+        return super.equals(obj);
+      }
+      flyteidl.service.Dataproxy.GetDataResponse other = (flyteidl.service.Dataproxy.GetDataResponse) obj;
+
+      if (!getDataCase().equals(other.getDataCase())) return false;
+      switch (dataCase_) {
+        case 1:
+          if (!getLiteralMap()
+              .equals(other.getLiteralMap())) return false;
+          break;
+        case 2:
+          if (!getPreSignedUrls()
+              .equals(other.getPreSignedUrls())) return false;
+          break;
+        case 3:
+          if (!getLiteral()
+              .equals(other.getLiteral())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      switch (dataCase_) {
+        case 1:
+          hash = (37 * hash) + LITERAL_MAP_FIELD_NUMBER;
+          hash = (53 * hash) + getLiteralMap().hashCode();
+          break;
+        case 2:
+          hash = (37 * hash) + PRE_SIGNED_URLS_FIELD_NUMBER;
+          hash = (53 * hash) + getPreSignedUrls().hashCode();
+          break;
+        case 3:
+          hash = (37 * hash) + LITERAL_FIELD_NUMBER;
+          hash = (53 * hash) + getLiteral().hashCode();
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.service.Dataproxy.GetDataResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.service.Dataproxy.GetDataResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.service.GetDataResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.service.GetDataResponse)
+        flyteidl.service.Dataproxy.GetDataResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.service.Dataproxy.GetDataResponse.class, flyteidl.service.Dataproxy.GetDataResponse.Builder.class);
+      }
+
+      // Construct using flyteidl.service.Dataproxy.GetDataResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        dataCase_ = 0;
+        data_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.service.Dataproxy.internal_static_flyteidl_service_GetDataResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.GetDataResponse getDefaultInstanceForType() {
+        return flyteidl.service.Dataproxy.GetDataResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.GetDataResponse build() {
+        flyteidl.service.Dataproxy.GetDataResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.service.Dataproxy.GetDataResponse buildPartial() {
+        flyteidl.service.Dataproxy.GetDataResponse result = new flyteidl.service.Dataproxy.GetDataResponse(this);
+        if (dataCase_ == 1) {
+          if (literalMapBuilder_ == null) {
+            result.data_ = data_;
+          } else {
+            result.data_ = literalMapBuilder_.build();
+          }
+        }
+        if (dataCase_ == 2) {
+          if (preSignedUrlsBuilder_ == null) {
+            result.data_ = data_;
+          } else {
+            result.data_ = preSignedUrlsBuilder_.build();
+          }
+        }
+        if (dataCase_ == 3) {
+          if (literalBuilder_ == null) {
+            result.data_ = data_;
+          } else {
+            result.data_ = literalBuilder_.build();
+          }
+        }
+        result.dataCase_ = dataCase_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.service.Dataproxy.GetDataResponse) {
+          return mergeFrom((flyteidl.service.Dataproxy.GetDataResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.service.Dataproxy.GetDataResponse other) {
+        if (other == flyteidl.service.Dataproxy.GetDataResponse.getDefaultInstance()) return this;
+        switch (other.getDataCase()) {
+          case LITERAL_MAP: {
+            mergeLiteralMap(other.getLiteralMap());
+            break;
+          }
+          case PRE_SIGNED_URLS: {
+            mergePreSignedUrls(other.getPreSignedUrls());
+            break;
+          }
+          case LITERAL: {
+            mergeLiteral(other.getLiteral());
+            break;
+          }
+          case DATA_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.service.Dataproxy.GetDataResponse parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.service.Dataproxy.GetDataResponse) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int dataCase_ = 0;
+      private java.lang.Object data_;
+      public DataCase
+          getDataCase() {
+        return DataCase.forNumber(
+            dataCase_);
+      }
+
+      public Builder clearData() {
+        dataCase_ = 0;
+        data_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> literalMapBuilder_;
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public boolean hasLiteralMap() {
+        return dataCase_ == 1;
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap getLiteralMap() {
+        if (literalMapBuilder_ == null) {
+          if (dataCase_ == 1) {
+            return (flyteidl.core.Literals.LiteralMap) data_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        } else {
+          if (dataCase_ == 1) {
+            return literalMapBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public Builder setLiteralMap(flyteidl.core.Literals.LiteralMap value) {
+        if (literalMapBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          literalMapBuilder_.setMessage(value);
+        }
+        dataCase_ = 1;
+        return this;
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public Builder setLiteralMap(
+          flyteidl.core.Literals.LiteralMap.Builder builderForValue) {
+        if (literalMapBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          literalMapBuilder_.setMessage(builderForValue.build());
+        }
+        dataCase_ = 1;
+        return this;
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public Builder mergeLiteralMap(flyteidl.core.Literals.LiteralMap value) {
+        if (literalMapBuilder_ == null) {
+          if (dataCase_ == 1 &&
+              data_ != flyteidl.core.Literals.LiteralMap.getDefaultInstance()) {
+            data_ = flyteidl.core.Literals.LiteralMap.newBuilder((flyteidl.core.Literals.LiteralMap) data_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            data_ = value;
+          }
+          onChanged();
+        } else {
+          if (dataCase_ == 1) {
+            literalMapBuilder_.mergeFrom(value);
+          }
+          literalMapBuilder_.setMessage(value);
+        }
+        dataCase_ = 1;
+        return this;
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public Builder clearLiteralMap() {
+        if (literalMapBuilder_ == null) {
+          if (dataCase_ == 1) {
+            dataCase_ = 0;
+            data_ = null;
+            onChanged();
+          }
+        } else {
+          if (dataCase_ == 1) {
+            dataCase_ = 0;
+            data_ = null;
+          }
+          literalMapBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMap.Builder getLiteralMapBuilder() {
+        return getLiteralMapFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      public flyteidl.core.Literals.LiteralMapOrBuilder getLiteralMapOrBuilder() {
+        if ((dataCase_ == 1) && (literalMapBuilder_ != null)) {
+          return literalMapBuilder_.getMessageOrBuilder();
+        } else {
+          if (dataCase_ == 1) {
+            return (flyteidl.core.Literals.LiteralMap) data_;
+          }
+          return flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * literal map data will be returned
+       * </pre>
+       *
+       * <code>.flyteidl.core.LiteralMap literal_map = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder> 
+          getLiteralMapFieldBuilder() {
+        if (literalMapBuilder_ == null) {
+          if (!(dataCase_ == 1)) {
+            data_ = flyteidl.core.Literals.LiteralMap.getDefaultInstance();
+          }
+          literalMapBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.LiteralMap, flyteidl.core.Literals.LiteralMap.Builder, flyteidl.core.Literals.LiteralMapOrBuilder>(
+                  (flyteidl.core.Literals.LiteralMap) data_,
+                  getParentForChildren(),
+                  isClean());
+          data_ = null;
+        }
+        dataCase_ = 1;
+        onChanged();;
+        return literalMapBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.service.Dataproxy.PreSignedURLs, flyteidl.service.Dataproxy.PreSignedURLs.Builder, flyteidl.service.Dataproxy.PreSignedURLsOrBuilder> preSignedUrlsBuilder_;
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public boolean hasPreSignedUrls() {
+        return dataCase_ == 2;
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public flyteidl.service.Dataproxy.PreSignedURLs getPreSignedUrls() {
+        if (preSignedUrlsBuilder_ == null) {
+          if (dataCase_ == 2) {
+            return (flyteidl.service.Dataproxy.PreSignedURLs) data_;
+          }
+          return flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
+        } else {
+          if (dataCase_ == 2) {
+            return preSignedUrlsBuilder_.getMessage();
+          }
+          return flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public Builder setPreSignedUrls(flyteidl.service.Dataproxy.PreSignedURLs value) {
+        if (preSignedUrlsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          preSignedUrlsBuilder_.setMessage(value);
+        }
+        dataCase_ = 2;
+        return this;
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public Builder setPreSignedUrls(
+          flyteidl.service.Dataproxy.PreSignedURLs.Builder builderForValue) {
+        if (preSignedUrlsBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          preSignedUrlsBuilder_.setMessage(builderForValue.build());
+        }
+        dataCase_ = 2;
+        return this;
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public Builder mergePreSignedUrls(flyteidl.service.Dataproxy.PreSignedURLs value) {
+        if (preSignedUrlsBuilder_ == null) {
+          if (dataCase_ == 2 &&
+              data_ != flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance()) {
+            data_ = flyteidl.service.Dataproxy.PreSignedURLs.newBuilder((flyteidl.service.Dataproxy.PreSignedURLs) data_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            data_ = value;
+          }
+          onChanged();
+        } else {
+          if (dataCase_ == 2) {
+            preSignedUrlsBuilder_.mergeFrom(value);
+          }
+          preSignedUrlsBuilder_.setMessage(value);
+        }
+        dataCase_ = 2;
+        return this;
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public Builder clearPreSignedUrls() {
+        if (preSignedUrlsBuilder_ == null) {
+          if (dataCase_ == 2) {
+            dataCase_ = 0;
+            data_ = null;
+            onChanged();
+          }
+        } else {
+          if (dataCase_ == 2) {
+            dataCase_ = 0;
+            data_ = null;
+          }
+          preSignedUrlsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public flyteidl.service.Dataproxy.PreSignedURLs.Builder getPreSignedUrlsBuilder() {
+        return getPreSignedUrlsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      public flyteidl.service.Dataproxy.PreSignedURLsOrBuilder getPreSignedUrlsOrBuilder() {
+        if ((dataCase_ == 2) && (preSignedUrlsBuilder_ != null)) {
+          return preSignedUrlsBuilder_.getMessageOrBuilder();
+        } else {
+          if (dataCase_ == 2) {
+            return (flyteidl.service.Dataproxy.PreSignedURLs) data_;
+          }
+          return flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Flyte deck html will be returned as a signed url users can download
+       * </pre>
+       *
+       * <code>.flyteidl.service.PreSignedURLs pre_signed_urls = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.service.Dataproxy.PreSignedURLs, flyteidl.service.Dataproxy.PreSignedURLs.Builder, flyteidl.service.Dataproxy.PreSignedURLsOrBuilder> 
+          getPreSignedUrlsFieldBuilder() {
+        if (preSignedUrlsBuilder_ == null) {
+          if (!(dataCase_ == 2)) {
+            data_ = flyteidl.service.Dataproxy.PreSignedURLs.getDefaultInstance();
+          }
+          preSignedUrlsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.service.Dataproxy.PreSignedURLs, flyteidl.service.Dataproxy.PreSignedURLs.Builder, flyteidl.service.Dataproxy.PreSignedURLsOrBuilder>(
+                  (flyteidl.service.Dataproxy.PreSignedURLs) data_,
+                  getParentForChildren(),
+                  isClean());
+          data_ = null;
+        }
+        dataCase_ = 2;
+        onChanged();;
+        return preSignedUrlsBuilder_;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.Literal, flyteidl.core.Literals.Literal.Builder, flyteidl.core.Literals.LiteralOrBuilder> literalBuilder_;
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public boolean hasLiteral() {
+        return dataCase_ == 3;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public flyteidl.core.Literals.Literal getLiteral() {
+        if (literalBuilder_ == null) {
+          if (dataCase_ == 3) {
+            return (flyteidl.core.Literals.Literal) data_;
+          }
+          return flyteidl.core.Literals.Literal.getDefaultInstance();
+        } else {
+          if (dataCase_ == 3) {
+            return literalBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.Literal.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder setLiteral(flyteidl.core.Literals.Literal value) {
+        if (literalBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          literalBuilder_.setMessage(value);
+        }
+        dataCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder setLiteral(
+          flyteidl.core.Literals.Literal.Builder builderForValue) {
+        if (literalBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          literalBuilder_.setMessage(builderForValue.build());
+        }
+        dataCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder mergeLiteral(flyteidl.core.Literals.Literal value) {
+        if (literalBuilder_ == null) {
+          if (dataCase_ == 3 &&
+              data_ != flyteidl.core.Literals.Literal.getDefaultInstance()) {
+            data_ = flyteidl.core.Literals.Literal.newBuilder((flyteidl.core.Literals.Literal) data_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            data_ = value;
+          }
+          onChanged();
+        } else {
+          if (dataCase_ == 3) {
+            literalBuilder_.mergeFrom(value);
+          }
+          literalBuilder_.setMessage(value);
+        }
+        dataCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public Builder clearLiteral() {
+        if (literalBuilder_ == null) {
+          if (dataCase_ == 3) {
+            dataCase_ = 0;
+            data_ = null;
+            onChanged();
+          }
+        } else {
+          if (dataCase_ == 3) {
+            dataCase_ = 0;
+            data_ = null;
+          }
+          literalBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public flyteidl.core.Literals.Literal.Builder getLiteralBuilder() {
+        return getLiteralFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      public flyteidl.core.Literals.LiteralOrBuilder getLiteralOrBuilder() {
+        if ((dataCase_ == 3) && (literalBuilder_ != null)) {
+          return literalBuilder_.getMessageOrBuilder();
+        } else {
+          if (dataCase_ == 3) {
+            return (flyteidl.core.Literals.Literal) data_;
+          }
+          return flyteidl.core.Literals.Literal.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Single literal will be returned. This is returned when the user/url requests a specific output or input
+       * by name. See the o3 example above.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Literal literal = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.Literal, flyteidl.core.Literals.Literal.Builder, flyteidl.core.Literals.LiteralOrBuilder> 
+          getLiteralFieldBuilder() {
+        if (literalBuilder_ == null) {
+          if (!(dataCase_ == 3)) {
+            data_ = flyteidl.core.Literals.Literal.getDefaultInstance();
+          }
+          literalBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.Literal, flyteidl.core.Literals.Literal.Builder, flyteidl.core.Literals.LiteralOrBuilder>(
+                  (flyteidl.core.Literals.Literal) data_,
+                  getParentForChildren(),
+                  isClean());
+          data_ = null;
+        }
+        dataCase_ = 3;
+        onChanged();;
+        return literalBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.service.GetDataResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.service.GetDataResponse)
+    private static final flyteidl.service.Dataproxy.GetDataResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.service.Dataproxy.GetDataResponse();
+    }
+
+    public static flyteidl.service.Dataproxy.GetDataResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GetDataResponse>
+        PARSER = new com.google.protobuf.AbstractParser<GetDataResponse>() {
+      @java.lang.Override
+      public GetDataResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GetDataResponse(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GetDataResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GetDataResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.service.Dataproxy.GetDataResponse getDefaultInstanceForType() {
       return DEFAULT_INSTANCE;
     }
 
@@ -6368,6 +9721,21 @@ public final class Dataproxy {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_service_CreateDownloadLinkResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_service_PreSignedURLs_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_service_PreSignedURLs_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_service_GetDataRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_service_GetDataRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_service_GetDataResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_service_GetDataResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -6381,43 +9749,56 @@ public final class Dataproxy {
       "eidl.service\032\034google/api/annotations.pro" +
       "to\032\036google/protobuf/duration.proto\032\037goog" +
       "le/protobuf/timestamp.proto\032\036flyteidl/co" +
-      "re/identifier.proto\"v\n\034CreateUploadLocat" +
-      "ionResponse\022\022\n\nsigned_url\030\001 \001(\t\022\022\n\nnativ" +
-      "e_url\030\002 \001(\t\022.\n\nexpires_at\030\003 \001(\0132\032.google" +
-      ".protobuf.Timestamp\"\224\001\n\033CreateUploadLoca" +
-      "tionRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002" +
-      " \001(\t\022\020\n\010filename\030\003 \001(\t\022-\n\nexpires_in\030\004 \001" +
-      "(\0132\031.google.protobuf.Duration\022\023\n\013content" +
-      "_md5\030\005 \001(\014\"f\n\035CreateDownloadLocationRequ" +
-      "est\022\022\n\nnative_url\030\001 \001(\t\022-\n\nexpires_in\030\002 " +
-      "\001(\0132\031.google.protobuf.Duration:\002\030\001\"h\n\036Cr" +
-      "eateDownloadLocationResponse\022\022\n\nsigned_u" +
-      "rl\030\001 \001(\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.pr" +
-      "otobuf.Timestamp:\002\030\001\"\320\001\n\031CreateDownloadL" +
-      "inkRequest\0225\n\rartifact_type\030\001 \001(\0162\036.flyt" +
-      "eidl.service.ArtifactType\022-\n\nexpires_in\030" +
-      "\002 \001(\0132\031.google.protobuf.Duration\022C\n\021node" +
-      "_execution_id\030\003 \001(\0132&.flyteidl.core.Node" +
-      "ExecutionIdentifierH\000B\010\n\006source\"`\n\032Creat" +
-      "eDownloadLinkResponse\022\022\n\nsigned_url\030\001 \003(" +
-      "\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.protobuf." +
-      "Timestamp*C\n\014ArtifactType\022\033\n\027ARTIFACT_TY" +
-      "PE_UNDEFINED\020\000\022\026\n\022ARTIFACT_TYPE_DECK\020\0012\374" +
-      "\003\n\020DataProxyService\022\240\001\n\024CreateUploadLoca" +
-      "tion\022-.flyteidl.service.CreateUploadLoca" +
-      "tionRequest\032..flyteidl.service.CreateUpl" +
-      "oadLocationResponse\")\202\323\344\223\002#\"\036/api/v1/dat" +
-      "aproxy/artifact_urn:\001*\022\246\001\n\026CreateDownloa" +
-      "dLocation\022/.flyteidl.service.CreateDownl" +
-      "oadLocationRequest\0320.flyteidl.service.Cr" +
-      "eateDownloadLocationResponse\")\210\002\001\202\323\344\223\002 \022" +
-      "\036/api/v1/dataproxy/artifact_urn\022\233\001\n\022Crea" +
-      "teDownloadLink\022+.flyteidl.service.Create" +
-      "DownloadLinkRequest\032,.flyteidl.service.C" +
-      "reateDownloadLinkResponse\"*\202\323\344\223\002$\"\037/api/" +
-      "v1/dataproxy/artifact_link:\001*B9Z7github." +
-      "com/flyteorg/flyteidl/gen/pb-go/flyteidl" +
-      "/serviceb\006proto3"
+      "re/identifier.proto\032\034flyteidl/core/liter" +
+      "als.proto\"v\n\034CreateUploadLocationRespons" +
+      "e\022\022\n\nsigned_url\030\001 \001(\t\022\022\n\nnative_url\030\002 \001(" +
+      "\t\022.\n\nexpires_at\030\003 \001(\0132\032.google.protobuf." +
+      "Timestamp\"\253\001\n\033CreateUploadLocationReques" +
+      "t\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\020\n\010fi" +
+      "lename\030\003 \001(\t\022-\n\nexpires_in\030\004 \001(\0132\031.googl" +
+      "e.protobuf.Duration\022\023\n\013content_md5\030\005 \001(\014" +
+      "\022\025\n\rfilename_root\030\006 \001(\t\"f\n\035CreateDownloa" +
+      "dLocationRequest\022\022\n\nnative_url\030\001 \001(\t\022-\n\n" +
+      "expires_in\030\002 \001(\0132\031.google.protobuf.Durat" +
+      "ion:\002\030\001\"h\n\036CreateDownloadLocationRespons" +
+      "e\022\022\n\nsigned_url\030\001 \001(\t\022.\n\nexpires_at\030\002 \001(" +
+      "\0132\032.google.protobuf.Timestamp:\002\030\001\"\320\001\n\031Cr" +
+      "eateDownloadLinkRequest\0225\n\rartifact_type" +
+      "\030\001 \001(\0162\036.flyteidl.service.ArtifactType\022-" +
+      "\n\nexpires_in\030\002 \001(\0132\031.google.protobuf.Dur" +
+      "ation\022C\n\021node_execution_id\030\003 \001(\0132&.flyte" +
+      "idl.core.NodeExecutionIdentifierH\000B\010\n\006so" +
+      "urce\"\242\001\n\032CreateDownloadLinkResponse\022\026\n\ns" +
+      "igned_url\030\001 \003(\tB\002\030\001\0222\n\nexpires_at\030\002 \001(\0132" +
+      "\032.google.protobuf.TimestampB\002\030\001\0228\n\017pre_s" +
+      "igned_urls\030\003 \001(\0132\037.flyteidl.service.PreS" +
+      "ignedURLs\"S\n\rPreSignedURLs\022\022\n\nsigned_url" +
+      "\030\001 \003(\t\022.\n\nexpires_at\030\002 \001(\0132\032.google.prot" +
+      "obuf.Timestamp\"#\n\016GetDataRequest\022\021\n\tflyt" +
+      "e_url\030\001 \001(\t\"\262\001\n\017GetDataResponse\0220\n\013liter" +
+      "al_map\030\001 \001(\0132\031.flyteidl.core.LiteralMapH" +
+      "\000\022:\n\017pre_signed_urls\030\002 \001(\0132\037.flyteidl.se" +
+      "rvice.PreSignedURLsH\000\022)\n\007literal\030\003 \001(\0132\026" +
+      ".flyteidl.core.LiteralH\000B\006\n\004data*C\n\014Arti" +
+      "factType\022\033\n\027ARTIFACT_TYPE_UNDEFINED\020\000\022\026\n" +
+      "\022ARTIFACT_TYPE_DECK\020\0012\342\004\n\020DataProxyServi" +
+      "ce\022\240\001\n\024CreateUploadLocation\022-.flyteidl.s" +
+      "ervice.CreateUploadLocationRequest\032..fly" +
+      "teidl.service.CreateUploadLocationRespon" +
+      "se\")\202\323\344\223\002#\"\036/api/v1/dataproxy/artifact_u" +
+      "rn:\001*\022\246\001\n\026CreateDownloadLocation\022/.flyte" +
+      "idl.service.CreateDownloadLocationReques" +
+      "t\0320.flyteidl.service.CreateDownloadLocat" +
+      "ionResponse\")\210\002\001\202\323\344\223\002 \022\036/api/v1/dataprox" +
+      "y/artifact_urn\022\233\001\n\022CreateDownloadLink\022+." +
+      "flyteidl.service.CreateDownloadLinkReque" +
+      "st\032,.flyteidl.service.CreateDownloadLink" +
+      "Response\"*\202\323\344\223\002$\"\037/api/v1/dataproxy/arti" +
+      "fact_link:\001*\022d\n\007GetData\022 .flyteidl.servi" +
+      "ce.GetDataRequest\032!.flyteidl.service.Get" +
+      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB9Z7gi" +
+      "thub.com/flyteorg/flyteidl/gen/pb-go/fly" +
+      "teidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6434,6 +9815,7 @@ public final class Dataproxy {
           com.google.protobuf.DurationProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
+          flyteidl.core.Literals.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_service_CreateUploadLocationResponse_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -6446,7 +9828,7 @@ public final class Dataproxy {
     internal_static_flyteidl_service_CreateUploadLocationRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_CreateUploadLocationRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", });
+        new java.lang.String[] { "Project", "Domain", "Filename", "ExpiresIn", "ContentMd5", "FilenameRoot", });
     internal_static_flyteidl_service_CreateDownloadLocationRequest_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_service_CreateDownloadLocationRequest_fieldAccessorTable = new
@@ -6470,7 +9852,25 @@ public final class Dataproxy {
     internal_static_flyteidl_service_CreateDownloadLinkResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_service_CreateDownloadLinkResponse_descriptor,
+        new java.lang.String[] { "SignedUrl", "ExpiresAt", "PreSignedUrls", });
+    internal_static_flyteidl_service_PreSignedURLs_descriptor =
+      getDescriptor().getMessageTypes().get(6);
+    internal_static_flyteidl_service_PreSignedURLs_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_service_PreSignedURLs_descriptor,
         new java.lang.String[] { "SignedUrl", "ExpiresAt", });
+    internal_static_flyteidl_service_GetDataRequest_descriptor =
+      getDescriptor().getMessageTypes().get(7);
+    internal_static_flyteidl_service_GetDataRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_service_GetDataRequest_descriptor,
+        new java.lang.String[] { "FlyteUrl", });
+    internal_static_flyteidl_service_GetDataResponse_descriptor =
+      getDescriptor().getMessageTypes().get(8);
+    internal_static_flyteidl_service_GetDataResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_service_GetDataResponse_descriptor,
+        new java.lang.String[] { "LiteralMap", "PreSignedUrls", "Literal", "Data", });
     com.google.protobuf.ExtensionRegistry registry =
         com.google.protobuf.ExtensionRegistry.newInstance();
     registry.add(com.google.api.AnnotationsProto.http);
@@ -6480,6 +9880,7 @@ public final class Dataproxy {
     com.google.protobuf.DurationProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
+    flyteidl.core.Literals.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

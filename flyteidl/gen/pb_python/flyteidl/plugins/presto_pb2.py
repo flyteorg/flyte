@@ -15,12 +15,13 @@ _sym_db = _symbol_database.Default()
 
 DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1d\x66lyteidl/plugins/presto.proto\x12\x10\x66lyteidl.plugins\"\x82\x01\n\x0bPrestoQuery\x12#\n\rrouting_group\x18\x01 \x01(\tR\x0croutingGroup\x12\x18\n\x07\x63\x61talog\x18\x02 \x01(\tR\x07\x63\x61talog\x12\x16\n\x06schema\x18\x03 \x01(\tR\x06schema\x12\x1c\n\tstatement\x18\x04 \x01(\tR\tstatementB\xbd\x01\n\x14\x63om.flyteidl.pluginsB\x0bPrestoProtoP\x01Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins\xa2\x02\x03\x46PX\xaa\x02\x10\x46lyteidl.Plugins\xca\x02\x10\x46lyteidl\\Plugins\xe2\x02\x1c\x46lyteidl\\Plugins\\GPBMetadata\xea\x02\x11\x46lyteidl::Pluginsb\x06proto3')
 
-_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl.plugins.presto_pb2', globals())
+_globals = globals()
+_builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'flyteidl.plugins.presto_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\024com.flyteidl.pluginsB\013PrestoProtoP\001Z7github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins\242\002\003FPX\252\002\020Flyteidl.Plugins\312\002\020Flyteidl\\Plugins\342\002\034Flyteidl\\Plugins\\GPBMetadata\352\002\021Flyteidl::Plugins'
-  _PRESTOQUERY._serialized_start=52
-  _PRESTOQUERY._serialized_end=182
+  _globals['_PRESTOQUERY']._serialized_start=52
+  _globals['_PRESTOQUERY']._serialized_end=182
 # @@protoc_insertion_point(module_scope)

@@ -6,11 +6,19 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class CategoricalParameterRange(_message.Message):
-    __slots__ = ["values"]
-    VALUES_FIELD_NUMBER: _ClassVar[int]
-    values: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, values: _Optional[_Iterable[str]] = ...) -> None: ...
+class HyperparameterScalingType(_message.Message):
+    __slots__ = []
+    class Value(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        AUTO: _ClassVar[HyperparameterScalingType.Value]
+        LINEAR: _ClassVar[HyperparameterScalingType.Value]
+        LOGARITHMIC: _ClassVar[HyperparameterScalingType.Value]
+        REVERSELOGARITHMIC: _ClassVar[HyperparameterScalingType.Value]
+    AUTO: HyperparameterScalingType.Value
+    LINEAR: HyperparameterScalingType.Value
+    LOGARITHMIC: HyperparameterScalingType.Value
+    REVERSELOGARITHMIC: HyperparameterScalingType.Value
+    def __init__(self) -> None: ...
 
 class ContinuousParameterRange(_message.Message):
     __slots__ = ["max_value", "min_value", "scaling_type"]
@@ -22,16 +30,6 @@ class ContinuousParameterRange(_message.Message):
     scaling_type: HyperparameterScalingType.Value
     def __init__(self, max_value: _Optional[float] = ..., min_value: _Optional[float] = ..., scaling_type: _Optional[_Union[HyperparameterScalingType.Value, str]] = ...) -> None: ...
 
-class HyperparameterScalingType(_message.Message):
-    __slots__ = []
-    class Value(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-    AUTO: HyperparameterScalingType.Value
-    LINEAR: HyperparameterScalingType.Value
-    LOGARITHMIC: HyperparameterScalingType.Value
-    REVERSELOGARITHMIC: HyperparameterScalingType.Value
-    def __init__(self) -> None: ...
-
 class IntegerParameterRange(_message.Message):
     __slots__ = ["max_value", "min_value", "scaling_type"]
     MAX_VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -42,14 +40,20 @@ class IntegerParameterRange(_message.Message):
     scaling_type: HyperparameterScalingType.Value
     def __init__(self, max_value: _Optional[int] = ..., min_value: _Optional[int] = ..., scaling_type: _Optional[_Union[HyperparameterScalingType.Value, str]] = ...) -> None: ...
 
+class CategoricalParameterRange(_message.Message):
+    __slots__ = ["values"]
+    VALUES_FIELD_NUMBER: _ClassVar[int]
+    values: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, values: _Optional[_Iterable[str]] = ...) -> None: ...
+
 class ParameterRangeOneOf(_message.Message):
-    __slots__ = ["categorical_parameter_range", "continuous_parameter_range", "integer_parameter_range"]
-    CATEGORICAL_PARAMETER_RANGE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["continuous_parameter_range", "integer_parameter_range", "categorical_parameter_range"]
     CONTINUOUS_PARAMETER_RANGE_FIELD_NUMBER: _ClassVar[int]
     INTEGER_PARAMETER_RANGE_FIELD_NUMBER: _ClassVar[int]
-    categorical_parameter_range: CategoricalParameterRange
+    CATEGORICAL_PARAMETER_RANGE_FIELD_NUMBER: _ClassVar[int]
     continuous_parameter_range: ContinuousParameterRange
     integer_parameter_range: IntegerParameterRange
+    categorical_parameter_range: CategoricalParameterRange
     def __init__(self, continuous_parameter_range: _Optional[_Union[ContinuousParameterRange, _Mapping]] = ..., integer_parameter_range: _Optional[_Union[IntegerParameterRange, _Mapping]] = ..., categorical_parameter_range: _Optional[_Union[CategoricalParameterRange, _Mapping]] = ...) -> None: ...
 
 class ParameterRanges(_message.Message):

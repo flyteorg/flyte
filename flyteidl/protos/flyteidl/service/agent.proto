@@ -1,0 +1,15 @@
+syntax = "proto3";
+package flyteidl.service;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service";
+import "flyteidl/admin/agent.proto";
+
+// AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+service AsyncAgentService {
+  // Send a task create request to the agent server.
+  rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){};
+  // Get job status.
+  rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){};
+  // Delete the task resource.
+  rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){};
+}

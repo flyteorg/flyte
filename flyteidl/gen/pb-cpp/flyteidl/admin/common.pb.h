@@ -37,6 +37,8 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/identifier.pb.h"
+#include "flyteidl/core/literals.pb.h"
+#include <google/protobuf/timestamp.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fcommon_2eproto
@@ -47,7 +49,7 @@ struct TableStruct_flyteidl_2fadmin_2fcommon_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[24]
+  static const ::google::protobuf::internal::ParseTable schema[26]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -68,6 +70,12 @@ extern AuthRoleDefaultTypeInternal _AuthRole_default_instance_;
 class EmailNotification;
 class EmailNotificationDefaultTypeInternal;
 extern EmailNotificationDefaultTypeInternal _EmailNotification_default_instance_;
+class Envs;
+class EnvsDefaultTypeInternal;
+extern EnvsDefaultTypeInternal _Envs_default_instance_;
+class FlyteURLs;
+class FlyteURLsDefaultTypeInternal;
+extern FlyteURLsDefaultTypeInternal _FlyteURLs_default_instance_;
 class Labels;
 class LabelsDefaultTypeInternal;
 extern LabelsDefaultTypeInternal _Labels_default_instance_;
@@ -136,6 +144,8 @@ template<> ::flyteidl::admin::Annotations* Arena::CreateMaybeMessage<::flyteidl:
 template<> ::flyteidl::admin::Annotations_ValuesEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::Annotations_ValuesEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::admin::AuthRole* Arena::CreateMaybeMessage<::flyteidl::admin::AuthRole>(Arena*);
 template<> ::flyteidl::admin::EmailNotification* Arena::CreateMaybeMessage<::flyteidl::admin::EmailNotification>(Arena*);
+template<> ::flyteidl::admin::Envs* Arena::CreateMaybeMessage<::flyteidl::admin::Envs>(Arena*);
+template<> ::flyteidl::admin::FlyteURLs* Arena::CreateMaybeMessage<::flyteidl::admin::FlyteURLs>(Arena*);
 template<> ::flyteidl::admin::Labels* Arena::CreateMaybeMessage<::flyteidl::admin::Labels>(Arena*);
 template<> ::flyteidl::admin::Labels_ValuesEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::admin::Labels_ValuesEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::admin::NamedEntity* Arena::CreateMaybeMessage<::flyteidl::admin::NamedEntity>(Arena*);
@@ -3009,6 +3019,124 @@ class Annotations final :
 };
 // -------------------------------------------------------------------
 
+class Envs final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Envs) */ {
+ public:
+  Envs();
+  virtual ~Envs();
+
+  Envs(const Envs& from);
+
+  inline Envs& operator=(const Envs& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  Envs(Envs&& from) noexcept
+    : Envs() {
+    *this = ::std::move(from);
+  }
+
+  inline Envs& operator=(Envs&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const Envs& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const Envs* internal_default_instance() {
+    return reinterpret_cast<const Envs*>(
+               &_Envs_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    22;
+
+  void Swap(Envs* other);
+  friend void swap(Envs& a, Envs& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline Envs* New() const final {
+    return CreateMaybeMessage<Envs>(nullptr);
+  }
+
+  Envs* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<Envs>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const Envs& from);
+  void MergeFrom(const Envs& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Envs* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // repeated .flyteidl.core.KeyValuePair values = 1;
+  int values_size() const;
+  void clear_values();
+  static const int kValuesFieldNumber = 1;
+  ::flyteidl::core::KeyValuePair* mutable_values(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::KeyValuePair >*
+      mutable_values();
+  const ::flyteidl::core::KeyValuePair& values(int index) const;
+  ::flyteidl::core::KeyValuePair* add_values();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::KeyValuePair >&
+      values() const;
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.Envs)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::KeyValuePair > values_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
 class AuthRole final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.AuthRole) */ {
  public:
@@ -3047,7 +3175,7 @@ class AuthRole final :
                &_AuthRole_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    23;
 
   void Swap(AuthRole* other);
   friend void swap(AuthRole& a, AuthRole& b) {
@@ -3182,7 +3310,7 @@ class RawOutputDataConfig final :
                &_RawOutputDataConfig_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    24;
 
   void Swap(RawOutputDataConfig* other);
   friend void swap(RawOutputDataConfig& a, RawOutputDataConfig& b) {
@@ -3259,6 +3387,156 @@ class RawOutputDataConfig final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr output_location_prefix_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
+};
+// -------------------------------------------------------------------
+
+class FlyteURLs final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.FlyteURLs) */ {
+ public:
+  FlyteURLs();
+  virtual ~FlyteURLs();
+
+  FlyteURLs(const FlyteURLs& from);
+
+  inline FlyteURLs& operator=(const FlyteURLs& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  FlyteURLs(FlyteURLs&& from) noexcept
+    : FlyteURLs() {
+    *this = ::std::move(from);
+  }
+
+  inline FlyteURLs& operator=(FlyteURLs&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const FlyteURLs& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const FlyteURLs* internal_default_instance() {
+    return reinterpret_cast<const FlyteURLs*>(
+               &_FlyteURLs_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    25;
+
+  void Swap(FlyteURLs* other);
+  friend void swap(FlyteURLs& a, FlyteURLs& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline FlyteURLs* New() const final {
+    return CreateMaybeMessage<FlyteURLs>(nullptr);
+  }
+
+  FlyteURLs* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<FlyteURLs>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const FlyteURLs& from);
+  void MergeFrom(const FlyteURLs& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(FlyteURLs* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string inputs = 1;
+  void clear_inputs();
+  static const int kInputsFieldNumber = 1;
+  const ::std::string& inputs() const;
+  void set_inputs(const ::std::string& value);
+  #if LANG_CXX11
+  void set_inputs(::std::string&& value);
+  #endif
+  void set_inputs(const char* value);
+  void set_inputs(const char* value, size_t size);
+  ::std::string* mutable_inputs();
+  ::std::string* release_inputs();
+  void set_allocated_inputs(::std::string* inputs);
+
+  // string outputs = 2;
+  void clear_outputs();
+  static const int kOutputsFieldNumber = 2;
+  const ::std::string& outputs() const;
+  void set_outputs(const ::std::string& value);
+  #if LANG_CXX11
+  void set_outputs(::std::string&& value);
+  #endif
+  void set_outputs(const char* value);
+  void set_outputs(const char* value, size_t size);
+  ::std::string* mutable_outputs();
+  ::std::string* release_outputs();
+  void set_allocated_outputs(::std::string* outputs);
+
+  // string deck = 3;
+  void clear_deck();
+  static const int kDeckFieldNumber = 3;
+  const ::std::string& deck() const;
+  void set_deck(const ::std::string& value);
+  #if LANG_CXX11
+  void set_deck(::std::string&& value);
+  #endif
+  void set_deck(const char* value);
+  void set_deck(const char* value, size_t size);
+  ::std::string* mutable_deck();
+  ::std::string* release_deck();
+  void set_allocated_deck(::std::string* deck);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.FlyteURLs)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr inputs_;
+  ::google::protobuf::internal::ArenaStringPtr outputs_;
+  ::google::protobuf::internal::ArenaStringPtr deck_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
 };
@@ -5418,6 +5696,37 @@ Annotations::mutable_values() {
 
 // -------------------------------------------------------------------
 
+// Envs
+
+// repeated .flyteidl.core.KeyValuePair values = 1;
+inline int Envs::values_size() const {
+  return values_.size();
+}
+inline ::flyteidl::core::KeyValuePair* Envs::mutable_values(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Envs.values)
+  return values_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::KeyValuePair >*
+Envs::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.Envs.values)
+  return &values_;
+}
+inline const ::flyteidl::core::KeyValuePair& Envs::values(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Envs.values)
+  return values_.Get(index);
+}
+inline ::flyteidl::core::KeyValuePair* Envs::add_values() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.Envs.values)
+  return values_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::KeyValuePair >&
+Envs::values() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.Envs.values)
+  return values_;
+}
+
+// -------------------------------------------------------------------
+
 // AuthRole
 
 // string assumable_iam_role = 1;
@@ -5583,9 +5892,176 @@ inline void RawOutputDataConfig::set_allocated_output_location_prefix(::std::str
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.RawOutputDataConfig.output_location_prefix)
 }
 
+// -------------------------------------------------------------------
+
+// FlyteURLs
+
+// string inputs = 1;
+inline void FlyteURLs::clear_inputs() {
+  inputs_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& FlyteURLs::inputs() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.FlyteURLs.inputs)
+  return inputs_.GetNoArena();
+}
+inline void FlyteURLs::set_inputs(const ::std::string& value) {
+  
+  inputs_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.FlyteURLs.inputs)
+}
+#if LANG_CXX11
+inline void FlyteURLs::set_inputs(::std::string&& value) {
+  
+  inputs_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.FlyteURLs.inputs)
+}
+#endif
+inline void FlyteURLs::set_inputs(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  inputs_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.FlyteURLs.inputs)
+}
+inline void FlyteURLs::set_inputs(const char* value, size_t size) {
+  
+  inputs_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.FlyteURLs.inputs)
+}
+inline ::std::string* FlyteURLs::mutable_inputs() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.FlyteURLs.inputs)
+  return inputs_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* FlyteURLs::release_inputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.FlyteURLs.inputs)
+  
+  return inputs_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void FlyteURLs::set_allocated_inputs(::std::string* inputs) {
+  if (inputs != nullptr) {
+    
+  } else {
+    
+  }
+  inputs_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), inputs);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.FlyteURLs.inputs)
+}
+
+// string outputs = 2;
+inline void FlyteURLs::clear_outputs() {
+  outputs_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& FlyteURLs::outputs() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.FlyteURLs.outputs)
+  return outputs_.GetNoArena();
+}
+inline void FlyteURLs::set_outputs(const ::std::string& value) {
+  
+  outputs_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.FlyteURLs.outputs)
+}
+#if LANG_CXX11
+inline void FlyteURLs::set_outputs(::std::string&& value) {
+  
+  outputs_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.FlyteURLs.outputs)
+}
+#endif
+inline void FlyteURLs::set_outputs(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  outputs_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.FlyteURLs.outputs)
+}
+inline void FlyteURLs::set_outputs(const char* value, size_t size) {
+  
+  outputs_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.FlyteURLs.outputs)
+}
+inline ::std::string* FlyteURLs::mutable_outputs() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.FlyteURLs.outputs)
+  return outputs_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* FlyteURLs::release_outputs() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.FlyteURLs.outputs)
+  
+  return outputs_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void FlyteURLs::set_allocated_outputs(::std::string* outputs) {
+  if (outputs != nullptr) {
+    
+  } else {
+    
+  }
+  outputs_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), outputs);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.FlyteURLs.outputs)
+}
+
+// string deck = 3;
+inline void FlyteURLs::clear_deck() {
+  deck_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& FlyteURLs::deck() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.FlyteURLs.deck)
+  return deck_.GetNoArena();
+}
+inline void FlyteURLs::set_deck(const ::std::string& value) {
+  
+  deck_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.FlyteURLs.deck)
+}
+#if LANG_CXX11
+inline void FlyteURLs::set_deck(::std::string&& value) {
+  
+  deck_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.FlyteURLs.deck)
+}
+#endif
+inline void FlyteURLs::set_deck(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  deck_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.FlyteURLs.deck)
+}
+inline void FlyteURLs::set_deck(const char* value, size_t size) {
+  
+  deck_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.FlyteURLs.deck)
+}
+inline ::std::string* FlyteURLs::mutable_deck() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.FlyteURLs.deck)
+  return deck_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* FlyteURLs::release_deck() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.FlyteURLs.deck)
+  
+  return deck_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void FlyteURLs::set_allocated_deck(::std::string* deck) {
+  if (deck != nullptr) {
+    
+  } else {
+    
+  }
+  deck_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), deck);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.FlyteURLs.deck)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

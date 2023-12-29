@@ -6,36 +6,32 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class ProjectDomainAttributes(_message.Message):
-    __slots__ = ["domain", "matching_attributes", "project"]
+    __slots__ = ["project", "domain", "matching_attributes"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     MATCHING_ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    project: str
     domain: str
     matching_attributes: _matchable_resource_pb2.MatchingAttributes
-    project: str
     def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., matching_attributes: _Optional[_Union[_matchable_resource_pb2.MatchingAttributes, _Mapping]] = ...) -> None: ...
 
-class ProjectDomainAttributesDeleteRequest(_message.Message):
-    __slots__ = ["domain", "project", "resource_type"]
-    DOMAIN_FIELD_NUMBER: _ClassVar[int]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
-    RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
-    domain: str
-    project: str
-    resource_type: _matchable_resource_pb2.MatchableResource
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., resource_type: _Optional[_Union[_matchable_resource_pb2.MatchableResource, str]] = ...) -> None: ...
+class ProjectDomainAttributesUpdateRequest(_message.Message):
+    __slots__ = ["attributes"]
+    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
+    attributes: ProjectDomainAttributes
+    def __init__(self, attributes: _Optional[_Union[ProjectDomainAttributes, _Mapping]] = ...) -> None: ...
 
-class ProjectDomainAttributesDeleteResponse(_message.Message):
+class ProjectDomainAttributesUpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
 class ProjectDomainAttributesGetRequest(_message.Message):
-    __slots__ = ["domain", "project", "resource_type"]
-    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["project", "domain", "resource_type"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
-    domain: str
     project: str
+    domain: str
     resource_type: _matchable_resource_pb2.MatchableResource
     def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., resource_type: _Optional[_Union[_matchable_resource_pb2.MatchableResource, str]] = ...) -> None: ...
 
@@ -45,12 +41,16 @@ class ProjectDomainAttributesGetResponse(_message.Message):
     attributes: ProjectDomainAttributes
     def __init__(self, attributes: _Optional[_Union[ProjectDomainAttributes, _Mapping]] = ...) -> None: ...
 
-class ProjectDomainAttributesUpdateRequest(_message.Message):
-    __slots__ = ["attributes"]
-    ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
-    attributes: ProjectDomainAttributes
-    def __init__(self, attributes: _Optional[_Union[ProjectDomainAttributes, _Mapping]] = ...) -> None: ...
+class ProjectDomainAttributesDeleteRequest(_message.Message):
+    __slots__ = ["project", "domain", "resource_type"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    project: str
+    domain: str
+    resource_type: _matchable_resource_pb2.MatchableResource
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., resource_type: _Optional[_Union[_matchable_resource_pb2.MatchableResource, str]] = ...) -> None: ...
 
-class ProjectDomainAttributesUpdateResponse(_message.Message):
+class ProjectDomainAttributesDeleteResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...

@@ -1,0 +1,1158 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "flyteidl/service/external_plugin_service.proto",
+    "version": "version not set"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "BlobTypeBlobDimensionality": {
+      "type": "string",
+      "enum": [
+        "SINGLE",
+        "MULTIPART"
+      ],
+      "default": "SINGLE"
+    },
+    "ContainerArchitecture": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "AMD64",
+        "ARM64",
+        "ARM_V6",
+        "ARM_V7"
+      ],
+      "default": "UNKNOWN",
+      "description": "Architecture-type the container image supports."
+    },
+    "DataLoadingConfigLiteralMapFormat": {
+      "type": "string",
+      "enum": [
+        "JSON",
+        "YAML",
+        "PROTO"
+      ],
+      "default": "JSON",
+      "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
+      "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
+    },
+    "IOStrategyDownloadMode": {
+      "type": "string",
+      "enum": [
+        "DOWNLOAD_EAGER",
+        "DOWNLOAD_STREAM",
+        "DO_NOT_DOWNLOAD"
+      ],
+      "default": "DOWNLOAD_EAGER",
+      "description": "- DOWNLOAD_EAGER: All data will be downloaded before the main container is executed\n - DOWNLOAD_STREAM: Data will be downloaded as a stream and an End-Of-Stream marker will be written to indicate all data has been downloaded. Refer to protocol for details\n - DO_NOT_DOWNLOAD: Large objects (offloaded) will not be downloaded",
+      "title": "Mode to use for downloading"
+    },
+    "IOStrategyUploadMode": {
+      "type": "string",
+      "enum": [
+        "UPLOAD_ON_EXIT",
+        "UPLOAD_EAGER",
+        "DO_NOT_UPLOAD"
+      ],
+      "default": "UPLOAD_ON_EXIT",
+      "description": "- UPLOAD_ON_EXIT: All data will be uploaded after the main container exits\n - UPLOAD_EAGER: Data will be uploaded as it appears. Refer to protocol specification for details\n - DO_NOT_UPLOAD: Data will not be uploaded, only references will be written",
+      "title": "Mode to use for uploading"
+    },
+    "ResourcesResourceEntry": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/definitions/ResourcesResourceName",
+          "description": "Resource name."
+        },
+        "value": {
+          "type": "string",
+          "title": "Value must be a valid k8s quantity. See\nhttps://github.com/kubernetes/apimachinery/blob/master/pkg/api/resource/quantity.go#L30-L80"
+        }
+      },
+      "description": "Encapsulates a resource name and value."
+    },
+    "ResourcesResourceName": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CPU",
+        "GPU",
+        "MEMORY",
+        "STORAGE",
+        "EPHEMERAL_STORAGE"
+      ],
+      "default": "UNKNOWN",
+      "description": "Known resource names.\n\n - EPHEMERAL_STORAGE: For Kubernetes-based deployments, pods use ephemeral local storage for scratch space, caching, and for logs."
+    },
+    "RuntimeMetadataRuntimeType": {
+      "type": "string",
+      "enum": [
+        "OTHER",
+        "FLYTE_SDK"
+      ],
+      "default": "OTHER"
+    },
+    "SchemaColumnSchemaColumnType": {
+      "type": "string",
+      "enum": [
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION"
+      ],
+      "default": "INTEGER"
+    },
+    "SchemaTypeSchemaColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "A unique name -within the schema type- for the column"
+        },
+        "type": {
+          "$ref": "#/definitions/SchemaColumnSchemaColumnType",
+          "description": "The column type. This allows a limited set of types currently."
+        }
+      }
+    },
+    "SecretMountType": {
+      "type": "string",
+      "enum": [
+        "ANY",
+        "ENV_VAR",
+        "FILE"
+      ],
+      "default": "ANY",
+      "description": " - ANY: Default case, indicates the client can tolerate either mounting options.\n - ENV_VAR: ENV_VAR indicates the secret needs to be mounted as an environment variable.\n - FILE: FILE indicates the secret needs to be mounted as a file."
+    },
+    "SqlDialect": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "ANSI",
+        "HIVE",
+        "OTHER"
+      ],
+      "default": "UNDEFINED",
+      "description": "The dialect of the SQL statement. This is used to validate and parse SQL statements at compilation time to avoid\nexpensive runtime operations. If set to an unsupported dialect, no validation will be done on the statement.\nWe support the following dialect: ansi, hive."
+    },
+    "StructuredDatasetTypeDatasetColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique name within the schema type for the column."
+        },
+        "literal_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The column type."
+        }
+      }
+    },
+    "coreBinary": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "byte"
+        },
+        "tag": {
+          "type": "string"
+        }
+      },
+      "description": "A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.\nIt's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data."
+    },
+    "coreBlob": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/coreBlobMetadata"
+        },
+        "uri": {
+          "type": "string"
+        }
+      },
+      "description": "Refers to an offloaded set of files. It encapsulates the type of the store and a unique uri for where the data is.\nThere are no restrictions on how the uri is formatted since it will depend on how to interact with the store."
+    },
+    "coreBlobMetadata": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreBlobType"
+        }
+      }
+    },
+    "coreBlobType": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "title": "Format can be a free form string understood by SDK/UI etc like\ncsv, parquet etc"
+        },
+        "dimensionality": {
+          "$ref": "#/definitions/BlobTypeBlobDimensionality"
+        }
+      },
+      "title": "Defines type behavior for blob objects"
+    },
+    "coreContainer": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string",
+          "title": "Container image url. Eg: docker/redis:latest"
+        },
+        "command": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Command to be executed, if not provided, the default entrypoint in the container image will be used."
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "These will default to Flyte given paths. If provided, the system will not append known paths. If the task still\nneeds flyte's inputs and outputs path, add $(FLYTE_INPUT_FILE), $(FLYTE_OUTPUT_FILE) wherever makes sense and the\nsystem will populate these before executing the container."
+        },
+        "resources": {
+          "$ref": "#/definitions/coreResources",
+          "description": "Container resources requirement as specified by the container engine."
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Environment variables will be set as the container is starting up."
+        },
+        "config": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreKeyValuePair"
+          },
+          "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreContainerPort"
+          },
+          "title": "Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but\nnot supported on AWS Batch)\nOnly K8s"
+        },
+        "data_config": {
+          "$ref": "#/definitions/coreDataLoadingConfig",
+          "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flyteidl. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
+        },
+        "architecture": {
+          "$ref": "#/definitions/ContainerArchitecture"
+        }
+      }
+    },
+    "coreContainerPort": {
+      "type": "object",
+      "properties": {
+        "container_port": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of port to expose on the pod's IP address.\nThis must be a valid port number, 0 \u003c x \u003c 65536."
+        }
+      },
+      "description": "Defines port properties for a container."
+    },
+    "coreDataLoadingConfig": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Flag enables DataLoading Config. If this is not set, data loading will not be used!"
+        },
+        "input_path": {
+          "type": "string",
+          "title": "File system path (start at root). This folder will contain all the inputs exploded to a separate file.\nExample, if the input interface needs (x: int, y: blob, z: multipart_blob) and the input path is '/var/flyte/inputs', then the file system will look like\n/var/flyte/inputs/inputs.\u003cmetadata format dependent -\u003e .pb .json .yaml\u003e -\u003e Format as defined previously. The Blob and Multipart blob will reference local filesystem instead of remote locations\n/var/flyte/inputs/x -\u003e X is a file that contains the value of x (integer) in string format\n/var/flyte/inputs/y -\u003e Y is a file in Binary format\n/var/flyte/inputs/z/... -\u003e Note Z itself is a directory\nMore information about the protocol - refer to docs #TODO reference docs here"
+        },
+        "output_path": {
+          "type": "string",
+          "title": "File system path (start at root). This folder should contain all the outputs for the task as individual files and/or an error text file"
+        },
+        "format": {
+          "$ref": "#/definitions/DataLoadingConfigLiteralMapFormat",
+          "title": "In the inputs folder, there will be an additional summary/metadata file that contains references to all files or inlined primitive values.\nThis format decides the actual encoding for the data. Refer to the encoding to understand the specifics of the contents and the encoding"
+        },
+        "io_strategy": {
+          "$ref": "#/definitions/coreIOStrategy"
+        }
+      },
+      "description": "This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.\nFlyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path\nAny outputs generated by the user container - within output_path are automatically uploaded."
+    },
+    "coreEnumType": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Predefined set of enum values."
+        }
+      },
+      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "coreError": {
+      "type": "object",
+      "properties": {
+        "failed_node_id": {
+          "type": "string",
+          "description": "The node id that threw the error."
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message thrown."
+        }
+      },
+      "description": "Represents an error thrown from a node."
+    },
+    "coreIOStrategy": {
+      "type": "object",
+      "properties": {
+        "download_mode": {
+          "$ref": "#/definitions/IOStrategyDownloadMode",
+          "title": "Mode to use to manage downloads"
+        },
+        "upload_mode": {
+          "$ref": "#/definitions/IOStrategyUploadMode",
+          "title": "Mode to use to manage uploads"
+        }
+      },
+      "title": "Strategy to use when dealing with Blob, Schema, or multipart blob data (large datasets)"
+    },
+    "coreIdentifier": {
+      "type": "object",
+      "properties": {
+        "resource_type": {
+          "$ref": "#/definitions/coreResourceType",
+          "description": "Identifies the specific type of resource that this identifier corresponds to."
+        },
+        "project": {
+          "type": "string",
+          "description": "Name of the project the resource belongs to."
+        },
+        "domain": {
+          "type": "string",
+          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
+        },
+        "name": {
+          "type": "string",
+          "description": "User provided value for the resource."
+        },
+        "version": {
+          "type": "string",
+          "description": "Specific version of the resource."
+        }
+      },
+      "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
+    },
+    "coreIdentity": {
+      "type": "object",
+      "properties": {
+        "iam_role": {
+          "type": "string",
+          "description": "iam_role references the fully qualified name of Identity \u0026 Access Management role to impersonate."
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "description": "k8s_service_account references a kubernetes service account to impersonate."
+        },
+        "oauth2_client": {
+          "$ref": "#/definitions/coreOAuth2Client",
+          "description": "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when\nmaking external calls."
+        },
+        "execution_identity": {
+          "type": "string",
+          "title": "execution_identity references the subject who makes the execution"
+        }
+      },
+      "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
+    },
+    "coreK8sObjectMetadata": {
+      "type": "object",
+      "properties": {
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional labels to add to the pod definition."
+        },
+        "annotations": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional annotations to add to the pod definition."
+        }
+      },
+      "description": "Metadata for building a kubernetes object when a task is executed."
+    },
+    "coreK8sPod": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/coreK8sObjectMetadata",
+          "description": "Contains additional metadata for building a kubernetes pod."
+        },
+        "pod_spec": {
+          "$ref": "#/definitions/protobufStruct",
+          "title": "Defines the primary pod spec created when a task is executed.\nThis should be a JSON-marshalled pod spec, which can be defined in\n- go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936\n- python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py"
+        },
+        "data_config": {
+          "$ref": "#/definitions/coreDataLoadingConfig",
+          "title": "BETA: Optional configuration for DataLoading. If not specified, then default values are used.\nThis makes it possible to to run a completely portable container, that uses inputs and outputs\nonly from the local file-system and without having any reference to flytekit. This is supported only on K8s at the moment.\nIf data loading is enabled, then data will be mounted in accompanying directories specified in the DataLoadingConfig. If the directories\nare not specified, inputs will be mounted onto and outputs will be uploaded from a pre-determined file-system path. Refer to the documentation\nto understand the default paths.\nOnly K8s"
+        }
+      },
+      "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
+    },
+    "coreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
+    "coreLiteral": {
+      "type": "object",
+      "properties": {
+        "scalar": {
+          "$ref": "#/definitions/coreScalar",
+          "description": "A simple value."
+        },
+        "collection": {
+          "$ref": "#/definitions/coreLiteralCollection",
+          "description": "A collection of literals to allow nesting."
+        },
+        "map": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of strings to literals."
+        },
+        "hash": {
+          "type": "string",
+          "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        }
+      },
+      "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
+    },
+    "coreLiteralCollection": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralMap": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralType": {
+      "type": "object",
+      "properties": {
+        "simple": {
+          "$ref": "#/definitions/coreSimpleType",
+          "description": "A simple type that can be compared one-to-one with another."
+        },
+        "schema": {
+          "$ref": "#/definitions/coreSchemaType",
+          "description": "A complex type that requires matching of inner fields."
+        },
+        "collection_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a collection. Only homogeneous collections are allowed."
+        },
+        "map_value_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a map type. The type of the key is always a string."
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlobType",
+          "description": "A blob might have specialized implementation details depending on associated metadata."
+        },
+        "enum_type": {
+          "$ref": "#/definitions/coreEnumType",
+          "description": "Defines an enum with pre-defined string values."
+        },
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "title": "Generalized schema support"
+        },
+        "union_type": {
+          "$ref": "#/definitions/coreUnionType",
+          "description": "Defines an union type with pre-defined LiteralTypes."
+        },
+        "metadata": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
+        },
+        "annotation": {
+          "$ref": "#/definitions/coreTypeAnnotation",
+          "description": "This field contains arbitrary data that might have special semantic\nmeaning for the client but does not effect internal flyte behavior."
+        },
+        "structure": {
+          "$ref": "#/definitions/coreTypeStructure",
+          "description": "Hints to improve type matching."
+        }
+      },
+      "description": "Defines a strong type to allow type checking between interfaces."
+    },
+    "coreOAuth2Client": {
+      "type": "object",
+      "properties": {
+        "client_id": {
+          "type": "string",
+          "title": "client_id is the public id for the client to use. The system will not perform any pre-auth validation that the\nsecret requested matches the client_id indicated here.\n+required"
+        },
+        "client_secret": {
+          "$ref": "#/definitions/coreSecret",
+          "title": "client_secret is a reference to the secret used to authenticate the OAuth2 client.\n+required"
+        }
+      },
+      "description": "OAuth2Client encapsulates OAuth2 Client Credentials to be used when making calls on behalf of that task."
+    },
+    "coreOAuth2TokenRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "name indicates a unique id for the token request within this task token requests. It'll be used as a suffix for\nenvironment variables and as a filename for mounting tokens as files.\n+required"
+        },
+        "type": {
+          "$ref": "#/definitions/coreOAuth2TokenRequestType",
+          "title": "type indicates the type of the request to make. Defaults to CLIENT_CREDENTIALS.\n+required"
+        },
+        "client": {
+          "$ref": "#/definitions/coreOAuth2Client",
+          "title": "client references the client_id/secret to use to request the OAuth2 token.\n+required"
+        },
+        "idp_discovery_endpoint": {
+          "type": "string",
+          "title": "idp_discovery_endpoint references the discovery endpoint used to retrieve token endpoint and other related\ninformation.\n+optional"
+        },
+        "token_endpoint": {
+          "type": "string",
+          "title": "token_endpoint references the token issuance endpoint. If idp_discovery_endpoint is not provided, this parameter is\nmandatory.\n+optional"
+        }
+      },
+      "description": "OAuth2TokenRequest encapsulates information needed to request an OAuth2 token.\nFLYTE_TOKENS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\ntokens are passed through environment variables.\nFLYTE_TOKENS_PATH_PREFIX will be passed to indicate the prefix of the path where secrets will be mounted if tokens\nare passed through file mounts."
+    },
+    "coreOAuth2TokenRequestType": {
+      "type": "string",
+      "enum": [
+        "CLIENT_CREDENTIALS"
+      ],
+      "default": "CLIENT_CREDENTIALS",
+      "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
+    },
+    "corePrimitive": {
+      "type": "object",
+      "properties": {
+        "integer": {
+          "type": "string",
+          "format": "int64"
+        },
+        "float_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "string_value": {
+          "type": "string"
+        },
+        "boolean": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        }
+      },
+      "title": "Primitive Types"
+    },
+    "coreResourceType": {
+      "type": "string",
+      "enum": [
+        "UNSPECIFIED",
+        "TASK",
+        "WORKFLOW",
+        "LAUNCH_PLAN",
+        "DATASET"
+      ],
+      "default": "UNSPECIFIED",
+      "description": "Indicates a resource type within Flyte.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects"
+    },
+    "coreResources": {
+      "type": "object",
+      "properties": {
+        "requests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourcesResourceEntry"
+          },
+          "description": "The desired set of resources requested. ResourceNames must be unique within the list."
+        },
+        "limits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourcesResourceEntry"
+          },
+          "description": "Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique\nwithin the list."
+        }
+      },
+      "description": "A customizable interface to convey resources requested for a container. This can be interpreted differently for different\ncontainer engines."
+    },
+    "coreRetryStrategy": {
+      "type": "object",
+      "properties": {
+        "retries": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Number of retries. Retries will be consumed when the job fails with a recoverable error.\nThe number of retries must be less than or equals to 10."
+        }
+      },
+      "description": "Retry strategy associated with an executable unit."
+    },
+    "coreRuntimeMetadata": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/RuntimeMetadataRuntimeType",
+          "description": "Type of runtime."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the runtime. All versions should be backward compatible. However, certain cases call for version\nchecks to ensure tighter validation or setting expectations."
+        },
+        "flavor": {
+          "type": "string",
+          "description": "+optional It can be used to provide extra information about the runtime (e.g. python, golang... etc.)."
+        }
+      },
+      "description": "Runtime information. This is loosely defined to allow for extensibility."
+    },
+    "coreScalar": {
+      "type": "object",
+      "properties": {
+        "primitive": {
+          "$ref": "#/definitions/corePrimitive"
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlob"
+        },
+        "binary": {
+          "$ref": "#/definitions/coreBinary"
+        },
+        "schema": {
+          "$ref": "#/definitions/coreSchema"
+        },
+        "none_type": {
+          "$ref": "#/definitions/coreVoid"
+        },
+        "error": {
+          "$ref": "#/definitions/coreError"
+        },
+        "generic": {
+          "$ref": "#/definitions/protobufStruct"
+        },
+        "structured_dataset": {
+          "$ref": "#/definitions/coreStructuredDataset"
+        },
+        "union": {
+          "$ref": "#/definitions/coreUnion"
+        }
+      }
+    },
+    "coreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
+    },
+    "coreSchemaType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SchemaTypeSchemaColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        }
+      },
+      "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
+    },
+    "coreSecret": {
+      "type": "object",
+      "properties": {
+        "group": {
+          "type": "string",
+          "title": "The name of the secret group where to find the key referenced below. For K8s secrets, this should be the name of\nthe v1/secret object. For Confidant, this should be the Credential name. For Vault, this should be the secret name.\nFor AWS Secret Manager, this should be the name of the secret.\n+required"
+        },
+        "group_version": {
+          "type": "string",
+          "title": "The group version to fetch. This is not supported in all secret management systems. It'll be ignored for the ones\nthat do not support it.\n+optional"
+        },
+        "key": {
+          "type": "string",
+          "title": "The name of the secret to mount. This has to match an existing secret in the system. It's up to the implementation\nof the secret management system to require case sensitivity. For K8s secrets, Confidant and Vault, this should\nmatch one of the keys inside the secret. For AWS Secret Manager, it's ignored.\n+optional"
+        },
+        "mount_requirement": {
+          "$ref": "#/definitions/SecretMountType",
+          "title": "mount_requirement is optional. Indicates where the secret has to be mounted. If provided, the execution will fail\nif the underlying key management system cannot satisfy that requirement. If not provided, the default location\nwill depend on the key management system.\n+optional"
+        }
+      },
+      "description": "Secret encapsulates information about the secret a task needs to proceed. An environment variable\nFLYTE_SECRETS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if\nsecrets are passed through environment variables.\nFLYTE_SECRETS_DEFAULT_DIR will be passed to indicate the prefix of the path where secrets will be mounted if secrets\nare passed through file mounts."
+    },
+    "coreSecurityContext": {
+      "type": "object",
+      "properties": {
+        "run_as": {
+          "$ref": "#/definitions/coreIdentity",
+          "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
+        },
+        "secrets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreSecret"
+          },
+          "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        },
+        "tokens": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreOAuth2TokenRequest"
+          },
+          "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
+        }
+      },
+      "description": "SecurityContext holds security attributes that apply to tasks."
+    },
+    "coreSimpleType": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION",
+        "BINARY",
+        "ERROR",
+        "STRUCT"
+      ],
+      "default": "NONE",
+      "description": "Define a set of simple types."
+    },
+    "coreSql": {
+      "type": "object",
+      "properties": {
+        "statement": {
+          "type": "string",
+          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nRefer to the templating documentation.\nhttps://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
+        },
+        "dialect": {
+          "$ref": "#/definitions/SqlDialect"
+        }
+      },
+      "description": "Sql represents a generic sql workload with a statement and dialect."
+    },
+    "coreStructuredDataset": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "title": "String location uniquely identifying where the data is.\nShould start with the storage location (e.g. s3://, gs://, bq://, etc.)"
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreStructuredDatasetMetadata"
+        }
+      }
+    },
+    "coreStructuredDatasetMetadata": {
+      "type": "object",
+      "properties": {
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "description": "Bundle the type information along with the literal.\nThis is here because StructuredDatasets can often be more defined at run time than at compile time.\nThat is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset,\nwithout any column information, but at run time, you might have that column information.\nflytekit python will copy this type information into the literal, from the type information, if not provided by\nthe various plugins (encoders).\nSince this field is run time generated, it's not used for any type checking."
+        }
+      }
+    },
+    "coreStructuredDatasetType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StructuredDatasetTypeDatasetColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        },
+        "format": {
+          "type": "string",
+          "description": "This is the storage format, the format of the bits at rest\nparquet, feather, csv, etc.\nFor two types to be compatible, the format will need to be an exact match."
+        },
+        "external_schema_type": {
+          "type": "string",
+          "description": "This is a string representing the type that the bytes in external_schema_bytes are formatted in.\nThis is an optional field that will not be used for type checking."
+        },
+        "external_schema_bytes": {
+          "type": "string",
+          "format": "byte",
+          "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
+        }
+      }
+    },
+    "coreTaskMetadata": {
+      "type": "object",
+      "properties": {
+        "discoverable": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Indicates whether the system should attempt to lookup this task's output to avoid duplication of work."
+        },
+        "runtime": {
+          "$ref": "#/definitions/coreRuntimeMetadata",
+          "description": "Runtime information about the task."
+        },
+        "timeout": {
+          "type": "string",
+          "description": "The overall timeout of a task including user-triggered retries."
+        },
+        "retries": {
+          "$ref": "#/definitions/coreRetryStrategy",
+          "description": "Number of retries per task."
+        },
+        "discovery_version": {
+          "type": "string",
+          "description": "Indicates a logical version to apply to this task for the purpose of discovery."
+        },
+        "deprecated_error_message": {
+          "type": "string",
+          "description": "If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers\nof the ending of support for a given task."
+        },
+        "interruptible": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "cache_serializable": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
+        },
+        "generates_deck": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Indicates whether the task will generate a Deck URI when it finishes executing."
+        },
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Arbitrary tags that allow users and the platform to store small but arbitrary labels"
+        },
+        "pod_template_name": {
+          "type": "string",
+          "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
+        }
+      },
+      "title": "Task Metadata"
+    },
+    "coreTaskTemplate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "description": "Auto generated taskId by the system. Task Id uniquely identifies this task globally."
+        },
+        "type": {
+          "type": "string",
+          "description": "A predefined yet extensible Task type identifier. This can be used to customize any of the components. If no\nextensions are provided in the system, Flyte will resolve the this task to its TaskCategory and default the\nimplementation registered for the TaskCategory."
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreTaskMetadata",
+          "description": "Extra metadata about the task."
+        },
+        "interface": {
+          "$ref": "#/definitions/coreTypedInterface",
+          "description": "A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees\ncompile-time validation of the workflow to avoid costly runtime failures."
+        },
+        "custom": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Custom data about the task. This is extensible to allow various plugins in the system."
+        },
+        "container": {
+          "$ref": "#/definitions/coreContainer"
+        },
+        "k8s_pod": {
+          "$ref": "#/definitions/coreK8sPod"
+        },
+        "sql": {
+          "$ref": "#/definitions/coreSql"
+        },
+        "task_type_version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "This can be used to customize task handling at execution time for the same task type."
+        },
+        "security_context": {
+          "$ref": "#/definitions/coreSecurityContext",
+          "description": "security_context encapsulates security attributes requested to run this task."
+        },
+        "config": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Metadata about the custom defined for this task. This is extensible to allow various plugins in the system\nto use as required.\nreserve the field numbers 1 through 15 for very frequently occurring message elements"
+        }
+      },
+      "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
+    },
+    "coreTypeAnnotation": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "A arbitrary JSON payload to describe a type."
+        }
+      },
+      "description": "TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs."
+    },
+    "coreTypeStructure": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "title": "Must exactly match for types to be castable"
+        }
+      },
+      "description": "Hints to improve type matching\ne.g. allows distinguishing output from custom type transformers\neven if the underlying IDL serialization matches."
+    },
+    "coreTypedInterface": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/coreVariableMap"
+        },
+        "outputs": {
+          "$ref": "#/definitions/coreVariableMap"
+        }
+      },
+      "description": "Defines strongly typed inputs and outputs."
+    },
+    "coreUnion": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLiteral"
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType"
+        }
+      },
+      "description": "The runtime representation of a tagged union value. See `UnionType` for more details."
+    },
+    "coreUnionType": {
+      "type": "object",
+      "properties": {
+        "variants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "description": "Predefined set of variants in union."
+        }
+      },
+      "description": "Defines a tagged union type, also known as a variant (and formally as the sum type).\n\nA sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag\nA value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by\nstoring the varaint's tag with the literal value and can be examined in runtime.\n\nType S is typically written as\nS := Apple A | Banana B | Cantaloupe C | ...\n\nNotably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:\nOptional X := X | Null\n\nSee also: https://en.wikipedia.org/wiki/Tagged_union"
+    },
+    "coreVariable": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Variable literal type."
+        },
+        "description": {
+          "type": "string",
+          "title": "+optional string describing input variable"
+        }
+      },
+      "description": "Defines a strongly typed variable."
+    },
+    "coreVariableMap": {
+      "type": "object",
+      "properties": {
+        "variables": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreVariable"
+          },
+          "description": "Defines a map of variable names to variables."
+        }
+      },
+      "title": "A map of Variables"
+    },
+    "coreVoid": {
+      "type": "object",
+      "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
+    },
+    "flyteidlserviceState": {
+      "type": "string",
+      "enum": [
+        "RETRYABLE_FAILURE",
+        "PERMANENT_FAILURE",
+        "PENDING",
+        "RUNNING",
+        "SUCCEEDED"
+      ],
+      "default": "RETRYABLE_FAILURE",
+      "description": "The state of the execution is used to control its visibility in the UI/CLI."
+    },
+    "flyteidlserviceTaskCreateResponse": {
+      "type": "object",
+      "properties": {
+        "job_id": {
+          "type": "string"
+        }
+      },
+      "description": "Represents a create response structure."
+    },
+    "protobufListValue": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Repeated field of dynamically typed values."
+        }
+      },
+      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "protobufStruct": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/protobufValue"
+          },
+          "description": "Unordered map of dynamically typed values."
+        }
+      },
+      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
+    },
+    "protobufValue": {
+      "type": "object",
+      "properties": {
+        "null_value": {
+          "$ref": "#/definitions/protobufNullValue",
+          "description": "Represents a null value."
+        },
+        "number_value": {
+          "type": "number",
+          "format": "double",
+          "description": "Represents a double value."
+        },
+        "string_value": {
+          "type": "string",
+          "description": "Represents a string value."
+        },
+        "bool_value": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Represents a boolean value."
+        },
+        "struct_value": {
+          "$ref": "#/definitions/protobufStruct",
+          "description": "Represents a structured value."
+        },
+        "list_value": {
+          "$ref": "#/definitions/protobufListValue",
+          "description": "Represents a repeated `Value`."
+        }
+      },
+      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+    },
+    "serviceTaskDeleteResponse": {
+      "type": "object",
+      "description": "Response to delete a task."
+    },
+    "serviceTaskGetResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/flyteidlserviceState",
+          "description": "The state of the execution is used to control its visibility in the UI/CLI."
+        },
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "title": "The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a\nStructured dataset pointing to the query result table.\n+optional"
+        }
+      },
+      "description": "Response to get an individual task state."
+    }
+  }
+}

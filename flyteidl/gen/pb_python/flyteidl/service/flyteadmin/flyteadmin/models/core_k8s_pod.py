@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig  # noqa: F401,E501
 from flyteadmin.models.core_k8s_object_metadata import CoreK8sObjectMetadata  # noqa: F401,E501
 from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
@@ -35,25 +36,30 @@ class CoreK8sPod(object):
     """
     swagger_types = {
         'metadata': 'CoreK8sObjectMetadata',
-        'pod_spec': 'ProtobufStruct'
+        'pod_spec': 'ProtobufStruct',
+        'data_config': 'CoreDataLoadingConfig'
     }
 
     attribute_map = {
         'metadata': 'metadata',
-        'pod_spec': 'pod_spec'
+        'pod_spec': 'pod_spec',
+        'data_config': 'data_config'
     }
 
-    def __init__(self, metadata=None, pod_spec=None):  # noqa: E501
+    def __init__(self, metadata=None, pod_spec=None, data_config=None):  # noqa: E501
         """CoreK8sPod - a model defined in Swagger"""  # noqa: E501
 
         self._metadata = None
         self._pod_spec = None
+        self._data_config = None
         self.discriminator = None
 
         if metadata is not None:
             self.metadata = metadata
         if pod_spec is not None:
             self.pod_spec = pod_spec
+        if data_config is not None:
+            self.data_config = data_config
 
     @property
     def metadata(self):
@@ -98,6 +104,27 @@ class CoreK8sPod(object):
         """
 
         self._pod_spec = pod_spec
+
+    @property
+    def data_config(self):
+        """Gets the data_config of this CoreK8sPod.  # noqa: E501
+
+
+        :return: The data_config of this CoreK8sPod.  # noqa: E501
+        :rtype: CoreDataLoadingConfig
+        """
+        return self._data_config
+
+    @data_config.setter
+    def data_config(self, data_config):
+        """Sets the data_config of this CoreK8sPod.
+
+
+        :param data_config: The data_config of this CoreK8sPod.  # noqa: E501
+        :type: CoreDataLoadingConfig
+        """
+
+        self._data_config = data_config
 
     def to_dict(self):
         """Returns the model properties as a dict"""

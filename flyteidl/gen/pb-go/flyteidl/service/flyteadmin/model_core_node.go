@@ -29,4 +29,6 @@ type CoreNode struct {
 	BranchNode *CoreBranchNode `json:"branch_node,omitempty"`
 	// Information about the condition to evaluate in this node.
 	GateNode *CoreGateNode `json:"gate_node,omitempty"`
+	// Information about the sub-node executions for each value in the list of this nodes inputs values.
+	ArrayNode *CoreArrayNode `json:"array_node,omitempty"`
 }

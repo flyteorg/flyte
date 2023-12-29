@@ -4,10 +4,6 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class GetVersionRequest(_message.Message):
-    __slots__ = []
-    def __init__(self) -> None: ...
-
 class GetVersionResponse(_message.Message):
     __slots__ = ["control_plane_version"]
     CONTROL_PLANE_VERSION_FIELD_NUMBER: _ClassVar[int]
@@ -15,11 +11,15 @@ class GetVersionResponse(_message.Message):
     def __init__(self, control_plane_version: _Optional[_Union[Version, _Mapping]] = ...) -> None: ...
 
 class Version(_message.Message):
-    __slots__ = ["Build", "BuildTime", "Version"]
-    BUILDTIME_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["Build", "Version", "BuildTime"]
     BUILD_FIELD_NUMBER: _ClassVar[int]
-    Build: str
-    BuildTime: str
     VERSION_FIELD_NUMBER: _ClassVar[int]
+    BUILDTIME_FIELD_NUMBER: _ClassVar[int]
+    Build: str
     Version: str
+    BuildTime: str
     def __init__(self, Build: _Optional[str] = ..., Version: _Optional[str] = ..., BuildTime: _Optional[str] = ...) -> None: ...
+
+class GetVersionRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...

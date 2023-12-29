@@ -123,6 +123,19 @@ message TaskExecutionClosure {
     // TaskExecutionMetadata ExternalResourceInfo fields for each subtask rather than the TaskLog
     // in this message.
     int32 event_version = 17;
+
+    // A time-series of the phase transition or update explanations. This, when compared to storing a singular reason
+    // as previously done, is much more valuable in visualizing and understanding historical evaluations.
+    repeated Reason reasons = 18;
+}
+
+// Reason is a single message annotated with a timestamp to indicate the instant the reason occurred.
+message Reason {
+    // occurred_at is the timestamp indicating the instant that this reason happened.
+    google.protobuf.Timestamp occurred_at = 1;
+
+    // message is the explanation for the most recent phase transition or status update.
+    string message = 2;
 }
 
 // Request structure to fetch inputs and output for a task execution.
@@ -148,4 +161,8 @@ message TaskExecutionGetDataResponse {
 
     // Full_outputs will only be populated if they are under a configured size threshold.
     core.LiteralMap full_outputs               = 4;
+
+    // flyte tiny url to fetch a core.LiteralMap of task execution's IO
+    // Deck will be empty for task
+    FlyteURLs flyte_urls = 5;
 }

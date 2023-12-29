@@ -13256,6 +13256,24 @@ public final class ExecutionOuterClass {
      */
     com.google.protobuf.ByteString
         getExecutionClusterBytes();
+
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    java.lang.String getNamespace();
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getNamespaceBytes();
   }
   /**
    * <pre>
@@ -13275,6 +13293,7 @@ public final class ExecutionOuterClass {
     }
     private SystemMetadata() {
       executionCluster_ = "";
+      namespace_ = "";
     }
 
     @java.lang.Override
@@ -13305,6 +13324,12 @@ public final class ExecutionOuterClass {
               java.lang.String s = input.readStringRequireUtf8();
 
               executionCluster_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              namespace_ = s;
               break;
             }
             default: {
@@ -13381,6 +13406,48 @@ public final class ExecutionOuterClass {
       }
     }
 
+    public static final int NAMESPACE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object namespace_;
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    public java.lang.String getNamespace() {
+      java.lang.Object ref = namespace_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        namespace_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Which kubernetes namespace the execution ran under.
+     * </pre>
+     *
+     * <code>string namespace = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getNamespaceBytes() {
+      java.lang.Object ref = namespace_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        namespace_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -13398,6 +13465,9 @@ public final class ExecutionOuterClass {
       if (!getExecutionClusterBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, executionCluster_);
       }
+      if (!getNamespaceBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, namespace_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13409,6 +13479,9 @@ public final class ExecutionOuterClass {
       size = 0;
       if (!getExecutionClusterBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, executionCluster_);
+      }
+      if (!getNamespaceBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, namespace_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -13427,6 +13500,8 @@ public final class ExecutionOuterClass {
 
       if (!getExecutionCluster()
           .equals(other.getExecutionCluster())) return false;
+      if (!getNamespace()
+          .equals(other.getNamespace())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -13440,6 +13515,8 @@ public final class ExecutionOuterClass {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + EXECUTION_CLUSTER_FIELD_NUMBER;
       hash = (53 * hash) + getExecutionCluster().hashCode();
+      hash = (37 * hash) + NAMESPACE_FIELD_NUMBER;
+      hash = (53 * hash) + getNamespace().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -13579,6 +13656,8 @@ public final class ExecutionOuterClass {
         super.clear();
         executionCluster_ = "";
 
+        namespace_ = "";
+
         return this;
       }
 
@@ -13606,6 +13685,7 @@ public final class ExecutionOuterClass {
       public flyteidl.admin.ExecutionOuterClass.SystemMetadata buildPartial() {
         flyteidl.admin.ExecutionOuterClass.SystemMetadata result = new flyteidl.admin.ExecutionOuterClass.SystemMetadata(this);
         result.executionCluster_ = executionCluster_;
+        result.namespace_ = namespace_;
         onBuilt();
         return result;
       }
@@ -13656,6 +13736,10 @@ public final class ExecutionOuterClass {
         if (other == flyteidl.admin.ExecutionOuterClass.SystemMetadata.getDefaultInstance()) return this;
         if (!other.getExecutionCluster().isEmpty()) {
           executionCluster_ = other.executionCluster_;
+          onChanged();
+        }
+        if (!other.getNamespace().isEmpty()) {
+          namespace_ = other.namespace_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -13772,6 +13856,95 @@ public final class ExecutionOuterClass {
   checkByteStringIsUtf8(value);
         
         executionCluster_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object namespace_ = "";
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public java.lang.String getNamespace() {
+        java.lang.Object ref = namespace_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          namespace_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getNamespaceBytes() {
+        java.lang.Object ref = namespace_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          namespace_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder setNamespace(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        namespace_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder clearNamespace() {
+        
+        namespace_ = getDefaultInstance().getNamespace();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Which kubernetes namespace the execution ran under.
+       * </pre>
+       *
+       * <code>string namespace = 2;</code>
+       */
+      public Builder setNamespaceBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        namespace_ = value;
         onChanged();
         return this;
       }
@@ -17003,6 +17176,66 @@ public final class ExecutionOuterClass {
      */
     boolean getOverwriteCache();
 
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 23;</code>
+     */
+    boolean hasEnvs();
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 23;</code>
+     */
+    flyteidl.admin.Common.Envs getEnvs();
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 23;</code>
+     */
+    flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder();
+
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    java.util.List<java.lang.String>
+        getTagsList();
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    int getTagsCount();
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    java.lang.String getTags(int index);
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    com.google.protobuf.ByteString
+        getTagsBytes(int index);
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -17023,6 +17256,7 @@ public final class ExecutionOuterClass {
       super(builder);
     }
     private ExecutionSpec() {
+      tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -17221,6 +17455,28 @@ public final class ExecutionOuterClass {
               overwriteCache_ = input.readBool();
               break;
             }
+            case 186: {
+              flyteidl.admin.Common.Envs.Builder subBuilder = null;
+              if (envs_ != null) {
+                subBuilder = envs_.toBuilder();
+              }
+              envs_ = input.readMessage(flyteidl.admin.Common.Envs.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(envs_);
+                envs_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 194: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00010000) != 0)) {
+                tags_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00010000;
+              }
+              tags_.add(s);
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -17236,6 +17492,9 @@ public final class ExecutionOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00010000) != 0)) {
+          tags_ = tags_.getUnmodifiableView();
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -17253,6 +17512,7 @@ public final class ExecutionOuterClass {
               flyteidl.admin.ExecutionOuterClass.ExecutionSpec.class, flyteidl.admin.ExecutionOuterClass.ExecutionSpec.Builder.class);
     }
 
+    private int bitField0_;
     private int notificationOverridesCase_ = 0;
     private java.lang.Object notificationOverrides_;
     public enum NotificationOverridesCase
@@ -17755,6 +18015,84 @@ public final class ExecutionOuterClass {
       return overwriteCache_;
     }
 
+    public static final int ENVS_FIELD_NUMBER = 23;
+    private flyteidl.admin.Common.Envs envs_;
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 23;</code>
+     */
+    public boolean hasEnvs() {
+      return envs_ != null;
+    }
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 23;</code>
+     */
+    public flyteidl.admin.Common.Envs getEnvs() {
+      return envs_ == null ? flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+    }
+    /**
+     * <pre>
+     * Environment variables to be set for the execution.
+     * </pre>
+     *
+     * <code>.flyteidl.admin.Envs envs = 23;</code>
+     */
+    public flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder() {
+      return getEnvs();
+    }
+
+    public static final int TAGS_FIELD_NUMBER = 24;
+    private com.google.protobuf.LazyStringList tags_;
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getTagsList() {
+      return tags_;
+    }
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    public int getTagsCount() {
+      return tags_.size();
+    }
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    public java.lang.String getTags(int index) {
+      return tags_.get(index);
+    }
+    /**
+     * <pre>
+     * Tags to be set for the execution.
+     * </pre>
+     *
+     * <code>repeated string tags = 24;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTagsBytes(int index) {
+      return tags_.getByteString(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -17814,6 +18152,12 @@ public final class ExecutionOuterClass {
       }
       if (overwriteCache_ != false) {
         output.writeBool(22, overwriteCache_);
+      }
+      if (envs_ != null) {
+        output.writeMessage(23, getEnvs());
+      }
+      for (int i = 0; i < tags_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 24, tags_.getRaw(i));
       }
       unknownFields.writeTo(output);
     }
@@ -17884,6 +18228,18 @@ public final class ExecutionOuterClass {
       if (overwriteCache_ != false) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(22, overwriteCache_);
+      }
+      if (envs_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(23, getEnvs());
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < tags_.size(); i++) {
+          dataSize += computeStringSizeNoTag(tags_.getRaw(i));
+        }
+        size += dataSize;
+        size += 2 * getTagsList().size();
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -17959,6 +18315,13 @@ public final class ExecutionOuterClass {
       }
       if (getOverwriteCache()
           != other.getOverwriteCache()) return false;
+      if (hasEnvs() != other.hasEnvs()) return false;
+      if (hasEnvs()) {
+        if (!getEnvs()
+            .equals(other.getEnvs())) return false;
+      }
+      if (!getTagsList()
+          .equals(other.getTagsList())) return false;
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
         case 5:
@@ -18032,6 +18395,14 @@ public final class ExecutionOuterClass {
       hash = (37 * hash) + OVERWRITE_CACHE_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
           getOverwriteCache());
+      if (hasEnvs()) {
+        hash = (37 * hash) + ENVS_FIELD_NUMBER;
+        hash = (53 * hash) + getEnvs().hashCode();
+      }
+      if (getTagsCount() > 0) {
+        hash = (37 * hash) + TAGS_FIELD_NUMBER;
+        hash = (53 * hash) + getTagsList().hashCode();
+      }
       switch (notificationOverridesCase_) {
         case 5:
           hash = (37 * hash) + NOTIFICATIONS_FIELD_NUMBER;
@@ -18253,6 +18624,14 @@ public final class ExecutionOuterClass {
         }
         overwriteCache_ = false;
 
+        if (envsBuilder_ == null) {
+          envs_ = null;
+        } else {
+          envs_ = null;
+          envsBuilder_ = null;
+        }
+        tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00010000);
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -18281,6 +18660,8 @@ public final class ExecutionOuterClass {
       @java.lang.Override
       public flyteidl.admin.ExecutionOuterClass.ExecutionSpec buildPartial() {
         flyteidl.admin.ExecutionOuterClass.ExecutionSpec result = new flyteidl.admin.ExecutionOuterClass.ExecutionSpec(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (launchPlanBuilder_ == null) {
           result.launchPlan_ = launchPlan_;
         } else {
@@ -18348,6 +18729,17 @@ public final class ExecutionOuterClass {
           result.interruptible_ = interruptibleBuilder_.build();
         }
         result.overwriteCache_ = overwriteCache_;
+        if (envsBuilder_ == null) {
+          result.envs_ = envs_;
+        } else {
+          result.envs_ = envsBuilder_.build();
+        }
+        if (((bitField0_ & 0x00010000) != 0)) {
+          tags_ = tags_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00010000);
+        }
+        result.tags_ = tags_;
+        result.bitField0_ = to_bitField0_;
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
         return result;
@@ -18436,6 +18828,19 @@ public final class ExecutionOuterClass {
         if (other.getOverwriteCache() != false) {
           setOverwriteCache(other.getOverwriteCache());
         }
+        if (other.hasEnvs()) {
+          mergeEnvs(other.getEnvs());
+        }
+        if (!other.tags_.isEmpty()) {
+          if (tags_.isEmpty()) {
+            tags_ = other.tags_;
+            bitField0_ = (bitField0_ & ~0x00010000);
+          } else {
+            ensureTagsIsMutable();
+            tags_.addAll(other.tags_);
+          }
+          onChanged();
+        }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
             mergeNotifications(other.getNotifications());
@@ -18492,6 +18897,7 @@ public final class ExecutionOuterClass {
         return this;
       }
 
+      private int bitField0_;
 
       private flyteidl.core.IdentifierOuterClass.Identifier launchPlan_;
       private com.google.protobuf.SingleFieldBuilderV3<
@@ -20528,6 +20934,289 @@ public final class ExecutionOuterClass {
       public Builder clearOverwriteCache() {
         
         overwriteCache_ = false;
+        onChanged();
+        return this;
+      }
+
+      private flyteidl.admin.Common.Envs envs_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder> envsBuilder_;
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public boolean hasEnvs() {
+        return envsBuilder_ != null || envs_ != null;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public flyteidl.admin.Common.Envs getEnvs() {
+        if (envsBuilder_ == null) {
+          return envs_ == null ? flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+        } else {
+          return envsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public Builder setEnvs(flyteidl.admin.Common.Envs value) {
+        if (envsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          envs_ = value;
+          onChanged();
+        } else {
+          envsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public Builder setEnvs(
+          flyteidl.admin.Common.Envs.Builder builderForValue) {
+        if (envsBuilder_ == null) {
+          envs_ = builderForValue.build();
+          onChanged();
+        } else {
+          envsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public Builder mergeEnvs(flyteidl.admin.Common.Envs value) {
+        if (envsBuilder_ == null) {
+          if (envs_ != null) {
+            envs_ =
+              flyteidl.admin.Common.Envs.newBuilder(envs_).mergeFrom(value).buildPartial();
+          } else {
+            envs_ = value;
+          }
+          onChanged();
+        } else {
+          envsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public Builder clearEnvs() {
+        if (envsBuilder_ == null) {
+          envs_ = null;
+          onChanged();
+        } else {
+          envs_ = null;
+          envsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public flyteidl.admin.Common.Envs.Builder getEnvsBuilder() {
+        
+        onChanged();
+        return getEnvsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      public flyteidl.admin.Common.EnvsOrBuilder getEnvsOrBuilder() {
+        if (envsBuilder_ != null) {
+          return envsBuilder_.getMessageOrBuilder();
+        } else {
+          return envs_ == null ?
+              flyteidl.admin.Common.Envs.getDefaultInstance() : envs_;
+        }
+      }
+      /**
+       * <pre>
+       * Environment variables to be set for the execution.
+       * </pre>
+       *
+       * <code>.flyteidl.admin.Envs envs = 23;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder> 
+          getEnvsFieldBuilder() {
+        if (envsBuilder_ == null) {
+          envsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.admin.Common.Envs, flyteidl.admin.Common.Envs.Builder, flyteidl.admin.Common.EnvsOrBuilder>(
+                  getEnvs(),
+                  getParentForChildren(),
+                  isClean());
+          envs_ = null;
+        }
+        return envsBuilder_;
+      }
+
+      private com.google.protobuf.LazyStringList tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureTagsIsMutable() {
+        if (!((bitField0_ & 0x00010000) != 0)) {
+          tags_ = new com.google.protobuf.LazyStringArrayList(tags_);
+          bitField0_ |= 0x00010000;
+         }
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getTagsList() {
+        return tags_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public int getTagsCount() {
+        return tags_.size();
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public java.lang.String getTags(int index) {
+        return tags_.get(index);
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTagsBytes(int index) {
+        return tags_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public Builder setTags(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureTagsIsMutable();
+        tags_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public Builder addTags(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureTagsIsMutable();
+        tags_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public Builder addAllTags(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureTagsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, tags_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public Builder clearTags() {
+        tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00010000);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Tags to be set for the execution.
+       * </pre>
+       *
+       * <code>repeated string tags = 24;</code>
+       */
+      public Builder addTagsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureTagsIsMutable();
+        tags_.add(value);
         onChanged();
         return this;
       }
@@ -26176,6 +26865,1451 @@ public final class ExecutionOuterClass {
 
   }
 
+  public interface WorkflowExecutionGetMetricsRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.WorkflowExecutionGetMetricsRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * id defines the workflow execution to query for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <pre>
+     * id defines the workflow execution to query for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getId();
+    /**
+     * <pre>
+     * id defines the workflow execution to query for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getIdOrBuilder();
+
+    /**
+     * <pre>
+     * depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+     * </pre>
+     *
+     * <code>int32 depth = 2;</code>
+     */
+    int getDepth();
+  }
+  /**
+   * <pre>
+   * WorkflowExecutionGetMetricsRequest represents a request to retrieve metrics for the specified workflow execution.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetMetricsRequest}
+   */
+  public  static final class WorkflowExecutionGetMetricsRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.WorkflowExecutionGetMetricsRequest)
+      WorkflowExecutionGetMetricsRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use WorkflowExecutionGetMetricsRequest.newBuilder() to construct.
+    private WorkflowExecutionGetMetricsRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private WorkflowExecutionGetMetricsRequest() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private WorkflowExecutionGetMetricsRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder subBuilder = null;
+              if (id_ != null) {
+                subBuilder = id_.toBuilder();
+              }
+              id_ = input.readMessage(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(id_);
+                id_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 16: {
+
+              depth_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest.class, flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest.Builder.class);
+    }
+
+    public static final int ID_FIELD_NUMBER = 1;
+    private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier id_;
+    /**
+     * <pre>
+     * id defines the workflow execution to query for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+     */
+    public boolean hasId() {
+      return id_ != null;
+    }
+    /**
+     * <pre>
+     * id defines the workflow execution to query for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getId() {
+      return id_ == null ? flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : id_;
+    }
+    /**
+     * <pre>
+     * id defines the workflow execution to query for.
+     * </pre>
+     *
+     * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getIdOrBuilder() {
+      return getId();
+    }
+
+    public static final int DEPTH_FIELD_NUMBER = 2;
+    private int depth_;
+    /**
+     * <pre>
+     * depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+     * </pre>
+     *
+     * <code>int32 depth = 2;</code>
+     */
+    public int getDepth() {
+      return depth_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (id_ != null) {
+        output.writeMessage(1, getId());
+      }
+      if (depth_ != 0) {
+        output.writeInt32(2, depth_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (id_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getId());
+      }
+      if (depth_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, depth_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest other = (flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest) obj;
+
+      if (hasId() != other.hasId()) return false;
+      if (hasId()) {
+        if (!getId()
+            .equals(other.getId())) return false;
+      }
+      if (getDepth()
+          != other.getDepth()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      hash = (37 * hash) + DEPTH_FIELD_NUMBER;
+      hash = (53 * hash) + getDepth();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * WorkflowExecutionGetMetricsRequest represents a request to retrieve metrics for the specified workflow execution.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetMetricsRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.WorkflowExecutionGetMetricsRequest)
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest.class, flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (idBuilder_ == null) {
+          id_ = null;
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+        depth_ = 0;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest getDefaultInstanceForType() {
+        return flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest build() {
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest buildPartial() {
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest result = new flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest(this);
+        if (idBuilder_ == null) {
+          result.id_ = id_;
+        } else {
+          result.id_ = idBuilder_.build();
+        }
+        result.depth_ = depth_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest) {
+          return mergeFrom((flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest other) {
+        if (other == flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          mergeId(other.getId());
+        }
+        if (other.getDepth() != 0) {
+          setDepth(other.getDepth());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier id_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> idBuilder_;
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public boolean hasId() {
+        return idBuilder_ != null || id_ != null;
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier getId() {
+        if (idBuilder_ == null) {
+          return id_ == null ? flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : id_;
+        } else {
+          return idBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public Builder setId(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (idBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          id_ = value;
+          onChanged();
+        } else {
+          idBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public Builder setId(
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder builderForValue) {
+        if (idBuilder_ == null) {
+          id_ = builderForValue.build();
+          onChanged();
+        } else {
+          idBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public Builder mergeId(flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier value) {
+        if (idBuilder_ == null) {
+          if (id_ != null) {
+            id_ =
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.newBuilder(id_).mergeFrom(value).buildPartial();
+          } else {
+            id_ = value;
+          }
+          onChanged();
+        } else {
+          idBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public Builder clearId() {
+        if (idBuilder_ == null) {
+          id_ = null;
+          onChanged();
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder getIdBuilder() {
+        
+        onChanged();
+        return getIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder getIdOrBuilder() {
+        if (idBuilder_ != null) {
+          return idBuilder_.getMessageOrBuilder();
+        } else {
+          return id_ == null ?
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.getDefaultInstance() : id_;
+        }
+      }
+      /**
+       * <pre>
+       * id defines the workflow execution to query for.
+       * </pre>
+       *
+       * <code>.flyteidl.core.WorkflowExecutionIdentifier id = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder> 
+          getIdFieldBuilder() {
+        if (idBuilder_ == null) {
+          idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifier.Builder, flyteidl.core.IdentifierOuterClass.WorkflowExecutionIdentifierOrBuilder>(
+                  getId(),
+                  getParentForChildren(),
+                  isClean());
+          id_ = null;
+        }
+        return idBuilder_;
+      }
+
+      private int depth_ ;
+      /**
+       * <pre>
+       * depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+       * </pre>
+       *
+       * <code>int32 depth = 2;</code>
+       */
+      public int getDepth() {
+        return depth_;
+      }
+      /**
+       * <pre>
+       * depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+       * </pre>
+       *
+       * <code>int32 depth = 2;</code>
+       */
+      public Builder setDepth(int value) {
+        
+        depth_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+       * </pre>
+       *
+       * <code>int32 depth = 2;</code>
+       */
+      public Builder clearDepth() {
+        
+        depth_ = 0;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.WorkflowExecutionGetMetricsRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowExecutionGetMetricsRequest)
+    private static final flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest();
+    }
+
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<WorkflowExecutionGetMetricsRequest>
+        PARSER = new com.google.protobuf.AbstractParser<WorkflowExecutionGetMetricsRequest>() {
+      @java.lang.Override
+      public WorkflowExecutionGetMetricsRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new WorkflowExecutionGetMetricsRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<WorkflowExecutionGetMetricsRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WorkflowExecutionGetMetricsRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface WorkflowExecutionGetMetricsResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.WorkflowExecutionGetMetricsResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+     * hierarchical structure using Flyte entity references.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Span span = 1;</code>
+     */
+    boolean hasSpan();
+    /**
+     * <pre>
+     * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+     * hierarchical structure using Flyte entity references.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Span span = 1;</code>
+     */
+    flyteidl.core.Metrics.Span getSpan();
+    /**
+     * <pre>
+     * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+     * hierarchical structure using Flyte entity references.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Span span = 1;</code>
+     */
+    flyteidl.core.Metrics.SpanOrBuilder getSpanOrBuilder();
+  }
+  /**
+   * <pre>
+   * WorkflowExecutionGetMetricsResponse represents the response containing metrics for the specified workflow execution.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetMetricsResponse}
+   */
+  public  static final class WorkflowExecutionGetMetricsResponse extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.WorkflowExecutionGetMetricsResponse)
+      WorkflowExecutionGetMetricsResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use WorkflowExecutionGetMetricsResponse.newBuilder() to construct.
+    private WorkflowExecutionGetMetricsResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private WorkflowExecutionGetMetricsResponse() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private WorkflowExecutionGetMetricsResponse(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Metrics.Span.Builder subBuilder = null;
+              if (span_ != null) {
+                subBuilder = span_.toBuilder();
+              }
+              span_ = input.readMessage(flyteidl.core.Metrics.Span.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(span_);
+                span_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse.class, flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse.Builder.class);
+    }
+
+    public static final int SPAN_FIELD_NUMBER = 1;
+    private flyteidl.core.Metrics.Span span_;
+    /**
+     * <pre>
+     * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+     * hierarchical structure using Flyte entity references.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Span span = 1;</code>
+     */
+    public boolean hasSpan() {
+      return span_ != null;
+    }
+    /**
+     * <pre>
+     * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+     * hierarchical structure using Flyte entity references.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Span span = 1;</code>
+     */
+    public flyteidl.core.Metrics.Span getSpan() {
+      return span_ == null ? flyteidl.core.Metrics.Span.getDefaultInstance() : span_;
+    }
+    /**
+     * <pre>
+     * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+     * hierarchical structure using Flyte entity references.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Span span = 1;</code>
+     */
+    public flyteidl.core.Metrics.SpanOrBuilder getSpanOrBuilder() {
+      return getSpan();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (span_ != null) {
+        output.writeMessage(1, getSpan());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (span_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getSpan());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse other = (flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse) obj;
+
+      if (hasSpan() != other.hasSpan()) return false;
+      if (hasSpan()) {
+        if (!getSpan()
+            .equals(other.getSpan())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasSpan()) {
+        hash = (37 * hash) + SPAN_FIELD_NUMBER;
+        hash = (53 * hash) + getSpan().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * WorkflowExecutionGetMetricsResponse represents the response containing metrics for the specified workflow execution.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.WorkflowExecutionGetMetricsResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.WorkflowExecutionGetMetricsResponse)
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse.class, flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (spanBuilder_ == null) {
+          span_ = null;
+        } else {
+          span_ = null;
+          spanBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.ExecutionOuterClass.internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse getDefaultInstanceForType() {
+        return flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse build() {
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse buildPartial() {
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse result = new flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse(this);
+        if (spanBuilder_ == null) {
+          result.span_ = span_;
+        } else {
+          result.span_ = spanBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse) {
+          return mergeFrom((flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse other) {
+        if (other == flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse.getDefaultInstance()) return this;
+        if (other.hasSpan()) {
+          mergeSpan(other.getSpan());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.Metrics.Span span_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Metrics.Span, flyteidl.core.Metrics.Span.Builder, flyteidl.core.Metrics.SpanOrBuilder> spanBuilder_;
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public boolean hasSpan() {
+        return spanBuilder_ != null || span_ != null;
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public flyteidl.core.Metrics.Span getSpan() {
+        if (spanBuilder_ == null) {
+          return span_ == null ? flyteidl.core.Metrics.Span.getDefaultInstance() : span_;
+        } else {
+          return spanBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public Builder setSpan(flyteidl.core.Metrics.Span value) {
+        if (spanBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          span_ = value;
+          onChanged();
+        } else {
+          spanBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public Builder setSpan(
+          flyteidl.core.Metrics.Span.Builder builderForValue) {
+        if (spanBuilder_ == null) {
+          span_ = builderForValue.build();
+          onChanged();
+        } else {
+          spanBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public Builder mergeSpan(flyteidl.core.Metrics.Span value) {
+        if (spanBuilder_ == null) {
+          if (span_ != null) {
+            span_ =
+              flyteidl.core.Metrics.Span.newBuilder(span_).mergeFrom(value).buildPartial();
+          } else {
+            span_ = value;
+          }
+          onChanged();
+        } else {
+          spanBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public Builder clearSpan() {
+        if (spanBuilder_ == null) {
+          span_ = null;
+          onChanged();
+        } else {
+          span_ = null;
+          spanBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public flyteidl.core.Metrics.Span.Builder getSpanBuilder() {
+        
+        onChanged();
+        return getSpanFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      public flyteidl.core.Metrics.SpanOrBuilder getSpanOrBuilder() {
+        if (spanBuilder_ != null) {
+          return spanBuilder_.getMessageOrBuilder();
+        } else {
+          return span_ == null ?
+              flyteidl.core.Metrics.Span.getDefaultInstance() : span_;
+        }
+      }
+      /**
+       * <pre>
+       * Span defines the top-level breakdown of the workflows execution. More precise information is nested in a
+       * hierarchical structure using Flyte entity references.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Span span = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Metrics.Span, flyteidl.core.Metrics.Span.Builder, flyteidl.core.Metrics.SpanOrBuilder> 
+          getSpanFieldBuilder() {
+        if (spanBuilder_ == null) {
+          spanBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Metrics.Span, flyteidl.core.Metrics.Span.Builder, flyteidl.core.Metrics.SpanOrBuilder>(
+                  getSpan(),
+                  getParentForChildren(),
+                  isClean());
+          span_ = null;
+        }
+        return spanBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.WorkflowExecutionGetMetricsResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.WorkflowExecutionGetMetricsResponse)
+    private static final flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse();
+    }
+
+    public static flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<WorkflowExecutionGetMetricsResponse>
+        PARSER = new com.google.protobuf.AbstractParser<WorkflowExecutionGetMetricsResponse>() {
+      @java.lang.Override
+      public WorkflowExecutionGetMetricsResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new WorkflowExecutionGetMetricsResponse(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<WorkflowExecutionGetMetricsResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<WorkflowExecutionGetMetricsResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.ExecutionOuterClass.WorkflowExecutionGetMetricsResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_ExecutionCreateRequest_descriptor;
   private static final 
@@ -26281,6 +28415,16 @@ public final class ExecutionOuterClass {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_ExecutionUpdateResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -26295,110 +28439,117 @@ public final class ExecutionOuterClass {
       "ent.proto\032\033flyteidl/admin/common.proto\032\034" +
       "flyteidl/core/literals.proto\032\035flyteidl/c" +
       "ore/execution.proto\032\036flyteidl/core/ident" +
-      "ifier.proto\032\034flyteidl/core/security.prot" +
-      "o\032\036google/protobuf/duration.proto\032\037googl" +
-      "e/protobuf/timestamp.proto\032\036google/proto" +
-      "buf/wrappers.proto\"\237\001\n\026ExecutionCreateRe" +
-      "quest\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014" +
-      "\n\004name\030\003 \001(\t\022+\n\004spec\030\004 \001(\0132\035.flyteidl.ad" +
-      "min.ExecutionSpec\022)\n\006inputs\030\005 \001(\0132\031.flyt" +
-      "eidl.core.LiteralMap\"\177\n\030ExecutionRelaunc" +
-      "hRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wor" +
-      "kflowExecutionIdentifier\022\014\n\004name\030\003 \001(\t\022\027" +
-      "\n\017overwrite_cache\030\004 \001(\010J\004\010\002\020\003\"\224\001\n\027Execut" +
-      "ionRecoverRequest\0226\n\002id\030\001 \001(\0132*.flyteidl" +
-      ".core.WorkflowExecutionIdentifier\022\014\n\004nam" +
-      "e\030\002 \001(\t\0223\n\010metadata\030\003 \001(\0132!.flyteidl.adm" +
-      "in.ExecutionMetadata\"Q\n\027ExecutionCreateR" +
-      "esponse\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Work" +
-      "flowExecutionIdentifier\"U\n\033WorkflowExecu" +
-      "tionGetRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.co" +
-      "re.WorkflowExecutionIdentifier\"\243\001\n\tExecu" +
-      "tion\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflo" +
-      "wExecutionIdentifier\022+\n\004spec\030\002 \001(\0132\035.fly" +
-      "teidl.admin.ExecutionSpec\0221\n\007closure\030\003 \001" +
-      "(\0132 .flyteidl.admin.ExecutionClosure\"M\n\r" +
-      "ExecutionList\022-\n\nexecutions\030\001 \003(\0132\031.flyt" +
-      "eidl.admin.Execution\022\r\n\005token\030\002 \001(\t\"X\n\016L" +
-      "iteralMapBlob\022/\n\006values\030\001 \001(\0132\031.flyteidl" +
-      ".core.LiteralMapB\002\030\001H\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n" +
-      "\004data\"1\n\rAbortMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n" +
-      "\tprincipal\030\002 \001(\t\"\360\005\n\020ExecutionClosure\0225\n" +
-      "\007outputs\030\001 \001(\0132\036.flyteidl.admin.LiteralM" +
-      "apBlobB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.flyteidl.c" +
-      "ore.ExecutionErrorH\000\022\031\n\013abort_cause\030\n \001(" +
-      "\tB\002\030\001H\000\0227\n\016abort_metadata\030\014 \001(\0132\035.flytei" +
-      "dl.admin.AbortMetadataH\000\0224\n\013output_data\030" +
-      "\r \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\0226" +
-      "\n\017computed_inputs\030\003 \001(\0132\031.flyteidl.core." +
-      "LiteralMapB\002\030\001\0225\n\005phase\030\004 \001(\0162&.flyteidl" +
-      ".core.WorkflowExecution.Phase\022.\n\nstarted" +
-      "_at\030\005 \001(\0132\032.google.protobuf.Timestamp\022+\n" +
-      "\010duration\030\006 \001(\0132\031.google.protobuf.Durati" +
-      "on\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf" +
-      ".Timestamp\022.\n\nupdated_at\030\010 \001(\0132\032.google." +
-      "protobuf.Timestamp\0223\n\rnotifications\030\t \003(" +
-      "\0132\034.flyteidl.admin.Notification\022.\n\013workf" +
-      "low_id\030\013 \001(\0132\031.flyteidl.core.Identifier\022" +
-      "I\n\024state_change_details\030\016 \001(\0132+.flyteidl" +
-      ".admin.ExecutionStateChangeDetailsB\017\n\rou" +
-      "tput_result\"+\n\016SystemMetadata\022\031\n\021executi" +
-      "on_cluster\030\001 \001(\t\"\332\003\n\021ExecutionMetadata\022=" +
-      "\n\004mode\030\001 \001(\0162/.flyteidl.admin.ExecutionM" +
-      "etadata.ExecutionMode\022\021\n\tprincipal\030\002 \001(\t" +
-      "\022\017\n\007nesting\030\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132" +
-      "\032.google.protobuf.Timestamp\022E\n\025parent_no" +
-      "de_execution\030\005 \001(\0132&.flyteidl.core.NodeE" +
-      "xecutionIdentifier\022G\n\023reference_executio" +
-      "n\030\020 \001(\0132*.flyteidl.core.WorkflowExecutio" +
-      "nIdentifier\0227\n\017system_metadata\030\021 \001(\0132\036.f" +
-      "lyteidl.admin.SystemMetadata\"g\n\rExecutio" +
-      "nMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYST" +
-      "EM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\022\r" +
-      "\n\tRECOVERED\020\005\"G\n\020NotificationList\0223\n\rnot" +
-      "ifications\030\001 \003(\0132\034.flyteidl.admin.Notifi" +
-      "cation\"\200\006\n\rExecutionSpec\022.\n\013launch_plan\030" +
-      "\001 \001(\0132\031.flyteidl.core.Identifier\022-\n\006inpu" +
-      "ts\030\002 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001\022" +
-      "3\n\010metadata\030\003 \001(\0132!.flyteidl.admin.Execu" +
-      "tionMetadata\0229\n\rnotifications\030\005 \001(\0132 .fl" +
-      "yteidl.admin.NotificationListH\000\022\025\n\013disab" +
-      "le_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteid" +
-      "l.admin.Labels\0220\n\013annotations\030\010 \001(\0132\033.fl" +
-      "yteidl.admin.Annotations\0228\n\020security_con" +
-      "text\030\n \001(\0132\036.flyteidl.core.SecurityConte" +
-      "xt\022/\n\tauth_role\030\020 \001(\0132\030.flyteidl.admin.A" +
-      "uthRoleB\002\030\001\022;\n\022quality_of_service\030\021 \001(\0132" +
-      "\037.flyteidl.core.QualityOfService\022\027\n\017max_" +
-      "parallelism\030\022 \001(\005\022C\n\026raw_output_data_con" +
-      "fig\030\023 \001(\0132#.flyteidl.admin.RawOutputData" +
-      "Config\022=\n\022cluster_assignment\030\024 \001(\0132!.fly" +
-      "teidl.admin.ClusterAssignment\0221\n\rinterru" +
-      "ptible\030\025 \001(\0132\032.google.protobuf.BoolValue" +
-      "\022\027\n\017overwrite_cache\030\026 \001(\010B\030\n\026notificatio" +
-      "n_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateR" +
+      "ifier.proto\032\033flyteidl/core/metrics.proto" +
+      "\032\034flyteidl/core/security.proto\032\036google/p" +
+      "rotobuf/duration.proto\032\037google/protobuf/" +
+      "timestamp.proto\032\036google/protobuf/wrapper" +
+      "s.proto\"\237\001\n\026ExecutionCreateRequest\022\017\n\007pr" +
+      "oject\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(" +
+      "\t\022+\n\004spec\030\004 \001(\0132\035.flyteidl.admin.Executi" +
+      "onSpec\022)\n\006inputs\030\005 \001(\0132\031.flyteidl.core.L" +
+      "iteralMap\"\177\n\030ExecutionRelaunchRequest\0226\n" +
+      "\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExecut" +
+      "ionIdentifier\022\014\n\004name\030\003 \001(\t\022\027\n\017overwrite" +
+      "_cache\030\004 \001(\010J\004\010\002\020\003\"\224\001\n\027ExecutionRecoverR" +
       "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
-      "lowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n" +
-      "\032ExecutionTerminateResponse\"Y\n\037WorkflowE" +
-      "xecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.fly" +
-      "teidl.core.WorkflowExecutionIdentifier\"\336" +
-      "\001\n WorkflowExecutionGetDataResponse\022,\n\007o" +
-      "utputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030" +
-      "\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBl" +
-      "obB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.c" +
-      "ore.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031.f" +
-      "lyteidl.core.LiteralMap\"\177\n\026ExecutionUpda" +
-      "teRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wo" +
-      "rkflowExecutionIdentifier\022-\n\005state\030\002 \001(\016" +
-      "2\036.flyteidl.admin.ExecutionState\"\220\001\n\033Exe" +
-      "cutionStateChangeDetails\022-\n\005state\030\001 \001(\0162" +
-      "\036.flyteidl.admin.ExecutionState\022/\n\013occur" +
-      "red_at\030\002 \001(\0132\032.google.protobuf.Timestamp" +
-      "\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpdateRe" +
-      "sponse*>\n\016ExecutionState\022\024\n\020EXECUTION_AC" +
-      "TIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7Z5github" +
-      ".com/flyteorg/flyteidl/gen/pb-go/flyteid" +
-      "l/adminb\006proto3"
+      "lowExecutionIdentifier\022\014\n\004name\030\002 \001(\t\0223\n\010" +
+      "metadata\030\003 \001(\0132!.flyteidl.admin.Executio" +
+      "nMetadata\"Q\n\027ExecutionCreateResponse\0226\n\002" +
+      "id\030\001 \001(\0132*.flyteidl.core.WorkflowExecuti" +
+      "onIdentifier\"U\n\033WorkflowExecutionGetRequ" +
+      "est\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflow" +
+      "ExecutionIdentifier\"\243\001\n\tExecution\0226\n\002id\030" +
+      "\001 \001(\0132*.flyteidl.core.WorkflowExecutionI" +
+      "dentifier\022+\n\004spec\030\002 \001(\0132\035.flyteidl.admin" +
+      ".ExecutionSpec\0221\n\007closure\030\003 \001(\0132 .flytei" +
+      "dl.admin.ExecutionClosure\"M\n\rExecutionLi" +
+      "st\022-\n\nexecutions\030\001 \003(\0132\031.flyteidl.admin." +
+      "Execution\022\r\n\005token\030\002 \001(\t\"X\n\016LiteralMapBl" +
+      "ob\022/\n\006values\030\001 \001(\0132\031.flyteidl.core.Liter" +
+      "alMapB\002\030\001H\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\rAb" +
+      "ortMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n\tprincipal\030" +
+      "\002 \001(\t\"\360\005\n\020ExecutionClosure\0225\n\007outputs\030\001 " +
+      "\001(\0132\036.flyteidl.admin.LiteralMapBlobB\002\030\001H" +
+      "\000\022.\n\005error\030\002 \001(\0132\035.flyteidl.core.Executi" +
+      "onErrorH\000\022\031\n\013abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016" +
+      "abort_metadata\030\014 \001(\0132\035.flyteidl.admin.Ab" +
+      "ortMetadataH\000\0224\n\013output_data\030\r \001(\0132\031.fly" +
+      "teidl.core.LiteralMapB\002\030\001H\000\0226\n\017computed_" +
+      "inputs\030\003 \001(\0132\031.flyteidl.core.LiteralMapB" +
+      "\002\030\001\0225\n\005phase\030\004 \001(\0162&.flyteidl.core.Workf" +
+      "lowExecution.Phase\022.\n\nstarted_at\030\005 \001(\0132\032" +
+      ".google.protobuf.Timestamp\022+\n\010duration\030\006" +
+      " \001(\0132\031.google.protobuf.Duration\022.\n\ncreat" +
+      "ed_at\030\007 \001(\0132\032.google.protobuf.Timestamp\022" +
+      ".\n\nupdated_at\030\010 \001(\0132\032.google.protobuf.Ti" +
+      "mestamp\0223\n\rnotifications\030\t \003(\0132\034.flyteid" +
+      "l.admin.Notification\022.\n\013workflow_id\030\013 \001(" +
+      "\0132\031.flyteidl.core.Identifier\022I\n\024state_ch" +
+      "ange_details\030\016 \001(\0132+.flyteidl.admin.Exec" +
+      "utionStateChangeDetailsB\017\n\routput_result" +
+      "\">\n\016SystemMetadata\022\031\n\021execution_cluster\030" +
+      "\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\332\003\n\021ExecutionMe" +
+      "tadata\022=\n\004mode\030\001 \001(\0162/.flyteidl.admin.Ex" +
+      "ecutionMetadata.ExecutionMode\022\021\n\tprincip" +
+      "al\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\0220\n\014scheduled_a" +
+      "t\030\004 \001(\0132\032.google.protobuf.Timestamp\022E\n\025p" +
+      "arent_node_execution\030\005 \001(\0132&.flyteidl.co" +
+      "re.NodeExecutionIdentifier\022G\n\023reference_" +
+      "execution\030\020 \001(\0132*.flyteidl.core.Workflow" +
+      "ExecutionIdentifier\0227\n\017system_metadata\030\021" +
+      " \001(\0132\036.flyteidl.admin.SystemMetadata\"g\n\r" +
+      "ExecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001" +
+      "\022\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORK" +
+      "FLOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020NotificationLis" +
+      "t\0223\n\rnotifications\030\001 \003(\0132\034.flyteidl.admi" +
+      "n.Notification\"\262\006\n\rExecutionSpec\022.\n\013laun" +
+      "ch_plan\030\001 \001(\0132\031.flyteidl.core.Identifier" +
+      "\022-\n\006inputs\030\002 \001(\0132\031.flyteidl.core.Literal" +
+      "MapB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.adm" +
+      "in.ExecutionMetadata\0229\n\rnotifications\030\005 " +
+      "\001(\0132 .flyteidl.admin.NotificationListH\000\022" +
+      "\025\n\013disable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026" +
+      ".flyteidl.admin.Labels\0220\n\013annotations\030\010 " +
+      "\001(\0132\033.flyteidl.admin.Annotations\0228\n\020secu" +
+      "rity_context\030\n \001(\0132\036.flyteidl.core.Secur" +
+      "ityContext\022/\n\tauth_role\030\020 \001(\0132\030.flyteidl" +
+      ".admin.AuthRoleB\002\030\001\022;\n\022quality_of_servic" +
+      "e\030\021 \001(\0132\037.flyteidl.core.QualityOfService" +
+      "\022\027\n\017max_parallelism\030\022 \001(\005\022C\n\026raw_output_" +
+      "data_config\030\023 \001(\0132#.flyteidl.admin.RawOu" +
+      "tputDataConfig\022=\n\022cluster_assignment\030\024 \001" +
+      "(\0132!.flyteidl.admin.ClusterAssignment\0221\n" +
+      "\rinterruptible\030\025 \001(\0132\032.google.protobuf.B" +
+      "oolValue\022\027\n\017overwrite_cache\030\026 \001(\010\022\"\n\004env" +
+      "s\030\027 \001(\0132\024.flyteidl.admin.Envs\022\014\n\004tags\030\030 " +
+      "\003(\tB\030\n\026notification_overridesJ\004\010\004\020\005\"b\n\031E" +
+      "xecutionTerminateRequest\0226\n\002id\030\001 \001(\0132*.f" +
+      "lyteidl.core.WorkflowExecutionIdentifier" +
+      "\022\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTerminateRes" +
+      "ponse\"Y\n\037WorkflowExecutionGetDataRequest" +
+      "\0226\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExe" +
+      "cutionIdentifier\"\336\001\n WorkflowExecutionGe" +
+      "tDataResponse\022,\n\007outputs\030\001 \001(\0132\027.flyteid" +
+      "l.admin.UrlBlobB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027.fl" +
+      "yteidl.admin.UrlBlobB\002\030\001\022.\n\013full_inputs\030" +
+      "\003 \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014full" +
+      "_outputs\030\004 \001(\0132\031.flyteidl.core.LiteralMa" +
+      "p\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030\001 \001(\0132" +
+      "*.flyteidl.core.WorkflowExecutionIdentif" +
+      "ier\022-\n\005state\030\002 \001(\0162\036.flyteidl.admin.Exec" +
+      "utionState\"\220\001\n\033ExecutionStateChangeDetai" +
+      "ls\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin.Execu" +
+      "tionState\022/\n\013occurred_at\030\002 \001(\0132\032.google." +
+      "protobuf.Timestamp\022\021\n\tprincipal\030\003 \001(\t\"\031\n" +
+      "\027ExecutionUpdateResponse\"k\n\"WorkflowExec" +
+      "utionGetMetricsRequest\0226\n\002id\030\001 \001(\0132*.fly" +
+      "teidl.core.WorkflowExecutionIdentifier\022\r" +
+      "\n\005depth\030\002 \001(\005\"H\n#WorkflowExecutionGetMet" +
+      "ricsResponse\022!\n\004span\030\001 \001(\0132\023.flyteidl.co" +
+      "re.Span*>\n\016ExecutionState\022\024\n\020EXECUTION_A" +
+      "CTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B7Z5githu" +
+      "b.com/flyteorg/flyteidl/gen/pb-go/flytei" +
+      "dl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -26416,6 +28567,7 @@ public final class ExecutionOuterClass {
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
+          flyteidl.core.Metrics.getDescriptor(),
           flyteidl.core.Security.getDescriptor(),
           com.google.protobuf.DurationProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
@@ -26486,7 +28638,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_SystemMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_SystemMetadata_descriptor,
-        new java.lang.String[] { "ExecutionCluster", });
+        new java.lang.String[] { "ExecutionCluster", "Namespace", });
     internal_static_flyteidl_admin_ExecutionMetadata_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_admin_ExecutionMetadata_fieldAccessorTable = new
@@ -26504,7 +28656,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "ClusterAssignment", "Interruptible", "OverwriteCache", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "ClusterAssignment", "Interruptible", "OverwriteCache", "Envs", "Tags", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new
@@ -26547,11 +28699,24 @@ public final class ExecutionOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionUpdateResponse_descriptor,
         new java.lang.String[] { });
+    internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_descriptor =
+      getDescriptor().getMessageTypes().get(21);
+    internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_WorkflowExecutionGetMetricsRequest_descriptor,
+        new java.lang.String[] { "Id", "Depth", });
+    internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_descriptor =
+      getDescriptor().getMessageTypes().get(22);
+    internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_WorkflowExecutionGetMetricsResponse_descriptor,
+        new java.lang.String[] { "Span", });
     flyteidl.admin.ClusterAssignmentOuterClass.getDescriptor();
     flyteidl.admin.Common.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
+    flyteidl.core.Metrics.getDescriptor();
     flyteidl.core.Security.getDescriptor();
     com.google.protobuf.DurationProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();

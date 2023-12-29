@@ -1081,25 +1081,25 @@ public final class Condition {
      * Can be a constant
      * </pre>
      *
-     * <code>.flyteidl.core.Primitive primitive = 1;</code>
+     * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
      */
-    boolean hasPrimitive();
+    @java.lang.Deprecated boolean hasPrimitive();
     /**
      * <pre>
      * Can be a constant
      * </pre>
      *
-     * <code>.flyteidl.core.Primitive primitive = 1;</code>
+     * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.Primitive getPrimitive();
+    @java.lang.Deprecated flyteidl.core.Literals.Primitive getPrimitive();
     /**
      * <pre>
      * Can be a constant
      * </pre>
      *
-     * <code>.flyteidl.core.Primitive primitive = 1;</code>
+     * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
      */
-    flyteidl.core.Literals.PrimitiveOrBuilder getPrimitiveOrBuilder();
+    @java.lang.Deprecated flyteidl.core.Literals.PrimitiveOrBuilder getPrimitiveOrBuilder();
 
     /**
      * <pre>
@@ -1118,6 +1118,31 @@ public final class Condition {
      */
     com.google.protobuf.ByteString
         getVarBytes();
+
+    /**
+     * <pre>
+     * Replace the primitive field
+     * </pre>
+     *
+     * <code>.flyteidl.core.Scalar scalar = 3;</code>
+     */
+    boolean hasScalar();
+    /**
+     * <pre>
+     * Replace the primitive field
+     * </pre>
+     *
+     * <code>.flyteidl.core.Scalar scalar = 3;</code>
+     */
+    flyteidl.core.Literals.Scalar getScalar();
+    /**
+     * <pre>
+     * Replace the primitive field
+     * </pre>
+     *
+     * <code>.flyteidl.core.Scalar scalar = 3;</code>
+     */
+    flyteidl.core.Literals.ScalarOrBuilder getScalarOrBuilder();
 
     public flyteidl.core.Condition.Operand.ValCase getValCase();
   }
@@ -1184,6 +1209,20 @@ public final class Condition {
               val_ = s;
               break;
             }
+            case 26: {
+              flyteidl.core.Literals.Scalar.Builder subBuilder = null;
+              if (valCase_ == 3) {
+                subBuilder = ((flyteidl.core.Literals.Scalar) val_).toBuilder();
+              }
+              val_ =
+                  input.readMessage(flyteidl.core.Literals.Scalar.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((flyteidl.core.Literals.Scalar) val_);
+                val_ = subBuilder.buildPartial();
+              }
+              valCase_ = 3;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -1220,8 +1259,9 @@ public final class Condition {
     private java.lang.Object val_;
     public enum ValCase
         implements com.google.protobuf.Internal.EnumLite {
-      PRIMITIVE(1),
+      @java.lang.Deprecated PRIMITIVE(1),
       VAR(2),
+      SCALAR(3),
       VAL_NOT_SET(0);
       private final int value;
       private ValCase(int value) {
@@ -1239,6 +1279,7 @@ public final class Condition {
         switch (value) {
           case 1: return PRIMITIVE;
           case 2: return VAR;
+          case 3: return SCALAR;
           case 0: return VAL_NOT_SET;
           default: return null;
         }
@@ -1260,9 +1301,9 @@ public final class Condition {
      * Can be a constant
      * </pre>
      *
-     * <code>.flyteidl.core.Primitive primitive = 1;</code>
+     * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
      */
-    public boolean hasPrimitive() {
+    @java.lang.Deprecated public boolean hasPrimitive() {
       return valCase_ == 1;
     }
     /**
@@ -1270,9 +1311,9 @@ public final class Condition {
      * Can be a constant
      * </pre>
      *
-     * <code>.flyteidl.core.Primitive primitive = 1;</code>
+     * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.Primitive getPrimitive() {
+    @java.lang.Deprecated public flyteidl.core.Literals.Primitive getPrimitive() {
       if (valCase_ == 1) {
          return (flyteidl.core.Literals.Primitive) val_;
       }
@@ -1283,9 +1324,9 @@ public final class Condition {
      * Can be a constant
      * </pre>
      *
-     * <code>.flyteidl.core.Primitive primitive = 1;</code>
+     * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
      */
-    public flyteidl.core.Literals.PrimitiveOrBuilder getPrimitiveOrBuilder() {
+    @java.lang.Deprecated public flyteidl.core.Literals.PrimitiveOrBuilder getPrimitiveOrBuilder() {
       if (valCase_ == 1) {
          return (flyteidl.core.Literals.Primitive) val_;
       }
@@ -1343,6 +1384,44 @@ public final class Condition {
       }
     }
 
+    public static final int SCALAR_FIELD_NUMBER = 3;
+    /**
+     * <pre>
+     * Replace the primitive field
+     * </pre>
+     *
+     * <code>.flyteidl.core.Scalar scalar = 3;</code>
+     */
+    public boolean hasScalar() {
+      return valCase_ == 3;
+    }
+    /**
+     * <pre>
+     * Replace the primitive field
+     * </pre>
+     *
+     * <code>.flyteidl.core.Scalar scalar = 3;</code>
+     */
+    public flyteidl.core.Literals.Scalar getScalar() {
+      if (valCase_ == 3) {
+         return (flyteidl.core.Literals.Scalar) val_;
+      }
+      return flyteidl.core.Literals.Scalar.getDefaultInstance();
+    }
+    /**
+     * <pre>
+     * Replace the primitive field
+     * </pre>
+     *
+     * <code>.flyteidl.core.Scalar scalar = 3;</code>
+     */
+    public flyteidl.core.Literals.ScalarOrBuilder getScalarOrBuilder() {
+      if (valCase_ == 3) {
+         return (flyteidl.core.Literals.Scalar) val_;
+      }
+      return flyteidl.core.Literals.Scalar.getDefaultInstance();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1363,6 +1442,9 @@ public final class Condition {
       if (valCase_ == 2) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, val_);
       }
+      if (valCase_ == 3) {
+        output.writeMessage(3, (flyteidl.core.Literals.Scalar) val_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1378,6 +1460,10 @@ public final class Condition {
       }
       if (valCase_ == 2) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, val_);
+      }
+      if (valCase_ == 3) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, (flyteidl.core.Literals.Scalar) val_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1404,6 +1490,10 @@ public final class Condition {
           if (!getVar()
               .equals(other.getVar())) return false;
           break;
+        case 3:
+          if (!getScalar()
+              .equals(other.getScalar())) return false;
+          break;
         case 0:
         default:
       }
@@ -1426,6 +1516,10 @@ public final class Condition {
         case 2:
           hash = (37 * hash) + VAR_FIELD_NUMBER;
           hash = (53 * hash) + getVar().hashCode();
+          break;
+        case 3:
+          hash = (37 * hash) + SCALAR_FIELD_NUMBER;
+          hash = (53 * hash) + getScalar().hashCode();
           break;
         case 0:
         default:
@@ -1605,6 +1699,13 @@ public final class Condition {
         if (valCase_ == 2) {
           result.val_ = val_;
         }
+        if (valCase_ == 3) {
+          if (scalarBuilder_ == null) {
+            result.val_ = val_;
+          } else {
+            result.val_ = scalarBuilder_.build();
+          }
+        }
         result.valCase_ = valCase_;
         onBuilt();
         return result;
@@ -1665,6 +1766,10 @@ public final class Condition {
             onChanged();
             break;
           }
+          case SCALAR: {
+            mergeScalar(other.getScalar());
+            break;
+          }
           case VAL_NOT_SET: {
             break;
           }
@@ -1720,9 +1825,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public boolean hasPrimitive() {
+      @java.lang.Deprecated public boolean hasPrimitive() {
         return valCase_ == 1;
       }
       /**
@@ -1730,9 +1835,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.Primitive getPrimitive() {
+      @java.lang.Deprecated public flyteidl.core.Literals.Primitive getPrimitive() {
         if (primitiveBuilder_ == null) {
           if (valCase_ == 1) {
             return (flyteidl.core.Literals.Primitive) val_;
@@ -1750,9 +1855,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public Builder setPrimitive(flyteidl.core.Literals.Primitive value) {
+      @java.lang.Deprecated public Builder setPrimitive(flyteidl.core.Literals.Primitive value) {
         if (primitiveBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1770,9 +1875,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public Builder setPrimitive(
+      @java.lang.Deprecated public Builder setPrimitive(
           flyteidl.core.Literals.Primitive.Builder builderForValue) {
         if (primitiveBuilder_ == null) {
           val_ = builderForValue.build();
@@ -1788,9 +1893,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public Builder mergePrimitive(flyteidl.core.Literals.Primitive value) {
+      @java.lang.Deprecated public Builder mergePrimitive(flyteidl.core.Literals.Primitive value) {
         if (primitiveBuilder_ == null) {
           if (valCase_ == 1 &&
               val_ != flyteidl.core.Literals.Primitive.getDefaultInstance()) {
@@ -1814,9 +1919,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public Builder clearPrimitive() {
+      @java.lang.Deprecated public Builder clearPrimitive() {
         if (primitiveBuilder_ == null) {
           if (valCase_ == 1) {
             valCase_ = 0;
@@ -1837,9 +1942,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.Primitive.Builder getPrimitiveBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.Primitive.Builder getPrimitiveBuilder() {
         return getPrimitiveFieldBuilder().getBuilder();
       }
       /**
@@ -1847,9 +1952,9 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
-      public flyteidl.core.Literals.PrimitiveOrBuilder getPrimitiveOrBuilder() {
+      @java.lang.Deprecated public flyteidl.core.Literals.PrimitiveOrBuilder getPrimitiveOrBuilder() {
         if ((valCase_ == 1) && (primitiveBuilder_ != null)) {
           return primitiveBuilder_.getMessageOrBuilder();
         } else {
@@ -1864,7 +1969,7 @@ public final class Condition {
        * Can be a constant
        * </pre>
        *
-       * <code>.flyteidl.core.Primitive primitive = 1;</code>
+       * <code>.flyteidl.core.Primitive primitive = 1 [deprecated = true];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.Primitive, flyteidl.core.Literals.Primitive.Builder, flyteidl.core.Literals.PrimitiveOrBuilder> 
@@ -1983,6 +2088,178 @@ public final class Condition {
         val_ = value;
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.Scalar, flyteidl.core.Literals.Scalar.Builder, flyteidl.core.Literals.ScalarOrBuilder> scalarBuilder_;
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public boolean hasScalar() {
+        return valCase_ == 3;
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public flyteidl.core.Literals.Scalar getScalar() {
+        if (scalarBuilder_ == null) {
+          if (valCase_ == 3) {
+            return (flyteidl.core.Literals.Scalar) val_;
+          }
+          return flyteidl.core.Literals.Scalar.getDefaultInstance();
+        } else {
+          if (valCase_ == 3) {
+            return scalarBuilder_.getMessage();
+          }
+          return flyteidl.core.Literals.Scalar.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public Builder setScalar(flyteidl.core.Literals.Scalar value) {
+        if (scalarBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          val_ = value;
+          onChanged();
+        } else {
+          scalarBuilder_.setMessage(value);
+        }
+        valCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public Builder setScalar(
+          flyteidl.core.Literals.Scalar.Builder builderForValue) {
+        if (scalarBuilder_ == null) {
+          val_ = builderForValue.build();
+          onChanged();
+        } else {
+          scalarBuilder_.setMessage(builderForValue.build());
+        }
+        valCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public Builder mergeScalar(flyteidl.core.Literals.Scalar value) {
+        if (scalarBuilder_ == null) {
+          if (valCase_ == 3 &&
+              val_ != flyteidl.core.Literals.Scalar.getDefaultInstance()) {
+            val_ = flyteidl.core.Literals.Scalar.newBuilder((flyteidl.core.Literals.Scalar) val_)
+                .mergeFrom(value).buildPartial();
+          } else {
+            val_ = value;
+          }
+          onChanged();
+        } else {
+          if (valCase_ == 3) {
+            scalarBuilder_.mergeFrom(value);
+          }
+          scalarBuilder_.setMessage(value);
+        }
+        valCase_ = 3;
+        return this;
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public Builder clearScalar() {
+        if (scalarBuilder_ == null) {
+          if (valCase_ == 3) {
+            valCase_ = 0;
+            val_ = null;
+            onChanged();
+          }
+        } else {
+          if (valCase_ == 3) {
+            valCase_ = 0;
+            val_ = null;
+          }
+          scalarBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public flyteidl.core.Literals.Scalar.Builder getScalarBuilder() {
+        return getScalarFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      public flyteidl.core.Literals.ScalarOrBuilder getScalarOrBuilder() {
+        if ((valCase_ == 3) && (scalarBuilder_ != null)) {
+          return scalarBuilder_.getMessageOrBuilder();
+        } else {
+          if (valCase_ == 3) {
+            return (flyteidl.core.Literals.Scalar) val_;
+          }
+          return flyteidl.core.Literals.Scalar.getDefaultInstance();
+        }
+      }
+      /**
+       * <pre>
+       * Replace the primitive field
+       * </pre>
+       *
+       * <code>.flyteidl.core.Scalar scalar = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Literals.Scalar, flyteidl.core.Literals.Scalar.Builder, flyteidl.core.Literals.ScalarOrBuilder> 
+          getScalarFieldBuilder() {
+        if (scalarBuilder_ == null) {
+          if (!(valCase_ == 3)) {
+            val_ = flyteidl.core.Literals.Scalar.getDefaultInstance();
+          }
+          scalarBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Literals.Scalar, flyteidl.core.Literals.Scalar.Builder, flyteidl.core.Literals.ScalarOrBuilder>(
+                  (flyteidl.core.Literals.Scalar) val_,
+                  getParentForChildren(),
+                  isClean());
+          val_ = null;
+        }
+        valCase_ = 3;
+        onChanged();;
+        return scalarBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -4010,21 +4287,22 @@ public final class Condition {
       "rator\022*\n\nleft_value\030\002 \001(\0132\026.flyteidl.cor" +
       "e.Operand\022+\n\013right_value\030\003 \001(\0132\026.flyteid" +
       "l.core.Operand\"=\n\010Operator\022\006\n\002EQ\020\000\022\007\n\003NE" +
-      "Q\020\001\022\006\n\002GT\020\002\022\007\n\003GTE\020\003\022\006\n\002LT\020\004\022\007\n\003LTE\020\005\"N\n" +
-      "\007Operand\022-\n\tprimitive\030\001 \001(\0132\030.flyteidl.c" +
-      "ore.PrimitiveH\000\022\r\n\003var\030\002 \001(\tH\000B\005\n\003val\"\223\001" +
-      "\n\021BooleanExpression\022;\n\013conjunction\030\001 \001(\013" +
-      "2$.flyteidl.core.ConjunctionExpressionH\000" +
-      "\0229\n\ncomparison\030\002 \001(\0132#.flyteidl.core.Com" +
-      "parisonExpressionH\000B\006\n\004expr\"\372\001\n\025Conjunct" +
-      "ionExpression\022F\n\010operator\030\001 \001(\01624.flytei" +
-      "dl.core.ConjunctionExpression.LogicalOpe" +
-      "rator\0229\n\017left_expression\030\002 \001(\0132 .flyteid" +
-      "l.core.BooleanExpression\022:\n\020right_expres" +
-      "sion\030\003 \001(\0132 .flyteidl.core.BooleanExpres" +
-      "sion\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n\002OR\020\001" +
-      "B6Z4github.com/flyteorg/flyteidl/gen/pb-" +
-      "go/flyteidl/coreb\006proto3"
+      "Q\020\001\022\006\n\002GT\020\002\022\007\n\003GTE\020\003\022\006\n\002LT\020\004\022\007\n\003LTE\020\005\"{\n" +
+      "\007Operand\0221\n\tprimitive\030\001 \001(\0132\030.flyteidl.c" +
+      "ore.PrimitiveB\002\030\001H\000\022\r\n\003var\030\002 \001(\tH\000\022\'\n\006sc" +
+      "alar\030\003 \001(\0132\025.flyteidl.core.ScalarH\000B\005\n\003v" +
+      "al\"\223\001\n\021BooleanExpression\022;\n\013conjunction\030" +
+      "\001 \001(\0132$.flyteidl.core.ConjunctionExpress" +
+      "ionH\000\0229\n\ncomparison\030\002 \001(\0132#.flyteidl.cor" +
+      "e.ComparisonExpressionH\000B\006\n\004expr\"\372\001\n\025Con" +
+      "junctionExpression\022F\n\010operator\030\001 \001(\01624.f" +
+      "lyteidl.core.ConjunctionExpression.Logic" +
+      "alOperator\0229\n\017left_expression\030\002 \001(\0132 .fl" +
+      "yteidl.core.BooleanExpression\022:\n\020right_e" +
+      "xpression\030\003 \001(\0132 .flyteidl.core.BooleanE" +
+      "xpression\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n" +
+      "\002OR\020\001B6Z4github.com/flyteorg/flyteidl/ge" +
+      "n/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4050,7 +4328,7 @@ public final class Condition {
     internal_static_flyteidl_core_Operand_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Operand_descriptor,
-        new java.lang.String[] { "Primitive", "Var", "Val", });
+        new java.lang.String[] { "Primitive", "Var", "Scalar", "Val", });
     internal_static_flyteidl_core_BooleanExpression_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_core_BooleanExpression_fieldAccessorTable = new

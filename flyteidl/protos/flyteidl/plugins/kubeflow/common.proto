@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package flyteidl.plugins.kubeflow;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+
+
+enum RestartPolicy {
+    RESTART_POLICY_NEVER = 0;
+    RESTART_POLICY_ON_FAILURE = 1;
+    RESTART_POLICY_ALWAYS = 2;
+}
+
+enum CleanPodPolicy {
+    CLEANPOD_POLICY_NONE = 0;
+    CLEANPOD_POLICY_RUNNING = 1;
+    CLEANPOD_POLICY_ALL = 2;
+}
+
+message RunPolicy {
+    // Defines the policy to kill pods after the job completes. Default to None.
+    CleanPodPolicy clean_pod_policy = 1;
+
+    // TTL to clean up jobs. Default to infinite.
+    int32 ttl_seconds_after_finished = 2;
+
+    // Specifies the duration in seconds relative to the startTime that the job may be active
+    // before the system tries to terminate it; value must be positive integer.
+    int32 active_deadline_seconds = 3;
+
+    // Number of retries before marking this job failed.
+    int32 backoff_limit = 4;
+}

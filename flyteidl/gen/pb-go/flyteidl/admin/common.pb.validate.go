@@ -1598,6 +1598,85 @@ var _ interface {
 	ErrorName() string
 } = AnnotationsValidationError{}
 
+// Validate checks the field values on Envs with the rules defined in the proto
+// definition for this message. If any rules are violated, an error is returned.
+func (m *Envs) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetValues() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return EnvsValidationError{
+					field:  fmt.Sprintf("Values[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// EnvsValidationError is the validation error returned by Envs.Validate if the
+// designated constraints aren't met.
+type EnvsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EnvsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EnvsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EnvsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EnvsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EnvsValidationError) ErrorName() string { return "EnvsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e EnvsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEnvs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EnvsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EnvsValidationError{}
+
 // Validate checks the field values on AuthRole with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.
 func (m *AuthRole) Validate() error {
@@ -1734,3 +1813,73 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RawOutputDataConfigValidationError{}
+
+// Validate checks the field values on FlyteURLs with the rules defined in the
+// proto definition for this message. If any rules are violated, an error is returned.
+func (m *FlyteURLs) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Inputs
+
+	// no validation rules for Outputs
+
+	// no validation rules for Deck
+
+	return nil
+}
+
+// FlyteURLsValidationError is the validation error returned by
+// FlyteURLs.Validate if the designated constraints aren't met.
+type FlyteURLsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e FlyteURLsValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e FlyteURLsValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e FlyteURLsValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e FlyteURLsValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e FlyteURLsValidationError) ErrorName() string { return "FlyteURLsValidationError" }
+
+// Error satisfies the builtin error interface
+func (e FlyteURLsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sFlyteURLs.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = FlyteURLsValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = FlyteURLsValidationError{}

@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_primitive import CorePrimitive  # noqa: F401,E501
+from flyteadmin.models.core_scalar import CoreScalar  # noqa: F401,E501
 
 
 class CoreOperand(object):
@@ -34,25 +35,30 @@ class CoreOperand(object):
     """
     swagger_types = {
         'primitive': 'CorePrimitive',
-        'var': 'str'
+        'var': 'str',
+        'scalar': 'CoreScalar'
     }
 
     attribute_map = {
         'primitive': 'primitive',
-        'var': 'var'
+        'var': 'var',
+        'scalar': 'scalar'
     }
 
-    def __init__(self, primitive=None, var=None):  # noqa: E501
+    def __init__(self, primitive=None, var=None, scalar=None):  # noqa: E501
         """CoreOperand - a model defined in Swagger"""  # noqa: E501
 
         self._primitive = None
         self._var = None
+        self._scalar = None
         self.discriminator = None
 
         if primitive is not None:
             self.primitive = primitive
         if var is not None:
             self.var = var
+        if scalar is not None:
+            self.scalar = scalar
 
     @property
     def primitive(self):
@@ -95,6 +101,27 @@ class CoreOperand(object):
         """
 
         self._var = var
+
+    @property
+    def scalar(self):
+        """Gets the scalar of this CoreOperand.  # noqa: E501
+
+
+        :return: The scalar of this CoreOperand.  # noqa: E501
+        :rtype: CoreScalar
+        """
+        return self._scalar
+
+    @scalar.setter
+    def scalar(self, scalar):
+        """Sets the scalar of this CoreOperand.
+
+
+        :param scalar: The scalar of this CoreOperand.  # noqa: E501
+        :type: CoreScalar
+        """
+
+        self._scalar = scalar
 
     def to_dict(self):
         """Returns the model properties as a dict"""

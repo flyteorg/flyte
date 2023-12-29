@@ -251,6 +251,8 @@ func (m *TaskMetadata) Validate() error {
 
 	// no validation rules for Tags
 
+	// no validation rules for PodTemplateName
+
 	switch m.InterruptibleValue.(type) {
 
 	case *TaskMetadata_Interruptible:
@@ -850,6 +852,16 @@ func (m *K8SPod) Validate() error {
 		if err := v.Validate(); err != nil {
 			return K8SPodValidationError{
 				field:  "PodSpec",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if v, ok := interface{}(m.GetDataConfig()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return K8SPodValidationError{
+				field:  "DataConfig",
 				reason: "embedded message failed validation",
 				cause:  err,
 			}

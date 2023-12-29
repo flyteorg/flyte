@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/identifier.proto";
+import "google/protobuf/timestamp.proto";
+
+// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
+// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
+// precise definitions.
+message Span {
+    // start_time defines the instance this span began.
+    google.protobuf.Timestamp start_time = 1;
+
+    // end_time defines the instance this span completed.
+    google.protobuf.Timestamp end_time = 2;
+
+    oneof id {
+        // workflow_id is the id of the workflow execution this Span represents.
+        flyteidl.core.WorkflowExecutionIdentifier workflow_id = 3;
+
+        // node_id is the id of the node execution this Span represents.
+        flyteidl.core.NodeExecutionIdentifier node_id = 4;
+
+        // task_id is the id of the task execution this Span represents.
+        flyteidl.core.TaskExecutionIdentifier task_id = 5;
+
+        // operation_id is the id of a unique operation that this Span represents.
+        string operation_id = 6;
+    }
+
+    // spans defines a collection of Spans that breakdown this execution.
+    repeated Span spans = 7;
+}
