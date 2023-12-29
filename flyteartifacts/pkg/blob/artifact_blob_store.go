@@ -3,11 +3,13 @@ package blob
 import (
 	"context"
 	"fmt"
+
+	"github.com/golang/protobuf/ptypes/any"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/golang/protobuf/ptypes/any"
 )
 
 type ArtifactBlobStore struct {

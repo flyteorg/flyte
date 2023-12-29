@@ -4,6 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/lib"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
@@ -12,10 +18,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"gorm.io/gorm"
-	"strconv"
 )
 
 // RDSStorage should implement StorageInterface

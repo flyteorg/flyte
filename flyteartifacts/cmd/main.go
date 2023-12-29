@@ -2,14 +2,14 @@ package main
 
 import (
 	"context"
+	_ "net/http/pprof" // Required to serve application.
+
 	sharedCmd "github.com/flyteorg/flyte/flyteartifacts/cmd/shared"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/server"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	_ "net/http/pprof" // Required to serve application.
 )
 
 func main() {

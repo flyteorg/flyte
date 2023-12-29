@@ -3,12 +3,14 @@ package processor
 import (
 	"context"
 	"fmt"
+	"testing"
+
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
 	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/golang/protobuf/proto"
-	"testing"
 )
 
 type EchoEventsHandler struct{}

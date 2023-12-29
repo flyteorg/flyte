@@ -2,9 +2,11 @@ package shared
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flytestdlib/database"
+
 	"github.com/go-gormigrate/gormigrate/v2"
 	"github.com/spf13/cobra"
+
+	"github.com/flyteorg/flyte/flytestdlib/database"
 )
 
 // NewMigrateCmd represents the migrate command

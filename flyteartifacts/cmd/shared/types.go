@@ -2,9 +2,11 @@ package shared
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
+
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"google.golang.org/grpc"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type GrpcRegistrationHook func(ctx context.Context, server *grpc.Server, scope promutils.Scope) error

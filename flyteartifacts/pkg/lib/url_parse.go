@@ -2,11 +2,12 @@ package lib
 
 import (
 	"errors"
-	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"net/url"
 	"regexp"
 	"strings"
+
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var flyteURLNameRe = regexp.MustCompile(`(?P<name>[\w/-]+)(?:(:(?P<tag>\w+))?)(?:(@(?P<version>\w+))?)`)

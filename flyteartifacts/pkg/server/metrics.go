@@ -1,9 +1,11 @@
 package server
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/prometheus/client_golang/prometheus"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type RequestMetrics struct {
