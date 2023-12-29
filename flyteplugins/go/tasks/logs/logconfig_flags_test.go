@@ -253,4 +253,18 @@ func TestLogConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_dynamic-log-links-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("dynamic-log-links-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("dynamic-log-links-enabled"); err == nil {
+				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vBool), &actual.IsDynamicLogLinksEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

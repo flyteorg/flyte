@@ -7,6 +7,11 @@ import (
 
 //go:generate pflags LogConfig --default-var=DefaultConfig
 
+
+type DynamicLogLinks struct {
+	Flyin tasklog.TemplateURI `json:"flyin" pflag:"-,Template Uri to use when building flyin log links"`
+}
+
 // LogConfig encapsulates plugins' log configs
 type LogConfig struct {
 	IsCloudwatchEnabled bool `json:"cloudwatch-enabled" pflag:",Enable Cloudwatch Logging"`
@@ -27,6 +32,9 @@ type LogConfig struct {
 	// Deprecated: Please use StackDriverTemplateURI
 	StackdriverLogResourceName string              `json:"stackdriver-logresourcename" pflag:",Name of the logresource in stackdriver"`
 	StackDriverTemplateURI     tasklog.TemplateURI `json:"stackdriver-template-uri" pflag:",Template Uri to use when building stackdriver log links"`
+
+	IsDynamicLogLinksEnabled bool `json:"dynamic-log-links-enabled" pflag:",Enable dynamic log links"`
+	DynamicLogLinks 	  DynamicLogLinks `json:"dynamic-log-links" pflag:",Map of dynamic log links"`
 
 	Templates []tasklog.TemplateLogPlugin `json:"templates" pflag:"-,"`
 }

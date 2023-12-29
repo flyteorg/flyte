@@ -14,7 +14,7 @@ import (
 )
 
 // Internal
-func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, taskExecID pluginsCore.TaskExecutionID, pod *v1.Pod, index uint32, nameSuffix string, extraLogTemplateVarsByScheme *tasklog.TemplateVarsByScheme) ([]*core.TaskLog, error) {
+func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, taskExecID pluginsCore.TaskExecutionID, pod *v1.Pod, index uint32, nameSuffix string, extraLogTemplateVarsByScheme *tasklog.TemplateVarsByScheme, taskTemplate *core.TaskTemplate) ([]*core.TaskLog, error) {
 	if logPlugin == nil {
 		return nil, nil
 	}
@@ -51,6 +51,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 			PodUnixFinishTime:         finishTime,
 			TaskExecutionID:           taskExecID,
 			ExtraTemplateVarsByScheme: extraLogTemplateVarsByScheme,
+			TaskTemplate:              taskTemplate,
 		},
 	)
 
@@ -62,7 +63,8 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 }
 
 type templateLogPluginCollection struct {
-	plugins []tasklog.TemplateLogPlugin
+	plugins        []tasklog.TemplateLogPlugin
+	dynamicPlugins []tasklog.TemplateLogPlugin
 }
 
 func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.Output, error) {
@@ -83,6 +85,7 @@ func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.O
 func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 	// Use a list to maintain order.
 	var plugins []tasklog.TemplateLogPlugin
+	var dynamicPlugins []tasklog.TemplateLogPlugin
 
 	if cfg.IsKubernetesEnabled {
 		if len(cfg.KubernetesTemplateURI) > 0 {
@@ -108,6 +111,12 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 		}
 	}
 
+	if cfg.IsDynamicLogLinksEnabled {
+		if len(cfg.DynamicLogLinks.Flyin) > 0 {
+			dynamicPlugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Flyin Logs", Scheme: tasklog.TemplateSchemeDynamic, TemplateURIs: []tasklog.TemplateURI{cfg.DynamicLogLinks.Flyin}, MessageFormat: core.TaskLog_JSON})
+		}
+	}
+
 	plugins = append(plugins, cfg.Templates...)
-	return templateLogPluginCollection{plugins: plugins}, nil
+	return templateLogPluginCollection{plugins: plugins, dynamicPlugins: dynamicPlugins}, nil
 }
