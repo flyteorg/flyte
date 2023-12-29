@@ -31,7 +31,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.access_key_id | string | `"minio"` |  |
 | flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.auth_type | string | `"accesskey"` |  |
 | flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.disable_ssl | bool | `true` |  |
-| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.endpoint | string | `"http://localhost:30002"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.endpoint | string | `"http://flyte-sandbox-minio.flyte:9000"` |  |
 | flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.secret_key | string | `"miniostorage"` |  |
 | flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.v2_signing | bool | `true` |  |
 | flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.kind | string | `"s3"` |  |
