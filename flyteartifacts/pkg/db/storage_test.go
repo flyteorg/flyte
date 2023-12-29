@@ -7,17 +7,17 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"os"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestBasicWrite(t *testing.T) {

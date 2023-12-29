@@ -2,11 +2,13 @@ package server
 
 import (
 	"context"
+
+	"github.com/golang/protobuf/ptypes/any"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	stdLibStorage "github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/golang/protobuf/ptypes/any"
 )
 
 type StorageInterface interface {

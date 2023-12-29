@@ -1,12 +1,12 @@
 package configuration
 
 import (
+	"time"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration/shared"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	stdLibDb "github.com/flyteorg/flyte/flytestdlib/database"
 	stdLibStorage "github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"time"
 )
 
 const artifactsServer = "artifactsServer"

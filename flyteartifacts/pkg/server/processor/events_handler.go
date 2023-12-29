@@ -3,16 +3,17 @@ package processor
 import (
 	"context"
 	"fmt"
+
 	event2 "github.com/cloudevents/sdk-go/v2/event"
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/lib"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	adminPb "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/golang/protobuf/proto"
 )
 
 // ServiceCallHandler will take events and call the grpc endpoints directly. The service should most likely be local.

@@ -2,9 +2,10 @@ package lib
 
 import (
 	"fmt"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"strings"
 	"time"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const DateFormat string = "2006-01-02"

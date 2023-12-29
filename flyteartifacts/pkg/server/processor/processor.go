@@ -2,8 +2,10 @@ package processor
 
 import (
 	"context"
+
 	"github.com/NYTimes/gizmo/pubsub"
 	gizmoAWS "github.com/NYTimes/gizmo/pubsub/aws"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
 	configCommon "github.com/flyteorg/flyte/flytestdlib/config"

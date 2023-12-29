@@ -59,7 +59,7 @@ flyte-binary:
             config:
               disable_ssl: true
               v2_signing: true
-              endpoint: http://localhost:30002
+              endpoint: http://flyte-sandbox-minio.flyte:9000
               auth_type: accesskey
               access_key_id: minio
               secret_key: miniostorage

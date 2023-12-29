@@ -2,6 +2,7 @@ package processor
 
 import (
 	"context"
+
 	"github.com/cloudevents/sdk-go/v2/event"
 	"github.com/golang/protobuf/proto"
 )

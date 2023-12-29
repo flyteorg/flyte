@@ -497,7 +497,7 @@ data:
             access_key_id: minio
             auth_type: accesskey
             disable_ssl: true
-            endpoint: http://localhost:30002
+            endpoint: http://flyte-sandbox-minio.flyte:9000
             secret_key: miniostorage
             v2_signing: true
           kind: s3
@@ -858,7 +858,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RTRFWEhLQ1c3V3h5N1JpQg==
+  haSharedSecret: bkVuc0pmTEgwZEp0QUVSbQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1256,7 +1256,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 3e7625f0de3a210017c0f2ab5b8ad17a9ccac048a5a06f6466b8d762d8aa27d7
+        checksum/configuration: 9502021d87030cfe424e840eee4c26900579d180008686827db9d9ef3f723a5b
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1421,7 +1421,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 266445a61b2ef5d294e608c36659f8c3c6605c1b718d73870eb7e0584783504a
+        checksum/secret: 63b35e1a77beeb576299ff75680ecfdebf9034eab5c85af9b0c24646b1e3007c
       labels:
         app: docker-registry
         release: flyte-sandbox

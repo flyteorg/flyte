@@ -2,13 +2,9 @@ package shared
 
 import (
 	"context"
-	"google.golang.org/grpc/reflection"
 	"net"
 	"net/http"
 
-	sharedCfg "github.com/flyteorg/flyte/flyteartifacts/pkg/configuration/shared"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -18,6 +14,11 @@ import (
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/health"
 	"google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc/reflection"
+
+	sharedCfg "github.com/flyteorg/flyte/flyteartifacts/pkg/configuration/shared"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 func NewServeCmd(commandName string, serverCfg sharedCfg.ServerConfiguration, grpcHook GrpcRegistrationHook, httpHook HttpRegistrationHook) *cobra.Command {

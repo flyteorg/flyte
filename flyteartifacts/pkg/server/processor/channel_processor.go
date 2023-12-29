@@ -3,14 +3,16 @@ package processor
 import (
 	"bytes"
 	"context"
+	"time"
+
 	pbcloudevents "github.com/cloudevents/sdk-go/binding/format/protobuf/v2"
 	"github.com/cloudevents/sdk-go/v2/event"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
+
 	flyteEvents "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/sandboxutils"
-	"github.com/golang/protobuf/jsonpb"
-	"github.com/golang/protobuf/proto"
-	"time"
 )
 
 type SandboxCloudEventsReceiver struct {

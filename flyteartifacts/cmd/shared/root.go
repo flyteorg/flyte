@@ -4,14 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-	"os"
 )
 
 var (

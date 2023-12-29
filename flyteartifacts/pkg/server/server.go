@@ -3,6 +3,13 @@ package server
 import (
 	"context"
 	"fmt"
+	_ "net/http/pprof" // Required to serve application.
+
+	"github.com/go-gormigrate/gormigrate/v2"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/pkg/errors"
+	"google.golang.org/grpc"
+
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/blob"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/configuration"
 	"github.com/flyteorg/flyte/flyteartifacts/pkg/db"
@@ -12,11 +19,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/go-gormigrate/gormigrate/v2"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/pkg/errors"
-	"google.golang.org/grpc"
-	_ "net/http/pprof" // Required to serve application.
 )
 
 type ArtifactService struct {

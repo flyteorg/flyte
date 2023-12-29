@@ -2,9 +2,11 @@ package lib
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteartifacts/pkg/models"
 )
 
 func TestURLParseWithTag(t *testing.T) {

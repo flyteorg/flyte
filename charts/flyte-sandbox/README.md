@@ -27,9 +27,21 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.clusterResourceTemplates.inlineConfigMap | string | `"{{ include \"flyte-sandbox.clusterResourceTemplates.inlineConfigMap\" . }}"` |  |
 | flyte-binary.configuration.database.host | string | `"{{ printf \"%s-postgresql\" .Release.Name | trunc 63 | trimSuffix \"-\" }}"` |  |
 | flyte-binary.configuration.database.password | string | `"postgres"` |  |
-| flyte-binary.configuration.inline.artifacts.host | string | `"localhost"` |  |
-| flyte-binary.configuration.inline.artifacts.insecure | bool | `true` |  |
-| flyte-binary.configuration.inline.artifacts.port | int | `50051` |  |
+| flyte-binary.configuration.inline.artifactsProcessor.cloudProvider | string | `"Sandbox"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.access_key_id | string | `"minio"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.auth_type | string | `"accesskey"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.disable_ssl | bool | `true` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.endpoint | string | `"http://flyte-sandbox-minio.flyte:9000"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.secret_key | string | `"miniostorage"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.config.v2_signing | bool | `true` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.stow.kind | string | `"s3"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactBlobStoreConfig.type | string | `"stow"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactDatabaseConfig.postgres.dbname | string | `"artifacts"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactDatabaseConfig.postgres.host | string | `"{{ printf \"%s-postgresql\" .Release.Name | trunc 63 | trimSuffix \"-\" }}"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactDatabaseConfig.postgres.options | string | `"sslmode=disable"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactDatabaseConfig.postgres.password | string | `"postgres"` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactDatabaseConfig.postgres.port | int | `5432` |  |
+| flyte-binary.configuration.inline.artifactsServer.artifactDatabaseConfig.postgres.username | string | `"postgres"` |  |
 | flyte-binary.configuration.inline.cloudEvents.cloudEventVersion | string | `"v2"` |  |
 | flyte-binary.configuration.inline.cloudEvents.enable | bool | `true` |  |
 | flyte-binary.configuration.inline.cloudEvents.type | string | `"sandbox"` |  |
