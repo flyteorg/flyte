@@ -7,7 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
-	"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
+	//"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
@@ -32,6 +32,9 @@ const (
 var tracerProviders = make(map[string]*trace.TracerProvider)
 var noopTracerProvider = rawtrace.NewNoopTracerProvider()
 
+//var fileExporter *stdouttrace.Exporter
+var fileExporter trace.SpanExporter
+
 func RegisterTracerProvider(serviceName string, config *Config) error {
 	if config == nil {
 		return nil
@@ -42,21 +45,28 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 	case NoopExporter:
 		return nil
 	case FileExporter:
-		// configure file exporter
-		f, err := os.Create(config.FileConfig.Filename)
-		if err != nil {
-			return err
+		if fileExporter == nil {
+			// configure file exporter
+			f, err := os.Create(config.FileConfig.Filename)
+			if err != nil {
+				return err
+			}
+
+			/*fileExporter, err = stdouttrace.New(
+				stdouttrace.WithWriter(f),
+				//stdouttrace.WithPrettyPrint(), // TODO @hamersaw - remove?
+			)
+			if err != nil {
+				return err
+			}*/
+
+			fileExporter, err = NewExporter(f)
+			if err != nil {
+				return err
+			}
 		}
 
-		exporter, err := stdouttrace.New(
-			stdouttrace.WithWriter(f),
-			stdouttrace.WithPrettyPrint(),
-		)
-		if err != nil {
-			return err
-		}
-
-		opts = append(opts, trace.WithBatcher(exporter))
+		opts = append(opts, trace.WithBatcher(fileExporter))
 	case JaegerExporter:
 		// configure jaeger exporter
 		exporter, err := jaeger.New(

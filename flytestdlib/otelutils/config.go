@@ -24,7 +24,7 @@ var (
 	defaultConfig = &Config{
 		ExporterType: NoopExporter,
 		FileConfig: FileConfig{
-			Filename: "/tmp/trace.txt",
+			Filename: "/tmp/otel.json",
 		},
 		JaegerConfig: JaegerConfig{
 			Endpoint: "http://localhost:14268/api/traces",
