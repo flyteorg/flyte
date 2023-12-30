@@ -685,7 +685,7 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure, false},
 		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess, false},
 		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
-		{rayv1alpha1.JobStatusStopped, rayv1alpha1.JobDeploymentStatusSuspended, pluginsCore.PhaseRunning, true},
+		{rayv1alpha1.JobStatusStopped, rayv1alpha1.JobDeploymentStatusSuspended, pluginsCore.PhaseRunning, false},
 	}
 
 	for _, tc := range testCases {
