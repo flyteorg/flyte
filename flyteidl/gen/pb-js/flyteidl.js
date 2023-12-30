@@ -17525,33 +17525,6 @@
                 return ErrorDocument;
             })();
     
-<<<<<<< HEAD
-            core.Span = (function() {
-    
-                /**
-                 * Properties of a Span.
-                 * @memberof flyteidl.core
-                 * @interface ISpan
-                 * @property {google.protobuf.ITimestamp|null} [startTime] Span startTime
-                 * @property {google.protobuf.ITimestamp|null} [endTime] Span endTime
-                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [workflowId] Span workflowId
-                 * @property {flyteidl.core.INodeExecutionIdentifier|null} [nodeId] Span nodeId
-                 * @property {flyteidl.core.ITaskExecutionIdentifier|null} [taskId] Span taskId
-                 * @property {string|null} [operationId] Span operationId
-                 * @property {Array.<flyteidl.core.ISpan>|null} [spans] Span spans
-                 */
-    
-                /**
-                 * Constructs a new Span.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents a Span.
-                 * @implements ISpan
-                 * @constructor
-                 * @param {flyteidl.core.ISpan=} [properties] Properties to set
-                 */
-                function Span(properties) {
-                    this.spans = [];
-=======
             core.CacheEvictionError = (function() {
     
                 /**
@@ -17574,7 +17547,6 @@
                  * @param {flyteidl.core.ICacheEvictionError=} [properties] Properties to set
                  */
                 function CacheEvictionError(properties) {
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -17582,62 +17554,6 @@
                 }
     
                 /**
-<<<<<<< HEAD
-                 * Span startTime.
-                 * @member {google.protobuf.ITimestamp|null|undefined} startTime
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Span.prototype.startTime = null;
-    
-                /**
-                 * Span endTime.
-                 * @member {google.protobuf.ITimestamp|null|undefined} endTime
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Span.prototype.endTime = null;
-    
-                /**
-                 * Span workflowId.
-                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} workflowId
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Span.prototype.workflowId = null;
-    
-                /**
-                 * Span nodeId.
-                 * @member {flyteidl.core.INodeExecutionIdentifier|null|undefined} nodeId
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Span.prototype.nodeId = null;
-    
-                /**
-                 * Span taskId.
-                 * @member {flyteidl.core.ITaskExecutionIdentifier|null|undefined} taskId
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Span.prototype.taskId = null;
-    
-                /**
-                 * Span operationId.
-                 * @member {string} operationId
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Span.prototype.operationId = "";
-    
-                /**
-                 * Span spans.
-                 * @member {Array.<flyteidl.core.ISpan>} spans
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Span.prototype.spans = $util.emptyArray;
-=======
                  * CacheEvictionError code.
                  * @member {flyteidl.core.CacheEvictionError.Code} code
                  * @memberof flyteidl.core.CacheEvictionError
@@ -17676,21 +17592,11 @@
                  * @instance
                  */
                 CacheEvictionError.prototype.workflowExecutionId = null;
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
-<<<<<<< HEAD
-                 * Span id.
-                 * @member {"workflowId"|"nodeId"|"taskId"|"operationId"|undefined} id
-                 * @memberof flyteidl.core.Span
-                 * @instance
-                 */
-                Object.defineProperty(Span.prototype, "id", {
-                    get: $util.oneOfGetter($oneOfFields = ["workflowId", "nodeId", "taskId", "operationId"]),
-=======
                  * CacheEvictionError source.
                  * @member {"taskExecutionId"|"workflowExecutionId"|undefined} source
                  * @memberof flyteidl.core.CacheEvictionError
@@ -17698,51 +17604,10 @@
                  */
                 Object.defineProperty(CacheEvictionError.prototype, "source", {
                     get: $util.oneOfGetter($oneOfFields = ["taskExecutionId", "workflowExecutionId"]),
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
                 /**
-<<<<<<< HEAD
-                 * Creates a new Span instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.Span
-                 * @static
-                 * @param {flyteidl.core.ISpan=} [properties] Properties to set
-                 * @returns {flyteidl.core.Span} Span instance
-                 */
-                Span.create = function create(properties) {
-                    return new Span(properties);
-                };
-    
-                /**
-                 * Encodes the specified Span message. Does not implicitly {@link flyteidl.core.Span.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.Span
-                 * @static
-                 * @param {flyteidl.core.ISpan} message Span message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                Span.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.startTime != null && message.hasOwnProperty("startTime"))
-                        $root.google.protobuf.Timestamp.encode(message.startTime, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.endTime != null && message.hasOwnProperty("endTime"))
-                        $root.google.protobuf.Timestamp.encode(message.endTime, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
-                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.workflowId, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-                    if (message.nodeId != null && message.hasOwnProperty("nodeId"))
-                        $root.flyteidl.core.NodeExecutionIdentifier.encode(message.nodeId, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.taskId != null && message.hasOwnProperty("taskId"))
-                        $root.flyteidl.core.TaskExecutionIdentifier.encode(message.taskId, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
-                    if (message.operationId != null && message.hasOwnProperty("operationId"))
-                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.operationId);
-                    if (message.spans != null && message.spans.length)
-                        for (var i = 0; i < message.spans.length; ++i)
-                            $root.flyteidl.core.Span.encode(message.spans[i], writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
-=======
                  * Creates a new CacheEvictionError instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.CacheEvictionError
@@ -17776,27 +17641,10 @@
                         $root.flyteidl.core.TaskExecutionIdentifier.encode(message.taskExecutionId, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.workflowExecutionId != null && message.hasOwnProperty("workflowExecutionId"))
                         $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.workflowExecutionId, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
                     return writer;
                 };
     
                 /**
-<<<<<<< HEAD
-                 * Decodes a Span message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.Span
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.Span} Span
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                Span.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Span();
-=======
                  * Decodes a CacheEvictionError message from the specified reader or buffer.
                  * @function decode
                  * @memberof flyteidl.core.CacheEvictionError
@@ -17811,34 +17659,10 @@
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
                     var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.CacheEvictionError();
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-<<<<<<< HEAD
-                            message.startTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.endTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            message.workflowId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
-                            break;
-                        case 4:
-                            message.nodeId = $root.flyteidl.core.NodeExecutionIdentifier.decode(reader, reader.uint32());
-                            break;
-                        case 5:
-                            message.taskId = $root.flyteidl.core.TaskExecutionIdentifier.decode(reader, reader.uint32());
-                            break;
-                        case 6:
-                            message.operationId = reader.string();
-                            break;
-                        case 7:
-                            if (!(message.spans && message.spans.length))
-                                message.spans = [];
-                            message.spans.push($root.flyteidl.core.Span.decode(reader, reader.uint32()));
-=======
                             message.code = reader.int32();
                             break;
                         case 2:
@@ -17852,7 +17676,6 @@
                             break;
                         case 5:
                             message.workflowExecutionId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17863,77 +17686,13 @@
                 };
     
                 /**
-<<<<<<< HEAD
-                 * Verifies a Span message.
-                 * @function verify
-                 * @memberof flyteidl.core.Span
-=======
                  * Verifies a CacheEvictionError message.
                  * @function verify
                  * @memberof flyteidl.core.CacheEvictionError
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
                  * @static
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-<<<<<<< HEAD
-                Span.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    var properties = {};
-                    if (message.startTime != null && message.hasOwnProperty("startTime")) {
-                        var error = $root.google.protobuf.Timestamp.verify(message.startTime);
-                        if (error)
-                            return "startTime." + error;
-                    }
-                    if (message.endTime != null && message.hasOwnProperty("endTime")) {
-                        var error = $root.google.protobuf.Timestamp.verify(message.endTime);
-                        if (error)
-                            return "endTime." + error;
-                    }
-                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
-                        properties.id = 1;
-                        {
-                            var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.workflowId);
-                            if (error)
-                                return "workflowId." + error;
-                        }
-                    }
-                    if (message.nodeId != null && message.hasOwnProperty("nodeId")) {
-                        if (properties.id === 1)
-                            return "id: multiple values";
-                        properties.id = 1;
-                        {
-                            var error = $root.flyteidl.core.NodeExecutionIdentifier.verify(message.nodeId);
-                            if (error)
-                                return "nodeId." + error;
-                        }
-                    }
-                    if (message.taskId != null && message.hasOwnProperty("taskId")) {
-                        if (properties.id === 1)
-                            return "id: multiple values";
-                        properties.id = 1;
-                        {
-                            var error = $root.flyteidl.core.TaskExecutionIdentifier.verify(message.taskId);
-                            if (error)
-                                return "taskId." + error;
-                        }
-                    }
-                    if (message.operationId != null && message.hasOwnProperty("operationId")) {
-                        if (properties.id === 1)
-                            return "id: multiple values";
-                        properties.id = 1;
-                        if (!$util.isString(message.operationId))
-                            return "operationId: string expected";
-                    }
-                    if (message.spans != null && message.hasOwnProperty("spans")) {
-                        if (!Array.isArray(message.spans))
-                            return "spans: array expected";
-                        for (var i = 0; i < message.spans.length; ++i) {
-                            var error = $root.flyteidl.core.Span.verify(message.spans[i]);
-                            if (error)
-                                return "spans." + error;
-=======
                 CacheEvictionError.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
@@ -17973,15 +17732,11 @@
                             var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.workflowExecutionId);
                             if (error)
                                 return "workflowExecutionId." + error;
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
                         }
                     }
                     return null;
                 };
     
-<<<<<<< HEAD
-                return Span;
-=======
                 /**
                  * Code enum.
                  * @name flyteidl.core.CacheEvictionError.Code
@@ -18123,7 +17878,270 @@
                 };
     
                 return CacheEvictionErrorList;
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
+            })();
+    
+            core.Span = (function() {
+    
+                /**
+                 * Properties of a Span.
+                 * @memberof flyteidl.core
+                 * @interface ISpan
+                 * @property {google.protobuf.ITimestamp|null} [startTime] Span startTime
+                 * @property {google.protobuf.ITimestamp|null} [endTime] Span endTime
+                 * @property {flyteidl.core.IWorkflowExecutionIdentifier|null} [workflowId] Span workflowId
+                 * @property {flyteidl.core.INodeExecutionIdentifier|null} [nodeId] Span nodeId
+                 * @property {flyteidl.core.ITaskExecutionIdentifier|null} [taskId] Span taskId
+                 * @property {string|null} [operationId] Span operationId
+                 * @property {Array.<flyteidl.core.ISpan>|null} [spans] Span spans
+                 */
+    
+                /**
+                 * Constructs a new Span.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a Span.
+                 * @implements ISpan
+                 * @constructor
+                 * @param {flyteidl.core.ISpan=} [properties] Properties to set
+                 */
+                function Span(properties) {
+                    this.spans = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Span startTime.
+                 * @member {google.protobuf.ITimestamp|null|undefined} startTime
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.startTime = null;
+    
+                /**
+                 * Span endTime.
+                 * @member {google.protobuf.ITimestamp|null|undefined} endTime
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.endTime = null;
+    
+                /**
+                 * Span workflowId.
+                 * @member {flyteidl.core.IWorkflowExecutionIdentifier|null|undefined} workflowId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.workflowId = null;
+    
+                /**
+                 * Span nodeId.
+                 * @member {flyteidl.core.INodeExecutionIdentifier|null|undefined} nodeId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.nodeId = null;
+    
+                /**
+                 * Span taskId.
+                 * @member {flyteidl.core.ITaskExecutionIdentifier|null|undefined} taskId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.taskId = null;
+    
+                /**
+                 * Span operationId.
+                 * @member {string} operationId
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.operationId = "";
+    
+                /**
+                 * Span spans.
+                 * @member {Array.<flyteidl.core.ISpan>} spans
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Span.prototype.spans = $util.emptyArray;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * Span id.
+                 * @member {"workflowId"|"nodeId"|"taskId"|"operationId"|undefined} id
+                 * @memberof flyteidl.core.Span
+                 * @instance
+                 */
+                Object.defineProperty(Span.prototype, "id", {
+                    get: $util.oneOfGetter($oneOfFields = ["workflowId", "nodeId", "taskId", "operationId"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
+                 * Creates a new Span instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {flyteidl.core.ISpan=} [properties] Properties to set
+                 * @returns {flyteidl.core.Span} Span instance
+                 */
+                Span.create = function create(properties) {
+                    return new Span(properties);
+                };
+    
+                /**
+                 * Encodes the specified Span message. Does not implicitly {@link flyteidl.core.Span.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {flyteidl.core.ISpan} message Span message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Span.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.startTime != null && message.hasOwnProperty("startTime"))
+                        $root.google.protobuf.Timestamp.encode(message.startTime, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.endTime != null && message.hasOwnProperty("endTime"))
+                        $root.google.protobuf.Timestamp.encode(message.endTime, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
+                        $root.flyteidl.core.WorkflowExecutionIdentifier.encode(message.workflowId, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.nodeId != null && message.hasOwnProperty("nodeId"))
+                        $root.flyteidl.core.NodeExecutionIdentifier.encode(message.nodeId, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.taskId != null && message.hasOwnProperty("taskId"))
+                        $root.flyteidl.core.TaskExecutionIdentifier.encode(message.taskId, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.operationId != null && message.hasOwnProperty("operationId"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.operationId);
+                    if (message.spans != null && message.spans.length)
+                        for (var i = 0; i < message.spans.length; ++i)
+                            $root.flyteidl.core.Span.encode(message.spans[i], writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Span message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Span} Span
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Span.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Span();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.startTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.endTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.workflowId = $root.flyteidl.core.WorkflowExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            message.nodeId = $root.flyteidl.core.NodeExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.taskId = $root.flyteidl.core.TaskExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.operationId = reader.string();
+                            break;
+                        case 7:
+                            if (!(message.spans && message.spans.length))
+                                message.spans = [];
+                            message.spans.push($root.flyteidl.core.Span.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Span message.
+                 * @function verify
+                 * @memberof flyteidl.core.Span
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Span.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    var properties = {};
+                    if (message.startTime != null && message.hasOwnProperty("startTime")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.startTime);
+                        if (error)
+                            return "startTime." + error;
+                    }
+                    if (message.endTime != null && message.hasOwnProperty("endTime")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.endTime);
+                        if (error)
+                            return "endTime." + error;
+                    }
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
+                        properties.id = 1;
+                        {
+                            var error = $root.flyteidl.core.WorkflowExecutionIdentifier.verify(message.workflowId);
+                            if (error)
+                                return "workflowId." + error;
+                        }
+                    }
+                    if (message.nodeId != null && message.hasOwnProperty("nodeId")) {
+                        if (properties.id === 1)
+                            return "id: multiple values";
+                        properties.id = 1;
+                        {
+                            var error = $root.flyteidl.core.NodeExecutionIdentifier.verify(message.nodeId);
+                            if (error)
+                                return "nodeId." + error;
+                        }
+                    }
+                    if (message.taskId != null && message.hasOwnProperty("taskId")) {
+                        if (properties.id === 1)
+                            return "id: multiple values";
+                        properties.id = 1;
+                        {
+                            var error = $root.flyteidl.core.TaskExecutionIdentifier.verify(message.taskId);
+                            if (error)
+                                return "taskId." + error;
+                        }
+                    }
+                    if (message.operationId != null && message.hasOwnProperty("operationId")) {
+                        if (properties.id === 1)
+                            return "id: multiple values";
+                        properties.id = 1;
+                        if (!$util.isString(message.operationId))
+                            return "operationId: string expected";
+                    }
+                    if (message.spans != null && message.hasOwnProperty("spans")) {
+                        if (!Array.isArray(message.spans))
+                            return "spans: array expected";
+                        for (var i = 0; i < message.spans.length; ++i) {
+                            var error = $root.flyteidl.core.Span.verify(message.spans[i]);
+                            if (error)
+                                return "spans." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return Span;
             })();
     
             core.WorkflowClosure = (function() {

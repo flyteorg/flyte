@@ -159,14 +159,14 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fcache_2eproto[] =
   "ject}/{task_execution_id.task_id.domain}"
   "/{task_execution_id.task_id.name}/{task_"
   "execution_id.task_id.version}/{task_exec"
-  "ution_id.retry_attempt}B9Z7github.com/fl"
-  "yteorg/flyteidl/gen/pb-go/flyteidl/servi"
-  "ceb\006proto3"
+  "ution_id.retry_attempt}B\?Z=github.com/fl"
+  "yteorg/flyte/flyteidl/gen/pb-go/flyteidl"
+  "/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fcache_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fcache_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fcache_2eproto,
-  "flyteidl/service/cache.proto", &assign_descriptors_table_flyteidl_2fservice_2fcache_2eproto, 1290,
+  "flyteidl/service/cache.proto", &assign_descriptors_table_flyteidl_2fservice_2fcache_2eproto, 1296,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fcache_2eproto() {

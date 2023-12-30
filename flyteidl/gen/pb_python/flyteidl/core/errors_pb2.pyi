@@ -8,33 +8,6 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
-class CacheEvictionError(_message.Message):
-    __slots__ = ["code", "message", "node_execution_id", "task_execution_id", "workflow_execution_id"]
-    class Code(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-        __slots__ = []
-    ARTIFACT_DELETE_FAILED: CacheEvictionError.Code
-    CODE_FIELD_NUMBER: _ClassVar[int]
-    DATABASE_UPDATE_FAILED: CacheEvictionError.Code
-    INTERNAL: CacheEvictionError.Code
-    MESSAGE_FIELD_NUMBER: _ClassVar[int]
-    NODE_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
-    RESERVATION_NOT_ACQUIRED: CacheEvictionError.Code
-    RESERVATION_NOT_RELEASED: CacheEvictionError.Code
-    TASK_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
-    WORKFLOW_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
-    code: CacheEvictionError.Code
-    message: str
-    node_execution_id: _identifier_pb2.NodeExecutionIdentifier
-    task_execution_id: _identifier_pb2.TaskExecutionIdentifier
-    workflow_execution_id: _identifier_pb2.WorkflowExecutionIdentifier
-    def __init__(self, code: _Optional[_Union[CacheEvictionError.Code, str]] = ..., message: _Optional[str] = ..., node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., workflow_execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ...) -> None: ...
-
-class CacheEvictionErrorList(_message.Message):
-    __slots__ = ["errors"]
-    ERRORS_FIELD_NUMBER: _ClassVar[int]
-    errors: _containers.RepeatedCompositeFieldContainer[CacheEvictionError]
-    def __init__(self, errors: _Optional[_Iterable[_Union[CacheEvictionError, _Mapping]]] = ...) -> None: ...
-
 class ContainerError(_message.Message):
     __slots__ = ["code", "message", "kind", "origin"]
     class Kind(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
@@ -58,3 +31,35 @@ class ErrorDocument(_message.Message):
     ERROR_FIELD_NUMBER: _ClassVar[int]
     error: ContainerError
     def __init__(self, error: _Optional[_Union[ContainerError, _Mapping]] = ...) -> None: ...
+
+class CacheEvictionError(_message.Message):
+    __slots__ = ["code", "message", "node_execution_id", "task_execution_id", "workflow_execution_id"]
+    class Code(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        INTERNAL: _ClassVar[CacheEvictionError.Code]
+        RESERVATION_NOT_ACQUIRED: _ClassVar[CacheEvictionError.Code]
+        DATABASE_UPDATE_FAILED: _ClassVar[CacheEvictionError.Code]
+        ARTIFACT_DELETE_FAILED: _ClassVar[CacheEvictionError.Code]
+        RESERVATION_NOT_RELEASED: _ClassVar[CacheEvictionError.Code]
+    INTERNAL: CacheEvictionError.Code
+    RESERVATION_NOT_ACQUIRED: CacheEvictionError.Code
+    DATABASE_UPDATE_FAILED: CacheEvictionError.Code
+    ARTIFACT_DELETE_FAILED: CacheEvictionError.Code
+    RESERVATION_NOT_RELEASED: CacheEvictionError.Code
+    CODE_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    NODE_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
+    TASK_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
+    WORKFLOW_EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
+    code: CacheEvictionError.Code
+    message: str
+    node_execution_id: _identifier_pb2.NodeExecutionIdentifier
+    task_execution_id: _identifier_pb2.TaskExecutionIdentifier
+    workflow_execution_id: _identifier_pb2.WorkflowExecutionIdentifier
+    def __init__(self, code: _Optional[_Union[CacheEvictionError.Code, str]] = ..., message: _Optional[str] = ..., node_execution_id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., task_execution_id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ..., workflow_execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ...) -> None: ...
+
+class CacheEvictionErrorList(_message.Message):
+    __slots__ = ["errors"]
+    ERRORS_FIELD_NUMBER: _ClassVar[int]
+    errors: _containers.RepeatedCompositeFieldContainer[CacheEvictionError]
+    def __init__(self, errors: _Optional[_Iterable[_Union[CacheEvictionError, _Mapping]]] = ...) -> None: ...

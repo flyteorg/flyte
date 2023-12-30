@@ -2066,9 +2066,9 @@ public final class Cache {
       "ject}/{task_execution_id.task_id.domain}" +
       "/{task_execution_id.task_id.name}/{task_" +
       "execution_id.task_id.version}/{task_exec" +
-      "ution_id.retry_attempt}B9Z7github.com/fl" +
-      "yteorg/flyteidl/gen/pb-go/flyteidl/servi" +
-      "ceb\006proto3"
+      "ution_id.retry_attempt}B?Z=github.com/fl" +
+      "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +
+      "/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

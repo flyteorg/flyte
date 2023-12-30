@@ -38,11 +38,7 @@ public final class Admin {
       "admin/task_execution.proto\032\034flyteidl/adm" +
       "in/version.proto\032\033flyteidl/admin/common." +
       "proto\032\'flyteidl/admin/description_entity" +
-<<<<<<< HEAD
       ".proto2\204N\n\014AdminService\022m\n\nCreateTask\022!." +
-=======
-      ".proto2\274L\n\014AdminService\022m\n\nCreateTask\022!." +
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
       "flyteidl.admin.TaskCreateRequest\032\".flyte" +
       "idl.admin.TaskCreateResponse\"\030\202\323\344\223\002\022\"\r/a" +
       "pi/v1/tasks:\001*\022\210\001\n\007GetTask\022 .flyteidl.ad" +
@@ -286,7 +282,6 @@ public final class Admin {
       "\002\232\001\022O/api/v1/description_entities/{resou" +
       "rce_type}/{id.project}/{id.domain}/{id.n" +
       "ame}ZG\022E/api/v1/description_entities/{re" +
-<<<<<<< HEAD
       "source_type}/{id.project}/{id.domain}\022\305\001" +
       "\n\023GetExecutionMetrics\0222.flyteidl.admin.W" +
       "orkflowExecutionGetMetricsRequest\0323.flyt" +
@@ -295,11 +290,6 @@ public final class Admin {
       "ns/{id.project}/{id.domain}/{id.name}B?Z" +
       "=github.com/flyteorg/flyte/flyteidl/gen/" +
       "pb-go/flyteidl/serviceb\006proto3"
-=======
-      "source_type}/{id.project}/{id.domain}B9Z" +
-      "7github.com/flyteorg/flyteidl/gen/pb-go/" +
-      "flyteidl/serviceb\006proto3"
->>>>>>> blackshark-ai/flyteidl/datacatalog-delete-artifact
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
