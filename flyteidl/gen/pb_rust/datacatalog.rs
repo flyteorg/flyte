@@ -150,7 +150,7 @@ pub struct UpdateArtifactRequest {
     /// ArtifactData entries will be removed from the underlying blob storage and database.
     #[prost(message, repeated, tag="4")]
     pub data: ::prost::alloc::vec::Vec<ArtifactData>,
-    /// Update task execution metadata when overwriting cache
+    /// Update execution metadata(including execution domain, name, node, project data) when overwriting cache
     #[prost(message, optional, tag="5")]
     pub metadata: ::core::option::Option<Metadata>,
     /// Either ID of artifact or name of tag to retrieve existing artifact from

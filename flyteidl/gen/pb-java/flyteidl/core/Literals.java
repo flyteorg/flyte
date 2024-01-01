@@ -9377,6 +9377,60 @@ public final class Literals {
     com.google.protobuf.ByteString
         getHashBytes();
 
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    int getMetadataCount();
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    boolean containsMetadata(
+        java.lang.String key);
+    /**
+     * Use {@link #getMetadataMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getMetadata();
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getMetadataMap();
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+
+    java.lang.String getMetadataOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+
+    java.lang.String getMetadataOrThrow(
+        java.lang.String key);
+
     public flyteidl.core.Literals.Literal.ValueCase getValueCase();
   }
   /**
@@ -9471,6 +9525,19 @@ public final class Literals {
               hash_ = s;
               break;
             }
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
+                metadata_ = com.google.protobuf.MapField.newMapField(
+                    MetadataDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000010;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              metadata__ = input.readMessage(
+                  MetadataDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              metadata_.getMutableMap().put(
+                  metadata__.getKey(), metadata__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -9495,6 +9562,18 @@ public final class Literals {
       return flyteidl.core.Literals.internal_static_flyteidl_core_Literal_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 5:
+          return internalGetMetadata();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -9503,6 +9582,7 @@ public final class Literals {
               flyteidl.core.Literals.Literal.class, flyteidl.core.Literals.Literal.Builder.class);
     }
 
+    private int bitField0_;
     private int valueCase_ = 0;
     private java.lang.Object value_;
     public enum ValueCase
@@ -9703,6 +9783,98 @@ public final class Literals {
       }
     }
 
+    public static final int METADATA_FIELD_NUMBER = 5;
+    private static final class MetadataDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.core.Literals.internal_static_flyteidl_core_Literal_MetadataEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> metadata_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetMetadata() {
+      if (metadata_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            MetadataDefaultEntryHolder.defaultEntry);
+      }
+      return metadata_;
+    }
+
+    public int getMetadataCount() {
+      return internalGetMetadata().getMap().size();
+    }
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+
+    public boolean containsMetadata(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetMetadata().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getMetadataMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getMetadata() {
+      return getMetadataMap();
+    }
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getMetadataMap() {
+      return internalGetMetadata().getMap();
+    }
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+
+    public java.lang.String getMetadataOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetMetadata().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Additional metadata for literals.
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; metadata = 5;</code>
+     */
+
+    public java.lang.String getMetadataOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetMetadata().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -9729,6 +9901,12 @@ public final class Literals {
       if (!getHashBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, hash_);
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetMetadata(),
+          MetadataDefaultEntryHolder.defaultEntry,
+          5);
       unknownFields.writeTo(output);
     }
 
@@ -9753,6 +9931,16 @@ public final class Literals {
       if (!getHashBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, hash_);
       }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetMetadata().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        metadata__ = MetadataDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(5, metadata__);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -9770,6 +9958,8 @@ public final class Literals {
 
       if (!getHash()
           .equals(other.getHash())) return false;
+      if (!internalGetMetadata().equals(
+          other.internalGetMetadata())) return false;
       if (!getValueCase().equals(other.getValueCase())) return false;
       switch (valueCase_) {
         case 1:
@@ -9800,6 +9990,10 @@ public final class Literals {
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + HASH_FIELD_NUMBER;
       hash = (53 * hash) + getHash().hashCode();
+      if (!internalGetMetadata().getMap().isEmpty()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetMetadata().hashCode();
+      }
       switch (valueCase_) {
         case 1:
           hash = (37 * hash) + SCALAR_FIELD_NUMBER;
@@ -9927,6 +10121,28 @@ public final class Literals {
         return flyteidl.core.Literals.internal_static_flyteidl_core_Literal_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 5:
+            return internalGetMetadata();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 5:
+            return internalGetMutableMetadata();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -9955,6 +10171,7 @@ public final class Literals {
         super.clear();
         hash_ = "";
 
+        internalGetMutableMetadata().clear();
         valueCase_ = 0;
         value_ = null;
         return this;
@@ -9983,6 +10200,8 @@ public final class Literals {
       @java.lang.Override
       public flyteidl.core.Literals.Literal buildPartial() {
         flyteidl.core.Literals.Literal result = new flyteidl.core.Literals.Literal(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (valueCase_ == 1) {
           if (scalarBuilder_ == null) {
             result.value_ = value_;
@@ -10005,6 +10224,9 @@ public final class Literals {
           }
         }
         result.hash_ = hash_;
+        result.metadata_ = internalGetMetadata();
+        result.metadata_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
         result.valueCase_ = valueCase_;
         onBuilt();
         return result;
@@ -10058,6 +10280,8 @@ public final class Literals {
           hash_ = other.hash_;
           onChanged();
         }
+        internalGetMutableMetadata().mergeFrom(
+            other.internalGetMetadata());
         switch (other.getValueCase()) {
           case SCALAR: {
             mergeScalar(other.getScalar());
@@ -10118,6 +10342,7 @@ public final class Literals {
         return this;
       }
 
+      private int bitField0_;
 
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.Scalar, flyteidl.core.Literals.Scalar.Builder, flyteidl.core.Literals.ScalarOrBuilder> scalarBuilder_;
@@ -10731,6 +10956,157 @@ public final class Literals {
         
         hash_ = value;
         onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> metadata_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMetadata() {
+        if (metadata_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              MetadataDefaultEntryHolder.defaultEntry);
+        }
+        return metadata_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableMetadata() {
+        onChanged();;
+        if (metadata_ == null) {
+          metadata_ = com.google.protobuf.MapField.newMapField(
+              MetadataDefaultEntryHolder.defaultEntry);
+        }
+        if (!metadata_.isMutable()) {
+          metadata_ = metadata_.copy();
+        }
+        return metadata_;
+      }
+
+      public int getMetadataCount() {
+        return internalGetMetadata().getMap().size();
+      }
+      /**
+       * <pre>
+       * Additional metadata for literals.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+
+      public boolean containsMetadata(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetMetadata().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getMetadataMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getMetadata() {
+        return getMetadataMap();
+      }
+      /**
+       * <pre>
+       * Additional metadata for literals.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getMetadataMap() {
+        return internalGetMetadata().getMap();
+      }
+      /**
+       * <pre>
+       * Additional metadata for literals.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+
+      public java.lang.String getMetadataOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetMetadata().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Additional metadata for literals.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+
+      public java.lang.String getMetadataOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetMetadata().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearMetadata() {
+        internalGetMutableMetadata().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata for literals.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+
+      public Builder removeMetadata(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableMetadata().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableMetadata() {
+        return internalGetMutableMetadata().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Additional metadata for literals.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+      public Builder putMetadata(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableMetadata().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata for literals.
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; metadata = 5;</code>
+       */
+
+      public Builder putAllMetadata(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableMetadata().getMutableMap()
+            .putAll(values);
         return this;
       }
       @java.lang.Override
@@ -18409,6 +18785,11 @@ public final class Literals {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_Literal_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_Literal_MetadataEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_Literal_MetadataEntry_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_LiteralCollection_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -18504,36 +18885,39 @@ public final class Literals {
       "(\0132\027.google.protobuf.StructH\000\022>\n\022structu" +
       "red_dataset\030\010 \001(\0132 .flyteidl.core.Struct" +
       "uredDatasetH\000\022%\n\005union\030\t \001(\0132\024.flyteidl." +
-      "core.UnionH\000B\007\n\005value\"\253\001\n\007Literal\022\'\n\006sca" +
+      "core.UnionH\000B\007\n\005value\"\224\002\n\007Literal\022\'\n\006sca" +
       "lar\030\001 \001(\0132\025.flyteidl.core.ScalarH\000\0226\n\nco" +
       "llection\030\002 \001(\0132 .flyteidl.core.LiteralCo" +
       "llectionH\000\022(\n\003map\030\003 \001(\0132\031.flyteidl.core." +
-      "LiteralMapH\000\022\014\n\004hash\030\004 \001(\tB\007\n\005value\"=\n\021L" +
-      "iteralCollection\022(\n\010literals\030\001 \003(\0132\026.fly" +
-      "teidl.core.Literal\"\220\001\n\nLiteralMap\0229\n\010lit" +
-      "erals\030\001 \003(\0132\'.flyteidl.core.LiteralMap.L" +
-      "iteralsEntry\032G\n\rLiteralsEntry\022\013\n\003key\030\001 \001" +
-      "(\t\022%\n\005value\030\002 \001(\0132\026.flyteidl.core.Litera" +
-      "l:\0028\001\"E\n\025BindingDataCollection\022,\n\010bindin" +
-      "gs\030\001 \003(\0132\032.flyteidl.core.BindingData\"\234\001\n" +
-      "\016BindingDataMap\022=\n\010bindings\030\001 \003(\0132+.flyt" +
-      "eidl.core.BindingDataMap.BindingsEntry\032K" +
-      "\n\rBindingsEntry\022\013\n\003key\030\001 \001(\t\022)\n\005value\030\002 " +
-      "\001(\0132\032.flyteidl.core.BindingData:\0028\001\";\n\tU" +
-      "nionInfo\022.\n\ntargetType\030\001 \001(\0132\032.flyteidl." +
-      "core.LiteralType\"\205\002\n\013BindingData\022\'\n\006scal" +
-      "ar\030\001 \001(\0132\025.flyteidl.core.ScalarH\000\022:\n\ncol" +
-      "lection\030\002 \001(\0132$.flyteidl.core.BindingDat" +
-      "aCollectionH\000\0221\n\007promise\030\003 \001(\0132\036.flyteid" +
-      "l.core.OutputReferenceH\000\022,\n\003map\030\004 \001(\0132\035." +
-      "flyteidl.core.BindingDataMapH\000\022\'\n\005union\030" +
-      "\005 \001(\0132\030.flyteidl.core.UnionInfoB\007\n\005value" +
-      "\"C\n\007Binding\022\013\n\003var\030\001 \001(\t\022+\n\007binding\030\002 \001(" +
-      "\0132\032.flyteidl.core.BindingData\"*\n\014KeyValu" +
-      "ePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\" \n\rRet" +
-      "ryStrategy\022\017\n\007retries\030\005 \001(\rB<Z:github.co" +
-      "m/flyteorg/flyte/flyteidl/gen/pb-go/flyt" +
-      "eidl/coreb\006proto3"
+      "LiteralMapH\000\022\014\n\004hash\030\004 \001(\t\0226\n\010metadata\030\005" +
+      " \003(\0132$.flyteidl.core.Literal.MetadataEnt" +
+      "ry\032/\n\rMetadataEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005valu" +
+      "e\030\002 \001(\t:\0028\001B\007\n\005value\"=\n\021LiteralCollectio" +
+      "n\022(\n\010literals\030\001 \003(\0132\026.flyteidl.core.Lite" +
+      "ral\"\220\001\n\nLiteralMap\0229\n\010literals\030\001 \003(\0132\'.f" +
+      "lyteidl.core.LiteralMap.LiteralsEntry\032G\n" +
+      "\rLiteralsEntry\022\013\n\003key\030\001 \001(\t\022%\n\005value\030\002 \001" +
+      "(\0132\026.flyteidl.core.Literal:\0028\001\"E\n\025Bindin" +
+      "gDataCollection\022,\n\010bindings\030\001 \003(\0132\032.flyt" +
+      "eidl.core.BindingData\"\234\001\n\016BindingDataMap" +
+      "\022=\n\010bindings\030\001 \003(\0132+.flyteidl.core.Bindi" +
+      "ngDataMap.BindingsEntry\032K\n\rBindingsEntry" +
+      "\022\013\n\003key\030\001 \001(\t\022)\n\005value\030\002 \001(\0132\032.flyteidl." +
+      "core.BindingData:\0028\001\";\n\tUnionInfo\022.\n\ntar" +
+      "getType\030\001 \001(\0132\032.flyteidl.core.LiteralTyp" +
+      "e\"\205\002\n\013BindingData\022\'\n\006scalar\030\001 \001(\0132\025.flyt" +
+      "eidl.core.ScalarH\000\022:\n\ncollection\030\002 \001(\0132$" +
+      ".flyteidl.core.BindingDataCollectionH\000\0221" +
+      "\n\007promise\030\003 \001(\0132\036.flyteidl.core.OutputRe" +
+      "ferenceH\000\022,\n\003map\030\004 \001(\0132\035.flyteidl.core.B" +
+      "indingDataMapH\000\022\'\n\005union\030\005 \001(\0132\030.flyteid" +
+      "l.core.UnionInfoB\007\n\005value\"C\n\007Binding\022\013\n\003" +
+      "var\030\001 \001(\t\022+\n\007binding\030\002 \001(\0132\032.flyteidl.co" +
+      "re.BindingData\"*\n\014KeyValuePair\022\013\n\003key\030\001 " +
+      "\001(\t\022\r\n\005value\030\002 \001(\t\" \n\rRetryStrategy\022\017\n\007r" +
+      "etries\030\005 \001(\rB<Z:github.com/flyteorg/flyt" +
+      "e/flyteidl/gen/pb-go/flyteidl/coreb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18616,7 +19000,13 @@ public final class Literals {
     internal_static_flyteidl_core_Literal_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Literal_descriptor,
-        new java.lang.String[] { "Scalar", "Collection", "Map", "Hash", "Value", });
+        new java.lang.String[] { "Scalar", "Collection", "Map", "Hash", "Metadata", "Value", });
+    internal_static_flyteidl_core_Literal_MetadataEntry_descriptor =
+      internal_static_flyteidl_core_Literal_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_core_Literal_MetadataEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_Literal_MetadataEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_LiteralCollection_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_core_LiteralCollection_fieldAccessorTable = new
