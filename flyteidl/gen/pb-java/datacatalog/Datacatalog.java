@@ -10339,7 +10339,7 @@ public final class Datacatalog {
 
     /**
      * <pre>
-     * Update task execution metadata when overwriting cache
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
      * </pre>
      *
      * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -10347,7 +10347,7 @@ public final class Datacatalog {
     boolean hasMetadata();
     /**
      * <pre>
-     * Update task execution metadata when overwriting cache
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
      * </pre>
      *
      * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -10355,7 +10355,7 @@ public final class Datacatalog {
     datacatalog.Datacatalog.Metadata getMetadata();
     /**
      * <pre>
-     * Update task execution metadata when overwriting cache
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
      * </pre>
      *
      * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -10712,7 +10712,7 @@ public final class Datacatalog {
     private datacatalog.Datacatalog.Metadata metadata_;
     /**
      * <pre>
-     * Update task execution metadata when overwriting cache
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
      * </pre>
      *
      * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -10722,7 +10722,7 @@ public final class Datacatalog {
     }
     /**
      * <pre>
-     * Update task execution metadata when overwriting cache
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
      * </pre>
      *
      * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -10732,7 +10732,7 @@ public final class Datacatalog {
     }
     /**
      * <pre>
-     * Update task execution metadata when overwriting cache
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
      * </pre>
      *
      * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11875,7 +11875,7 @@ public final class Datacatalog {
           datacatalog.Datacatalog.Metadata, datacatalog.Datacatalog.Metadata.Builder, datacatalog.Datacatalog.MetadataOrBuilder> metadataBuilder_;
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11885,7 +11885,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11899,7 +11899,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11919,7 +11919,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11937,7 +11937,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11959,7 +11959,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11977,7 +11977,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -11989,7 +11989,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
@@ -12004,7 +12004,7 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Update task execution metadata when overwriting cache
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
        * </pre>
        *
        * <code>.datacatalog.Metadata metadata = 5;</code>
