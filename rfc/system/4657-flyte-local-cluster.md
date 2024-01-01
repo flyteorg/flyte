@@ -2,22 +2,27 @@
 
 **Authors:**
 
-- @pingsutw
-- @Future-Outlier
-
+- [@pingsutw](https://github.com/pingsutw)
+- [@Future-Outlier](https://github.com/Future-Outlier)
 
 ## 1 Executive Summary
 
+Flyte can support sandbox mode and single binary mode now.
+We want to support local cluster mode, which won't start kubernetes when using flyte.
+This aims to simplify the setup and use of Flyte for users who prefer or require a more localized environment.
 
 ## 2 Motivation
 
-*What motivates this proposal, and why is it important?*
-
-*Here, we aim to get comfortable articulating the value of our actions.*
+Currently, lots of companies deploy flyte in sandbox mode, which needs to run thekubernetes cluster.
+However, there are companies want to deploy flyte without using kubernetes, so we want to propose a solution to run all components in local cluster, previously in kubernetes cluster. 
 
 ## 3 Proposed Implementation
 
-*This is the core of your proposal, and its purpose is to help you think through the problem because [writing is thinking](https://medium.learningbyshipping.com/writing-is-thinking-an-annotated-twitter-thread-2a75fe07fade).*
+There 3 mainly component in the kubernetes cluster we need to change it in flyte.
+
+* Change database from postegres SQL to sqlite
+* Change file system from minio and stow to local file system
+* Change runtime from Kubernetes to Process
 
 *Consider:*
 
@@ -31,26 +36,24 @@
 
 ## 5 Drawbacks
 
-*Are there any reasons why we should not do this? Here we aim to evaluate risk and check ourselves.*
+* There are other priorities to be completed first
+* Add the cost of maintaining flyte
 
 ## 6 Alternatives
 
-*What are other ways of achieving the same outcome?*
+Use sandbox and single binary mode only.
 
 ## 7 Potential Impact and Dependencies
 
-*Here, we aim to be mindful of our environment and generate empathy towards others who may be impacted by our decisions.*
-
-- *What other systems or teams are affected by this proposal?*
-- *How could this be exploited by malicious attackers?*
+We need to pay attention on how to overwrite functions so that it can work properly as single binary mode.
 
 ## 8 Unresolved questions
 
-*What parts of the proposal are still being defined or not covered by this proposal?*
+* Should local cluster mode have flyte console?
 
 ## 9 Conclusion
 
-*Here, we briefly outline why this is the right decision to make at this time and move forward!*
+* Flyte local cluster mode can help companies to deploy flyte without using kubernetes, which is far more easier than before. 
 
 ## 10 RFC Process Guide, remove this section when done
 
