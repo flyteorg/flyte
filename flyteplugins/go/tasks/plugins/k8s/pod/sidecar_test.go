@@ -230,16 +230,9 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
-		Value:    "dedicated",
-		Operator: v1.TolerationOpExists,
-		Effect:   v1.TaintEffectNoSchedule,
-	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
-			ResourceNvidiaGPU:  {tolGPU},
+			ResourceNvidiaGPU: {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
@@ -340,16 +333,9 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
-		Value:    "dedicated",
-		Operator: v1.TolerationOpExists,
-		Effect:   v1.TaintEffectNoSchedule,
-	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
-			ResourceNvidiaGPU:  {tolGPU},
+			ResourceNvidiaGPU: {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
@@ -413,8 +399,7 @@ func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
 
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {},
-			ResourceNvidiaGPU:  {},
+			ResourceNvidiaGPU: {},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
@@ -457,16 +442,9 @@ func TestBuildSidecarResource(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
-		Value:    "dedicated",
-		Operator: v1.TolerationOpExists,
-		Effect:   v1.TaintEffectNoSchedule,
-	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
-			ResourceNvidiaGPU:  {tolGPU},
+			ResourceNvidiaGPU: {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),

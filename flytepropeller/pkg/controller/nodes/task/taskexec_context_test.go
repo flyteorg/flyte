@@ -381,14 +381,12 @@ func TestConvertTaskResourcesToRequirements(t *testing.T) {
 			CPU:              resource.MustParse("1"),
 			Memory:           resource.MustParse("2"),
 			EphemeralStorage: resource.MustParse("3"),
-			Storage:          resource.MustParse("4"),
 			GPU:              resource.MustParse("5"),
 		},
 		Limits: v1alpha1.TaskResourceSpec{
 			CPU:              resource.MustParse("10"),
 			Memory:           resource.MustParse("20"),
 			EphemeralStorage: resource.MustParse("30"),
-			Storage:          resource.MustParse("40"),
 			GPU:              resource.MustParse("50"),
 		},
 	})
@@ -397,14 +395,12 @@ func TestConvertTaskResourcesToRequirements(t *testing.T) {
 			corev1.ResourceCPU:              resource.MustParse("1"),
 			corev1.ResourceMemory:           resource.MustParse("2"),
 			corev1.ResourceEphemeralStorage: resource.MustParse("3"),
-			corev1.ResourceStorage:          resource.MustParse("4"),
 			utils.ResourceNvidiaGPU:         resource.MustParse("5"),
 		},
 		Limits: corev1.ResourceList{
 			corev1.ResourceCPU:              resource.MustParse("10"),
 			corev1.ResourceMemory:           resource.MustParse("20"),
 			corev1.ResourceEphemeralStorage: resource.MustParse("30"),
-			corev1.ResourceStorage:          resource.MustParse("40"),
 			utils.ResourceNvidiaGPU:         resource.MustParse("50"),
 		},
 	}, resourceRequirements)

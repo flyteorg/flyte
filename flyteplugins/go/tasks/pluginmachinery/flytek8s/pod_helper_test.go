@@ -693,12 +693,10 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 func updatePod(t *testing.T) {
 	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
+			v1.ResourceCPU: resource.MustParse("1024m"),
 		},
 		Requests: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
+			v1.ResourceCPU: resource.MustParse("1024m"),
 		},
 	}, nil)
 
@@ -809,13 +807,11 @@ func toK8sPodInterruptible(t *testing.T) {
 
 	x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
-			ResourceNvidiaGPU:  resource.MustParse("1"),
+			v1.ResourceCPU:    resource.MustParse("1024m"),
+			ResourceNvidiaGPU: resource.MustParse("1"),
 		},
 		Requests: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
+			v1.ResourceCPU: resource.MustParse("1024m"),
 		},
 	}, nil)
 
@@ -853,17 +849,9 @@ func TestToK8sPod(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
-		Value:    "dedicated",
-		Operator: v1.TolerationOpExists,
-		Effect:   v1.TaintEffectNoSchedule,
-	}
-
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
-			ResourceNvidiaGPU:  {tolGPU},
+			ResourceNvidiaGPU: {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
@@ -876,13 +864,11 @@ func TestToK8sPod(t *testing.T) {
 	t.Run("WithGPU", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Limits: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
-				ResourceNvidiaGPU:  resource.MustParse("1"),
+				v1.ResourceCPU:    resource.MustParse("1024m"),
+				ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 			Requests: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU: resource.MustParse("1024m"),
 			},
 		}, nil)
 
@@ -894,12 +880,10 @@ func TestToK8sPod(t *testing.T) {
 	t.Run("NoGPU", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Limits: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU: resource.MustParse("1024m"),
 			},
 			Requests: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU: resource.MustParse("1024m"),
 			},
 		}, nil)
 
@@ -912,12 +896,10 @@ func TestToK8sPod(t *testing.T) {
 	t.Run("Default toleration, selector, scheduler", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Limits: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU: resource.MustParse("1024m"),
 			},
 			Requests: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU: resource.MustParse("1024m"),
 			},
 		}, nil)
 
