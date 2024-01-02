@@ -693,10 +693,12 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 func updatePod(t *testing.T) {
 	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			v1.ResourceCPU: resource.MustParse("1024m"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
 		Requests: v1.ResourceList{
-			v1.ResourceCPU: resource.MustParse("1024m"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
 	}, nil)
 
@@ -807,11 +809,13 @@ func toK8sPodInterruptible(t *testing.T) {
 
 	x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			v1.ResourceCPU:    resource.MustParse("1024m"),
-			ResourceNvidiaGPU: resource.MustParse("1"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+			ResourceNvidiaGPU:           resource.MustParse("1"),
 		},
 		Requests: v1.ResourceList{
-			v1.ResourceCPU: resource.MustParse("1024m"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
 	}, nil)
 
@@ -849,9 +853,17 @@ func TestToK8sPod(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
+		Value:    "dedicated",
+		Operator: v1.TolerationOpExists,
+		Effect:   v1.TaintEffectNoSchedule,
+	}
+
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			ResourceNvidiaGPU: {tolGPU},
+			v1.ResourceEphemeralStorage: {tolEphemeralStorage},
+			ResourceNvidiaGPU:           {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
@@ -864,42 +876,48 @@ func TestToK8sPod(t *testing.T) {
 	t.Run("WithGPU", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Limits: v1.ResourceList{
-				v1.ResourceCPU:    resource.MustParse("1024m"),
-				ResourceNvidiaGPU: resource.MustParse("1"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+				ResourceNvidiaGPU:           resource.MustParse("1"),
 			},
 			Requests: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+			},
+		}, nil)
+
+		p, _, _, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.Equal(t, len(p.Tolerations), 2)
+	})
+
+	t.Run("NoGPU", func(t *testing.T) {
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
+			Limits: v1.ResourceList{
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+			},
+			Requests: v1.ResourceList{
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
 		}, nil)
 
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 1)
-	})
-
-	t.Run("NoGPU", func(t *testing.T) {
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
-			Limits: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
-			},
-			Requests: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
-			},
-		}, nil)
-
-		p, _, _, err := ToK8sPodSpec(ctx, x)
-		assert.NoError(t, err)
-		assert.Equal(t, len(p.Tolerations), 0)
 		assert.Equal(t, "some-acceptable-name", p.Containers[0].Name)
 	})
 
 	t.Run("Default toleration, selector, scheduler", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Limits: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
 			Requests: v1.ResourceList{
-				v1.ResourceCPU: resource.MustParse("1024m"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
 		}, nil)
 

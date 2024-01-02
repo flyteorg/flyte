@@ -205,6 +205,9 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 			assert.NotEmpty(t, j.Spec.Containers)
 			assert.Equal(t, containerResourceRequirements.Limits[v1.ResourceCPU], j.Spec.Containers[0].Resources.Limits[v1.ResourceCPU])
 
+			ephemeralStorageRes := j.Spec.Containers[0].Resources.Limits[v1.ResourceEphemeralStorage]
+			assert.Equal(t, int64(0), (&ephemeralStorageRes).Value())
+
 			assert.Equal(t, command, j.Spec.Containers[0].Command)
 			assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
 
