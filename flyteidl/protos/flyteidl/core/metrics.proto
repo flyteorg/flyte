@@ -34,3 +34,32 @@ message Span {
     // spans defines a collection of Spans that breakdown this execution.
     repeated Span spans = 7;
 }
+
+enum ExecutionMetric {
+    EXECUTION_METRIC_UNDEFINED = 0;
+
+    // Memory metrics
+
+    // Average memory usage, measured in bytes
+    EXECUTION_METRIC_USED_MEMORY_BYTES_AVG = 1;
+    // Average memory allocation, measured in bytes
+    EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG = 2;
+
+    // CPU metrics
+    // Average CPU usage, measured in CPU cores
+    EXECUTION_METRIC_USED_CPU_AVG = 20;
+    // Average CPU allocation, measured in CPU cores
+    EXECUTION_METRIC_ALLOCATED_CPU_AVG = 21;
+}
+
+message ExecutionMetricResult {
+    // The metric this data represents
+    ExecutionMetric metric = 1;
+
+    // The result data in prometheus range query result format
+    // https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+    // This may include multiple time series, differentiated by their metric labels.
+    // Start time is greater of (execution attempt start, 48h ago)
+    // End time is lesser of (execution attempt end, now)
+    google.protobuf.Struct data = 2;
+}

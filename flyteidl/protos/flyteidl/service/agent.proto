@@ -5,6 +5,9 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/servi
 
 import "google/api/annotations.proto";
 import "flyteidl/admin/agent.proto";
+import "flyteidl/core/identifier.proto";
+import "flyteidl/core/metrics.proto";
+import "validate/validate.proto";
 
 // AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
 service AsyncAgentService {
@@ -32,4 +35,20 @@ service AgentMetadataService {
       get: "/api/v1/agents"
     };
   };
+}
+
+message GetTaskExecutionMetricsRequest {
+  // The task execution attempt to query
+  core.TaskExecutionIdentifier id = 1 [(validate.rules).message.required = true];
+  // The metrics to query. If empty, will return a default set of metrics
+  repeated core.ExecutionMetric metrics = 2 [(validate.rules).repeated.unique = true];
+  // Used for fetching sub task level metrics . eg in case of map task
+  uint32 subtask_index = 3;
+  // Retry attempt of the subtask.
+  uint32 subtask_retry_attempt = 4;
+}
+
+message GetTaskExecutionMetricsResponse {
+  // The execution metric results
+  repeated core.ExecutionMetricResult results = 1;
 }
