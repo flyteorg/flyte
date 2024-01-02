@@ -124,8 +124,7 @@ func span(sd tracesdk.ReadOnlySpan) *tracepb.Span {
 	}
 
 	if psid := sd.Parent().SpanID(); psid.IsValid() {
-		//s.ParentSpanId = psid[:]
-		s.ParentSpanId = []byte(psid.String())
+		s.ParentSpanId = psid[:]
 	}
 
 	return s

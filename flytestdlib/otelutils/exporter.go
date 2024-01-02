@@ -90,7 +90,6 @@ func (e *Exporter) ExportSpans(ctx context.Context, spans []trace.ReadOnlySpan) 
 	parentSpanIDs := parentSpanIDRegexp.FindAllStringSubmatch(msg, -1)
 	e.mapUniqueIDs(parentSpanIDs, uniqueIDs, 16)
 
-	// TODO @hamersaw - parentSpanIds are not matching up with spanIds, need to figure out why
 	// TODO @hamersaw - gorm migrations are not working from formatting - ex `FROM \"migrations\"`
 
 	for id, hexID := range uniqueIDs {
