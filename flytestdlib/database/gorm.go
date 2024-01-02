@@ -37,7 +37,10 @@ func GetGormLogger(ctx context.Context, logConfig *logger.Config) gormLogger.Int
 		logLevel = gormLogger.Info
 		ignoreRecordNotFoundError = false
 	default:
-		logLevel = gormLogger.Silent
+		logLevel = gormLogger.Info
+	}
+	if logConfigLevel > logger.DebugLevel {
+		logLevel = gormLogger.Info
 	}
 	// Copied from gormLogger.Default initialization. The gormLogger interface only allows modifying the LogLevel
 	// and not IgnoreRecordNotFoundError.
