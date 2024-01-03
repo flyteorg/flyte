@@ -11,5 +11,7 @@ import (
 // in flyteidl
 type ReservationManager interface {
 	GetOrExtendReservation(context.Context, *datacatalog.GetOrExtendReservationRequest) (*datacatalog.GetOrExtendReservationResponse, error)
+	GetOrExtendReservations(context.Context, *datacatalog.GetOrExtendReservationsRequest) (*datacatalog.GetOrExtendReservationsResponse, error)
 	ReleaseReservation(context.Context, *datacatalog.ReleaseReservationRequest) (*datacatalog.ReleaseReservationResponse, error)
+	ReleaseReservations(context.Context, *datacatalog.ReleaseReservationsRequest) (*datacatalog.ReleaseReservationResponse, error)
 }

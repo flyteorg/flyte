@@ -51,7 +51,7 @@ func NewCollectedErrors(code codes.Code, errors []error) error {
 		errorCollection[idx] = err.Error()
 	}
 
-	return NewDataCatalogError(code, strings.Join((errorCollection), ", "))
+	return NewDataCatalogError(code, strings.Join(errorCollection, ", "))
 }
 
 func IsAlreadyExistsError(err error) bool {

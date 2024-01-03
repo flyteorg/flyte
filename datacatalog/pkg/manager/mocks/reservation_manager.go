@@ -56,6 +56,47 @@ func (_m *ReservationManager) GetOrExtendReservation(_a0 context.Context, _a1 *d
 	return r0, r1
 }
 
+type ReservationManager_GetOrExtendReservations struct {
+	*mock.Call
+}
+
+func (_m ReservationManager_GetOrExtendReservations) Return(_a0 *datacatalog.GetOrExtendReservationsResponse, _a1 error) *ReservationManager_GetOrExtendReservations {
+	return &ReservationManager_GetOrExtendReservations{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ReservationManager) OnGetOrExtendReservations(_a0 context.Context, _a1 *datacatalog.GetOrExtendReservationsRequest) *ReservationManager_GetOrExtendReservations {
+	c_call := _m.On("GetOrExtendReservations", _a0, _a1)
+	return &ReservationManager_GetOrExtendReservations{Call: c_call}
+}
+
+func (_m *ReservationManager) OnGetOrExtendReservationsMatch(matchers ...interface{}) *ReservationManager_GetOrExtendReservations {
+	c_call := _m.On("GetOrExtendReservations", matchers...)
+	return &ReservationManager_GetOrExtendReservations{Call: c_call}
+}
+
+// GetOrExtendReservations provides a mock function with given fields: _a0, _a1
+func (_m *ReservationManager) GetOrExtendReservations(_a0 context.Context, _a1 *datacatalog.GetOrExtendReservationsRequest) (*datacatalog.GetOrExtendReservationsResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *datacatalog.GetOrExtendReservationsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.GetOrExtendReservationsRequest) *datacatalog.GetOrExtendReservationsResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.GetOrExtendReservationsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.GetOrExtendReservationsRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type ReservationManager_ReleaseReservation struct {
 	*mock.Call
 }
@@ -89,6 +130,47 @@ func (_m *ReservationManager) ReleaseReservation(_a0 context.Context, _a1 *datac
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.ReleaseReservationRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type ReservationManager_ReleaseReservations struct {
+	*mock.Call
+}
+
+func (_m ReservationManager_ReleaseReservations) Return(_a0 *datacatalog.ReleaseReservationResponse, _a1 error) *ReservationManager_ReleaseReservations {
+	return &ReservationManager_ReleaseReservations{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ReservationManager) OnReleaseReservations(_a0 context.Context, _a1 *datacatalog.ReleaseReservationsRequest) *ReservationManager_ReleaseReservations {
+	c_call := _m.On("ReleaseReservations", _a0, _a1)
+	return &ReservationManager_ReleaseReservations{Call: c_call}
+}
+
+func (_m *ReservationManager) OnReleaseReservationsMatch(matchers ...interface{}) *ReservationManager_ReleaseReservations {
+	c_call := _m.On("ReleaseReservations", matchers...)
+	return &ReservationManager_ReleaseReservations{Call: c_call}
+}
+
+// ReleaseReservations provides a mock function with given fields: _a0, _a1
+func (_m *ReservationManager) ReleaseReservations(_a0 context.Context, _a1 *datacatalog.ReleaseReservationsRequest) (*datacatalog.ReleaseReservationResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *datacatalog.ReleaseReservationResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.ReleaseReservationsRequest) *datacatalog.ReleaseReservationResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.ReleaseReservationResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.ReleaseReservationsRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)
