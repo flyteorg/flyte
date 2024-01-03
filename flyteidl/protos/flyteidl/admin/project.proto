@@ -16,20 +16,12 @@ message Domain {
     string name  = 2;
 }
 
-message ProjectIdentifier {
-    // Globally unique project name.
-    string id = 1;
-
-    // Optional, org key applied to the resource.
-    string org = 2;
-}
-
 
 // Top-level namespace used to classify different entities like workflows and executions.
 message Project {
     // Deprecated, use identifier instead.
     // Globally unique project name.
-    string id               = 1[deprecated = true];
+    string id               = 1;
 
     // Display name.
     string name             = 2;
@@ -55,8 +47,8 @@ message Project {
     }
     ProjectState state = 6;
 
-    // Optional, org key applied to the project.
-    ProjectIdentifier identifier = 7;
+    // Optional, org key applied to the resource.
+    string org = 7;
 }
 
 // Represents a list of projects.

@@ -39354,133 +39354,6 @@
                 return Domain;
             })();
     
-            admin.ProjectIdentifier = (function() {
-    
-                /**
-                 * Properties of a ProjectIdentifier.
-                 * @memberof flyteidl.admin
-                 * @interface IProjectIdentifier
-                 * @property {string|null} [id] ProjectIdentifier id
-                 * @property {string|null} [org] ProjectIdentifier org
-                 */
-    
-                /**
-                 * Constructs a new ProjectIdentifier.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents a ProjectIdentifier.
-                 * @implements IProjectIdentifier
-                 * @constructor
-                 * @param {flyteidl.admin.IProjectIdentifier=} [properties] Properties to set
-                 */
-                function ProjectIdentifier(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ProjectIdentifier id.
-                 * @member {string} id
-                 * @memberof flyteidl.admin.ProjectIdentifier
-                 * @instance
-                 */
-                ProjectIdentifier.prototype.id = "";
-    
-                /**
-                 * ProjectIdentifier org.
-                 * @member {string} org
-                 * @memberof flyteidl.admin.ProjectIdentifier
-                 * @instance
-                 */
-                ProjectIdentifier.prototype.org = "";
-    
-                /**
-                 * Creates a new ProjectIdentifier instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.ProjectIdentifier
-                 * @static
-                 * @param {flyteidl.admin.IProjectIdentifier=} [properties] Properties to set
-                 * @returns {flyteidl.admin.ProjectIdentifier} ProjectIdentifier instance
-                 */
-                ProjectIdentifier.create = function create(properties) {
-                    return new ProjectIdentifier(properties);
-                };
-    
-                /**
-                 * Encodes the specified ProjectIdentifier message. Does not implicitly {@link flyteidl.admin.ProjectIdentifier.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.ProjectIdentifier
-                 * @static
-                 * @param {flyteidl.admin.IProjectIdentifier} message ProjectIdentifier message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ProjectIdentifier.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a ProjectIdentifier message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.ProjectIdentifier
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.ProjectIdentifier} ProjectIdentifier
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ProjectIdentifier.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectIdentifier();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.id = reader.string();
-                            break;
-                        case 2:
-                            message.org = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a ProjectIdentifier message.
-                 * @function verify
-                 * @memberof flyteidl.admin.ProjectIdentifier
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ProjectIdentifier.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.id != null && message.hasOwnProperty("id"))
-                        if (!$util.isString(message.id))
-                            return "id: string expected";
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        if (!$util.isString(message.org))
-                            return "org: string expected";
-                    return null;
-                };
-    
-                return ProjectIdentifier;
-            })();
-    
             admin.Project = (function() {
     
                 /**
@@ -39493,7 +39366,7 @@
                  * @property {string|null} [description] Project description
                  * @property {flyteidl.admin.ILabels|null} [labels] Project labels
                  * @property {flyteidl.admin.Project.ProjectState|null} [state] Project state
-                 * @property {flyteidl.admin.IProjectIdentifier|null} [identifier] Project identifier
+                 * @property {string|null} [org] Project org
                  */
     
                 /**
@@ -39561,12 +39434,12 @@
                 Project.prototype.state = 0;
     
                 /**
-                 * Project identifier.
-                 * @member {flyteidl.admin.IProjectIdentifier|null|undefined} identifier
+                 * Project org.
+                 * @member {string} org
                  * @memberof flyteidl.admin.Project
                  * @instance
                  */
-                Project.prototype.identifier = null;
+                Project.prototype.org = "";
     
                 /**
                  * Creates a new Project instance using the specified properties.
@@ -39605,8 +39478,8 @@
                         $root.flyteidl.admin.Labels.encode(message.labels, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     if (message.state != null && message.hasOwnProperty("state"))
                         writer.uint32(/* id 6, wireType 0 =*/48).int32(message.state);
-                    if (message.identifier != null && message.hasOwnProperty("identifier"))
-                        $root.flyteidl.admin.ProjectIdentifier.encode(message.identifier, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 7, wireType 2 =*/58).string(message.org);
                     return writer;
                 };
     
@@ -39649,7 +39522,7 @@
                             message.state = reader.int32();
                             break;
                         case 7:
-                            message.identifier = $root.flyteidl.admin.ProjectIdentifier.decode(reader, reader.uint32());
+                            message.org = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -39702,11 +39575,9 @@
                         case 2:
                             break;
                         }
-                    if (message.identifier != null && message.hasOwnProperty("identifier")) {
-                        var error = $root.flyteidl.admin.ProjectIdentifier.verify(message.identifier);
-                        if (error)
-                            return "identifier." + error;
-                    }
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
                     return null;
                 };
     

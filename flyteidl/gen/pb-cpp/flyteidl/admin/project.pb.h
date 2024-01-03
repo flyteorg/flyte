@@ -43,7 +43,7 @@ struct TableStruct_flyteidl_2fadmin_2fproject_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[8]
+  static const ::google::protobuf::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -58,9 +58,6 @@ extern DomainDefaultTypeInternal _Domain_default_instance_;
 class Project;
 class ProjectDefaultTypeInternal;
 extern ProjectDefaultTypeInternal _Project_default_instance_;
-class ProjectIdentifier;
-class ProjectIdentifierDefaultTypeInternal;
-extern ProjectIdentifierDefaultTypeInternal _ProjectIdentifier_default_instance_;
 class ProjectListRequest;
 class ProjectListRequestDefaultTypeInternal;
 extern ProjectListRequestDefaultTypeInternal _ProjectListRequest_default_instance_;
@@ -82,7 +79,6 @@ namespace google {
 namespace protobuf {
 template<> ::flyteidl::admin::Domain* Arena::CreateMaybeMessage<::flyteidl::admin::Domain>(Arena*);
 template<> ::flyteidl::admin::Project* Arena::CreateMaybeMessage<::flyteidl::admin::Project>(Arena*);
-template<> ::flyteidl::admin::ProjectIdentifier* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectIdentifier>(Arena*);
 template<> ::flyteidl::admin::ProjectListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectListRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectRegisterRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectRegisterRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectRegisterResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectRegisterResponse>(Arena*);
@@ -252,141 +248,6 @@ class Domain final :
 };
 // -------------------------------------------------------------------
 
-class ProjectIdentifier final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectIdentifier) */ {
- public:
-  ProjectIdentifier();
-  virtual ~ProjectIdentifier();
-
-  ProjectIdentifier(const ProjectIdentifier& from);
-
-  inline ProjectIdentifier& operator=(const ProjectIdentifier& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  ProjectIdentifier(ProjectIdentifier&& from) noexcept
-    : ProjectIdentifier() {
-    *this = ::std::move(from);
-  }
-
-  inline ProjectIdentifier& operator=(ProjectIdentifier&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const ProjectIdentifier& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const ProjectIdentifier* internal_default_instance() {
-    return reinterpret_cast<const ProjectIdentifier*>(
-               &_ProjectIdentifier_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    1;
-
-  void Swap(ProjectIdentifier* other);
-  friend void swap(ProjectIdentifier& a, ProjectIdentifier& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline ProjectIdentifier* New() const final {
-    return CreateMaybeMessage<ProjectIdentifier>(nullptr);
-  }
-
-  ProjectIdentifier* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<ProjectIdentifier>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const ProjectIdentifier& from);
-  void MergeFrom(const ProjectIdentifier& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(ProjectIdentifier* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // string id = 1;
-  void clear_id();
-  static const int kIdFieldNumber = 1;
-  const ::std::string& id() const;
-  void set_id(const ::std::string& value);
-  #if LANG_CXX11
-  void set_id(::std::string&& value);
-  #endif
-  void set_id(const char* value);
-  void set_id(const char* value, size_t size);
-  ::std::string* mutable_id();
-  ::std::string* release_id();
-  void set_allocated_id(::std::string* id);
-
-  // string org = 2;
-  void clear_org();
-  static const int kOrgFieldNumber = 2;
-  const ::std::string& org() const;
-  void set_org(const ::std::string& value);
-  #if LANG_CXX11
-  void set_org(::std::string&& value);
-  #endif
-  void set_org(const char* value);
-  void set_org(const char* value, size_t size);
-  ::std::string* mutable_org();
-  ::std::string* release_org();
-  void set_allocated_org(::std::string* org);
-
-  // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectIdentifier)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr id_;
-  ::google::protobuf::internal::ArenaStringPtr org_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
-};
-// -------------------------------------------------------------------
-
 class Project final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.Project) */ {
  public:
@@ -425,7 +286,7 @@ class Project final :
                &_Project_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    1;
 
   void Swap(Project* other);
   friend void swap(Project& a, Project& b) {
@@ -522,19 +383,19 @@ class Project final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::admin::Domain >&
       domains() const;
 
-  // string id = 1 [deprecated = true];
-  PROTOBUF_DEPRECATED void clear_id();
-  PROTOBUF_DEPRECATED static const int kIdFieldNumber = 1;
-  PROTOBUF_DEPRECATED const ::std::string& id() const;
-  PROTOBUF_DEPRECATED void set_id(const ::std::string& value);
+  // string id = 1;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::std::string& id() const;
+  void set_id(const ::std::string& value);
   #if LANG_CXX11
-  PROTOBUF_DEPRECATED void set_id(::std::string&& value);
+  void set_id(::std::string&& value);
   #endif
-  PROTOBUF_DEPRECATED void set_id(const char* value);
-  PROTOBUF_DEPRECATED void set_id(const char* value, size_t size);
-  PROTOBUF_DEPRECATED ::std::string* mutable_id();
-  PROTOBUF_DEPRECATED ::std::string* release_id();
-  PROTOBUF_DEPRECATED void set_allocated_id(::std::string* id);
+  void set_id(const char* value);
+  void set_id(const char* value, size_t size);
+  ::std::string* mutable_id();
+  ::std::string* release_id();
+  void set_allocated_id(::std::string* id);
 
   // string name = 2;
   void clear_name();
@@ -564,6 +425,20 @@ class Project final :
   ::std::string* release_description();
   void set_allocated_description(::std::string* description);
 
+  // string org = 7;
+  void clear_org();
+  static const int kOrgFieldNumber = 7;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.Labels labels = 5;
   bool has_labels() const;
   void clear_labels();
@@ -572,15 +447,6 @@ class Project final :
   ::flyteidl::admin::Labels* release_labels();
   ::flyteidl::admin::Labels* mutable_labels();
   void set_allocated_labels(::flyteidl::admin::Labels* labels);
-
-  // .flyteidl.admin.ProjectIdentifier identifier = 7;
-  bool has_identifier() const;
-  void clear_identifier();
-  static const int kIdentifierFieldNumber = 7;
-  const ::flyteidl::admin::ProjectIdentifier& identifier() const;
-  ::flyteidl::admin::ProjectIdentifier* release_identifier();
-  ::flyteidl::admin::ProjectIdentifier* mutable_identifier();
-  void set_allocated_identifier(::flyteidl::admin::ProjectIdentifier* identifier);
 
   // .flyteidl.admin.Project.ProjectState state = 6;
   void clear_state();
@@ -597,8 +463,8 @@ class Project final :
   ::google::protobuf::internal::ArenaStringPtr id_;
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::internal::ArenaStringPtr description_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   ::flyteidl::admin::Labels* labels_;
-  ::flyteidl::admin::ProjectIdentifier* identifier_;
   int state_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
@@ -643,7 +509,7 @@ class Projects final :
                &_Projects_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    2;
 
   void Swap(Projects* other);
   friend void swap(Projects& a, Projects& b) {
@@ -776,7 +642,7 @@ class ProjectListRequest final :
                &_ProjectListRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    3;
 
   void Swap(ProjectListRequest* other);
   friend void swap(ProjectListRequest& a, ProjectListRequest& b) {
@@ -928,7 +794,7 @@ class ProjectRegisterRequest final :
                &_ProjectRegisterRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    4;
 
   void Swap(ProjectRegisterRequest* other);
   friend void swap(ProjectRegisterRequest& a, ProjectRegisterRequest& b) {
@@ -1043,7 +909,7 @@ class ProjectRegisterResponse final :
                &_ProjectRegisterResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    5;
 
   void Swap(ProjectRegisterResponse* other);
   friend void swap(ProjectRegisterResponse& a, ProjectRegisterResponse& b) {
@@ -1148,7 +1014,7 @@ class ProjectUpdateResponse final :
                &_ProjectUpdateResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    6;
 
   void Swap(ProjectUpdateResponse* other);
   friend void swap(ProjectUpdateResponse& a, ProjectUpdateResponse& b) {
@@ -1332,119 +1198,9 @@ inline void Domain::set_allocated_name(::std::string* name) {
 
 // -------------------------------------------------------------------
 
-// ProjectIdentifier
-
-// string id = 1;
-inline void ProjectIdentifier::clear_id() {
-  id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& ProjectIdentifier::id() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectIdentifier.id)
-  return id_.GetNoArena();
-}
-inline void ProjectIdentifier::set_id(const ::std::string& value) {
-  
-  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectIdentifier.id)
-}
-#if LANG_CXX11
-inline void ProjectIdentifier::set_id(::std::string&& value) {
-  
-  id_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectIdentifier.id)
-}
-#endif
-inline void ProjectIdentifier::set_id(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectIdentifier.id)
-}
-inline void ProjectIdentifier::set_id(const char* value, size_t size) {
-  
-  id_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectIdentifier.id)
-}
-inline ::std::string* ProjectIdentifier::mutable_id() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectIdentifier.id)
-  return id_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ProjectIdentifier::release_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectIdentifier.id)
-  
-  return id_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ProjectIdentifier::set_allocated_id(::std::string* id) {
-  if (id != nullptr) {
-    
-  } else {
-    
-  }
-  id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), id);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectIdentifier.id)
-}
-
-// string org = 2;
-inline void ProjectIdentifier::clear_org() {
-  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& ProjectIdentifier::org() const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectIdentifier.org)
-  return org_.GetNoArena();
-}
-inline void ProjectIdentifier::set_org(const ::std::string& value) {
-  
-  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectIdentifier.org)
-}
-#if LANG_CXX11
-inline void ProjectIdentifier::set_org(::std::string&& value) {
-  
-  org_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectIdentifier.org)
-}
-#endif
-inline void ProjectIdentifier::set_org(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectIdentifier.org)
-}
-inline void ProjectIdentifier::set_org(const char* value, size_t size) {
-  
-  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectIdentifier.org)
-}
-inline ::std::string* ProjectIdentifier::mutable_org() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectIdentifier.org)
-  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ProjectIdentifier::release_org() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectIdentifier.org)
-  
-  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ProjectIdentifier::set_allocated_org(::std::string* org) {
-  if (org != nullptr) {
-    
-  } else {
-    
-  }
-  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectIdentifier.org)
-}
-
-// -------------------------------------------------------------------
-
 // Project
 
-// string id = 1 [deprecated = true];
+// string id = 1;
 inline void Project::clear_id() {
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1692,55 +1448,57 @@ inline void Project::set_state(::flyteidl::admin::Project_ProjectState value) {
   // @@protoc_insertion_point(field_set:flyteidl.admin.Project.state)
 }
 
-// .flyteidl.admin.ProjectIdentifier identifier = 7;
-inline bool Project::has_identifier() const {
-  return this != internal_default_instance() && identifier_ != nullptr;
+// string org = 7;
+inline void Project::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline void Project::clear_identifier() {
-  if (GetArenaNoVirtual() == nullptr && identifier_ != nullptr) {
-    delete identifier_;
-  }
-  identifier_ = nullptr;
+inline const ::std::string& Project::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Project.org)
+  return org_.GetNoArena();
 }
-inline const ::flyteidl::admin::ProjectIdentifier& Project::identifier() const {
-  const ::flyteidl::admin::ProjectIdentifier* p = identifier_;
-  // @@protoc_insertion_point(field_get:flyteidl.admin.Project.identifier)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::ProjectIdentifier*>(
-      &::flyteidl::admin::_ProjectIdentifier_default_instance_);
-}
-inline ::flyteidl::admin::ProjectIdentifier* Project::release_identifier() {
-  // @@protoc_insertion_point(field_release:flyteidl.admin.Project.identifier)
+inline void Project::set_org(const ::std::string& value) {
   
-  ::flyteidl::admin::ProjectIdentifier* temp = identifier_;
-  identifier_ = nullptr;
-  return temp;
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Project.org)
 }
-inline ::flyteidl::admin::ProjectIdentifier* Project::mutable_identifier() {
+#if LANG_CXX11
+inline void Project::set_org(::std::string&& value) {
   
-  if (identifier_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::admin::ProjectIdentifier>(GetArenaNoVirtual());
-    identifier_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Project.identifier)
-  return identifier_;
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.Project.org)
 }
-inline void Project::set_allocated_identifier(::flyteidl::admin::ProjectIdentifier* identifier) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete identifier_;
-  }
-  if (identifier) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      identifier = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, identifier, submessage_arena);
-    }
+#endif
+inline void Project::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.Project.org)
+}
+inline void Project::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.Project.org)
+}
+inline ::std::string* Project::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.Project.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Project::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.Project.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Project::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
     
   } else {
     
   }
-  identifier_ = identifier;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Project.identifier)
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.Project.org)
 }
 
 // -------------------------------------------------------------------
@@ -2065,8 +1823,6 @@ inline void ProjectRegisterRequest::set_allocated_project(::flyteidl::admin::Pro
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

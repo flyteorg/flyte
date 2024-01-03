@@ -2247,23 +2247,12 @@ pub struct Domain {
     #[prost(string, tag="2")]
     pub name: ::prost::alloc::string::String,
 }
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ProjectIdentifier {
-    /// Globally unique project name.
-    #[prost(string, tag="1")]
-    pub id: ::prost::alloc::string::String,
-    /// Optional, org key applied to the resource.
-    #[prost(string, tag="2")]
-    pub org: ::prost::alloc::string::String,
-}
 /// Top-level namespace used to classify different entities like workflows and executions.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Project {
     /// Deprecated, use identifier instead.
     /// Globally unique project name.
-    #[deprecated]
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,
     /// Display name.
@@ -2279,9 +2268,9 @@ pub struct Project {
     pub labels: ::core::option::Option<Labels>,
     #[prost(enumeration="project::ProjectState", tag="6")]
     pub state: i32,
-    /// Optional, org key applied to the project.
-    #[prost(message, optional, tag="7")]
-    pub identifier: ::core::option::Option<ProjectIdentifier>,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="7")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `Project`.
 pub mod project {

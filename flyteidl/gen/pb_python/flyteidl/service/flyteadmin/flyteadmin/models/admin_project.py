@@ -18,7 +18,6 @@ import six
 
 from flyteadmin.models.admin_domain import AdminDomain  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
-from flyteadmin.models.admin_project_identifier import AdminProjectIdentifier  # noqa: F401,E501
 from flyteadmin.models.project_project_state import ProjectProjectState  # noqa: F401,E501
 
 
@@ -42,7 +41,7 @@ class AdminProject(object):
         'description': 'str',
         'labels': 'AdminLabels',
         'state': 'ProjectProjectState',
-        'identifier': 'AdminProjectIdentifier'
+        'org': 'str'
     }
 
     attribute_map = {
@@ -52,10 +51,10 @@ class AdminProject(object):
         'description': 'description',
         'labels': 'labels',
         'state': 'state',
-        'identifier': 'identifier'
+        'org': 'org'
     }
 
-    def __init__(self, id=None, name=None, domains=None, description=None, labels=None, state=None, identifier=None):  # noqa: E501
+    def __init__(self, id=None, name=None, domains=None, description=None, labels=None, state=None, org=None):  # noqa: E501
         """AdminProject - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -64,7 +63,7 @@ class AdminProject(object):
         self._description = None
         self._labels = None
         self._state = None
-        self._identifier = None
+        self._org = None
         self.discriminator = None
 
         if id is not None:
@@ -79,8 +78,8 @@ class AdminProject(object):
             self.labels = labels
         if state is not None:
             self.state = state
-        if identifier is not None:
-            self.identifier = identifier
+        if org is not None:
+            self.org = org
 
     @property
     def id(self):
@@ -215,27 +214,27 @@ class AdminProject(object):
         self._state = state
 
     @property
-    def identifier(self):
-        """Gets the identifier of this AdminProject.  # noqa: E501
+    def org(self):
+        """Gets the org of this AdminProject.  # noqa: E501
 
-        Optional, org key applied to the project.  # noqa: E501
+        Optional, org key applied to the resource.  # noqa: E501
 
-        :return: The identifier of this AdminProject.  # noqa: E501
-        :rtype: AdminProjectIdentifier
+        :return: The org of this AdminProject.  # noqa: E501
+        :rtype: str
         """
-        return self._identifier
+        return self._org
 
-    @identifier.setter
-    def identifier(self, identifier):
-        """Sets the identifier of this AdminProject.
+    @org.setter
+    def org(self, org):
+        """Sets the org of this AdminProject.
 
-        Optional, org key applied to the project.  # noqa: E501
+        Optional, org key applied to the resource.  # noqa: E501
 
-        :param identifier: The identifier of this AdminProject.  # noqa: E501
-        :type: AdminProjectIdentifier
+        :param org: The org of this AdminProject.  # noqa: E501
+        :type: str
         """
 
-        self._identifier = identifier
+        self._org = org
 
     def to_dict(self):
         """Returns the model properties as a dict"""

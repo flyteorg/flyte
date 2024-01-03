@@ -3360,15 +3360,15 @@ func request_AdminService_UpdateProject_1(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["identifier.id"]
+	val, ok = pathParams["id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "identifier.id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "identifier.id", val)
+	protoReq.Id, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "identifier.id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
 	msg, err := client.UpdateProject(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -3395,15 +3395,15 @@ func request_AdminService_UpdateProject_2(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["identifier.org"]
+	val, ok = pathParams["org"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "identifier.org")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "identifier.org", val)
+	protoReq.Org, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "identifier.org", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
 	}
 
 	val, ok = pathParams["id"]
@@ -3441,26 +3441,26 @@ func request_AdminService_UpdateProject_3(ctx context.Context, marshaler runtime
 		_   = err
 	)
 
-	val, ok = pathParams["identifier.org"]
+	val, ok = pathParams["org"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "identifier.org")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "identifier.org", val)
+	protoReq.Org, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "identifier.org", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
 	}
 
-	val, ok = pathParams["identifier.id"]
+	val, ok = pathParams["id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "identifier.id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "identifier.id", val)
+	protoReq.Id, err = runtime.String(val)
 
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "identifier.id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
 	}
 
 	msg, err := client.UpdateProject(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -8441,11 +8441,11 @@ var (
 
 	pattern_AdminService_UpdateProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))
 
-	pattern_AdminService_UpdateProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "identifier.id"}, ""))
+	pattern_AdminService_UpdateProject_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "projects", "id"}, ""))
 
-	pattern_AdminService_UpdateProject_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "projects", "org", "identifier.org", "id"}, ""))
+	pattern_AdminService_UpdateProject_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "projects", "org", "id"}, ""))
 
-	pattern_AdminService_UpdateProject_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "projects", "org", "identifier.org", "identifier.id"}, ""))
+	pattern_AdminService_UpdateProject_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "projects", "org", "id"}, ""))
 
 	pattern_AdminService_ListProjects_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 

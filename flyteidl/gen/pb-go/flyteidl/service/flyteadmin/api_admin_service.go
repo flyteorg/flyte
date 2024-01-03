@@ -10138,7 +10138,7 @@ AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project
 
 @return AdminProjectUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProject(ctx context.Context, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -10224,104 +10224,13 @@ func (a *AdminServiceApiService) UpdateProject(ctx context.Context, id string, b
 /* 
 AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param identifierId Globally unique project name.
- * @param body
-
-@return AdminProjectUpdateResponse
-*/
-func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, identifierId string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
-	var (
-		localVarHttpMethod = strings.ToUpper("Put")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
-		localVarReturnValue AdminProjectUpdateResponse
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/{identifier.id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"identifier.id"+"}", fmt.Sprintf("%v", identifierId), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
-	if localVarHttpContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHttpContentType
-	}
-
-	// to determine the Accept header
-	localVarHttpHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
-	if localVarHttpHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
-	}
-	// body params
-	localVarPostBody = &body
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHttpResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHttpResponse == nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
-	localVarHttpResponse.Body.Close()
-	if err != nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	if localVarHttpResponse.StatusCode < 300 {
-		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
-	}
-
-	if localVarHttpResponse.StatusCode >= 300 {
-		newErr := GenericSwaggerError{
-			body: localVarBody,
-			error: localVarHttpResponse.Status,
-		}
-		
-		if localVarHttpResponse.StatusCode == 200 {
-			var v AdminProjectUpdateResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
-		return localVarReturnValue, localVarHttpResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHttpResponse, nil
-}
-
-/* 
-AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
- * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param identifierOrg Optional, org key applied to the resource.
+ * @param org Optional, org key applied to the resource.
  * @param id Deprecated, use identifier instead. Globally unique project name.
  * @param body
 
 @return AdminProjectUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProject3(ctx context.Context, identifierOrg string, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) UpdateProject4(ctx context.Context, org string, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -10331,102 +10240,9 @@ func (a *AdminServiceApiService) UpdateProject3(ctx context.Context, identifierO
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{identifier.org}/{id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"identifier.org"+"}", fmt.Sprintf("%v", identifierOrg), -1)
+	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{org}/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", fmt.Sprintf("%v", id), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
-	if localVarHttpContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHttpContentType
-	}
-
-	// to determine the Accept header
-	localVarHttpHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
-	if localVarHttpHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
-	}
-	// body params
-	localVarPostBody = &body
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHttpResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHttpResponse == nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
-	localVarHttpResponse.Body.Close()
-	if err != nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	if localVarHttpResponse.StatusCode < 300 {
-		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
-	}
-
-	if localVarHttpResponse.StatusCode >= 300 {
-		newErr := GenericSwaggerError{
-			body: localVarBody,
-			error: localVarHttpResponse.Status,
-		}
-		
-		if localVarHttpResponse.StatusCode == 200 {
-			var v AdminProjectUpdateResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
-		return localVarReturnValue, localVarHttpResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHttpResponse, nil
-}
-
-/* 
-AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
- * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param identifierOrg Optional, org key applied to the resource.
- * @param identifierId Globally unique project name.
- * @param body
-
-@return AdminProjectUpdateResponse
-*/
-func (a *AdminServiceApiService) UpdateProject4(ctx context.Context, identifierOrg string, identifierId string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
-	var (
-		localVarHttpMethod = strings.ToUpper("Put")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
-		localVarReturnValue AdminProjectUpdateResponse
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{identifier.org}/{identifier.id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"identifier.org"+"}", fmt.Sprintf("%v", identifierOrg), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"identifier.id"+"}", fmt.Sprintf("%v", identifierId), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

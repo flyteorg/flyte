@@ -782,764 +782,6 @@ public final class ProjectOuterClass {
 
   }
 
-  public interface ProjectIdentifierOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:flyteidl.admin.ProjectIdentifier)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <pre>
-     * Globally unique project name.
-     * </pre>
-     *
-     * <code>string id = 1;</code>
-     */
-    java.lang.String getId();
-    /**
-     * <pre>
-     * Globally unique project name.
-     * </pre>
-     *
-     * <code>string id = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getIdBytes();
-
-    /**
-     * <pre>
-     * Optional, org key applied to the resource.
-     * </pre>
-     *
-     * <code>string org = 2;</code>
-     */
-    java.lang.String getOrg();
-    /**
-     * <pre>
-     * Optional, org key applied to the resource.
-     * </pre>
-     *
-     * <code>string org = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getOrgBytes();
-  }
-  /**
-   * Protobuf type {@code flyteidl.admin.ProjectIdentifier}
-   */
-  public  static final class ProjectIdentifier extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:flyteidl.admin.ProjectIdentifier)
-      ProjectIdentifierOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use ProjectIdentifier.newBuilder() to construct.
-    private ProjectIdentifier(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private ProjectIdentifier() {
-      id_ = "";
-      org_ = "";
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private ProjectIdentifier(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              id_ = s;
-              break;
-            }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              org_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectIdentifier_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectIdentifier_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              flyteidl.admin.ProjectOuterClass.ProjectIdentifier.class, flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder.class);
-    }
-
-    public static final int ID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object id_;
-    /**
-     * <pre>
-     * Globally unique project name.
-     * </pre>
-     *
-     * <code>string id = 1;</code>
-     */
-    public java.lang.String getId() {
-      java.lang.Object ref = id_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        id_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     * Globally unique project name.
-     * </pre>
-     *
-     * <code>string id = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getIdBytes() {
-      java.lang.Object ref = id_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        id_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int ORG_FIELD_NUMBER = 2;
-    private volatile java.lang.Object org_;
-    /**
-     * <pre>
-     * Optional, org key applied to the resource.
-     * </pre>
-     *
-     * <code>string org = 2;</code>
-     */
-    public java.lang.String getOrg() {
-      java.lang.Object ref = org_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        org_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     * Optional, org key applied to the resource.
-     * </pre>
-     *
-     * <code>string org = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getOrgBytes() {
-      java.lang.Object ref = org_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        org_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!getIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
-      }
-      if (!getOrgBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, org_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!getIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
-      }
-      if (!getOrgBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, org_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof flyteidl.admin.ProjectOuterClass.ProjectIdentifier)) {
-        return super.equals(obj);
-      }
-      flyteidl.admin.ProjectOuterClass.ProjectIdentifier other = (flyteidl.admin.ProjectOuterClass.ProjectIdentifier) obj;
-
-      if (!getId()
-          .equals(other.getId())) return false;
-      if (!getOrg()
-          .equals(other.getOrg())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + ID_FIELD_NUMBER;
-      hash = (53 * hash) + getId().hashCode();
-      hash = (37 * hash) + ORG_FIELD_NUMBER;
-      hash = (53 * hash) + getOrg().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(flyteidl.admin.ProjectOuterClass.ProjectIdentifier prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code flyteidl.admin.ProjectIdentifier}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:flyteidl.admin.ProjectIdentifier)
-        flyteidl.admin.ProjectOuterClass.ProjectIdentifierOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectIdentifier_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectIdentifier_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                flyteidl.admin.ProjectOuterClass.ProjectIdentifier.class, flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder.class);
-      }
-
-      // Construct using flyteidl.admin.ProjectOuterClass.ProjectIdentifier.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        id_ = "";
-
-        org_ = "";
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return flyteidl.admin.ProjectOuterClass.internal_static_flyteidl_admin_ProjectIdentifier_descriptor;
-      }
-
-      @java.lang.Override
-      public flyteidl.admin.ProjectOuterClass.ProjectIdentifier getDefaultInstanceForType() {
-        return flyteidl.admin.ProjectOuterClass.ProjectIdentifier.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public flyteidl.admin.ProjectOuterClass.ProjectIdentifier build() {
-        flyteidl.admin.ProjectOuterClass.ProjectIdentifier result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public flyteidl.admin.ProjectOuterClass.ProjectIdentifier buildPartial() {
-        flyteidl.admin.ProjectOuterClass.ProjectIdentifier result = new flyteidl.admin.ProjectOuterClass.ProjectIdentifier(this);
-        result.id_ = id_;
-        result.org_ = org_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof flyteidl.admin.ProjectOuterClass.ProjectIdentifier) {
-          return mergeFrom((flyteidl.admin.ProjectOuterClass.ProjectIdentifier)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(flyteidl.admin.ProjectOuterClass.ProjectIdentifier other) {
-        if (other == flyteidl.admin.ProjectOuterClass.ProjectIdentifier.getDefaultInstance()) return this;
-        if (!other.getId().isEmpty()) {
-          id_ = other.id_;
-          onChanged();
-        }
-        if (!other.getOrg().isEmpty()) {
-          org_ = other.org_;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        flyteidl.admin.ProjectOuterClass.ProjectIdentifier parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (flyteidl.admin.ProjectOuterClass.ProjectIdentifier) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private java.lang.Object id_ = "";
-      /**
-       * <pre>
-       * Globally unique project name.
-       * </pre>
-       *
-       * <code>string id = 1;</code>
-       */
-      public java.lang.String getId() {
-        java.lang.Object ref = id_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          id_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Globally unique project name.
-       * </pre>
-       *
-       * <code>string id = 1;</code>
-       */
-      public com.google.protobuf.ByteString
-          getIdBytes() {
-        java.lang.Object ref = id_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          id_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Globally unique project name.
-       * </pre>
-       *
-       * <code>string id = 1;</code>
-       */
-      public Builder setId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        id_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Globally unique project name.
-       * </pre>
-       *
-       * <code>string id = 1;</code>
-       */
-      public Builder clearId() {
-        
-        id_ = getDefaultInstance().getId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Globally unique project name.
-       * </pre>
-       *
-       * <code>string id = 1;</code>
-       */
-      public Builder setIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        id_ = value;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object org_ = "";
-      /**
-       * <pre>
-       * Optional, org key applied to the resource.
-       * </pre>
-       *
-       * <code>string org = 2;</code>
-       */
-      public java.lang.String getOrg() {
-        java.lang.Object ref = org_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          org_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the resource.
-       * </pre>
-       *
-       * <code>string org = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getOrgBytes() {
-        java.lang.Object ref = org_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          org_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the resource.
-       * </pre>
-       *
-       * <code>string org = 2;</code>
-       */
-      public Builder setOrg(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        org_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the resource.
-       * </pre>
-       *
-       * <code>string org = 2;</code>
-       */
-      public Builder clearOrg() {
-        
-        org_ = getDefaultInstance().getOrg();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the resource.
-       * </pre>
-       *
-       * <code>string org = 2;</code>
-       */
-      public Builder setOrgBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        org_ = value;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:flyteidl.admin.ProjectIdentifier)
-    }
-
-    // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectIdentifier)
-    private static final flyteidl.admin.ProjectOuterClass.ProjectIdentifier DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new flyteidl.admin.ProjectOuterClass.ProjectIdentifier();
-    }
-
-    public static flyteidl.admin.ProjectOuterClass.ProjectIdentifier getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<ProjectIdentifier>
-        PARSER = new com.google.protobuf.AbstractParser<ProjectIdentifier>() {
-      @java.lang.Override
-      public ProjectIdentifier parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ProjectIdentifier(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<ProjectIdentifier> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ProjectIdentifier> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public flyteidl.admin.ProjectOuterClass.ProjectIdentifier getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   public interface ProjectOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.admin.Project)
       com.google.protobuf.MessageOrBuilder {
@@ -1550,18 +792,18 @@ public final class ProjectOuterClass {
      * Globally unique project name.
      * </pre>
      *
-     * <code>string id = 1 [deprecated = true];</code>
+     * <code>string id = 1;</code>
      */
-    @java.lang.Deprecated java.lang.String getId();
+    java.lang.String getId();
     /**
      * <pre>
      * Deprecated, use identifier instead.
      * Globally unique project name.
      * </pre>
      *
-     * <code>string id = 1 [deprecated = true];</code>
+     * <code>string id = 1;</code>
      */
-    @java.lang.Deprecated com.google.protobuf.ByteString
+    com.google.protobuf.ByteString
         getIdBytes();
 
     /**
@@ -1655,28 +897,21 @@ public final class ProjectOuterClass {
 
     /**
      * <pre>
-     * Optional, org key applied to the project.
+     * Optional, org key applied to the resource.
      * </pre>
      *
-     * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+     * <code>string org = 7;</code>
      */
-    boolean hasIdentifier();
+    java.lang.String getOrg();
     /**
      * <pre>
-     * Optional, org key applied to the project.
+     * Optional, org key applied to the resource.
      * </pre>
      *
-     * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+     * <code>string org = 7;</code>
      */
-    flyteidl.admin.ProjectOuterClass.ProjectIdentifier getIdentifier();
-    /**
-     * <pre>
-     * Optional, org key applied to the project.
-     * </pre>
-     *
-     * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
-     */
-    flyteidl.admin.ProjectOuterClass.ProjectIdentifierOrBuilder getIdentifierOrBuilder();
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
@@ -1700,6 +935,7 @@ public final class ProjectOuterClass {
       domains_ = java.util.Collections.emptyList();
       description_ = "";
       state_ = 0;
+      org_ = "";
     }
 
     @java.lang.Override
@@ -1773,16 +1009,9 @@ public final class ProjectOuterClass {
               break;
             }
             case 58: {
-              flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder subBuilder = null;
-              if (identifier_ != null) {
-                subBuilder = identifier_.toBuilder();
-              }
-              identifier_ = input.readMessage(flyteidl.admin.ProjectOuterClass.ProjectIdentifier.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(identifier_);
-                identifier_ = subBuilder.buildPartial();
-              }
+              java.lang.String s = input.readStringRequireUtf8();
 
+              org_ = s;
               break;
             }
             default: {
@@ -1964,9 +1193,9 @@ public final class ProjectOuterClass {
      * Globally unique project name.
      * </pre>
      *
-     * <code>string id = 1 [deprecated = true];</code>
+     * <code>string id = 1;</code>
      */
-    @java.lang.Deprecated public java.lang.String getId() {
+    public java.lang.String getId() {
       java.lang.Object ref = id_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -1984,9 +1213,9 @@ public final class ProjectOuterClass {
      * Globally unique project name.
      * </pre>
      *
-     * <code>string id = 1 [deprecated = true];</code>
+     * <code>string id = 1;</code>
      */
-    @java.lang.Deprecated public com.google.protobuf.ByteString
+    public com.google.protobuf.ByteString
         getIdBytes() {
       java.lang.Object ref = id_;
       if (ref instanceof java.lang.String) {
@@ -2164,37 +1393,46 @@ public final class ProjectOuterClass {
       return result == null ? flyteidl.admin.ProjectOuterClass.Project.ProjectState.UNRECOGNIZED : result;
     }
 
-    public static final int IDENTIFIER_FIELD_NUMBER = 7;
-    private flyteidl.admin.ProjectOuterClass.ProjectIdentifier identifier_;
+    public static final int ORG_FIELD_NUMBER = 7;
+    private volatile java.lang.Object org_;
     /**
      * <pre>
-     * Optional, org key applied to the project.
+     * Optional, org key applied to the resource.
      * </pre>
      *
-     * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+     * <code>string org = 7;</code>
      */
-    public boolean hasIdentifier() {
-      return identifier_ != null;
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
     }
     /**
      * <pre>
-     * Optional, org key applied to the project.
+     * Optional, org key applied to the resource.
      * </pre>
      *
-     * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+     * <code>string org = 7;</code>
      */
-    public flyteidl.admin.ProjectOuterClass.ProjectIdentifier getIdentifier() {
-      return identifier_ == null ? flyteidl.admin.ProjectOuterClass.ProjectIdentifier.getDefaultInstance() : identifier_;
-    }
-    /**
-     * <pre>
-     * Optional, org key applied to the project.
-     * </pre>
-     *
-     * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
-     */
-    public flyteidl.admin.ProjectOuterClass.ProjectIdentifierOrBuilder getIdentifierOrBuilder() {
-      return getIdentifier();
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -2229,8 +1467,8 @@ public final class ProjectOuterClass {
       if (state_ != flyteidl.admin.ProjectOuterClass.Project.ProjectState.ACTIVE.getNumber()) {
         output.writeEnum(6, state_);
       }
-      if (identifier_ != null) {
-        output.writeMessage(7, getIdentifier());
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, org_);
       }
       unknownFields.writeTo(output);
     }
@@ -2262,9 +1500,8 @@ public final class ProjectOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(6, state_);
       }
-      if (identifier_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(7, getIdentifier());
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2295,11 +1532,8 @@ public final class ProjectOuterClass {
             .equals(other.getLabels())) return false;
       }
       if (state_ != other.state_) return false;
-      if (hasIdentifier() != other.hasIdentifier()) return false;
-      if (hasIdentifier()) {
-        if (!getIdentifier()
-            .equals(other.getIdentifier())) return false;
-      }
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2327,10 +1561,8 @@ public final class ProjectOuterClass {
       }
       hash = (37 * hash) + STATE_FIELD_NUMBER;
       hash = (53 * hash) + state_;
-      if (hasIdentifier()) {
-        hash = (37 * hash) + IDENTIFIER_FIELD_NUMBER;
-        hash = (53 * hash) + getIdentifier().hashCode();
-      }
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2489,12 +1721,8 @@ public final class ProjectOuterClass {
         }
         state_ = 0;
 
-        if (identifierBuilder_ == null) {
-          identifier_ = null;
-        } else {
-          identifier_ = null;
-          identifierBuilder_ = null;
-        }
+        org_ = "";
+
         return this;
       }
 
@@ -2541,11 +1769,7 @@ public final class ProjectOuterClass {
           result.labels_ = labelsBuilder_.build();
         }
         result.state_ = state_;
-        if (identifierBuilder_ == null) {
-          result.identifier_ = identifier_;
-        } else {
-          result.identifier_ = identifierBuilder_.build();
-        }
+        result.org_ = org_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2639,8 +1863,9 @@ public final class ProjectOuterClass {
         if (other.state_ != 0) {
           setStateValue(other.getStateValue());
         }
-        if (other.hasIdentifier()) {
-          mergeIdentifier(other.getIdentifier());
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2679,9 +1904,9 @@ public final class ProjectOuterClass {
        * Globally unique project name.
        * </pre>
        *
-       * <code>string id = 1 [deprecated = true];</code>
+       * <code>string id = 1;</code>
        */
-      @java.lang.Deprecated public java.lang.String getId() {
+      public java.lang.String getId() {
         java.lang.Object ref = id_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
@@ -2699,9 +1924,9 @@ public final class ProjectOuterClass {
        * Globally unique project name.
        * </pre>
        *
-       * <code>string id = 1 [deprecated = true];</code>
+       * <code>string id = 1;</code>
        */
-      @java.lang.Deprecated public com.google.protobuf.ByteString
+      public com.google.protobuf.ByteString
           getIdBytes() {
         java.lang.Object ref = id_;
         if (ref instanceof String) {
@@ -2720,9 +1945,9 @@ public final class ProjectOuterClass {
        * Globally unique project name.
        * </pre>
        *
-       * <code>string id = 1 [deprecated = true];</code>
+       * <code>string id = 1;</code>
        */
-      @java.lang.Deprecated public Builder setId(
+      public Builder setId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -2738,9 +1963,9 @@ public final class ProjectOuterClass {
        * Globally unique project name.
        * </pre>
        *
-       * <code>string id = 1 [deprecated = true];</code>
+       * <code>string id = 1;</code>
        */
-      @java.lang.Deprecated public Builder clearId() {
+      public Builder clearId() {
         
         id_ = getDefaultInstance().getId();
         onChanged();
@@ -2752,9 +1977,9 @@ public final class ProjectOuterClass {
        * Globally unique project name.
        * </pre>
        *
-       * <code>string id = 1 [deprecated = true];</code>
+       * <code>string id = 1;</code>
        */
-      @java.lang.Deprecated public Builder setIdBytes(
+      public Builder setIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -3371,157 +2596,93 @@ public final class ProjectOuterClass {
         return this;
       }
 
-      private flyteidl.admin.ProjectOuterClass.ProjectIdentifier identifier_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.admin.ProjectOuterClass.ProjectIdentifier, flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder, flyteidl.admin.ProjectOuterClass.ProjectIdentifierOrBuilder> identifierBuilder_;
+      private java.lang.Object org_ = "";
       /**
        * <pre>
-       * Optional, org key applied to the project.
+       * Optional, org key applied to the resource.
        * </pre>
        *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+       * <code>string org = 7;</code>
        */
-      public boolean hasIdentifier() {
-        return identifierBuilder_ != null || identifier_ != null;
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the project.
-       * </pre>
-       *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
-       */
-      public flyteidl.admin.ProjectOuterClass.ProjectIdentifier getIdentifier() {
-        if (identifierBuilder_ == null) {
-          return identifier_ == null ? flyteidl.admin.ProjectOuterClass.ProjectIdentifier.getDefaultInstance() : identifier_;
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
         } else {
-          return identifierBuilder_.getMessage();
+          return (java.lang.String) ref;
         }
       }
       /**
        * <pre>
-       * Optional, org key applied to the project.
+       * Optional, org key applied to the resource.
        * </pre>
        *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+       * <code>string org = 7;</code>
        */
-      public Builder setIdentifier(flyteidl.admin.ProjectOuterClass.ProjectIdentifier value) {
-        if (identifierBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          identifier_ = value;
-          onChanged();
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
         } else {
-          identifierBuilder_.setMessage(value);
+          return (com.google.protobuf.ByteString) ref;
         }
-
-        return this;
       }
       /**
        * <pre>
-       * Optional, org key applied to the project.
+       * Optional, org key applied to the resource.
        * </pre>
        *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+       * <code>string org = 7;</code>
        */
-      public Builder setIdentifier(
-          flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder builderForValue) {
-        if (identifierBuilder_ == null) {
-          identifier_ = builderForValue.build();
-          onChanged();
-        } else {
-          identifierBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the project.
-       * </pre>
-       *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
-       */
-      public Builder mergeIdentifier(flyteidl.admin.ProjectOuterClass.ProjectIdentifier value) {
-        if (identifierBuilder_ == null) {
-          if (identifier_ != null) {
-            identifier_ =
-              flyteidl.admin.ProjectOuterClass.ProjectIdentifier.newBuilder(identifier_).mergeFrom(value).buildPartial();
-          } else {
-            identifier_ = value;
-          }
-          onChanged();
-        } else {
-          identifierBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the project.
-       * </pre>
-       *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
-       */
-      public Builder clearIdentifier() {
-        if (identifierBuilder_ == null) {
-          identifier_ = null;
-          onChanged();
-        } else {
-          identifier_ = null;
-          identifierBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <pre>
-       * Optional, org key applied to the project.
-       * </pre>
-       *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
-       */
-      public flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder getIdentifierBuilder() {
-        
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
         onChanged();
-        return getIdentifierFieldBuilder().getBuilder();
+        return this;
       }
       /**
        * <pre>
-       * Optional, org key applied to the project.
+       * Optional, org key applied to the resource.
        * </pre>
        *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+       * <code>string org = 7;</code>
        */
-      public flyteidl.admin.ProjectOuterClass.ProjectIdentifierOrBuilder getIdentifierOrBuilder() {
-        if (identifierBuilder_ != null) {
-          return identifierBuilder_.getMessageOrBuilder();
-        } else {
-          return identifier_ == null ?
-              flyteidl.admin.ProjectOuterClass.ProjectIdentifier.getDefaultInstance() : identifier_;
-        }
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
       }
       /**
        * <pre>
-       * Optional, org key applied to the project.
+       * Optional, org key applied to the resource.
        * </pre>
        *
-       * <code>.flyteidl.admin.ProjectIdentifier identifier = 7;</code>
+       * <code>string org = 7;</code>
        */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.admin.ProjectOuterClass.ProjectIdentifier, flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder, flyteidl.admin.ProjectOuterClass.ProjectIdentifierOrBuilder> 
-          getIdentifierFieldBuilder() {
-        if (identifierBuilder_ == null) {
-          identifierBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.admin.ProjectOuterClass.ProjectIdentifier, flyteidl.admin.ProjectOuterClass.ProjectIdentifier.Builder, flyteidl.admin.ProjectOuterClass.ProjectIdentifierOrBuilder>(
-                  getIdentifier(),
-                  getParentForChildren(),
-                  isClean());
-          identifier_ = null;
-        }
-        return identifierBuilder_;
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -7232,11 +6393,6 @@ public final class ProjectOuterClass {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_Domain_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_admin_ProjectIdentifier_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_admin_ProjectIdentifier_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_Project_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -7277,26 +6433,23 @@ public final class ProjectOuterClass {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/admin/project.proto\022\016flyteidl" +
       ".admin\032\033flyteidl/admin/common.proto\"\"\n\006D" +
-      "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\",\n\021Proje" +
-      "ctIdentifier\022\n\n\002id\030\001 \001(\t\022\013\n\003org\030\002 \001(\t\"\271\002" +
-      "\n\007Project\022\016\n\002id\030\001 \001(\tB\002\030\001\022\014\n\004name\030\002 \001(\t\022" +
-      "\'\n\007domains\030\003 \003(\0132\026.flyteidl.admin.Domain" +
-      "\022\023\n\013description\030\004 \001(\t\022&\n\006labels\030\005 \001(\0132\026." +
-      "flyteidl.admin.Labels\0223\n\005state\030\006 \001(\0162$.f" +
-      "lyteidl.admin.Project.ProjectState\0225\n\nid" +
-      "entifier\030\007 \001(\0132!.flyteidl.admin.ProjectI" +
-      "dentifier\">\n\014ProjectState\022\n\n\006ACTIVE\020\000\022\014\n" +
-      "\010ARCHIVED\020\001\022\024\n\020SYSTEM_GENERATED\020\002\"D\n\010Pro" +
-      "jects\022)\n\010projects\030\001 \003(\0132\027.flyteidl.admin" +
-      ".Project\022\r\n\005token\030\002 \001(\t\"j\n\022ProjectListRe" +
-      "quest\022\r\n\005limit\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\022\017\n\007f" +
-      "ilters\030\003 \001(\t\022%\n\007sort_by\030\004 \001(\0132\024.flyteidl" +
-      ".admin.Sort\"B\n\026ProjectRegisterRequest\022(\n" +
-      "\007project\030\001 \001(\0132\027.flyteidl.admin.Project\"" +
-      "\031\n\027ProjectRegisterResponse\"\027\n\025ProjectUpd" +
-      "ateResponseB=Z;github.com/flyteorg/flyte" +
-      "/flyteidl/gen/pb-go/flyteidl/adminb\006prot" +
-      "o3"
+      "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\213\002\n\007Proj" +
+      "ect\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\'\n\007domains" +
+      "\030\003 \003(\0132\026.flyteidl.admin.Domain\022\023\n\013descri" +
+      "ption\030\004 \001(\t\022&\n\006labels\030\005 \001(\0132\026.flyteidl.a" +
+      "dmin.Labels\0223\n\005state\030\006 \001(\0162$.flyteidl.ad" +
+      "min.Project.ProjectState\022\013\n\003org\030\007 \001(\t\">\n" +
+      "\014ProjectState\022\n\n\006ACTIVE\020\000\022\014\n\010ARCHIVED\020\001\022" +
+      "\024\n\020SYSTEM_GENERATED\020\002\"D\n\010Projects\022)\n\010pro" +
+      "jects\030\001 \003(\0132\027.flyteidl.admin.Project\022\r\n\005" +
+      "token\030\002 \001(\t\"j\n\022ProjectListRequest\022\r\n\005lim" +
+      "it\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\022\017\n\007filters\030\003 \001(\t" +
+      "\022%\n\007sort_by\030\004 \001(\0132\024.flyteidl.admin.Sort\"" +
+      "B\n\026ProjectRegisterRequest\022(\n\007project\030\001 \001" +
+      "(\0132\027.flyteidl.admin.Project\"\031\n\027ProjectRe" +
+      "gisterResponse\"\027\n\025ProjectUpdateResponseB" +
+      "=Z;github.com/flyteorg/flyte/flyteidl/ge" +
+      "n/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -7317,44 +6470,38 @@ public final class ProjectOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Domain_descriptor,
         new java.lang.String[] { "Id", "Name", });
-    internal_static_flyteidl_admin_ProjectIdentifier_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_flyteidl_admin_ProjectIdentifier_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_admin_ProjectIdentifier_descriptor,
-        new java.lang.String[] { "Id", "Org", });
     internal_static_flyteidl_admin_Project_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_admin_Project_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Project_descriptor,
-        new java.lang.String[] { "Id", "Name", "Domains", "Description", "Labels", "State", "Identifier", });
+        new java.lang.String[] { "Id", "Name", "Domains", "Description", "Labels", "State", "Org", });
     internal_static_flyteidl_admin_Projects_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_Projects_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Projects_descriptor,
         new java.lang.String[] { "Projects", "Token", });
     internal_static_flyteidl_admin_ProjectListRequest_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_admin_ProjectListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectListRequest_descriptor,
         new java.lang.String[] { "Limit", "Token", "Filters", "SortBy", });
     internal_static_flyteidl_admin_ProjectRegisterRequest_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_admin_ProjectRegisterRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectRegisterRequest_descriptor,
         new java.lang.String[] { "Project", });
     internal_static_flyteidl_admin_ProjectRegisterResponse_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_admin_ProjectRegisterResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectRegisterResponse_descriptor,
         new java.lang.String[] { });
     internal_static_flyteidl_admin_ProjectUpdateResponse_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_ProjectUpdateResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectUpdateResponse_descriptor,

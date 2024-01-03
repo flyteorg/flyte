@@ -16264,64 +16264,6 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a ProjectIdentifier. */
-        interface IProjectIdentifier {
-
-            /** ProjectIdentifier id */
-            id?: (string|null);
-
-            /** ProjectIdentifier org */
-            org?: (string|null);
-        }
-
-        /** Represents a ProjectIdentifier. */
-        class ProjectIdentifier implements IProjectIdentifier {
-
-            /**
-             * Constructs a new ProjectIdentifier.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.admin.IProjectIdentifier);
-
-            /** ProjectIdentifier id. */
-            public id: string;
-
-            /** ProjectIdentifier org. */
-            public org: string;
-
-            /**
-             * Creates a new ProjectIdentifier instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns ProjectIdentifier instance
-             */
-            public static create(properties?: flyteidl.admin.IProjectIdentifier): flyteidl.admin.ProjectIdentifier;
-
-            /**
-             * Encodes the specified ProjectIdentifier message. Does not implicitly {@link flyteidl.admin.ProjectIdentifier.verify|verify} messages.
-             * @param message ProjectIdentifier message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.admin.IProjectIdentifier, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a ProjectIdentifier message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns ProjectIdentifier
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectIdentifier;
-
-            /**
-             * Verifies a ProjectIdentifier message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of a Project. */
         interface IProject {
 
@@ -16343,8 +16285,8 @@ export namespace flyteidl {
             /** Project state */
             state?: (flyteidl.admin.Project.ProjectState|null);
 
-            /** Project identifier */
-            identifier?: (flyteidl.admin.IProjectIdentifier|null);
+            /** Project org */
+            org?: (string|null);
         }
 
         /** Represents a Project. */
@@ -16374,8 +16316,8 @@ export namespace flyteidl {
             /** Project state. */
             public state: flyteidl.admin.Project.ProjectState;
 
-            /** Project identifier. */
-            public identifier?: (flyteidl.admin.IProjectIdentifier|null);
+            /** Project org. */
+            public org: string;
 
             /**
              * Creates a new Project instance using the specified properties.

@@ -4366,7 +4366,7 @@
         ]
       }
     },
-    "/api/v1/projects/org/{identifier.org}/{identifier.id}": {
+    "/api/v1/projects/org/{org}/{id}": {
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "operationId": "UpdateProject4",
@@ -4380,48 +4380,7 @@
         },
         "parameters": [
           {
-            "name": "identifier.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "identifier.id",
-            "description": "Globally unique project name.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminProject"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/projects/org/{identifier.org}/{id}": {
-      "put": {
-        "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
-        "operationId": "UpdateProject3",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminProjectUpdateResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "identifier.org",
+            "name": "org",
             "description": "Optional, org key applied to the resource.",
             "in": "path",
             "required": true,
@@ -4448,44 +4407,10 @@
         ]
       }
     },
-    "/api/v1/projects/{identifier.id}": {
-      "put": {
-        "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
-        "operationId": "UpdateProject2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminProjectUpdateResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "identifier.id",
-            "description": "Globally unique project name.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminProject"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/projects/{id}": {
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
-        "operationId": "UpdateProject",
+        "operationId": "UpdateProject2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -8234,9 +8159,9 @@
         "state": {
           "$ref": "#/definitions/ProjectProjectState"
         },
-        "identifier": {
-          "$ref": "#/definitions/adminProjectIdentifier",
-          "description": "Optional, org key applied to the project."
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Top-level namespace used to classify different entities like workflows and executions."
@@ -8372,19 +8297,6 @@
     "adminProjectDomainAttributesUpdateResponse": {
       "type": "object",
       "description": "Purposefully empty, may be populated in the future."
-    },
-    "adminProjectIdentifier": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Globally unique project name."
-        },
-        "org": {
-          "type": "string",
-          "description": "Optional, org key applied to the resource."
-        }
-      }
     },
     "adminProjectRegisterRequest": {
       "type": "object",
