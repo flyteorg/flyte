@@ -20,10 +20,10 @@ service AsyncAgentService {
   // Errors include
   //  * OutOfRange if metrics are not available for the specified task time range
   //  * various other errors
-  rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse) {};
+  rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse){};
 
   // GetTaskLogs returns task execution logs, if available.
-  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (flyteidl.admin.GetTaskLogsResponse) {};
+  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (flyteidl.admin.GetTaskLogsResponse){};
 }
 
 // AgentMetadataService defines an RPC service that is also served over HTTP via grpc-gateway.
