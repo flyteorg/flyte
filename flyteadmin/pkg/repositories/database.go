@@ -2,11 +2,13 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
+	"github.com/jackc/pgconn"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -17,6 +19,8 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 )
 
+const pqInvalidDBCode = "3D000"
+const pqDbAlreadyExistsCode = "42P04"
 const defaultDB = "postgres"
 
 // Resolves a password value from either a user-provided inline value or a filepath whose contents contain a password.
@@ -118,7 +122,7 @@ func createPostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 		return gormDb, nil
 	}
 
-	if !database.IsPgErrorWithCode(err, database.PqInvalidDBCode) {
+	if !isPgErrorWithCode(err, pqInvalidDBCode) {
 		return nil, err
 	}
 
@@ -142,13 +146,24 @@ func createPostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 	result := gormDb.Exec(createDBStatement)
 
 	if result.Error != nil {
-		if !database.IsPgErrorWithCode(result.Error, database.PqDbAlreadyExistsCode) {
+		if !isPgErrorWithCode(result.Error, pqDbAlreadyExistsCode) {
 			return nil, result.Error
 		}
 		logger.Warningf(ctx, "Got DB already exists error for [%s], skipping...", pgConfig.DbName)
 	}
 	// Now try connecting to the db again
 	return gorm.Open(dialector, gormConfig)
+}
+
+func isPgErrorWithCode(err error, code string) bool {
+	pgErr := &pgconn.PgError{}
+	if !errors.As(err, &pgErr) {
+		// err chain does not contain a pgconn.PgError
+		return false
+	}
+
+	// pgconn.PgError found in chain and set to code specified
+	return pgErr.Code == code
 }
 
 func setupDbConnectionPool(ctx context.Context, gormDb *gorm.DB, dbConfig *database.DbConfig) error {

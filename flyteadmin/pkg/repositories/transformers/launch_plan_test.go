@@ -68,6 +68,7 @@ func TestToLaunchPlanModel(t *testing.T) {
 	assert.Equal(t, "domain", launchPlanModel.Domain)
 	assert.Equal(t, "name", launchPlanModel.Name)
 	assert.Equal(t, "version", launchPlanModel.Version)
+	assert.Equal(t, testOrg, launchPlanModel.Org)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
 	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
@@ -84,18 +85,7 @@ func TestToLaunchPlanModel(t *testing.T) {
 }
 
 func TestToLaunchPlanModelWithCronSchedule(t *testing.T) {
-
-	t.Run("deprecated cron schedule", func(t *testing.T) {
-		lpRequest := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
-		testLaunchPlanWithCronInternal(t, lpRequest)
-	})
-	t.Run("cron schedule", func(t *testing.T) {
-		lpRequest := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
-		testLaunchPlanWithCronInternal(t, lpRequest)
-	})
-}
-
-func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCreateRequest) {
+	lpRequest := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
 	lpRequest.Spec.DefaultInputs = expectedInputs
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")
@@ -115,6 +105,7 @@ func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCrea
 	assert.Equal(t, "domain", launchPlanModel.Domain)
 	assert.Equal(t, "name", launchPlanModel.Name)
 	assert.Equal(t, "version", launchPlanModel.Version)
+	assert.Equal(t, testOrg, launchPlanModel.Org)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
 	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
@@ -151,6 +142,7 @@ func TestToLaunchPlanModelWithFixedRateSchedule(t *testing.T) {
 	assert.Equal(t, "domain", launchPlanModel.Domain)
 	assert.Equal(t, "name", launchPlanModel.Name)
 	assert.Equal(t, "version", launchPlanModel.Version)
+	assert.Equal(t, testOrg, launchPlanModel.Org)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
 	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
@@ -193,6 +185,7 @@ func TestFromLaunchPlanModel(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 			Version: "version",
+			Org:     testOrg,
 		},
 		Spec:    specBytes,
 		Closure: closureBytes,
@@ -206,6 +199,7 @@ func TestFromLaunchPlanModel(t *testing.T) {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
+		Org:          testOrg,
 	}, lp.Id))
 	assert.True(t, proto.Equal(&closure, lp.Closure))
 	assert.True(t, proto.Equal(lpRequest.Spec, lp.Spec))
@@ -239,6 +233,7 @@ func TestFromLaunchPlanModels(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 			Version: "version",
+			Org:     testOrg,
 		},
 		Spec:    specBytes,
 		Closure: closureBytes,

@@ -28,4 +28,5 @@ type ResourceID struct {
 	Workflow     string
 	LaunchPlan   string
 	ResourceType string
+	Org          string
 }

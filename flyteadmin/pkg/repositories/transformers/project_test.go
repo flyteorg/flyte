@@ -23,10 +23,12 @@ func TestCreateProjectModel(t *testing.T) {
 		Description: "project_description",
 		Labels:      &labels,
 		State:       admin.Project_ACTIVE,
+		Org:         testOrg,
 	}
 
 	projectBytes, _ := proto.Marshal(&project)
-	projectModel := CreateProjectModel(&project)
+	projectModel, err := CreateProjectModel(&project)
+	assert.NoError(t, err)
 
 	activeState := int32(admin.Project_ACTIVE)
 	assert.Equal(t, models.Project{
@@ -35,6 +37,7 @@ func TestCreateProjectModel(t *testing.T) {
 		Description: "project_description",
 		Labels:      projectBytes,
 		State:       &activeState,
+		Org:         testOrg,
 	}, projectModel)
 }
 
@@ -45,6 +48,7 @@ func TestFromProjectModel(t *testing.T) {
 		Name:        "proj_name",
 		Description: "proj_description",
 		State:       &activeState,
+		Org:         testOrg,
 	}
 	domains := []*admin.Domain{
 		{
@@ -63,6 +67,7 @@ func TestFromProjectModel(t *testing.T) {
 		Description: "proj_description",
 		Domains:     domains,
 		State:       admin.Project_ACTIVE,
+		Org:         testOrg,
 	}, &project))
 }
 
@@ -74,6 +79,7 @@ func TestFromProjectModels(t *testing.T) {
 			Name:        "proj1_name",
 			Description: "proj1_description",
 			State:       &activeState,
+			Org:         testOrg,
 		},
 		{
 			Identifier:  "proj2_id",
@@ -100,5 +106,8 @@ func TestFromProjectModels(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("proj%v_description", index+1), project.Description)
 		assert.Equal(t, admin.Project_ACTIVE, project.State)
 		assert.EqualValues(t, domains, project.Domains)
+		if index == 0 {
+			assert.Equal(t, testOrg, project.Org)
+		}
 	}
 }

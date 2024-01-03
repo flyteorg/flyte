@@ -49,6 +49,7 @@ func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (mo
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
+			Org:     input.Org,
 		},
 	}).Take(&workflow)
 	timer.Stop()
@@ -59,6 +60,7 @@ func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (mo
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
+			Org:     input.Org,
 		})
 	} else if tx.Error != nil {
 		return models.Workflow{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -119,7 +121,7 @@ func (r *WorkflowRepo) ListIdentifiers(ctx context.Context, input interfaces.Lis
 	// Scan the results into a list of workflows
 	var workflows []models.Workflow
 	timer := r.metrics.ListIdentifiersDuration.Start()
-	tx.Select([]string{Project, Domain, Name}).Group(identifierGroupBy).Scan(&workflows)
+	tx.Select([]string{Project, Domain, Name, Org}).Group(identifierGroupBy).Scan(&workflows)
 	timer.Stop()
 	if tx.Error != nil {
 		return interfaces.WorkflowCollectionOutput{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

@@ -32,6 +32,7 @@ func getRunningExecutionModel(specBytes []byte, existingClosureBytes []byte, sta
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Spec:               specBytes,
 		Phase:              core.WorkflowExecution_RUNNING.String(),
@@ -62,6 +63,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		Domain:  "domain",
 		Name:    "workflow name",
 		Version: "version",
+		Org:     testOrg,
 	}
 
 	cluster := "cluster"
@@ -77,6 +79,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
@@ -95,6 +98,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, "project", execution.Project)
 		assert.Equal(t, "domain", execution.Domain)
 		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, testOrg, execution.Org)
 		assert.Equal(t, lpID, execution.LaunchPlanID)
 		assert.Equal(t, wfID, execution.WorkflowID)
 		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
@@ -136,6 +140,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
@@ -155,6 +160,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, "project", execution.Project)
 		assert.Equal(t, "domain", execution.Domain)
 		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, "org", execution.Org)
 		assert.Equal(t, lpID, execution.LaunchPlanID)
 		assert.Equal(t, wfID, execution.WorkflowID)
 		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
@@ -203,6 +209,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
@@ -222,6 +229,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, "project", execution.Project)
 		assert.Equal(t, "domain", execution.Domain)
 		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, testOrg, execution.Org)
 		assert.Equal(t, lpID, execution.LaunchPlanID)
 		assert.Equal(t, wfID, execution.WorkflowID)
 		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
@@ -270,6 +278,7 @@ func TestCreateExecutionModel(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 			RequestSpec:           execRequest.Spec,
 			LaunchPlanID:          lpID,
@@ -289,6 +298,7 @@ func TestCreateExecutionModel(t *testing.T) {
 		assert.Equal(t, "project", execution.Project)
 		assert.Equal(t, "domain", execution.Domain)
 		assert.Equal(t, "name", execution.Name)
+		assert.Equal(t, testOrg, execution.Org)
 		assert.Equal(t, lpID, execution.LaunchPlanID)
 		assert.Equal(t, wfID, execution.WorkflowID)
 		assert.EqualValues(t, createdAt, *execution.ExecutionCreatedAt)
@@ -378,6 +388,7 @@ func TestUpdateModelState_UnknownToRunning(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Spec:               specBytes,
 		Phase:              core.WorkflowExecution_RUNNING.String(),
@@ -450,6 +461,7 @@ func TestUpdateModelState_RunningToFailed(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Spec:               specBytes,
 		Phase:              core.WorkflowExecution_ABORTED.String(),
@@ -492,6 +504,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Spec:               specBytes,
 		Phase:              core.WorkflowExecution_SUCCEEDED.String(),
@@ -604,7 +617,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 		}
 		mockStorage := commonMocks.GetMockStorageClient()
 		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
-			assert.Equal(t, reference.String(), "s3://bucket/metadata/project/domain/name/offloaded_outputs")
+			assert.Equal(t, reference.String(), "s3://bucket/metadata/org/project/domain/name/offloaded_outputs")
 			return nil
 		}
 		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
@@ -613,6 +626,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 					Project: "project",
 					Domain:  "domain",
 					Name:    "name",
+					Org:     testOrg,
 				},
 				Phase:      core.WorkflowExecution_SUCCEEDED,
 				OccurredAt: occurredAtProto,
@@ -636,7 +650,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 			OutputResult: &admin.ExecutionClosure_Outputs{
 				Outputs: &admin.LiteralMapBlob{
 					Data: &admin.LiteralMapBlob_Uri{
-						Uri: "s3://bucket/metadata/project/domain/name/offloaded_outputs",
+						Uri: "s3://bucket/metadata/org/project/domain/name/offloaded_outputs",
 					},
 				},
 			},
@@ -685,6 +699,7 @@ func TestGetExecutionIdentifier(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 	}
 	actualIdentifier := GetExecutionIdentifier(&executionModel)
@@ -692,6 +707,7 @@ func TestGetExecutionIdentifier(t *testing.T) {
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
+		Org:     testOrg,
 	}, &actualIdentifier))
 }
 
@@ -722,6 +738,7 @@ func TestFromExecutionModel(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		User:         "",
 		Spec:         specBytes,
@@ -739,6 +756,7 @@ func TestFromExecutionModel(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Spec:    spec,
 		Closure: &closure,
@@ -755,6 +773,7 @@ func TestFromExecutionModel_Aborted(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Phase:      core.WorkflowExecution_ABORTED.String(),
 		AbortCause: abortCause,
@@ -789,6 +808,7 @@ func TestFromExecutionModel_Error(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Phase:   core.WorkflowExecution_FAILED.String(),
 		Closure: executionClosureBytes,
@@ -815,6 +835,7 @@ func TestFromExecutionModel_ValidUTF8TrimmedErrorMsg(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Phase:   core.WorkflowExecution_FAILED.String(),
 		Closure: executionClosureBytes,
@@ -837,6 +858,7 @@ func TestFromExecutionModel_OverwriteNamespace(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Phase:      core.WorkflowExecution_RUNNING.String(),
 		AbortCause: abortCause,
@@ -881,6 +903,7 @@ func TestFromExecutionModels(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 			Spec:         specBytes,
 			Phase:        phase,
@@ -900,6 +923,7 @@ func TestFromExecutionModels(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Spec:    spec,
 		Closure: &closure,
@@ -983,6 +1007,7 @@ func TestReassignCluster(t *testing.T) {
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
+		Org:     testOrg,
 	}
 
 	t.Run("happy case", func(t *testing.T) {

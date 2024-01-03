@@ -6,6 +6,7 @@ type LaunchPlanKey struct {
 	Domain  string `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
 	Name    string `gorm:"primary_key;index:lp_project_domain_name_idx" valid:"length(0|255)"`
 	Version string `gorm:"primary_key" valid:"length(0|255)"`
+	Org     string `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
 }
 
 type LaunchPlanScheduleType string

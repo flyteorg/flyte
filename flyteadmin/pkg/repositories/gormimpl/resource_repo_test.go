@@ -24,7 +24,7 @@ func TestCreateWorkflowAttributes(t *testing.T) {
 	query := GlobalMock.NewMock()
 	GlobalMock.Logging = true
 	query.WithQuery(
-		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING "id"`)
+		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","org","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING "id"`)
 
 	err := resourceRepo.CreateOrUpdate(context.Background(), models.Resource{
 		Project:      "project",
@@ -63,16 +63,17 @@ func TestUpdateWorkflowAttributes_WithExisting(t *testing.T) {
 
 	mockSelectQuery := GlobalMock.NewMock()
 	mockSelectQuery.WithQuery(
-		`SELECT * FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."resource_type" = $3 AND "resources"."priority" = $4 ORDER BY "resources"."id" LIMIT 1`).WithReply(results)
+		`SELECT * FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."org" = $3 AND "resources"."resource_type" = $4 AND "resources"."priority" = $5 ORDER BY "resources"."id" LIMIT 1`).WithReply(results)
 
 	mockSaveQuery := GlobalMock.NewMock()
 	mockSaveQuery.WithQuery(
-		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
+		`INSERT INTO "resources" ("created_at","updated_at","deleted_at","project","domain","workflow","launch_plan","org","resource_type","priority","attributes") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`)
 
 	err := resourceRepo.CreateOrUpdate(context.Background(), models.Resource{
 		ResourceType: resourceType.String(),
 		Project:      project,
 		Domain:       domain,
+		Org:          testOrg,
 		Priority:     2,
 	})
 	assert.NoError(t, err)
@@ -92,7 +93,7 @@ func TestGetWorkflowAttributes(t *testing.T) {
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6,$7) AND launch_plan IN ($8) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6,$7) AND launch_plan IN ($8) AND org IN ($9) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -117,7 +118,7 @@ func TestProjectDomainAttributes(t *testing.T) {
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6) AND launch_plan IN ($7) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain IN ($2,$3) AND project IN ($4,$5) AND workflow IN ($6) AND launch_plan IN ($7) AND org IN ($8) ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -142,7 +143,7 @@ func TestProjectLevelAttributes(t *testing.T) {
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain = '' AND project = $2 AND workflow = '' AND launch_plan = '' ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE resource_type = $1 AND domain = '' AND project = $2 AND workflow = '' AND launch_plan = '' AND org = $3 ORDER BY priority desc,"resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})

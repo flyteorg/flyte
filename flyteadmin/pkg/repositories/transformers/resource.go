@@ -25,6 +25,7 @@ func WorkflowAttributesToResourceModel(attributes admin.WorkflowAttributes, reso
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityWorkflowLevel,
 		Attributes:   attributeBytes,
+		Org:          attributes.GetOrg(),
 	}, nil
 }
 
@@ -95,6 +96,7 @@ func FromResourceModelToWorkflowAttributes(model models.Resource) (admin.Workflo
 		Domain:             model.Domain,
 		Workflow:           model.Workflow,
 		MatchingAttributes: &attributes,
+		Org:                model.Org,
 	}, nil
 }
 
@@ -109,6 +111,7 @@ func ProjectDomainAttributesToResourceModel(attributes admin.ProjectDomainAttrib
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityProjectDomainLevel,
 		Attributes:   attributeBytes,
+		Org:          attributes.GetOrg(),
 	}, nil
 }
 
@@ -122,6 +125,7 @@ func ProjectAttributesToResourceModel(attributes admin.ProjectAttributes, resour
 		ResourceType: resource.String(),
 		Priority:     models.ResourcePriorityProjectLevel,
 		Attributes:   attributeBytes,
+		Org:          attributes.GetOrg(),
 	}, nil
 }
 
@@ -165,6 +169,7 @@ func FromResourceModelToProjectDomainAttributes(model models.Resource) (admin.Pr
 		Project:            model.Project,
 		Domain:             model.Domain,
 		MatchingAttributes: &attributes,
+		Org:                model.Org,
 	}, nil
 }
 
@@ -181,6 +186,7 @@ func FromResourceModelToMatchableAttributes(model models.Resource) (admin.Matcha
 		Domain:     model.Domain,
 		Workflow:   model.Workflow,
 		LaunchPlan: model.LaunchPlan,
+		Org:        model.Org,
 	}, nil
 }
 

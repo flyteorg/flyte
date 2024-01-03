@@ -27,6 +27,7 @@ func TestCreateExecutionEventModel(t *testing.T) {
 					Project: "project",
 					Domain:  "domain",
 					Name:    "name",
+					Org:     testOrg,
 				},
 				Phase:      phase,
 				OccurredAt: occurredAt,
@@ -39,6 +40,7 @@ func TestCreateExecutionEventModel(t *testing.T) {
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
+		Org:     testOrg,
 	}, executionEvent.ExecutionKey)
 	assert.Equal(t, timestamp, executionEvent.OccurredAt)
 	assert.Equal(t, phase.String(), executionEvent.Phase)

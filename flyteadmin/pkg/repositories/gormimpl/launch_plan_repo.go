@@ -58,6 +58,7 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
+			Org:     input.Org,
 		},
 	}).Take(&launchPlan)
 	timer.Stop()
@@ -69,6 +70,7 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 				Domain:  input.Domain,
 				Name:    input.Name,
 				Version: input.Version,
+				Org:     input.Org,
 			})
 	} else if tx.Error != nil {
 		return models.LaunchPlan{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -166,7 +168,7 @@ func (r *LaunchPlanRepo) ListLaunchPlanIdentifiers(ctx context.Context, input in
 	// Scan the results into a list of launch plans
 	var launchPlans []models.LaunchPlan
 	timer := r.metrics.ListIdentifiersDuration.Start()
-	tx.Select([]string{Project, Domain, Name}).Group(identifierGroupBy).Scan(&launchPlans)
+	tx.Select([]string{Project, Domain, Name, Org}).Group(identifierGroupBy).Scan(&launchPlans)
 	timer.Stop()
 	if tx.Error != nil {
 		return interfaces.LaunchPlanCollectionOutput{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

@@ -3,6 +3,7 @@ package models
 type Project struct {
 	BaseModel
 	Identifier  string `gorm:"primary_key"`
+	Org         string `gorm:"primary_key" valid:"length(0|255)"`
 	Name        string `valid:"length(0|255)"` // Human-readable name, not a unique identifier.
 	Description string `gorm:"type:varchar(300)"`
 	Labels      []byte

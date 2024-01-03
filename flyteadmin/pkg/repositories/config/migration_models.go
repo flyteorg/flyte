@@ -20,12 +20,14 @@ type TaskKey struct {
 	Domain  string `gorm:"primary_key"`
 	Name    string `gorm:"primary_key"`
 	Version string `gorm:"primary_key"`
+	Org     string `gorm:"primary_key"`
 }
 
 type ExecutionKey struct {
 	Project string `gorm:"primary_key;column:execution_project"`
 	Domain  string `gorm:"primary_key;column:execution_domain"`
 	Name    string `gorm:"primary_key;column:execution_name"`
+	Org     string `gorm:"primary_key;column:execution_org"`
 }
 
 type NodeExecutionKey struct {
@@ -63,6 +65,7 @@ type TaskExecutionKey struct {
 	Project string `gorm:"primary_key;column:execution_project;index:idx_task_executions_exec"`
 	Domain  string `gorm:"primary_key;column:execution_domain;index:idx_task_executions_exec"`
 	Name    string `gorm:"primary_key;column:execution_name;index:idx_task_executions_exec"`
+	Org     string `gorm:"primary_key;column:execution_org;index:idx_task_executions_exec"`
 	NodeID  string `gorm:"primary_key;index:idx_task_executions_exec;index"`
 	// *IMPORTANT* This is a pointer to an int in order to allow setting an empty ("0") value according to gorm convention.
 	// Because RetryAttempt is part of the TaskExecution primary key is should *never* be null.

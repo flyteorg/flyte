@@ -98,7 +98,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 	// create initial signalModel
 	mockInsertQuery := GlobalMock.NewMock()
 	mockInsertQuery.WithQuery(
-		`INSERT INTO "signals" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","signal_id","type","value","id") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
+		`INSERT INTO "signals" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","execution_org","signal_id","type","value","id") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`)
 
 	err := signalRepo.GetOrCreate(ctx, signalModel)
 	assert.NoError(t, err)

@@ -69,6 +69,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 		LaunchPlan:   input.LaunchPlan,
 		ResourceType: input.ResourceType,
 		Priority:     input.Priority,
+		Org:          input.Org,
 	})
 	timer.Stop()
 	if tx.Error != nil {
@@ -93,7 +94,7 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 	var resources []models.Resource
 	timer := r.metrics.GetDuration.Start()
 
-	txWhereClause := "resource_type = ? AND domain IN (?) AND project IN (?) AND workflow IN (?) AND launch_plan IN (?)"
+	txWhereClause := "resource_type = ? AND domain IN (?) AND project IN (?) AND workflow IN (?) AND launch_plan IN (?) AND org IN (?)"
 	project := []string{""}
 	if ID.Project != "" {
 		project = append(project, ID.Project)
@@ -114,7 +115,12 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 		launchPlan = append(launchPlan, ID.LaunchPlan)
 	}
 
-	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, domain, project, workflow, launchPlan)
+	org := []string{""}
+	if ID.Org != "" {
+		org = append(org, ID.Org)
+	}
+
+	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, domain, project, workflow, launchPlan, org)
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
@@ -138,9 +144,9 @@ func (r *ResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.Resour
 	var resources []models.Resource
 	timer := r.metrics.GetDuration.Start()
 
-	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = ''"
+	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = '' AND org = $3"
 
-	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, ID.Project)
+	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, ID.Project, ID.Org)
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
@@ -165,6 +171,7 @@ func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (mo
 		Workflow:     ID.Workflow,
 		LaunchPlan:   ID.LaunchPlan,
 		ResourceType: ID.ResourceType,
+		Org:          ID.Org,
 	}).First(&model)
 	timer.Stop()
 
@@ -199,6 +206,7 @@ func (r *ResourceRepo) Delete(ctx context.Context, ID interfaces.ResourceID) err
 			Workflow:     ID.Workflow,
 			LaunchPlan:   ID.LaunchPlan,
 			ResourceType: ID.ResourceType,
+			Org:          ID.Org,
 		}).Unscoped().Delete(models.Resource{})
 	})
 

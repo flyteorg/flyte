@@ -126,6 +126,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 			Project: input.WorkflowExecutionID.Project,
 			Domain:  input.WorkflowExecutionID.Domain,
 			Name:    input.WorkflowExecutionID.Name,
+			Org:     input.WorkflowExecutionID.GetOrg(),
 		},
 		Spec:                  spec,
 		Phase:                 input.Phase.String(),
@@ -248,7 +249,8 @@ func UpdateExecutionModelState(
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
 			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.ExecutionId.Project, request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
+				request.GetEvent().GetExecutionId().GetOrg(), request.Event.ExecutionId.Project,
+				request.Event.ExecutionId.Domain, request.Event.ExecutionId.Name, OutputsObjectSuffix)
 			if err != nil {
 				return err
 			}
@@ -339,6 +341,7 @@ func GetExecutionIdentifier(executionModel *models.Execution) core.WorkflowExecu
 		Project: executionModel.Project,
 		Domain:  executionModel.Domain,
 		Name:    executionModel.Name,
+		Org:     executionModel.Org,
 	}
 }
 

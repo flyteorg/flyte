@@ -14,8 +14,9 @@ import (
 
 func TestCreateNodeExecutionEvent(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	nodeExecutionEventQuery := GlobalMock.NewMock()
-	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","node_id","request_id","occurred_at","phase") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`)
+	nodeExecutionEventQuery.WithQuery(`INSERT INTO "node_execution_events" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","execution_org","node_id","request_id","occurred_at","phase") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`)
 	nodeExecEventRepo := NewNodeExecutionEventRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 	err := nodeExecEventRepo.Create(context.Background(), models.NodeExecutionEvent{
 		NodeExecutionKey: models.NodeExecutionKey{

@@ -34,6 +34,7 @@ var workflowAttributes = admin.WorkflowAttributes{
 	Domain:             resourceDomain,
 	Workflow:           resourceWorkflow,
 	MatchingAttributes: matchingClusterResourceAttributes,
+	Org:                testOrg,
 }
 
 var marshalledClusterResourceAttributes, _ = proto.Marshal(matchingClusterResourceAttributes)
@@ -52,6 +53,7 @@ var projectDomainAttributes = admin.ProjectDomainAttributes{
 	Project:            resourceProject,
 	Domain:             resourceDomain,
 	MatchingAttributes: matchingExecutionQueueAttributes,
+	Org:                testOrg,
 }
 
 var marshalledExecutionQueueAttributes, _ = proto.Marshal(matchingExecutionQueueAttributes)
@@ -66,6 +68,7 @@ func TestToProjectDomainAttributesModel(t *testing.T) {
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
 		Priority:     models.ResourcePriorityProjectDomainLevel,
 		Attributes:   marshalledExecutionQueueAttributes,
+		Org:          testOrg,
 	}, model)
 }
 
@@ -83,6 +86,7 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 			Workflow:     resourceWorkflow,
 			ResourceType: "PLUGIN_OVERRIDE",
 			Attributes:   existingWorkflowAttributes,
+			Org:          testOrg,
 		}
 		mergeUpdatedModel, err := MergeUpdatePluginAttributes(context.Background(), existingModel,
 			admin.MatchableResource_PLUGIN_OVERRIDE, &repoInterfaces.ResourceID{},
@@ -119,6 +123,7 @@ func TestMergeUpdateProjectDomainAttributes(t *testing.T) {
 			Domain:       resourceDomain,
 			Workflow:     resourceWorkflow,
 			ResourceType: "PLUGIN_OVERRIDE",
+			Org:          testOrg,
 		}
 		_, err := MergeUpdatePluginAttributes(context.Background(), existingModel,
 			admin.MatchableResource_TASK_RESOURCE, &repoInterfaces.ResourceID{}, &admin.MatchingAttributes{})
@@ -132,6 +137,7 @@ func TestFromProjectDomainAttributesModel(t *testing.T) {
 		Domain:       resourceDomain,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
 		Attributes:   marshalledExecutionQueueAttributes,
+		Org:          testOrg,
 	}
 	unmarshalledAttributes, err := FromResourceModelToProjectDomainAttributes(model)
 	assert.Nil(t, err)
@@ -144,6 +150,7 @@ func TestFromProjectDomainAttributesModel_InvalidResourceAttributes(t *testing.T
 		Domain:       resourceDomain,
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
 		Attributes:   []byte("i'm invalid!"),
+		Org:          testOrg,
 	}
 	_, err := FromResourceModelToProjectDomainAttributes(model)
 	assert.NotNil(t, err)
@@ -160,6 +167,7 @@ func TestToWorkflowAttributesModel(t *testing.T) {
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
 		Priority:     models.ResourcePriorityWorkflowLevel,
 		Attributes:   marshalledClusterResourceAttributes,
+		Org:          testOrg,
 	}, model)
 }
 
@@ -216,6 +224,7 @@ func TestMergeUpdateWorkflowAttributes(t *testing.T) {
 			Domain:       resourceDomain,
 			Workflow:     resourceWorkflow,
 			ResourceType: "TASK_RESOURCE",
+			Org:          testOrg,
 		}
 		_, err := MergeUpdateWorkflowAttributes(context.Background(), existingModel,
 			admin.MatchableResource_TASK_RESOURCE, &repoInterfaces.ResourceID{}, &admin.WorkflowAttributes{})
@@ -230,6 +239,7 @@ func TestFromWorkflowAttributesModel(t *testing.T) {
 		Workflow:     "workflow",
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
 		Attributes:   marshalledClusterResourceAttributes,
+		Org:          testOrg,
 	}
 	unmarshalledAttributes, err := FromResourceModelToWorkflowAttributes(model)
 	assert.Nil(t, err)
@@ -243,6 +253,7 @@ func TestFromWorkflowAttributesModel_InvalidResourceAttributes(t *testing.T) {
 		Workflow:     "workflow",
 		ResourceType: admin.MatchableResource_EXECUTION_QUEUE.String(),
 		Attributes:   []byte("i'm invalid!"),
+		Org:          testOrg,
 	}
 	_, err := FromResourceModelToWorkflowAttributes(model)
 	assert.NotNil(t, err)
@@ -253,6 +264,7 @@ func TestProjectAttributesToResourceModel(t *testing.T) {
 	pa := admin.ProjectAttributes{
 		Project:            resourceProject,
 		MatchingAttributes: matchingClusterResourceAttributes,
+		Org:                testOrg,
 	}
 	rm, err := ProjectAttributesToResourceModel(pa, admin.MatchableResource_CLUSTER_RESOURCE)
 
@@ -263,5 +275,6 @@ func TestProjectAttributesToResourceModel(t *testing.T) {
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE.String(),
 		Priority:     models.ResourcePriorityProjectLevel,
 		Attributes:   marshalledClusterResourceAttributes,
+		Org:          testOrg,
 	}, rm)
 }

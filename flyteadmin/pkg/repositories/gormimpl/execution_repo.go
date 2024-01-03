@@ -40,6 +40,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
+			Org:     input.Org,
 		},
 	}).Take(&execution)
 	timer.Stop()
@@ -49,6 +50,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
+			Org:     input.Org,
 		})
 	} else if tx.Error != nil {
 		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)

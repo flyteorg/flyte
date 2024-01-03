@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 )
 
+const Org = "org"
 const Project = "project"
 const Domain = "domain"
 const Name = "name"
@@ -34,7 +35,7 @@ const executionAdminTagsTableName = "execution_admin_tags"
 const limit = "limit"
 const filters = "filters"
 
-var identifierGroupBy = fmt.Sprintf("%s, %s, %s", Project, Domain, Name)
+var identifierGroupBy = fmt.Sprintf("%s, %s, %s, %s", Org, Project, Domain, Name)
 
 var entityToTableName = map[common.Entity]string{
 	common.Execution:           "executions",
@@ -53,24 +54,24 @@ var entityToTableName = map[common.Entity]string{
 
 var innerJoinExecToNodeExec = fmt.Sprintf(
 	"INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
+		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
 	executionTableName, nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName,
-	nodeExecutionTableName, executionTableName)
+	nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName)
 
 var innerJoinNodeExecToTaskExec = fmt.Sprintf(
 	"INNER JOIN %s ON %s.node_id = %s.node_id AND %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
+		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
 	nodeExecutionTableName, taskExecutionTableName, nodeExecutionTableName, taskExecutionTableName,
 	nodeExecutionTableName, taskExecutionTableName, nodeExecutionTableName, taskExecutionTableName,
-	nodeExecutionTableName)
+	nodeExecutionTableName, taskExecutionTableName, nodeExecutionTableName)
 
 // Because dynamic tasks do NOT necessarily register static task definitions, we use a left join to not exclude
 // dynamic tasks from list queries.
 var leftJoinTaskToTaskExec = fmt.Sprintf(
 	"LEFT JOIN %s ON %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name AND "+
-		"%s.version = %s.version",
+		"%s.version = %s.version AND %s.org = %s.org",
 	taskTableName, taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName,
-	taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName)
+	taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName, taskExecutionTableName, taskTableName)
 
 // Validates there are no missing but required parameters in ListResourceInput
 func ValidateListInput(input interfaces.ListResourceInput) adminErrors.FlyteAdminError {

@@ -42,7 +42,7 @@ func CreateLaunchPlanModel(
 
 	scheduleType := models.LaunchPlanScheduleTypeNONE
 	if launchPlan.Spec.EntityMetadata != nil && launchPlan.Spec.EntityMetadata.Schedule != nil {
-		if launchPlan.Spec.EntityMetadata.Schedule.GetCronExpression() != "" || launchPlan.Spec.EntityMetadata.Schedule.GetCronSchedule() != nil {
+		if launchPlan.Spec.EntityMetadata.Schedule.GetCronExpression() != "" {
 			scheduleType = models.LaunchPlanScheduleTypeCRON
 		} else if launchPlan.Spec.EntityMetadata.Schedule.GetRate() != nil {
 			scheduleType = models.LaunchPlanScheduleTypeRATE
@@ -57,6 +57,7 @@ func CreateLaunchPlanModel(
 			Domain:  launchPlan.Id.Domain,
 			Name:    launchPlan.Id.Name,
 			Version: launchPlan.Id.Version,
+			Org:     launchPlan.GetId().GetOrg(),
 		},
 		Spec:         spec,
 		State:        &state,
@@ -100,6 +101,7 @@ func FromLaunchPlanModel(model models.LaunchPlan) (*admin.LaunchPlan, error) {
 		Domain:       model.Domain,
 		Name:         model.Name,
 		Version:      model.Version,
+		Org:          model.Org,
 	}
 
 	return &admin.LaunchPlan{
@@ -128,6 +130,7 @@ func FromLaunchPlanModelsToIdentifiers(launchPlanModels []models.LaunchPlan) []*
 			Project: launchPlanModel.Project,
 			Domain:  launchPlanModel.Domain,
 			Name:    launchPlanModel.Name,
+			Org:     launchPlanModel.Org,
 		}
 	}
 	return ids

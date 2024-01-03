@@ -75,7 +75,7 @@ func addTerminalState(
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
 			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
+				request.GetEvent().GetId().GetExecutionId().GetOrg(), request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
 				request.Event.Id.NodeId, OutputsObjectSuffix)
 			if err != nil {
 				return err
@@ -105,6 +105,7 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 				Project: input.Request.Event.Id.ExecutionId.Project,
 				Domain:  input.Request.Event.Id.ExecutionId.Domain,
 				Name:    input.Request.Event.Id.ExecutionId.Name,
+				Org:     input.Request.GetEvent().GetId().GetExecutionId().GetOrg(),
 			},
 		},
 		Phase: input.Request.Event.Phase.String(),
@@ -353,6 +354,7 @@ func FromNodeExecutionModel(nodeExecutionModel models.NodeExecution, opts *Execu
 				Project: nodeExecutionModel.NodeExecutionKey.ExecutionKey.Project,
 				Domain:  nodeExecutionModel.NodeExecutionKey.ExecutionKey.Domain,
 				Name:    nodeExecutionModel.NodeExecutionKey.ExecutionKey.Name,
+				Org:     nodeExecutionModel.NodeExecutionKey.ExecutionKey.Org,
 			},
 		},
 		InputUri: nodeExecutionModel.InputURI,
@@ -386,7 +388,7 @@ func handleNodeExecutionInputs(ctx context.Context,
 		nodeExecutionModel.InputURI = request.Event.GetInputUri()
 	case *event.NodeExecutionEvent_InputData:
 		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetInputData(),
-			request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
+			request.GetEvent().GetId().GetExecutionId().GetOrg(), request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
 			request.Event.Id.NodeId, InputsObjectSuffix)
 		if err != nil {
 			return err

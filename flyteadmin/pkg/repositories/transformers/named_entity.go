@@ -13,6 +13,7 @@ func CreateNamedEntityModel(request *admin.NamedEntityUpdateRequest) models.Name
 			Project:      request.Id.Project,
 			Domain:       request.Id.Domain,
 			Name:         request.Id.Name,
+			Org:          request.GetId().GetOrg(),
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: request.Metadata.Description,
@@ -38,6 +39,7 @@ func FromNamedEntityModel(model models.NamedEntity) admin.NamedEntity {
 			Project: model.Project,
 			Domain:  model.Domain,
 			Name:    model.Name,
+			Org:     model.Org,
 		},
 		Metadata: &admin.NamedEntityMetadata{
 			Description: model.Description,

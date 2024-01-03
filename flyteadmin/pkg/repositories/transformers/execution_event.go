@@ -17,9 +17,10 @@ func CreateExecutionEventModel(request admin.WorkflowExecutionEventRequest) (*mo
 	}
 	return &models.ExecutionEvent{
 		ExecutionKey: models.ExecutionKey{
-			Project: request.Event.ExecutionId.Project,
-			Domain:  request.Event.ExecutionId.Domain,
-			Name:    request.Event.ExecutionId.Name,
+			Project: request.GetEvent().GetExecutionId().Project,
+			Domain:  request.GetEvent().GetExecutionId().Domain,
+			Name:    request.GetEvent().GetExecutionId().Name,
+			Org:     request.GetEvent().GetExecutionId().GetOrg(),
 		},
 		RequestID:  request.RequestId,
 		OccurredAt: occurredAt,

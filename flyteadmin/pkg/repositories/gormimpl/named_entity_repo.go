@@ -26,12 +26,12 @@ var resourceTypeToTableName = map[core.ResourceType]string{
 
 var joinString = "RIGHT JOIN (?) AS entities ON named_entity_metadata.resource_type = %d AND " +
 	"named_entity_metadata.project = entities.project AND named_entity_metadata.domain = entities.domain AND " +
-	"named_entity_metadata.name = entities.name"
+	"named_entity_metadata.name = entities.name AND named_entity_metadata.org = entities.org"
 
 func getSubQueryJoin(db *gorm.DB, tableName string, input interfaces.ListNamedEntityInput) *gorm.DB {
-	tx := db.Select([]string{Project, Domain, Name}).
+	tx := db.Select([]string{Project, Domain, Name, Org}).
 		Table(tableName).
-		Where(map[string]interface{}{Project: input.Project, Domain: input.Domain}).
+		Where(map[string]interface{}{Project: input.Project, Domain: input.Domain, Org: input.Org}).
 		Limit(input.Limit).
 		Offset(input.Offset).
 		Group(identifierGroupBy)
@@ -45,18 +45,18 @@ func getSubQueryJoin(db *gorm.DB, tableName string, input interfaces.ListNamedEn
 }
 
 var leftJoinWorkflowNameToMetadata = fmt.Sprintf(
-	"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name", namedEntityMetadataTableName, namedEntityMetadataTableName, core.ResourceType_WORKFLOW, namedEntityMetadataTableName, workflowTableName,
-	namedEntityMetadataTableName, workflowTableName,
+	"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name AND %s.org = %s.org", namedEntityMetadataTableName, namedEntityMetadataTableName, core.ResourceType_WORKFLOW, namedEntityMetadataTableName, workflowTableName,
+	namedEntityMetadataTableName, workflowTableName, namedEntityMetadataTableName, workflowTableName,
 	namedEntityMetadataTableName, workflowTableName)
 
 var leftJoinLaunchPlanNameToMetadata = fmt.Sprintf(
-	"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name", namedEntityMetadataTableName, namedEntityMetadataTableName, core.ResourceType_LAUNCH_PLAN, namedEntityMetadataTableName, launchPlanTableName,
-	namedEntityMetadataTableName, launchPlanTableName,
+	"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name AND %s.org = %s.org", namedEntityMetadataTableName, namedEntityMetadataTableName, core.ResourceType_LAUNCH_PLAN, namedEntityMetadataTableName, launchPlanTableName,
+	namedEntityMetadataTableName, launchPlanTableName, namedEntityMetadataTableName, launchPlanTableName,
 	namedEntityMetadataTableName, launchPlanTableName)
 
 var leftJoinTaskNameToMetadata = fmt.Sprintf(
-	"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name", namedEntityMetadataTableName, namedEntityMetadataTableName, core.ResourceType_TASK, namedEntityMetadataTableName, taskTableName,
-	namedEntityMetadataTableName, taskTableName,
+	"LEFT JOIN %s ON %s.resource_type = %d AND %s.project = %s.project AND %s.domain = %s.domain AND %s.name = %s.name AND %s.org = %s.org", namedEntityMetadataTableName, namedEntityMetadataTableName, core.ResourceType_TASK, namedEntityMetadataTableName, taskTableName,
+	namedEntityMetadataTableName, taskTableName, namedEntityMetadataTableName, taskTableName,
 	namedEntityMetadataTableName, taskTableName)
 
 var resourceTypeToMetadataJoin = map[core.ResourceType]string{
@@ -65,23 +65,23 @@ var resourceTypeToMetadataJoin = map[core.ResourceType]string{
 	core.ResourceType_TASK:        leftJoinTaskNameToMetadata,
 }
 
-var getGroupByForNamedEntity = fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s, %s.%s",
-	innerJoinTableAlias, Project, innerJoinTableAlias, Domain, innerJoinTableAlias, Name, namedEntityMetadataTableName,
-	Description,
-	namedEntityMetadataTableName, State)
+var getGroupByForNamedEntity = fmt.Sprintf("%s.%s, %s.%s, %s.%s, %s.%s, %s.%s, %s.%s",
+	innerJoinTableAlias, Project, innerJoinTableAlias, Domain, innerJoinTableAlias, Name, innerJoinTableAlias, Org, namedEntityMetadataTableName,
+	Description, namedEntityMetadataTableName, State)
 
 func getSelectForNamedEntity(tableName string, resourceType core.ResourceType) []string {
 	return []string{
 		fmt.Sprintf("%s.%s", tableName, Project),
 		fmt.Sprintf("%s.%s", tableName, Domain),
 		fmt.Sprintf("%s.%s", tableName, Name),
+		fmt.Sprintf("%s.%s", tableName, Org),
 		fmt.Sprintf("'%d' AS %s", resourceType, ResourceType),
 		fmt.Sprintf("%s.%s", namedEntityMetadataTableName, Description),
 		fmt.Sprintf("%s.%s", namedEntityMetadataTableName, State),
 	}
 }
 
-func getNamedEntityFilters(resourceType core.ResourceType, project string, domain string, name string) ([]common.InlineFilter, error) {
+func getNamedEntityFilters(resourceType core.ResourceType, project string, domain string, name string, org string) ([]common.InlineFilter, error) {
 	entity := common.ResourceTypeToEntity[resourceType]
 
 	filters := make([]common.InlineFilter, 0)
@@ -100,6 +100,13 @@ func getNamedEntityFilters(resourceType core.ResourceType, project string, domai
 		return nil, err
 	}
 	filters = append(filters, nameFilter)
+	if len(org) > 0 {
+		orgFilter, err := common.NewSingleValueFilter(entity, common.Equal, Org, org)
+		if err != nil {
+			return nil, err
+		}
+		filters = append(filters, orgFilter)
+	}
 
 	return filters, nil
 }
@@ -120,6 +127,7 @@ func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) 
 			Project:      input.Project,
 			Domain:       input.Domain,
 			Name:         input.Name,
+			Org:          input.Org,
 		},
 	}).Assign(input.NamedEntityMetadataFields).Omit("id").FirstOrCreate(&metadata)
 	timer.Stop()
@@ -132,7 +140,7 @@ func (r *NamedEntityRepo) Update(ctx context.Context, input models.NamedEntity) 
 func (r *NamedEntityRepo) Get(ctx context.Context, input interfaces.GetNamedEntityInput) (models.NamedEntity, error) {
 	var namedEntity models.NamedEntity
 
-	filters, err := getNamedEntityFilters(input.ResourceType, input.Project, input.Domain, input.Name)
+	filters, err := getNamedEntityFilters(input.ResourceType, input.Project, input.Domain, input.Name, input.Org)
 	if err != nil {
 		return models.NamedEntity{}, err
 	}

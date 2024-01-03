@@ -12,6 +12,7 @@ type GetNamedEntityInput struct {
 	Project      string
 	Domain       string
 	Name         string
+	Org          string
 }
 
 // Parameters for querying multiple resources.
@@ -19,6 +20,7 @@ type ListNamedEntityInput struct {
 	ListResourceInput
 	Project      string
 	Domain       string
+	Org          string
 	ResourceType core.ResourceType
 }
 

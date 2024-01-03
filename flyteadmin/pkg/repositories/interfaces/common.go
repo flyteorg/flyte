@@ -10,6 +10,7 @@ type Identifier struct {
 	Domain  string
 	Name    string
 	Version string
+	Org     string
 }
 
 // Parameters for querying multiple resources.

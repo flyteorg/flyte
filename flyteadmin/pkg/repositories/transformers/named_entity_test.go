@@ -19,6 +19,7 @@ func TestCreateNamedEntityModel(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Metadata: &admin.NamedEntityMetadata{
 			Description: "description",
@@ -32,6 +33,7 @@ func TestCreateNamedEntityModel(t *testing.T) {
 			Project:      "project",
 			Domain:       "domain",
 			Name:         "name",
+			Org:          testOrg,
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: "description",
@@ -48,6 +50,7 @@ func TestFromNamedEntityModel(t *testing.T) {
 			Project:      "project",
 			Domain:       "domain",
 			Name:         "name",
+			Org:          testOrg,
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: "description",
@@ -62,6 +65,7 @@ func TestFromNamedEntityModel(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		Metadata: &admin.NamedEntityMetadata{
 			Description: "description",

@@ -28,6 +28,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 		Domain:       domain,
 		Name:         name,
 		Version:      version,
+		Org:          testOrg,
 	})
 	assert.Empty(t, output)
 	assert.EqualError(t, err, "Test transformer failed to find transformation to apply")
@@ -35,7 +36,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "description_entities" WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4 LIMIT 1`).
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "description_entities" WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4 AND org = $5 LIMIT 1`).
 		WithReply(descriptionEntities)
 	output, err = descriptionEntityRepo.Get(context.Background(), interfaces.GetDescriptionEntityInput{
 		ResourceType: resourceType,
@@ -43,6 +44,7 @@ func TestGetDescriptionEntity(t *testing.T) {
 		Domain:       domain,
 		Name:         name,
 		Version:      version,
+		Org:          testOrg,
 	})
 	assert.Empty(t, err)
 	assert.Equal(t, project, output.Project)
@@ -103,7 +105,7 @@ func getMockDescriptionEntityResponseFromDb(version string, digest []byte) map[s
 }
 
 func TestGetDescriptionEntityFilters(t *testing.T) {
-	filters, err := getDescriptionEntityFilters(resourceType, project, domain, name, version)
+	filters, err := getDescriptionEntityFilters(resourceType, project, domain, name, version, testOrg)
 	entity := common.ResourceTypeToEntity[resourceType]
 	assert.NoError(t, err)
 
@@ -122,4 +124,8 @@ func TestGetDescriptionEntityFilters(t *testing.T) {
 	versionFilter, err := common.NewSingleValueFilter(entity, common.Equal, Version, version)
 	assert.NoError(t, err)
 	assert.Equal(t, filters[3], versionFilter)
+
+	orgFilter, err := common.NewSingleValueFilter(entity, common.Equal, Org, testOrg)
+	assert.NoError(t, err)
+	assert.Equal(t, filters[4], orgFilter)
 }

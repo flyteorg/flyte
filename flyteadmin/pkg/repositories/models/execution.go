@@ -17,6 +17,7 @@ type ExecutionKey struct {
 	Project string `gorm:"primary_key;column:execution_project" valid:"length(0|255)"`
 	Domain  string `gorm:"primary_key;column:execution_domain" valid:"length(0|255)"`
 	Name    string `gorm:"primary_key;column:execution_name" valid:"length(0|255)"`
+	Org     string `gorm:"primary_key;column:execution_org" valid:"length(0|255)"`
 }
 
 // Database model to encapsulate a (workflow) execution.

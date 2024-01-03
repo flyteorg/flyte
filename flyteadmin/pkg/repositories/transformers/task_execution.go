@@ -83,9 +83,11 @@ func addTaskTerminalState(
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
 			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+				request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetOrg(),
 				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
 				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
-				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
+				request.GetEvent().GetTaskId().GetOrg(), request.Event.TaskId.Project, request.Event.TaskId.Domain,
+				request.Event.TaskId.Name, request.Event.TaskId.Version,
 				strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), OutputsObjectSuffix)
 			if err != nil {
 				return err
@@ -110,6 +112,7 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 				Domain:  input.Request.Event.TaskId.Domain,
 				Name:    input.Request.Event.TaskId.Name,
 				Version: input.Request.Event.TaskId.Version,
+				Org:     input.Request.GetEvent().GetTaskId().GetOrg(),
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: input.Request.Event.ParentNodeExecutionId.NodeId,
@@ -117,6 +120,7 @@ func CreateTaskExecutionModel(ctx context.Context, input CreateTaskExecutionMode
 					Project: input.Request.Event.ParentNodeExecutionId.ExecutionId.Project,
 					Domain:  input.Request.Event.ParentNodeExecutionId.ExecutionId.Domain,
 					Name:    input.Request.Event.ParentNodeExecutionId.ExecutionId.Name,
+					Org:     input.Request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetOrg(),
 				},
 			},
 			RetryAttempt: &input.Request.Event.RetryAttempt,
@@ -477,6 +481,7 @@ func FromTaskExecutionModel(taskExecutionModel models.TaskExecution, opts *Execu
 				Domain:       taskExecutionModel.TaskExecutionKey.TaskKey.Domain,
 				Name:         taskExecutionModel.TaskExecutionKey.TaskKey.Name,
 				Version:      taskExecutionModel.TaskExecutionKey.TaskKey.Version,
+				Org:          taskExecutionModel.TaskExecutionKey.TaskKey.Org,
 			},
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				NodeId: taskExecutionModel.NodeExecutionKey.NodeID,
@@ -484,6 +489,7 @@ func FromTaskExecutionModel(taskExecutionModel models.TaskExecution, opts *Execu
 					Project: taskExecutionModel.TaskExecutionKey.NodeExecutionKey.ExecutionKey.Project,
 					Domain:  taskExecutionModel.TaskExecutionKey.NodeExecutionKey.ExecutionKey.Domain,
 					Name:    taskExecutionModel.TaskExecutionKey.NodeExecutionKey.ExecutionKey.Name,
+					Org:     taskExecutionModel.TaskExecutionKey.NodeExecutionKey.ExecutionKey.Org,
 				},
 			},
 			RetryAttempt: *taskExecutionModel.TaskExecutionKey.RetryAttempt,
@@ -521,9 +527,11 @@ func handleTaskExecutionInputs(ctx context.Context, taskExecutionModel *models.T
 		taskExecutionModel.InputURI = request.GetEvent().GetInputUri()
 	case *event.TaskExecutionEvent_InputData:
 		uri, err := common.OffloadLiteralMap(ctx, storageClient, request.GetEvent().GetInputData(),
+			request.GetEvent().GetParentNodeExecutionId().GetExecutionId().GetOrg(),
 			request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
 			request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
-			request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
+			request.GetEvent().GetTaskId().GetOrg(), request.Event.TaskId.Project, request.Event.TaskId.Domain,
+			request.Event.TaskId.Name, request.Event.TaskId.Version,
 			strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), InputsObjectSuffix)
 		if err != nil {
 			return err

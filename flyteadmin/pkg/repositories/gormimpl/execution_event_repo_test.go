@@ -21,7 +21,7 @@ func TestCreateExecutionEvent(t *testing.T) {
 	created := false
 
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`INSERT INTO "execution_events" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","request_id","occurred_at","phase") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`).WithCallback(
+	GlobalMock.NewMock().WithQuery(`INSERT INTO "execution_events" ("created_at","updated_at","deleted_at","execution_project","execution_domain","execution_name","execution_org","request_id","occurred_at","phase") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			created = true
 		},

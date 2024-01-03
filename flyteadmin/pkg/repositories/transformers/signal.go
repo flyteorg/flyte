@@ -25,6 +25,9 @@ func CreateSignalModel(signalID *core.SignalIdentifier, signalType *core.Literal
 			if len(signalID.ExecutionId.Name) > 0 {
 				executionKey.Name = signalID.ExecutionId.Name
 			}
+			if len(signalID.GetExecutionId().GetOrg()) > 0 {
+				executionKey.Org = signalID.GetExecutionId().GetOrg()
+			}
 		}
 
 		if len(signalID.SignalId) > 0 {
@@ -82,6 +85,10 @@ func FromSignalModel(signalModel models.Signal) (admin.Signal, error) {
 	if len(signalModel.SignalKey.ExecutionKey.Name) > 0 {
 		executionID = initWorkflowExecutionIdentifier(executionID)
 		executionID.Name = signalModel.SignalKey.ExecutionKey.Name
+	}
+	if len(signalModel.SignalKey.ExecutionKey.Org) > 0 {
+		executionID = initWorkflowExecutionIdentifier(executionID)
+		executionID.Org = signalModel.SignalKey.ExecutionKey.Org
 	}
 
 	var signalID *core.SignalIdentifier
