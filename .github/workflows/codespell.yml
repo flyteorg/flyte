@@ -25,4 +25,4 @@ jobs:
       - name: Codespell
         uses: codespell-project/actions-codespell@v2
         with:
-          skip: "*.pb"
+          skip: "*.pb,monodocs-environment.lock.yaml"

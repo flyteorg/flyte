@@ -295,6 +295,22 @@ func dummyTensorFlowJobResource(tensorflowResourceHandler tensorflowOperatorReso
 	}
 }
 
+func TestGetReplicaCount(t *testing.T) {
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+	tfObj := dummyTensorFlowCustomObj(1, 0, 0, 0)
+	taskTemplate := dummyTensorFlowTaskTemplate("the job", tfObj)
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+	tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
+	assert.True(t, ok)
+
+	assert.NotNil(t, common.GetReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeWorker))
+	assert.NotNil(t, common.GetReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypePS))
+	assert.NotNil(t, common.GetReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeChief))
+	assert.NotNil(t, common.GetReplicaCount(tensorflowJob.Spec.TFReplicaSpecs, kubeflowv1.TFJobReplicaTypeEval))
+}
+
 func TestBuildResourceTensorFlow(t *testing.T) {
 	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
 
@@ -641,10 +657,12 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 			},
@@ -654,9 +672,11 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 				},
 			},
 		},
@@ -695,19 +715,23 @@ func TestBuildResourceTensorFlowV1(t *testing.T) {
 		kubeflowv1.TFJobReplicaTypeWorker: {
 			Requests: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("1024m"),
+				corev1.ResourceMemory:      resource.MustParse("1Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 			Limits: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("2048m"),
+				corev1.ResourceMemory:      resource.MustParse("2Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 		},
 		kubeflowv1.TFJobReplicaTypePS: {
 			Requests: corev1.ResourceList{
-				corev1.ResourceCPU: resource.MustParse("250m"),
+				corev1.ResourceCPU:    resource.MustParse("250m"),
+				corev1.ResourceMemory: resource.MustParse("1Gi"),
 			},
 			Limits: corev1.ResourceList{
-				corev1.ResourceCPU: resource.MustParse("500m"),
+				corev1.ResourceCPU:    resource.MustParse("500m"),
+				corev1.ResourceMemory: resource.MustParse("2Gi"),
 			},
 		},
 		kubeflowv1.TFJobReplicaTypeEval: {
@@ -761,10 +785,12 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 					{Name: core.Resources_GPU, Value: "1"},
 				},
 			},
@@ -775,10 +801,12 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 		kubeflowv1.TFJobReplicaTypeWorker: {
 			Requests: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("1024m"),
+				corev1.ResourceMemory:      resource.MustParse("1Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 			Limits: corev1.ResourceList{
 				corev1.ResourceCPU:         resource.MustParse("2048m"),
+				corev1.ResourceMemory:      resource.MustParse("2Gi"),
 				flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
 			},
 		},
@@ -811,4 +839,65 @@ func TestBuildResourceTensorFlowV1WithOnlyWorker(t *testing.T) {
 
 		assert.True(t, hasContainerWithDefaultTensorFlowName)
 	}
+}
+
+func TestBuildResourceTensorFlowV1ResourceTolerations(t *testing.T) {
+	gpuToleration := corev1.Toleration{
+		Key:      "nvidia.com/gpu",
+		Value:    "present",
+		Operator: corev1.TolerationOpEqual,
+		Effect:   corev1.TaintEffectNoSchedule,
+	}
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
+		GpuResourceName: flytek8s.ResourceNvidiaGPU,
+		ResourceTolerations: map[corev1.ResourceName][]corev1.Toleration{
+			flytek8s.ResourceNvidiaGPU: {gpuToleration},
+		},
+	}))
+
+	taskConfig := &kfplugins.DistributedTensorflowTrainingTask{
+		ChiefReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+			Replicas: 1,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
+				},
+			},
+		},
+		WorkerReplicas: &kfplugins.DistributedTensorflowTrainingReplicaSpec{
+			Replicas: 100,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
+					{Name: core.Resources_GPU, Value: "1"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
+					{Name: core.Resources_GPU, Value: "1"},
+				},
+			},
+		},
+	}
+
+	tensorflowResourceHandler := tensorflowOperatorResourceHandler{}
+
+	taskTemplate := dummyTensorFlowTaskTemplate("v1", taskConfig)
+	taskTemplate.TaskTypeVersion = 1
+
+	resource, err := tensorflowResourceHandler.BuildResource(context.TODO(), dummyTensorFlowTaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+
+	tensorflowJob, ok := resource.(*kubeflowv1.TFJob)
+	assert.True(t, ok)
+
+	assert.NotContains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeChief].Template.Spec.Tolerations, gpuToleration)
+	assert.Contains(t, tensorflowJob.Spec.TFReplicaSpecs[kubeflowv1.TFJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
 }

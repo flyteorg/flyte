@@ -844,6 +844,13 @@ func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 
 func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
 			ContainerStatuses: []v1.ContainerStatus{
@@ -860,6 +867,33 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+}
+
+func TestDemystifiedSidecarStatus_PrimaryNotExistsYet(t *testing.T) {
+	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Primary",
+				},
+			},
+		},
+		Status: v1.PodStatus{
+			Phase: v1.PodRunning,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
+	}
+	res.SetAnnotations(map[string]string{
+		flytek8s.PrimaryContainerKey: "Primary",
+	})
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	assert.Nil(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }
 
 func TestGetProperties(t *testing.T) {

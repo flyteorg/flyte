@@ -241,11 +241,29 @@ Spin up a cluster
 
       .. group-tab:: Helm chart
 
-        Install Flyte using the :ref:`flyte-binary helm chart <deployment-deployment-cloud-simple>`.
+         1. Add the following to your values file under `configmap.inline`:
+
+         .. code-block:: yaml
+            
+            tasks:
+              task-plugins:
+                enabled-plugins:
+                  - container
+                  - sidecar
+                  - K8S-ARRAY
+                  - spark
+                  - ray
+                default-for-task-types:
+                  - container: container
+                  - container_array: K8S-ARRAY
+                  - spark: spark
+                  - ray: ray
+ 
+         2. Install the :ref:`flyte-binary Helm chart <deployment-deployment-cloud-simple>`.
    
   .. group-tab:: Flyte core
    
-    If you hae installed Flyte using the `flyte-core helm chart 
+    If you have installed Flyte using the `flyte-core Helm chart 
     <https://github.com/flyteorg/flyte/tree/master/charts/flyte-core>`__, please ensure:
 
     * You have the correct kubeconfig and have selected the correct Kubernetes context.
@@ -534,22 +552,38 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart, edit the relevant YAML file.
+        1. Make sure that your Helm values file includes the following configuration:
 
         .. code-block:: yaml
-          :emphasize-lines: 7,11
+         
+           configuration:
+             inline:
+              tasks:
+                task-plugins:
+                  enabled-plugins:
+                    - container
+                    - sidecar
+                    - k8s-array
+                    - ray
+                  default-for-task-types:
+                    - container: container
+                    - container_array: k8s-array
+                    - ray: ray
 
-          tasks:
-            task-plugins:
-              enabled-plugins:
-                - container
-                - sidecar
-                - k8s-array
-                - ray
-              default-for-task-types:
-                - container: container
-                - container_array: k8s-array
-                - ray: ray
+           rbac:
+             extraRules:
+               - apiGroups:
+               - "ray.io"
+               resources:
+               - rayjob
+               verbs:
+               - create
+               - get
+               - list
+               - patch
+               - update
+          
+        2. Run a ``helm upgrade`` operation
 
       .. group-tab:: Flyte core
     

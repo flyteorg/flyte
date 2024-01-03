@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coreos/go-oidc"
+	"github.com/coreos/go-oidc/v3/oidc"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"golang.org/x/oauth2"
@@ -131,7 +131,12 @@ func IdentityContextFromIDTokenToken(ctx context.Context, tokenStr, clientID str
 		logger.Infof(ctx, "Failed to unmarshal claims from id token, err: %v", err)
 	}
 
-	// TODO: Document why automatically specify "all" scope
+	// This path is used when a user logs into the UI and when you login through the UI, you should have all the capabilities your identity
+	// allows you to have, which is denoted by the "all" scope.
+	// There was a plan to one day define one of a handful of scopes (all, proj admin, user, viewer) and if you configure your IDP
+	// to issue the right scopes, admin can do very light weight 'AuthZ' on admin based on these scopes, but until that plan is effected,
+	// we just use this single scope that Admin expects for all methods
+	// And because not all IdPs allow us to configure the Identity Token claims, the scope needs to live here.
 	return NewIdentityContext(idToken.Audience[0], idToken.Subject, "", idToken.IssuedAt,
 		sets.NewString(ScopeAll), userInfo, claims)
 }

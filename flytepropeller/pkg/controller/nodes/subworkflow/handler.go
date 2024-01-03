@@ -49,12 +49,11 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeEx
 			errors.BadSpecificationError, errMsg, nil)), nil
 	}
 
-	updateNodeStateFn := func(transition handler.Transition, newPhase v1alpha1.WorkflowNodePhase, err error) (handler.Transition, error) {
+	updateNodeStateFn := func(transition handler.Transition, workflowNodeState handler.WorkflowNodeState, err error) (handler.Transition, error) {
 		if err != nil {
 			return transition, err
 		}
 
-		workflowNodeState := handler.WorkflowNodeState{Phase: newPhase}
 		err = nCtx.NodeStateWriter().PutWorkflowNodeState(workflowNodeState)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to store WorkflowNodeState, err :%s", err.Error())
@@ -75,10 +74,10 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeEx
 
 		if wfNode.GetSubWorkflowRef() != nil {
 			trns, err := w.subWfHandler.StartSubWorkflow(ctx, nCtx)
-			return updateNodeStateFn(trns, v1alpha1.WorkflowNodePhaseExecuting, err)
+			return updateNodeStateFn(trns, handler.WorkflowNodeState{Phase: v1alpha1.WorkflowNodePhaseExecuting}, err)
 		} else if wfNode.GetLaunchPlanRefID() != nil {
 			trns, err := w.lpHandler.StartLaunchPlan(ctx, nCtx)
-			return updateNodeStateFn(trns, v1alpha1.WorkflowNodePhaseExecuting, err)
+			return updateNodeStateFn(trns, handler.WorkflowNodeState{Phase: v1alpha1.WorkflowNodePhaseExecuting}, err)
 		}
 
 		return invalidWFNodeError()
@@ -95,8 +94,9 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeEx
 		}
 
 		if wfNode.GetSubWorkflowRef() != nil {
+			originalError := nCtx.NodeStateReader().GetWorkflowNodeState().Error
 			trns, err := w.subWfHandler.HandleFailingSubWorkflow(ctx, nCtx)
-			return updateNodeStateFn(trns, workflowPhase, err)
+			return updateNodeStateFn(trns, handler.WorkflowNodeState{Phase: workflowPhase, Error: originalError}, err)
 		} else if wfNode.GetLaunchPlanRefID() != nil {
 			// There is no failure node for launch plans, terminate immediately.
 			return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailureErr(wfNodeState.Error, nil)), nil

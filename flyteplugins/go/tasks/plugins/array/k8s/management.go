@@ -324,16 +324,37 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	return newState, externalResources, nil
 }
 
+func TerminateSubTasksOnAbort(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, config *Config,
+	terminateFunction func(context.Context, SubTaskExecutionContext, *Config, core.KubeClient) error, currentState *arrayCore.State) error {
+
+	_, externalResources, err := TerminateSubTasks(ctx, tCtx, kubeClient, GetConfig(), terminateFunction, currentState)
+	if err != nil {
+		return err
+	}
+
+	taskInfo := &core.TaskInfo{
+		ExternalResources: externalResources,
+	}
+	executionErr := &idlCore.ExecutionError{
+		Code:    "ArraySubtasksAborted",
+		Message: "Array subtasks were aborted",
+	}
+	phaseInfo := core.PhaseInfoFailed(core.PhaseAborted, executionErr, taskInfo)
+
+	return tCtx.EventsRecorder().RecordRaw(ctx, phaseInfo)
+}
+
 // TerminateSubTasks performs operations to gracefully terminate all subtasks. This may include
 // aborting and finalizing active k8s resources.
 func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kubeClient core.KubeClient, config *Config,
-	terminateFunction func(context.Context, SubTaskExecutionContext, *Config, core.KubeClient) error, currentState *arrayCore.State) error {
+	terminateFunction func(context.Context, SubTaskExecutionContext, *Config, core.KubeClient) error, currentState *arrayCore.State) (*arrayCore.State, []*core.ExternalResource, error) {
 
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
+	externalResources := make([]*core.ExternalResource, 0, len(currentState.GetArrayStatus().Detailed.GetItems()))
 	if err != nil {
-		return err
+		return currentState, externalResources, err
 	} else if taskTemplate == nil {
-		return errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
+		return currentState, externalResources, errors.Errorf(errors.BadTaskSpecification, "Required value not set, taskTemplate is nil")
 	}
 
 	messageCollector := errorcollector.NewErrorMessageCollector()
@@ -353,18 +374,25 @@ func TerminateSubTasks(ctx context.Context, tCtx core.TaskExecutionContext, kube
 		originalIdx := arrayCore.CalculateOriginalIndex(childIdx, currentState.GetIndexesToCache())
 		stCtx, err := NewSubTaskExecutionContext(ctx, tCtx, taskTemplate, childIdx, originalIdx, retryAttempt, 0)
 		if err != nil {
-			return err
+			return currentState, externalResources, err
 		}
 
 		err = terminateFunction(ctx, stCtx, config, kubeClient)
 		if err != nil {
 			messageCollector.Collect(childIdx, err.Error())
+		} else {
+			externalResources = append(externalResources, &core.ExternalResource{
+				ExternalID:   stCtx.TaskExecutionMetadata().GetTaskExecutionID().GetGeneratedName(),
+				Index:        uint32(originalIdx),
+				RetryAttempt: uint32(retryAttempt),
+				Phase:        core.PhaseAborted,
+			})
 		}
 	}
 
 	if messageCollector.Length() > 0 {
-		return fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength))
+		return currentState, externalResources, fmt.Errorf(messageCollector.Summary(config.MaxErrorStringLength))
 	}
 
-	return nil
+	return currentState.SetPhase(arrayCore.PhaseWriteToDiscoveryThenFail, currentState.PhaseVersion+1), externalResources, nil
 }

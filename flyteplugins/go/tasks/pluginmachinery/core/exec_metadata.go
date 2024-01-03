@@ -27,6 +27,10 @@ type TaskExecutionID interface {
 
 	// GetID returns the underlying idl task identifier.
 	GetID() core.TaskExecutionIdentifier
+
+	// GetUniqueNodeID returns the fully-qualified Node ID that is unique within a
+	// given workflow execution.
+	GetUniqueNodeID() string
 }
 
 // TaskExecutionMetadata represents any execution information for a Task. It is used to communicate meta information about the
