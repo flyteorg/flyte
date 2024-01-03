@@ -67,7 +67,10 @@ func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error
 	}
 
 	if options.ClientOptions == nil {
-		options.ClientOptions = &client.Options{Mapper: mapper}
+		options.ClientOptions = &client.Options{
+			HTTPClient: httpClient,
+			Mapper: mapper,
+		}
 	}
 
 	client, err := client.New(config, *options.ClientOptions)
