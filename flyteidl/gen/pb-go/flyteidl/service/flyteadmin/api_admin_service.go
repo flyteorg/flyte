@@ -10133,7 +10133,7 @@ func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, resourc
 /* 
 AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param id Deprecated, use identifier instead. Globally unique project name.
+ * @param id Globally unique project name.
  * @param body
 
 @return AdminProjectUpdateResponse
@@ -10225,7 +10225,7 @@ func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, id string, 
 AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the resource.
- * @param id Deprecated, use identifier instead. Globally unique project name.
+ * @param id Globally unique project name.
  * @param body
 
 @return AdminProjectUpdateResponse

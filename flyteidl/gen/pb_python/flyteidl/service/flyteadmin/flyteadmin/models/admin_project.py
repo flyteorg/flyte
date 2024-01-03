@@ -85,7 +85,7 @@ class AdminProject(object):
     def id(self):
         """Gets the id of this AdminProject.  # noqa: E501
 
-        Deprecated, use identifier instead. Globally unique project name.  # noqa: E501
+        Globally unique project name.  # noqa: E501
 
         :return: The id of this AdminProject.  # noqa: E501
         :rtype: str
@@ -96,7 +96,7 @@ class AdminProject(object):
     def id(self, id):
         """Sets the id of this AdminProject.
 
-        Deprecated, use identifier instead. Globally unique project name.  # noqa: E501
+        Globally unique project name.  # noqa: E501
 
         :param id: The id of this AdminProject.  # noqa: E501
         :type: str
