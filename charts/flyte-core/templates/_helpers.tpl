@@ -119,6 +119,11 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flytepropeller-userstorage" -}}
+propeller:
+  rawoutput-prefix: {{ include "flyte-core.storage.userDataPrefix" . }}
+{{- end -}}
+
 {{- define "flyte-pod-webhook.name" -}}
 flyte-pod-webhook
 {{- end -}}
@@ -156,7 +161,22 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 {{- end }}
 
+{{/*
+Get the Flyte user data prefix.
+*/}}
+{{- define "flyte-core.storage.userDataPrefix" -}}
+{{- $userBucketName := required "User data container required" .Values.storage.userBucketName -}}
+{{- if eq "s3" .Values.storage.type -}}
+{{- printf "s3://%s/data" $userBucketName -}}
+{{- else if eq "gcs" .Values.storage.type -}}
+{{- printf "gs://%s/data" $userBucketName -}}
+{{- else if eq "azure" .Values.storage.type -}}
+{{- printf "abfs://%s/data" $userBucketName -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "storage.base" -}}
+{{ include "flytepropeller-userstorage" .}}
 storage:
 {{- if eq .Values.storage.type "s3" }}
   type: s3
@@ -205,3 +225,7 @@ storage:
   limits:
     maxDownloadMBs: {{ .Values.storage.limits.maxDownloadMBs }}
 {{- end }}
+
+#{{- define "flytepropeller-core" -}}
+#{{ include "flytepropeller.storage" .}}
+#{{- end }}

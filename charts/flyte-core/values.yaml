@@ -415,8 +415,11 @@ common:
 storage:
   # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
   type: sandbox
-  # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
+  # -- bucketName defines the storage bucket Flyte will use. Required for all types except for sandbox.
   bucketName: my-s3-bucket
+  #-- userBucketName is a required setting and defines a separate bucket to be used by Flyte to store all the Raw data produced by Tasks
+  #-- Use the same value as for bucketName to store metadata and raw data in the same bucket. 
+  userBucketName: my-s3-bucket
   # -- settings for storage type s3
   s3:
     region: us-east-1
@@ -639,7 +642,6 @@ configmap:
       pod-template-name: "flytepropeller-template"
     # -- follows the structure specified [here](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/config).
     propeller:
-      rawoutput-prefix: s3://my-s3-bucket/
       metadata-prefix: metadata/propeller
       workers: 4
       max-workflow-retries: 30
