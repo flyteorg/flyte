@@ -633,7 +633,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// currently just mocking based on node phase -> which works for all k8s plugins
 	// we can not pre-allocated a bit array because max size is 256B and with 5k fanout node state = 1.28MB
 	pluginStateBytes := a.pluginStateBytesStarted
-	if taskPhase == int(core.PhaseUndefined) || taskPhase == int(core.PhaseRetryableFailure) {
+	if taskPhase == int(core.PhaseUndefined) || taskPhase == int(core.PhaseRetryableFailure) || taskPhase == int(core.PhaseWaitingForResources) {
 		pluginStateBytes = a.pluginStateBytesNotStarted
 	}
 
