@@ -136,9 +136,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 	// For now, don't append any additional information unless succeeded
 	if rawEvent.Phase != core.WorkflowExecution_SUCCEEDED {
 		return &event.CloudEventWorkflowExecution{
-			RawEvent:        rawEvent,
-			OutputData:      nil,
-			OutputInterface: nil,
+			RawEvent: rawEvent,
 		}, nil
 	}
 
