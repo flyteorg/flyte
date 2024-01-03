@@ -8,7 +8,6 @@ Configure Kubernetes Plugins
 This guide provides an overview of setting up the Kubernetes Operator backend plugin in your Flyte deployment.
 It assumes that you have already installed Flyte using any of the methods described in the `Deployment guide <https://docs.flyte.org/en/latest/deployment/deployment/index.html#deployment-deployment>`__.
 
-
 Install the Kubernetes operator
 -------------------------------
 
@@ -17,7 +16,6 @@ Install the Kubernetes operator
   .. group-tab:: PyTorch/TensorFlow/MPI
 
     First, `install Kustomize <https://kubectl.docs.kubernetes.io/installation/kustomize/>`__.
-
 
     Build and apply the training-operator.
   
@@ -172,7 +170,6 @@ Specify plugin configuration
                     - container_array: k8s-array
                     - pytorch: pytorch
 
-
       .. group-tab:: Flyte core
     
         Create a file named ``values-override.yaml`` and add the following config to it:
@@ -218,7 +215,6 @@ Specify plugin configuration
                     - container: container
                     - container_array: k8s-array
                     - tensorflow: tensorflow
-
 
       .. group-tab:: Flyte core
     
@@ -266,7 +262,6 @@ Specify plugin configuration
                     - container_array: k8s-array
                     - mpi: mpi
 
-
       .. group-tab:: Flyte core
     
         Create a file named ``values-override.yaml`` and add the following config to it:
@@ -311,7 +306,6 @@ Specify plugin configuration
                      - container: container
                      - container_array: k8s-array
                      - ray: ray
-
            rbac:
              extraRules:
                - apiGroups:
@@ -380,7 +374,17 @@ Specify plugin configuration
                            value: "4"
                        - projectQuotaMemory:
                            value: "3000Mi"
-
+                 tasks:
+                    task-plugins:
+                      enabled-plugins:
+                        - container
+                        - sidecar
+                        - k8s-array
+                        - spark
+                      default-for-task-types:
+                        - container: container
+                        - container_array: k8s-array
+                        - spark: spark
                  plugins:
                     spark:
                     # Edit the Spark configuration as you see fit
@@ -479,13 +483,26 @@ Specify plugin configuration
                           name: spark
                           namespace: {{ namespace }}
       
-
         .. group-tab:: Flyte core
 
           Create a file named ``values-override.yaml`` and add the following config to it:
    
           .. code-block:: yaml
-   
+
+            configmap:
+              enabled_plugins:
+                tasks:
+                  task-plugins:
+                    enabled-plugins:
+                      - container
+                      - sidecar
+                      - k8s-array
+                      - spark
+                    default-for-task-types:
+                      container: container
+                      sidecar: sidecar
+                      container_array: k8s-array
+                      spark: spark 
             cluster_resource_manager:
               enabled: true
               config:
@@ -497,7 +514,6 @@ Specify plugin configuration
                   # If you make use of ResourceQuotas, your Tasks should include resource Requests, otherwise 
                   #the K8s scheduler may reject Pod creation. Learn how to request resources from Task definitions
                   # https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/customizing_resources.html#customizing-task-resources
-
                     - production:
                         - projectQuotaCpu:
                             value: "5"
@@ -613,21 +629,6 @@ Specify plugin configuration
                       - spark.network.timeout: 600s
                       - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                       - spark.executor.heartbeatInterval: 60s
-
-            configmap:
-              enabled_plugins:
-                tasks:
-                  task-plugins:
-                    enabled-plugins:
-                      - container
-                      - sidecar
-                      - k8s-array
-                      - spark
-                    default-for-task-types:
-                      container: container
-                      sidecar: sidecar
-                      container_array: k8s-array
-                      spark: spark
    
   .. group-tab:: Dask
    
