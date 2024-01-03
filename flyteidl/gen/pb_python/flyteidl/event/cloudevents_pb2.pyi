@@ -50,17 +50,17 @@ class CloudEventTaskExecution(_message.Message):
     def __init__(self, raw_event: _Optional[_Union[_event_pb2.TaskExecutionEvent, _Mapping]] = ...) -> None: ...
 
 class CloudEventExecutionStart(_message.Message):
-    __slots__ = ["execution_id", "launch_plan_id", "workflow_id", "artifact_ids", "artifact_keys", "principal"]
+    __slots__ = ["execution_id", "launch_plan_id", "workflow_id", "artifact_ids", "artifact_trackers", "principal"]
     EXECUTION_ID_FIELD_NUMBER: _ClassVar[int]
     LAUNCH_PLAN_ID_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_ID_FIELD_NUMBER: _ClassVar[int]
     ARTIFACT_IDS_FIELD_NUMBER: _ClassVar[int]
-    ARTIFACT_KEYS_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_TRACKERS_FIELD_NUMBER: _ClassVar[int]
     PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
     execution_id: _identifier_pb2.WorkflowExecutionIdentifier
     launch_plan_id: _identifier_pb2.Identifier
     workflow_id: _identifier_pb2.Identifier
     artifact_ids: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactID]
-    artifact_keys: _containers.RepeatedScalarFieldContainer[str]
+    artifact_trackers: _containers.RepeatedScalarFieldContainer[str]
     principal: str
-    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ..., artifact_keys: _Optional[_Iterable[str]] = ..., principal: _Optional[str] = ...) -> None: ...
+    def __init__(self, execution_id: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., launch_plan_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., workflow_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ..., artifact_trackers: _Optional[_Iterable[str]] = ..., principal: _Optional[str] = ...) -> None: ...

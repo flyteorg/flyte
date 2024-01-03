@@ -18488,7 +18488,7 @@
                  * @property {flyteidl.core.IIdentifier|null} [launchPlanId] CloudEventExecutionStart launchPlanId
                  * @property {flyteidl.core.IIdentifier|null} [workflowId] CloudEventExecutionStart workflowId
                  * @property {Array.<flyteidl.core.IArtifactID>|null} [artifactIds] CloudEventExecutionStart artifactIds
-                 * @property {Array.<string>|null} [artifactKeys] CloudEventExecutionStart artifactKeys
+                 * @property {Array.<string>|null} [artifactTrackers] CloudEventExecutionStart artifactTrackers
                  * @property {string|null} [principal] CloudEventExecutionStart principal
                  */
     
@@ -18502,7 +18502,7 @@
                  */
                 function CloudEventExecutionStart(properties) {
                     this.artifactIds = [];
-                    this.artifactKeys = [];
+                    this.artifactTrackers = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -18542,12 +18542,12 @@
                 CloudEventExecutionStart.prototype.artifactIds = $util.emptyArray;
     
                 /**
-                 * CloudEventExecutionStart artifactKeys.
-                 * @member {Array.<string>} artifactKeys
+                 * CloudEventExecutionStart artifactTrackers.
+                 * @member {Array.<string>} artifactTrackers
                  * @memberof flyteidl.event.CloudEventExecutionStart
                  * @instance
                  */
-                CloudEventExecutionStart.prototype.artifactKeys = $util.emptyArray;
+                CloudEventExecutionStart.prototype.artifactTrackers = $util.emptyArray;
     
                 /**
                  * CloudEventExecutionStart principal.
@@ -18590,9 +18590,9 @@
                     if (message.artifactIds != null && message.artifactIds.length)
                         for (var i = 0; i < message.artifactIds.length; ++i)
                             $root.flyteidl.core.ArtifactID.encode(message.artifactIds[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.artifactKeys != null && message.artifactKeys.length)
-                        for (var i = 0; i < message.artifactKeys.length; ++i)
-                            writer.uint32(/* id 5, wireType 2 =*/42).string(message.artifactKeys[i]);
+                    if (message.artifactTrackers != null && message.artifactTrackers.length)
+                        for (var i = 0; i < message.artifactTrackers.length; ++i)
+                            writer.uint32(/* id 5, wireType 2 =*/42).string(message.artifactTrackers[i]);
                     if (message.principal != null && message.hasOwnProperty("principal"))
                         writer.uint32(/* id 6, wireType 2 =*/50).string(message.principal);
                     return writer;
@@ -18631,9 +18631,9 @@
                             message.artifactIds.push($root.flyteidl.core.ArtifactID.decode(reader, reader.uint32()));
                             break;
                         case 5:
-                            if (!(message.artifactKeys && message.artifactKeys.length))
-                                message.artifactKeys = [];
-                            message.artifactKeys.push(reader.string());
+                            if (!(message.artifactTrackers && message.artifactTrackers.length))
+                                message.artifactTrackers = [];
+                            message.artifactTrackers.push(reader.string());
                             break;
                         case 6:
                             message.principal = reader.string();
@@ -18681,12 +18681,12 @@
                                 return "artifactIds." + error;
                         }
                     }
-                    if (message.artifactKeys != null && message.hasOwnProperty("artifactKeys")) {
-                        if (!Array.isArray(message.artifactKeys))
-                            return "artifactKeys: array expected";
-                        for (var i = 0; i < message.artifactKeys.length; ++i)
-                            if (!$util.isString(message.artifactKeys[i]))
-                                return "artifactKeys: string[] expected";
+                    if (message.artifactTrackers != null && message.hasOwnProperty("artifactTrackers")) {
+                        if (!Array.isArray(message.artifactTrackers))
+                            return "artifactTrackers: array expected";
+                        for (var i = 0; i < message.artifactTrackers.length; ++i)
+                            if (!$util.isString(message.artifactTrackers[i]))
+                                return "artifactTrackers: string[] expected";
                     }
                     if (message.principal != null && message.hasOwnProperty("principal"))
                         if (!$util.isString(message.principal))

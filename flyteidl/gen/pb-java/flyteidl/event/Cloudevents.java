@@ -4673,7 +4673,7 @@ public final class Cloudevents {
 
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -4682,7 +4682,7 @@ public final class Cloudevents {
         getArtifactIdsList();
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -4690,7 +4690,7 @@ public final class Cloudevents {
     flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index);
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -4698,7 +4698,7 @@ public final class Cloudevents {
     int getArtifactIdsCount();
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -4707,7 +4707,7 @@ public final class Cloudevents {
         getArtifactIdsOrBuilderList();
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -4717,38 +4717,38 @@ public final class Cloudevents {
 
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
     java.util.List<java.lang.String>
-        getArtifactKeysList();
+        getArtifactTrackersList();
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
-    int getArtifactKeysCount();
+    int getArtifactTrackersCount();
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
-    java.lang.String getArtifactKeys(int index);
+    java.lang.String getArtifactTrackers(int index);
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
     com.google.protobuf.ByteString
-        getArtifactKeysBytes(int index);
+        getArtifactTrackersBytes(int index);
 
     /**
      * <code>string principal = 6;</code>
@@ -4778,7 +4778,7 @@ public final class Cloudevents {
     }
     private CloudEventExecutionStart() {
       artifactIds_ = java.util.Collections.emptyList();
-      artifactKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      artifactTrackers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
       principal_ = "";
     }
 
@@ -4857,10 +4857,10 @@ public final class Cloudevents {
             case 42: {
               java.lang.String s = input.readStringRequireUtf8();
               if (!((mutable_bitField0_ & 0x00000010) != 0)) {
-                artifactKeys_ = new com.google.protobuf.LazyStringArrayList();
+                artifactTrackers_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00000010;
               }
-              artifactKeys_.add(s);
+              artifactTrackers_.add(s);
               break;
             }
             case 50: {
@@ -4888,7 +4888,7 @@ public final class Cloudevents {
           artifactIds_ = java.util.Collections.unmodifiableList(artifactIds_);
         }
         if (((mutable_bitField0_ & 0x00000010) != 0)) {
-          artifactKeys_ = artifactKeys_.getUnmodifiableView();
+          artifactTrackers_ = artifactTrackers_.getUnmodifiableView();
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -4999,7 +4999,7 @@ public final class Cloudevents {
     private java.util.List<flyteidl.core.ArtifactId.ArtifactID> artifactIds_;
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -5009,7 +5009,7 @@ public final class Cloudevents {
     }
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -5020,7 +5020,7 @@ public final class Cloudevents {
     }
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -5030,7 +5030,7 @@ public final class Cloudevents {
     }
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -5040,7 +5040,7 @@ public final class Cloudevents {
     }
     /**
      * <pre>
-     * Artifact IDs found
+     * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
      * </pre>
      *
      * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -5050,49 +5050,49 @@ public final class Cloudevents {
       return artifactIds_.get(index);
     }
 
-    public static final int ARTIFACT_KEYS_FIELD_NUMBER = 5;
-    private com.google.protobuf.LazyStringList artifactKeys_;
+    public static final int ARTIFACT_TRACKERS_FIELD_NUMBER = 5;
+    private com.google.protobuf.LazyStringList artifactTrackers_;
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
     public com.google.protobuf.ProtocolStringList
-        getArtifactKeysList() {
-      return artifactKeys_;
+        getArtifactTrackersList() {
+      return artifactTrackers_;
     }
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
-    public int getArtifactKeysCount() {
-      return artifactKeys_.size();
+    public int getArtifactTrackersCount() {
+      return artifactTrackers_.size();
     }
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
-    public java.lang.String getArtifactKeys(int index) {
-      return artifactKeys_.get(index);
+    public java.lang.String getArtifactTrackers(int index) {
+      return artifactTrackers_.get(index);
     }
     /**
      * <pre>
-     * Artifact keys found.
+     * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
      * </pre>
      *
-     * <code>repeated string artifact_keys = 5;</code>
+     * <code>repeated string artifact_trackers = 5;</code>
      */
     public com.google.protobuf.ByteString
-        getArtifactKeysBytes(int index) {
-      return artifactKeys_.getByteString(index);
+        getArtifactTrackersBytes(int index) {
+      return artifactTrackers_.getByteString(index);
     }
 
     public static final int PRINCIPAL_FIELD_NUMBER = 6;
@@ -5155,8 +5155,8 @@ public final class Cloudevents {
       for (int i = 0; i < artifactIds_.size(); i++) {
         output.writeMessage(4, artifactIds_.get(i));
       }
-      for (int i = 0; i < artifactKeys_.size(); i++) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, artifactKeys_.getRaw(i));
+      for (int i = 0; i < artifactTrackers_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, artifactTrackers_.getRaw(i));
       }
       if (!getPrincipalBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 6, principal_);
@@ -5188,11 +5188,11 @@ public final class Cloudevents {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < artifactKeys_.size(); i++) {
-          dataSize += computeStringSizeNoTag(artifactKeys_.getRaw(i));
+        for (int i = 0; i < artifactTrackers_.size(); i++) {
+          dataSize += computeStringSizeNoTag(artifactTrackers_.getRaw(i));
         }
         size += dataSize;
-        size += 1 * getArtifactKeysList().size();
+        size += 1 * getArtifactTrackersList().size();
       }
       if (!getPrincipalBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, principal_);
@@ -5229,8 +5229,8 @@ public final class Cloudevents {
       }
       if (!getArtifactIdsList()
           .equals(other.getArtifactIdsList())) return false;
-      if (!getArtifactKeysList()
-          .equals(other.getArtifactKeysList())) return false;
+      if (!getArtifactTrackersList()
+          .equals(other.getArtifactTrackersList())) return false;
       if (!getPrincipal()
           .equals(other.getPrincipal())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
@@ -5260,9 +5260,9 @@ public final class Cloudevents {
         hash = (37 * hash) + ARTIFACT_IDS_FIELD_NUMBER;
         hash = (53 * hash) + getArtifactIdsList().hashCode();
       }
-      if (getArtifactKeysCount() > 0) {
-        hash = (37 * hash) + ARTIFACT_KEYS_FIELD_NUMBER;
-        hash = (53 * hash) + getArtifactKeysList().hashCode();
+      if (getArtifactTrackersCount() > 0) {
+        hash = (37 * hash) + ARTIFACT_TRACKERS_FIELD_NUMBER;
+        hash = (53 * hash) + getArtifactTrackersList().hashCode();
       }
       hash = (37 * hash) + PRINCIPAL_FIELD_NUMBER;
       hash = (53 * hash) + getPrincipal().hashCode();
@@ -5428,7 +5428,7 @@ public final class Cloudevents {
         } else {
           artifactIdsBuilder_.clear();
         }
-        artifactKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        artifactTrackers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000010);
         principal_ = "";
 
@@ -5485,10 +5485,10 @@ public final class Cloudevents {
           result.artifactIds_ = artifactIdsBuilder_.build();
         }
         if (((bitField0_ & 0x00000010) != 0)) {
-          artifactKeys_ = artifactKeys_.getUnmodifiableView();
+          artifactTrackers_ = artifactTrackers_.getUnmodifiableView();
           bitField0_ = (bitField0_ & ~0x00000010);
         }
-        result.artifactKeys_ = artifactKeys_;
+        result.artifactTrackers_ = artifactTrackers_;
         result.principal_ = principal_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -5574,13 +5574,13 @@ public final class Cloudevents {
             }
           }
         }
-        if (!other.artifactKeys_.isEmpty()) {
-          if (artifactKeys_.isEmpty()) {
-            artifactKeys_ = other.artifactKeys_;
+        if (!other.artifactTrackers_.isEmpty()) {
+          if (artifactTrackers_.isEmpty()) {
+            artifactTrackers_ = other.artifactTrackers_;
             bitField0_ = (bitField0_ & ~0x00000010);
           } else {
-            ensureArtifactKeysIsMutable();
-            artifactKeys_.addAll(other.artifactKeys_);
+            ensureArtifactTrackersIsMutable();
+            artifactTrackers_.addAll(other.artifactTrackers_);
           }
           onChanged();
         }
@@ -6055,7 +6055,7 @@ public final class Cloudevents {
 
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6069,7 +6069,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6083,7 +6083,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6097,7 +6097,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6118,7 +6118,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6136,7 +6136,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6156,7 +6156,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6177,7 +6177,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6195,7 +6195,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6213,7 +6213,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6232,7 +6232,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6249,7 +6249,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6266,7 +6266,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6277,7 +6277,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6291,7 +6291,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6306,7 +6306,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6317,7 +6317,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6329,7 +6329,7 @@ public final class Cloudevents {
       }
       /**
        * <pre>
-       * Artifact IDs found
+       * Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
        * </pre>
        *
        * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 4;</code>
@@ -6353,132 +6353,132 @@ public final class Cloudevents {
         return artifactIdsBuilder_;
       }
 
-      private com.google.protobuf.LazyStringList artifactKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      private void ensureArtifactKeysIsMutable() {
+      private com.google.protobuf.LazyStringList artifactTrackers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureArtifactTrackersIsMutable() {
         if (!((bitField0_ & 0x00000010) != 0)) {
-          artifactKeys_ = new com.google.protobuf.LazyStringArrayList(artifactKeys_);
+          artifactTrackers_ = new com.google.protobuf.LazyStringArrayList(artifactTrackers_);
           bitField0_ |= 0x00000010;
          }
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
       public com.google.protobuf.ProtocolStringList
-          getArtifactKeysList() {
-        return artifactKeys_.getUnmodifiableView();
+          getArtifactTrackersList() {
+        return artifactTrackers_.getUnmodifiableView();
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
-      public int getArtifactKeysCount() {
-        return artifactKeys_.size();
+      public int getArtifactTrackersCount() {
+        return artifactTrackers_.size();
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
-      public java.lang.String getArtifactKeys(int index) {
-        return artifactKeys_.get(index);
+      public java.lang.String getArtifactTrackers(int index) {
+        return artifactTrackers_.get(index);
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
       public com.google.protobuf.ByteString
-          getArtifactKeysBytes(int index) {
-        return artifactKeys_.getByteString(index);
+          getArtifactTrackersBytes(int index) {
+        return artifactTrackers_.getByteString(index);
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
-      public Builder setArtifactKeys(
+      public Builder setArtifactTrackers(
           int index, java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureArtifactKeysIsMutable();
-        artifactKeys_.set(index, value);
+  ensureArtifactTrackersIsMutable();
+        artifactTrackers_.set(index, value);
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
-      public Builder addArtifactKeys(
+      public Builder addArtifactTrackers(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
-  ensureArtifactKeysIsMutable();
-        artifactKeys_.add(value);
+  ensureArtifactTrackersIsMutable();
+        artifactTrackers_.add(value);
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
-      public Builder addAllArtifactKeys(
+      public Builder addAllArtifactTrackers(
           java.lang.Iterable<java.lang.String> values) {
-        ensureArtifactKeysIsMutable();
+        ensureArtifactTrackersIsMutable();
         com.google.protobuf.AbstractMessageLite.Builder.addAll(
-            values, artifactKeys_);
+            values, artifactTrackers_);
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
-      public Builder clearArtifactKeys() {
-        artifactKeys_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      public Builder clearArtifactTrackers() {
+        artifactTrackers_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000010);
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * Artifact keys found.
+       * Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
        * </pre>
        *
-       * <code>repeated string artifact_keys = 5;</code>
+       * <code>repeated string artifact_trackers = 5;</code>
        */
-      public Builder addArtifactKeysBytes(
+      public Builder addArtifactTrackersBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
-        ensureArtifactKeysIsMutable();
-        artifactKeys_.add(value);
+        ensureArtifactTrackersIsMutable();
+        artifactTrackers_.add(value);
         onChanged();
         return this;
       }
@@ -6657,16 +6657,16 @@ public final class Cloudevents {
       "l\030\005 \001(\t\0221\n\016launch_plan_id\030\006 \001(\0132\031.flytei" +
       "dl.core.Identifier\"P\n\027CloudEventTaskExec" +
       "ution\0225\n\traw_event\030\001 \001(\0132\".flyteidl.even" +
-      "t.TaskExecutionEvent\"\232\002\n\030CloudEventExecu" +
+      "t.TaskExecutionEvent\"\236\002\n\030CloudEventExecu" +
       "tionStart\022@\n\014execution_id\030\001 \001(\0132*.flytei" +
       "dl.core.WorkflowExecutionIdentifier\0221\n\016l" +
       "aunch_plan_id\030\002 \001(\0132\031.flyteidl.core.Iden" +
       "tifier\022.\n\013workflow_id\030\003 \001(\0132\031.flyteidl.c" +
       "ore.Identifier\022/\n\014artifact_ids\030\004 \003(\0132\031.f" +
-      "lyteidl.core.ArtifactID\022\025\n\rartifact_keys" +
-      "\030\005 \003(\t\022\021\n\tprincipal\030\006 \001(\tB=Z;github.com/" +
-      "flyteorg/flyte/flyteidl/gen/pb-go/flytei" +
-      "dl/eventb\006proto3"
+      "lyteidl.core.ArtifactID\022\031\n\021artifact_trac" +
+      "kers\030\005 \003(\t\022\021\n\tprincipal\030\006 \001(\tB=Z;github." +
+      "com/flyteorg/flyte/flyteidl/gen/pb-go/fl" +
+      "yteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6709,7 +6709,7 @@ public final class Cloudevents {
     internal_static_flyteidl_event_CloudEventExecutionStart_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_CloudEventExecutionStart_descriptor,
-        new java.lang.String[] { "ExecutionId", "LaunchPlanId", "WorkflowId", "ArtifactIds", "ArtifactKeys", "Principal", });
+        new java.lang.String[] { "ExecutionId", "LaunchPlanId", "WorkflowId", "ArtifactIds", "ArtifactTrackers", "Principal", });
     flyteidl.event.Event.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
