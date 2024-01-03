@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 import "flyteidl/core/identifier.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 // Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
 // which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more

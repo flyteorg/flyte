@@ -5,9 +5,10 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
-import "flyteidl/core/interface.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/metrics.proto";
+
 
 // The state of the execution is used to control its visibility in the UI/CLI.
 enum State {
@@ -124,4 +125,36 @@ message ListAgentsRequest {}
 // A response containing a list of agents.
 message ListAgentsResponse {
   repeated Agent agents = 1;
+}
+
+// A request to get the metrics from a task execution.
+message GetTaskMetricsRequest {
+  // A predefined yet extensible Task type identifier.
+  string task_type = 1;
+  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  bytes resource_meta = 2;
+  // The metrics to query. If empty, will return a default set of metrics.
+  repeated core.ExecutionMetric metrics = 3;
+}
+
+// A response containing a list of metrics for a task execution.
+message GetTaskMetricsResponse {
+  // The execution metric results.
+  repeated core.ExecutionMetricResult results = 1;
+}
+
+// A request to get the log from a task execution.
+message GetTaskLogsRequest {
+  // A predefined yet extensible Task type identifier.
+  string task_type = 1;
+  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  bytes resource_meta = 2;
+  // Number of lines to return.
+  uint64 lines = 3;
+}
+
+// A response containing the logs for a task execution.
+message GetTaskLogsResponse {
+  // The execution log results.
+  repeated string results = 1;
 }
