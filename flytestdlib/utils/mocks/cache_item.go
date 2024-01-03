@@ -18,13 +18,13 @@ func (_m CacheItem_ID) Return(_a0 string) *CacheItem_ID {
 }
 
 func (_m *CacheItem) OnID() *CacheItem_ID {
-	c_call := _m.On("ID")
-	return &CacheItem_ID{Call: c_call}
+	c := _m.On("ID")
+	return &CacheItem_ID{Call: c}
 }
 
 func (_m *CacheItem) OnIDMatch(matchers ...interface{}) *CacheItem_ID {
-	c_call := _m.On("ID", matchers...)
-	return &CacheItem_ID{Call: c_call}
+	c := _m.On("ID", matchers...)
+	return &CacheItem_ID{Call: c}
 }
 
 // ID provides a mock function with given fields:

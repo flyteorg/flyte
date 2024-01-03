@@ -22,13 +22,13 @@ func (_m Filter_Add) Return(evicted bool) *Filter_Add {
 }
 
 func (_m *Filter) OnAdd(ctx context.Context, id []byte) *Filter_Add {
-	c_call := _m.On("Add", ctx, id)
-	return &Filter_Add{Call: c_call}
+	c := _m.On("Add", ctx, id)
+	return &Filter_Add{Call: c}
 }
 
 func (_m *Filter) OnAddMatch(matchers ...interface{}) *Filter_Add {
-	c_call := _m.On("Add", matchers...)
-	return &Filter_Add{Call: c_call}
+	c := _m.On("Add", matchers...)
+	return &Filter_Add{Call: c}
 }
 
 // Add provides a mock function with given fields: ctx, id
@@ -54,13 +54,13 @@ func (_m Filter_Contains) Return(_a0 bool) *Filter_Contains {
 }
 
 func (_m *Filter) OnContains(ctx context.Context, id []byte) *Filter_Contains {
-	c_call := _m.On("Contains", ctx, id)
-	return &Filter_Contains{Call: c_call}
+	c := _m.On("Contains", ctx, id)
+	return &Filter_Contains{Call: c}
 }
 
 func (_m *Filter) OnContainsMatch(matchers ...interface{}) *Filter_Contains {
-	c_call := _m.On("Contains", matchers...)
-	return &Filter_Contains{Call: c_call}
+	c := _m.On("Contains", matchers...)
+	return &Filter_Contains{Call: c}
 }
 
 // Contains provides a mock function with given fields: ctx, id
