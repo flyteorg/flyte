@@ -3,6 +3,8 @@ from flyteidl.core import tasks_pb2 as _tasks_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import metrics_pb2 as _metrics_pb2
+from google.protobuf import duration_pb2 as _duration_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
@@ -152,14 +154,20 @@ class ListAgentsResponse(_message.Message):
     def __init__(self, agents: _Optional[_Iterable[_Union[Agent, _Mapping]]] = ...) -> None: ...
 
 class GetTaskMetricsRequest(_message.Message):
-    __slots__ = ["task_type", "resource_meta", "metrics"]
+    __slots__ = ["task_type", "resource_meta", "metrics", "start_time", "end_time", "step"]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
     METRICS_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
+    STEP_FIELD_NUMBER: _ClassVar[int]
     task_type: str
     resource_meta: bytes
     metrics: _containers.RepeatedScalarFieldContainer[_metrics_pb2.ExecutionMetric]
-    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., metrics: _Optional[_Iterable[_Union[_metrics_pb2.ExecutionMetric, str]]] = ...) -> None: ...
+    start_time: _timestamp_pb2.Timestamp
+    end_time: _timestamp_pb2.Timestamp
+    step: _duration_pb2.Duration
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., metrics: _Optional[_Iterable[_Union[_metrics_pb2.ExecutionMetric, str]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., step: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class GetTaskMetricsResponse(_message.Message):
     __slots__ = ["results"]
@@ -178,7 +186,9 @@ class GetTaskLogsRequest(_message.Message):
     def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., lines: _Optional[int] = ...) -> None: ...
 
 class GetTaskLogsResponse(_message.Message):
-    __slots__ = ["results"]
+    __slots__ = ["results", "token"]
     RESULTS_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
     results: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, results: _Optional[_Iterable[str]] = ...) -> None: ...
+    token: str
+    def __init__(self, results: _Optional[_Iterable[str]] = ..., token: _Optional[str] = ...) -> None: ...

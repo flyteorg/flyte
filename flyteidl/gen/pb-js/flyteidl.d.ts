@@ -9619,6 +9619,15 @@ export namespace flyteidl {
 
             /** GetTaskMetricsRequest metrics */
             metrics?: (flyteidl.core.ExecutionMetric[]|null);
+
+            /** GetTaskMetricsRequest startTime */
+            startTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest endTime */
+            endTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest step */
+            step?: (google.protobuf.IDuration|null);
         }
 
         /** Represents a GetTaskMetricsRequest. */
@@ -9638,6 +9647,15 @@ export namespace flyteidl {
 
             /** GetTaskMetricsRequest metrics. */
             public metrics: flyteidl.core.ExecutionMetric[];
+
+            /** GetTaskMetricsRequest startTime. */
+            public startTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest endTime. */
+            public endTime?: (google.protobuf.ITimestamp|null);
+
+            /** GetTaskMetricsRequest step. */
+            public step?: (google.protobuf.IDuration|null);
 
             /**
              * Creates a new GetTaskMetricsRequest instance using the specified properties.
@@ -9793,6 +9811,9 @@ export namespace flyteidl {
 
             /** GetTaskLogsResponse results */
             results?: (string[]|null);
+
+            /** GetTaskLogsResponse token */
+            token?: (string|null);
         }
 
         /** Represents a GetTaskLogsResponse. */
@@ -9806,6 +9827,9 @@ export namespace flyteidl {
 
             /** GetTaskLogsResponse results. */
             public results: string[];
+
+            /** GetTaskLogsResponse token. */
+            public token: string;
 
             /**
              * Creates a new GetTaskLogsResponse instance using the specified properties.

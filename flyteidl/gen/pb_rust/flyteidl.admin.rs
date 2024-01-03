@@ -169,6 +169,15 @@ pub struct GetTaskMetricsRequest {
     /// The metrics to query. If empty, will return a default set of metrics.
     #[prost(enumeration="super::core::ExecutionMetric", repeated, tag="3")]
     pub metrics: ::prost::alloc::vec::Vec<i32>,
+    /// Start timestamp, inclusive.
+    #[prost(message, optional, tag="4")]
+    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// End timestamp, inclusive..
+    #[prost(message, optional, tag="5")]
+    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// Query resolution step width in duration format or float number of seconds.
+    #[prost(message, optional, tag="6")]
+    pub step: ::core::option::Option<::prost_types::Duration>,
 }
 /// A response containing a list of metrics for a task execution.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -199,6 +208,10 @@ pub struct GetTaskLogsResponse {
     /// The execution log results.
     #[prost(string, repeated, tag="1")]
     pub results: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+    /// in a query. If there are no more results, this value will be empty.
+    #[prost(string, tag="2")]
+    pub token: ::prost::alloc::string::String,
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]

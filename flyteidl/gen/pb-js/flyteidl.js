@@ -23492,6 +23492,9 @@
                  * @property {string|null} [taskType] GetTaskMetricsRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskMetricsRequest resourceMeta
                  * @property {Array.<flyteidl.core.ExecutionMetric>|null} [metrics] GetTaskMetricsRequest metrics
+                 * @property {google.protobuf.ITimestamp|null} [startTime] GetTaskMetricsRequest startTime
+                 * @property {google.protobuf.ITimestamp|null} [endTime] GetTaskMetricsRequest endTime
+                 * @property {google.protobuf.IDuration|null} [step] GetTaskMetricsRequest step
                  */
     
                 /**
@@ -23535,6 +23538,30 @@
                 GetTaskMetricsRequest.prototype.metrics = $util.emptyArray;
     
                 /**
+                 * GetTaskMetricsRequest startTime.
+                 * @member {google.protobuf.ITimestamp|null|undefined} startTime
+                 * @memberof flyteidl.admin.GetTaskMetricsRequest
+                 * @instance
+                 */
+                GetTaskMetricsRequest.prototype.startTime = null;
+    
+                /**
+                 * GetTaskMetricsRequest endTime.
+                 * @member {google.protobuf.ITimestamp|null|undefined} endTime
+                 * @memberof flyteidl.admin.GetTaskMetricsRequest
+                 * @instance
+                 */
+                GetTaskMetricsRequest.prototype.endTime = null;
+    
+                /**
+                 * GetTaskMetricsRequest step.
+                 * @member {google.protobuf.IDuration|null|undefined} step
+                 * @memberof flyteidl.admin.GetTaskMetricsRequest
+                 * @instance
+                 */
+                GetTaskMetricsRequest.prototype.step = null;
+    
+                /**
                  * Creates a new GetTaskMetricsRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskMetricsRequest
@@ -23568,6 +23595,12 @@
                             writer.int32(message.metrics[i]);
                         writer.ldelim();
                     }
+                    if (message.startTime != null && message.hasOwnProperty("startTime"))
+                        $root.google.protobuf.Timestamp.encode(message.startTime, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.endTime != null && message.hasOwnProperty("endTime"))
+                        $root.google.protobuf.Timestamp.encode(message.endTime, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    if (message.step != null && message.hasOwnProperty("step"))
+                        $root.google.protobuf.Duration.encode(message.step, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
                     return writer;
                 };
     
@@ -23604,6 +23637,15 @@
                                     message.metrics.push(reader.int32());
                             } else
                                 message.metrics.push(reader.int32());
+                            break;
+                        case 4:
+                            message.startTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.endTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 6:
+                            message.step = $root.google.protobuf.Duration.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23644,6 +23686,21 @@
                             case 21:
                                 break;
                             }
+                    }
+                    if (message.startTime != null && message.hasOwnProperty("startTime")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.startTime);
+                        if (error)
+                            return "startTime." + error;
+                    }
+                    if (message.endTime != null && message.hasOwnProperty("endTime")) {
+                        var error = $root.google.protobuf.Timestamp.verify(message.endTime);
+                        if (error)
+                            return "endTime." + error;
+                    }
+                    if (message.step != null && message.hasOwnProperty("step")) {
+                        var error = $root.google.protobuf.Duration.verify(message.step);
+                        if (error)
+                            return "step." + error;
                     }
                     return null;
                 };
@@ -23922,6 +23979,7 @@
                  * @memberof flyteidl.admin
                  * @interface IGetTaskLogsResponse
                  * @property {Array.<string>|null} [results] GetTaskLogsResponse results
+                 * @property {string|null} [token] GetTaskLogsResponse token
                  */
     
                 /**
@@ -23947,6 +24005,14 @@
                  * @instance
                  */
                 GetTaskLogsResponse.prototype.results = $util.emptyArray;
+    
+                /**
+                 * GetTaskLogsResponse token.
+                 * @member {string} token
+                 * @memberof flyteidl.admin.GetTaskLogsResponse
+                 * @instance
+                 */
+                GetTaskLogsResponse.prototype.token = "";
     
                 /**
                  * Creates a new GetTaskLogsResponse instance using the specified properties.
@@ -23975,6 +24041,8 @@
                     if (message.results != null && message.results.length)
                         for (var i = 0; i < message.results.length; ++i)
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.results[i]);
+                    if (message.token != null && message.hasOwnProperty("token"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.token);
                     return writer;
                 };
     
@@ -24000,6 +24068,9 @@
                             if (!(message.results && message.results.length))
                                 message.results = [];
                             message.results.push(reader.string());
+                            break;
+                        case 2:
+                            message.token = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24027,6 +24098,9 @@
                             if (!$util.isString(message.results[i]))
                                 return "results: string[] expected";
                     }
+                    if (message.token != null && message.hasOwnProperty("token"))
+                        if (!$util.isString(message.token))
+                            return "token: string expected";
                     return null;
                 };
     

@@ -12095,6 +12095,81 @@ public final class AgentOuterClass {
      * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
      */
     int getMetricsValue(int index);
+
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    boolean hasStartTime();
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    com.google.protobuf.Timestamp getStartTime();
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getStartTimeOrBuilder();
+
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    boolean hasEndTime();
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    com.google.protobuf.Timestamp getEndTime();
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getEndTimeOrBuilder();
+
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    boolean hasStep();
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    com.google.protobuf.Duration getStep();
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    com.google.protobuf.DurationOrBuilder getStepOrBuilder();
   }
   /**
    * <pre>
@@ -12174,6 +12249,45 @@ public final class AgentOuterClass {
                 metrics_.add(rawValue);
               }
               input.popLimit(oldLimit);
+              break;
+            }
+            case 34: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (startTime_ != null) {
+                subBuilder = startTime_.toBuilder();
+              }
+              startTime_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(startTime_);
+                startTime_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (endTime_ != null) {
+                subBuilder = endTime_.toBuilder();
+              }
+              endTime_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(endTime_);
+                endTime_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 50: {
+              com.google.protobuf.Duration.Builder subBuilder = null;
+              if (step_ != null) {
+                subBuilder = step_.toBuilder();
+              }
+              step_ = input.readMessage(com.google.protobuf.Duration.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(step_);
+                step_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -12333,6 +12447,105 @@ public final class AgentOuterClass {
     }
     private int metricsMemoizedSerializedSize;
 
+    public static final int START_TIME_FIELD_NUMBER = 4;
+    private com.google.protobuf.Timestamp startTime_;
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    public boolean hasStartTime() {
+      return startTime_ != null;
+    }
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    public com.google.protobuf.Timestamp getStartTime() {
+      return startTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : startTime_;
+    }
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getStartTimeOrBuilder() {
+      return getStartTime();
+    }
+
+    public static final int END_TIME_FIELD_NUMBER = 5;
+    private com.google.protobuf.Timestamp endTime_;
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    public boolean hasEndTime() {
+      return endTime_ != null;
+    }
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    public com.google.protobuf.Timestamp getEndTime() {
+      return endTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : endTime_;
+    }
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getEndTimeOrBuilder() {
+      return getEndTime();
+    }
+
+    public static final int STEP_FIELD_NUMBER = 6;
+    private com.google.protobuf.Duration step_;
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    public boolean hasStep() {
+      return step_ != null;
+    }
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    public com.google.protobuf.Duration getStep() {
+      return step_ == null ? com.google.protobuf.Duration.getDefaultInstance() : step_;
+    }
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getStepOrBuilder() {
+      return getStep();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -12360,6 +12573,15 @@ public final class AgentOuterClass {
       }
       for (int i = 0; i < metrics_.size(); i++) {
         output.writeEnumNoTag(metrics_.get(i));
+      }
+      if (startTime_ != null) {
+        output.writeMessage(4, getStartTime());
+      }
+      if (endTime_ != null) {
+        output.writeMessage(5, getEndTime());
+      }
+      if (step_ != null) {
+        output.writeMessage(6, getStep());
       }
       unknownFields.writeTo(output);
     }
@@ -12389,6 +12611,18 @@ public final class AgentOuterClass {
             .computeUInt32SizeNoTag(dataSize);
         }metricsMemoizedSerializedSize = dataSize;
       }
+      if (startTime_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getStartTime());
+      }
+      if (endTime_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getEndTime());
+      }
+      if (step_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, getStep());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -12409,6 +12643,21 @@ public final class AgentOuterClass {
       if (!getResourceMeta()
           .equals(other.getResourceMeta())) return false;
       if (!metrics_.equals(other.metrics_)) return false;
+      if (hasStartTime() != other.hasStartTime()) return false;
+      if (hasStartTime()) {
+        if (!getStartTime()
+            .equals(other.getStartTime())) return false;
+      }
+      if (hasEndTime() != other.hasEndTime()) return false;
+      if (hasEndTime()) {
+        if (!getEndTime()
+            .equals(other.getEndTime())) return false;
+      }
+      if (hasStep() != other.hasStep()) return false;
+      if (hasStep()) {
+        if (!getStep()
+            .equals(other.getStep())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -12427,6 +12676,18 @@ public final class AgentOuterClass {
       if (getMetricsCount() > 0) {
         hash = (37 * hash) + METRICS_FIELD_NUMBER;
         hash = (53 * hash) + metrics_.hashCode();
+      }
+      if (hasStartTime()) {
+        hash = (37 * hash) + START_TIME_FIELD_NUMBER;
+        hash = (53 * hash) + getStartTime().hashCode();
+      }
+      if (hasEndTime()) {
+        hash = (37 * hash) + END_TIME_FIELD_NUMBER;
+        hash = (53 * hash) + getEndTime().hashCode();
+      }
+      if (hasStep()) {
+        hash = (37 * hash) + STEP_FIELD_NUMBER;
+        hash = (53 * hash) + getStep().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -12571,6 +12832,24 @@ public final class AgentOuterClass {
 
         metrics_ = java.util.Collections.emptyList();
         bitField0_ = (bitField0_ & ~0x00000004);
+        if (startTimeBuilder_ == null) {
+          startTime_ = null;
+        } else {
+          startTime_ = null;
+          startTimeBuilder_ = null;
+        }
+        if (endTimeBuilder_ == null) {
+          endTime_ = null;
+        } else {
+          endTime_ = null;
+          endTimeBuilder_ = null;
+        }
+        if (stepBuilder_ == null) {
+          step_ = null;
+        } else {
+          step_ = null;
+          stepBuilder_ = null;
+        }
         return this;
       }
 
@@ -12606,6 +12885,21 @@ public final class AgentOuterClass {
           bitField0_ = (bitField0_ & ~0x00000004);
         }
         result.metrics_ = metrics_;
+        if (startTimeBuilder_ == null) {
+          result.startTime_ = startTime_;
+        } else {
+          result.startTime_ = startTimeBuilder_.build();
+        }
+        if (endTimeBuilder_ == null) {
+          result.endTime_ = endTime_;
+        } else {
+          result.endTime_ = endTimeBuilder_.build();
+        }
+        if (stepBuilder_ == null) {
+          result.step_ = step_;
+        } else {
+          result.step_ = stepBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -12671,6 +12965,15 @@ public final class AgentOuterClass {
             metrics_.addAll(other.metrics_);
           }
           onChanged();
+        }
+        if (other.hasStartTime()) {
+          mergeStartTime(other.getStartTime());
+        }
+        if (other.hasEndTime()) {
+          mergeEndTime(other.getEndTime());
+        }
+        if (other.hasStep()) {
+          mergeStep(other.getStep());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -12996,6 +13299,465 @@ public final class AgentOuterClass {
         }
         onChanged();
         return this;
+      }
+
+      private com.google.protobuf.Timestamp startTime_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> startTimeBuilder_;
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public boolean hasStartTime() {
+        return startTimeBuilder_ != null || startTime_ != null;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public com.google.protobuf.Timestamp getStartTime() {
+        if (startTimeBuilder_ == null) {
+          return startTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : startTime_;
+        } else {
+          return startTimeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder setStartTime(com.google.protobuf.Timestamp value) {
+        if (startTimeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          startTime_ = value;
+          onChanged();
+        } else {
+          startTimeBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder setStartTime(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (startTimeBuilder_ == null) {
+          startTime_ = builderForValue.build();
+          onChanged();
+        } else {
+          startTimeBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder mergeStartTime(com.google.protobuf.Timestamp value) {
+        if (startTimeBuilder_ == null) {
+          if (startTime_ != null) {
+            startTime_ =
+              com.google.protobuf.Timestamp.newBuilder(startTime_).mergeFrom(value).buildPartial();
+          } else {
+            startTime_ = value;
+          }
+          onChanged();
+        } else {
+          startTimeBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder clearStartTime() {
+        if (startTimeBuilder_ == null) {
+          startTime_ = null;
+          onChanged();
+        } else {
+          startTime_ = null;
+          startTimeBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getStartTimeBuilder() {
+        
+        onChanged();
+        return getStartTimeFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getStartTimeOrBuilder() {
+        if (startTimeBuilder_ != null) {
+          return startTimeBuilder_.getMessageOrBuilder();
+        } else {
+          return startTime_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : startTime_;
+        }
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getStartTimeFieldBuilder() {
+        if (startTimeBuilder_ == null) {
+          startTimeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getStartTime(),
+                  getParentForChildren(),
+                  isClean());
+          startTime_ = null;
+        }
+        return startTimeBuilder_;
+      }
+
+      private com.google.protobuf.Timestamp endTime_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> endTimeBuilder_;
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public boolean hasEndTime() {
+        return endTimeBuilder_ != null || endTime_ != null;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public com.google.protobuf.Timestamp getEndTime() {
+        if (endTimeBuilder_ == null) {
+          return endTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : endTime_;
+        } else {
+          return endTimeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder setEndTime(com.google.protobuf.Timestamp value) {
+        if (endTimeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          endTime_ = value;
+          onChanged();
+        } else {
+          endTimeBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder setEndTime(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (endTimeBuilder_ == null) {
+          endTime_ = builderForValue.build();
+          onChanged();
+        } else {
+          endTimeBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder mergeEndTime(com.google.protobuf.Timestamp value) {
+        if (endTimeBuilder_ == null) {
+          if (endTime_ != null) {
+            endTime_ =
+              com.google.protobuf.Timestamp.newBuilder(endTime_).mergeFrom(value).buildPartial();
+          } else {
+            endTime_ = value;
+          }
+          onChanged();
+        } else {
+          endTimeBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder clearEndTime() {
+        if (endTimeBuilder_ == null) {
+          endTime_ = null;
+          onChanged();
+        } else {
+          endTime_ = null;
+          endTimeBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getEndTimeBuilder() {
+        
+        onChanged();
+        return getEndTimeFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getEndTimeOrBuilder() {
+        if (endTimeBuilder_ != null) {
+          return endTimeBuilder_.getMessageOrBuilder();
+        } else {
+          return endTime_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : endTime_;
+        }
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getEndTimeFieldBuilder() {
+        if (endTimeBuilder_ == null) {
+          endTimeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getEndTime(),
+                  getParentForChildren(),
+                  isClean());
+          endTime_ = null;
+        }
+        return endTimeBuilder_;
+      }
+
+      private com.google.protobuf.Duration step_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> stepBuilder_;
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public boolean hasStep() {
+        return stepBuilder_ != null || step_ != null;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public com.google.protobuf.Duration getStep() {
+        if (stepBuilder_ == null) {
+          return step_ == null ? com.google.protobuf.Duration.getDefaultInstance() : step_;
+        } else {
+          return stepBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder setStep(com.google.protobuf.Duration value) {
+        if (stepBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          step_ = value;
+          onChanged();
+        } else {
+          stepBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder setStep(
+          com.google.protobuf.Duration.Builder builderForValue) {
+        if (stepBuilder_ == null) {
+          step_ = builderForValue.build();
+          onChanged();
+        } else {
+          stepBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder mergeStep(com.google.protobuf.Duration value) {
+        if (stepBuilder_ == null) {
+          if (step_ != null) {
+            step_ =
+              com.google.protobuf.Duration.newBuilder(step_).mergeFrom(value).buildPartial();
+          } else {
+            step_ = value;
+          }
+          onChanged();
+        } else {
+          stepBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder clearStep() {
+        if (stepBuilder_ == null) {
+          step_ = null;
+          onChanged();
+        } else {
+          step_ = null;
+          stepBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public com.google.protobuf.Duration.Builder getStepBuilder() {
+        
+        onChanged();
+        return getStepFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public com.google.protobuf.DurationOrBuilder getStepOrBuilder() {
+        if (stepBuilder_ != null) {
+          return stepBuilder_.getMessageOrBuilder();
+        } else {
+          return step_ == null ?
+              com.google.protobuf.Duration.getDefaultInstance() : step_;
+        }
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+          getStepFieldBuilder() {
+        if (stepBuilder_ == null) {
+          stepBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                  getStep(),
+                  getParentForChildren(),
+                  isClean());
+          step_ = null;
+        }
+        return stepBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -14751,6 +15513,26 @@ public final class AgentOuterClass {
      */
     com.google.protobuf.ByteString
         getResultsBytes(int index);
+
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
   }
   /**
    * <pre>
@@ -14770,6 +15552,7 @@ public final class AgentOuterClass {
     }
     private GetTaskLogsResponse() {
       results_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      token_ = "";
     }
 
     @java.lang.Override
@@ -14803,6 +15586,12 @@ public final class AgentOuterClass {
                 mutable_bitField0_ |= 0x00000001;
               }
               results_.add(s);
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              token_ = s;
               break;
             }
             default: {
@@ -14840,6 +15629,7 @@ public final class AgentOuterClass {
               flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.class, flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.Builder.class);
     }
 
+    private int bitField0_;
     public static final int RESULTS_FIELD_NUMBER = 1;
     private com.google.protobuf.LazyStringList results_;
     /**
@@ -14885,6 +15675,50 @@ public final class AgentOuterClass {
       return results_.getByteString(index);
     }
 
+    public static final int TOKEN_FIELD_NUMBER = 2;
+    private volatile java.lang.Object token_;
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -14901,6 +15735,9 @@ public final class AgentOuterClass {
                         throws java.io.IOException {
       for (int i = 0; i < results_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, results_.getRaw(i));
+      }
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, token_);
       }
       unknownFields.writeTo(output);
     }
@@ -14919,6 +15756,9 @@ public final class AgentOuterClass {
         size += dataSize;
         size += 1 * getResultsList().size();
       }
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, token_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -14936,6 +15776,8 @@ public final class AgentOuterClass {
 
       if (!getResultsList()
           .equals(other.getResultsList())) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -14951,6 +15793,8 @@ public final class AgentOuterClass {
         hash = (37 * hash) + RESULTS_FIELD_NUMBER;
         hash = (53 * hash) + getResultsList().hashCode();
       }
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -15090,6 +15934,8 @@ public final class AgentOuterClass {
         super.clear();
         results_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000001);
+        token_ = "";
+
         return this;
       }
 
@@ -15117,11 +15963,14 @@ public final class AgentOuterClass {
       public flyteidl.admin.AgentOuterClass.GetTaskLogsResponse buildPartial() {
         flyteidl.admin.AgentOuterClass.GetTaskLogsResponse result = new flyteidl.admin.AgentOuterClass.GetTaskLogsResponse(this);
         int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         if (((bitField0_ & 0x00000001) != 0)) {
           results_ = results_.getUnmodifiableView();
           bitField0_ = (bitField0_ & ~0x00000001);
         }
         result.results_ = results_;
+        result.token_ = token_;
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -15178,6 +16027,10 @@ public final class AgentOuterClass {
             ensureResultsIsMutable();
             results_.addAll(other.results_);
           }
+          onChanged();
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -15336,6 +16189,100 @@ public final class AgentOuterClass {
   checkByteStringIsUtf8(value);
         ensureResultsIsMutable();
         results_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder clearToken() {
+        
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        token_ = value;
         onChanged();
         return this;
       }
@@ -15505,56 +16452,62 @@ public final class AgentOuterClass {
       "dmin\032\034flyteidl/core/literals.proto\032\031flyt" +
       "eidl/core/tasks.proto\032\036flyteidl/core/ide" +
       "ntifier.proto\032\035flyteidl/core/execution.p" +
-      "roto\032\033flyteidl/core/metrics.proto\"\232\004\n\025Ta" +
-      "skExecutionMetadata\022A\n\021task_execution_id" +
-      "\030\001 \001(\0132&.flyteidl.core.TaskExecutionIden" +
-      "tifier\022\021\n\tnamespace\030\002 \001(\t\022A\n\006labels\030\003 \003(" +
-      "\01321.flyteidl.admin.TaskExecutionMetadata" +
-      ".LabelsEntry\022K\n\013annotations\030\004 \003(\01326.flyt" +
-      "eidl.admin.TaskExecutionMetadata.Annotat" +
-      "ionsEntry\022\033\n\023k8s_service_account\030\005 \001(\t\022^" +
-      "\n\025environment_variables\030\006 \003(\0132?.flyteidl" +
-      ".admin.TaskExecutionMetadata.Environment" +
-      "VariablesEntry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001" +
-      "(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEntr" +
-      "y\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031Env" +
-      "ironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005v" +
-      "alue\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTaskRequest\022)\n\006" +
-      "inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMap\022" +
-      "-\n\010template\030\002 \001(\0132\033.flyteidl.core.TaskTe" +
-      "mplate\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_ex" +
-      "ecution_metadata\030\004 \001(\0132%.flyteidl.admin." +
-      "TaskExecutionMetadata\"b\n\022CreateTaskRespo" +
-      "nse\022\027\n\rresource_meta\030\001 \001(\014H\000\022,\n\010resource" +
-      "\030\002 \001(\0132\030.flyteidl.admin.ResourceH\000B\005\n\003re" +
-      "s\":\n\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025" +
-      "\n\rresource_meta\030\002 \001(\014\"h\n\017GetTaskResponse" +
-      "\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Reso" +
-      "urce\022)\n\tlog_links\030\002 \003(\0132\026.flyteidl.core." +
-      "TaskLog\"\230\001\n\010Resource\022$\n\005state\030\001 \001(\0162\025.fl" +
-      "yteidl.admin.State\022*\n\007outputs\030\002 \001(\0132\031.fl" +
-      "yteidl.core.LiteralMap\022\017\n\007message\030\003 \001(\t\022" +
-      ")\n\tlog_links\030\004 \003(\0132\026.flyteidl.core.TaskL" +
-      "og\"=\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001 \001" +
-      "(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTaskR" +
-      "esponse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024suppor" +
-      "ted_task_types\030\002 \003(\t\"\037\n\017GetAgentRequest\022" +
-      "\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005age" +
-      "nt\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListA" +
-      "gentsRequest\";\n\022ListAgentsResponse\022%\n\006ag" +
-      "ents\030\001 \003(\0132\025.flyteidl.admin.Agent\"r\n\025Get" +
-      "TaskMetricsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n" +
-      "\rresource_meta\030\002 \001(\014\022/\n\007metrics\030\003 \003(\0162\036." +
-      "flyteidl.core.ExecutionMetric\"O\n\026GetTask" +
-      "MetricsResponse\0225\n\007results\030\001 \003(\0132$.flyte" +
-      "idl.core.ExecutionMetricResult\"M\n\022GetTas" +
-      "kLogsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresou" +
-      "rce_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\"&\n\023GetTask" +
-      "LogsResponse\022\017\n\007results\030\001 \003(\t*^\n\005State\022\025" +
-      "\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILU" +
-      "RE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEE" +
-      "DED\020\004B=Z;github.com/flyteorg/flyte/flyte" +
-      "idl/gen/pb-go/flyteidl/adminb\006proto3"
+      "roto\032\033flyteidl/core/metrics.proto\032\036googl" +
+      "e/protobuf/duration.proto\032\037google/protob" +
+      "uf/timestamp.proto\"\232\004\n\025TaskExecutionMeta" +
+      "data\022A\n\021task_execution_id\030\001 \001(\0132&.flytei" +
+      "dl.core.TaskExecutionIdentifier\022\021\n\tnames" +
+      "pace\030\002 \001(\t\022A\n\006labels\030\003 \003(\01321.flyteidl.ad" +
+      "min.TaskExecutionMetadata.LabelsEntry\022K\n" +
+      "\013annotations\030\004 \003(\01326.flyteidl.admin.Task" +
+      "ExecutionMetadata.AnnotationsEntry\022\033\n\023k8" +
+      "s_service_account\030\005 \001(\t\022^\n\025environment_v" +
+      "ariables\030\006 \003(\0132?.flyteidl.admin.TaskExec" +
+      "utionMetadata.EnvironmentVariablesEntry\032" +
+      "-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
+      "(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(\t\022" +
+      "\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031EnvironmentVariabl" +
+      "esEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"" +
+      "\314\001\n\021CreateTaskRequest\022)\n\006inputs\030\001 \001(\0132\031." +
+      "flyteidl.core.LiteralMap\022-\n\010template\030\002 \001" +
+      "(\0132\033.flyteidl.core.TaskTemplate\022\025\n\routpu" +
+      "t_prefix\030\003 \001(\t\022F\n\027task_execution_metadat" +
+      "a\030\004 \001(\0132%.flyteidl.admin.TaskExecutionMe" +
+      "tadata\"b\n\022CreateTaskResponse\022\027\n\rresource" +
+      "_meta\030\001 \001(\014H\000\022,\n\010resource\030\002 \001(\0132\030.flytei" +
+      "dl.admin.ResourceH\000B\005\n\003res\":\n\016GetTaskReq" +
+      "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta" +
+      "\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030\001 " +
+      "\001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_lin" +
+      "ks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"\230\001\n\010Res" +
+      "ource\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin.St" +
+      "ate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Lit" +
+      "eralMap\022\017\n\007message\030\003 \001(\t\022)\n\tlog_links\030\004 " +
+      "\003(\0132\026.flyteidl.core.TaskLog\"=\n\021DeleteTas" +
+      "kRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_" +
+      "meta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"3\n\005Agen" +
+      "t\022\014\n\004name\030\001 \001(\t\022\034\n\024supported_task_types\030" +
+      "\002 \003(\t\"\037\n\017GetAgentRequest\022\014\n\004name\030\001 \001(\t\"8" +
+      "\n\020GetAgentResponse\022$\n\005agent\030\001 \001(\0132\025.flyt" +
+      "eidl.admin.Agent\"\023\n\021ListAgentsRequest\";\n" +
+      "\022ListAgentsResponse\022%\n\006agents\030\001 \003(\0132\025.fl" +
+      "yteidl.admin.Agent\"\371\001\n\025GetTaskMetricsReq" +
+      "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta" +
+      "\030\002 \001(\014\022/\n\007metrics\030\003 \003(\0162\036.flyteidl.core." +
+      "ExecutionMetric\022.\n\nstart_time\030\004 \001(\0132\032.go" +
+      "ogle.protobuf.Timestamp\022,\n\010end_time\030\005 \001(" +
+      "\0132\032.google.protobuf.Timestamp\022\'\n\004step\030\006 " +
+      "\001(\0132\031.google.protobuf.Duration\"O\n\026GetTas" +
+      "kMetricsResponse\0225\n\007results\030\001 \003(\0132$.flyt" +
+      "eidl.core.ExecutionMetricResult\"M\n\022GetTa" +
+      "skLogsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rreso" +
+      "urce_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\"5\n\023GetTas" +
+      "kLogsResponse\022\017\n\007results\030\001 \003(\t\022\r\n\005token\030" +
+      "\002 \001(\t*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n" +
+      "\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUN" +
+      "NING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyt" +
+      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/a" +
+      "dminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -15572,6 +16525,8 @@ public final class AgentOuterClass {
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
           flyteidl.core.Metrics.getDescriptor(),
+          com.google.protobuf.DurationProto.getDescriptor(),
+          com.google.protobuf.TimestampProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -15674,7 +16629,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_GetTaskMetricsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor,
-        new java.lang.String[] { "TaskType", "ResourceMeta", "Metrics", });
+        new java.lang.String[] { "TaskType", "ResourceMeta", "Metrics", "StartTime", "EndTime", "Step", });
     internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_GetTaskMetricsResponse_fieldAccessorTable = new
@@ -15692,12 +16647,14 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_GetTaskLogsResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor,
-        new java.lang.String[] { "Results", });
+        new java.lang.String[] { "Results", "Token", });
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Tasks.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.Metrics.getDescriptor();
+    com.google.protobuf.DurationProto.getDescriptor();
+    com.google.protobuf.TimestampProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

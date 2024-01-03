@@ -40,6 +40,8 @@
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/execution.pb.h"
 #include "flyteidl/core/metrics.pb.h"
+#include <google/protobuf/duration.pb.h>
+#include <google/protobuf/timestamp.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fagent_2eproto
@@ -2125,6 +2127,33 @@ class GetTaskMetricsRequest final :
   ::std::string* release_resource_meta();
   void set_allocated_resource_meta(::std::string* resource_meta);
 
+  // .google.protobuf.Timestamp start_time = 4;
+  bool has_start_time() const;
+  void clear_start_time();
+  static const int kStartTimeFieldNumber = 4;
+  const ::google::protobuf::Timestamp& start_time() const;
+  ::google::protobuf::Timestamp* release_start_time();
+  ::google::protobuf::Timestamp* mutable_start_time();
+  void set_allocated_start_time(::google::protobuf::Timestamp* start_time);
+
+  // .google.protobuf.Timestamp end_time = 5;
+  bool has_end_time() const;
+  void clear_end_time();
+  static const int kEndTimeFieldNumber = 5;
+  const ::google::protobuf::Timestamp& end_time() const;
+  ::google::protobuf::Timestamp* release_end_time();
+  ::google::protobuf::Timestamp* mutable_end_time();
+  void set_allocated_end_time(::google::protobuf::Timestamp* end_time);
+
+  // .google.protobuf.Duration step = 6;
+  bool has_step() const;
+  void clear_step();
+  static const int kStepFieldNumber = 6;
+  const ::google::protobuf::Duration& step() const;
+  ::google::protobuf::Duration* release_step();
+  ::google::protobuf::Duration* mutable_step();
+  void set_allocated_step(::google::protobuf::Duration* step);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.GetTaskMetricsRequest)
  private:
   class HasBitSetters;
@@ -2134,6 +2163,9 @@ class GetTaskMetricsRequest final :
   mutable std::atomic<int> _metrics_cached_byte_size_;
   ::google::protobuf::internal::ArenaStringPtr task_type_;
   ::google::protobuf::internal::ArenaStringPtr resource_meta_;
+  ::google::protobuf::Timestamp* start_time_;
+  ::google::protobuf::Timestamp* end_time_;
+  ::google::protobuf::Duration* step_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
 };
@@ -2516,12 +2548,27 @@ class GetTaskLogsResponse final :
   const ::google::protobuf::RepeatedPtrField<::std::string>& results() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_results();
 
+  // string token = 2;
+  void clear_token();
+  static const int kTokenFieldNumber = 2;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.GetTaskLogsResponse)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> results_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
 };
@@ -3956,6 +4003,144 @@ GetTaskMetricsRequest::mutable_metrics() {
   return &metrics_;
 }
 
+// .google.protobuf.Timestamp start_time = 4;
+inline bool GetTaskMetricsRequest::has_start_time() const {
+  return this != internal_default_instance() && start_time_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& GetTaskMetricsRequest::start_time() const {
+  const ::google::protobuf::Timestamp* p = start_time_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskMetricsRequest.start_time)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* GetTaskMetricsRequest::release_start_time() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.GetTaskMetricsRequest.start_time)
+  
+  ::google::protobuf::Timestamp* temp = start_time_;
+  start_time_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* GetTaskMetricsRequest::mutable_start_time() {
+  
+  if (start_time_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    start_time_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskMetricsRequest.start_time)
+  return start_time_;
+}
+inline void GetTaskMetricsRequest::set_allocated_start_time(::google::protobuf::Timestamp* start_time) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(start_time_);
+  }
+  if (start_time) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(start_time)->GetArena();
+    if (message_arena != submessage_arena) {
+      start_time = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, start_time, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  start_time_ = start_time;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskMetricsRequest.start_time)
+}
+
+// .google.protobuf.Timestamp end_time = 5;
+inline bool GetTaskMetricsRequest::has_end_time() const {
+  return this != internal_default_instance() && end_time_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& GetTaskMetricsRequest::end_time() const {
+  const ::google::protobuf::Timestamp* p = end_time_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskMetricsRequest.end_time)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* GetTaskMetricsRequest::release_end_time() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.GetTaskMetricsRequest.end_time)
+  
+  ::google::protobuf::Timestamp* temp = end_time_;
+  end_time_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* GetTaskMetricsRequest::mutable_end_time() {
+  
+  if (end_time_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    end_time_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskMetricsRequest.end_time)
+  return end_time_;
+}
+inline void GetTaskMetricsRequest::set_allocated_end_time(::google::protobuf::Timestamp* end_time) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(end_time_);
+  }
+  if (end_time) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(end_time)->GetArena();
+    if (message_arena != submessage_arena) {
+      end_time = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, end_time, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  end_time_ = end_time;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskMetricsRequest.end_time)
+}
+
+// .google.protobuf.Duration step = 6;
+inline bool GetTaskMetricsRequest::has_step() const {
+  return this != internal_default_instance() && step_ != nullptr;
+}
+inline const ::google::protobuf::Duration& GetTaskMetricsRequest::step() const {
+  const ::google::protobuf::Duration* p = step_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskMetricsRequest.step)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Duration*>(
+      &::google::protobuf::_Duration_default_instance_);
+}
+inline ::google::protobuf::Duration* GetTaskMetricsRequest::release_step() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.GetTaskMetricsRequest.step)
+  
+  ::google::protobuf::Duration* temp = step_;
+  step_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Duration* GetTaskMetricsRequest::mutable_step() {
+  
+  if (step_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Duration>(GetArenaNoVirtual());
+    step_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskMetricsRequest.step)
+  return step_;
+}
+inline void GetTaskMetricsRequest::set_allocated_step(::google::protobuf::Duration* step) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(step_);
+  }
+  if (step) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(step)->GetArena();
+    if (message_arena != submessage_arena) {
+      step = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, step, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  step_ = step;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskMetricsRequest.step)
+}
+
 // -------------------------------------------------------------------
 
 // GetTaskMetricsResponse
@@ -4182,6 +4367,59 @@ inline ::google::protobuf::RepeatedPtrField<::std::string>*
 GetTaskLogsResponse::mutable_results() {
   // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.GetTaskLogsResponse.results)
   return &results_;
+}
+
+// string token = 2;
+inline void GetTaskLogsResponse::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& GetTaskLogsResponse::token() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskLogsResponse.token)
+  return token_.GetNoArena();
+}
+inline void GetTaskLogsResponse::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.GetTaskLogsResponse.token)
+}
+#if LANG_CXX11
+inline void GetTaskLogsResponse::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.GetTaskLogsResponse.token)
+}
+#endif
+inline void GetTaskLogsResponse::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.GetTaskLogsResponse.token)
+}
+inline void GetTaskLogsResponse::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.GetTaskLogsResponse.token)
+}
+inline ::std::string* GetTaskLogsResponse::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskLogsResponse.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* GetTaskLogsResponse::release_token() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.GetTaskLogsResponse.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void GetTaskLogsResponse::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskLogsResponse.token)
 }
 
 #ifdef __GNUC__
