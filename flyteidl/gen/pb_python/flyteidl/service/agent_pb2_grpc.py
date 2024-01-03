@@ -74,9 +74,8 @@ class AsyncAgentServiceServicer(object):
         * OutOfRange if metrics are not available for the specified task time range
         * various other errors
         """
-        print("hhhhhhhhhhhhhhhhhhhhhhhhhhh")
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implementeddddddddddddddddddddddd!')
+        context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
     def GetTaskLogs(self, request, context):
