@@ -19954,6 +19954,42 @@ public final class Datacatalog {
      */
     com.google.protobuf.ByteString
         getUUIDBytes();
+
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 6;</code>
+     */
+    java.lang.String getPartition();
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getPartitionBytes();
+
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
@@ -19977,6 +20013,8 @@ public final class Datacatalog {
       domain_ = "";
       version_ = "";
       uUID_ = "";
+      partition_ = "";
+      org_ = "";
     }
 
     @java.lang.Override
@@ -20031,6 +20069,18 @@ public final class Datacatalog {
               java.lang.String s = input.readStringRequireUtf8();
 
               uUID_ = s;
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              partition_ = s;
+              break;
+            }
+            case 58: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -20275,6 +20325,90 @@ public final class Datacatalog {
       }
     }
 
+    public static final int PARTITION_FIELD_NUMBER = 6;
+    private volatile java.lang.Object partition_;
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 6;</code>
+     */
+    public java.lang.String getPartition() {
+      java.lang.Object ref = partition_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        partition_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPartitionBytes() {
+      java.lang.Object ref = partition_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        partition_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int ORG_FIELD_NUMBER = 7;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -20304,6 +20438,12 @@ public final class Datacatalog {
       if (!getUUIDBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, uUID_);
       }
+      if (!getPartitionBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, partition_);
+      }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -20327,6 +20467,12 @@ public final class Datacatalog {
       }
       if (!getUUIDBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, uUID_);
+      }
+      if (!getPartitionBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, partition_);
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -20353,6 +20499,10 @@ public final class Datacatalog {
           .equals(other.getVersion())) return false;
       if (!getUUID()
           .equals(other.getUUID())) return false;
+      if (!getPartition()
+          .equals(other.getPartition())) return false;
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -20374,6 +20524,10 @@ public final class Datacatalog {
       hash = (53 * hash) + getVersion().hashCode();
       hash = (37 * hash) + UUID_FIELD_NUMBER;
       hash = (53 * hash) + getUUID().hashCode();
+      hash = (37 * hash) + PARTITION_FIELD_NUMBER;
+      hash = (53 * hash) + getPartition().hashCode();
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -20521,6 +20675,10 @@ public final class Datacatalog {
 
         uUID_ = "";
 
+        partition_ = "";
+
+        org_ = "";
+
         return this;
       }
 
@@ -20552,6 +20710,8 @@ public final class Datacatalog {
         result.domain_ = domain_;
         result.version_ = version_;
         result.uUID_ = uUID_;
+        result.partition_ = partition_;
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -20618,6 +20778,14 @@ public final class Datacatalog {
         }
         if (!other.getUUID().isEmpty()) {
           uUID_ = other.uUID_;
+          onChanged();
+        }
+        if (!other.getPartition().isEmpty()) {
+          partition_ = other.partition_;
+          onChanged();
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -21090,6 +21258,184 @@ public final class Datacatalog {
   checkByteStringIsUtf8(value);
         
         uUID_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object partition_ = "";
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 6;</code>
+       */
+      public java.lang.String getPartition() {
+        java.lang.Object ref = partition_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          partition_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPartitionBytes() {
+        java.lang.Object ref = partition_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          partition_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 6;</code>
+       */
+      public Builder setPartition(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        partition_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 6;</code>
+       */
+      public Builder clearPartition() {
+        
+        partition_ = getDefaultInstance().getPartition();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 6;</code>
+       */
+      public Builder setPartitionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        partition_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
         onChanged();
         return this;
       }
@@ -31392,6 +31738,24 @@ public final class Datacatalog {
     com.google.protobuf.ByteString
         getVersionBytes();
 
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 5;</code>
+     */
+    java.lang.String getPartition();
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getPartitionBytes();
+
     public datacatalog.Datacatalog.DatasetPropertyFilter.PropertyCase getPropertyCase();
   }
   /**
@@ -31461,6 +31825,12 @@ public final class Datacatalog {
               property_ = s;
               break;
             }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+              propertyCase_ = 5;
+              property_ = s;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -31501,6 +31871,7 @@ public final class Datacatalog {
       NAME(2),
       DOMAIN(3),
       VERSION(4),
+      PARTITION(5),
       PROPERTY_NOT_SET(0);
       private final int value;
       private PropertyCase(int value) {
@@ -31520,6 +31891,7 @@ public final class Datacatalog {
           case 2: return NAME;
           case 3: return DOMAIN;
           case 4: return VERSION;
+          case 5: return PARTITION;
           case 0: return PROPERTY_NOT_SET;
           default: return null;
         }
@@ -31707,6 +32079,57 @@ public final class Datacatalog {
       }
     }
 
+    public static final int PARTITION_FIELD_NUMBER = 5;
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 5;</code>
+     */
+    public java.lang.String getPartition() {
+      java.lang.Object ref = "";
+      if (propertyCase_ == 5) {
+        ref = property_;
+      }
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (propertyCase_ == 5) {
+          property_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, partition key applied to the dataset.
+     * </pre>
+     *
+     * <code>string partition = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPartitionBytes() {
+      java.lang.Object ref = "";
+      if (propertyCase_ == 5) {
+        ref = property_;
+      }
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        if (propertyCase_ == 5) {
+          property_ = b;
+        }
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -31733,6 +32156,9 @@ public final class Datacatalog {
       if (propertyCase_ == 4) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, property_);
       }
+      if (propertyCase_ == 5) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, property_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -31753,6 +32179,9 @@ public final class Datacatalog {
       }
       if (propertyCase_ == 4) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, property_);
+      }
+      if (propertyCase_ == 5) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, property_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -31787,6 +32216,10 @@ public final class Datacatalog {
           if (!getVersion()
               .equals(other.getVersion())) return false;
           break;
+        case 5:
+          if (!getPartition()
+              .equals(other.getPartition())) return false;
+          break;
         case 0:
         default:
       }
@@ -31817,6 +32250,10 @@ public final class Datacatalog {
         case 4:
           hash = (37 * hash) + VERSION_FIELD_NUMBER;
           hash = (53 * hash) + getVersion().hashCode();
+          break;
+        case 5:
+          hash = (37 * hash) + PARTITION_FIELD_NUMBER;
+          hash = (53 * hash) + getPartition().hashCode();
           break;
         case 0:
         default:
@@ -31998,6 +32435,9 @@ public final class Datacatalog {
         if (propertyCase_ == 4) {
           result.property_ = property_;
         }
+        if (propertyCase_ == 5) {
+          result.property_ = property_;
+        }
         result.propertyCase_ = propertyCase_;
         onBuilt();
         return result;
@@ -32068,6 +32508,12 @@ public final class Datacatalog {
           }
           case VERSION: {
             propertyCase_ = 4;
+            property_ = other.property_;
+            onChanged();
+            break;
+          }
+          case PARTITION: {
+            propertyCase_ = 5;
             property_ = other.property_;
             onChanged();
             break;
@@ -32435,6 +32881,106 @@ public final class Datacatalog {
   }
   checkByteStringIsUtf8(value);
         propertyCase_ = 4;
+        property_ = value;
+        onChanged();
+        return this;
+      }
+
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 5;</code>
+       */
+      public java.lang.String getPartition() {
+        java.lang.Object ref = "";
+        if (propertyCase_ == 5) {
+          ref = property_;
+        }
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (propertyCase_ == 5) {
+            property_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPartitionBytes() {
+        java.lang.Object ref = "";
+        if (propertyCase_ == 5) {
+          ref = property_;
+        }
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          if (propertyCase_ == 5) {
+            property_ = b;
+          }
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 5;</code>
+       */
+      public Builder setPartition(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  propertyCase_ = 5;
+        property_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 5;</code>
+       */
+      public Builder clearPartition() {
+        if (propertyCase_ == 5) {
+          propertyCase_ = 0;
+          property_ = null;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, partition key applied to the dataset.
+       * </pre>
+       *
+       * <code>string partition = 5;</code>
+       */
+      public Builder setPartitionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        propertyCase_ = 5;
         property_ = value;
         onChanged();
         return this;
@@ -33869,73 +34415,75 @@ public final class Datacatalog {
       "datacatalog.DatasetID\022\'\n\010metadata\030\002 \001(\0132" +
       "\025.datacatalog.Metadata\022\025\n\rpartitionKeys\030" +
       "\003 \003(\t\"\'\n\tPartition\022\013\n\003key\030\001 \001(\t\022\r\n\005value" +
-      "\030\002 \001(\t\"Y\n\tDatasetID\022\017\n\007project\030\001 \001(\t\022\014\n\004" +
+      "\030\002 \001(\t\"y\n\tDatasetID\022\017\n\007project\030\001 \001(\t\022\014\n\004" +
       "name\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\017\n\007version\030\004 " +
-      "\001(\t\022\014\n\004UUID\030\005 \001(\t\"\215\002\n\010Artifact\022\n\n\002id\030\001 \001" +
-      "(\t\022\'\n\007dataset\030\002 \001(\0132\026.datacatalog.Datase" +
-      "tID\022\'\n\004data\030\003 \003(\0132\031.datacatalog.Artifact" +
-      "Data\022\'\n\010metadata\030\004 \001(\0132\025.datacatalog.Met" +
-      "adata\022*\n\npartitions\030\005 \003(\0132\026.datacatalog." +
-      "Partition\022\036\n\004tags\030\006 \003(\0132\020.datacatalog.Ta" +
-      "g\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf." +
-      "Timestamp\"C\n\014ArtifactData\022\014\n\004name\030\001 \001(\t\022" +
-      "%\n\005value\030\002 \001(\0132\026.flyteidl.core.Literal\"Q" +
-      "\n\003Tag\022\014\n\004name\030\001 \001(\t\022\023\n\013artifact_id\030\002 \001(\t" +
-      "\022\'\n\007dataset\030\003 \001(\0132\026.datacatalog.DatasetI" +
-      "D\"m\n\010Metadata\0222\n\007key_map\030\001 \003(\0132!.datacat" +
-      "alog.Metadata.KeyMapEntry\032-\n\013KeyMapEntry" +
-      "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"F\n\020Filt" +
-      "erExpression\0222\n\007filters\030\001 \003(\0132!.datacata" +
-      "log.SinglePropertyFilter\"\211\003\n\024SinglePrope" +
-      "rtyFilter\0224\n\ntag_filter\030\001 \001(\0132\036.datacata" +
-      "log.TagPropertyFilterH\000\022@\n\020partition_fil" +
-      "ter\030\002 \001(\0132$.datacatalog.PartitionPropert" +
-      "yFilterH\000\022>\n\017artifact_filter\030\003 \001(\0132#.dat" +
-      "acatalog.ArtifactPropertyFilterH\000\022<\n\016dat" +
-      "aset_filter\030\004 \001(\0132\".datacatalog.DatasetP" +
-      "ropertyFilterH\000\022F\n\010operator\030\n \001(\01624.data" +
-      "catalog.SinglePropertyFilter.ComparisonO" +
-      "perator\" \n\022ComparisonOperator\022\n\n\006EQUALS\020" +
-      "\000B\021\n\017property_filter\";\n\026ArtifactProperty" +
-      "Filter\022\025\n\013artifact_id\030\001 \001(\tH\000B\n\n\010propert" +
-      "y\"3\n\021TagPropertyFilter\022\022\n\010tag_name\030\001 \001(\t" +
-      "H\000B\n\n\010property\"S\n\027PartitionPropertyFilte" +
-      "r\022,\n\007key_val\030\001 \001(\0132\031.datacatalog.KeyValu" +
-      "ePairH\000B\n\n\010property\"*\n\014KeyValuePair\022\013\n\003k" +
-      "ey\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"k\n\025DatasetProper" +
-      "tyFilter\022\021\n\007project\030\001 \001(\tH\000\022\016\n\004name\030\002 \001(" +
-      "\tH\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007version\030\004 \001(\tH\000" +
-      "B\n\n\010property\"\361\001\n\021PaginationOptions\022\r\n\005li" +
-      "mit\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(" +
-      "\0162&.datacatalog.PaginationOptions.SortKe" +
-      "y\022;\n\tsortOrder\030\004 \001(\0162(.datacatalog.Pagin" +
-      "ationOptions.SortOrder\"*\n\tSortOrder\022\016\n\nD" +
-      "ESCENDING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n" +
-      "\rCREATION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCrea" +
-      "teDataset\022!.datacatalog.CreateDatasetReq" +
-      "uest\032\".datacatalog.CreateDatasetResponse" +
-      "\022M\n\nGetDataset\022\036.datacatalog.GetDatasetR" +
-      "equest\032\037.datacatalog.GetDatasetResponse\022" +
-      "Y\n\016CreateArtifact\022\".datacatalog.CreateAr" +
-      "tifactRequest\032#.datacatalog.CreateArtifa" +
-      "ctResponse\022P\n\013GetArtifact\022\037.datacatalog." +
-      "GetArtifactRequest\032 .datacatalog.GetArti" +
-      "factResponse\022A\n\006AddTag\022\032.datacatalog.Add" +
-      "TagRequest\032\033.datacatalog.AddTagResponse\022" +
-      "V\n\rListArtifacts\022!.datacatalog.ListArtif" +
-      "actsRequest\032\".datacatalog.ListArtifactsR" +
-      "esponse\022S\n\014ListDatasets\022 .datacatalog.Li" +
-      "stDatasetsRequest\032!.datacatalog.ListData" +
-      "setsResponse\022Y\n\016UpdateArtifact\022\".datacat" +
-      "alog.UpdateArtifactRequest\032#.datacatalog" +
-      ".UpdateArtifactResponse\022q\n\026GetOrExtendRe" +
-      "servation\022*.datacatalog.GetOrExtendReser" +
-      "vationRequest\032+.datacatalog.GetOrExtendR" +
-      "eservationResponse\022e\n\022ReleaseReservation" +
-      "\022&.datacatalog.ReleaseReservationRequest" +
-      "\032\'.datacatalog.ReleaseReservationRespons" +
-      "eBCZAgithub.com/flyteorg/flyte/flyteidl/" +
-      "gen/pb-go/flyteidl/datacatalogb\006proto3"
+      "\001(\t\022\014\n\004UUID\030\005 \001(\t\022\021\n\tpartition\030\006 \001(\t\022\013\n\003" +
+      "org\030\007 \001(\t\"\215\002\n\010Artifact\022\n\n\002id\030\001 \001(\t\022\'\n\007da" +
+      "taset\030\002 \001(\0132\026.datacatalog.DatasetID\022\'\n\004d" +
+      "ata\030\003 \003(\0132\031.datacatalog.ArtifactData\022\'\n\010" +
+      "metadata\030\004 \001(\0132\025.datacatalog.Metadata\022*\n" +
+      "\npartitions\030\005 \003(\0132\026.datacatalog.Partitio" +
+      "n\022\036\n\004tags\030\006 \003(\0132\020.datacatalog.Tag\022.\n\ncre" +
+      "ated_at\030\007 \001(\0132\032.google.protobuf.Timestam" +
+      "p\"C\n\014ArtifactData\022\014\n\004name\030\001 \001(\t\022%\n\005value" +
+      "\030\002 \001(\0132\026.flyteidl.core.Literal\"Q\n\003Tag\022\014\n" +
+      "\004name\030\001 \001(\t\022\023\n\013artifact_id\030\002 \001(\t\022\'\n\007data" +
+      "set\030\003 \001(\0132\026.datacatalog.DatasetID\"m\n\010Met" +
+      "adata\0222\n\007key_map\030\001 \003(\0132!.datacatalog.Met" +
+      "adata.KeyMapEntry\032-\n\013KeyMapEntry\022\013\n\003key\030" +
+      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"F\n\020FilterExpres" +
+      "sion\0222\n\007filters\030\001 \003(\0132!.datacatalog.Sing" +
+      "lePropertyFilter\"\211\003\n\024SinglePropertyFilte" +
+      "r\0224\n\ntag_filter\030\001 \001(\0132\036.datacatalog.TagP" +
+      "ropertyFilterH\000\022@\n\020partition_filter\030\002 \001(" +
+      "\0132$.datacatalog.PartitionPropertyFilterH" +
+      "\000\022>\n\017artifact_filter\030\003 \001(\0132#.datacatalog" +
+      ".ArtifactPropertyFilterH\000\022<\n\016dataset_fil" +
+      "ter\030\004 \001(\0132\".datacatalog.DatasetPropertyF" +
+      "ilterH\000\022F\n\010operator\030\n \001(\01624.datacatalog." +
+      "SinglePropertyFilter.ComparisonOperator\"" +
+      " \n\022ComparisonOperator\022\n\n\006EQUALS\020\000B\021\n\017pro" +
+      "perty_filter\";\n\026ArtifactPropertyFilter\022\025" +
+      "\n\013artifact_id\030\001 \001(\tH\000B\n\n\010property\"3\n\021Tag" +
+      "PropertyFilter\022\022\n\010tag_name\030\001 \001(\tH\000B\n\n\010pr" +
+      "operty\"S\n\027PartitionPropertyFilter\022,\n\007key" +
+      "_val\030\001 \001(\0132\031.datacatalog.KeyValuePairH\000B" +
+      "\n\n\010property\"*\n\014KeyValuePair\022\013\n\003key\030\001 \001(\t" +
+      "\022\r\n\005value\030\002 \001(\t\"\200\001\n\025DatasetPropertyFilte" +
+      "r\022\021\n\007project\030\001 \001(\tH\000\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006" +
+      "domain\030\003 \001(\tH\000\022\021\n\007version\030\004 \001(\tH\000\022\023\n\tpar" +
+      "tition\030\005 \001(\tH\000B\n\n\010property\"\361\001\n\021Paginatio" +
+      "nOptions\022\r\n\005limit\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\0227" +
+      "\n\007sortKey\030\003 \001(\0162&.datacatalog.Pagination" +
+      "Options.SortKey\022;\n\tsortOrder\030\004 \001(\0162(.dat" +
+      "acatalog.PaginationOptions.SortOrder\"*\n\t" +
+      "SortOrder\022\016\n\nDESCENDING\020\000\022\r\n\tASCENDING\020\001" +
+      "\"\034\n\007SortKey\022\021\n\rCREATION_TIME\020\0002\206\007\n\013DataC" +
+      "atalog\022V\n\rCreateDataset\022!.datacatalog.Cr" +
+      "eateDatasetRequest\032\".datacatalog.CreateD" +
+      "atasetResponse\022M\n\nGetDataset\022\036.datacatal" +
+      "og.GetDatasetRequest\032\037.datacatalog.GetDa" +
+      "tasetResponse\022Y\n\016CreateArtifact\022\".dataca" +
+      "talog.CreateArtifactRequest\032#.datacatalo" +
+      "g.CreateArtifactResponse\022P\n\013GetArtifact\022" +
+      "\037.datacatalog.GetArtifactRequest\032 .datac" +
+      "atalog.GetArtifactResponse\022A\n\006AddTag\022\032.d" +
+      "atacatalog.AddTagRequest\032\033.datacatalog.A" +
+      "ddTagResponse\022V\n\rListArtifacts\022!.datacat" +
+      "alog.ListArtifactsRequest\032\".datacatalog." +
+      "ListArtifactsResponse\022S\n\014ListDatasets\022 ." +
+      "datacatalog.ListDatasetsRequest\032!.dataca" +
+      "talog.ListDatasetsResponse\022Y\n\016UpdateArti" +
+      "fact\022\".datacatalog.UpdateArtifactRequest" +
+      "\032#.datacatalog.UpdateArtifactResponse\022q\n" +
+      "\026GetOrExtendReservation\022*.datacatalog.Ge" +
+      "tOrExtendReservationRequest\032+.datacatalo" +
+      "g.GetOrExtendReservationResponse\022e\n\022Rele" +
+      "aseReservation\022&.datacatalog.ReleaseRese" +
+      "rvationRequest\032\'.datacatalog.ReleaseRese" +
+      "rvationResponseBCZAgithub.com/flyteorg/f" +
+      "lyte/flyteidl/gen/pb-go/flyteidl/datacat" +
+      "alogb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -34101,7 +34649,7 @@ public final class Datacatalog {
     internal_static_datacatalog_DatasetID_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_datacatalog_DatasetID_descriptor,
-        new java.lang.String[] { "Project", "Name", "Domain", "Version", "UUID", });
+        new java.lang.String[] { "Project", "Name", "Domain", "Version", "UUID", "Partition", "Org", });
     internal_static_datacatalog_Artifact_descriptor =
       getDescriptor().getMessageTypes().get(25);
     internal_static_datacatalog_Artifact_fieldAccessorTable = new
@@ -34173,7 +34721,7 @@ public final class Datacatalog {
     internal_static_datacatalog_DatasetPropertyFilter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_datacatalog_DatasetPropertyFilter_descriptor,
-        new java.lang.String[] { "Project", "Name", "Domain", "Version", "Property", });
+        new java.lang.String[] { "Project", "Name", "Domain", "Version", "Partition", "Property", });
     internal_static_datacatalog_PaginationOptions_descriptor =
       getDescriptor().getMessageTypes().get(36);
     internal_static_datacatalog_PaginationOptions_fieldAccessorTable = new

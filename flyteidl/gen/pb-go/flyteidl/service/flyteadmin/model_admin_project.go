@@ -11,7 +11,7 @@ package flyteadmin
 
 // Top-level namespace used to classify different entities like workflows and executions.
 type AdminProject struct {
-	// Globally unique project name.
+	// Deprecated, use identifier instead. Globally unique project name.
 	Id string `json:"id,omitempty"`
 	// Display name.
 	Name string `json:"name,omitempty"`
@@ -20,4 +20,6 @@ type AdminProject struct {
 	// Leverage Labels from flyteidl.admin.common.proto to tag projects with ownership information.
 	Labels *AdminLabels `json:"labels,omitempty"`
 	State *ProjectProjectState `json:"state,omitempty"`
+	// Optional, org key applied to the project.
+	Identifier *AdminProjectIdentifier `json:"identifier,omitempty"`
 }

@@ -15,8 +15,16 @@ class Domain(_message.Message):
     name: str
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
+class ProjectIdentifier(_message.Message):
+    __slots__ = ["id", "org"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    id: str
+    org: str
+    def __init__(self, id: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
+
 class Project(_message.Message):
-    __slots__ = ["id", "name", "domains", "description", "labels", "state"]
+    __slots__ = ["id", "name", "domains", "description", "labels", "state", "identifier"]
     class ProjectState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         ACTIVE: _ClassVar[Project.ProjectState]
@@ -31,13 +39,15 @@ class Project(_message.Message):
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    IDENTIFIER_FIELD_NUMBER: _ClassVar[int]
     id: str
     name: str
     domains: _containers.RepeatedCompositeFieldContainer[Domain]
     description: str
     labels: _common_pb2.Labels
     state: Project.ProjectState
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., domains: _Optional[_Iterable[_Union[Domain, _Mapping]]] = ..., description: _Optional[str] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., state: _Optional[_Union[Project.ProjectState, str]] = ...) -> None: ...
+    identifier: ProjectIdentifier
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., domains: _Optional[_Iterable[_Union[Domain, _Mapping]]] = ..., description: _Optional[str] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., state: _Optional[_Union[Project.ProjectState, str]] = ..., identifier: _Optional[_Union[ProjectIdentifier, _Mapping]] = ...) -> None: ...
 
 class Projects(_message.Message):
     __slots__ = ["projects", "token"]

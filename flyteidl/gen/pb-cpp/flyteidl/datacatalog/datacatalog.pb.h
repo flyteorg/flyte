@@ -3518,6 +3518,34 @@ class DatasetID final :
   ::std::string* release_uuid();
   void set_allocated_uuid(::std::string* uuid);
 
+  // string partition = 6;
+  void clear_partition();
+  static const int kPartitionFieldNumber = 6;
+  const ::std::string& partition() const;
+  void set_partition(const ::std::string& value);
+  #if LANG_CXX11
+  void set_partition(::std::string&& value);
+  #endif
+  void set_partition(const char* value);
+  void set_partition(const char* value, size_t size);
+  ::std::string* mutable_partition();
+  ::std::string* release_partition();
+  void set_allocated_partition(::std::string* partition);
+
+  // string org = 7;
+  void clear_org();
+  static const int kOrgFieldNumber = 7;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // @@protoc_insertion_point(class_scope:datacatalog.DatasetID)
  private:
   class HasBitSetters;
@@ -3528,6 +3556,8 @@ class DatasetID final :
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr version_;
   ::google::protobuf::internal::ArenaStringPtr uuid_;
+  ::google::protobuf::internal::ArenaStringPtr partition_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
 };
@@ -5039,6 +5069,7 @@ class DatasetPropertyFilter final :
     kName = 2,
     kDomain = 3,
     kVersion = 4,
+    kPartition = 5,
     PROPERTY_NOT_SET = 0,
   };
 
@@ -5173,6 +5204,23 @@ class DatasetPropertyFilter final :
   ::std::string* release_version();
   void set_allocated_version(::std::string* version);
 
+  // string partition = 5;
+  private:
+  bool has_partition() const;
+  public:
+  void clear_partition();
+  static const int kPartitionFieldNumber = 5;
+  const ::std::string& partition() const;
+  void set_partition(const ::std::string& value);
+  #if LANG_CXX11
+  void set_partition(::std::string&& value);
+  #endif
+  void set_partition(const char* value);
+  void set_partition(const char* value, size_t size);
+  ::std::string* mutable_partition();
+  ::std::string* release_partition();
+  void set_allocated_partition(::std::string* partition);
+
   void clear_property();
   PropertyCase property_case() const;
   // @@protoc_insertion_point(class_scope:datacatalog.DatasetPropertyFilter)
@@ -5182,6 +5230,7 @@ class DatasetPropertyFilter final :
   void set_has_name();
   void set_has_domain();
   void set_has_version();
+  void set_has_partition();
 
   inline bool has_property() const;
   inline void clear_has_property();
@@ -5193,6 +5242,7 @@ class DatasetPropertyFilter final :
     ::google::protobuf::internal::ArenaStringPtr name_;
     ::google::protobuf::internal::ArenaStringPtr domain_;
     ::google::protobuf::internal::ArenaStringPtr version_;
+    ::google::protobuf::internal::ArenaStringPtr partition_;
   } property_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -8044,6 +8094,112 @@ inline void DatasetID::set_allocated_uuid(::std::string* uuid) {
   // @@protoc_insertion_point(field_set_allocated:datacatalog.DatasetID.UUID)
 }
 
+// string partition = 6;
+inline void DatasetID::clear_partition() {
+  partition_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DatasetID::partition() const {
+  // @@protoc_insertion_point(field_get:datacatalog.DatasetID.partition)
+  return partition_.GetNoArena();
+}
+inline void DatasetID::set_partition(const ::std::string& value) {
+  
+  partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:datacatalog.DatasetID.partition)
+}
+#if LANG_CXX11
+inline void DatasetID::set_partition(::std::string&& value) {
+  
+  partition_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:datacatalog.DatasetID.partition)
+}
+#endif
+inline void DatasetID::set_partition(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:datacatalog.DatasetID.partition)
+}
+inline void DatasetID::set_partition(const char* value, size_t size) {
+  
+  partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:datacatalog.DatasetID.partition)
+}
+inline ::std::string* DatasetID::mutable_partition() {
+  
+  // @@protoc_insertion_point(field_mutable:datacatalog.DatasetID.partition)
+  return partition_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DatasetID::release_partition() {
+  // @@protoc_insertion_point(field_release:datacatalog.DatasetID.partition)
+  
+  return partition_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DatasetID::set_allocated_partition(::std::string* partition) {
+  if (partition != nullptr) {
+    
+  } else {
+    
+  }
+  partition_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), partition);
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.DatasetID.partition)
+}
+
+// string org = 7;
+inline void DatasetID::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& DatasetID::org() const {
+  // @@protoc_insertion_point(field_get:datacatalog.DatasetID.org)
+  return org_.GetNoArena();
+}
+inline void DatasetID::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:datacatalog.DatasetID.org)
+}
+#if LANG_CXX11
+inline void DatasetID::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:datacatalog.DatasetID.org)
+}
+#endif
+inline void DatasetID::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:datacatalog.DatasetID.org)
+}
+inline void DatasetID::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:datacatalog.DatasetID.org)
+}
+inline ::std::string* DatasetID::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:datacatalog.DatasetID.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DatasetID::release_org() {
+  // @@protoc_insertion_point(field_release:datacatalog.DatasetID.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void DatasetID::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.DatasetID.org)
+}
+
 // -------------------------------------------------------------------
 
 // Artifact
@@ -9595,6 +9751,98 @@ inline void DatasetPropertyFilter::set_allocated_version(::std::string* version)
     property_.version_.UnsafeSetDefault(version);
   }
   // @@protoc_insertion_point(field_set_allocated:datacatalog.DatasetPropertyFilter.version)
+}
+
+// string partition = 5;
+inline bool DatasetPropertyFilter::has_partition() const {
+  return property_case() == kPartition;
+}
+inline void DatasetPropertyFilter::set_has_partition() {
+  _oneof_case_[0] = kPartition;
+}
+inline void DatasetPropertyFilter::clear_partition() {
+  if (has_partition()) {
+    property_.partition_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_property();
+  }
+}
+inline const ::std::string& DatasetPropertyFilter::partition() const {
+  // @@protoc_insertion_point(field_get:datacatalog.DatasetPropertyFilter.partition)
+  if (has_partition()) {
+    return property_.partition_.GetNoArena();
+  }
+  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
+}
+inline void DatasetPropertyFilter::set_partition(const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:datacatalog.DatasetPropertyFilter.partition)
+  if (!has_partition()) {
+    clear_property();
+    set_has_partition();
+    property_.partition_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  property_.partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:datacatalog.DatasetPropertyFilter.partition)
+}
+#if LANG_CXX11
+inline void DatasetPropertyFilter::set_partition(::std::string&& value) {
+  // @@protoc_insertion_point(field_set:datacatalog.DatasetPropertyFilter.partition)
+  if (!has_partition()) {
+    clear_property();
+    set_has_partition();
+    property_.partition_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  property_.partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:datacatalog.DatasetPropertyFilter.partition)
+}
+#endif
+inline void DatasetPropertyFilter::set_partition(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  if (!has_partition()) {
+    clear_property();
+    set_has_partition();
+    property_.partition_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  property_.partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:datacatalog.DatasetPropertyFilter.partition)
+}
+inline void DatasetPropertyFilter::set_partition(const char* value, size_t size) {
+  if (!has_partition()) {
+    clear_property();
+    set_has_partition();
+    property_.partition_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  property_.partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:datacatalog.DatasetPropertyFilter.partition)
+}
+inline ::std::string* DatasetPropertyFilter::mutable_partition() {
+  if (!has_partition()) {
+    clear_property();
+    set_has_partition();
+    property_.partition_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_mutable:datacatalog.DatasetPropertyFilter.partition)
+  return property_.partition_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* DatasetPropertyFilter::release_partition() {
+  // @@protoc_insertion_point(field_release:datacatalog.DatasetPropertyFilter.partition)
+  if (has_partition()) {
+    clear_has_property();
+    return property_.partition_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  } else {
+    return nullptr;
+  }
+}
+inline void DatasetPropertyFilter::set_allocated_partition(::std::string* partition) {
+  if (has_property()) {
+    clear_property();
+  }
+  if (partition != nullptr) {
+    set_has_partition();
+    property_.partition_.UnsafeSetDefault(partition);
+  }
+  // @@protoc_insertion_point(field_set_allocated:datacatalog.DatasetPropertyFilter.partition)
 }
 
 inline bool DatasetPropertyFilter::has_property() const {

@@ -647,7 +647,7 @@ type ArrayNode struct {
 	// node is the sub-node that will be executed for each element in the array.
 	Node *Node `protobuf:"bytes,1,opt,name=node,proto3" json:"node,omitempty"`
 	// parallelism defines the minimum number of instances to bring up concurrently at any given
-	// point. Note that this is an optimistic restriction and that, due to network partitioning or
+	// point. Note that this is an optimistic restriction and that, due to network orging or
 	// other failures, the actual number of currently running instances might be more. This has to
 	// be a positive number if assigned. Default value is size.
 	Parallelism uint32 `protobuf:"varint,2,opt,name=parallelism,proto3" json:"parallelism,omitempty"`
