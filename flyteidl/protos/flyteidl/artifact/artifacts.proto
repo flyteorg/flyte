@@ -207,7 +207,7 @@ service ArtifactRegistry {
 
   rpc DeactivateTrigger (DeactivateTriggerRequest) returns (DeactivateTriggerResponse) {
     option (google.api.http) = {
-      post: "/artifacts/api/v1/trigger/deactivate"
+      put: "/artifacts/api/v1/trigger/deactivate"
       body: "*"
     };
   }
