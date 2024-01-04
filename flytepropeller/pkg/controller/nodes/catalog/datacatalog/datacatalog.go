@@ -404,6 +404,28 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 	return response.Reservation, nil
 }
 
+// GetOrExtendReservationByArtifactTag attempts to get a reservation for the cacheable task identified by the provided
+// dataset ID and artifact tag, reserving it for the given owner ID. If you have previously acquired a reservation it
+// will be extended. If another entity holds the reservation that is returned.
+func (m *CatalogClient) GetOrExtendReservationByArtifactTag(ctx context.Context, datasetID *datacatalog.DatasetID,
+	artifactTag string, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error) {
+	reservationQuery := &datacatalog.GetOrExtendReservationRequest{
+		ReservationId: &datacatalog.ReservationID{
+			DatasetId: datasetID,
+			TagName:   artifactTag,
+		},
+		OwnerId:           ownerID,
+		HeartbeatInterval: ptypes.DurationProto(heartbeatInterval),
+	}
+
+	response, err := m.client.GetOrExtendReservation(ctx, reservationQuery)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.Reservation, nil
+}
+
 // ReleaseReservation attempts to release a reservation for a cacheable task. If the reservation
 // does not exist (e.x. it never existed or has been acquired by another owner) then this call
 // still succeeds.
@@ -437,6 +459,79 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 
 	_, err = m.client.ReleaseReservation(ctx, reservationQuery)
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ReleaseReservationByArtifactTag attempts to release a reservation by the given owner ID for a cacheable task
+// identified by the provided dataset ID and artifact tag. If the reservation does not exist (e.x. it never existed or
+// has been acquired by another owner) then this call still succeeds.
+func (m *CatalogClient) ReleaseReservationByArtifactTag(ctx context.Context, datasetID *datacatalog.DatasetID,
+	artifactTag string, ownerID string) error {
+	reservationQuery := &datacatalog.ReleaseReservationRequest{
+		ReservationId: &datacatalog.ReservationID{
+			DatasetId: datasetID,
+			TagName:   artifactTag,
+		},
+		OwnerId: ownerID,
+	}
+
+	if _, err := m.client.ReleaseReservation(ctx, reservationQuery); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CatalogClient) Delete(ctx context.Context, key catalog.Key) error {
+	datasetID, err := GenerateDatasetIDForTask(ctx, key)
+	if err != nil {
+		return err
+	}
+
+	inputs := &core.LiteralMap{}
+	if key.TypedInterface.Inputs != nil {
+		retInputs, err := key.InputReader.Get(ctx)
+		if err != nil {
+			return errors.Wrap(err, "failed to read inputs when trying to query catalog")
+		}
+		inputs = retInputs
+	}
+
+	tag, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
+	if err != nil {
+		return err
+	}
+
+	return m.DeleteByArtifactTag(ctx, datasetID, tag)
+}
+
+func (m *CatalogClient) DeleteByArtifactTag(ctx context.Context, datasetID *datacatalog.DatasetID, artifactTag string) error {
+	deleteQuery := &datacatalog.DeleteArtifactRequest{
+		Dataset: datasetID,
+		QueryHandle: &datacatalog.DeleteArtifactRequest_TagName{
+			TagName: artifactTag,
+		},
+	}
+
+	if _, err := m.client.DeleteArtifact(ctx, deleteQuery); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CatalogClient) DeleteByArtifactID(ctx context.Context, datasetID *datacatalog.DatasetID, artifactID string) error {
+	deleteQuery := &datacatalog.DeleteArtifactRequest{
+		Dataset: datasetID,
+		QueryHandle: &datacatalog.DeleteArtifactRequest_ArtifactId{
+			ArtifactId: artifactID,
+		},
+	}
+
+	if _, err := m.client.DeleteArtifact(ctx, deleteQuery); err != nil {
 		return err
 	}
 
