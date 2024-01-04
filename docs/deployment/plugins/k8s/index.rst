@@ -8,6 +8,7 @@ Configure Kubernetes Plugins
 This guide provides an overview of setting up the Kubernetes Operator backend plugin in your Flyte deployment.
 It assumes that you have already installed Flyte using any of the methods described in the `Deployment guide <https://docs.flyte.org/en/latest/deployment/deployment/index.html#deployment-deployment>`__.
 
+
 Install the Kubernetes operator
 -------------------------------
 
@@ -149,9 +150,29 @@ Specify plugin configuration
 
     .. tabs::
 
+      .. group-tab:: Demo (sandbox) cluster
+
+         Enable the PyTorch plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+
+        .. code-block:: yaml
+          :emphasize-lines: 7,12    
+           
+           tasks:
+             task-plugins:
+               default-for-task-types:
+                 container: container
+                 container_array: k8s-array
+                 sidecar: sidecar
+                 pytorch: pytorch
+               enabled-plugins:
+               - container
+               - k8s-array
+               - sidecar
+               - pytorch
+           
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart, edit the relevant YAML file.
+         Add the following contents to your Helm values file:
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -194,10 +215,30 @@ Specify plugin configuration
   .. group-tab:: TensorFlow
    
     .. tabs::
+      
+      .. group-tab:: Demo (sandbox) cluster
+
+         Enable the TensorFlow plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+
+        .. code-block:: yaml
+          :emphasize-lines: 7,12    
+           
+           tasks:
+             task-plugins:
+               default-for-task-types:
+                 container: container
+                 container_array: k8s-array
+                 sidecar: sidecar
+                 tensorflow: tensorflow
+               enabled-plugins:
+               - container
+               - k8s-array
+               - sidecar
+               - tensorflow
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart, edit the relevant YAML file.
+        Add the following contents to your Helm values file:
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -241,9 +282,29 @@ Specify plugin configuration
    
     .. tabs::
 
+      .. group-tab:: Demo (sandbox) cluster
+
+         Enable the MPI plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+
+        .. code-block:: yaml
+          :emphasize-lines: 7,12    
+           
+           tasks:
+             task-plugins:
+               default-for-task-types:
+                 container: container
+                 container_array: k8s-array
+                 sidecar: sidecar
+                 mpi: mpi
+               enabled-plugins:
+               - container
+               - k8s-array
+               - sidecar
+               - mpi
+
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart, edit the relevant YAML file.
+        Add the following contents to your Helm values file:
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -286,6 +347,26 @@ Specify plugin configuration
   .. group-tab:: Ray
 
     .. tabs::
+
+      .. group-tab:: Demo (sandbox) cluster
+
+         Enable the Ray plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+
+        .. code-block:: yaml
+          :emphasize-lines: 7,12    
+           
+           tasks:
+             task-plugins:
+               default-for-task-types:
+                 container: container
+                 container_array: k8s-array
+                 sidecar: sidecar
+                 ray: ray
+               enabled-plugins:
+               - container
+               - k8s-array
+               - sidecar
+               - ray
 
       .. group-tab:: Flyte binary
 
@@ -346,9 +427,64 @@ Specify plugin configuration
    
       .. tabs:: 
 
+        .. group-tab:: Demo (sandbox) cluster
+
+           Enable the Spark plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+
+        .. code-block:: yaml
+           
+           tasks:
+             task-plugins:
+               default-for-task-types:
+                 container: container
+                 container_array: k8s-array
+                 sidecar: sidecar
+                 spark: spark
+               enabled-plugins:
+                 - container
+                 - sidecar
+                 - k8s-array
+                 - spark
+           plugins:
+             spark:
+               spark-config-default:
+                 - spark.driver.cores: "1"
+                 - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+                 - spark.hadoop.fs.s3a.endpoint: "http://minio.flyte:9000"
+                 - spark.hadoop.fs.s3a.access.key: "minio"
+                 - spark.hadoop.fs.s3a.secret.key: "miniostorage"
+                 - spark.hadoop.fs.s3a.path.style.access: "true"
+                 - spark.kubernetes.allocation.batch.size: "50"
+                 - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                 - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                 - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                 - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                 - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                 - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                 - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+           cluster_resources:
+             refreshInterval: 5m
+             customData:
+               - production:
+                   - projectQuotaCpu:
+                       value: "5"
+                   - projectQuotaMemory:
+                       value: "4000Mi"
+               - staging:
+                   - projectQuotaCpu:
+                       value: "2"
+                   - projectQuotaMemory:
+                       value: "3000Mi"
+               - development:
+                   - projectQuotaCpu:
+                       value: "4"
+                   - projectQuotaMemory:
+                       value: "5000Mi"
+             refresh: 5m
+
         .. group-tab:: Flyte binary
 
-          Add the following content to the values file:
+          Add the following contents to your Helm values file:
 
           .. code-block:: yaml
 
@@ -634,9 +770,29 @@ Specify plugin configuration
    
     .. tabs::
 
+      .. group-tab:: Demo (sandbox) cluster
+
+         Enable the Dask plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+
+        .. code-block:: yaml
+          :emphasize-lines: 7,12    
+           
+           tasks:
+             task-plugins:
+               default-for-task-types:
+                 container: container
+                 container_array: k8s-array
+                 sidecar: sidecar
+                 dask: dask
+               enabled-plugins:
+               - container
+               - k8s-array
+               - sidecar
+               - dask
+
       .. group-tab:: Flyte binary
 
-        Edit the relevant YAML file to specify the plugin.
+        Add the following contents to your Helm values file:
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
