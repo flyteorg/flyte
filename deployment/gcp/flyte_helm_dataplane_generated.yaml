@@ -165,6 +165,8 @@ data:
       resourcemanager:
         type: noop
   storage.yaml: | 
+    propeller:
+      rawoutput-prefix: gs://<RAWBUCKETNAME>/data
     storage:
       type: stow
       stow:
@@ -435,7 +437,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "c73cc0217526d4e3af5eca469c1d9cbedc92d56caddc9e05d926b5cd5b82f26"
+        configChecksum: "600d4f0d38961f98f5c66875315205e519ae890daf402c7a648a415cb4a5f2a"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -516,7 +518,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.9.37
       annotations:
-        configChecksum: "c73cc0217526d4e3af5eca469c1d9cbedc92d56caddc9e05d926b5cd5b82f26"
+        configChecksum: "600d4f0d38961f98f5c66875315205e519ae890daf402c7a648a415cb4a5f2a"
     spec:
       securityContext:
         fsGroup: 65534

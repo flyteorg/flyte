@@ -165,6 +165,8 @@ data:
       resourcemanager:
         type: noop
   storage.yaml: | 
+    propeller:
+      rawoutput-prefix: s3:///data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -427,7 +429,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f1e5347cc1810b310fe4e5571a143a29a15cc6685abe43202cc95277f1c5142"
+        configChecksum: "53ae6f8b339143223bf6404ac2ab34cfbbcb7db22ad855f819c273af11ec082"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -509,7 +511,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.9.37
       annotations:
-        configChecksum: "f1e5347cc1810b310fe4e5571a143a29a15cc6685abe43202cc95277f1c5142"
+        configChecksum: "53ae6f8b339143223bf6404ac2ab34cfbbcb7db22ad855f819c273af11ec082"
     spec:
       securityContext:
         fsGroup: 65534

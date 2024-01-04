@@ -160,6 +160,8 @@ data:
       signedUrls:
         durationMinutes: 3
   storage.yaml: | 
+    propeller:
+      rawoutput-prefix: s3:///data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -354,6 +356,8 @@ data:
       profiler-port: 10254
       storage-prefix: metadata/datacatalog
   storage.yaml: | 
+    propeller:
+      rawoutput-prefix: s3:///data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -557,7 +561,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "570c02a8ecfaaeb8c41b95e1c7552d79d1e8939fe9bf88fdcf46f76aa94fb4f"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -845,7 +849,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
+        configChecksum: "d2b4422443675df425e730b50f585783098d47541bd8ff756cc9e2185547351"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -936,7 +940,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "570c02a8ecfaaeb8c41b95e1c7552d79d1e8939fe9bf88fdcf46f76aa94fb4f"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

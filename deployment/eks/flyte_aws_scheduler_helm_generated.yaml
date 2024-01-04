@@ -179,6 +179,8 @@ data:
       signedUrls:
         durationMinutes: 3
   storage.yaml: | 
+    propeller:
+      rawoutput-prefix: s3:///data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -388,6 +390,8 @@ data:
       profiler-port: 10254
       storage-prefix: metadata/datacatalog
   storage.yaml: | 
+    propeller:
+      rawoutput-prefix: s3:///data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -500,6 +504,8 @@ data:
       resourcemanager:
         type: noop
   storage.yaml: | 
+    propeller:
+      rawoutput-prefix: s3:///data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -851,7 +857,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2b5c85969f2bd85bb51a084f9fd72c20c3aca94be99e53cb4c4e9f78e77ebc5"
+        configChecksum: "95d1dd730b7edaa54371c132e487b3dfc870befaaccc585aa528bbe453d993e"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1139,7 +1145,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
+        configChecksum: "d2b4422443675df425e730b50f585783098d47541bd8ff756cc9e2185547351"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1230,7 +1236,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "f1e5347cc1810b310fe4e5571a143a29a15cc6685abe43202cc95277f1c5142"
+        configChecksum: "53ae6f8b339143223bf6404ac2ab34cfbbcb7db22ad855f819c273af11ec082"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1312,7 +1318,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.9.37
       annotations:
-        configChecksum: "f1e5347cc1810b310fe4e5571a143a29a15cc6685abe43202cc95277f1c5142"
+        configChecksum: "53ae6f8b339143223bf6404ac2ab34cfbbcb7db22ad855f819c273af11ec082"
     spec:
       securityContext:
         fsGroup: 65534
