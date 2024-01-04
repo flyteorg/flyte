@@ -1,13 +1,6 @@
 package catalog
 
 import (
-	"context"
-	"fmt"
-
-	"google.golang.org/grpc"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
@@ -47,18 +40,4 @@ type Config struct {
 // GetConfig gets loaded config for Discovery
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
-}
-
-func NewCatalogClient(ctx context.Context, authOpt ...grpc.DialOption) (catalog.Client, error) {
-	catalogConfig := GetConfig()
-
-	switch catalogConfig.Type {
-	case DataCatalogType:
-		return datacatalog.NewDataCatalog(ctx, catalogConfig.Endpoint, catalogConfig.Insecure,
-			catalogConfig.MaxCacheAge.Duration, catalogConfig.UseAdminAuth, catalogConfig.DefaultServiceConfig,
-			authOpt...)
-	case NoOpDiscoveryType, "":
-		return NOOPCatalog{}, nil
-	}
-	return nil, fmt.Errorf("no such catalog type available: %s", catalogConfig.Type)
 }

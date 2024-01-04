@@ -5,6 +5,7 @@ package controller
 import (
 	"context"
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/catalog"
 	"os"
 	"runtime/pprof"
 	"time"
@@ -41,7 +42,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog"
 	errors3 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/factory"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery"
