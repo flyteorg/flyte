@@ -7,7 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils/secrets"
 )
 
-const executionIdentityVariable = "execution_identity"
+const executionIdentityVariable = "execution-identity"
 
 // TaskExecutionContext provides a layer on top of core TaskExecutionContext with a custom TaskExecutionMetadata.
 type TaskExecutionContext struct {
