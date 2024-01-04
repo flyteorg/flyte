@@ -44,7 +44,7 @@ func TestEndToEnd(t *testing.T) {
 	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext())
 	assert.NoError(t, err)
 
-	t.Run("run a databricks job", func(t *testing.T) {
+	t.Run("run a databricks job by new_cluster key", func(t *testing.T) {
 		databricksConfDict := map[string]interface{}{
 			"name": "flytekit databricks plugin example",
 			"new_cluster": map[string]string{
@@ -54,6 +54,34 @@ func TestEndToEnd(t *testing.T) {
 			},
 			"timeout_seconds": 3600,
 			"max_retries":     1,
+		}
+		databricksConfig, err := utils.MarshalObjToStruct(databricksConfDict)
+		assert.NoError(t, err)
+		sparkJob := plugins.SparkJob{DatabricksConf: databricksConfig, DatabricksToken: "token", SparkConf: map[string]string{"spark.driver.bindAddress": "127.0.0.1"}}
+		st, err := utils.MarshalPbToStruct(&sparkJob)
+		assert.NoError(t, err)
+		inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+		template := flyteIdlCore.TaskTemplate{
+			Type:   "databricks",
+			Custom: st,
+			Target: &coreIdl.TaskTemplate_Container{
+				Container: &coreIdl.Container{
+					Command: []string{"command"},
+					Args:    []string{"pyflyte-execute"},
+				},
+			},
+		}
+
+		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
+		assert.Equal(t, true, phase.Phase().IsSuccess())
+	})
+
+	t.Run("run a databricks job by new_cluster key", func(t *testing.T) {
+		databricksConfDict := map[string]interface{}{
+			"name":                "flytekit databricks plugin example",
+			"existing_cluster_id": "1201-my-cluster",
+			"timeout_seconds":     3600,
+			"max_retries":         1,
 		}
 		databricksConfig, err := utils.MarshalObjToStruct(databricksConfDict)
 		assert.NoError(t, err)

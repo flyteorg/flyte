@@ -323,14 +323,14 @@ func TestServerConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_grpc.enableGrpcHistograms", func(t *testing.T) {
+	t.Run("Test_grpc.enableGrpcLatencyMetrics", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
 			testValue := "1"
 
-			cmdFlags.Set("grpc.enableGrpcHistograms", testValue)
-			if vBool, err := cmdFlags.GetBool("grpc.enableGrpcHistograms"); err == nil {
-				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.GrpcConfig.EnableGrpcHistograms)
+			cmdFlags.Set("grpc.enableGrpcLatencyMetrics", testValue)
+			if vBool, err := cmdFlags.GetBool("grpc.enableGrpcLatencyMetrics"); err == nil {
+				testDecodeJson_ServerConfig(t, fmt.Sprintf("%v", vBool), &actual.GrpcConfig.EnableGrpcLatencyMetrics)
 
 			} else {
 				assert.FailNow(t, err.Error())

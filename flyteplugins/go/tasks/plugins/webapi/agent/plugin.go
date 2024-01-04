@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"time"
 
+	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
+	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -28,18 +31,21 @@ import (
 )
 
 type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
+type GetAgentMetadataClientFunc func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error)
 
 type Plugin struct {
 	metricScope     promutils.Scope
 	cfg             *Config
 	getClient       GetClientFunc
 	connectionCache map[*Agent]*grpc.ClientConn
+	agentRegistry   map[string]*Agent // map[taskType] => Agent
 }
 
 type ResourceWrapper struct {
-	State   admin.State
-	Outputs *flyteIdl.LiteralMap
-	Message string
+	State    admin.State
+	Outputs  *flyteIdl.LiteralMap
+	Message  string
+	LogLinks []*flyteIdl.TaskLog
 }
 
 type ResourceMetaWrapper struct {
@@ -88,10 +94,8 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	agent, err := getFinalAgent(taskTemplate.Type, p.cfg)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to find agent agent with error: %v", err)
-	}
+	agent := getFinalAgent(taskTemplate.Type, p.cfg, p.agentRegistry)
+
 	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to connect to agent with error: %v", err)
@@ -111,21 +115,36 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		taskTemplate.GetContainer().Args = argTemplate
 	}
 
+	// If the agent returned a resource, we assume this is a synchronous task.
+	// The state should be a terminal state, for example, SUCCEEDED, PERMANENT_FAILURE, or RETRYABLE_FAILURE.
+	if res.GetResource() != nil {
+		logger.Infof(ctx, "Agent is executing a synchronous task.")
+		return nil,
+			ResourceWrapper{
+				State:    res.GetResource().State,
+				Outputs:  res.GetResource().Outputs,
+				Message:  res.GetResource().Message,
+				LogLinks: res.GetResource().LogLinks,
+			}, nil
+	}
+
+	logger.Infof(ctx, "Agent is executing an asynchronous task.")
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
 		Token:             "",
 		TaskType:          taskTemplate.Type,
-	}, ResourceWrapper{State: admin.State_RUNNING}, nil
+	}, nil, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 
-	agent, err := getFinalAgent(metadata.TaskType, p.cfg)
+	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find agent with error: %v", err)
 	}
+
 	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
@@ -140,9 +159,10 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	}
 
 	return ResourceWrapper{
-		State:   res.Resource.State,
-		Outputs: res.Resource.Outputs,
-		Message: res.Resource.Message,
+		State:    res.Resource.State,
+		Outputs:  res.Resource.Outputs,
+		Message:  res.Resource.Message,
+		LogLinks: res.LogLinks,
 	}, nil
 }
 
@@ -152,10 +172,8 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 
-	agent, err := getFinalAgent(metadata.TaskType, p.cfg)
-	if err != nil {
-		return fmt.Errorf("failed to find agent agent with error: %v", err)
-	}
+	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
+
 	client, err := p.getClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return fmt.Errorf("failed to connect to agent with error: %v", err)
@@ -170,7 +188,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
-	taskInfo := &core.TaskInfo{}
+	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
 	switch resource.State {
 	case admin.State_PENDING:
@@ -205,7 +223,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 
 	var opReader io.OutputReader
 	if resource.Outputs != nil {
-		logger.Debugf(ctx, "Agent returned an output")
+		logger.Debugf(ctx, "Agent returned an output.")
 		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
@@ -214,23 +232,19 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType string, cfg *Config) (*Agent, error) {
-	if id, exists := cfg.AgentForTaskTypes[taskType]; exists {
-		if agent, exists := cfg.Agents[id]; exists {
-			return agent, nil
-		}
-		return nil, fmt.Errorf("no agent definition found for ID %s that matches task type %s", id, taskType)
+func getFinalAgent(taskType string, cfg *Config, agentRegistry map[string]*Agent) *Agent {
+	if agent, exists := agentRegistry[taskType]; exists {
+		return agent
 	}
 
-	return &cfg.DefaultAgent, nil
+	return &cfg.DefaultAgent
 }
 
-func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (*grpc.ClientConn, error) {
 	conn, ok := connectionCache[agent]
 	if ok {
-		return service.NewAsyncAgentServiceClient(conn), nil
+		return conn, nil
 	}
-
 	var opts []grpc.DialOption
 
 	if agent.Insecure {
@@ -269,7 +283,26 @@ func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent
 			}
 		}()
 	}()
+
+	return conn, nil
+}
+
+func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	conn, err := getGrpcConnection(ctx, agent, connectionCache)
+	if err != nil {
+		return nil, err
+	}
+
 	return service.NewAsyncAgentServiceClient(conn), nil
+}
+
+func getAgentMetadataClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
+	conn, err := getGrpcConnection(ctx, agent, connectionCache)
+	if err != nil {
+		return nil, err
+	}
+
+	return service.NewAgentMetadataServiceClient(conn), nil
 }
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
@@ -297,11 +330,71 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	if timeout == 0 {
 		return ctx, func() {}
 	}
+
 	return context.WithTimeout(ctx, timeout)
 }
 
+func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, getAgentMetadataClientFunc GetAgentMetadataClientFunc) (map[string]*Agent, error) {
+	agentRegistry := make(map[string]*Agent)
+	var agentDeployments []*Agent
+
+	// Ensure that the old configuration is backward compatible
+	for taskType, agentID := range cfg.AgentForTaskTypes {
+		agentRegistry[taskType] = cfg.Agents[agentID]
+	}
+
+	if len(cfg.DefaultAgent.Endpoint) != 0 {
+		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
+	}
+	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
+	for _, agentDeployment := range agentDeployments {
+		client, err := getAgentMetadataClientFunc(context.Background(), agentDeployment, connectionCache)
+		if err != nil {
+			return nil, fmt.Errorf("failed to connect to agent [%v] with error: [%v]", agentDeployment, err)
+		}
+
+		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentDeployment)
+		defer cancel()
+
+		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
+		if err != nil {
+			grpcStatus, ok := status.FromError(err)
+			if grpcStatus.Code() == codes.Unimplemented {
+				// we should not panic here, as we want to continue to support old agent settings
+				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployment)
+				continue
+			}
+
+			if !ok {
+				return nil, fmt.Errorf("failed to list agent with a non-gRPC error : [%v]", err)
+			}
+
+			return nil, fmt.Errorf("failed to list agent with error: [%v]", err)
+		}
+
+		agents := res.GetAgents()
+		for _, agent := range agents {
+			supportedTaskTypes := agent.SupportedTaskTypes
+			for _, supportedTaskType := range supportedTaskTypes {
+				agentRegistry[supportedTaskType] = agentDeployment
+			}
+		}
+	}
+
+	return agentRegistry, nil
+}
+
 func newAgentPlugin() webapi.PluginEntry {
-	supportedTaskTypes := GetConfig().SupportedTaskTypes
+	cfg := GetConfig()
+	connectionCache := make(map[*Agent]*grpc.ClientConn)
+	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache, getAgentMetadataClientFunc)
+	if err != nil {
+		// We should wait for all agents to be up and running before starting the server
+		panic(err)
+	}
+
+	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
+	logger.Infof(context.Background(), "Agent supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
@@ -309,9 +402,10 @@ func newAgentPlugin() webapi.PluginEntry {
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
 				metricScope:     iCtx.MetricsScope(),
-				cfg:             GetConfig(),
+				cfg:             cfg,
 				getClient:       getClientFunc,
-				connectionCache: make(map[*Agent]*grpc.ClientConn),
+				connectionCache: connectionCache,
+				agentRegistry:   agentRegistry,
 			}, nil
 		},
 	}

@@ -2,6 +2,7 @@ package array
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -26,16 +27,16 @@ func newStaticInputReader(inputPaths io.InputFilePaths, input *core.LiteralMap) 
 	}
 }
 
-func constructLiteralMap(ctx context.Context, inputReader io.InputReader, index int) (*core.LiteralMap, error) {
-	inputs, err := inputReader.Get(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+func constructLiteralMap(inputs *core.LiteralMap, index int) (*core.LiteralMap, error) {
 	literals := make(map[string]*core.Literal)
 	for name, literal := range inputs.Literals {
 		if literalCollection := literal.GetCollection(); literalCollection != nil {
+			if index >= len(literalCollection.Literals) {
+				return nil, fmt.Errorf("index %v out of bounds for literal collection %v", index, name)
+			}
 			literals[name] = literalCollection.Literals[index]
+		} else {
+			literals[name] = literal
 		}
 	}
 
@@ -103,8 +104,10 @@ func (a *arrayNodeExecutionContext) TaskReader() interfaces.TaskReader {
 	return a.taskReader
 }
 
-func newArrayNodeExecutionContext(nodeExecutionContext interfaces.NodeExecutionContext, inputReader io.InputReader, eventRecorder arrayEventRecorder, subNodeIndex int, nodeStatus *v1alpha1.NodeStatus, currentParallelism *uint32, maxParallelism uint32) *arrayNodeExecutionContext {
-	arrayExecutionContext := newArrayExecutionContext(nodeExecutionContext.ExecutionContext(), subNodeIndex, currentParallelism, maxParallelism)
+func newArrayNodeExecutionContext(nodeExecutionContext interfaces.NodeExecutionContext, inputReader io.InputReader,
+	eventRecorder arrayEventRecorder, subNodeIndex int, nodeStatus *v1alpha1.NodeStatus) *arrayNodeExecutionContext {
+
+	arrayExecutionContext := newArrayExecutionContext(nodeExecutionContext.ExecutionContext(), subNodeIndex)
 	return &arrayNodeExecutionContext{
 		NodeExecutionContext: nodeExecutionContext,
 		eventRecorder:        eventRecorder,

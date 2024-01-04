@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	rayv1alpha1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1alpha1"
 	"github.com/stretchr/testify/assert"
@@ -25,11 +24,14 @@ import (
 	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
-const testImage = "image://"
-const serviceAccount = "ray_sa"
+const (
+	testImage      = "image://"
+	serviceAccount = "ray_sa"
+)
 
 var (
 	dummyEnvVars = []*core.KeyValuePair{
@@ -56,28 +58,39 @@ var (
 	workerGroupName = "worker-group"
 )
 
-func dummyRayCustomObj() *plugins.RayJob {
-	return &plugins.RayJob{
-		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:   &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
-			WorkerGroupSpec: []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3}},
+func transformRayJobToCustomObj(rayJob *plugins.RayJob) *structpb.Struct {
+	structObj, err := utils.MarshalObjToStruct(rayJob)
+	if err != nil {
+		panic(err)
+	}
+	return structObj
+}
+
+func transformPodSpecToTaskTemplateTarget(podSpec *corev1.PodSpec) *core.TaskTemplate_K8SPod {
+	structObj, err := utils.MarshalObjToStruct(&podSpec)
+	if err != nil {
+		panic(err)
+	}
+	return &core.TaskTemplate_K8SPod{
+		K8SPod: &core.K8SPod{
+			PodSpec: structObj,
 		},
 	}
 }
 
-func dummyRayTaskTemplate(id string, rayJobObj *plugins.RayJob) *core.TaskTemplate {
-	ptObjJSON, err := utils.MarshalToString(rayJobObj)
-	if err != nil {
-		panic(err)
+func dummyRayCustomObj() *plugins.RayJob {
+	return &plugins.RayJob{
+		RayCluster: &plugins.RayCluster{
+			HeadGroupSpec:     &plugins.HeadGroupSpec{RayStartParams: map[string]string{"num-cpus": "1"}},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: true,
+		},
+		ShutdownAfterJobFinishes: true,
+		TtlSecondsAfterFinished:  120,
 	}
+}
 
-	structObj := structpb.Struct{}
-
-	err = jsonpb.UnmarshalString(ptObjJSON, &structObj)
-	if err != nil {
-		panic(err)
-	}
-
+func dummyRayTaskTemplate(id string, rayJob *plugins.RayJob) *core.TaskTemplate {
 	return &core.TaskTemplate{
 		Id:   &core.Identifier{Name: id},
 		Type: "container",
@@ -88,7 +101,7 @@ func dummyRayTaskTemplate(id string, rayJobObj *plugins.RayJob) *core.TaskTempla
 				Env:   dummyEnvVars,
 			},
 		},
-		Custom: &structObj,
+		Custom: transformRayJobToCustomObj(rayJob),
 	}
 }
 
@@ -168,21 +181,26 @@ func TestBuildResourceRay(t *testing.T) {
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
 
+	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
+	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
+	assert.Equal(t, *ray.Spec.TTLSecondsAfterFinished, int32(120))
+
 	headReplica := int32(1)
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, &headReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
-			"node-ip-address": "$MY_POD_IP", "num-cpus": "1"})
+			"node-ip-address": "$MY_POD_IP", "num-cpus": "1",
+		})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, &workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
@@ -198,7 +216,7 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
 	}))
 
-	fixtures := []struct {
+	params := []struct {
 		name                      string
 		resources                 *corev1.ResourceRequirements
 		extendedResourcesBase     *core.ExtendedResources
@@ -222,7 +240,7 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			[]corev1.NodeSelectorTerm{
 				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-t4"},
@@ -262,12 +280,12 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			[]corev1.NodeSelectorTerm{
 				{
 					MatchExpressions: []corev1.NodeSelectorRequirement{
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-node-label",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"nvidia-tesla-a100"},
 						},
-						corev1.NodeSelectorRequirement{
+						{
 							Key:      "gpu-partition-size",
 							Operator: corev1.NodeSelectorOpIn,
 							Values:   []string{"1g.5gb"},
@@ -292,11 +310,11 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 		},
 	}
 
-	for _, f := range fixtures {
-		t.Run(f.name, func(t *testing.T) {
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
 			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
-			taskTemplate.ExtendedResources = f.extendedResourcesBase
-			taskContext := dummyRayTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride)
+			taskTemplate.ExtendedResources = p.extendedResourcesBase
+			taskContext := dummyRayTaskContext(taskTemplate, p.resources, p.extendedResourcesOverride)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
 			assert.Nil(t, err)
@@ -308,12 +326,12 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			headNodeSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
 			assert.EqualValues(
 				t,
-				f.expectedNsr,
+				p.expectedNsr,
 				headNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
 			)
 			assert.EqualValues(
 				t,
-				f.expectedTol,
+				p.expectedTol,
 				headNodeSpec.Tolerations,
 			)
 
@@ -321,12 +339,12 @@ func TestBuildResourceRayExtendedResources(t *testing.T) {
 			workerNodeSpec := rayJob.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec
 			assert.EqualValues(
 				t,
-				f.expectedNsr,
+				p.expectedNsr,
 				workerNodeSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
 			)
 			assert.EqualValues(
 				t,
-				f.expectedTol,
+				p.expectedTol,
 				workerNodeSpec.Tolerations,
 			)
 		})
@@ -337,9 +355,12 @@ func TestDefaultStartParameters(t *testing.T) {
 	rayJobResourceHandler := rayJobResourceHandler{}
 	rayJob := &plugins.RayJob{
 		RayCluster: &plugins.RayCluster{
-			HeadGroupSpec:   &plugins.HeadGroupSpec{},
-			WorkerGroupSpec: []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3}},
+			HeadGroupSpec:     &plugins.HeadGroupSpec{},
+			WorkerGroupSpec:   []*plugins.WorkerGroupSpec{{GroupName: workerGroupName, Replicas: 3, MinReplicas: 3, MaxReplicas: 3}},
+			EnableAutoscaling: true,
 		},
+		ShutdownAfterJobFinishes: true,
+		TtlSecondsAfterFinished:  120,
 	}
 
 	taskTemplate := dummyRayTaskTemplate("ray-id", rayJob)
@@ -359,21 +380,26 @@ func TestDefaultStartParameters(t *testing.T) {
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
 
+	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
+	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
+	assert.Equal(t, *ray.Spec.TTLSecondsAfterFinished, int32(120))
+
 	headReplica := int32(1)
-	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, &headReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.HeadGroupSpec.Replicas, headReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.RayStartParams,
 		map[string]string{
 			"dashboard-host": "0.0.0.0", "disable-usage-stats": "true", "include-dashboard": "true",
-			"node-ip-address": "$MY_POD_IP"})
+			"node-ip-address": "$MY_POD_IP",
+		})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Annotations, map[string]string{"annotation-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Labels, map[string]string{"label-1": "val1"})
 	assert.Equal(t, ray.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec.Tolerations, toleration)
 
 	workerReplica := int32(3)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, &workerReplica)
-	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, &workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Replicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MinReplicas, workerReplica)
+	assert.Equal(t, *ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].MaxReplicas, workerReplica)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].GroupName, workerGroupName)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.ServiceAccountName, serviceAccount)
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].RayStartParams, map[string]string{"disable-usage-stats": "true", "node-ip-address": "$MY_POD_IP"})
@@ -382,19 +408,242 @@ func TestDefaultStartParameters(t *testing.T) {
 	assert.Equal(t, ray.Spec.RayClusterSpec.WorkerGroupSpecs[0].Template.Spec.Tolerations, toleration)
 }
 
+func TestInjectLogsSidecar(t *testing.T) {
+	rayJobObj := transformRayJobToCustomObj(dummyRayCustomObj())
+	params := []struct {
+		name         string
+		taskTemplate core.TaskTemplate
+		// primaryContainerName string
+		logsSidecarCfg                       *corev1.Container
+		expectedVolumes                      []corev1.Volume
+		expectedPrimaryContainerVolumeMounts []corev1.VolumeMount
+		expectedLogsSidecarVolumeMounts      []corev1.VolumeMount
+	}{
+		{
+			"container target",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: &core.TaskTemplate_Container{
+					Container: &core.Container{
+						Image: testImage,
+						Args:  testArgs,
+					},
+				},
+				Custom: rayJobObj,
+			},
+			&corev1.Container{
+				Name:  "logs-sidecar",
+				Image: "test-image",
+			},
+			[]corev1.Volume{
+				{
+					Name: "system-ray-state",
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+					ReadOnly:  true,
+				},
+			},
+		},
+		{
+			"container target with no sidecar",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: &core.TaskTemplate_Container{
+					Container: &core.Container{
+						Image: testImage,
+						Args:  testArgs,
+					},
+				},
+				Custom: rayJobObj,
+			},
+			nil,
+			nil,
+			nil,
+			nil,
+		},
+		{
+			"pod target",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: transformPodSpecToTaskTemplateTarget(&corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "main",
+							Image: "primary-image",
+						},
+					},
+				}),
+				Custom: rayJobObj,
+				Config: map[string]string{
+					flytek8s.PrimaryContainerKey: "main",
+				},
+			},
+			&corev1.Container{
+				Name:  "logs-sidecar",
+				Image: "test-image",
+			},
+			[]corev1.Volume{
+				{
+					Name: "system-ray-state",
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "system-ray-state",
+					MountPath: "/tmp/ray",
+					ReadOnly:  true,
+				},
+			},
+		},
+		{
+			"pod target with existing ray state volume",
+			core.TaskTemplate{
+				Id: &core.Identifier{Name: "ray-id"},
+				Target: transformPodSpecToTaskTemplateTarget(&corev1.PodSpec{
+					Containers: []corev1.Container{
+						{
+							Name:  "main",
+							Image: "primary-image",
+							VolumeMounts: []corev1.VolumeMount{
+								{
+									Name:      "test-vol",
+									MountPath: "/tmp/ray",
+								},
+							},
+						},
+					},
+					Volumes: []corev1.Volume{
+						{
+							Name: "test-vol",
+							VolumeSource: corev1.VolumeSource{
+								EmptyDir: &corev1.EmptyDirVolumeSource{},
+							},
+						},
+					},
+				}),
+				Custom: rayJobObj,
+				Config: map[string]string{
+					flytek8s.PrimaryContainerKey: "main",
+				},
+			},
+			&corev1.Container{
+				Name:  "logs-sidecar",
+				Image: "test-image",
+			},
+			[]corev1.Volume{
+				{
+					Name: "test-vol",
+					VolumeSource: corev1.VolumeSource{
+						EmptyDir: &corev1.EmptyDirVolumeSource{},
+					},
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "test-vol",
+					MountPath: "/tmp/ray",
+				},
+			},
+			[]corev1.VolumeMount{
+				{
+					Name:      "test-vol",
+					MountPath: "/tmp/ray",
+					ReadOnly:  true,
+				},
+			},
+		},
+	}
+
+	for _, p := range params {
+		t.Run(p.name, func(t *testing.T) {
+			assert.NoError(t, SetConfig(&Config{
+				LogsSidecar: p.logsSidecarCfg,
+			}))
+			taskContext := dummyRayTaskContext(&p.taskTemplate, resourceRequirements, nil)
+			rayJobResourceHandler := rayJobResourceHandler{}
+			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			rayJob, ok := r.(*rayv1alpha1.RayJob)
+			assert.True(t, ok)
+
+			headPodSpec := rayJob.Spec.RayClusterSpec.HeadGroupSpec.Template.Spec
+
+			// Check volumes
+			assert.EqualValues(t, p.expectedVolumes, headPodSpec.Volumes)
+
+			// Check containers and respective volume mounts
+			foundPrimaryContainer := false
+			foundLogsSidecar := false
+			for _, cnt := range headPodSpec.Containers {
+				if cnt.Name == "ray-head" {
+					foundPrimaryContainer = true
+					assert.EqualValues(
+						t,
+						p.expectedPrimaryContainerVolumeMounts,
+						cnt.VolumeMounts,
+					)
+				}
+				if p.logsSidecarCfg != nil && cnt.Name == p.logsSidecarCfg.Name {
+					foundLogsSidecar = true
+					assert.EqualValues(
+						t,
+						p.expectedLogsSidecarVolumeMounts,
+						cnt.VolumeMounts,
+					)
+				}
+			}
+			assert.Equal(t, true, foundPrimaryContainer)
+			assert.Equal(t, p.logsSidecarCfg != nil, foundLogsSidecar)
+		})
+	}
+}
+
 func newPluginContext() k8s.PluginContext {
 	plg := &mocks2.PluginContext{}
 
 	taskExecID := &mocks.TaskExecutionID{}
 	taskExecID.OnGetID().Return(core.TaskExecutionIdentifier{
+		TaskId: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Name:         "my-task-name",
+			Project:      "my-task-project",
+			Domain:       "my-task-domain",
+			Version:      "1",
+		},
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Name:    "my_name",
-				Project: "my_project",
-				Domain:  "my_domain",
+				Name:    "my-execution-name",
+				Project: "my-execution-project",
+				Domain:  "my-execution-domain",
 			},
 		},
+		RetryAttempt: 1,
 	})
+	taskExecID.OnGetUniqueNodeID().Return("unique-node")
+	taskExecID.OnGetGeneratedName().Return("generated-name")
 
 	tskCtx := &mocks.TaskExecutionMetadata{}
 	tskCtx.OnGetTaskExecutionID().Return(taskExecID)
@@ -422,17 +671,19 @@ func TestGetTaskPhase(t *testing.T) {
 		rayJobPhase       rayv1alpha1.JobStatus
 		rayClusterPhase   rayv1alpha1.JobDeploymentStatus
 		expectedCorePhase pluginsCore.Phase
+		expectedError     bool
 	}{
-		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseUndefined},
-		{rayv1alpha1.JobStatusRunning, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning},
-		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure},
-		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess},
-		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess},
+		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusRunning, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure, false},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess, false},
+		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
+		{rayv1alpha1.JobStatusStopped, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseUndefined, true},
 	}
 
 	for _, tc := range testCases {
@@ -443,8 +694,165 @@ func TestGetTaskPhase(t *testing.T) {
 			startTime := metav1.NewTime(time.Now())
 			rayObject.Status.StartTime = &startTime
 			phaseInfo, err := rayJobResourceHandler.GetTaskPhase(ctx, pluginCtx, rayObject)
-			assert.Nil(t, err)
+			if tc.expectedError {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
 			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
+		})
+	}
+}
+
+func TestGetEventInfo_LogTemplates(t *testing.T) {
+	pluginCtx := newPluginContext()
+	testCases := []struct {
+		name             string
+		rayJob           rayv1alpha1.RayJob
+		logPlugin        tasklog.TemplateLogPlugin
+		expectedTaskLogs []*core.TaskLog
+	}{
+		{
+			name: "namespace",
+			rayJob: rayv1alpha1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "namespace",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .namespace }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "namespace",
+					Uri:  "http://test/test-namespace",
+				},
+			},
+		},
+		{
+			name:   "task execution ID",
+			rayJob: rayv1alpha1.RayJob{},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName: "taskExecID",
+				TemplateURIs: []tasklog.TemplateURI{
+					"http://test/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}",
+				},
+				Scheme: tasklog.TemplateSchemeTaskExecution,
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "taskExecID",
+					Uri:  "http://test/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/unique-node/taskId/my-task-name/attempt/1",
+				},
+			},
+		},
+		{
+			name: "ray cluster name",
+			rayJob: rayv1alpha1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+				},
+				Status: rayv1alpha1.RayJobStatus{
+					RayClusterName: "ray-cluster",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "ray cluster name",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .namespace }}/{{ .rayClusterName }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "ray cluster name",
+					Uri:  "http://test/test-namespace/ray-cluster",
+				},
+			},
+		},
+		{
+			name: "ray job ID",
+			rayJob: rayv1alpha1.RayJob{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "test-namespace",
+				},
+				Status: rayv1alpha1.RayJobStatus{
+					JobId: "ray-job-1",
+				},
+			},
+			logPlugin: tasklog.TemplateLogPlugin{
+				DisplayName:  "ray job ID",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{ .namespace }}/{{ .rayJobID }}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "ray job ID",
+					Uri:  "http://test/test-namespace/ray-job-1",
+				},
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ti, err := getEventInfoForRayJob(
+				logs.LogConfig{Templates: []tasklog.TemplateLogPlugin{tc.logPlugin}},
+				pluginCtx,
+				&tc.rayJob,
+			)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
+		})
+	}
+}
+
+func TestGetEventInfo_DashboardURL(t *testing.T) {
+	pluginCtx := newPluginContext()
+	testCases := []struct {
+		name                 string
+		rayJob               rayv1alpha1.RayJob
+		dashboardURLTemplate tasklog.TemplateLogPlugin
+		expectedTaskLogs     []*core.TaskLog
+	}{
+		{
+			name: "dashboard URL displayed",
+			rayJob: rayv1alpha1.RayJob{
+				Status: rayv1alpha1.RayJobStatus{
+					DashboardURL: "exists",
+					JobStatus:    rayv1alpha1.JobStatusRunning,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "Ray Dashboard",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{.generatedName}}"},
+				Scheme:       tasklog.TemplateSchemeTaskExecution,
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "Ray Dashboard",
+					Uri:  "http://test/generated-name",
+				},
+			},
+		},
+		{
+			name: "dashboard URL is not displayed",
+			rayJob: rayv1alpha1.RayJob{
+				Status: rayv1alpha1.RayJobStatus{
+					JobStatus: rayv1alpha1.JobStatusPending,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "dummy",
+				TemplateURIs: []tasklog.TemplateURI{"http://dummy"},
+			},
+			expectedTaskLogs: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
+			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
 	}
 }

@@ -227,6 +227,10 @@ func (m mockTaskExecutionIdentifier) GetGeneratedName() string {
 	return "task-exec-name"
 }
 
+func (m mockTaskExecutionIdentifier) GetUniqueNodeID() string {
+	return "unique-node-id"
+}
+
 func TestDecorateEnvVars(t *testing.T) {
 	ctx := context.Background()
 	ctx = contextutils.WithWorkflowID(ctx, "fake_workflow")

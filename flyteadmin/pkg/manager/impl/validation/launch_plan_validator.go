@@ -38,8 +38,14 @@ func ValidateLaunchPlan(ctx context.Context,
 	if err := validateLiteralMap(request.Spec.FixedInputs, shared.FixedInputs); err != nil {
 		return err
 	}
-	if err := validateParameterMap(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
-		return err
+	if config.GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		if err := validateParameterMapAllowArtifacts(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
+			return err
+		}
+	} else {
+		if err := validateParameterMapDisableArtifacts(request.Spec.DefaultInputs, shared.DefaultInputs); err != nil {
+			return err
+		}
 	}
 	expectedInputs, err := checkAndFetchExpectedInputForLaunchPlan(workflowInterface.GetInputs(), request.Spec.FixedInputs, request.Spec.DefaultInputs)
 	if err != nil {
@@ -54,11 +60,6 @@ func ValidateLaunchPlan(ctx context.Context,
 		if err := validateNotifications(request.Spec.EntityMetadata.Notifications); err != nil {
 			return err
 		}
-	}
-	// TODO: Remove redundant validation that occurs with launch plan and the validate method for the message.
-	// Ensure the notification types are validated.
-	if err := request.Validate(); err != nil {
-		return err
 	}
 	return nil
 }

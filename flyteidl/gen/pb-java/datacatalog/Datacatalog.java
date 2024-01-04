@@ -10337,6 +10337,31 @@ public final class Datacatalog {
     datacatalog.Datacatalog.ArtifactDataOrBuilder getDataOrBuilder(
         int index);
 
+    /**
+     * <pre>
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+     * </pre>
+     *
+     * <code>.datacatalog.Metadata metadata = 5;</code>
+     */
+    boolean hasMetadata();
+    /**
+     * <pre>
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+     * </pre>
+     *
+     * <code>.datacatalog.Metadata metadata = 5;</code>
+     */
+    datacatalog.Datacatalog.Metadata getMetadata();
+    /**
+     * <pre>
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+     * </pre>
+     *
+     * <code>.datacatalog.Metadata metadata = 5;</code>
+     */
+    datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder();
+
     public datacatalog.Datacatalog.UpdateArtifactRequest.QueryHandleCase getQueryHandleCase();
   }
   /**
@@ -10415,6 +10440,19 @@ public final class Datacatalog {
               }
               data_.add(
                   input.readMessage(datacatalog.Datacatalog.ArtifactData.parser(), extensionRegistry));
+              break;
+            }
+            case 42: {
+              datacatalog.Datacatalog.Metadata.Builder subBuilder = null;
+              if (metadata_ != null) {
+                subBuilder = metadata_.toBuilder();
+              }
+              metadata_ = input.readMessage(datacatalog.Datacatalog.Metadata.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(metadata_);
+                metadata_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -10670,6 +10708,39 @@ public final class Datacatalog {
       return data_.get(index);
     }
 
+    public static final int METADATA_FIELD_NUMBER = 5;
+    private datacatalog.Datacatalog.Metadata metadata_;
+    /**
+     * <pre>
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+     * </pre>
+     *
+     * <code>.datacatalog.Metadata metadata = 5;</code>
+     */
+    public boolean hasMetadata() {
+      return metadata_ != null;
+    }
+    /**
+     * <pre>
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+     * </pre>
+     *
+     * <code>.datacatalog.Metadata metadata = 5;</code>
+     */
+    public datacatalog.Datacatalog.Metadata getMetadata() {
+      return metadata_ == null ? datacatalog.Datacatalog.Metadata.getDefaultInstance() : metadata_;
+    }
+    /**
+     * <pre>
+     * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+     * </pre>
+     *
+     * <code>.datacatalog.Metadata metadata = 5;</code>
+     */
+    public datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder() {
+      return getMetadata();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10696,6 +10767,9 @@ public final class Datacatalog {
       for (int i = 0; i < data_.size(); i++) {
         output.writeMessage(4, data_.get(i));
       }
+      if (metadata_ != null) {
+        output.writeMessage(5, getMetadata());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10719,6 +10793,10 @@ public final class Datacatalog {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, data_.get(i));
       }
+      if (metadata_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getMetadata());
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -10741,6 +10819,11 @@ public final class Datacatalog {
       }
       if (!getDataList()
           .equals(other.getDataList())) return false;
+      if (hasMetadata() != other.hasMetadata()) return false;
+      if (hasMetadata()) {
+        if (!getMetadata()
+            .equals(other.getMetadata())) return false;
+      }
       if (!getQueryHandleCase().equals(other.getQueryHandleCase())) return false;
       switch (queryHandleCase_) {
         case 2:
@@ -10772,6 +10855,10 @@ public final class Datacatalog {
       if (getDataCount() > 0) {
         hash = (37 * hash) + DATA_FIELD_NUMBER;
         hash = (53 * hash) + getDataList().hashCode();
+      }
+      if (hasMetadata()) {
+        hash = (37 * hash) + METADATA_FIELD_NUMBER;
+        hash = (53 * hash) + getMetadata().hashCode();
       }
       switch (queryHandleCase_) {
         case 2:
@@ -10935,6 +11022,12 @@ public final class Datacatalog {
         } else {
           dataBuilder_.clear();
         }
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
         queryHandleCase_ = 0;
         queryHandle_ = null;
         return this;
@@ -10984,6 +11077,11 @@ public final class Datacatalog {
           result.data_ = data_;
         } else {
           result.data_ = dataBuilder_.build();
+        }
+        if (metadataBuilder_ == null) {
+          result.metadata_ = metadata_;
+        } else {
+          result.metadata_ = metadataBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         result.queryHandleCase_ = queryHandleCase_;
@@ -11063,6 +11161,9 @@ public final class Datacatalog {
               dataBuilder_.addAllMessages(other.data_);
             }
           }
+        }
+        if (other.hasMetadata()) {
+          mergeMetadata(other.getMetadata());
         }
         switch (other.getQueryHandleCase()) {
           case ARTIFACT_ID: {
@@ -11767,6 +11868,159 @@ public final class Datacatalog {
           data_ = null;
         }
         return dataBuilder_;
+      }
+
+      private datacatalog.Datacatalog.Metadata metadata_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          datacatalog.Datacatalog.Metadata, datacatalog.Datacatalog.Metadata.Builder, datacatalog.Datacatalog.MetadataOrBuilder> metadataBuilder_;
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public boolean hasMetadata() {
+        return metadataBuilder_ != null || metadata_ != null;
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public datacatalog.Datacatalog.Metadata getMetadata() {
+        if (metadataBuilder_ == null) {
+          return metadata_ == null ? datacatalog.Datacatalog.Metadata.getDefaultInstance() : metadata_;
+        } else {
+          return metadataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public Builder setMetadata(datacatalog.Datacatalog.Metadata value) {
+        if (metadataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          metadata_ = value;
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public Builder setMetadata(
+          datacatalog.Datacatalog.Metadata.Builder builderForValue) {
+        if (metadataBuilder_ == null) {
+          metadata_ = builderForValue.build();
+          onChanged();
+        } else {
+          metadataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public Builder mergeMetadata(datacatalog.Datacatalog.Metadata value) {
+        if (metadataBuilder_ == null) {
+          if (metadata_ != null) {
+            metadata_ =
+              datacatalog.Datacatalog.Metadata.newBuilder(metadata_).mergeFrom(value).buildPartial();
+          } else {
+            metadata_ = value;
+          }
+          onChanged();
+        } else {
+          metadataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public Builder clearMetadata() {
+        if (metadataBuilder_ == null) {
+          metadata_ = null;
+          onChanged();
+        } else {
+          metadata_ = null;
+          metadataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public datacatalog.Datacatalog.Metadata.Builder getMetadataBuilder() {
+        
+        onChanged();
+        return getMetadataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      public datacatalog.Datacatalog.MetadataOrBuilder getMetadataOrBuilder() {
+        if (metadataBuilder_ != null) {
+          return metadataBuilder_.getMessageOrBuilder();
+        } else {
+          return metadata_ == null ?
+              datacatalog.Datacatalog.Metadata.getDefaultInstance() : metadata_;
+        }
+      }
+      /**
+       * <pre>
+       * Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+       * </pre>
+       *
+       * <code>.datacatalog.Metadata metadata = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          datacatalog.Datacatalog.Metadata, datacatalog.Datacatalog.Metadata.Builder, datacatalog.Datacatalog.MetadataOrBuilder> 
+          getMetadataFieldBuilder() {
+        if (metadataBuilder_ == null) {
+          metadataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              datacatalog.Datacatalog.Metadata, datacatalog.Datacatalog.Metadata.Builder, datacatalog.Datacatalog.MetadataOrBuilder>(
+                  getMetadata(),
+                  getParentForChildren(),
+                  isClean());
+          metadata_ = null;
+        }
+        return metadataBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -33588,99 +33842,100 @@ public final class Datacatalog {
       "\002 \001(\0132\036.datacatalog.PaginationOptions\"R\n" +
       "\024ListDatasetsResponse\022&\n\010datasets\030\001 \003(\0132" +
       "\024.datacatalog.Dataset\022\022\n\nnext_token\030\002 \001(" +
-      "\t\"\244\001\n\025UpdateArtifactRequest\022\'\n\007dataset\030\001" +
+      "\t\"\315\001\n\025UpdateArtifactRequest\022\'\n\007dataset\030\001" +
       " \001(\0132\026.datacatalog.DatasetID\022\025\n\013artifact" +
       "_id\030\002 \001(\tH\000\022\022\n\010tag_name\030\003 \001(\tH\000\022\'\n\004data\030" +
-      "\004 \003(\0132\031.datacatalog.ArtifactDataB\016\n\014quer" +
-      "y_handle\"-\n\026UpdateArtifactResponse\022\023\n\013ar" +
-      "tifact_id\030\001 \001(\t\"M\n\rReservationID\022*\n\ndata" +
-      "set_id\030\001 \001(\0132\026.datacatalog.DatasetID\022\020\n\010" +
-      "tag_name\030\002 \001(\t\"\234\001\n\035GetOrExtendReservatio" +
-      "nRequest\0222\n\016reservation_id\030\001 \001(\0132\032.datac" +
-      "atalog.ReservationID\022\020\n\010owner_id\030\002 \001(\t\0225" +
-      "\n\022heartbeat_interval\030\003 \001(\0132\031.google.prot" +
-      "obuf.Duration\"\343\001\n\013Reservation\0222\n\016reserva" +
-      "tion_id\030\001 \001(\0132\032.datacatalog.ReservationI" +
-      "D\022\020\n\010owner_id\030\002 \001(\t\0225\n\022heartbeat_interva" +
-      "l\030\003 \001(\0132\031.google.protobuf.Duration\022.\n\nex" +
-      "pires_at\030\004 \001(\0132\032.google.protobuf.Timesta" +
-      "mp\022\'\n\010metadata\030\006 \001(\0132\025.datacatalog.Metad" +
-      "ata\"O\n\036GetOrExtendReservationResponse\022-\n" +
-      "\013reservation\030\001 \001(\0132\030.datacatalog.Reserva" +
-      "tion\"a\n\031ReleaseReservationRequest\0222\n\016res" +
-      "ervation_id\030\001 \001(\0132\032.datacatalog.Reservat" +
-      "ionID\022\020\n\010owner_id\030\002 \001(\t\"\034\n\032ReleaseReserv" +
-      "ationResponse\"m\n\007Dataset\022\"\n\002id\030\001 \001(\0132\026.d" +
-      "atacatalog.DatasetID\022\'\n\010metadata\030\002 \001(\0132\025" +
-      ".datacatalog.Metadata\022\025\n\rpartitionKeys\030\003" +
-      " \003(\t\"\'\n\tPartition\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
-      "\002 \001(\t\"Y\n\tDatasetID\022\017\n\007project\030\001 \001(\t\022\014\n\004n" +
-      "ame\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\017\n\007version\030\004 \001" +
-      "(\t\022\014\n\004UUID\030\005 \001(\t\"\215\002\n\010Artifact\022\n\n\002id\030\001 \001(" +
-      "\t\022\'\n\007dataset\030\002 \001(\0132\026.datacatalog.Dataset" +
-      "ID\022\'\n\004data\030\003 \003(\0132\031.datacatalog.ArtifactD" +
-      "ata\022\'\n\010metadata\030\004 \001(\0132\025.datacatalog.Meta" +
-      "data\022*\n\npartitions\030\005 \003(\0132\026.datacatalog.P" +
-      "artition\022\036\n\004tags\030\006 \003(\0132\020.datacatalog.Tag" +
-      "\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf.T" +
-      "imestamp\"C\n\014ArtifactData\022\014\n\004name\030\001 \001(\t\022%" +
-      "\n\005value\030\002 \001(\0132\026.flyteidl.core.Literal\"Q\n" +
-      "\003Tag\022\014\n\004name\030\001 \001(\t\022\023\n\013artifact_id\030\002 \001(\t\022" +
-      "\'\n\007dataset\030\003 \001(\0132\026.datacatalog.DatasetID" +
-      "\"m\n\010Metadata\0222\n\007key_map\030\001 \003(\0132!.datacata" +
-      "log.Metadata.KeyMapEntry\032-\n\013KeyMapEntry\022" +
-      "\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"F\n\020Filte" +
-      "rExpression\0222\n\007filters\030\001 \003(\0132!.datacatal" +
-      "og.SinglePropertyFilter\"\211\003\n\024SingleProper" +
-      "tyFilter\0224\n\ntag_filter\030\001 \001(\0132\036.datacatal" +
-      "og.TagPropertyFilterH\000\022@\n\020partition_filt" +
-      "er\030\002 \001(\0132$.datacatalog.PartitionProperty" +
-      "FilterH\000\022>\n\017artifact_filter\030\003 \001(\0132#.data" +
-      "catalog.ArtifactPropertyFilterH\000\022<\n\016data" +
-      "set_filter\030\004 \001(\0132\".datacatalog.DatasetPr" +
-      "opertyFilterH\000\022F\n\010operator\030\n \001(\01624.datac" +
-      "atalog.SinglePropertyFilter.ComparisonOp" +
-      "erator\" \n\022ComparisonOperator\022\n\n\006EQUALS\020\000" +
-      "B\021\n\017property_filter\";\n\026ArtifactPropertyF" +
-      "ilter\022\025\n\013artifact_id\030\001 \001(\tH\000B\n\n\010property" +
-      "\"3\n\021TagPropertyFilter\022\022\n\010tag_name\030\001 \001(\tH" +
-      "\000B\n\n\010property\"S\n\027PartitionPropertyFilter" +
-      "\022,\n\007key_val\030\001 \001(\0132\031.datacatalog.KeyValue" +
-      "PairH\000B\n\n\010property\"*\n\014KeyValuePair\022\013\n\003ke" +
-      "y\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"k\n\025DatasetPropert" +
-      "yFilter\022\021\n\007project\030\001 \001(\tH\000\022\016\n\004name\030\002 \001(\t" +
-      "H\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007version\030\004 \001(\tH\000B" +
-      "\n\n\010property\"\361\001\n\021PaginationOptions\022\r\n\005lim" +
-      "it\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(\016" +
-      "2&.datacatalog.PaginationOptions.SortKey" +
-      "\022;\n\tsortOrder\030\004 \001(\0162(.datacatalog.Pagina" +
-      "tionOptions.SortOrder\"*\n\tSortOrder\022\016\n\nDE" +
-      "SCENDING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n\r" +
-      "CREATION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCreat" +
-      "eDataset\022!.datacatalog.CreateDatasetRequ" +
-      "est\032\".datacatalog.CreateDatasetResponse\022" +
-      "M\n\nGetDataset\022\036.datacatalog.GetDatasetRe" +
-      "quest\032\037.datacatalog.GetDatasetResponse\022Y" +
-      "\n\016CreateArtifact\022\".datacatalog.CreateArt" +
-      "ifactRequest\032#.datacatalog.CreateArtifac" +
-      "tResponse\022P\n\013GetArtifact\022\037.datacatalog.G" +
-      "etArtifactRequest\032 .datacatalog.GetArtif" +
-      "actResponse\022A\n\006AddTag\022\032.datacatalog.AddT" +
-      "agRequest\032\033.datacatalog.AddTagResponse\022V" +
-      "\n\rListArtifacts\022!.datacatalog.ListArtifa" +
-      "ctsRequest\032\".datacatalog.ListArtifactsRe" +
-      "sponse\022S\n\014ListDatasets\022 .datacatalog.Lis" +
-      "tDatasetsRequest\032!.datacatalog.ListDatas" +
-      "etsResponse\022Y\n\016UpdateArtifact\022\".datacata" +
-      "log.UpdateArtifactRequest\032#.datacatalog." +
-      "UpdateArtifactResponse\022q\n\026GetOrExtendRes" +
-      "ervation\022*.datacatalog.GetOrExtendReserv" +
-      "ationRequest\032+.datacatalog.GetOrExtendRe" +
-      "servationResponse\022e\n\022ReleaseReservation\022" +
-      "&.datacatalog.ReleaseReservationRequest\032" +
-      "\'.datacatalog.ReleaseReservationResponse" +
-      "BCZAgithub.com/flyteorg/flyte/flyteidl/g" +
-      "en/pb-go/flyteidl/datacatalogb\006proto3"
+      "\004 \003(\0132\031.datacatalog.ArtifactData\022\'\n\010meta" +
+      "data\030\005 \001(\0132\025.datacatalog.MetadataB\016\n\014que" +
+      "ry_handle\"-\n\026UpdateArtifactResponse\022\023\n\013a" +
+      "rtifact_id\030\001 \001(\t\"M\n\rReservationID\022*\n\ndat" +
+      "aset_id\030\001 \001(\0132\026.datacatalog.DatasetID\022\020\n" +
+      "\010tag_name\030\002 \001(\t\"\234\001\n\035GetOrExtendReservati" +
+      "onRequest\0222\n\016reservation_id\030\001 \001(\0132\032.data" +
+      "catalog.ReservationID\022\020\n\010owner_id\030\002 \001(\t\022" +
+      "5\n\022heartbeat_interval\030\003 \001(\0132\031.google.pro" +
+      "tobuf.Duration\"\343\001\n\013Reservation\0222\n\016reserv" +
+      "ation_id\030\001 \001(\0132\032.datacatalog.Reservation" +
+      "ID\022\020\n\010owner_id\030\002 \001(\t\0225\n\022heartbeat_interv" +
+      "al\030\003 \001(\0132\031.google.protobuf.Duration\022.\n\ne" +
+      "xpires_at\030\004 \001(\0132\032.google.protobuf.Timest" +
+      "amp\022\'\n\010metadata\030\006 \001(\0132\025.datacatalog.Meta" +
+      "data\"O\n\036GetOrExtendReservationResponse\022-" +
+      "\n\013reservation\030\001 \001(\0132\030.datacatalog.Reserv" +
+      "ation\"a\n\031ReleaseReservationRequest\0222\n\016re" +
+      "servation_id\030\001 \001(\0132\032.datacatalog.Reserva" +
+      "tionID\022\020\n\010owner_id\030\002 \001(\t\"\034\n\032ReleaseReser" +
+      "vationResponse\"m\n\007Dataset\022\"\n\002id\030\001 \001(\0132\026." +
+      "datacatalog.DatasetID\022\'\n\010metadata\030\002 \001(\0132" +
+      "\025.datacatalog.Metadata\022\025\n\rpartitionKeys\030" +
+      "\003 \003(\t\"\'\n\tPartition\022\013\n\003key\030\001 \001(\t\022\r\n\005value" +
+      "\030\002 \001(\t\"Y\n\tDatasetID\022\017\n\007project\030\001 \001(\t\022\014\n\004" +
+      "name\030\002 \001(\t\022\016\n\006domain\030\003 \001(\t\022\017\n\007version\030\004 " +
+      "\001(\t\022\014\n\004UUID\030\005 \001(\t\"\215\002\n\010Artifact\022\n\n\002id\030\001 \001" +
+      "(\t\022\'\n\007dataset\030\002 \001(\0132\026.datacatalog.Datase" +
+      "tID\022\'\n\004data\030\003 \003(\0132\031.datacatalog.Artifact" +
+      "Data\022\'\n\010metadata\030\004 \001(\0132\025.datacatalog.Met" +
+      "adata\022*\n\npartitions\030\005 \003(\0132\026.datacatalog." +
+      "Partition\022\036\n\004tags\030\006 \003(\0132\020.datacatalog.Ta" +
+      "g\022.\n\ncreated_at\030\007 \001(\0132\032.google.protobuf." +
+      "Timestamp\"C\n\014ArtifactData\022\014\n\004name\030\001 \001(\t\022" +
+      "%\n\005value\030\002 \001(\0132\026.flyteidl.core.Literal\"Q" +
+      "\n\003Tag\022\014\n\004name\030\001 \001(\t\022\023\n\013artifact_id\030\002 \001(\t" +
+      "\022\'\n\007dataset\030\003 \001(\0132\026.datacatalog.DatasetI" +
+      "D\"m\n\010Metadata\0222\n\007key_map\030\001 \003(\0132!.datacat" +
+      "alog.Metadata.KeyMapEntry\032-\n\013KeyMapEntry" +
+      "\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"F\n\020Filt" +
+      "erExpression\0222\n\007filters\030\001 \003(\0132!.datacata" +
+      "log.SinglePropertyFilter\"\211\003\n\024SinglePrope" +
+      "rtyFilter\0224\n\ntag_filter\030\001 \001(\0132\036.datacata" +
+      "log.TagPropertyFilterH\000\022@\n\020partition_fil" +
+      "ter\030\002 \001(\0132$.datacatalog.PartitionPropert" +
+      "yFilterH\000\022>\n\017artifact_filter\030\003 \001(\0132#.dat" +
+      "acatalog.ArtifactPropertyFilterH\000\022<\n\016dat" +
+      "aset_filter\030\004 \001(\0132\".datacatalog.DatasetP" +
+      "ropertyFilterH\000\022F\n\010operator\030\n \001(\01624.data" +
+      "catalog.SinglePropertyFilter.ComparisonO" +
+      "perator\" \n\022ComparisonOperator\022\n\n\006EQUALS\020" +
+      "\000B\021\n\017property_filter\";\n\026ArtifactProperty" +
+      "Filter\022\025\n\013artifact_id\030\001 \001(\tH\000B\n\n\010propert" +
+      "y\"3\n\021TagPropertyFilter\022\022\n\010tag_name\030\001 \001(\t" +
+      "H\000B\n\n\010property\"S\n\027PartitionPropertyFilte" +
+      "r\022,\n\007key_val\030\001 \001(\0132\031.datacatalog.KeyValu" +
+      "ePairH\000B\n\n\010property\"*\n\014KeyValuePair\022\013\n\003k" +
+      "ey\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"k\n\025DatasetProper" +
+      "tyFilter\022\021\n\007project\030\001 \001(\tH\000\022\016\n\004name\030\002 \001(" +
+      "\tH\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007version\030\004 \001(\tH\000" +
+      "B\n\n\010property\"\361\001\n\021PaginationOptions\022\r\n\005li" +
+      "mit\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(" +
+      "\0162&.datacatalog.PaginationOptions.SortKe" +
+      "y\022;\n\tsortOrder\030\004 \001(\0162(.datacatalog.Pagin" +
+      "ationOptions.SortOrder\"*\n\tSortOrder\022\016\n\nD" +
+      "ESCENDING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n" +
+      "\rCREATION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCrea" +
+      "teDataset\022!.datacatalog.CreateDatasetReq" +
+      "uest\032\".datacatalog.CreateDatasetResponse" +
+      "\022M\n\nGetDataset\022\036.datacatalog.GetDatasetR" +
+      "equest\032\037.datacatalog.GetDatasetResponse\022" +
+      "Y\n\016CreateArtifact\022\".datacatalog.CreateAr" +
+      "tifactRequest\032#.datacatalog.CreateArtifa" +
+      "ctResponse\022P\n\013GetArtifact\022\037.datacatalog." +
+      "GetArtifactRequest\032 .datacatalog.GetArti" +
+      "factResponse\022A\n\006AddTag\022\032.datacatalog.Add" +
+      "TagRequest\032\033.datacatalog.AddTagResponse\022" +
+      "V\n\rListArtifacts\022!.datacatalog.ListArtif" +
+      "actsRequest\032\".datacatalog.ListArtifactsR" +
+      "esponse\022S\n\014ListDatasets\022 .datacatalog.Li" +
+      "stDatasetsRequest\032!.datacatalog.ListData" +
+      "setsResponse\022Y\n\016UpdateArtifact\022\".datacat" +
+      "alog.UpdateArtifactRequest\032#.datacatalog" +
+      ".UpdateArtifactResponse\022q\n\026GetOrExtendRe" +
+      "servation\022*.datacatalog.GetOrExtendReser" +
+      "vationRequest\032+.datacatalog.GetOrExtendR" +
+      "eservationResponse\022e\n\022ReleaseReservation" +
+      "\022&.datacatalog.ReleaseReservationRequest" +
+      "\032\'.datacatalog.ReleaseReservationRespons" +
+      "eBCZAgithub.com/flyteorg/flyte/flyteidl/" +
+      "gen/pb-go/flyteidl/datacatalogb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -33786,7 +34041,7 @@ public final class Datacatalog {
     internal_static_datacatalog_UpdateArtifactRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_datacatalog_UpdateArtifactRequest_descriptor,
-        new java.lang.String[] { "Dataset", "ArtifactId", "TagName", "Data", "QueryHandle", });
+        new java.lang.String[] { "Dataset", "ArtifactId", "TagName", "Data", "Metadata", "QueryHandle", });
     internal_static_datacatalog_UpdateArtifactResponse_descriptor =
       getDescriptor().getMessageTypes().get(15);
     internal_static_datacatalog_UpdateArtifactResponse_fieldAccessorTable = new

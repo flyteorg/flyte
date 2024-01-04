@@ -75,7 +75,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	if err != nil {
 		return nil, err
 	}
-	nonInterruptibleTaskCtx := flytek8s.NewNonInterruptibleTaskExecutionContext(taskCtx)
+	nonInterruptibleTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithInterruptible(false))
 	nonInterruptiblePodSpec, _, _, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
 	if err != nil {
 		return nil, err
@@ -298,13 +298,13 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		status == daskAPI.DaskJobClusterCreated
 
 	if !isQueued {
-		taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+		taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 		o, err := logPlugin.GetTaskLogs(
 			tasklog.Input{
-				Namespace:               job.ObjectMeta.Namespace,
-				PodName:                 job.Status.JobRunnerPodName,
-				LogName:                 "(User logs)",
-				TaskExecutionIdentifier: &taskExecID,
+				Namespace:       job.ObjectMeta.Namespace,
+				PodName:         job.Status.JobRunnerPodName,
+				LogName:         "(User logs)",
+				TaskExecutionID: taskExecID,
 			},
 		)
 		if err != nil {
