@@ -389,8 +389,8 @@ message DatasetPropertyFilter {
         string name = 2;
         string domain = 3;
         string version = 4;
-        // Optional, partition key applied to the dataset.
-        string partition = 5;
+        // Optional, org key applied to the dataset.
+        string org = 5;
     }
 }
 

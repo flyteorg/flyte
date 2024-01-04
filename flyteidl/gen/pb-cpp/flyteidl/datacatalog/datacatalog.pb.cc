@@ -200,7 +200,7 @@ class DatasetPropertyFilterDefaultTypeInternal {
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr version_;
-  ::google::protobuf::internal::ArenaStringPtr partition_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
 } _DatasetPropertyFilter_default_instance_;
 class PaginationOptionsDefaultTypeInternal {
  public:
@@ -1098,7 +1098,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fdatacatalog_2fdatacatalo
   offsetof(::datacatalog::DatasetPropertyFilterDefaultTypeInternal, name_),
   offsetof(::datacatalog::DatasetPropertyFilterDefaultTypeInternal, domain_),
   offsetof(::datacatalog::DatasetPropertyFilterDefaultTypeInternal, version_),
-  offsetof(::datacatalog::DatasetPropertyFilterDefaultTypeInternal, partition_),
+  offsetof(::datacatalog::DatasetPropertyFilterDefaultTypeInternal, org_),
   PROTOBUF_FIELD_OFFSET(::datacatalog::DatasetPropertyFilter, property_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::datacatalog::PaginationOptions, _internal_metadata_),
@@ -1288,46 +1288,46 @@ const char descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eprot
   "ag_name\030\001 \001(\tH\000B\n\n\010property\"S\n\027Partition"
   "PropertyFilter\022,\n\007key_val\030\001 \001(\0132\031.dataca"
   "talog.KeyValuePairH\000B\n\n\010property\"*\n\014KeyV"
-  "aluePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\200\001\n"
-  "\025DatasetPropertyFilter\022\021\n\007project\030\001 \001(\tH"
-  "\000\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007v"
-  "ersion\030\004 \001(\tH\000\022\023\n\tpartition\030\005 \001(\tH\000B\n\n\010p"
-  "roperty\"\361\001\n\021PaginationOptions\022\r\n\005limit\030\001"
-  " \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(\0162&.d"
-  "atacatalog.PaginationOptions.SortKey\022;\n\t"
-  "sortOrder\030\004 \001(\0162(.datacatalog.Pagination"
-  "Options.SortOrder\"*\n\tSortOrder\022\016\n\nDESCEN"
-  "DING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n\rCREA"
-  "TION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCreateDat"
-  "aset\022!.datacatalog.CreateDatasetRequest\032"
-  "\".datacatalog.CreateDatasetResponse\022M\n\nG"
-  "etDataset\022\036.datacatalog.GetDatasetReques"
-  "t\032\037.datacatalog.GetDatasetResponse\022Y\n\016Cr"
-  "eateArtifact\022\".datacatalog.CreateArtifac"
-  "tRequest\032#.datacatalog.CreateArtifactRes"
-  "ponse\022P\n\013GetArtifact\022\037.datacatalog.GetAr"
-  "tifactRequest\032 .datacatalog.GetArtifactR"
-  "esponse\022A\n\006AddTag\022\032.datacatalog.AddTagRe"
-  "quest\032\033.datacatalog.AddTagResponse\022V\n\rLi"
-  "stArtifacts\022!.datacatalog.ListArtifactsR"
-  "equest\032\".datacatalog.ListArtifactsRespon"
-  "se\022S\n\014ListDatasets\022 .datacatalog.ListDat"
-  "asetsRequest\032!.datacatalog.ListDatasetsR"
-  "esponse\022Y\n\016UpdateArtifact\022\".datacatalog."
-  "UpdateArtifactRequest\032#.datacatalog.Upda"
-  "teArtifactResponse\022q\n\026GetOrExtendReserva"
-  "tion\022*.datacatalog.GetOrExtendReservatio"
-  "nRequest\032+.datacatalog.GetOrExtendReserv"
-  "ationResponse\022e\n\022ReleaseReservation\022&.da"
-  "tacatalog.ReleaseReservationRequest\032\'.da"
-  "tacatalog.ReleaseReservationResponseBCZA"
-  "github.com/flyteorg/flyte/flyteidl/gen/p"
-  "b-go/flyteidl/datacatalogb\006proto3"
+  "aluePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"z\n\025"
+  "DatasetPropertyFilter\022\021\n\007project\030\001 \001(\tH\000"
+  "\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007ve"
+  "rsion\030\004 \001(\tH\000\022\r\n\003org\030\005 \001(\tH\000B\n\n\010property"
+  "\"\361\001\n\021PaginationOptions\022\r\n\005limit\030\001 \001(\r\022\r\n"
+  "\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(\0162&.datacata"
+  "log.PaginationOptions.SortKey\022;\n\tsortOrd"
+  "er\030\004 \001(\0162(.datacatalog.PaginationOptions"
+  ".SortOrder\"*\n\tSortOrder\022\016\n\nDESCENDING\020\000\022"
+  "\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n\rCREATION_TI"
+  "ME\020\0002\206\007\n\013DataCatalog\022V\n\rCreateDataset\022!."
+  "datacatalog.CreateDatasetRequest\032\".datac"
+  "atalog.CreateDatasetResponse\022M\n\nGetDatas"
+  "et\022\036.datacatalog.GetDatasetRequest\032\037.dat"
+  "acatalog.GetDatasetResponse\022Y\n\016CreateArt"
+  "ifact\022\".datacatalog.CreateArtifactReques"
+  "t\032#.datacatalog.CreateArtifactResponse\022P"
+  "\n\013GetArtifact\022\037.datacatalog.GetArtifactR"
+  "equest\032 .datacatalog.GetArtifactResponse"
+  "\022A\n\006AddTag\022\032.datacatalog.AddTagRequest\032\033"
+  ".datacatalog.AddTagResponse\022V\n\rListArtif"
+  "acts\022!.datacatalog.ListArtifactsRequest\032"
+  "\".datacatalog.ListArtifactsResponse\022S\n\014L"
+  "istDatasets\022 .datacatalog.ListDatasetsRe"
+  "quest\032!.datacatalog.ListDatasetsResponse"
+  "\022Y\n\016UpdateArtifact\022\".datacatalog.UpdateA"
+  "rtifactRequest\032#.datacatalog.UpdateArtif"
+  "actResponse\022q\n\026GetOrExtendReservation\022*."
+  "datacatalog.GetOrExtendReservationReques"
+  "t\032+.datacatalog.GetOrExtendReservationRe"
+  "sponse\022e\n\022ReleaseReservation\022&.datacatal"
+  "og.ReleaseReservationRequest\032\'.datacatal"
+  "og.ReleaseReservationResponseBCZAgithub."
+  "com/flyteorg/flyte/flyteidl/gen/pb-go/fl"
+  "yteidl/datacatalogb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto = {
   false, InitDefaults_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 
   descriptor_table_protodef_flyteidl_2fdatacatalog_2fdatacatalog_2eproto,
-  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 4953,
+  "flyteidl/datacatalog/datacatalog.proto", &assign_descriptors_table_flyteidl_2fdatacatalog_2fdatacatalog_2eproto, 4946,
 };
 
 void AddDescriptors_flyteidl_2fdatacatalog_2fdatacatalog_2eproto() {
@@ -14495,7 +14495,7 @@ void DatasetPropertyFilter::InitAsDefaultInstance() {
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::datacatalog::_DatasetPropertyFilter_default_instance_.version_.UnsafeSetDefault(
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::datacatalog::_DatasetPropertyFilter_default_instance_.partition_.UnsafeSetDefault(
+  ::datacatalog::_DatasetPropertyFilter_default_instance_.org_.UnsafeSetDefault(
       &::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 class DatasetPropertyFilter::HasBitSetters {
@@ -14507,7 +14507,7 @@ const int DatasetPropertyFilter::kProjectFieldNumber;
 const int DatasetPropertyFilter::kNameFieldNumber;
 const int DatasetPropertyFilter::kDomainFieldNumber;
 const int DatasetPropertyFilter::kVersionFieldNumber;
-const int DatasetPropertyFilter::kPartitionFieldNumber;
+const int DatasetPropertyFilter::kOrgFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 DatasetPropertyFilter::DatasetPropertyFilter()
@@ -14537,8 +14537,8 @@ DatasetPropertyFilter::DatasetPropertyFilter(const DatasetPropertyFilter& from)
       set_version(from.version());
       break;
     }
-    case kPartition: {
-      set_partition(from.partition());
+    case kOrg: {
+      set_org(from.org());
       break;
     }
     case PROPERTY_NOT_SET: {
@@ -14593,8 +14593,8 @@ void DatasetPropertyFilter::clear_property() {
       property_.version_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
       break;
     }
-    case kPartition: {
-      property_.partition_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    case kOrg: {
+      property_.org_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
       break;
     }
     case PROPERTY_NOT_SET: {
@@ -14692,13 +14692,13 @@ const char* DatasetPropertyFilter::_InternalParse(const char* begin, const char*
         ptr += size;
         break;
       }
-      // string partition = 5;
+      // string org = 5;
       case 5: {
         if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("datacatalog.DatasetPropertyFilter.partition");
-        object = msg->mutable_partition();
+        ctx->extra_parse_data().SetFieldName("datacatalog.DatasetPropertyFilter.org");
+        object = msg->mutable_org();
         if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
           parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
           goto string_till_end;
@@ -14802,15 +14802,15 @@ bool DatasetPropertyFilter::MergePartialFromCodedStream(
         break;
       }
 
-      // string partition = 5;
+      // string org = 5;
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_partition()));
+                input, this->mutable_org()));
           DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->partition().data(), static_cast<int>(this->partition().length()),
+            this->org().data(), static_cast<int>(this->org().length()),
             ::google::protobuf::internal::WireFormatLite::PARSE,
-            "datacatalog.DatasetPropertyFilter.partition"));
+            "datacatalog.DatasetPropertyFilter.org"));
         } else {
           goto handle_unusual;
         }
@@ -14884,14 +14884,14 @@ void DatasetPropertyFilter::SerializeWithCachedSizes(
       4, this->version(), output);
   }
 
-  // string partition = 5;
-  if (has_partition()) {
+  // string org = 5;
+  if (has_org()) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->partition().data(), static_cast<int>(this->partition().length()),
+      this->org().data(), static_cast<int>(this->org().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "datacatalog.DatasetPropertyFilter.partition");
+      "datacatalog.DatasetPropertyFilter.org");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      5, this->partition(), output);
+      5, this->org(), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -14951,15 +14951,15 @@ void DatasetPropertyFilter::SerializeWithCachedSizes(
         4, this->version(), target);
   }
 
-  // string partition = 5;
-  if (has_partition()) {
+  // string org = 5;
+  if (has_org()) {
     ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->partition().data(), static_cast<int>(this->partition().length()),
+      this->org().data(), static_cast<int>(this->org().length()),
       ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "datacatalog.DatasetPropertyFilter.partition");
+      "datacatalog.DatasetPropertyFilter.org");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        5, this->partition(), target);
+        5, this->org(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -15012,11 +15012,11 @@ size_t DatasetPropertyFilter::ByteSizeLong() const {
           this->version());
       break;
     }
-    // string partition = 5;
-    case kPartition: {
+    // string org = 5;
+    case kOrg: {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
-          this->partition());
+          this->org());
       break;
     }
     case PROPERTY_NOT_SET: {
@@ -15067,8 +15067,8 @@ void DatasetPropertyFilter::MergeFrom(const DatasetPropertyFilter& from) {
       set_version(from.version());
       break;
     }
-    case kPartition: {
-      set_partition(from.partition());
+    case kOrg: {
+      set_org(from.org());
       break;
     }
     case PROPERTY_NOT_SET: {

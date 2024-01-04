@@ -31567,21 +31567,21 @@ public final class Datacatalog {
 
     /**
      * <pre>
-     * Optional, partition key applied to the dataset.
+     * Optional, org key applied to the dataset.
      * </pre>
      *
-     * <code>string partition = 5;</code>
+     * <code>string org = 5;</code>
      */
-    java.lang.String getPartition();
+    java.lang.String getOrg();
     /**
      * <pre>
-     * Optional, partition key applied to the dataset.
+     * Optional, org key applied to the dataset.
      * </pre>
      *
-     * <code>string partition = 5;</code>
+     * <code>string org = 5;</code>
      */
     com.google.protobuf.ByteString
-        getPartitionBytes();
+        getOrgBytes();
 
     public datacatalog.Datacatalog.DatasetPropertyFilter.PropertyCase getPropertyCase();
   }
@@ -31698,7 +31698,7 @@ public final class Datacatalog {
       NAME(2),
       DOMAIN(3),
       VERSION(4),
-      PARTITION(5),
+      ORG(5),
       PROPERTY_NOT_SET(0);
       private final int value;
       private PropertyCase(int value) {
@@ -31718,7 +31718,7 @@ public final class Datacatalog {
           case 2: return NAME;
           case 3: return DOMAIN;
           case 4: return VERSION;
-          case 5: return PARTITION;
+          case 5: return ORG;
           case 0: return PROPERTY_NOT_SET;
           default: return null;
         }
@@ -31906,15 +31906,15 @@ public final class Datacatalog {
       }
     }
 
-    public static final int PARTITION_FIELD_NUMBER = 5;
+    public static final int ORG_FIELD_NUMBER = 5;
     /**
      * <pre>
-     * Optional, partition key applied to the dataset.
+     * Optional, org key applied to the dataset.
      * </pre>
      *
-     * <code>string partition = 5;</code>
+     * <code>string org = 5;</code>
      */
-    public java.lang.String getPartition() {
+    public java.lang.String getOrg() {
       java.lang.Object ref = "";
       if (propertyCase_ == 5) {
         ref = property_;
@@ -31933,13 +31933,13 @@ public final class Datacatalog {
     }
     /**
      * <pre>
-     * Optional, partition key applied to the dataset.
+     * Optional, org key applied to the dataset.
      * </pre>
      *
-     * <code>string partition = 5;</code>
+     * <code>string org = 5;</code>
      */
     public com.google.protobuf.ByteString
-        getPartitionBytes() {
+        getOrgBytes() {
       java.lang.Object ref = "";
       if (propertyCase_ == 5) {
         ref = property_;
@@ -32044,8 +32044,8 @@ public final class Datacatalog {
               .equals(other.getVersion())) return false;
           break;
         case 5:
-          if (!getPartition()
-              .equals(other.getPartition())) return false;
+          if (!getOrg()
+              .equals(other.getOrg())) return false;
           break;
         case 0:
         default:
@@ -32079,8 +32079,8 @@ public final class Datacatalog {
           hash = (53 * hash) + getVersion().hashCode();
           break;
         case 5:
-          hash = (37 * hash) + PARTITION_FIELD_NUMBER;
-          hash = (53 * hash) + getPartition().hashCode();
+          hash = (37 * hash) + ORG_FIELD_NUMBER;
+          hash = (53 * hash) + getOrg().hashCode();
           break;
         case 0:
         default:
@@ -32339,7 +32339,7 @@ public final class Datacatalog {
             onChanged();
             break;
           }
-          case PARTITION: {
+          case ORG: {
             propertyCase_ = 5;
             property_ = other.property_;
             onChanged();
@@ -32715,12 +32715,12 @@ public final class Datacatalog {
 
       /**
        * <pre>
-       * Optional, partition key applied to the dataset.
+       * Optional, org key applied to the dataset.
        * </pre>
        *
-       * <code>string partition = 5;</code>
+       * <code>string org = 5;</code>
        */
-      public java.lang.String getPartition() {
+      public java.lang.String getOrg() {
         java.lang.Object ref = "";
         if (propertyCase_ == 5) {
           ref = property_;
@@ -32739,13 +32739,13 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Optional, partition key applied to the dataset.
+       * Optional, org key applied to the dataset.
        * </pre>
        *
-       * <code>string partition = 5;</code>
+       * <code>string org = 5;</code>
        */
       public com.google.protobuf.ByteString
-          getPartitionBytes() {
+          getOrgBytes() {
         java.lang.Object ref = "";
         if (propertyCase_ == 5) {
           ref = property_;
@@ -32764,12 +32764,12 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Optional, partition key applied to the dataset.
+       * Optional, org key applied to the dataset.
        * </pre>
        *
-       * <code>string partition = 5;</code>
+       * <code>string org = 5;</code>
        */
-      public Builder setPartition(
+      public Builder setOrg(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -32781,12 +32781,12 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Optional, partition key applied to the dataset.
+       * Optional, org key applied to the dataset.
        * </pre>
        *
-       * <code>string partition = 5;</code>
+       * <code>string org = 5;</code>
        */
-      public Builder clearPartition() {
+      public Builder clearOrg() {
         if (propertyCase_ == 5) {
           propertyCase_ = 0;
           property_ = null;
@@ -32796,12 +32796,12 @@ public final class Datacatalog {
       }
       /**
        * <pre>
-       * Optional, partition key applied to the dataset.
+       * Optional, org key applied to the dataset.
        * </pre>
        *
-       * <code>string partition = 5;</code>
+       * <code>string org = 5;</code>
        */
-      public Builder setPartitionBytes(
+      public Builder setOrgBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -34275,41 +34275,41 @@ public final class Datacatalog {
       "ag_name\030\001 \001(\tH\000B\n\n\010property\"S\n\027Partition" +
       "PropertyFilter\022,\n\007key_val\030\001 \001(\0132\031.dataca" +
       "talog.KeyValuePairH\000B\n\n\010property\"*\n\014KeyV" +
-      "aluePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"\200\001\n" +
-      "\025DatasetPropertyFilter\022\021\n\007project\030\001 \001(\tH" +
-      "\000\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007v" +
-      "ersion\030\004 \001(\tH\000\022\023\n\tpartition\030\005 \001(\tH\000B\n\n\010p" +
-      "roperty\"\361\001\n\021PaginationOptions\022\r\n\005limit\030\001" +
-      " \001(\r\022\r\n\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(\0162&.d" +
-      "atacatalog.PaginationOptions.SortKey\022;\n\t" +
-      "sortOrder\030\004 \001(\0162(.datacatalog.Pagination" +
-      "Options.SortOrder\"*\n\tSortOrder\022\016\n\nDESCEN" +
-      "DING\020\000\022\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n\rCREA" +
-      "TION_TIME\020\0002\206\007\n\013DataCatalog\022V\n\rCreateDat" +
-      "aset\022!.datacatalog.CreateDatasetRequest\032" +
-      "\".datacatalog.CreateDatasetResponse\022M\n\nG" +
-      "etDataset\022\036.datacatalog.GetDatasetReques" +
-      "t\032\037.datacatalog.GetDatasetResponse\022Y\n\016Cr" +
-      "eateArtifact\022\".datacatalog.CreateArtifac" +
-      "tRequest\032#.datacatalog.CreateArtifactRes" +
-      "ponse\022P\n\013GetArtifact\022\037.datacatalog.GetAr" +
-      "tifactRequest\032 .datacatalog.GetArtifactR" +
-      "esponse\022A\n\006AddTag\022\032.datacatalog.AddTagRe" +
-      "quest\032\033.datacatalog.AddTagResponse\022V\n\rLi" +
-      "stArtifacts\022!.datacatalog.ListArtifactsR" +
-      "equest\032\".datacatalog.ListArtifactsRespon" +
-      "se\022S\n\014ListDatasets\022 .datacatalog.ListDat" +
-      "asetsRequest\032!.datacatalog.ListDatasetsR" +
-      "esponse\022Y\n\016UpdateArtifact\022\".datacatalog." +
-      "UpdateArtifactRequest\032#.datacatalog.Upda" +
-      "teArtifactResponse\022q\n\026GetOrExtendReserva" +
-      "tion\022*.datacatalog.GetOrExtendReservatio" +
-      "nRequest\032+.datacatalog.GetOrExtendReserv" +
-      "ationResponse\022e\n\022ReleaseReservation\022&.da" +
-      "tacatalog.ReleaseReservationRequest\032\'.da" +
-      "tacatalog.ReleaseReservationResponseBCZA" +
-      "github.com/flyteorg/flyte/flyteidl/gen/p" +
-      "b-go/flyteidl/datacatalogb\006proto3"
+      "aluePair\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t\"z\n\025" +
+      "DatasetPropertyFilter\022\021\n\007project\030\001 \001(\tH\000" +
+      "\022\016\n\004name\030\002 \001(\tH\000\022\020\n\006domain\030\003 \001(\tH\000\022\021\n\007ve" +
+      "rsion\030\004 \001(\tH\000\022\r\n\003org\030\005 \001(\tH\000B\n\n\010property" +
+      "\"\361\001\n\021PaginationOptions\022\r\n\005limit\030\001 \001(\r\022\r\n" +
+      "\005token\030\002 \001(\t\0227\n\007sortKey\030\003 \001(\0162&.datacata" +
+      "log.PaginationOptions.SortKey\022;\n\tsortOrd" +
+      "er\030\004 \001(\0162(.datacatalog.PaginationOptions" +
+      ".SortOrder\"*\n\tSortOrder\022\016\n\nDESCENDING\020\000\022" +
+      "\r\n\tASCENDING\020\001\"\034\n\007SortKey\022\021\n\rCREATION_TI" +
+      "ME\020\0002\206\007\n\013DataCatalog\022V\n\rCreateDataset\022!." +
+      "datacatalog.CreateDatasetRequest\032\".datac" +
+      "atalog.CreateDatasetResponse\022M\n\nGetDatas" +
+      "et\022\036.datacatalog.GetDatasetRequest\032\037.dat" +
+      "acatalog.GetDatasetResponse\022Y\n\016CreateArt" +
+      "ifact\022\".datacatalog.CreateArtifactReques" +
+      "t\032#.datacatalog.CreateArtifactResponse\022P" +
+      "\n\013GetArtifact\022\037.datacatalog.GetArtifactR" +
+      "equest\032 .datacatalog.GetArtifactResponse" +
+      "\022A\n\006AddTag\022\032.datacatalog.AddTagRequest\032\033" +
+      ".datacatalog.AddTagResponse\022V\n\rListArtif" +
+      "acts\022!.datacatalog.ListArtifactsRequest\032" +
+      "\".datacatalog.ListArtifactsResponse\022S\n\014L" +
+      "istDatasets\022 .datacatalog.ListDatasetsRe" +
+      "quest\032!.datacatalog.ListDatasetsResponse" +
+      "\022Y\n\016UpdateArtifact\022\".datacatalog.UpdateA" +
+      "rtifactRequest\032#.datacatalog.UpdateArtif" +
+      "actResponse\022q\n\026GetOrExtendReservation\022*." +
+      "datacatalog.GetOrExtendReservationReques" +
+      "t\032+.datacatalog.GetOrExtendReservationRe" +
+      "sponse\022e\n\022ReleaseReservation\022&.datacatal" +
+      "og.ReleaseReservationRequest\032\'.datacatal" +
+      "og.ReleaseReservationResponseBCZAgithub." +
+      "com/flyteorg/flyte/flyteidl/gen/pb-go/fl" +
+      "yteidl/datacatalogb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -34547,7 +34547,7 @@ public final class Datacatalog {
     internal_static_datacatalog_DatasetPropertyFilter_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_datacatalog_DatasetPropertyFilter_descriptor,
-        new java.lang.String[] { "Project", "Name", "Domain", "Version", "Partition", "Property", });
+        new java.lang.String[] { "Project", "Name", "Domain", "Version", "Org", "Property", });
     internal_static_datacatalog_PaginationOptions_descriptor =
       getDescriptor().getMessageTypes().get(36);
     internal_static_datacatalog_PaginationOptions_fieldAccessorTable = new

@@ -305,18 +305,18 @@ class KeyValuePair(_message.Message):
     def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
 class DatasetPropertyFilter(_message.Message):
-    __slots__ = ["project", "name", "domain", "version", "partition"]
+    __slots__ = ["project", "name", "domain", "version", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
-    PARTITION_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     name: str
     domain: str
     version: str
-    partition: str
-    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ..., partition: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class PaginationOptions(_message.Message):
     __slots__ = ["limit", "token", "sortKey", "sortOrder"]
