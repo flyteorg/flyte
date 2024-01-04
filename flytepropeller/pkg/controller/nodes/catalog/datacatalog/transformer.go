@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
@@ -159,7 +160,7 @@ const (
 	execProjectKey     = "exec-project"
 	execNodeIDKey      = "exec-node"
 	execTaskAttemptKey = "exec-attempt"
-	execOrgKey         = "exec-rog"
+	execOrgKey         = "exec-org"
 )
 
 // Understanding Catalog Identifiers
