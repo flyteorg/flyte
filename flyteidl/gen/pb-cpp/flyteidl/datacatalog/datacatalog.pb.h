@@ -3518,23 +3518,9 @@ class DatasetID final :
   ::std::string* release_uuid();
   void set_allocated_uuid(::std::string* uuid);
 
-  // string partition = 6;
-  void clear_partition();
-  static const int kPartitionFieldNumber = 6;
-  const ::std::string& partition() const;
-  void set_partition(const ::std::string& value);
-  #if LANG_CXX11
-  void set_partition(::std::string&& value);
-  #endif
-  void set_partition(const char* value);
-  void set_partition(const char* value, size_t size);
-  ::std::string* mutable_partition();
-  ::std::string* release_partition();
-  void set_allocated_partition(::std::string* partition);
-
-  // string org = 7;
+  // string org = 6;
   void clear_org();
-  static const int kOrgFieldNumber = 7;
+  static const int kOrgFieldNumber = 6;
   const ::std::string& org() const;
   void set_org(const ::std::string& value);
   #if LANG_CXX11
@@ -3556,7 +3542,6 @@ class DatasetID final :
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr version_;
   ::google::protobuf::internal::ArenaStringPtr uuid_;
-  ::google::protobuf::internal::ArenaStringPtr partition_;
   ::google::protobuf::internal::ArenaStringPtr org_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fdatacatalog_2fdatacatalog_2eproto;
@@ -8094,60 +8079,7 @@ inline void DatasetID::set_allocated_uuid(::std::string* uuid) {
   // @@protoc_insertion_point(field_set_allocated:datacatalog.DatasetID.UUID)
 }
 
-// string partition = 6;
-inline void DatasetID::clear_partition() {
-  partition_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& DatasetID::partition() const {
-  // @@protoc_insertion_point(field_get:datacatalog.DatasetID.partition)
-  return partition_.GetNoArena();
-}
-inline void DatasetID::set_partition(const ::std::string& value) {
-  
-  partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:datacatalog.DatasetID.partition)
-}
-#if LANG_CXX11
-inline void DatasetID::set_partition(::std::string&& value) {
-  
-  partition_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:datacatalog.DatasetID.partition)
-}
-#endif
-inline void DatasetID::set_partition(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:datacatalog.DatasetID.partition)
-}
-inline void DatasetID::set_partition(const char* value, size_t size) {
-  
-  partition_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:datacatalog.DatasetID.partition)
-}
-inline ::std::string* DatasetID::mutable_partition() {
-  
-  // @@protoc_insertion_point(field_mutable:datacatalog.DatasetID.partition)
-  return partition_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* DatasetID::release_partition() {
-  // @@protoc_insertion_point(field_release:datacatalog.DatasetID.partition)
-  
-  return partition_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void DatasetID::set_allocated_partition(::std::string* partition) {
-  if (partition != nullptr) {
-    
-  } else {
-    
-  }
-  partition_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), partition);
-  // @@protoc_insertion_point(field_set_allocated:datacatalog.DatasetID.partition)
-}
-
-// string org = 7;
+// string org = 6;
 inline void DatasetID::clear_org() {
   org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }

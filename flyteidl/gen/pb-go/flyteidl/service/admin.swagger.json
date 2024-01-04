@@ -4369,7 +4369,7 @@
     "/api/v1/projects/org/{org}/{id}": {
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
-        "operationId": "UpdateProject4",
+        "operationId": "UpdateProject2",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -4410,7 +4410,7 @@
     "/api/v1/projects/{id}": {
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
-        "operationId": "UpdateProject2",
+        "operationId": "UpdateProject",
         "responses": {
           "200": {
             "description": "A successful response.",

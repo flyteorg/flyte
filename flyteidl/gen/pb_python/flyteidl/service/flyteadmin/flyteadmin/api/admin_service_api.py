@@ -11841,12 +11841,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project2(self, id, body, **kwargs):  # noqa: E501
+    def update_project(self, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project2(id, body, async_req=True)
+        >>> thread = api.update_project(id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11858,17 +11858,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project2_with_http_info(id, body, **kwargs)  # noqa: E501
+            return self.update_project_with_http_info(id, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project2_with_http_info(id, body, **kwargs)  # noqa: E501
+            (data) = self.update_project_with_http_info(id, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project2_with_http_info(self, id, body, **kwargs):  # noqa: E501
+    def update_project_with_http_info(self, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project2_with_http_info(id, body, async_req=True)
+        >>> thread = api.update_project_with_http_info(id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11890,18 +11890,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project2" % key
+                    " to method update_project" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id' is set
         if ('id' not in params or
                 params['id'] is None):
-            raise ValueError("Missing the required parameter `id` when calling `update_project2`")  # noqa: E501
+            raise ValueError("Missing the required parameter `id` when calling `update_project`")  # noqa: E501
         # verify the required parameter 'body' is set
         if ('body' not in params or
                 params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project2`")  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `update_project`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11946,12 +11946,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project4(self, org, id, body, **kwargs):  # noqa: E501
+    def update_project2(self, org, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project4(org, id, body, async_req=True)
+        >>> thread = api.update_project2(org, id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11964,17 +11964,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project4_with_http_info(org, id, body, **kwargs)  # noqa: E501
+            return self.update_project2_with_http_info(org, id, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project4_with_http_info(org, id, body, **kwargs)  # noqa: E501
+            (data) = self.update_project2_with_http_info(org, id, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project4_with_http_info(self, org, id, body, **kwargs):  # noqa: E501
+    def update_project2_with_http_info(self, org, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project4_with_http_info(org, id, body, async_req=True)
+        >>> thread = api.update_project2_with_http_info(org, id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11997,22 +11997,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project4" % key
+                    " to method update_project2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
         if ('org' not in params or
                 params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `update_project4`")  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `update_project2`")  # noqa: E501
         # verify the required parameter 'id' is set
         if ('id' not in params or
                 params['id'] is None):
-            raise ValueError("Missing the required parameter `id` when calling `update_project4`")  # noqa: E501
+            raise ValueError("Missing the required parameter `id` when calling `update_project2`")  # noqa: E501
         # verify the required parameter 'body' is set
         if ('body' not in params or
                 params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project4`")  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `update_project2`")  # noqa: E501
 
         collection_formats = {}
 

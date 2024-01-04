@@ -451,14 +451,6 @@ service AdminService {
       put: "/api/v1/projects/{id}"
       body: "*"
       additional_bindings {
-        put: "/api/v1/projects/{id}"
-        body: "*"
-      }
-      additional_bindings {
-        put: "/api/v1/projects/org/{org}/{id}"
-        body: "*"
-      }
-      additional_bindings {
         put: "/api/v1/projects/org/{org}/{id}"
         body: "*"
       }
