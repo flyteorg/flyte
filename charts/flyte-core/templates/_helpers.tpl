@@ -225,7 +225,3 @@ storage:
   limits:
     maxDownloadMBs: {{ .Values.storage.limits.maxDownloadMBs }}
 {{- end }}
-
-#{{- define "flytepropeller-core" -}}
-#{{ include "flytepropeller.storage" .}}
-#{{- end }}
