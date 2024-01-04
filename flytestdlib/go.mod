@@ -18,6 +18,9 @@ require (
 	github.com/go-gormigrate/gormigrate/v2 v2.1.1
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.3
+	github.com/google/uuid v1.3.1
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
+	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/jackc/pgconn v1.14.1
 	github.com/jackc/pgx/v5 v5.4.3
@@ -30,6 +33,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.8.4
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.35.0
 	go.opentelemetry.io/otel v1.19.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.17.0
 	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.19.0
@@ -78,7 +82,6 @@ require (
 	github.com/google/gnostic-models v0.6.8 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
-	github.com/google/uuid v1.3.1 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
 	github.com/googleapis/gax-go/v2 v2.7.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
