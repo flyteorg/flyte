@@ -59,7 +59,7 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 	}
 
 	id := tCtx.GetSecurityContext().RunAs.ExecutionIdentity
-	if id != "" {
+	if len(id) > 0 {
 		injectLabels[executionIdentityVariable] = id
 	}
 
